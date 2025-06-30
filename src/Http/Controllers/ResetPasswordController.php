@@ -172,7 +172,6 @@ class ResetPasswordController extends Controller
             ]);
         }
 
-
         return $this->redirector->to(route('admin.password.reset.link'))->withErrors([
             'token' => 'Your password reset token has expired or could not be found, please retry.',
         ]);
@@ -212,7 +211,6 @@ class ResetPasswordController extends Controller
     private function getUserFromToken($token)
     {
         $clearToken = DB::table($this->config->get('auth.passwords.' . Modularity::getAuthProviderName() . '.table', 'password_resets'))->where('token', $token)->first();
-
 
         if ($clearToken) {
             return User::where('email', $clearToken->email)->first();

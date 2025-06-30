@@ -16,7 +16,7 @@ class ModularityNotificationSentListener
         $notificationClass = get_class($notification);
 
         if (str_starts_with($notificationClass, 'Modules\\') || str_starts_with($notificationClass, 'Unusualify\\Modularity\\')) {
-            if(method_exists($notification, 'afterNotificationSent')){
+            if (method_exists($notification, 'afterNotificationSent')) {
                 $notification->afterNotificationSent();
             }
         }

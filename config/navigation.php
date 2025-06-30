@@ -157,8 +157,8 @@ return [
             'profile' => [
                 'name' => 'Profile Settings',
                 'route_name' => 'admin.profile',
-                'icon' => '$accountSettings'
-            ]
+                'icon' => '$accountSettings',
+            ],
         ],
     ],
 

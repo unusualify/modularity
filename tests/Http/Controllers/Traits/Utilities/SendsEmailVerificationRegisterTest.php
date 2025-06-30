@@ -2,15 +2,16 @@
 
 namespace Unusualify\Modularity\Tests\Http\Controllers\Traits\Utilities;
 
-use Unusualify\Modularity\Tests\ModelTestCase;
-use Unusualify\Modularity\Brokers\RegisterBroker;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Auth\Passwords\DatabaseTokenRepository;
-use Illuminate\Http\Request;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Mail;
+use Unusualify\Modularity\Brokers\RegisterBroker;
 use Unusualify\Modularity\Entities\User;
 use Unusualify\Modularity\Tests\Http\Controllers\ControllerUsingSendsEmailVerificationRegister;
+use Unusualify\Modularity\Tests\ModelTestCase;
+
 class SendsEmailVerificationRegisterTest extends ModelTestCase
 {
     protected $registerBrokerManager;
@@ -25,11 +26,11 @@ class SendsEmailVerificationRegisterTest extends ModelTestCase
 
     use RefreshDatabase;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $this->controller = new ControllerUsingSendsEmailVerificationRegister();
+        $this->controller = new ControllerUsingSendsEmailVerificationRegister;
 
         config(['auth.passwords.modularity_users' => [
             'provider' => 'modularity_users',
@@ -45,14 +46,13 @@ class SendsEmailVerificationRegisterTest extends ModelTestCase
             'throttle' => 60,
         ]]);
 
-
-        $this->brokerConfig = Config::get("auth.passwords.register_verified_users");
+        $this->brokerConfig = Config::get('auth.passwords.register_verified_users');
 
         $this->tokens = new DatabaseTokenRepository(
             $this->app['db']->connection(),
             $this->app['hash'],
             $this->brokerConfig['table'],
-            "12345678",
+            '12345678',
             $this->brokerConfig['expire'],
             $this->brokerConfig['throttle'] ?? 0
         );
@@ -65,7 +65,7 @@ class SendsEmailVerificationRegisterTest extends ModelTestCase
         );
     }
 
-    public function testBroker()
+    public function test_broker()
     {
         $broker = $this->controller->broker();
         $this->assertInstanceOf(RegisterBroker::class, $broker);
@@ -78,32 +78,32 @@ class SendsEmailVerificationRegisterTest extends ModelTestCase
         $this->assertEquals(60, $this->brokerConfig['throttle']);
     }
 
-    public function testValidateEmail()
+    public function test_validate_email()
     {
-        $request = new Request();
+        $request = new Request;
         $request->merge(['email' => 'test@test.com']);
 
         $this->controller->validateEmail($request);
         $this->assertTrue(true);
 
         $request->merge(['email' => 'test']);
-        $this->expectExceptionMessage("The email field must be a valid email address.");
+        $this->expectExceptionMessage('The email field must be a valid email address.');
         $this->controller->validateEmail($request);
     }
 
-    public function testCredentials()
+    public function test_credentials()
     {
-        $request = new Request();
-        $request->merge(['email' => 'test@test.com','password' => 'password']);
+        $request = new Request;
+        $request->merge(['email' => 'test@test.com', 'password' => 'password']);
         $credentials = $this->controller->credentials($request);
         $this->assertEquals(['email' => 'test@test.com'], $credentials);
     }
 
-    public function testSendVerificationLinkEmail()
+    public function test_send_verification_link_email()
     {
         Mail::fake();
 
-        $request = new Request();
+        $request = new Request;
         $request->merge(['email' => 'test@test.com']);
 
         $response = $this->controller->sendVerificationLinkEmail($request);
@@ -122,7 +122,7 @@ class SendsEmailVerificationRegisterTest extends ModelTestCase
             'email' => 'test@test.com',
         ]);
 
-        $failedRequest = new Request();
+        $failedRequest = new Request;
         $failedRequest->merge(['email' => 'test@test.com']);
         $failedResponse = $this->controller->sendVerificationLinkEmail($failedRequest);
 

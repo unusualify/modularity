@@ -2,22 +2,21 @@
 
 namespace Unusualify\Modularity\Http\Controllers\Traits\Utilities;
 
-
-use Unusualify\Modularity\Facades\Register;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
+use Unusualify\Modularity\Entities\Traits\Auth\RedirectsUsers;
 use Unusualify\Modularity\Entities\User;
 use Unusualify\Modularity\Events\VerifiedEmailRegister;
-use Illuminate\Support\Facades\Hash;
-use Unusualify\Modularity\Entities\Traits\Auth\RedirectsUsers;
-
+use Unusualify\Modularity\Facades\Register;
 
 trait CreateVerifiedEmailAccount
 {
     use RedirectsUsers;
+
     public function broker()
     {
         return Register::broker();
@@ -28,7 +27,7 @@ trait CreateVerifiedEmailAccount
         return Auth::guard();
     }
 
-    public  function rules()
+    public function rules()
     {
         return [
             'token' => 'required',
@@ -48,15 +47,14 @@ trait CreateVerifiedEmailAccount
     public function credentials(Request $request)
     {
         return $request->only(
-            'email', 'name','surname','company','password', 'password_confirmation', 'token'
+            'email', 'name', 'surname', 'company', 'password', 'password_confirmation', 'token'
         );
     }
 
-        /**
+    /**
      * Get the response for a successful password reset.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $response
+     * @param string $response
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
      */
     protected function sendRegisterResponse(Request $request, $response)
@@ -66,7 +64,7 @@ trait CreateVerifiedEmailAccount
         }
 
         return redirect($this->redirectPath())
-                            ->with('status', trans($response));
+            ->with('status', trans($response));
     }
 
     protected function sendRegisterFailedResponse(Request $request, $response)
@@ -78,13 +76,13 @@ trait CreateVerifiedEmailAccount
         }
 
         return redirect()->back()
-                    ->withInput($request->only('email'))
-                    ->withErrors(['email' => trans($response)]);
+            ->withInput($request->only('email'))
+            ->withErrors(['email' => trans($response)]);
     }
 
     // !! This method is not used in the project but it is here for reference like ResetPasswordController::reset method
     // equivalent to completeRegister in CompleteRegisterController
-    //!!Main related method is completeRegister in CompleteRegisterController
+    // !!Main related method is completeRegister in CompleteRegisterController
 
     public function register(Request $request)
     {
@@ -99,7 +97,6 @@ trait CreateVerifiedEmailAccount
                 $this->registerEmail($credentials);
             }
         );
-
 
         // If the password was successfully reset, we will redirect the user back to
         // the application's home authenticated view. If there is an error we can
@@ -147,4 +144,3 @@ trait CreateVerifiedEmailAccount
         return $user;
     }
 }
-

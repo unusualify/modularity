@@ -6,11 +6,9 @@ use Unusualify\Modularity\Providers\RouteServiceProvider;
 
 abstract class RouteTestCase extends TestCase
 {
-
     protected function setUp(): void
     {
         parent::setUp();
-
 
         // dd(
         //     parse_url('http://localhost'),

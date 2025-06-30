@@ -60,13 +60,12 @@ trait ChatableScopes
     /**
      * Scope to get models that have a notifiable message.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
      * @param int|null $minuteOffset
-     * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeHasNotifiableMessage(Builder $query, $minuteOffset = null): Builder
     {
         $chatMessageTable = (new ChatMessage)->getTable();
+
         return $query->whereHas('latestChatMessage', function (Builder $query) use ($minuteOffset, $chatMessageTable) {
 
             $query->where('is_read', false)->whereNull('notified_at')->when($minuteOffset, function ($query) use ($minuteOffset, $chatMessageTable) {

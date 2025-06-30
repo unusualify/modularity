@@ -8,32 +8,29 @@ use Illuminate\Auth\Passwords\TokenRepositoryInterface;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Support\Carbon;
-use Unusualify\Modularity\Contracts\RegisterBroker as RegisterBrokerContract;
 use Illuminate\Support\Facades\DB;
+use Unusualify\Modularity\Contracts\RegisterBroker as RegisterBrokerContract;
 
 class RegisterBroker extends PasswordBroker implements RegisterBrokerContract
 {
-    public function __construct(TokenRepositoryInterface $tokens,UserProvider $users, protected ConnectionInterface $connection, protected array $config)
+    public function __construct(TokenRepositoryInterface $tokens, UserProvider $users, protected ConnectionInterface $connection, protected array $config)
     {
         parent::__construct($tokens, $users);
     }
 
-
     /**
      * Send a password reset link to a user.
      *
-     * @param  array  $credentials
-     * @param  \Closure|null  $callback
      * @return string
      */
     public function sendVerificationLink(array $credentials, ?Closure $callback = null)
     {
         $user = $this->getUser($credentials);
-        if (!is_null($user)) {
+        if (! is_null($user)) {
             return static::ALREADY_REGISTERED;
         } else {
             $email = $credentials['email'];
-            $user = new \Unusualify\Modularity\Entities\User();
+            $user = new \Unusualify\Modularity\Entities\User;
             $user->email = $email;
 
             if ($this->tokens->recentlyCreatedToken($user)) {
@@ -49,6 +46,7 @@ class RegisterBroker extends PasswordBroker implements RegisterBrokerContract
         }
 
         $user->sendRegisterNotification($token);
+
         return static::VERIFICATION_LINK_SENT;
 
     }
@@ -57,7 +55,7 @@ class RegisterBroker extends PasswordBroker implements RegisterBrokerContract
     {
         $response = $this->validateRegister($credentials);
 
-        if($response === static::VERIFICATION_SUCCESS) {
+        if ($response === static::VERIFICATION_SUCCESS) {
             $callback($credentials);
             $this->deleteToken($credentials['email']);
         }
@@ -72,11 +70,12 @@ class RegisterBroker extends PasswordBroker implements RegisterBrokerContract
 
         $userIsRegistered = $this->emailIsRegistered($email);
 
-        if($userIsRegistered) {
+        if ($userIsRegistered) {
             return static::ALREADY_REGISTERED;
-        } else if (! $userHasValidToken = $this->emailTokenExists($email, $token)){
+        } elseif (! $userHasValidToken = $this->emailTokenExists($email, $token)) {
             return static::INVALID_VERIFICATION_TOKEN;
         }
+
         return static::VERIFICATION_SUCCESS;
 
     }
@@ -106,6 +105,6 @@ class RegisterBroker extends PasswordBroker implements RegisterBrokerContract
     public function deleteToken($email)
     {
         $this->connection->table($this->config['table'])
-        ->where('email', $email)->delete();
+            ->where('email', $email)->delete();
     }
 }

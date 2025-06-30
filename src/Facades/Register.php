@@ -37,7 +37,7 @@ class Register extends Password
 
     const VERIFICATION_THROTTLED = RegisterBroker::VERIFICATION_THROTTLED;
 
-     protected static function getFacadeAccessor()
+    protected static function getFacadeAccessor()
     {
         return 'auth.register';
     }

@@ -10,12 +10,10 @@ use InvalidArgumentException;
  */
 class RegisterBrokerManager extends PasswordBrokerManager
 {
-
     public function __construct($app)
     {
         parent::__construct($app);
     }
-
 
     public function resolve($name)
     {
@@ -47,5 +45,4 @@ class RegisterBrokerManager extends PasswordBrokerManager
     {
         return 'register_verified_users';
     }
-
 }

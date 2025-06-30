@@ -2,9 +2,7 @@
 
 namespace Modules\SystemNotification\Notifications;
 
-use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Unusualify\Modularity\Facades\ModularityLog;
 
 class ChatableUnreadNotification extends FeatureNotification implements ShouldQueue

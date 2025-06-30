@@ -2,11 +2,11 @@
 
 namespace Unusualify\Modularity\Http\Controllers\Traits\Utilities;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Unusualify\Modularity\Brokers\RegisterBroker;
-use Illuminate\Http\JsonResponse;
-use Unusualify\Modularity\Services\MessageStage;
 use Unusualify\Modularity\Facades\Register;
+use Unusualify\Modularity\Services\MessageStage;
 
 trait SendsEmailVerificationRegister
 {
@@ -17,7 +17,6 @@ trait SendsEmailVerificationRegister
         $response = $this->broker()->sendVerificationLink(
             $this->credentials($request)
         );
-
 
         return $response == RegisterBroker::VERIFICATION_LINK_SENT
             ? $this->sendVerificationLinkResponse($request, $response)
@@ -38,6 +37,7 @@ trait SendsEmailVerificationRegister
                     ], 200)
                     : back()->with('status', ___($response));
     }
+
     protected function sendVerificationLinkFailedResponse(Request $request, $response)
     {
         if ($request->wantsJson()) {
@@ -62,5 +62,4 @@ trait SendsEmailVerificationRegister
     {
         return Register::broker('register_verified_users');
     }
-
 }

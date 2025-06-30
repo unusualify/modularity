@@ -47,7 +47,7 @@ if (modularityConfig('enabled.users-management')) {
 
     Route::get('register/success', 'RegisterController@success')->name('register.success');
 
-    //Register with email verification
+    // Register with email verification
     Route::get('pre/register', 'PreRegisterController@showEmailForm')->name('pre-register.email-form');
     Route::post('pre/register', 'PreRegisterController@sendVerificationLinkEmail')->name('pre-register');
 

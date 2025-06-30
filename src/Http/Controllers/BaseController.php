@@ -628,7 +628,7 @@ abstract class BaseController extends PanelController
                     'Illuminate\Database\Eloquent\Relations\MorphTo',
                 ])) {
                     $result = $item->{$relationshipName};
-                } else if (in_array($relationshipType, [
+                } elseif (in_array($relationshipType, [
                     'Illuminate\Database\Eloquent\Relations\BelongsToMany',
                     'Illuminate\Database\Eloquent\Relations\HasMany',
                     'Illuminate\Database\Eloquent\Relations\HasManyThrough',
@@ -657,7 +657,7 @@ abstract class BaseController extends PanelController
                     $value = $result;
                 }
             } catch (\Throwable $th) {
-                ModularityLog::error("Error getting item column data", [
+                ModularityLog::error('Error getting item column data', [
                     'relationshipName' => $relationshipName,
                     'result' => $result,
                     'item' => $item,

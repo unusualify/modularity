@@ -3,21 +3,21 @@
 namespace Unusualify\Modularity\Http\Controllers;
 
 use Illuminate\Config\Repository as Config;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Routing\Redirector;
-use Unusualify\Modularity\Http\Controllers\Traits\ManageUtilities;
-use Illuminate\Support\Facades\Auth;
-use Unusualify\Modularity\Facades\Modularity;
-use Illuminate\Http\Request;
-use Illuminate\View\Factory as ViewFactory;
 use Illuminate\Http\JsonResponse;
-use Unusualify\Modularity\Services\MessageStage;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Redirector;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\View\Factory as ViewFactory;
+use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Facades\Register;
+use Unusualify\Modularity\Http\Controllers\Traits\ManageUtilities;
 use Unusualify\Modularity\Http\Controllers\Traits\Utilities\CreateVerifiedEmailAccount;
+use Unusualify\Modularity\Services\MessageStage;
 
-class CompleteRegisterController extends Controller{
-
+class CompleteRegisterController extends Controller
+{
     use ManageUtilities, CreateVerifiedEmailAccount;
 
     /**
@@ -70,8 +70,8 @@ class CompleteRegisterController extends Controller{
         $token = $request->route()->parameter('token');
         $email = $request->email;
 
-        if($email && $token && Register::broker('register_verified_users')->emailTokenExists(email: $email, token: $token)){
-            return $this->viewFactory->make(modularityBaseKey() . '::auth.register')->with ([
+        if ($email && $token && Register::broker('register_verified_users')->emailTokenExists(email: $email, token: $token)) {
+            return $this->viewFactory->make(modularityBaseKey() . '::auth.register')->with([
                 'formAttributes' => [
                     'title' => [
                         'text' => __('authentication.complete-registration'),
@@ -159,18 +159,18 @@ class CompleteRegisterController extends Controller{
                             ],
                         ],
                         'password_confirmation' => [
-                                'type' => 'password',
-                                'name' => 'password_confirmation',
-                                'label' => ___('authentication.password-confirmation'),
-                                'default' => '',
-                                'appendInnerIcon' => '$non-visibility',
-                                'slotHandlers' => [
-                                    'appendInner' => 'password',
-                                ],
-                                'col' => [
-                                    'cols' => 6,
-                                    'lg' => 6,
-                                ],
+                            'type' => 'password',
+                            'name' => 'password_confirmation',
+                            'label' => ___('authentication.password-confirmation'),
+                            'default' => '',
+                            'appendInnerIcon' => '$non-visibility',
+                            'slotHandlers' => [
+                                'appendInner' => 'password',
+                            ],
+                            'col' => [
+                                'cols' => 6,
+                                'lg' => 6,
+                            ],
 
                         ],
                         'token' => [
@@ -220,7 +220,7 @@ class CompleteRegisterController extends Controller{
                             ],
                         ],
                     ],
-                ]
+                ],
             ]);
         }
 
@@ -243,13 +243,11 @@ class CompleteRegisterController extends Controller{
             : $request->validate($this->rules(), $this->validationErrorMessages());
         }
 
-
         $response = $this->broker()->register(
             $this->credentials($request), function (array $credentials) {
                 $this->registerEmail($credentials);
             }
         );
-
 
         return $response == Register::VERIFIED_EMAIL_REGISTER
                     ? $this->sendRegisterResponse($request, $response)
@@ -295,5 +293,3 @@ class CompleteRegisterController extends Controller{
             ->withErrors(['email' => trans($response)]);
     }
 }
-
-

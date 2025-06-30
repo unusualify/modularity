@@ -2,9 +2,9 @@
 
 namespace Unusualify\Modularity\Notifications;
 
-use Illuminate\Notifications\Notification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Route;
 
@@ -27,6 +27,7 @@ class EmailVerification extends Notification
     public function toMail($notifiable)
     {
         $verificationUrl = $this->verificationUrl($notifiable);
+
         return (new MailMessage)
             ->subject(Lang::get('Email Verification'))
             ->line(Lang::get('You are receiving this email because we need to verify your email address.'))
@@ -43,5 +44,4 @@ class EmailVerification extends Notification
             'email' => $notifiable->email,
         ]);
     }
-
 }

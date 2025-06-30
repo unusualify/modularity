@@ -3,15 +3,16 @@
 namespace Unusualify\Modularity\Tests\Brokers;
 
 use Carbon\Carbon;
-use Unusualify\Modularity\Tests\ModelTestCase;
-use Unusualify\Modularity\Brokers\RegisterBroker;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Auth\Passwords\DatabaseTokenRepository;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
+use Unusualify\Modularity\Brokers\RegisterBroker;
 use Unusualify\Modularity\Entities\User;
 use Unusualify\Modularity\Notifications\EmailVerification;
-use Illuminate\Support\Facades\Notification;
+use Unusualify\Modularity\Tests\ModelTestCase;
+
 class RegisterBrokerTest extends ModelTestCase
 {
     use RefreshDatabase;
@@ -28,7 +29,7 @@ class RegisterBrokerTest extends ModelTestCase
 
     protected DatabaseTokenRepository $tokens;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -46,13 +47,13 @@ class RegisterBrokerTest extends ModelTestCase
             'throttle' => 60,
         ]]);
 
-        $this->brokerConfig = Config::get("auth.passwords.register_verified_users");
+        $this->brokerConfig = Config::get('auth.passwords.register_verified_users');
 
         $this->tokens = new DatabaseTokenRepository(
             $this->app['db']->connection(),
             $this->app['hash'],
             $this->brokerConfig['table'],
-            "12345678",
+            '12345678',
             $this->brokerConfig['expire'],
             $this->brokerConfig['throttle'] ?? 0
         );
@@ -66,7 +67,7 @@ class RegisterBrokerTest extends ModelTestCase
 
     }
 
-    public function testEmailIsRegistered()
+    public function test_email_is_registered()
     {
         $user = User::create([
             'name' => 'John Doe',
@@ -75,13 +76,13 @@ class RegisterBrokerTest extends ModelTestCase
         ]);
 
         $registeredEmail = $user->email;
-        $notRegisteredEmail = "celikerdem@gmail.com";
+        $notRegisteredEmail = 'celikerdem@gmail.com';
 
         $this->assertTrue($this->broker->emailIsRegistered($registeredEmail));
         $this->assertFalse($this->broker->emailIsRegistered($notRegisteredEmail));
     }
 
-    public function testTokenExpired()
+    public function test_token_expired()
     {
         $createdAt = now();
 
@@ -93,7 +94,7 @@ class RegisterBrokerTest extends ModelTestCase
 
     }
 
-    public function testDeleteToken()
+    public function test_delete_token()
     {
         $user = DB::table('um_email_verification_tokens')->insert([
             'email' => 'john@example.com',
@@ -108,7 +109,7 @@ class RegisterBrokerTest extends ModelTestCase
         $this->assertFalse(DB::table('um_email_verification_tokens')->where('email', $user->email)->exists());
     }
 
-    public function testEmailTokenExists()
+    public function test_email_token_exists()
     {
 
         $plainToken = '12345678';
@@ -130,7 +131,7 @@ class RegisterBrokerTest extends ModelTestCase
         $this->assertFalse($this->broker->emailTokenExists($userHasToken->email, $token));
     }
 
-    public function testValidateRegister()
+    public function test_validate_register()
     {
         $registeredUser = User::create([
             'name' => 'John',
@@ -147,7 +148,7 @@ class RegisterBrokerTest extends ModelTestCase
             'password' => $registeredUser->password,
             'password_confirmation' => 'password123',
             'token' => '12345678',
-       ];
+        ];
 
         $this->assertEquals(RegisterBroker::ALREADY_REGISTERED, $this->broker->validateRegister($credentials));
 
@@ -157,16 +158,16 @@ class RegisterBrokerTest extends ModelTestCase
         DB::table('um_email_verification_tokens')->insert([
             'email' => 'adam@example.com',
             'token' => $hashedToken,  // Store the HASHED token
-            'created_at' => now()->subSeconds($this->brokerConfig['expire'] * 60)
+            'created_at' => now()->subSeconds($this->brokerConfig['expire'] * 60),
         ]);
 
         $newUser = DB::table('um_email_verification_tokens')->get()->first();
 
-        $this->assertEquals(RegisterBroker::INVALID_VERIFICATION_TOKEN, $this->broker->validateRegister((array)$newUser));
+        $this->assertEquals(RegisterBroker::INVALID_VERIFICATION_TOKEN, $this->broker->validateRegister((array) $newUser));
 
         DB::table('um_email_verification_tokens')
-        ->where('email', 'adam@example.com')
-        ->update(['created_at' => now()]);
+            ->where('email', 'adam@example.com')
+            ->update(['created_at' => now()]);
 
         $newUser = DB::table('um_email_verification_tokens')->where('email', 'adam@example.com')->first();
 
@@ -178,7 +179,7 @@ class RegisterBrokerTest extends ModelTestCase
         $this->assertEquals(RegisterBroker::VERIFICATION_SUCCESS, $this->broker->validateRegister($userWithValidTokenCredentials));
     }
 
-    public function testRegister()
+    public function test_register()
     {
         $plainToken = '1234567890';
         $hashedToken = $this->app['hash']->make($plainToken);
@@ -199,27 +200,27 @@ class RegisterBrokerTest extends ModelTestCase
             'password' => 'password123',
             'password_confirmation' => 'password123',
             'token' => $plainToken,
-           ];
+        ];
 
         $tokenCounts = DB::table('um_email_verification_tokens')->get()->count();
         $this->assertEquals(1, $tokenCounts);
 
-        //Create a callback that tracks if it was called
+        // Create a callback that tracks if it was called
         $callbackCalled = false;
         $callbackCredentials = null;
 
-        $callback = function($creds) use (&$callbackCalled, &$callbackCredentials) {
+        $callback = function ($creds) use (&$callbackCalled, &$callbackCredentials) {
             $callbackCalled = true;
             $callbackCredentials = $creds;
         };
 
         $isVerificationSuccess = $this->broker->register($credentials, $callback);
         $this->assertEquals(RegisterBroker::VERIFICATION_SUCCESS, $isVerificationSuccess);
-        //Should be 0 because the token is deleted
+        // Should be 0 because the token is deleted
         $this->assertEquals(0, DB::table('um_email_verification_tokens')->get()->count());
     }
 
-    public function testSendVerificationLink()
+    public function test_send_verification_link()
     {
 
         $registeredUser = User::create([
@@ -228,7 +229,6 @@ class RegisterBrokerTest extends ModelTestCase
             'email' => 'celikerdem@gmail.com',
             'password' => 'password123',
         ]);
-
 
         $credentials = [
             'email' => $registeredUser->email,
@@ -244,9 +244,8 @@ class RegisterBrokerTest extends ModelTestCase
 
         $this->assertEquals(
             RegisterBroker::VERIFICATION_LINK_SENT,
-         $this->broker->sendVerificationLink($newUserCredentials)
+            $this->broker->sendVerificationLink($newUserCredentials)
         );
-
 
         Notification::assertSentTimes(EmailVerification::class, 1);
 

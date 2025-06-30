@@ -11,4 +11,3 @@ class ControllerUsingCreateVerifiedEmailAccount extends Controller
 {
     use AuthorizesRequests, ValidatesRequests, CreateVerifiedEmailAccount;
 }
-

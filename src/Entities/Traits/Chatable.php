@@ -162,8 +162,6 @@ trait Chatable
 
     /**
      * Get the interval in minutes
-     *
-     * @return int
      */
     protected static function getChatableNotificationInterval(): int
     {
@@ -172,7 +170,7 @@ trait Chatable
 
     public function shouldSendChatableNotification(ChatMessage $latestChatMessage): bool
     {
-        return !$latestChatMessage->is_read;
+        return ! $latestChatMessage->is_read;
     }
 
     public function handleChatableNotification(): void
@@ -182,10 +180,10 @@ trait Chatable
         if ($latestChatMessage
             && $this->shouldSendChatableNotification($latestChatMessage)
             && $latestChatMessage->created_at->diffInMinutes(now()) > static::getChatableNotificationInterval()
-            && !$latestChatMessage->notified_at
+            && ! $latestChatMessage->notified_at
         ) {
             $chatableCreator = null;
-            if(in_array('Unusualify\Modularity\Entities\Traits\HasCreator', class_uses_recursive($this))){
+            if (in_array('Unusualify\Modularity\Entities\Traits\HasCreator', class_uses_recursive($this))) {
                 $chatableCreator = $this->creator;
             }
 
@@ -195,10 +193,10 @@ trait Chatable
                 ? ($this->is_authorized ? $this->authorizedUser : null)
                 : null;
 
-            if($messageCreator){
-                if($chatableCreator && in_array('Illuminate\Notifications\RoutesNotifications', class_uses_recursive($chatableCreator)) && !$chatableCreator->is($messageCreator)){
+            if ($messageCreator) {
+                if ($chatableCreator && in_array('Illuminate\Notifications\RoutesNotifications', class_uses_recursive($chatableCreator)) && ! $chatableCreator->is($messageCreator)) {
                     $chatableCreator->notifyNow(new ChatableUnreadNotification($this));
-                }else if($chatableAuthorizedUser && in_array('Illuminate\Notifications\RoutesNotifications', class_uses_recursive($chatableAuthorizedUser)) && !$chatableAuthorizedUser->is($messageCreator)){
+                } elseif ($chatableAuthorizedUser && in_array('Illuminate\Notifications\RoutesNotifications', class_uses_recursive($chatableAuthorizedUser)) && ! $chatableAuthorizedUser->is($messageCreator)) {
                     $chatableAuthorizedUser->notifyNow(new ChatableUnreadNotification($this));
                 }
             }

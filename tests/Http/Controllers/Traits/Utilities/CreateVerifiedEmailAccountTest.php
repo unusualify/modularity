@@ -2,22 +2,21 @@
 
 namespace Unusualify\Modularity\Tests\Http\Controllers\Traits\Utilities;
 
-use Unusualify\Modularity\Tests\ModelTestCase;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Auth\Passwords\DatabaseTokenRepository;
-use Unusualify\Modularity\Brokers\RegisterBroker;
 use Illuminate\Contracts\Auth\Guard;
-use Illuminate\Http\Request;
-use Unusualify\Modularity\Entities\User;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
-use Unusualify\Modularity\Tests\Http\Controllers\ControllerUsingCreateVerifiedEmailAccount;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Hash;
 use Modules\SystemUser\Entities\Role;
+use Unusualify\Modularity\Brokers\RegisterBroker;
+use Unusualify\Modularity\Entities\User;
 use Unusualify\Modularity\Events\VerifiedEmailRegister;
 use Unusualify\Modularity\Facades\Modularity;
-use Unusualify\Modularity\Facades\Register;
+use Unusualify\Modularity\Tests\Http\Controllers\ControllerUsingCreateVerifiedEmailAccount;
+use Unusualify\Modularity\Tests\ModelTestCase;
 
 class CreateVerifiedEmailAccountTest extends ModelTestCase
 {
@@ -31,12 +30,11 @@ class CreateVerifiedEmailAccountTest extends ModelTestCase
 
     use RefreshDatabase;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $this->controller = new ControllerUsingCreateVerifiedEmailAccount();
-
+        $this->controller = new ControllerUsingCreateVerifiedEmailAccount;
 
         config(['auth.passwords.modularity_users' => [
             'provider' => 'modularity_users',
@@ -52,13 +50,13 @@ class CreateVerifiedEmailAccountTest extends ModelTestCase
             'throttle' => 60,
         ]]);
 
-        $this->brokerConfig = Config::get("auth.passwords.register_verified_users");
+        $this->brokerConfig = Config::get('auth.passwords.register_verified_users');
 
         $this->tokens = new DatabaseTokenRepository(
             $this->app['db']->connection(),
             $this->app['hash'],
             $this->brokerConfig['table'],
-            "12345678",
+            '12345678',
             $this->brokerConfig['expire'],
             $this->brokerConfig['throttle'] ?? 0
         );
@@ -77,19 +75,19 @@ class CreateVerifiedEmailAccountTest extends ModelTestCase
         ]);
     }
 
-    public function testBroker()
+    public function test_broker()
     {
         $broker = $this->controller->broker();
         $this->assertInstanceOf(RegisterBroker::class, $broker);
     }
 
-    public function testGuard()
+    public function test_guard()
     {
         $guard = $this->controller->guard();
         $this->assertInstanceOf(Guard::class, $guard);
     }
 
-    public function testRules()
+    public function test_rules()
     {
         $rules = $this->controller->rules();
         $this->assertArrayHasKey('token', $rules);
@@ -100,9 +98,9 @@ class CreateVerifiedEmailAccountTest extends ModelTestCase
         $this->assertArrayHasKey('password', $rules);
     }
 
-    public function testCredentials()
+    public function test_credentials()
     {
-        $request = new Request();
+        $request = new Request;
         $request->merge([
             'email' => 'test@test.com',
             'name' => 'Test',
@@ -122,11 +120,11 @@ class CreateVerifiedEmailAccountTest extends ModelTestCase
             'company' => 'Test',
             'password' => 'password',
             'password_confirmation' => 'password',
-            'token' => '12345678'
+            'token' => '12345678',
         ], $credentials);
     }
 
-    public function testSetUserRegister()
+    public function test_set_user_register()
     {
         $credentials = [
             'name' => 'Name ',
@@ -145,7 +143,7 @@ class CreateVerifiedEmailAccountTest extends ModelTestCase
         $this->assertTrue(Hash::check($credentials['password'], $user->password));
     }
 
-    public function testRegisterEmail()
+    public function test_register_email()
     {
         Event::fake();
         $credentials = [
@@ -155,7 +153,6 @@ class CreateVerifiedEmailAccountTest extends ModelTestCase
             'email_verified_at' => now(),
             'password' => 'password',
         ];
-
 
         $this->controller->registerEmail($credentials);
 
@@ -174,10 +171,10 @@ class CreateVerifiedEmailAccountTest extends ModelTestCase
 
     }
 
-    public function testRegister()
+    public function test_register()
     {
         $plainToken = '1234567890';
-        $hashedToken = $this->app['hash']->make($plainToken);// Hash the token first
+        $hashedToken = $this->app['hash']->make($plainToken); // Hash the token first
 
         DB::table('um_email_verification_tokens')->insert([
             'email' => 'john@example.com',
@@ -187,7 +184,7 @@ class CreateVerifiedEmailAccountTest extends ModelTestCase
 
         $user = DB::table('um_email_verification_tokens')->where('email', 'john@example.com')->first();
 
-        $request = new Request();
+        $request = new Request;
 
         $request->merge([
             'email' => $user->email,
@@ -207,5 +204,4 @@ class CreateVerifiedEmailAccountTest extends ModelTestCase
 
         $this->assertEquals('Registration has been completed successfully.', $response->getSession()->get('status'));
     }
-
 }

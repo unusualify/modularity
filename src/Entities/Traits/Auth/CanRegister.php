@@ -4,7 +4,6 @@ namespace Unusualify\Modularity\Entities\Traits\Auth;
 
 use Unusualify\Modularity\Notifications\EmailVerification;
 
-
 trait CanRegister
 {
     /**
@@ -20,7 +19,7 @@ trait CanRegister
     /**
      * Send the password reset notification.
      *
-     * @param  string  $token
+     * @param string $token
      * @return void
      */
     public function sendRegisterNotification($token)

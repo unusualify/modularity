@@ -51,12 +51,11 @@ class ChatableScheduler extends Command
             }
         } catch (\Throwable $th) {
             Log::channel('scheduler')
-                ->error("Modularity: Chatable scheduler error", [
+                ->error('Modularity: Chatable scheduler error', [
                     'error' => $th->getMessage(),
                     'trace' => $th->getTraceAsString(),
                 ]);
         }
-
 
     }
 }

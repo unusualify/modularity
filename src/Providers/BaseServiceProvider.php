@@ -172,7 +172,6 @@ class BaseServiceProvider extends ServiceProvider
             return new \Unusualify\Modularity\Brokers\RegisterBrokerManager($app);
         });
 
-
         $this->app->alias(\Unusualify\Modularity\Facades\ModularityVite::class, 'ModularityVite');
 
         $this->app->alias(\Torann\GeoIP\Facades\GeoIP::class, 'GeoIP');

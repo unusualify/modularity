@@ -8,8 +8,6 @@ use Unusualify\Modularity\Facades\Register;
 use Unusualify\Modularity\Http\Controllers\Traits\ManageUtilities;
 use Unusualify\Modularity\Http\Controllers\Traits\Utilities\SendsEmailVerificationRegister;
 
-
-
 class PreRegisterController extends Controller
 {
     use ManageUtilities, SendsEmailVerificationRegister;
@@ -160,4 +158,3 @@ class PreRegisterController extends Controller
         ]);
     }
 }
-

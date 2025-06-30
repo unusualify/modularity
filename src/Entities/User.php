@@ -13,12 +13,12 @@ use Laravel\Sanctum\HasApiTokens;
 use Modules\SystemUser\Entities\Company;
 use Spatie\Permission\Traits\HasRoles;
 use Unusualify\Modularity\Database\Factories\UserFactory;
+use Unusualify\Modularity\Entities\Traits\Auth\CanRegister;
 use Unusualify\Modularity\Entities\Traits\HasFileponds;
 use Unusualify\Modularity\Entities\Traits\HasOauth;
 use Unusualify\Modularity\Entities\Traits\HasScopes;
 use Unusualify\Modularity\Entities\Traits\IsTranslatable;
 use Unusualify\Modularity\Entities\Traits\ModelHelpers;
-use Unusualify\Modularity\Entities\Traits\Auth\CanRegister;
 use Unusualify\Modularity\Notifications\GeneratePasswordNotification;
 
 class User extends Authenticatable implements MustVerifyEmailContract
