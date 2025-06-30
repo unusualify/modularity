@@ -167,10 +167,6 @@
     },
     data() {
       return {
-        classes: [
-          'v-input-filepond',
-          this.class ?? '',
-        ],
         fileFieldClasses: [
           'v-input-filepond__file-field',
           (this.$slots.activator || this.$slots.body) ? 'd-none' : ''
@@ -325,6 +321,12 @@
 
     },
     computed:{
+      classes(){
+        return [
+          'v-input-filepond',
+          this.class ?? '',
+        ]
+      },
       server() {
         return {
           // revert: this.endPoints.revert,
