@@ -36,6 +36,9 @@ export const makeFormProps = propsFactory({
     type: Boolean,
     default: false
   },
+  subtitle: {
+    type: String,
+  },
   schema: {
     type: Object,
     // default () {
@@ -202,13 +205,24 @@ export default function useForm(props, context) {
 
   const checkSubmittable = (item) => {
     let result = false
+
     if(!(Object.prototype.hasOwnProperty.call(item, 'noSubmit') && item.noSubmit)) {
       result = true
     }
 
-    if(result && Object.prototype.hasOwnProperty.call(item, 'allowedRoles') && Array.isArray(item.allowedRoles)) {
-      if(!hasRoles(item.allowedRoles)) {
+    if(result === true) {
+      if(__isset(item.editable)
+        && (item.editable === false || item.editable === 'hidden')
+        && props.isEditing) {
         result = false
+      }else if(__isset(item.creatable)
+          && (item.creatable === false || item.creatable === 'hidden')
+          && !props.isEditing) {
+        result = false
+      }else if( Object.prototype.hasOwnProperty.call(item, 'allowedRoles') && Array.isArray(item.allowedRoles)) {
+        if(!hasRoles(item.allowedRoles)) {
+          result = false
+        }
       }
     }
 
@@ -218,6 +232,7 @@ export default function useForm(props, context) {
   const isSubmittable = computed(() => {
     return find(inputSchema.value, (input) => {
       let result = false
+
       if(['wrap', 'group'].includes(input.type)) {
         result = find(input.schema, checkSubmittable)
       } else {
@@ -345,6 +360,7 @@ export default function useForm(props, context) {
 
         if(props.refreshOnSaved) {
           callbackFunction = (data) => {
+            context.emit('submitted', data)
             if(callback && typeof callback === 'function') callback(data)
             if(Object.prototype.hasOwnProperty.call(data, 'forceRedirect') && data.forceRedirect) {
               redirector(data)
@@ -354,6 +370,7 @@ export default function useForm(props, context) {
           }
         } else {
           callbackFunction = (data) => {
+            context.emit('submitted', data)
             redirector(data)
             if(callback && typeof callback === 'function') callback(data)
           }

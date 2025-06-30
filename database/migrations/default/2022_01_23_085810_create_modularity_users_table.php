@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        $adminUserTable = modularityConfig('tables.users', 'admin_users');
+        $adminUserTable = modularityConfig('tables.users', 'um_users');
         $companyTable = modularityConfig('tables.companies', 'modularity_companies');
 
         if (! Schema::hasTable($adminUserTable)) {
-            Schema::create(modularityConfig('tables.users', 'admin_users'), function (Blueprint $table) use ($companyTable) {
+            Schema::create(modularityConfig('tables.users', 'um_users'), function (Blueprint $table) use ($companyTable) {
                 $table->id();
                 $table->unsignedBigInteger('company_id')->nullable(); // Foreign key column
                 $table->string('name');
@@ -47,10 +47,10 @@ return new class extends Migration
     public function down(): void
     {
 
-        $adminUserTable = modularityConfig('tables.users', 'admin_users');
+        $adminUserTable = modularityConfig('tables.users', 'um_users');
 
         if (Schema::hasTable($adminUserTable)) {
-            Schema::dropIfExists(modularityConfig('tables.users', 'admin_users'));
+            Schema::dropIfExists(modularityConfig('tables.users', 'um_users'));
         }
     }
 };

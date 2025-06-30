@@ -23,9 +23,9 @@ export default {
     'green-darken-1': '#1C7F20',
     success: '#54AF4C',
 
-    orange: '#FDB022',
-    'orange-lighten-1': '#FEF8EC',
-    'orange-darken-1': '#F88C00',
+    // orange: '#FDB022',
+    // 'orange-lighten-1': '#FEF8EC',
+    // 'orange-darken-1': '#F88C00',
     warning: '#FDB022', // '#F08712',
 
     // unusualify colors

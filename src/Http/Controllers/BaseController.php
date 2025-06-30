@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
+use Unusualify\Modularity\Facades\ModularityLog;
 use Unusualify\Modularity\Http\Controllers\Traits\ManageEvents;
 use Unusualify\Modularity\Http\Controllers\Traits\ManagePrevious;
 use Unusualify\Modularity\Http\Controllers\Traits\ManageSingleton;
@@ -612,27 +613,56 @@ abstract class BaseController extends PanelController
             }
 
             $itemTitle = $column['itemTitle'] ?? 'name';
+            $maxItems = $column['maxItems'] ?? 3;
+
+            $count = 0;
 
             try {
-                $records = $item->{$relationshipName};
+                $relationshipType = get_class($item->{$relationshipName}());
 
-                if ($records instanceof Collection) {
-                    $value = $records
+                if (in_array($relationshipType, [
+                    'Illuminate\Database\Eloquent\Relations\BelongsTo',
+                    'Illuminate\Database\Eloquent\Relations\HasOne',
+                    'Illuminate\Database\Eloquent\Relations\HasOneThrough',
+                    'Illuminate\Database\Eloquent\Relations\MorphOne',
+                    'Illuminate\Database\Eloquent\Relations\MorphTo',
+                ])) {
+                    $result = $item->{$relationshipName};
+                } elseif (in_array($relationshipType, [
+                    'Illuminate\Database\Eloquent\Relations\BelongsToMany',
+                    'Illuminate\Database\Eloquent\Relations\HasMany',
+                    'Illuminate\Database\Eloquent\Relations\HasManyThrough',
+                    'Illuminate\Database\Eloquent\Relations\MorphMany',
+                    'Illuminate\Database\Eloquent\Relations\MorphToMany',
+                ])) {
+                    $count = $item->{$relationshipName}()->count();
+                    $result = $item->{$relationshipName}()
+                        ->take($maxItems)
+                        ->get();
+                } else {
+                    $result = $item->{$relationshipName};
+                }
+
+                if ($result instanceof Collection) {
+                    $value = $result
                         ->pluck($itemTitle)
                         ->join(', ');
-                } elseif ($records instanceof Model) {
-                    $value = $records->{$itemTitle};
+
+                    if ($count > $maxItems) {
+                        $value .= ' ...';
+                    }
+                } elseif ($result instanceof Model) {
+                    $value = $result->{$itemTitle};
                 } else {
-                    $value = $records;
+                    $value = $result;
                 }
             } catch (\Throwable $th) {
-                dd(
-                    $relationshipName,
-                    $records,
-                    $item,
-                    $th
-                );
-                dd($relationshipName, $relation, $column, $matches, $th);
+                ModularityLog::error('Error getting item column data', [
+                    'relationshipName' => $relationshipName,
+                    'result' => $result,
+                    'item' => $item,
+                    'th' => $th,
+                ]);
             }
         }
 

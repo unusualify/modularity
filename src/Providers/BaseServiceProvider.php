@@ -98,6 +98,8 @@ class BaseServiceProvider extends ServiceProvider
                 ->daily()
                 ->appendOutputTo(storage_path('logs/scheduler.log'));
 
+            $schedule->command('modularity:scheduler:chatable')
+                ->everyMinute();
         });
     }
 
@@ -164,6 +166,10 @@ class BaseServiceProvider extends ServiceProvider
 
         $this->app->singleton('migration.backup', function (Application $app) {
             return new \Unusualify\Modularity\Services\MigrationBackup;
+        });
+
+        $this->app->singleton('auth.register', function (Application $app) {
+            return new \Unusualify\Modularity\Brokers\RegisterBrokerManager($app);
         });
 
         $this->app->alias(\Unusualify\Modularity\Facades\ModularityVite::class, 'ModularityVite');
@@ -282,9 +288,9 @@ class BaseServiceProvider extends ServiceProvider
             // }
         }
 
-        if (! config('modules.scan.enabled')) {
-            throw new \Exception('Modules scan is not enabled, set scan.enabled to true in config/modules.php');
-        }
+        // if (! config('modules.scan.enabled')) {
+        //     throw new \Exception('Modules scan is not enabled, set scan.enabled to true in config/modules.php');
+        // }
 
     }
 

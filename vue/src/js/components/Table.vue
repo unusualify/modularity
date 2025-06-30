@@ -282,7 +282,6 @@
           >
             <template v-slot:body="formModalBodyScope">
               <v-card class="fill-height d-flex flex-column">
-                <!-- <v-card-title class="text-h5 grey lighten-2"> </v-card-title> -->
                 <ue-form
                   ref="UeForm"
 
@@ -293,14 +292,21 @@
                   no-default-form-padding
                   v-bind="formAttributes"
 
-                  :title="formTitle"
+                  :title="{
+                    ...formAttributes.title ?? {},
+                    text: formTitle,
+                  }"
+                  :subtitle="formSubtitle"
                   :isEditing="editedIndex > -1"
                   :style="formModalBodyScope.isFullActive ? 'height: 90vh !important;' : 'height: 70vh !important;'"
                   :actions="formActions"
+                  has-submit
+                  :button-text="editedIndex > -1 ? $t('fields.update') : $t('fields.create')"
                   @action-complete="handleFormActionComplete"
+                  @submitted="handleFormSubmission"
                 >
 
-                  <template v-slot:header.left="headerLeftScope">
+                  <template v-slot:header.left="headerLeftScope" v-if="$slots['form.header.left']">
                     <slot name="form.header.left" v-bind="headerLeftScope">
                       {{ headerLeftScope.title }}
                     </slot>
@@ -325,7 +331,6 @@
                     </slot>
                   </template>
 
-
                   <template v-if="$slots['form.right.top']" v-slot:right.top="rightScope">
                     <slot name="form.right.top" v-bind="rightScope">
 
@@ -348,7 +353,6 @@
                     </slot>
                   </template>
 
-
                   <template v-if="$slots['form.actions.prepend']" v-slot:actions.prepend="actionsScope">
                     <slot name="form.actions.prepend" v-bind="actionsScope">
 
@@ -361,31 +365,18 @@
                     </slot>
                   </template>
 
-                </ue-form>
-                <!-- <v-card-text>
-                </v-card-text> -->
+                  <template v-if="$store.getters.isSuperAdmin" v-slot:options="optionsScope">
+                    <v-btn-secondary
+                      v-if="optionsScope.isSubmittable"
+                      :slim="false"
+                      variant="outlined"
+                      @click="$refs.UeForm.validate()"
+                    >
+                      {{ $t('fields.validate') }}
+                    </v-btn-secondary>
+                  </template>
 
-                <v-divider class="mx-6 mt-4"/>
-                <v-card-actions class="px-6 flex-grow-0">
-                  <v-spacer></v-spacer>
-                  <v-btn-secondary
-                    v-if="$store.getters.isSuperAdmin"
-                    :slim="false"
-                    variant="outlined"
-                    @click="$refs.UeForm.validate()"
-                  >
-                    {{ $t('Validate') }}
-                  </v-btn-secondary>
-                  <v-btn-primary
-                    :slim="false"
-                    variant="elevated"
-                    @click="confirmFormModal()"
-                    :disabled="!formIsValid"
-                    :loading="formLoading"
-                  >
-                    {{ $t('fields.save') }}
-                  </v-btn-primary>
-                </v-card-actions>
+                </ue-form>
               </v-card>
             </template>
           </ue-modal>
@@ -734,16 +725,14 @@
           <template v-if="col.formatter == 'edit' || col.formatter == 'activate'">
             <v-tooltip :text="item[col.key]" :key="i">
               <template v-slot:activator="{ props }">
-                <v-btn
+                <span
                   :key="i"
                   v-bind="props"
-                  class="pa-0 justify-start text-none"
-                  variant="plain"
-                  :color="`primary darken-1`"
+                  class="pa-0 justify-start text-none text-wrap text-primary darken-1 cursor-pointer"
                   @click="itemAction(item, ...col.formatter)"
                 >
-                  {{ col.key.match(/^id|uuid$/) ? window.__shorten(item[col.key], 8) : item[col.key] }}
-                </v-btn>
+                  {{ window.__shorten(item[col.key], item[col.key].textLength ?? 8) }}
+                </span>
                 <template v-if="col.key.match(/^id|uuid$/)">
                   <ue-copy-text :text="item[col.key]" />
                 </template>

@@ -13,6 +13,7 @@ use Laravel\Sanctum\HasApiTokens;
 use Modules\SystemUser\Entities\Company;
 use Spatie\Permission\Traits\HasRoles;
 use Unusualify\Modularity\Database\Factories\UserFactory;
+use Unusualify\Modularity\Entities\Traits\Auth\CanRegister;
 use Unusualify\Modularity\Entities\Traits\HasFileponds;
 use Unusualify\Modularity\Entities\Traits\HasOauth;
 use Unusualify\Modularity\Entities\Traits\HasScopes;
@@ -30,7 +31,8 @@ class User extends Authenticatable implements MustVerifyEmailContract
         ModelHelpers,
         Notifiable,
         HasFileponds,
-        HasOauth;
+        HasOauth,
+        CanRegister;
 
     /**
      * The attributes that are mass assignable.
@@ -49,6 +51,7 @@ class User extends Authenticatable implements MustVerifyEmailContract
         'country_id',
         'password',
         'published',
+        'email_verified_at',
     ];
 
     /**
@@ -242,5 +245,10 @@ class User extends Authenticatable implements MustVerifyEmailContract
     protected static function newFactory(): \Illuminate\Database\Eloquent\Factories\Factory
     {
         return UserFactory::new();
+    }
+
+    public function sendEmailVerification($token)
+    {
+        $this->notify(new \Unusualify\Modularity\Notifications\EmailVerification($token));
     }
 }

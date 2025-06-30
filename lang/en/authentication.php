@@ -39,6 +39,8 @@ return [
     'generate-password' => 'Generate Password',
 
     'confirm-provider' => 'Confirm your {provider} account',
+    'complete-registration-title' => 'COMPLETE REGISTRATION',
+    'complete-registration' => 'Complete Registration',
 
     'verification-complete' => 'Verification',
     'verification-complete-description' => 'Your email has been verified.',

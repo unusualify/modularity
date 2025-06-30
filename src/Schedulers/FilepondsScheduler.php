@@ -14,7 +14,7 @@ class FilepondsScheduler extends Command
      * @var string
      */
     protected $signature = 'modularity:fileponds:scheduler
-        {days=7 : The number of days to keep temporary fileponds}
+        {--days=7 : The number of days to keep temporary fileponds}
     ';
 
     /**
@@ -41,12 +41,13 @@ class FilepondsScheduler extends Command
      */
     public function handle()
     {
-        $temporaryFileponds = Filepond::clearTemporaryFiles($this->argument('days'));
+        $days = $this->option('days');
+        $temporaryFileponds = Filepond::clearTemporaryFiles($days);
 
         Filepond::clearFolders();
 
         Log::channel('scheduler')
-            ->info("Modularity: Deleted {$temporaryFileponds->count()} expired temporary fileponds in last {$this->argument('days')} days");
+            ->info("Modularity: Deleted {$temporaryFileponds->count()} expired temporary fileponds in last {$days} days");
 
         // $this->info(now()->format('Y-m-d H:i:s') . ' - Modularity: Temporary fileponds cleaned');
     }

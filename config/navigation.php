@@ -95,5 +95,71 @@ return [
             ],
         ],
     ],
+    'profileMenu' => [
+        'superadmin' => [
+            [
+                'name' => 'Profile Settings',
+                // 'route_name' => 'admin.profile',
+                'icon' => '$accountSettings',
+                'menuActivator' => 'profile',
+                'menuItems' => [
+                    'profile' => [
+                        'name' => 'Profile Settings',
+                        'route_name' => 'admin.profile',
+                        'icon' => '$accountSettings',
+                    ],
+                ],
+
+            ],
+            [
+                'name' => 'Dashboard',
+                'menuActivator' => 'dashboard',
+                'icon' => '$dashboard',
+                'menuItems' => [
+                    'facebook' => [
+                        'name' => 'Facebook',
+                        'href' => 'https://www.facebook.com',
+                        'icon' => 'mdi-facebook',
+                    ],
+                    'dashboard' => [
+                        'name' => 'Dashboard',
+                        'route_name' => 'admin.dashboard',
+                        'icon' => '$dashboard',
+                    ],
+                    'permissions' => [
+                        'name' => 'Permissions',
+                        'route_name' => 'admin.system.system_user.permission.index',
+                        'icon' => '$accountSettings',
+                    ],
+                ],
+            ],
+            'permissions' => [
+                'name' => 'Permissions',
+                'route_name' => 'admin.system.system_user.permission.index',
+                'icon' => '$accountSettings',
+            ],
+        ],
+        'default' => [
+            [
+                'name' => 'Profile Settings',
+                'route_name' => 'admin.profile',
+                'icon' => '$accountSettings',
+
+            ],
+            'permissions' => [
+                'name' => 'Permissions',
+                'route_name' => 'admin.system.system_user.permission.index',
+                'icon' => '$accountSettings',
+                'can' => 'permission_view',
+            ],
+        ],
+        'client' => [
+            'profile' => [
+                'name' => 'Profile Settings',
+                'route_name' => 'admin.profile',
+                'icon' => '$accountSettings',
+            ],
+        ],
+    ],
 
 ];

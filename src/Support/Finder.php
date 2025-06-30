@@ -243,4 +243,16 @@ class Finder
 
         return collect($models);
     }
+
+    /**
+     * Get all models that use a given trait.
+     *
+     * @param string $trait
+     * @return array
+     */
+    public function getModelsWithTrait($trait)
+    {
+        return $this->getAllModels()
+            ->filter(fn ($model) => in_array($trait, class_uses_recursive($model)))->values()->toArray();
+    }
 }

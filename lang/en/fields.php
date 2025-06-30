@@ -19,6 +19,7 @@ return [
     'confirm-description' => 'Are you sure you want to do this?',
     'confirm-action' => 'Are you sure want to {action} on selected {route}',
     'country' => 'Country',
+    'create' => 'Create',
     'delete' => 'Delete',
     'duplicate' => 'Duplicate',
     'edit' => 'Edit',
@@ -43,5 +44,6 @@ return [
     'success-update' => 'Updated Successfully.',
     'success-delete' => 'Removed Successfully.',
     'update' => 'Update',
+    'validate' => 'Validate',
     'switch-language' => 'Switch Language',
 ];

@@ -151,7 +151,7 @@ return [
                 'unread' => [
                     'label' => 'Read Notification',
                     'icon' => 'mdi-bell-alert',
-                    'color' => 'warning',
+                    'color' => 'orange-darken-1',
                     'variant' => 'flat',
                     'conditions' => [
                         ['is_read', '!=', true],

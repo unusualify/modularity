@@ -1,13 +1,14 @@
 <template>
   <ue-modal
-    v-model="show"
-    id="modalMedia"
     ref="modalMedia"
+    id="modalMedia"
+    v-model="show"
     fullscreen
     content-class=""
     width=""
     @opened="opened"
-    >
+    eager
+  >
     <template v-slot:activator="{props}">
       <slot name="activator" :props="{...props}"></slot>
     </template>
@@ -74,40 +75,23 @@
               <div slot="hidden-filters">
 
                 <!-- <a17-vselect class="medialibrary__filter-item" ref="filter" name="tag" :options="tags"
-                            :placeholder="$trans('media-library.filter-select-label', 'Filter by tag')" :searchable="true" maxHeight="175px"/>
+                            :placeholder="$trans('media-library.filter-select-label', 'Filter by tag')" :searchable="true" maxHeight="175px"
+                      />
                 <a17-checkbox class="medialibrary__filter-item" ref="unused" name="unused" :initial-value="0" :value="1" :label="$trans('media-library.unused-filter-label', 'Show unused only')"/> -->
               </div>
 
             </ue-filter>
             <ue-dropdown-filter
-            @submit="submitFilter"
-            @clear="clearDropdownFilters"
-            :loading="loading"
-            :filter-ref="$refs.filter"
+              @submit="submitFilter"
+              @clear="clearDropdownFilters"
+              :loading="loading"
+              :filter-ref="$refs.filter"
 
-            v-model:filterState="sharedFilterState"
-            :schema="filterSchema"
-          >
+              v-model:filterState="sharedFilterState"
+              :schema="filterSchema"
+            >
 
-          </ue-dropdown-filter>
-<!--
-
-[
-  {
-    "clearable" => "true"
-    "chips" => "true",
-    "label" => $trans('media-library.filter-select-label', 'Filter by tag'),
-    "name" => "tag"
-    "items" => "tags"
-    "class" => "medialibrary__filter"
-    "ref" => "filter"
-    "maxHeight" => "175px"
-    "v-model" => "sharedFilterState.tag"
-  }
-]
-
--->
-
+            </ue-dropdown-filter>
           </div>
 
           <div class="medialibrary__inner">

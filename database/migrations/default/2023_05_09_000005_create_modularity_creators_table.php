@@ -14,7 +14,6 @@ return new class extends Migration
     public function up()
     {
         $creatorRecordsTable = modularityConfig('tables.creator_records', 'modularity_creator_records');
-        // $usersTable = modularityConfig('tables.users', 'admin_users');
 
         if (! Schema::hasTable($creatorRecordsTable)) {
             Schema::create($creatorRecordsTable, function (Blueprint $table) {

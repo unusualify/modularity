@@ -49,6 +49,7 @@ class ChatMessage extends Model
         'is_sent' => 'boolean',
         'is_received' => 'boolean',
         'edited_at' => 'datetime',
+        'notified_at' => 'datetime',
     ];
 
     /**

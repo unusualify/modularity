@@ -77,12 +77,13 @@ abstract class FeatureNotification extends Notification implements ShouldQueue
         // }
 
         if (method_exists($model, 'getTitleValue')) {
-            return $model->getTitleValue();
+            return $model->getTitleValue() ?? '';
         } else {
             return $model->name
                 ?? $model->title
                 ?? $model->slug
-                ?? $model->id;
+                ?? $model->id
+                ?? '';
         }
     }
 

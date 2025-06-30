@@ -31,11 +31,12 @@ class NavigationMiddleware
                     $profileMenuKey = 'superadmin';
                 } elseif (count($user->roles) > 0 && $user->isClient()) {
                     $sidebarKey = 'client';
+                    $profileMenuKey = 'client';
                 }
             }
 
             $sidebarConfigKey = 'modularity-navigation.sidebar.' . $sidebarKey;
-            $profileMenuConfigKey = 'modularity.ui_settings.profileMenu.' . $profileMenuKey;
+            $profileMenuConfigKey = 'modularity-navigation.profileMenu.' . $profileMenuKey;
 
             $navigation = [
                 'current_url' => url()->current(),

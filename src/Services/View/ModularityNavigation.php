@@ -125,7 +125,7 @@ class ModularityNavigation
                 $array['iconProps'] = array_merge([
                     'color' => 'secondary',
                 ], $array['iconProps'] ?? []);
-                $array['class'] = 'text-secondary';
+                $array['class'] = $array['classOnBadge'] ?? 'text-secondary';
             }
         }
 

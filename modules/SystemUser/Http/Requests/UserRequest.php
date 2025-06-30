@@ -15,6 +15,7 @@ class UserRequest extends Request
     {
         return [
             'roles' => [
+                'sometimes',
                 'required',
                 function ($attribute, $value, $fail) {
                     $rolesTable = config('permission.table_names.roles', 'sp_roles');

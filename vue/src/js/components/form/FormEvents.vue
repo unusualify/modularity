@@ -14,7 +14,10 @@
         />
         <ue-recursive-stuff v-else-if="event.viewOnlyComponent"
           :configuration="event.viewOnlyComponent"
-          :bind-data="input"
+          :bind-data="{
+            ...input,
+            ...formItem
+          }"
           v-bind="tooltipActivatorScope.props"
           class="mr-2"
         />
@@ -78,6 +81,10 @@ export default {
     modelValue: {
       type: Object,
       required: true
+    },
+    formItem: {
+      type: Object,
+      default: () => ({})
     }
   },
   computed: {

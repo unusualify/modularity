@@ -1,5 +1,5 @@
 @extends("{$MODULARITY_VIEW_NAMESPACE}::auth.layout", [
-    'pageTitle' => ___('authentication.login')
+    'pageTitle' => ___('authentication.login') . ' | ' . \Unusualify\Modularity\Facades\Modularity::pageTitle()
 ])
 @section('appTypeClass', 'body--form')
 

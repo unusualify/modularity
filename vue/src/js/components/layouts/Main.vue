@@ -83,10 +83,9 @@
       <slot></slot>
 
       <!-- Media Library -->
-      <ue-modal-media
-        v-if="authorization && !$lodash.isEmpty(authorization) && !authorization.isClient"
-        v-model="showMediaLibrary"
+      <ue-modal-media v-if="$store.getters.mediaLibraryAccessible"
         ref="mediaLibrary"
+        v-model="$store.state.mediaLibrary.showModal"
       ></ue-modal-media>
 
       <!-- Delete Warning Media Modal -->
@@ -250,7 +249,7 @@
 </template>
 
 <script>
-  import { ALERT, CONFIG } from '@/store/mutations/index'
+  import { ALERT, CONFIG, MEDIA_LIBRARY } from '@/store/mutations/index'
   import { USER } from '@/store/mutations';
 
   export default {
@@ -420,7 +419,6 @@
           }
         ],
 
-        showMediaLibrary: false,
         showDeleteWarning: false,
         showImpersonateToolbar: false
       }
@@ -436,12 +434,17 @@
       },
       alertDialogMessage() {
         return this.$store.state.alert.dialogMessage
-      }
+      },
     },
     created () {
       if(this.$vuetify.display.mdAndDown){
         this.$store.commit(CONFIG.SET_SIDEBAR, false)
       }
+
+      this.$store.commit(MEDIA_LIBRARY.SET_ACCESSIBLE, this.authorization
+        && !this.$lodash.isEmpty(this.authorization)
+        && !this.authorization.isClient
+      )
     },
 
     mounted () {

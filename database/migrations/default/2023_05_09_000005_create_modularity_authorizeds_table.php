@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         $authorizedsTable = modularityConfig('tables.authorizeds', 'modularity_authorizeds');
-        $usersTable = modularityConfig('tables.users', 'admin_users');
+        $usersTable = modularityConfig('tables.users', 'um_users');
 
         if (! Schema::hasTable($authorizedsTable)) {
             Schema::create($authorizedsTable, function (Blueprint $table) use ($usersTable) {
