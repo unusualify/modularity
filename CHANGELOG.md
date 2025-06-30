@@ -2,6 +2,69 @@
 
 All notable changes to `modularity` will be documented in this file
 
+## v0.37.0 - 2025-06-30
+
+### :rocket: Features
+
+- update sidebarMenuItem class assignment for improved flexibility by @OoBook in https://github.com/unusualify/modularity/commit/a733477b65394cb659c3eab7f92c142014bf5b46
+- add ModularityNotificationSentListener to handle notification events by @OoBook in https://github.com/unusualify/modularity/commit/5acc360f4e148abc6865e84d9499884b56f75d10
+- introduce ModularityFinder facade for enhanced modularity support by @OoBook in https://github.com/unusualify/modularity/commit/fbb9976bcf3a2088c54266966273116bf7edf9de
+- add method to retrieve models using a specific trait by @OoBook in https://github.com/unusualify/modularity/commit/b2421bc4728936ae0dc7b3063161a99d9a0adb7f
+- implement chat notification system with notified_at field by @OoBook in https://github.com/unusualify/modularity/commit/0ed637c0ff3ab6823afec1f4f22d8b20bf5478c2
+- enhance data binding with formItem integration by @OoBook in https://github.com/unusualify/modularity/commit/c5737258dd1c586a6b1cf729fbbcdfd872779f67
+- integrate formItem for enhanced data binding by @OoBook in https://github.com/unusualify/modularity/commit/4de49f0e759f209e64f94cceeea4fe68ac7e81b9
+- enhance form component with subtitle support and improved data binding by @OoBook in https://github.com/unusualify/modularity/commit/d5538049f1b8b86c51e6261d092ee773a0360dd5
+- add page title callback functionality by @OoBook in https://github.com/unusualify/modularity/commit/2e19e3d857685d588b7542b3aca0938cf4a91172
+
+### :wrench: Bug Fixes
+
+- add 'sometimes' rule to roles validation for improved flexibility by @OoBook in https://github.com/unusualify/modularity/commit/3a20d1e47833b97c0803489dea3c62218f20096b
+- ensure getModelTitleField returns a default empty string for missing title values by @OoBook in https://github.com/unusualify/modularity/commit/8742f03c866bcb2ad3d69e3d9f57b8200d2c71a9
+- update command signature to use option for days parameter by @OoBook in https://github.com/unusualify/modularity/commit/e903535f1125d64b5c7f920de1a1d783aedeeaf6
+- adjust header padding for improved layout consistency by @OoBook in https://github.com/unusualify/modularity/commit/278d51cd99c8c6923b3883a1c47d528cc13dafbf
+- add color prop and improve button styling by @OoBook in https://github.com/unusualify/modularity/commit/c350372ea8bcdc5d8d53f752764fc037ce9bf719
+- move class definition to computed property by @OoBook in https://github.com/unusualify/modularity/commit/3a63c31c79f0e8af668b2c66271fa49c87966975
+- update notification color for unread messages by @OoBook in https://github.com/unusualify/modularity/commit/1a6760f36a07bb28addcab72ee17a9f90cdde603
+
+### :recycle: Refactors
+
+- comment out unused orange color definitions for clarity by @OoBook in https://github.com/unusualify/modularity/commit/02a2344b40ad26a356c55ff044a343d68996127d
+- comment out rules for logo field to enhance clarity by @OoBook in https://github.com/unusualify/modularity/commit/a2ad6c337ee27176866be83fdfb8cd04649b56df
+- enhance accessibility and modal management by @OoBook in https://github.com/unusualify/modularity/commit/586d2c922c0af730b3e44951b17dc90ff3a99f65
+- remove unused media library model binding by @OoBook in https://github.com/unusualify/modularity/commit/1d566337529005978c891888d9ede6cbdfd4b781
+- adjust layout for improved responsiveness by @OoBook in https://github.com/unusualify/modularity/commit/019add47ba423e2413471e30ddfcb854a54e12c3
+- update layout and improve data presentation by @OoBook in https://github.com/unusualify/modularity/commit/6ca469c998529ebe79ec41a8364951ef5b2fa5e7
+- update button to span for improved styling and functionality by @OoBook in https://github.com/unusualify/modularity/commit/6e8878ec32dd0cd3526a52c33be3d2762a8860ad
+- enhance profile menu configuration for user roles by @OoBook in https://github.com/unusualify/modularity/commit/63b3210ee9ec724a7cf3d040fc335a15006acf0e
+- improve form handling with enhanced title and submission logic by @OoBook in https://github.com/unusualify/modularity/commit/a990507b7f68638db50c51fb34e46cfd1103a785
+- add title configuration for improved table presentation by @OoBook in https://github.com/unusualify/modularity/commit/640e4a36c5c3a420a132073e4034af369399c039
+- enhance relationship data handling in getItemColumnData method by @OoBook in https://github.com/unusualify/modularity/commit/1506e3ca87e45ea41d74714c37f641e4b03371b6
+- improve checkbox rendering and add active color props by @OoBook in https://github.com/unusualify/modularity/commit/dd4beb98f215342fee453742f613fe5de088246a
+- enhance checkbox rendering and add new props for customization by @OoBook in https://github.com/unusualify/modularity/commit/04842c301267deffbb7de5c58383ce464dbcb2f2
+- simplify template structure and adjust title padding by @OoBook in https://github.com/unusualify/modularity/commit/dde856b5e1fe10a76787432b7314266e4ce3bf75
+- enhance page title handling across authentication views by @OoBook in https://github.com/unusualify/modularity/commit/362e0b59138dc4d857e82aaf9696201d3b2431cd
+- streamline user registration process by @OoBook in https://github.com/unusualify/modularity/commit/ede0df9aca0dcfbfaa2bb1a19a5065fc092f62bc
+
+### :lipstick: Styling
+
+- lint coding styles for v0.37.0 by @OoBook in https://github.com/unusualify/modularity/commit/5499bd8789cb1ac473d1ba9f725184a45e4328ae
+
+### :white_check_mark: Testing
+
+- update role creation and registration success message by @OoBook in https://github.com/unusualify/modularity/commit/bacde4a6e99301ba27b7a146f4d43febe3986de5
+
+### :package: Build
+
+- update build artifacts for v0.37.0 by @OoBook in https://github.com/unusualify/modularity/commit/759a08b2493fc623211975dfeb18c225e8ea9ab5
+
+### :green_heart: Workflow
+
+- change accepted label as planned to create a branch by @web-flow in https://github.com/unusualify/modularity/commit/1e9c3dbf23a7b003e15cde8b9f6f0677d65bbddd
+
+### :beers: Other Stuff
+
+- add new language entries for create and validate actions by @OoBook in https://github.com/unusualify/modularity/commit/a510db8d81c9f6e291d10b6213044816168ad72f
+
 ## v0.36.0 - 2025-06-22
 
 ### :rocket: Features
