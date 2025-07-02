@@ -12,7 +12,9 @@ jobs:
   add-to-project:
     runs-on: ubuntu-latest
     steps:
-      - uses: oobook/automated-issue-carrier@v1
+      - name: Automated Issue Carrier
+        uses: oobook/automated-issue-carrier@v1.0.0
+        id: automated-issue-carrier
         with:
           gh_token: ${{ secrets.GITHUB_TOKEN }}
           projects: "Modularity v0"
