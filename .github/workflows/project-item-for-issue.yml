@@ -15,7 +15,7 @@ jobs:
       - uses: oobook/automated-issue-carrier@v1
         with:
           gh_token: ${{ secrets.GITHUB_TOKEN }}
-          projects: "Modularity V0"
+          projects: "Modularity v0"
           labels: "bug,accepted enhancement,accepted"
           item_fields: "Status:Backlog,Size:S,Priority:P2"
           test: true
