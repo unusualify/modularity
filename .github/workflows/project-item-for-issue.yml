@@ -18,3 +18,4 @@ jobs:
           projects: "Modularity V0"
           labels: "bug,accepted enhancement,accepted"
           item_fields: "Status:Backlog,Size:S,Priority:P2"
+          test: true
