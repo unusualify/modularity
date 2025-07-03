@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Automated Issue Carrier
-        uses: oobook/automated-issue-carrier@v1.0.0
+        uses: oobook/automated-issue-carrier@v1
         id: automated-issue-carrier
         with:
           gh_token: ${{ secrets.GITHUB_TOKEN }}
