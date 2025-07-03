@@ -208,18 +208,17 @@
         scrollable
         transition="dialog-bottom-transition"
         width-type="sm"
+        persistent
       >
         <template v-slot:body="{ isActive, toggleFullscreen, close , isFullActive}">
           <v-card>
-
             <v-card-title>
-              <ue-title padding="y-3" :text="$t('Login')" color="grey-darken-5" transform="none" align="center" justify="space-between">
-                <template #right>
-                  <div class="d-flex align-center">
-                    <v-icon :icon="isFullActive ? 'mdi-fullscreen-exit' : 'mdi-fullscreen'" variant="plain" color="grey-darken-5" size="default" @click="toggleFullscreen()"/>
-                    <v-icon icon="$close" variant="plain" color="grey-darken-5" size="default" @click="close()"/>
-                  </div>
-                </template>
+              <ue-title padding="y-3" color="grey-darken-5" transform="none" align="center" justify="space-between">
+                <div>
+                  {{ $t('Login') }}
+                  <br>
+                  <span class="text-grey-darken-2 text-caption" >{{ $t('Your session has expired, please login again.') }}</span>
+                </div>
               </ue-title>
               <v-divider/>
             </v-card-title>
@@ -485,6 +484,16 @@
       },
       loginFormSubmitted(res) {
         // this.$store.commit(USER.CLOSE_LOGIN_MODAL)
+        if(res.variant === 'success') {
+          this.$store.commit(ALERT.SET_ALERT, {...res})
+          if(res.timeout) {
+            setTimeout(() => {
+              window.location.reload()
+            }, res.timeout)
+          }else{
+            window.location.reload()
+          }
+        }
       }
     }
   }
