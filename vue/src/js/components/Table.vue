@@ -785,9 +785,8 @@
               </v-icon>
             </template>
             <v-list>
-              <template v-for="(action, k) in rowActions" :key="k">
+              <template v-for="(action, k) in visibleRowActions" :key="k">
                 <v-list-item
-                  v-if="itemHasAction(item, action)"
                   @click="itemAction(item, action)"
                   >
                     <v-icon small :color="action.color" left>
@@ -800,9 +799,8 @@
           </v-menu>
 
           <div v-else>
-            <template v-for="(action, k) in rowActions" :key="k">
+            <template v-for="(action, k) in visibleRowActions" :key="k">
               <v-tooltip
-                v-if="itemHasAction(item, action)"
                 :text="$t( action.label ?? action.name )"
                 location="top"
                 >

@@ -380,6 +380,16 @@ export default function useTableItemActions(props, { tableForms, loadItems }) {
         ? 'dropdown'
         : 'inline'
     }),
+    visibleRowActions: computed(() => {
+      const actions = props.rowActions.reduce((acc, action) => {
+        if(itemHasAction(tableItem.editedItem.value, action)){
+          acc.push(action)
+        }
+        return acc
+      }, [])
+
+      return actions
+    })
   })
 
   return {
