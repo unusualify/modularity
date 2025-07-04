@@ -102,10 +102,15 @@ return [
             'no_default_table_row_actions' => true,
             'table_row_actions' => [
                 'read' => [
-                    'label' => 'See Notification',
+                    'is' => 'v-btn',
+                    'label' => 'Open',
                     'icon' => 'mdi-bell-check',
                     'color' => 'info',
+                    'iconColor' => 'white',
                     'variant' => 'flat',
+                    'componentProps' => [
+                        'variant' => 'elevated',
+                    ],
                     // 'href' => 'notification.read',
                     // 'target' => '_blank',
                     'conditions' => [
@@ -149,10 +154,15 @@ return [
                     ],
                 ],
                 'unread' => [
-                    'label' => 'Read Notification',
+                    'is' => 'v-btn',
+                    'label' => 'Open',
                     'icon' => 'mdi-bell-alert',
                     'color' => 'orange-darken-1',
+                    'iconColor' => 'white',
                     'variant' => 'flat',
+                    'componentProps' => [
+                        'variant' => 'elevated',
+                    ],
                     'conditions' => [
                         ['is_read', '!=', true],
                     ],
