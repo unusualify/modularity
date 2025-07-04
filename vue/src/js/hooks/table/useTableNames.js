@@ -149,7 +149,7 @@ export default function useTableNames(props, context) {
       : ''
 
     return t(langKey, {
-      route: transNameSingular.value,
+      route: Module.transNameSingular.value,
       name: itemName.toLocaleUpperCase()
     })
   })
