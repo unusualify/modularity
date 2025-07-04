@@ -13,6 +13,7 @@ export default async function formatPrependSchema(args, model, schema, input, in
   // const setterNotation = `${inputNotation}.${inputPropToFormat}`
   const prepend = args.shift() // *.packageLanguages
   const setterSchemaKey = args.shift() // schema.packageLanguages
+  const hasOrder = args.shift() == 'true'
 
   let {handlerName, handlerSchema, handlerValue} = formatHelpers.handlers(input, model, index)
 
@@ -99,6 +100,19 @@ export default async function formatPrependSchema(args, model, schema, input, in
         delete oldSchema[key]
       })
       let prependedKeys = relatedKeys.filter(key => !deletedKeys.includes(key))
+
+      if(hasOrder){
+        // reorder newSchema by prependedKeys
+        prependedKeys = prependedKeys.sort((a, b) => {
+          const aId = parseInt(a.match(/^(\d+)/)[1]);
+          const bId = parseInt(b.match(/^(\d+)/)[1]);
+          return aId - bId;
+        })
+        newSchema = prependedKeys.reduce((acc, key) => {
+          acc[key] = newSchema[key]
+          return acc;
+        }, {})
+      }
 
       let updatedSchema =  Object.assign(newSchema, oldSchema)
 

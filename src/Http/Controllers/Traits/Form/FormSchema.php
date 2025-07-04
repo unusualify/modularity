@@ -843,9 +843,10 @@ trait FormSchema
                         $inputToFormat = array_shift($args) ?? '';
                         $prependKey = array_shift($args) ?? null;
                         $setterSchemaKey = array_shift($args) ?? null;
+                        $orderKey = array_shift($args) ?? 'false';
 
                         if ($inputToFormat && $prependKey && $setterSchemaKey) {
-                            $events[] = "formatPrependSchema:{$inputToFormat}:{$prependKey}:{$setterSchemaKey}";
+                            $events[] = "formatPrependSchema:{$inputToFormat}:{$prependKey}:{$setterSchemaKey}:{$orderKey}";
                         }
 
                         break;
