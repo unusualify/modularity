@@ -784,15 +784,16 @@
                 >
               </v-icon>
             </template>
+
             <v-list>
               <template v-for="(action, k) in visibleRowActions" :key="k">
-                <v-list-item
+                <v-list-item v-if="itemHasAction(item, action)"
                   @click="itemAction(item, action)"
                   >
-                    <v-icon small :color="action.color" left>
-                      {{ action.icon ? action.icon : '$' + action.name }}
+                    <v-icon small :color="action.iconColor" left>
+                      {{ action.icon }}
                     </v-icon>
-                    {{ $t( action.label ?? $headline(action.name) ) }}
+                    {{ $t( action.label ) }}
                 </v-list-item>
               </template>
             </v-list>
@@ -800,20 +801,29 @@
 
           <div v-else>
             <template v-for="(action, k) in visibleRowActions" :key="k">
-              <v-tooltip
-                :text="$t( action.label ?? action.name )"
+              <v-tooltip v-if="itemHasAction(item, action)"
+                :text="$t( action.label )"
                 location="top"
+                :disabled="action.is !== 'v-icon'"
                 >
                 <template v-slot:activator="{ props }">
-                  <v-icon
-                    small
-                    class="mr-2"
+                  <component :is="action.is"
                     @click="itemAction(item, action)"
-                    :color="action.color"
-                    v-bind="props"
-                    >
-                    {{ action.icon ? action.icon : '$' + action.name }}
-                  </v-icon>
+                    v-bind="{
+                      ...(action.hasTooltip ? props : {}),
+                      ...(action.componentProps ?? {}),
+                    }"
+                  >
+                    <template #prepend>
+                      <v-icon small :color="action.iconColor" left :icon="action.icon" />
+                    </template>
+                    <template v-if="action.is !== 'v-icon'">
+                      {{ $t( action.label ) }}
+                    </template>
+                    <template v-else>
+                      {{ action.icon }}
+                    </template>
+                  </component>
                 </template>
               </v-tooltip>
             </template>
