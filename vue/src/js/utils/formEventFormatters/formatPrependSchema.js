@@ -104,7 +104,9 @@ export default async function formatPrependSchema(args, model, schema, input, in
       if(hasOrder){
         // reorder newSchema by prependedKeys
         prependedKeys = prependedKeys.sort((a, b) => {
-          return lastPrependedKeys.indexOf(a) - lastPrependedKeys.indexOf(b)
+          const aId = parseInt(a.match(/^(\d+)/)[1]);
+          const bId = parseInt(b.match(/^(\d+)/)[1]);
+          return aId - bId;
         })
         newSchema = prependedKeys.reduce((acc, key) => {
           acc[key] = newSchema[key]
