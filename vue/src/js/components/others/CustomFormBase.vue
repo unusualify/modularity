@@ -1391,7 +1391,7 @@ export default {
         const oldFormSchema = cloneDeep(this.formSchema)
         let isChanged = false
         event.forEach(e => {
-          if(e.key && e.value && this.formSchema?.[obj.key]){
+          if(e.key && (e.value !== null || e.value !== undefined) && this.formSchema?.[obj.key]){
             oldFormSchema[obj.key][e.key] = e.value
             isChanged = true
           }
