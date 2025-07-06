@@ -106,6 +106,18 @@ enum ProcessStatus: string
         };
     }
 
+    public function informationalMessage(): string
+    {
+        return match ($this) {
+            self::PREPARING => __('The contents are being prepared or updated. Please check back later.'),
+            // self::WAITING_FOR_CONFIRMATION => __('The contents are being prepared or updated. Please check back later.'),
+            // self::WAITING_FOR_REACTION => __('The contents are being prepared or updated. Please check back later.'),
+            self::REJECTED => __('The contents has been rejected. The reason is under review, you will be informed soon.'),
+            self::CONFIRMED => __('The contents are confirmed.'),
+            default => __('The contents are being prepared or updated. Please check back later.'),
+        };
+    }
+
     public static function get($caseName): ?string
     {
         foreach (self::cases() as $case) {
