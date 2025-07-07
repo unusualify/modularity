@@ -380,6 +380,11 @@ export default {
       context.emit('update:modelValue', val)
     }
 
+    const processModel = ref(props.process)
+    const processableModel = ref(props.process?.processable ?? null)
+    const processValid = ref(false)
+    const processableValid = ref(false)
+
     const formatSchema = () => {
       let schema = {}
       let processable = _.get(processModel.value, 'processable', {});
@@ -427,11 +432,6 @@ export default {
     const setSchema = () => {
       formSchema.value = formatSchema()
     }
-
-    const processModel = ref(props.process)
-    const processableModel = ref(props.process?.processable ?? null)
-    const processValid = ref(false)
-    const processableValid = ref(false)
 
     const reason = ref('')
     const promptModalActive = ref(false)
@@ -497,7 +497,6 @@ export default {
     })
 
     const informationalMessage = computed(() => {
-      console.log(processModel.value)
       if(processModel.value?.status){
         return processModel.value.status_informational_message
       }
@@ -511,10 +510,10 @@ export default {
 
       UeForm,
       formActive,
-      formSchema,
+      // formSchema,
       formIsValid,
 
-      processModel,
+      // processModel,
       processableModel,
       processValid,
       processableValid,
@@ -565,6 +564,8 @@ export default {
     return {
       ...useInput(props, { ...context, initializeInput, updateModelValue }),
       ...toRefs(states),
+      formSchema,
+      processModel,
       ...toRefs(methods),
     }
   },
