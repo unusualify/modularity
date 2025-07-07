@@ -153,7 +153,10 @@ export const makeFormProps = propsFactory({
     type: Boolean,
     default: false
   },
-
+  noWaitSourceLoading: {
+    type: Boolean,
+    default: false
+  }
 })
 
 export default function useForm(props, context) {
@@ -288,6 +291,11 @@ export default function useForm(props, context) {
     hasAdditionalSection,
 
     showAdditionalSectionDialog: false,
+
+    hasSchemaInputSourceLoading: computed(() => {
+      return Object.values(rawSchema.value).some(schema => Object.prototype.hasOwnProperty.call(schema, 'sourceLoading') && schema.sourceLoading === true
+        || (Object.prototype.hasOwnProperty.call(schema, 'type') && (schema.type === 'wrap' || schema.type === 'group') && Object.values(schema.schema).some(schema => Object.prototype.hasOwnProperty.call(schema, 'sourceLoading') && schema.sourceLoading === true)))
+    })
   })
   // Methods
 
@@ -609,7 +617,6 @@ export default function useForm(props, context) {
       //   if (__isset(this.rawSchema[key].event)) {
 
     },
-
     updatedCustomFormBaseModelValue: (value) => {
       model.value = value
     },

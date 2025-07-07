@@ -38,4 +38,5 @@ return [
     'variant' => 'outlined',
     'clearable',
     'color' => '',
+    'sourceLoading' => false,
 ];

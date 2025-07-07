@@ -6,12 +6,22 @@
     ]"
   >
     <div class="w-100">
+      <div v-if="hasSchemaInputSourceLoading && !noWaitSourceLoading" class="d-flex justify-center align-center h-100 pa-16">
+        <v-progress-circular
+          indeterminate
+          bg-color="primary-lighten-3"
+          color="primary"
+          :size="50"
+          :width="6"
+        />
+      </div>
       <ue-collapsible
         v-model="isOpen"
         :no-collapse="!collapsible"
         no-header-background
         :horizontal-padding="0"
         :vertical-padding="0"
+        :class="hasSchemaInputSourceLoading && !noWaitSourceLoading ? 'd-none' : ''"
       >
         <!-- Title -->
         <template v-slot:title v-if="(label || subtitle || $slots.title || $slots.append) && !(!noHeaders && hasRepeaterModels)">
@@ -63,10 +73,10 @@
                             <v-custom-form-base
                               :id="`ue-repeater-form-${itemSlot.index}`"
                               :modelValue="itemSlot.element"
-                              @update:modelValue="onUpdateRepeaterModel($event, itemSlot.index)"
                               :schema="repeaterSchemas[itemSlot.index]"
-                              @update:schema="onUpdateRepeaterSchema($event, itemSlot.index)"
                               :row="formRowAttribute"
+                              @update:schema="onUpdateRepeaterSchema($event, itemSlot.index)"
+                              @update:modelValue="onUpdateRepeaterModel($event, itemSlot.index)"
                             >
                               <!-- <template v-slot:[`slot-top-ue-repeater-form-${itemSlot.index}`]>
                                 <h4 class="slot">
@@ -127,10 +137,10 @@
                           :id="`ue-repeater-form-${index}`"
                           class="w-100 h-100"
                           :modelValue="item"
-                          @update:modelValue="onUpdateRepeaterModel($event, index)"
                           :schema="repeaterSchemas[index]"
-                          @update:schema="onUpdateRepeaterSchema($event, index)"
                           :row="formRowAttribute"
+                          @update:modelValue="onUpdateRepeaterModel($event, index)"
+                          @update:schema="onUpdateRepeaterSchema($event, index)"
                         >
 
                           <template

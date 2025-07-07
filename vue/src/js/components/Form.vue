@@ -147,14 +147,24 @@
               </template>
             </FormActions>
 
+            <div v-if="hasSchemaInputSourceLoading && !noWaitSourceLoading" class="d-flex justify-center align-center h-100 pa-16">
+              <v-progress-circular
+                indeterminate
+                bg-color="primary-lighten-3"
+                color="primary"
+                :size="60"
+                :width="6"
+              />
+            </div>
+
             <v-custom-form-base
+              :class="hasSchemaInputSourceLoading && !noWaitSourceLoading ? 'd-none' : ''"
               :id="formBaseId"
 
               v-model="model"
               :schema="inputSchema"
               :row="rowAttribute"
               :form-item="formItem"
-
               no-auto-generate-schema
 
               @update="handleUpdate"
