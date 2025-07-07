@@ -31,8 +31,10 @@ return [
                     'title' => 'Rate',
                     'key' => 'rate',
                     'formatter' => [
-                        0 => 'chip',
-                        1 => 'primary',
+                        'chip',
+                        [
+                            'color' => 'primary',
+                        ]
                     ],
                 ],
                 [
@@ -90,8 +92,10 @@ return [
                     'key' => 'symbol',
                     'searchable' => true,
                     'formatter' => [
-                        0 => 'chip',
-                        1 => 'success',
+                        'chip',
+                        [
+                            'color' => 'success',
+                        ]
                     ],
                 ],
                 [
@@ -99,8 +103,10 @@ return [
                     'key' => 'iso_4217',
                     'searchable' => true,
                     'formatter' => [
-                        0 => 'chip',
-                        1 => 'primary',
+                        'chip',
+                        [
+                            'color' => 'primary',
+                        ]
                     ],
                 ],
                 [

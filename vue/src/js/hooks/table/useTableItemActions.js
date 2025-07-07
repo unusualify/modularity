@@ -12,6 +12,7 @@ import { useAuthorization, useDynamicModal, useCastAttributes } from '@/hooks'
 import { useTableItem, useTableNames } from '@/hooks/table'
 
 import { checkItemConditions } from '@/utils/itemConditions';
+import useGenerate from '@/hooks/utils/useGenerate.js'
 
 export const makeTableItemActionsProps = propsFactory({
   isRowEditing: Boolean,
@@ -39,7 +40,7 @@ export default function useTableItemActions(props, { tableForms, loadItems }) {
   const { can } = useAuthorization()
   const DynamicModal = useDynamicModal()
   const { castObjectAttributes } = useCastAttributes()
-
+  const { generateButtonProps } = useGenerate()
   const { smAndDown, mdAndDown, lgAndDown } = useDisplay()
 
   // Create a reactive object to store action events
@@ -380,7 +381,64 @@ export default function useTableItemActions(props, { tableForms, loadItems }) {
         ? 'dropdown'
         : 'inline'
     }),
+    visibleRowActions: computed(() => {
+      return props.rowActions.reduce((acc, action) => {
+
+        if(Object.prototype.hasOwnProperty.call(action, 'href')){
+          console.error('href is not supported in row actions', action)
+
+          return acc
+        }
+
+        let component = 'v-icon'
+        let componentProps = {}
+        let hasTooltip = true
+
+        let icon = action.icon ? action.icon : '$' + action.name
+        let iconColor = action.iconColor ?? action.color ?? 'primary'
+
+        if(__isset(action.is) && action.is === 'v-btn'){
+          component = 'v-btn'
+          hasTooltip = false
+          componentProps = {
+            variant: 'plain',
+            class: 'pa-0 ma-2',
+            ...(action.componentProps ?? {}),
+            color: action.color,
+          }
+
+          if(action.icon){
+            componentProps.prependIcon = action.icon
+          }
+        }else{
+          componentProps = {
+            small: true,
+            class: 'mr-2',
+            ...(action.componentProps ?? {}),
+            color: action.color ?? 'grey-darken-2',
+          }
+        }
+
+        action.componentProps = componentProps
+        action.label = action.label ?? window.__headline(action.name)
+
+        acc.push({
+          ...action,
+          is: component,
+          icon,
+          iconColor,
+          hasTooltip,
+        })
+
+        return acc
+      }, [])
+
+      return actions
+    })
   })
+
+
+  console.log(states.visibleRowActions)
 
   return {
     ...toRefs(states),
