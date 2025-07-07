@@ -1,9 +1,11 @@
 // hooks/useFilepond.js
 
-import { reactive, toRefs, computed, ref, inject } from 'vue'
+import { reactive, toRefs, computed, ref, inject, watch } from 'vue'
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
 
 import { omit } from 'lodash-es'
+
+import { useValidation } from '@/hooks'
 
 export const makeFilepondProps = propsFactory({
   hint: {
@@ -128,6 +130,35 @@ export const makeFilepondProps = propsFactory({
 })
 
 export default function useFilepond(props, context) {
+  const { requiredRule } = useValidation(props)
 
-  return {}
+  const rawRules = window.__data_get(props.obj, 'schema.rawRules', '') || '';
+  const filepondRules = ref(props.rules ?? [])
+  const max = ref(props.maxFiles)
+  const min = ref(props.min)
+
+  if(props.isEditing ? props.editable === true : props.creatable === true){
+    if(!props.noRules && props.min && props.min > 0 && !rawRules.match(/required:array:\d+/)){
+      filepondRules.value.push(requiredRule.value('array', props.min))
+    }
+  }
+
+  if(min.value){
+    if(max.value < min.value) {
+      max.value = min.value
+    }
+  }
+
+  if(max.value < 1) {
+    max.value = 5
+  }
+
+  watch(() => props.rules, (newVal) => {
+    filepondRules.value = newVal
+  })
+
+  return {
+    filepondRules,
+    max
+  }
 }

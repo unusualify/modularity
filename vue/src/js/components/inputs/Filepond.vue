@@ -6,7 +6,7 @@
     v-model="input"
     hide-details
     :class="classes"
-    :rules="noRules ? [] : rules"
+    :rules="noRules ? [] : filepondRules"
   >
     <template v-slot:default="defaultSlot">
       <slot name="activator"
@@ -58,7 +58,7 @@
 
             :allow-file-type-validation="true"
             :accepted-file-types="acceptedFileTypes"
-            :max-files="maxFiles"
+            :max-files="max"
 
             :disabled="disabled"
             :allow-drop="!disabled"
@@ -163,6 +163,7 @@
 
       return {
         ...useInput(props,context),
+        ...useFilepond(props, context),
         requiredRule,
       };
     },
@@ -478,14 +479,13 @@
       },
     },
     created() {
-      let rawRules = __data_get(this.obj, 'schema.rawRules', '') || '';
+      // let rawRules = __data_get(this.obj, 'schema.rawRules', '') || '';
 
-      if(this.isEditing ? this.editable === true : this.creatable === true){
-        if(!this.noRules && this.min && this.min > 0 && !rawRules.match(/required:array:\d+/)){
-          this.rules.push(this.requiredRule('array', this.min))
-        }
-      }
-
+      // if(this.isEditing ? this.editable === true : this.creatable === true){
+      //   if(!this.noRules && this.min && this.min > 0 && !rawRules.match(/required:array:\d+/)){
+      //     this.rules.push(this.requiredRule('array', this.min))
+      //   }
+      // }
     },
     mounted() {
       // Set up a MutationObserver to watch for changes in VInput's error state
