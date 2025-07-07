@@ -152,6 +152,7 @@
       ...makeInputEmits,
       'loading',
       'loaded',
+      'loadedFile'
     ],
     props: {
       ...makeInputProps(),
