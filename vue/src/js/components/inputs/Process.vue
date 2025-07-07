@@ -68,31 +68,25 @@
       <v-skeleton-loader v-if="loading" type="table-heading, list-item-three-line" class="mb-4 w-100 h-100" style="min-height: 300px;"></v-skeleton-loader>
 
       <template v-else-if="processModel">
-        <v-card-text>
+        <v-card-text class="d-flex flex-column">
 
           <!-- Processable Title -->
-          <ue-list-section
-            class="mb-4"
-            :items="[
-              {
-                title: title,
-                value: processModel.status_label,
-              }
-            ]"
-            :item-fields="['title', 'value']"
-            :col-classes="['text-h5 font-weight-medium text-wrap', 'd-flex justify-end']"
-            :col-ratios="[1,2]"
-          >
-              <template v-slot:field.1="slotScope">
-                <v-chip
-                  :prepend-icon="processModel.status_icon"
-                  :color="processModel.status_color"
-                  class="text-subtitle-1"
-                >
-                  {{ processModel.status_label }}
-                </v-chip>
-              </template>
-          </ue-list-section>
+          <v-row no-gutters>
+            <v-col cols="12" sm="6" md="6" lg="8" xl="9" class="text-h5 font-weight-medium text-wrap pb-2">
+              {{ title }}
+            </v-col>
+            <v-col cols="12" sm="6" md="6" lg="4" xl="3" class="d-flex justify-sm-end pb-2">
+              <v-chip
+                :prepend-icon="processModel.status_icon"
+                :color="processModel.status_color"
+                class="text-subtitle-1"
+              >
+                {{ processModel.status_label }}
+              </v-chip>
+            </v-col>
+          </v-row>
+
+          <v-spacer class="flex-grow-0"></v-spacer>
 
           <!-- Edit Button -->
           <v-row v-if="$hasRoles(processableEditableRoles)">
@@ -275,6 +269,7 @@
                 <v-btn
                   :color="processModel.next_action_color"
                   variant="elevated"
+                  :loading="updating"
                   @click="updateProcess('waiting_for_reaction')"
                 >
                   {{ processModel.next_action_label }}
