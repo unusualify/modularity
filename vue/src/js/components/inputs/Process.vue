@@ -71,7 +71,7 @@
         <v-card-text class="d-flex flex-column">
 
           <!-- Processable Title -->
-          <v-row no-gutters>
+          <v-row no-gutters class="pb-4">
             <v-col cols="12" sm="6" md="6" lg="8" xl="9" class="text-h5 font-weight-medium text-wrap pb-2">
               {{ title }}
             </v-col>
@@ -158,17 +158,6 @@
               </template>
             </ue-list-section>
           </template>
-          <template v-else>
-            <!-- show informational message about contents preparing or updating by vuetify compenents in well formatted-->
-            <v-alert
-              type="info"
-              variant="tonal"
-              :color="processModel?.status_card_color ?? color"
-              class="my-4"
-            >
-              {{ informationalMessage }}
-            </v-alert>
-          </template>
 
           <!-- History -->
           <ue-list-section
@@ -184,6 +173,18 @@
             :col-ratios="historyColRatio ?? displayColRatio"
           >
           </ue-list-section>
+
+          <template v-if="!(showProcessableDetails && processableModel)">
+            <!-- show informational message about contents preparing or updating by vuetify compenents in well formatted-->
+            <v-alert
+              type="info"
+              variant="tonal"
+              :color="processModel?.status_card_color ?? color"
+              class="my-4"
+            >
+              {{ informationalMessage }}
+            </v-alert>
+          </template>
         </v-card-text>
 
         <v-spacer></v-spacer>
