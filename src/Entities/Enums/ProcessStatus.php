@@ -14,8 +14,8 @@ enum ProcessStatus: string
     {
         return match ($this) {
             self::PREPARING => __('Preparing'),
-            self::WAITING_FOR_CONFIRMATION => __('Waiting for Action'),
-            self::WAITING_FOR_REACTION => __('Waiting for Reaction'),
+            self::WAITING_FOR_CONFIRMATION => __('Waiting'),
+            self::WAITING_FOR_REACTION => __('Waiting'),
             self::REJECTED => __('Rejected'),
             self::CONFIRMED => __('Confirmed'),
             default => __('Processing'),
@@ -103,6 +103,18 @@ enum ProcessStatus: string
             self::REJECTED => 'secondary',
             self::CONFIRMED => 'success',
             default => 'primary',
+        };
+    }
+
+    public function informationalMessage(): string
+    {
+        return match ($this) {
+            self::PREPARING => __('The contents are being prepared or updated. Please check back later.'),
+            // self::WAITING_FOR_CONFIRMATION => __('The contents are being prepared or updated. Please check back later.'),
+            // self::WAITING_FOR_REACTION => __('The contents are being prepared or updated. Please check back later.'),
+            self::REJECTED => __('The contents has been rejected. The reason is under review, you will be informed soon.'),
+            self::CONFIRMED => __('The contents are confirmed.'),
+            default => __('The contents are being prepared or updated. Please check back later.'),
         };
     }
 

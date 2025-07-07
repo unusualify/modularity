@@ -33,6 +33,7 @@ class Process extends Model
         'status_card_variant',
         'status_card_color',
         'status_reason_label',
+        'status_informational_message',
         'next_action_label',
         'next_action_color',
     ];
@@ -118,6 +119,13 @@ class Process extends Model
     {
         return new Attribute(
             get: fn () => $this->status->nextActionColor(),
+        );
+    }
+
+    protected function statusInformationalMessage(): Attribute
+    {
+        return new Attribute(
+            get: fn () => $this->status->informationalMessage(),
         );
     }
 

@@ -133,11 +133,11 @@ export const makeFormProps = propsFactory({
     default: null
   },
   rightSlotMinWidth: {
-    type: Number,
+    type: [Number, String],
     default: 300
   },
   rightSlotMaxWidth: {
-    type: Number,
+    type: [Number, String],
     default: 600
   },
   additionalSectionDialogTitle: {

@@ -50,6 +50,25 @@ global.__isObject = (obj) => typeof obj === 'object' && obj !== null
 global.__isString = (str) => typeof str === 'string'
 global.__isset = (val) => val !== undefined && val !== null
 
+// Mock vue-i18n before importing the component
+vi.mock('vue-i18n', () => ({
+  useI18n: () => ({
+    t: (key) => key,
+    locale: 'en'
+  })
+}))
+
+// Mock only useAuthorization from @/hooks
+vi.mock('@/hooks', async () => {
+  const actual = await vi.importActual('@/hooks')
+  return {
+    ...actual,
+    useAuthorization: () => ({
+      hasRoles: vi.fn(() => true) // Mock hasRoles to return true by default
+    })
+  }
+})
+
 // Now import the components
 import VInputProcess from '../../src/js/components/inputs/Process.vue'
 

@@ -68,31 +68,25 @@
       <v-skeleton-loader v-if="loading" type="table-heading, list-item-three-line" class="mb-4 w-100 h-100" style="min-height: 300px;"></v-skeleton-loader>
 
       <template v-else-if="processModel">
-        <v-card-text>
+        <v-card-text class="d-flex flex-column">
 
           <!-- Processable Title -->
-          <ue-list-section
-            class="mb-4"
-            :items="[
-              {
-                title: title,
-                value: processModel.status_label,
-              }
-            ]"
-            :item-fields="['title', 'value']"
-            :col-classes="['text-h5 font-weight-medium text-wrap', 'd-flex justify-end']"
-            :col-ratios="[1,2]"
-          >
-              <template v-slot:field.1="slotScope">
-                <v-chip
-                  :prepend-icon="processModel.status_icon"
-                  :color="processModel.status_color"
-                  class="text-subtitle-1"
-                >
-                  {{ processModel.status_label }}
-                </v-chip>
-              </template>
-          </ue-list-section>
+          <v-row no-gutters class="pb-4">
+            <v-col cols="12" sm="6" md="6" lg="8" xl="9" class="text-h5 font-weight-medium text-wrap pb-2">
+              {{ title }}
+            </v-col>
+            <v-col cols="12" sm="6" md="6" lg="4" xl="3" class="d-flex justify-sm-end pb-2">
+              <v-chip
+                :prepend-icon="processModel.status_icon"
+                :color="processModel.status_color"
+                class="text-subtitle-1"
+              >
+                {{ processModel.status_label }}
+              </v-chip>
+            </v-col>
+          </v-row>
+
+          <v-spacer class="flex-grow-0"></v-spacer>
 
           <!-- Edit Button -->
           <v-row v-if="$hasRoles(processableEditableRoles)">
@@ -113,6 +107,7 @@
             </v-col>
           </v-row>
 
+          <!-- Processable Details -->
           <ue-list-section v-if="flattenedProcessableDetails.length > 0"
             :items="flattenedProcessableDetails"
             :item-fields="['title', 'value']"
@@ -121,8 +116,8 @@
           >
           </ue-list-section>
 
-          <!-- Processable display -->
-          <template v-if="processableModel">
+          <!-- Processable Form display -->
+          <template v-if="showProcessableDetails && processableModel">
             <ue-list-section
               v-for="formInput in formSchema"
               :key="formInput.name"
@@ -136,7 +131,7 @@
               :item-fields="['title', 'value']"
               :col-classes="['font-weight-medium text-wrap', 'd-flex justify-start']"
               item-classes="text-body-2"
-              :col-ratios="[5,7]"
+              :col-ratios="displayColRatio"
               vertical-align-top
             >
               <template v-slot:field.1="slotScope">
@@ -175,9 +170,21 @@
             ]"
             :item-fields="['title', 'value']"
             :col-classes="['font-weight-bold text-wrap', 'd-flex justify-start']"
-            :col-ratios="[1,2]"
+            :col-ratios="historyColRatio ?? displayColRatio"
           >
           </ue-list-section>
+
+          <template v-if="!(showProcessableDetails && processableModel)">
+            <!-- show informational message about contents preparing or updating by vuetify compenents in well formatted-->
+            <v-alert
+              type="info"
+              variant="tonal"
+              :color="processModel?.status_card_color ?? color"
+              class="my-4"
+            >
+              {{ informationalMessage }}
+            </v-alert>
+          </template>
         </v-card-text>
 
         <v-spacer></v-spacer>
@@ -263,6 +270,7 @@
                 <v-btn
                   :color="processModel.next_action_color"
                   variant="elevated"
+                  :loading="updating"
                   @click="updateProcess('waiting_for_reaction')"
                 >
                   {{ processModel.next_action_label }}
@@ -281,8 +289,13 @@
 
 <script>
 import { ref, reactive, computed, toRefs } from 'vue'
-import { useInput, makeInputProps, makeInputEmits } from '@/hooks'
+import _ from 'lodash-es'
+import { useI18n } from 'vue-i18n'
+
+import { useInput, makeInputProps, makeInputEmits, useAuthorization } from '@/hooks'
 import { ALERT } from '@/store/mutations'
+
+
 export default {
   name: 'v-input-process',
   emits: [...makeInputEmits],
@@ -333,12 +346,28 @@ export default {
       type: Array,
       default: () => ['superadmin']
     },
+    processableShowStatuses: {
+      type: [Array, Object],
+      default: () => ['*']
+    },
     actionRoles: {
       type: Object,
       default: () => {}
     },
+    displayColRatio: {
+      type: Array,
+      default: () => [5,7]
+    },
+    historyColRatio: {
+      type: Array,
+      default: null
+    },
   },
   setup (props, context) {
+    const { t } = useI18n()
+
+    const { hasRoles } = useAuthorization()
+
     const initializeInput = (val) => {
       return val
     }
@@ -347,102 +376,20 @@ export default {
       context.emit('update:modelValue', val)
     }
 
-    const UeForm = ref(null)
-
+    const processModel = ref(props.process)
+    const processableModel = ref(props.process?.processable ?? null)
+    const processValid = ref(false)
     const processableValid = ref(false)
 
-    const formIsValid = computed(() => {
-      return UeForm.value?.validModel ?? null
-    })
-
-    const processValid = ref(false)
-
-    const states = reactive({
-      UeForm,
-      formIsValid,
-      processValid,
-      processableValid,
-
-      bothFormAndProcessableValid: computed(() => {
-        return processableValid.value && formIsValid.value
-      }),
-      onlyOneValid: computed(() => {
-        return (processableValid.value && !formIsValid.value) || (!processableValid.value && formIsValid.value)
-      }),
-    })
-
-    return {
-      ...useInput(props, { ...context, initializeInput, updateModelValue }),
-      ...toRefs(states),
-    }
-  },
-  data: function () {
-    return {
-      loading: this.process ? false : true,
-      updating: false,
-
-      processModel: this.process,
-      processableModel: this?.process?.processable ?? null,
-      reason: '',
-
-      formActive: false,
-      formSchema: this.process ? this.formatSchema() : null,
-      promptModalActive: false,
-    }
-  },
-  computed: {
-    title() {
-      return this.$lodash.get(this.processModel.processable, this.processableTitle, '')
-    },
-
-    flattenedProcessableDetails() {
-      const processable = this.processModel?.processable ?? {}
-
-      let details = []
-
-      for(const detail of this.processableDetails){
-        if(__isset(detail.field) && __isset(detail.title)) {
-          details.push({
-            title: this.$t(detail.title),
-            value: this.$lodash.get(processable, detail.field, ''),
-          })
-        }
-      }
-
-      return details
-    }
-  },
-  watch: {
-    input: {
-      handler(val, old) {
-
-      },
-      immediate: true
-    },
-    processableModel: {
-      handler(val) {
-        if(!!val){
-          this.$nextTick(() => {
-            // __log('processableModel', val)
-          })
-        }
-      },
-      immediate: true
-    }
-  },
-  methods: {
-    setSchema() {
-      this.formSchema = this.formatSchema()
-    },
-    formatSchema() {
+    const formatSchema = () => {
       let schema = {}
-      let processable = this.$lodash.get(this.processModel, 'processable', {});
+      let processable = _.get(processModel.value, 'processable', {});
 
-      if(this.schema && __isObject(this.schema)){
-        schema = this.schema;
+      if(props.schema && __isObject(props.schema)){
+        schema = props.schema;
 
-        if(this.formatters && __isObject(this.formatters)){
-          for(const [inputName, formatter] of Object.entries(this.formatters)){
+        if(props.formatters && __isObject(props.formatters)){
+          for(const [inputName, formatter] of Object.entries(props.formatters)){
             if(schema[inputName]){
               for(const [formattedKey, formatterValues] of Object.entries(formatter)){
                 let newFormatterValues = formatterValues;
@@ -466,7 +413,182 @@ export default {
       }
 
       return schema;
+    }
+
+    const loading = ref(props.process ? false : true)
+    const updating = ref(false)
+
+    const UeForm = ref(null)
+    const formActive = ref(false)
+    const formSchema = ref(props.process ? formatSchema() : null)
+    const formIsValid = computed(() => {
+      return UeForm.value?.validModel ?? null
+    })
+
+    const setSchema = () => {
+      formSchema.value = formatSchema()
+    }
+
+    const reason = ref('')
+    const promptModalActive = ref(false)
+
+    const hasProcessableEditing = computed(() => {
+      let editingRoles = props.processableEditableRoles
+
+      if(__isString(editingRoles) && editingRoles === '*'){
+        return true
+      }
+
+      if(Array.isArray(editingRoles) && editingRoles.includes('*')){
+        return true
+      }
+
+      return hasRoles(editingRoles)
+    })
+
+    const canShowProcessableDetails = (model) => {
+      let statuses = props.processableShowStatuses
+
+      if(__isString(statuses) && statuses === '*'){
+        return true
+      }
+
+      if(Array.isArray(statuses) && statuses.includes('*')){
+        return true
+      }
+
+      if(!model?.status){
+        return false
+      }
+
+      const activeStatus = model.status
+
+      if(__isObject(statuses)){
+        for(const [status, roles] of Object.entries(statuses)){
+          if(activeStatus === status){
+            if(__isString(roles) && roles === '*'){
+              return true
+            }
+
+            if(Array.isArray(roles) && roles.includes('*')){
+              return true
+            }
+
+            if(hasRoles(roles)){
+              return true
+            }
+          }
+        }
+      } else if(Array.isArray(statuses)){
+        if(statuses.includes(model?.status)){
+          return true
+        }
+      }
+
+      return false
+    }
+
+    const showProcessableDetails = computed(() => {
+      return canShowProcessableDetails(processModel.value)
+    })
+
+    const informationalMessage = computed(() => {
+      if(processModel.value?.status){
+        return processModel.value.status_informational_message
+      }
+
+      return t('The contents are being prepared or updated. Please check back later.')
+    })
+
+    const states = reactive({
+      loading,
+      updating,
+
+      UeForm,
+      formActive,
+      // formSchema,
+      formIsValid,
+
+      // processModel,
+      processableModel,
+      processValid,
+      processableValid,
+
+      hasProcessableEditing,
+      showProcessableDetails,
+      informationalMessage,
+
+      reason,
+      promptModalActive,
+
+      title: computed(() => {
+        if(processModel.value?.processable){
+          return _.get(processModel.value.processable, props.processableTitle, '')
+        }
+
+        return null
+      }),
+      flattenedProcessableDetails: computed(() => {
+        const processable = processModel.value?.processable ?? {}
+
+        let details = []
+
+        for(const detail of props.processableDetails){
+          if(__isset(detail.field) && __isset(detail.title)) {
+            details.push({
+              title: t(detail.title),
+              value: _.get(processable, detail.field, ''),
+            })
+          }
+        }
+
+        return details
+      }),
+
+      bothFormAndProcessableValid: computed(() => {
+        return processableValid.value && formIsValid.value
+      }),
+      onlyOneValid: computed(() => {
+        return (processableValid.value && !formIsValid.value) || (!processableValid.value && formIsValid.value)
+      }),
+    })
+
+    const methods = reactive({
+      setSchema
+    })
+
+    return {
+      ...useInput(props, { ...context, initializeInput, updateModelValue }),
+      ...toRefs(states),
+      formSchema,
+      processModel,
+      ...toRefs(methods),
+    }
+  },
+  data: function () {
+    return {
+
+    }
+  },
+  watch: {
+    input: {
+      handler(val, old) {
+
+      },
+      immediate: true
     },
+    processableModel: {
+      handler(val) {
+        if(!!val){
+          this.$nextTick(() => {
+            // __log('processableModel', val)
+          })
+        }
+      },
+      immediate: true
+    }
+  },
+  methods: {
     fetchProcess() {
       if (this.input > 0 && !this.process) {
         const endpoint = this.fetchEndpoint.replace(':id', this.input);
@@ -502,14 +624,17 @@ export default {
     async updateProcess(status) {
 
       if (this.input) {
-        await this.UeForm.validate()
-        const isValid = this.UeForm.validModel
 
-        if(!isValid){
+        if(this.hasProcessableEditing){
+          await this.UeForm.validate()
+          const isValid = this.UeForm.validModel
 
-          this.$store.commit(ALERT.SET_ALERT, { message: this.$t('Please fill all the required fields'), variant: 'error', location: 'top', timeout: 2000 })
+          if(!isValid){
 
-          return
+            this.$store.commit(ALERT.SET_ALERT, { message: this.$t('Please fill all the required fields'), variant: 'error', location: 'top', timeout: 2000 })
+
+            return
+          }
         }
 
         this.updating = true
