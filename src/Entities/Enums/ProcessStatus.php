@@ -14,8 +14,8 @@ enum ProcessStatus: string
     {
         return match ($this) {
             self::PREPARING => __('Preparing'),
-            self::WAITING_FOR_CONFIRMATION => __('Waiting for Action'),
-            self::WAITING_FOR_REACTION => __('Waiting for Reaction'),
+            self::WAITING_FOR_CONFIRMATION => __('Waiting'),
+            self::WAITING_FOR_REACTION => __('Waiting'),
             self::REJECTED => __('Rejected'),
             self::CONFIRMED => __('Confirmed'),
             default => __('Processing'),
