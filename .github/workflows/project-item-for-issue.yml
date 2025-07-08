@@ -20,4 +20,4 @@ jobs:
           projects: "*"
           labels: "bug,accepted enhancement,accepted"
           item_fields: "Status:Backlog,Size:S,Priority:P2"
-          test: false
+          test: "true"
