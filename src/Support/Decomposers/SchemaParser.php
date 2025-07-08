@@ -5,7 +5,6 @@ namespace Unusualify\Modularity\Support\Decomposers;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Str;
 use Nwidart\Modules\Support\Migrations\SchemaParser as Parser;
 use Unusualify\Modularity\Facades\UFinder;
 use Unusualify\Modularity\Support\Finder;

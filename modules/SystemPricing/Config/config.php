@@ -34,7 +34,7 @@ return [
                         'chip',
                         [
                             'color' => 'primary',
-                        ]
+                        ],
                     ],
                 ],
                 [
@@ -95,7 +95,7 @@ return [
                         'chip',
                         [
                             'color' => 'success',
-                        ]
+                        ],
                     ],
                 ],
                 [
@@ -106,7 +106,7 @@ return [
                         'chip',
                         [
                             'color' => 'primary',
-                        ]
+                        ],
                     ],
                 ],
                 [
