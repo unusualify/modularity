@@ -2,6 +2,68 @@
 
 All notable changes to `modularity` will be documented in this file
 
+## v0.38.0 - 2025-07-08
+
+### :rocket: Features
+
+- enhance login modal with session expiration message and reload functionality by @OoBook in https://github.com/unusualify/modularity/commit/7e78d21517134913e3689a8f9ef465b39222a115
+- enhance formatPrependSchema to support ordering of prepended keys by @OoBook in https://github.com/unusualify/modularity/commit/ce6c9685c3985497d408972b9ec94eb9cc7a3686
+- update button actions for notifications by @OoBook in https://github.com/unusualify/modularity/commit/0921f1637f56489b084324a89ca6bac791b31fa3
+- implement sourceLoading state management in useInputFetch by @OoBook in https://github.com/unusualify/modularity/commit/e2096eec2532f9fa2c80348a767565f071f3fece
+- add loading indicator for schema input source by @OoBook in https://github.com/unusualify/modularity/commit/cd79e7890e839bbd3c1342111d45748d0d0ff87a
+- enhance loading state management and update event handling by @OoBook in https://github.com/unusualify/modularity/commit/1f7dadfa3c2c23cd9dd5f8be2852ab5d3c4a9302
+- enhance processable details display and validation logic by @OoBook in https://github.com/unusualify/modularity/commit/8a108b0950a58d17c02cc2036cdc3b2f5e87d55f
+- add status informational message to process entity by @OoBook in https://github.com/unusualify/modularity/commit/1869cf4a4701ca1707cd851e70c28d3cab162395
+
+### :wrench: Bug Fixes
+
+- correct project name in issue automation by @OoBook in https://github.com/unusualify/modularity/commit/30d7c2bb83bcfe2180f7ef6610060715eee8bf9f
+- improve key ordering logic for prepended keys by @OoBook in https://github.com/unusualify/modularity/commit/3c64bad5ceb6262a839801071b76c126a4b6850c
+- update route reference to use Module.transNameSingular by @OoBook in https://github.com/unusualify/modularity/commit/a0b20c8c2d1c90cde300aff32d9e3c48f5c90649
+- handle undefined item properties in action rendering by @OoBook in https://github.com/unusualify/modularity/commit/7b70a220c7695b93921c7d7bf7e64ca87b4ed557
+- update formatter structure for pricing configuration by @OoBook in https://github.com/unusualify/modularity/commit/6c7506f67528f5af630dfd7661b5090ae3cce267
+- update condition for form schema value assignment by @OoBook in https://github.com/unusualify/modularity/commit/f2221181cc528f5370711c4f1d01a1045ae93e4e
+
+### :recycle: Refactors
+
+- update action handling to use visibleRowActions by @OoBook in https://github.com/unusualify/modularity/commit/515b278843fbc192fc6b91f6a0b10f4eebfa0fe5
+- enhance action rendering and component handling by @OoBook in https://github.com/unusualify/modularity/commit/713220af2995c8e1823b119559f95cd094303ae6
+- refactor process model and validation logic by @OoBook in https://github.com/unusualify/modularity/commit/69378864a7ed6fbb57dcdeb45e89f2e14c5c0748
+- enhance file validation and rules management by @OoBook in https://github.com/unusualify/modularity/commit/f26013a4637b0b0a2b3daba18a33a845ca4d68c2
+- simplify status labels for clarity by @OoBook in https://github.com/unusualify/modularity/commit/aa5b06bae45e0d61c4bdc8e630e062bd189aa7ee
+- improve layout and structure of process details display by @OoBook in https://github.com/unusualify/modularity/commit/86da6f30844f39755d3707299c9ff5e22225b21d
+- update layout and improve informational message display by @OoBook in https://github.com/unusualify/modularity/commit/8c97f40c8c38e3460eebe14ea044d69230f2a406
+- adjust layout for process title and status chip by @OoBook in https://github.com/unusualify/modularity/commit/bd05d70846bf1b24110205fdab60304acbdd16f6
+
+### :lipstick: Styling
+
+- lint coding styles for v0.38.0 by @OoBook in https://github.com/unusualify/modularity/commit/88af8989771ae2e042f6e28f12e9c0099b9cd206
+
+### :white_check_mark: Testing
+
+- mock vue-i18n and useAuthorization for improved test isolation by @OoBook in https://github.com/unusualify/modularity/commit/9bb7507e95efe1d98fdc41f5c45232225f528001
+
+### :package: Build
+
+- update build artifacts for v0.38.0 by @OoBook in https://github.com/unusualify/modularity/commit/4f73919ce26c5785098adee52eb50240b130a3ee
+
+### :green_heart: Workflow
+
+- add workflow to automate issue labeling and project management by @OoBook in https://github.com/unusualify/modularity/commit/f07e4aca774d70ec22e059fcb57a41c7166b1925
+- add test flag to project item workflow by @OoBook in https://github.com/unusualify/modularity/commit/6b423a8b1b54de7372cf83bb2372ba7d0c558f77
+- disable test flag in project item workflow by @OoBook in https://github.com/unusualify/modularity/commit/6d8bfd0d53185bc405ea7b1f47764c0aa60d346e
+- enhance issue closing workflow with repository input and token handling by @OoBook in https://github.com/unusualify/modularity/commit/8158cb19db0930030d74ec7b7feb7a11ce02b3ff
+
+### :beers: Other Stuff
+
+- add .secrets to .gitignore by @OoBook in https://github.com/unusualify/modularity/commit/91898f903954d4b42a10e4a596840f40644a4b8a
+- update automated issue carrier version and add step ID by @OoBook in https://github.com/unusualify/modularity/commit/4d3f4e1a29b0cf0a859bea073f3e3d41b817cb59
+- update automated issue carrier version to v1 by @OoBook in https://github.com/unusualify/modularity/commit/93d2d2bef7b625fa575ff99429c5ce9289c700c4
+- add sourceLoading option to default input configuration by @OoBook in https://github.com/unusualify/modularity/commit/ada91ecdd5728d4a12cc29a672ead35abc01c284
+- add 'loadedFile' prop to input emits for enhanced file handling by @OoBook in https://github.com/unusualify/modularity/commit/ae253b38dcc9603bace93d0ab64ca206ee2e4121
+- allow rightSlotMinWidth and rightSlotMaxWidth to accept string values by @OoBook in https://github.com/unusualify/modularity/commit/41d1fa8d65310b2b806a86fe2476b5b8ea3a8ef0
+- add test:stop-on-error script for improved testing control by @OoBook in https://github.com/unusualify/modularity/commit/06ca63d1e8a8265af673604096a706e8c9543a76
+
 ## v0.37.0 - 2025-06-30
 
 ### :rocket: Features
