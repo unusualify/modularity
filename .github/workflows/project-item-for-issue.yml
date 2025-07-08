@@ -17,7 +17,7 @@ jobs:
         id: automated-issue-carrier
         with:
           gh_token: ${{ secrets.GITHUB_TOKEN }}
-          projects: "Modularity v0"
+          projects: "*"
           labels: "bug,accepted enhancement,accepted"
           item_fields: "Status:Backlog,Size:S,Priority:P2"
           test: false
