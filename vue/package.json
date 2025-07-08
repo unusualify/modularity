@@ -9,6 +9,7 @@
     "watch": "vite build --watch",
     "hmr-debug": "vite --debug hmr",
     "test": "vitest",
+    "test:stop-on-error": "vitest --bail=1",
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
     "test:update": "vitest -u",

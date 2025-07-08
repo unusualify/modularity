@@ -110,10 +110,13 @@ export const makeRepeaterProps = propsFactory({
       return { cols: 12 }
     }
   },
-
   idResetter: {
     type: String,
     default: null
+  },
+  noWaitSourceLoading: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -349,6 +352,9 @@ export default function useRepeater (props, context) {
     }, []),
     addButtonContent: computed(() => {
       return props.addButtonText + (props.hasButtonLabel && __isset(props.singularLabel) ? ` ${props.singularLabel}` : '')
+    }),
+    hasSchemaInputSourceLoading: computed(() => {
+      return Object.values(rawSchema.value).some(schema => Object.prototype.hasOwnProperty.call(schema, 'sourceLoading') && schema.sourceLoading === true)
     })
   })
 

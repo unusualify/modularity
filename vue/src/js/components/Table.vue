@@ -731,7 +731,7 @@
                   class="pa-0 justify-start text-none text-wrap text-primary darken-1 cursor-pointer"
                   @click="itemAction(item, ...col.formatter)"
                 >
-                  {{ window.__shorten(item[col.key], item[col.key].textLength ?? 8) }}
+                  {{ window.__isset(item[col.key]) ? window.__shorten(item[col.key], item[col.key]?.textLength ?? 8) : '' }}
                 </span>
                 <template v-if="col.key.match(/^id|uuid$/)">
                   <ue-copy-text :text="item[col.key]" />
@@ -784,38 +784,46 @@
                 >
               </v-icon>
             </template>
+
             <v-list>
-              <template v-for="(action, k) in rowActions" :key="k">
-                <v-list-item
-                  v-if="itemHasAction(item, action)"
+              <template v-for="(action, k) in visibleRowActions" :key="k">
+                <v-list-item v-if="itemHasAction(item, action)"
                   @click="itemAction(item, action)"
                   >
-                    <v-icon small :color="action.color" left>
-                      {{ action.icon ? action.icon : '$' + action.name }}
+                    <v-icon small :color="action.iconColor" left>
+                      {{ action.icon }}
                     </v-icon>
-                    {{ $t( action.label ?? $headline(action.name) ) }}
+                    {{ $t( action.label ) }}
                 </v-list-item>
               </template>
             </v-list>
           </v-menu>
 
           <div v-else>
-            <template v-for="(action, k) in rowActions" :key="k">
-              <v-tooltip
-                v-if="itemHasAction(item, action)"
-                :text="$t( action.label ?? action.name )"
+            <template v-for="(action, k) in visibleRowActions" :key="k">
+              <v-tooltip v-if="itemHasAction(item, action)"
+                :text="$t( action.label )"
                 location="top"
+                :disabled="action.is !== 'v-icon'"
                 >
                 <template v-slot:activator="{ props }">
-                  <v-icon
-                    small
-                    class="mr-2"
+                  <component :is="action.is"
                     @click="itemAction(item, action)"
-                    :color="action.color"
-                    v-bind="props"
-                    >
-                    {{ action.icon ? action.icon : '$' + action.name }}
-                  </v-icon>
+                    v-bind="{
+                      ...(action.hasTooltip ? props : {}),
+                      ...(action.componentProps ?? {}),
+                    }"
+                  >
+                    <template #prepend>
+                      <v-icon small :color="action.iconColor" left :icon="action.icon" />
+                    </template>
+                    <template v-if="action.is !== 'v-icon'">
+                      {{ $t( action.label ) }}
+                    </template>
+                    <template v-else>
+                      {{ action.icon }}
+                    </template>
+                  </component>
                 </template>
               </v-tooltip>
             </template>

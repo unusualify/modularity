@@ -36,6 +36,10 @@ export const makeInputFetchProps = propsFactory({
   items: {
     type: Array,
     default: () => []
+  },
+  sourceLoading: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -71,11 +75,16 @@ export default function useInputFetch(props, context) {
     if( !(nextPage.value > activeLastPage.value) || activeLastPage.value < 0){
       loading.value = true;
 
+      context.emit('update:input', [
+        {
+          key: 'sourceLoading',
+          value: true
+        }
+      ])
+
       return new Promise(() => {
         axios.get(fullUrl.value)
           .then(response => {
-
-
             if(response.status == 200){
 
               if(activeLastPage.value < 0)
@@ -108,12 +117,15 @@ export default function useInputFetch(props, context) {
                   }
                 }
 
-                if(searchContinue)
+                if(searchContinue){
                   getItemsFromApi()
-                else {
+                } else {
                   loading.value = false;
-
                   context.emit('update:input', [
+                    {
+                      key: 'sourceLoading',
+                      value: false
+                    },
                     {
                       key: 'items',
                       value: elements.value
@@ -130,6 +142,12 @@ export default function useInputFetch(props, context) {
                 }
               }else{
                 loading.value = false;
+                context.emit('update:input', [
+                  {
+                    key: 'sourceLoading',
+                    value: false
+                  },
+                ])
               }
 
             }
