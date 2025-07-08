@@ -72,10 +72,10 @@
 
           <!-- Processable Title -->
           <v-row no-gutters class="pb-4">
-            <v-col cols="12" sm="6" md="6" lg="8" xl="9" class="text-h5 font-weight-medium text-wrap pb-2">
+            <v-col cols="12" sm="6" md="6" lg="8" xl="9" class="text-h5 font-weight-medium text-wrap">
               {{ title }}
             </v-col>
-            <v-col cols="12" sm="6" md="6" lg="4" xl="3" class="d-flex justify-sm-end pb-2">
+            <v-col cols="12" sm="6" md="6" lg="4" xl="3" class="d-flex justify-sm-end">
               <v-chip
                 :prepend-icon="processModel.status_icon"
                 :color="processModel.status_color"
