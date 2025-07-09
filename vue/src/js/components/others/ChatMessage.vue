@@ -6,7 +6,9 @@
     ]"
     >
     <div
-      style="max-width: 60%; min-width: 30%;"
+      :style="[
+        $vuetify.display.smAndUp ? 'max-width: 60%; min-width: 30%;' : 'max-width: 100%; min-width: 100%;'
+      ]"
       :class="[
         'd-flex bg-grey-lighten-6 elevation-2 px-4 py-3 rounded position-relative',
         reverse ? 'flex-row-reverse' : 'flex-row',
@@ -17,11 +19,13 @@
       <!-- Avatar -->
       <v-tooltip :text="formatDate(message)" location="top">
         <template v-slot:activator="{ props }">
-          <v-avatar :size="avatarSize"
-          :class="[
-            reverse ? 'ml-3' : 'mr-3'
-          ]"
-          :image="message.user_profile.avatar_url" v-bind="props" />
+          <v-avatar
+            :size="$vuetify.display.smAndUp ? avatarSize : mobileAvatarSize"
+            :class="[
+              reverse ? 'ml-3' : 'mr-3'
+            ]"
+            :image="message.user_profile.avatar_url" v-bind="props"
+          />
         </template>
       </v-tooltip>
       <div
@@ -33,7 +37,17 @@
             'text-grey text-caption w-100 d-flex justify-space-between',
             reverse ? 'flex-row-reverse' : 'flex-row'
           ]">
-          <div>{{ message.user_profile.name }}</div>
+
+          <div :class="[
+            'w-50',
+            reverse ? 'text-end' : 'text-start'
+          ]">
+            <div v-if="$vuetify.display.smAndDown">
+              {{ formatDate(message) }}
+            </div>
+            <div>{{ message.user_profile.name }}</div>
+          </div>
+
           <div class="d-flex justify-end">
             <v-icon
               v-if="!noStarring"
@@ -59,12 +73,35 @@
         >
           <!-- Message content -->
           <div :class="['d-flex mt-2 text-break', reverse ? 'flex-row-reverse' : 'flex-row']">
-            {{ message.content }}
+            <div class="w-100">
+              <template v-if="message.content.length > contentTruncateLength">
+                <div v-if="isExpanded" v-html="message.content"></div>
+                <div v-else>
+                  <span v-html="truncatedContent"></span>
+                  <span class="text-grey-darken-1">...</span>
+                </div>
+
+                <v-expand-transition>
+                  <div v-if="message.content.length > contentTruncateLength" class="mt-1">
+                    <v-btn
+                      :text="isExpanded ? $t('Show less') : $t('Show more')"
+                      variant="plain"
+                      size="small"
+                      color="primary"
+                      @click="toggleExpand"
+                    />
+                  </div>
+                </v-expand-transition>
+              </template>
+              <template v-else>
+                {{ message.content }}
+              </template>
+            </div>
           </div>
 
           <!-- Attachments -->
-          <div v-if="message.attachments.length > 0" class="mt-2 pa-1 rounded">
-            <ue-title :text="$t('Attachments')" padding="b-2" type="caption" color="none"/>
+          <div v-if="message.attachments.length > 0" class="mt-2 py-1 rounded">
+            <ue-title :text="$t('Attachments')" padding="b-2" type="caption" color="none" transform="none"/>
             <ue-filepond-preview
               :source="message.attachments"
               image-size="24"
@@ -90,6 +127,10 @@
         type: Number,
         default: 50
       },
+      mobileAvatarSize: {
+        type: Number,
+        default: 25
+      },
       reverse: {
         type: Boolean,
         default: false
@@ -105,11 +146,16 @@
       noPinning: {
         type: Boolean,
         default: false
+      },
+      contentTruncateLength: {
+        type: Number,
+        default: 50
       }
     },
     data() {
       return {
-        readingTimer: null
+        readingTimer: null,
+        isExpanded: false
       }
     },
     computed: {
@@ -127,6 +173,12 @@
       },
       isUnread() {
         return !this.message.is_read && !this.reverse;
+      },
+      truncatedContent() {
+        if (this.message.content.length > this.contentTruncateLength) {
+          return this.message.content.substring(0, this.contentTruncateLength);
+        }
+        return this.message.content;
       }
     },
     methods: {
@@ -169,6 +221,9 @@
       markAsRead() {
         // message.is_read = true;
         this.updateMessage('is_read', true);
+      },
+      toggleExpand() {
+        this.isExpanded = !this.isExpanded;
       }
     },
     beforeUnmount() {
