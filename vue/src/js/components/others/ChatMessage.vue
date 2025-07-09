@@ -39,10 +39,11 @@
           ]">
 
           <div :class="[
-            'w-50',
+            $vuetify.display.smAndUp ? 'w-50' : 'w-75',
             reverse ? 'text-end' : 'text-start'
-          ]">
-            <div v-if="$vuetify.display.smAndDown">
+          ]"
+          >
+            <div v-if="$vuetify.display.smAndDown" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
               {{ formatDate(message) }}
             </div>
             <div>{{ message.user_profile.name }}</div>
