@@ -111,7 +111,8 @@
       return {
         loading: false,
         searchInput: this.search,
-        activeTab: Object.keys(this.groupedItems ?? {})[0] ?? 0
+        activeTab: Object.keys(this.groupedItems ?? {})[0] ?? 0,
+        elements: []
       }
     },
     computed: {
@@ -125,6 +126,7 @@
         return this.elements.reduce((acc, item, key) => {
           if(!this.noAllGroup)
             acc[allKey].push(item)
+
           const groupKeys = __data_get(item, this.groupKey)
 
           if(Array.isArray(groupKeys)){
