@@ -307,7 +307,7 @@ export default function useTableItemActions(props, { tableForms, loadItems }) {
             loadItems()
           }
         }, function(error) {
-          console.log(error)
+          console.error(error)
         })
       }
     }
@@ -450,13 +450,8 @@ export default function useTableItemActions(props, { tableForms, loadItems }) {
 
         return acc
       }, [])
-
-      return actions
     })
   })
-
-
-  console.log(states.visibleRowActions)
 
   return {
     ...toRefs(states),
