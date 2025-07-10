@@ -84,6 +84,7 @@ class RouteServiceProvider extends ServiceProvider
                         $router->group(
                             [
                                 // 'domain' => modularityConfig('admin_app_url'),
+                                'domain' => Modularity::getAdminAppUrl(),
                             ],
                             function ($router) {
 

@@ -149,11 +149,13 @@ class BaseServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton('unusualify.hosting', function (Application $app) {
-            return new \Unusualify\Modularity\Support\HostRouting($app, modularityConfig('app_url'));
+            // return new \Unusualify\Modularity\Support\HostRouting($app, modularityConfig('app_url'));
+            return new \Unusualify\Modularity\Support\HostRouting($app, $app['modularity']->getAppHost());
         });
 
         $this->app->singleton('unusualify.hostRouting', function (Application $app) {
-            return new \Unusualify\Modularity\Support\HostRouteRegistrar($app, modularityConfig('app_url'));
+            // return new \Unusualify\Modularity\Support\HostRouteRegistrar($app, modularityConfig('app_url'));
+            return new \Unusualify\Modularity\Support\HostRouteRegistrar($app, $app['modularity']->getAppHost());
         });
 
         $this->app->singleton('Filepond', function (Application $app) {
