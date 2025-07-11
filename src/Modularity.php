@@ -360,7 +360,7 @@ class Modularity extends FileRepository
      */
     public function hasAdminAppUrl(): bool
     {
-        return $this->config('admin_app_url') !== null;
+        return $this->config('admin_app_url') !== null && $this->config('admin_app_path') !== '';
     }
 
     /**
@@ -370,7 +370,15 @@ class Modularity extends FileRepository
      */
     public function getAdminAppUrl()
     {
-        return $this->config('admin_app_url');
+        $appUrl = $this->config('app_url');
+        $adminAppUrl = $this->config('admin_app_url');
+
+
+        $parsedUrl = parse_url($appUrl);
+        $scheme = $parsedUrl['scheme'];
+        $host = $parsedUrl['host'];
+
+        return $adminAppUrl !== null ? $adminAppUrl : $scheme . '://admin.' . $host;
     }
 
     /**
