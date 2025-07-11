@@ -333,26 +333,116 @@ class Modularity extends FileRepository
         ]);
     }
 
+    /**
+     * Get Laravel app url.
+     *
+     * @return string
+     */
     public function getAppUrl()
     {
         return $this->config('app_url');
     }
 
+    /**
+     * Get Laravel app host.
+     *
+     * @return string
+     */
+    public function getAppHost()
+    {
+        return parse_url($this->config('app_url'))['host'];
+    }
+
+    /**
+     * Check if admin app url is set.
+     *
+     * @return bool
+     */
     public function hasAdminAppUrl(): bool
     {
-        return $this->config('admin_app_url') !== null;
+        return $this->config('admin_app_url') !== null && $this->config('admin_app_path') !== '';
     }
 
+    /**
+     * Get admin app url.
+     *
+     * @return string
+     */
     public function getAdminAppUrl()
     {
-        return $this->config('admin_app_url');
+        $appUrl = $this->config('app_url');
+        $adminAppUrl = $this->config('admin_app_url');
+
+
+        $parsedUrl = parse_url($appUrl);
+        $scheme = $parsedUrl['scheme'];
+        $host = $parsedUrl['host'];
+
+        return $adminAppUrl !== null ? $adminAppUrl : $scheme . '://admin.' . $host;
     }
 
+    /**
+     * Get admin app host.
+     *
+     * @return string
+     */
+    public function getAdminAppHost()
+    {
+        return parse_url($this->getAdminAppUrl())['host'];
+    }
+
+    /**
+     * Check if the current url is a panel url.
+     *
+     * @param string|null $url
+     * @return bool
+     */
+    public function isPanelUrl($url = null)
+    {
+        $host = request()->getHost();
+        if($this->hasAdminAppUrl()) {
+
+            if($url) {
+                $host = parse_url($url)['host'];
+            }
+
+            $appAdminHost = $this->getAdminAppHost();
+
+            return $host === $appAdminHost;
+        }
+
+        $segment = request()->segment(1);
+
+        if($url) {
+            $parsedUrl = parse_url($url);
+            $host = $parsedUrl['host'];
+            $path = $parsedUrl['path'] ?? null; // /admin/settings
+
+            if(!$segment) {
+                return false;
+            }
+            // get the first segment, path can start with /
+            $segment = explode('/', trim($path, '/'))[0];
+        }
+
+        return $segment === $this->getAdminUrlPrefix() && $host === $this->getAppHost();
+    }
+
+    /**
+     * Get admin route name prefix.
+     *
+     * @return string
+     */
     public function getAdminRouteNamePrefix()
     {
         return rtrim(ltrim($this->config('admin_route_name_prefix', 'admin'), '.'), '.');
     }
 
+    /**
+     * Get admin url prefix.
+     *
+     * @return string
+     */
     public function getAdminUrlPrefix()
     {
         return $this->hasAdminAppUrl()
@@ -360,16 +450,31 @@ class Modularity extends FileRepository
             : rtrim(ltrim($this->config('admin_app_path', 'admin'), '/'), '/');
     }
 
+    /**
+     * Get system url prefix.
+     *
+     * @return string
+     */
     public function getSystemUrlPrefix()
     {
         return $this->config('system_prefix', 'system-settings');
     }
 
+    /**
+     * Get system route name prefix.
+     *
+     * @return string
+     */
     public function getSystemRouteNamePrefix()
     {
         return snakeCase(studlyName($this->getSystemUrlPrefix()));
     }
 
+    /**
+     * Get translations.
+     *
+     * @return array
+     */
     public function getTranslations()
     {
         $cache_key = static::$translationCacheKey;
@@ -387,6 +492,9 @@ class Modularity extends FileRepository
         return $translations;
     }
 
+    /**
+     * Clear translations cache.
+     */
     public function clearTranslations()
     {
         $cache_key = static::$translationCacheKey;

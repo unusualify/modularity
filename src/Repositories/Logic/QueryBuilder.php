@@ -98,13 +98,19 @@ trait QueryBuilder
     /**
      * @param array $with
      * @param array $withCount
+     * @param array $scopes
      * @return \Unusualify\Modularity\Models\Model
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
-    public function getById($id, $with = [], $withCount = [], $lazy = [])
+    public function getById($id, $with = [], $withCount = [], $lazy = [], $scopes = [])
     {
         $query = $this->model->query();
+
+        // Apply scopes first (authorization/filtering)
+        if (!empty($scopes)) {
+            $query = $this->filter($query, $scopes);
+        }
 
         $withs = $this->formatWiths($query, $with);
 
@@ -513,5 +519,61 @@ trait QueryBuilder
                 }
             : $item;
         }, $with);
+    }
+
+    /**
+     * Get a single item with applied scopes for authorization
+     *
+     * @param mixed $id
+     * @param array $with
+     * @param array $withCount
+     * @param array $lazy
+     * @param array $scopes
+     * @return \Unusualify\Modularity\Models\Model
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     */
+    public function getByIdWithScopes($id, $with = [], $withCount = [], $lazy = [], $scopes = [])
+    {
+        $query = $this->model->query();
+
+        // Apply scopes for authorization/filtering
+        $query = $this->filter($query, $scopes);
+
+        $withs = $this->formatWiths($query, $with);
+
+        if (classHasTrait($this->model, 'Illuminate\Database\Eloquent\SoftDeletes')) {
+            $result = $query->withTrashed()->with($withs)->withCount($withCount)->findOrFail($id);
+        } else {
+            $result = $query->with($withs)->withCount($withCount)->findOrFail($id);
+        }
+
+        // Handle lazy loading
+        if ($lazy && count($lazy) > 0 && $result instanceof \Illuminate\Database\Eloquent\Model) {
+            foreach ($lazy as $relation) {
+                $parts = explode('.', $relation);
+
+                if (count($parts) > 1) {
+                    foreach ($parts as $i => $part) {
+                        if ($i === 0) {
+                            $result = $result->load($part);
+                        } else {
+                            if ($result->{$parts[$i - 1]} instanceof \Illuminate\Database\Eloquent\Model) {
+                                $result = $result->{$parts[$i - 1]}->load($part);
+                            } elseif ($result->{$parts[$i - 1]} instanceof \Illuminate\Database\Eloquent\Collection) {
+                                $result->{$parts[$i - 1]} = $result->{$parts[$i - 1]}->map(function ($item) use ($part) {
+                                    $item->{$part};
+                                    return $item;
+                                });
+                            }
+                        }
+                    }
+                } else {
+                    $result->load($relation);
+                }
+            }
+        }
+
+        return $result;
     }
 }

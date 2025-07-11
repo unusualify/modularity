@@ -68,7 +68,6 @@ if (! function_exists('adminRouteNamePrefix')) {
     function adminRouteNamePrefix()
     {
         return Modularity::getAdminRouteNamePrefix();
-        // return rtrim(ltrim(modularityConfig('admin_route_name_prefix', 'admin'), '.'), '.');
     }
 }
 
@@ -77,9 +76,6 @@ if (! function_exists('adminUrlPrefix')) {
     function adminUrlPrefix()
     {
         return Modularity::getAdminUrlPrefix();
-        // return modularityConfig('admin_app_url')
-        //     ? false
-        //     : rtrim(ltrim(modularityConfig('admin_app_path', 'admin'), '/'), '/');
     }
 }
 

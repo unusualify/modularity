@@ -13,10 +13,15 @@ trait FormPageUtility
         if ($this->isSingleton) {
             $item = $this->repository->getModel()->single();
         } elseif ($id) {
-            $item = $this->repository->getById(
+            // Generate scopes for authorization
+            $scopes = $this->filterScope($this->nestedParentScopes());
+
+            $item = $this->repository->getByIdWithScopes(
                 $id,
                 $this->formWith,
-                $this->formWithCount
+                $this->formWithCount,
+                lazy: [],
+                scopes: $scopes
             );
         } else {
             $item = $this->repository->newInstance();
