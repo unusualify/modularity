@@ -6,10 +6,11 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
 use Unusualify\Modularity\Traits\Allowable;
+use Unusualify\Modularity\Traits\ResponsiveVisibility;
 
 trait FormActions
 {
-    use Allowable;
+    use Allowable, ResponsiveVisibility;
 
     /**
      * @return void
@@ -67,7 +68,15 @@ trait FormActions
 
             if (isset($action['schema'])) {
                 $action['schema'] = $this->createFormSchema($action['schema']);
-                // dd($action['schema']);
+            }
+
+            if (isset($action['responsive'])) {
+                $action = $this->applyResponsiveClasses(
+                    item: $action,
+                    searchKey: 'responsive',
+                    display: 'flex',
+                    classNotation: 'componentProps.class'
+                );
             }
 
             $acc[$key] = array_merge_recursive_preserve($default_action, $action);

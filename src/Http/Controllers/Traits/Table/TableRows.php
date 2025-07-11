@@ -238,6 +238,15 @@ trait TableRows
                 $action['url'] = resolve_route($action['url']);
             }
 
+            if (isset($action['responsive'])) {
+                $action = $this->applyResponsiveClasses(
+                    item: $action,
+                    searchKey: 'responsive',
+                    display: 'flex',
+                    classNotation: 'class'
+                );
+            }
+
             $acc[] = $action;
 
             return $acc;

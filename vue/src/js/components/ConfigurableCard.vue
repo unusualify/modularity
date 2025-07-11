@@ -3,8 +3,15 @@
     <!-- <template v-if="title" v-slot:title>
       <span class="font-weight-bold text-primary text-body-1">{{ title }}</span>
     </template> -->
-    <ue-title v-if="title" :text="title" :color="titleColor" padding="x-4" class="pt-4"/>
-    <div no-gutters class="ue-configurable-card__row" :style="rowStyle">
+    <slot name="title">
+      <ue-title v-if="title" :text="title" :color="titleColor" padding="x-4" class="pt-4"/>
+    </slot>
+    <div no-gutters class="ue-configurable-card__row"
+      :style="rowStyle"
+      :class="[
+        $vuetify.display.smAndDown ? `ga-${mobileRowGap}` : ''
+      ]"
+    >
       <div
         v-for="( segment,  segmentIndex) in itemsWithActions"
         :key="segmentIndex"
@@ -13,17 +20,18 @@
           !hideSeparator ? 'ue-configurable-card__col--seperator' : '',
           justifyCenterColumns ? 'ue-configurable-card__col--justify-center' : '',
           alignCenterColumns ? 'ue-configurable-card__col--align-center' : '',
-          $isset(columnStyles[segmentIndex]) ? `ue-configurable-card__col--unset-flex-basis` : '',
+          $isset(columnStyles[segmentIndex]) || colRatios.length > 0 ? `ue-configurable-card__col--unset-flex-basis` : '',
           columnClasses[segmentIndex] ?? ''
         ]"
-        :style="columnStyles[segmentIndex] ?? ''"
+        :style="getEffectiveColumnStyle(segmentIndex)"
       >
         <slot :name="`segment.${segmentIndex === '_actions' ? 'actions' : (parseInt(segmentIndex) + 1)}`"
           v-bind="{
             data: segment,
             actions: actions,
             actionProps: {actionIconMinHeight, actionIconSize}
-          }">
+          }"
+        >
           <template v-if="actions.length && segmentIndex === '_actions'">
             <!-- <v-divider class="my-2"></v-divider> -->
             <div class="d-flex fill-height flex-wrap justify-space-evenly align-center">
@@ -47,11 +55,7 @@
             <div class="d-flex fill-height">
               <ue-property-list :data="segment.map(item => [item])" class="" noPadding/>
             </div>
-            <!-- <v-list dense class="">
-              <v-list-item v-for="(item, itemIndex) in segment" :key="itemIndex">
-                {{ item }}
-              </v-list-item>
-            </v-list> -->
+
           </template>
           <template v-else>
             <div class="d-flex fill-height">
@@ -61,13 +65,6 @@
         </slot>
       </div>
     </div>
-
-    <!-- <v-card-actions v-if="actions && actions.length">
-      <v-spacer></v-spacer>
-      <v-btn v-for="(action, index) in actions" :key="index" :icon="action.icon" :color="action.color">
-        <v-icon>{{ action.icon }}</v-icon>
-      </v-btn>
-    </v-card-actions> -->
   </v-card>
 </template>
 
@@ -129,9 +126,22 @@
         default: () => ({}),
         // Example format: { 0: 'd-flex', '_actions': 'd-flex' }
       },
+      colRatios: {
+        type: Array,
+        default: () => [],
+        // Example format: [2, 1, 1] for 2:1:1 ratio or [3, 2, 1] for 3:2:1 ratio
+      },
       rowMinHeight: {
         type: String,
         default: null
+      },
+      noActions: {
+        type: Boolean,
+        default: false
+      },
+      mobileRowGap: {
+        type: [Number, String],
+        default: 4
       }
     },
     computed: {
@@ -141,7 +151,7 @@
       itemsWithActions() {
         // const lastKey = Object.keys(this.items).pop();
         const result = { ...this.items };
-        if (this.actions.length) {
+        if (this.actions.length && !this.noActions) {
           result['_actions'] = this.actions;
         }
         return result;
@@ -160,6 +170,18 @@
         return {
           ...(this.rowMinHeight ? { minHeight: this.rowMinHeight } : {})
         }
+      },
+      totalRatio() {
+        // Calculate the total ratio to determine percentages
+        if (!this.colRatios || this.colRatios.length === 0) {
+          return this.effectiveSegmentCount;
+        }
+
+        return this.colRatios.reduce((sum, ratio, index) => {
+          // Use the provided ratio or default to 1
+          const value = ratio || 1;
+          return sum + value;
+        }, 0);
       }
     },
     methods: {
@@ -169,6 +191,40 @@
       isArray(value) {
         return __isArray(value);
       },
+      getColumnStyleFromRatio(segmentIndex) {
+        // Return null if no ratios are provided
+        if (!this.colRatios || this.colRatios.length === 0) {
+          return null;
+        }
+
+        // Convert segmentIndex to numeric index (handle '_actions' case)
+        const colIndex = segmentIndex === '_actions' ? this.effectiveSegmentCount - 1 : parseInt(segmentIndex);
+
+        // Use the provided ratio or default to 1
+        const ratio = this.colRatios[colIndex] || 1;
+        const percentage = (ratio / this.totalRatio) * 100;
+
+        return {
+          flex: `${ratio} 0 0`,
+          maxWidth: `${percentage}%`
+        };
+      },
+      getEffectiveColumnStyle(segmentIndex) {
+        // Priority: 1. Custom columnStyles, 2. colRatios, 3. Default CSS classes
+        const customStyle = this.columnStyles[segmentIndex];
+        const ratioStyle = this.getColumnStyleFromRatio(segmentIndex);
+
+        if (customStyle) {
+          return customStyle;
+        } else if (ratioStyle) {
+          // Convert style object to CSS string
+          return Object.entries(ratioStyle)
+            .map(([key, value]) => `${key.replace(/([A-Z])/g, '-$1').toLowerCase()}: ${value}`)
+            .join('; ');
+        }
+
+        return '';
+      }
     }
   }
 </script>
@@ -179,7 +235,7 @@
       display: flex
       flex-wrap: wrap
       max-width: 100%
-      // padding-bottom: calc(12 * $spacer / 2)
+      margin: calc($spacer * 4) 0
 
       .ue-configurable-card__col
         &--justify-center:not(:first-child)
@@ -190,8 +246,8 @@
       // flex: 1
       min-width: 0
       max-width: 100%
-      padding: 0 calc($spacer * 4)
-      margin: calc($spacer * 4) 0
+      padding: 0 calc($spacer * 2)
+
       &--seperator
         border-right: 1px solid rgba(0, 0, 0, 0.12)
       &--align-center
@@ -208,9 +264,9 @@
           flex-basis: calc(100% / #{$i})
           max-width: calc(100% / #{$i})
 
-    @media (max-width: 600px)
+    @media (max-width: 575px)
       &__row
-        flex-direction: column
+        // flex-direction: column
 
       &__col
         flex-basis: 100% !important

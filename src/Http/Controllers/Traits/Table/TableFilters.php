@@ -87,6 +87,7 @@ trait TableFilters
                 'methods' => 'getCountFor',
                 'params' => [$filter->scope ?? $filter->slug],
                 ...(isset($filter->allowedRoles) ? ['allowedRoles' => $filter->allowedRoles] : []),
+                ...(isset($filter->responsive) ? ['responsive' => $filter->responsive] : []),
             ];
         }
 
@@ -123,6 +124,15 @@ trait TableFilters
                 }
 
                 $filter['number'] = $count;
+            }
+
+            if (isset($filter['responsive'])) {
+                $filter = $this->applyResponsiveClasses(
+                    item: $filter,
+                    searchKey: 'responsive',
+                    display: 'flex',
+                    classNotation: 'class'
+                );
             }
 
             $carry[] = Arr::except($filter, ['methods', 'params', 'force']);
