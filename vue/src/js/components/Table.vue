@@ -185,7 +185,8 @@
                             :key="index"
                             v-on:click.prevent="changeFilter(filter.slug)"
                             :class="[
-                              filter.slug === activeFilterSlug ? 'bg-primary' : ''
+                              filter.slug === activeFilterSlug ? 'bg-primary' : '',
+                              filter.class ?? ''
                             ]"
                           >
                             <v-list-item-title>{{ filter.name + '(' + filter.number+ ')' }} </v-list-item-title>
@@ -788,6 +789,7 @@
             <v-list>
               <template v-for="(action, k) in visibleRowActions" :key="k">
                 <v-list-item v-if="itemHasAction(item, action)"
+                  :class="action.class ?? ''"
                   @click="itemAction(item, action)"
                   >
                     <v-icon small :color="action.iconColor" left>
@@ -805,6 +807,7 @@
                 :text="$t( action.label )"
                 location="top"
                 :disabled="action.is !== 'v-icon'"
+                :class="action.class ?? ''"
                 >
                 <template v-slot:activator="{ props }">
                   <component :is="action.is"
