@@ -39,6 +39,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             ModularityProvider::class,
             PermissionServiceProvider::class,
             \Oobook\Priceable\LaravelServiceProvider::class,
+            \Astrotomic\Translatable\TranslatableServiceProvider::class,
         ];
     }
 
