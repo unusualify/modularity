@@ -90,10 +90,10 @@ class ModularityRoutes
     public function groupOptions(): array
     {
         return [
-            'as' => adminRouteNamePrefix() . '.',
+            'as' => Modularity::getAdminRouteNamePrefix() . '.',
             ...(Modularity::hasAdminAppUrl()
-                ? ['domain' => Modularity::getAdminAppUrl()]
-                : ['prefix' => Modularity::getAdminUrlPrefix()]
+                ? ['domain' => Modularity::getAdminAppHost()]
+                : ['prefix' => Modularity::getAdminUrlPrefix(), 'domain' => Modularity::getAppUrl()]
             ),
 
         ];
