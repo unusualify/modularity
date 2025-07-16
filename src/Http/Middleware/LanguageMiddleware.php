@@ -28,6 +28,13 @@ class LanguageMiddleware
             }
         }
 
+        if($request->has('language')){
+            $requestLocale = $request->get('language');
+            if(in_array($requestLocale, config('translatable.locales'))){
+                $locale = $requestLocale;
+            }
+        }
+
         config([modularityBaseKey() . '.locale' => $locale]);
         config([modularityBaseKey() . '.timezone' => auth()->user()->timezone ?? 'Europe/London']);
 
