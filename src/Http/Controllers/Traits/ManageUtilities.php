@@ -178,9 +178,6 @@ trait ManageUtilities
              ] : [])
              + $this->getViewLayoutVariables();
 
-
-
-
         return array_replace_recursive($data, $customFormData);
     }
 
@@ -195,7 +192,6 @@ trait ManageUtilities
 
         public function getViewLayoutVariables()
     {
-        // dd(Str::plural('Country'));
         $currentRoute = Route::current();
         $currentActionMethod = $currentRoute->getActionMethod();
         $snakeRouteName = Str::snake($this->routeName);
@@ -204,11 +200,8 @@ trait ManageUtilities
         // Check for custom title from configuration first
         $customTitle = $this->tableAttributes['customTitle'] ?? null;
 
-        // dd($currentActionMethod);
-
         switch ($currentActionMethod) {
             case 'create':
-                dd('Create');
                 $pageTitle = trans_choice($translationRouteKey, 1);
                 $headerTitle = $customTitle ?: __('fields.new-item', ['item' => trans_choice('modules.' . snakeCase($this->routeName), 1)]);
                 break;
@@ -221,10 +214,8 @@ trait ManageUtilities
                 $headerTitle = $customTitle ?: __('fields.show-item', ['item' => trans_choice('modules.' . snakeCase($this->routeName), 1)]);
                 break;
             default:
-                // dd($customTitle);
                 $pageTitle = $customTitle ?: trans_choice($translationRouteKey, 0);
                 $headerTitle = $customTitle ?: trans_choice($translationRouteKey, 0);
-                // dd($pageTitle, $headerTitle, trans_choice($translationRouteKey, 0));
         }
 
         return [
