@@ -106,6 +106,7 @@ class ModularityRoutes
         ]);
         Route::middlewareGroup('api.auth', [
             'api',
+            'throttle:api',
             'modularity.auth:' . $authGuardName,
             // 'auth',
         ]);
@@ -136,6 +137,122 @@ class ModularityRoutes
 
     }
 
+    /**
+     * Get API prefix
+     *
+     * @return string
+     */
+    public function getApiPrefix(): string
+    {
+        return modularityConfig('api.prefix', 'api/v1');
+    }
+
+    /**
+     * Get API domain
+     *
+     * @return string|null
+     */
+    public function getApiDomain(): ?string
+    {
+        return modularityConfig('api.domain');
+    }
+
+    /**
+     * Get API middlewares
+     *
+     * @return array
+     */
+    public function getApiMiddlewares(): array
+    {
+        return array_values(array_unique(modularityConfig('api.middlewares', [
+            'language',
+            'api',
+            'throttle:api',
+        ])));
+    }
+
+    /**
+     * Get public API middlewares
+     *
+     * @return array
+     */
+    public function getPublicApiMiddlewares(): array
+    {
+        return array_values(array_unique(array_merge(modularityConfig('api.public_middlewares', []), $this->getApiMiddlewares())));
+    }
+
+    public function getApiAuthMiddlewares(): array
+    {
+        return array_values(array_unique(array_merge(modularityConfig('api.auth_middlewares', [
+            'auth:sanctum',
+        ]), $this->getApiMiddlewares())));
+    }
+
+    /**
+     * Get API group options
+     *
+     * @return array
+     */
+    public function getApiGroupOptions(): array
+    {
+        return [
+            'as' => 'api.',
+            'prefix' => $this->getApiPrefix(),
+            'domain' => $this->getApiDomain(),
+            // 'middleware' => $this->getApiMiddlewares(),
+        ];
+    }
+
+    public function getAuthApiGroupOptions(): array
+    {
+        return array_merge($this->getApiGroupOptions(), [
+            'middleware' => $this->getApiAuthMiddlewares(),
+        ]);
+    }
+
+    public function getPublicApiGroupOptions(): array
+    {
+        return array_merge($this->getApiGroupOptions(), [
+            'as' => 'api.public.',
+            'prefix' => $this->getApiPrefix() . '/public',
+            'middleware' => $this->getPublicApiMiddlewares(),
+        ]);
+    }
+
+    public function getCustomApiRoutes(): array
+    {
+        return [
+            'bulk',
+            'export',
+            'import',
+            'search',
+            'filters',
+            'meta',
+        ];
+    }
+
+    public function getApiRoutes(): array
+    {
+        return array_merge([
+            'index',
+            'store',
+            'show',
+            'update',
+            'destroy',
+        ]);
+    }
+
+    /**
+     * Register routes
+     *
+     * @param mixed $router
+     * @param array $groupOptions
+     * @param array $middlewares
+     * @param string $namespace
+     * @param string $routesFile
+     * @param bool $instant
+     * @return void
+     */
     public function registerRoutes(
         $router,
         $groupOptions,
@@ -235,6 +352,14 @@ class ModularityRoutes
                 }
             }
 
+            // Skip if API routes are required but not enabled
+            if ($type === 'api') {
+                $hasApiRoutes = $item['has_api_routes'] ?? false;
+                if (!$hasApiRoutes) {
+                    continue;
+                }
+            }
+
             if (!isset($item['name'])) {
                 continue;
             }
@@ -297,6 +422,17 @@ class ModularityRoutes
 
             $resourceOptionsAs[] = $itemSnakeName;
 
+            if($type === 'api') {
+                $groupsStack = Route::getGroupStack();
+                $lastGroup = array_pop($groupsStack);
+                $namespace = $lastGroup['namespace'] ?? null;
+                $controllerNamespace = concatenate_namespace($namespace, $controllerName);
+
+                if(!@class_exists($controllerNamespace) || !is_subclass_of($controllerNamespace, \Unusualify\Modularity\Http\Controllers\ApiController::class)) {
+                    continue;
+                }
+            }
+
             // Register routes based on type
             $this->registerRouteGroup(
                 $type,
@@ -308,7 +444,8 @@ class ModularityRoutes
                 $itemStudlyName,
                 $resourceOptionsAs,
                 $resourceOptions,
-                $parameters
+                $parameters,
+                $item
             );
         }
     }
@@ -376,6 +513,7 @@ class ModularityRoutes
      * @param array $resourceOptionsAs
      * @param array $resourceOptions
      * @param array $parameters
+     * @param array $item
      * @return void
      */
     private function registerRouteGroup(
@@ -388,40 +526,160 @@ class ModularityRoutes
         string $itemStudlyName,
         array $resourceOptionsAs,
         array $resourceOptions,
-        array $parameters
+        array $parameters,
+        array $item = []
     ): void {
-        $routeGroup = $type === 'admin'
-            ? Route::middleware($middlewares)->prefix(implode('/', $prefixes))
-            : Route::prefix(implode('/', $prefixes));
+        // Handle API routes with public/authenticated separation
+        if ($type === 'api' && isset($item['public_api_routes']) && is_array($item['public_api_routes'])) {
+            $publicRoutes = $item['public_api_routes'];
+            $apiRoutes = $this->getApiRoutes();
+            $customRoutes = $this->getCustomApiRoutes();
+            $customPublicRoutes = [];
+            $customAuthenticatedRoutes = [];
 
-        $routeGroup->group(function () use (
-            $type,
-            $isSingleton,
-            $controllerName,
-            $routeUrlSegment,
-            $itemStudlyName,
-            $resourceOptionsAs,
-            $resourceOptions,
-            $parameters
-        ) {
-            if ($isSingleton) {
-                Route::singleton($routeUrlSegment, $controllerName, $resourceOptions);
-            } else {
-                // Add additional routes for admin only
-                if ($type === 'admin') {
-                    Route::additionalRoutes($routeUrlSegment, $itemStudlyName, [
-                        'as' => implode('.', $resourceOptionsAs),
-                    ]);
-                }
-
-                // Configure resource options based on type
-                $finalResourceOptions = $type === 'front'
-                    ? $resourceOptions + ['only' => ['index', 'create', 'store', 'show']]
-                    : $resourceOptions;
-
-                Route::resource($routeUrlSegment, $controllerName, $finalResourceOptions)
-                    ->parameters($parameters);
+            if(in_array('index', $publicRoutes)){
+                $customPublicRoutes = array_values(array_intersect($customRoutes, ['search', 'filters', 'meta']));
             }
-        });
+
+            $authenticatedRoutes = array_values(array_diff($apiRoutes, $publicRoutes));
+            $customAuthenticatedRoutes = array_values(array_diff($customRoutes, $customPublicRoutes));
+
+            // Register public routes if any
+            if (!empty($publicRoutes)) {
+                $this->registerApiRouteGroup(
+                    $this->getPublicApiMiddlewares(),
+                    $prefixes,
+                    $isSingleton,
+                    $controllerName,
+                    $routeUrlSegment,
+                    $itemStudlyName,
+                    $resourceOptionsAs,
+                    $resourceOptions,
+                    $parameters,
+                    $publicRoutes,
+                    $customPublicRoutes
+                );
+            }
+
+            // Register authenticated routes if any
+            if (!empty($authenticatedRoutes)) {
+                $this->registerApiRouteGroup(
+                    $this->getApiAuthMiddlewares(),
+                    $prefixes,
+                    $isSingleton,
+                    $controllerName,
+                    $routeUrlSegment,
+                    $itemStudlyName,
+                    $resourceOptionsAs,
+                    $resourceOptions,
+                    $parameters,
+                    $authenticatedRoutes,
+                    $customAuthenticatedRoutes
+                );
+            }
+
+        } else {
+            // Standard route registration
+            $routeGroup = match ($type) {
+                'admin' => Route::middleware($middlewares)->prefix(implode('/', $prefixes)),
+                'api' => Route::middleware($middlewares)->prefix(implode('/', $prefixes)),
+                default => Route::prefix(implode('/', $prefixes))
+            };
+
+
+            $routeGroup->group(function () use (
+                $type,
+                $isSingleton,
+                $controllerName,
+                $routeUrlSegment,
+                $itemStudlyName,
+                $resourceOptionsAs,
+                $resourceOptions,
+                $parameters
+            ) {
+                if ($isSingleton) {
+                    Route::singleton($routeUrlSegment, $controllerName, $resourceOptions);
+                } else {
+                    // Add additional routes based on type
+                    if ($type === 'admin') {
+                        Route::additionalRoutes($routeUrlSegment, $itemStudlyName, [
+                            'as' => implode('.', $resourceOptionsAs),
+                        ]);
+                    } elseif ($type === 'api') {
+                        Route::apiAdditionalRoutes($routeUrlSegment, $itemStudlyName, [
+                            'as' => implode('.', $resourceOptionsAs),
+                        ]);
+                    }
+
+                    // Configure resource options based on type
+                    $finalResourceOptions = match ($type) {
+                        'front' => $resourceOptions + ['only' => ['index', 'create', 'store', 'show']],
+                        'api' => $resourceOptions + ['only' => ['index', 'store', 'show', 'update', 'destroy']],
+                        default => $resourceOptions
+                    };
+
+                    $routeMethod = $type === 'api' ? 'apiResource' : 'resource';
+                    Route::$routeMethod($routeUrlSegment, $controllerName, $finalResourceOptions)
+                        ->parameters($parameters);
+                }
+            });
+        }
     }
+
+    /**
+     * Register API route group with specific middlewares and allowed routes.
+     *
+     * @param array $middlewares
+     * @param array $prefixes
+     * @param bool $isSingleton
+     * @param string $controllerName
+     * @param string $routeUrlSegment
+     * @param string $itemStudlyName
+     * @param array $resourceOptionsAs
+     * @param array $resourceOptions
+     * @param array $parameters
+     * @param array $allowedRoutes
+     * @return void
+     */
+    private function registerApiRouteGroup(
+        array $middlewares,
+        array $prefixes,
+        bool $isSingleton,
+        string $controllerName,
+        string $routeUrlSegment,
+        string $itemStudlyName,
+        array $resourceOptionsAs,
+        array $resourceOptions,
+        array $parameters,
+        array $allowedRoutes,
+        array $customRoutes
+    ): void {
+        Route::middleware($middlewares)
+            ->prefix(implode('/', $prefixes))
+            ->group(function () use (
+                $isSingleton,
+                $controllerName,
+                $routeUrlSegment,
+                $itemStudlyName,
+                $resourceOptionsAs,
+                $resourceOptions,
+                $parameters,
+                $allowedRoutes,
+                $customRoutes
+            ) {
+                if ($isSingleton) {
+                    Route::singleton($routeUrlSegment, $controllerName, $resourceOptions);
+                } else {
+                    // Add additional routes for API
+                    Route::apiAdditionalRoutes($routeUrlSegment, $itemStudlyName, [
+                        'as' => implode('.', $resourceOptionsAs),
+                    ], $customRoutes);
+
+                    $finalResourceOptions = $resourceOptions + ['only' => $allowedRoutes];
+                    Route::apiResource($routeUrlSegment, $controllerName, $finalResourceOptions)
+                        ->parameters($parameters);
+                }
+            });
+    }
+
 }

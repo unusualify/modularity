@@ -162,6 +162,10 @@ class RouteServiceProvider extends ServiceProvider
         $front_controller_namespace = $controller_namespace . '\\Front';
         $routes_folder = GenerateConfigReader::read('routes')->getPath();
 
+        $apiGroupOptions = ModularityRoutes::getApiGroupOptions();
+        $apiController_namespace = GenerateConfigReader::read('controller')->getNamespace();
+        $api_controller_namespace = $apiController_namespace . '\\API';
+
         foreach (Modularity::allEnabled() as $module) {
             $_groupOptions = [
                 'prefix' => $module->fullPrefix(),
@@ -176,14 +180,14 @@ class RouteServiceProvider extends ServiceProvider
                 $module->getDirectoryPath("{$routes_folder}/web.php"),
                 true
             );
-            ModularityRoutes::registerRoutes(
-                $router,
-                $_groupOptions,
-                ['api'], // $middlewares,
-                $module->getClassNamespace("{$controller_namespace}\API"),
-                $module->getDirectoryPath("{$routes_folder}/api.php"),
-                true
-            );
+            // ModularityRoutes::registerRoutes(
+            //     $router,
+            //     $_groupOptions,
+            //     ['api'], // $middlewares,
+            //     $module->getClassNamespace("{$controller_namespace}\API"),
+            //     $module->getDirectoryPath("{$routes_folder}/api.php"),
+            //     true
+            // );
             ModularityRoutes::registerRoutes(
                 $router,
                 [
@@ -218,6 +222,45 @@ class RouteServiceProvider extends ServiceProvider
                     Route::moduleFrontRoutes($module);
                 }
             );
+
+            // Public API routes (no authentication)
+            if (file_exists($module->getDirectoryPath("{$routes_folder}/public-api.php"))) {
+                ModularityRoutes::registerRoutes(
+                    $router,
+                    ModularityRoutes::getPublicApiGroupOptions(),
+                    [],
+                    $module->getClassNamespace("{$api_controller_namespace}"),
+                    $module->getDirectoryPath("{$routes_folder}/public-api.php"),
+                    true
+                );
+            }
+
+            if (file_exists($module->getDirectoryPath("{$routes_folder}/api.php"))) {
+                ModularityRoutes::registerRoutes(
+                    $router,
+                    ModularityRoutes::getAuthApiGroupOptions(),
+                    [],
+                    $module->getClassNamespace("{$api_controller_namespace}"),
+                    $module->getDirectoryPath("{$routes_folder}/api.php"),
+                    true
+                );
+            }
+
+            // API routes
+            $apiGroupOptions = [
+                'prefix' => ModularityRoutes::getApiPrefix(),
+                'as' => 'api.',
+                // 'middleware' => ModularityRoutes::getApiMiddlewares(),
+            ];
+            // $apiGroupOptions = ModularityRoutes::getAuthApiGroupOptions();
+
+            // Module-specific API routes with macro
+            $router->group([
+                ...$apiGroupOptions,
+                'namespace' => $module->getClassNamespace("{$api_controller_namespace}"),
+            ], function ($router) use ($module) {
+                Route::moduleApiRoutes($module);
+            });
 
         }
     }
@@ -409,6 +452,34 @@ class RouteServiceProvider extends ServiceProvider
 
             }
 
+        });
+
+        // API Route Macros
+        Route::macro('moduleApiRoutes', function ($module, $options = []) {
+            ModularityRoutes::registerModuleRoutes($module, $options, 'api');
+        });
+
+        Route::macro('apiAdditionalRoutes', function ($url, $routeName, $options, $customRoutes = null) {
+            $customRoutes = $customRoutes ?? ModularityRoutes::getCustomApiRoutes();
+
+            $controllerClass = "{$routeName}Controller";
+            $snakeCase = snakeCase($routeName);
+
+            foreach ($customRoutes as $customRoute) {
+                $customRouteKebab = kebabCase($customRoute);
+                $routeSlug = "{$url}/{$customRouteKebab}";
+
+                $mapping = [
+                    'as' => $options['as'] . ".{$customRoute}",
+                    'uses' => "{$controllerClass}@{$customRoute}",
+                ];
+
+                if (in_array($customRoute, ['bulk', 'import'])) {
+                    Route::post($routeSlug, $mapping);
+                } else {
+                    Route::get($routeSlug, $mapping);
+                }
+            }
         });
     }
 }
