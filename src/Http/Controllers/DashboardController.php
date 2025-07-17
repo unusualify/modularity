@@ -46,6 +46,9 @@ class DashboardController extends BaseController
 
         $endpoints = $this->getUrls();
 
-        return View::make("$this->baseKey::layouts.dashboard", compact('blocks', 'endpoints'));
+        $pageTitle = __('Dashboard') . ' - ' . \Unusualify\Modularity\Facades\Modularity::pageTitle();
+        $headerTitle = __('Dashboard');
+
+        return View::make("$this->baseKey::layouts.dashboard", compact('blocks', 'endpoints', 'pageTitle', 'headerTitle'));
     }
 }
