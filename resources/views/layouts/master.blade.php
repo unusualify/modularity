@@ -5,11 +5,13 @@
         $navigation ??= [];
         $impersonation ??= [];
         $authorization ??= [];
+        $headerTitle ??= config('app.name');
 
         $_mainConfiguration = [
             'navigation' => $navigation,
             'impersonation' => $impersonation,
-            'authorization' => $authorization
+            'authorization' => $authorization,
+            'headerTitle' => $headerTitle
         ];
     @endphp
     <div id="admin">
