@@ -50,7 +50,7 @@
 
         :height="windowSize.y - 64 - 24 - 59 - 76 - ($vuetify.display.mdAndDown ? 80 : 0)"
 
-        :hide-default-header="hideHeaders"
+        :hide-default-header="hideHeaders || ($vuetify.display.smAndDown && !showMobileHeaders)"
         :multi-sort="multiSort"
         :must-sort="mustSort"
         :density="tableDensity ?? 'comfortable'"
