@@ -71,7 +71,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         $app['config']->set('modules.activator', 'modularity');
 
         $app['config']->set('modularity.app_url', 'http://localhost');
-        $app['config']->set('modularity.admin_app_url', null);
+        $app['config']->set('modularity.admin_app_url', '');
         $app['config']->set('modularity.admin_app_path', 'admin');
         $app['config']->set('modularity.admin_route_name_prefix', 'admin');
 
