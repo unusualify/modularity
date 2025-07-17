@@ -4,6 +4,7 @@ namespace Unusualify\Modularity\Http\Controllers\Traits;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Route;
 use Unusualify\Modularity\Services\View\UWrapper;
 
@@ -174,7 +175,8 @@ trait ManageUtilities
         ] : [])
              + (Route::has($restoreRouteName) && $itemId ? [
                  'restoreUrl' => moduleRoute($this->moduleName, $this->routePrefix, 'restoreRevision', [$itemId]),
-             ] : []);
+             ] : [])
+             + $this->getViewLayoutVariables();
 
         return array_replace_recursive($data, $customFormData);
     }
@@ -188,10 +190,37 @@ trait ManageUtilities
         return [];
     }
 
-    public function getViewLayoutVariables()
+        public function getViewLayoutVariables()
     {
+        $currentRoute = Route::current();
+        $currentActionMethod = $currentRoute->getActionMethod();
+        $snakeRouteName = Str::snake($this->routeName);
+        $translationRouteKey = "modules.{$snakeRouteName}";
+
+        // Check for custom title from configuration first
+        $customTitle = $this->tableAttributes['customTitle'] ?? null;
+
+        switch ($currentActionMethod) {
+            case 'create':
+                $pageTitle = trans_choice($translationRouteKey, 1);
+                $headerTitle = $customTitle ?: __('fields.new-item', ['item' => trans_choice('modules.' . snakeCase($this->routeName), 1)]);
+                break;
+            case 'edit':
+                $pageTitle = trans_choice($translationRouteKey, 1);
+                $headerTitle = $customTitle ?: __('fields.edit-item', ['item' => trans_choice('modules.' . snakeCase($this->routeName), 1)]);
+                break;
+            case 'show':
+                $pageTitle = trans_choice($translationRouteKey, 1);
+                $headerTitle = $customTitle ?: __('fields.show-item', ['item' => trans_choice('modules.' . snakeCase($this->routeName), 1)]);
+                break;
+            default:
+                $pageTitle = $customTitle ?: trans_choice($translationRouteKey, 0);
+                $headerTitle = $customTitle ?: trans_choice($translationRouteKey, 0);
+        }
+
         return [
-            'pageTitle' => $this->getHeadline($this->routeName) . ' Module',
+            'pageTitle' => "$pageTitle - " . \Unusualify\Modularity\Facades\Modularity::pageTitle(),
+            'headerTitle' => $headerTitle,
         ];
     }
 
