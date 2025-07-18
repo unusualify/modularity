@@ -112,6 +112,8 @@ return [
             'observer' => ['path' => 'Observers', 'generate' => false],
             'routes' => ['path' => 'Routes', 'generate' => true],
             'controller' => ['path' => 'Http/Controllers', 'generate' => true],
+            'front-controller' => ['path' => 'Http/Controllers/Front', 'generate' => true],
+            'api-controller' => ['path' => 'Http/Controllers/Api', 'generate' => true],
             'filter' => ['path' => 'Http/Middleware', 'generate' => false],
             'request' => ['path' => 'Http/Requests', 'generate' => true],
             'provider' => ['path' => 'Providers', 'generate' => false],
