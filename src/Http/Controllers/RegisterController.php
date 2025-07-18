@@ -174,7 +174,7 @@ class RegisterController extends Controller
             'password' => Hash::make($request['password']),
         ]);
 
-        event(new ModularityUserRegistered($user));
+        event(new ModularityUserRegistered($user, $request));
 
         $user->assignRole('client-manager');
 
