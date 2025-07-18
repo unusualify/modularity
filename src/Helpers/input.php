@@ -53,19 +53,19 @@ if (! function_exists('hydrate_input_type')) {
 }
 
 if (! function_exists('modularity_format_input')) {
-    function modularity_format_input(array $input)
+    function modularity_format_input(array $input, $module = null, $routeName = null, $skipQueries = null)
     {
         $defaultInput = modularity_default_input();
 
-        return configure_input(hydrate_input(array_merge($defaultInput, $input)));
+        return configure_input(hydrate_input(array_merge($defaultInput, $input), $module, $routeName, $skipQueries));
     }
 }
 
 if (! function_exists('modularity_format_inputs')) {
-    function modularity_format_inputs(array $inputs)
+    function modularity_format_inputs(array $inputs, $module = null, $routeName = null, $skipQueries = null)
     {
-        return array_map(function ($v) {
-            return modularity_format_input($v);
+        return array_map(function ($v) use ($module, $routeName, $skipQueries) {
+            return modularity_format_input($v, $module, $routeName, $skipQueries);
         }, $inputs);
     }
 }
