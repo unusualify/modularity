@@ -179,6 +179,7 @@ export default {
         case 'md': return 450
         case 'lg': return 500
         case 'xl': return 600
+        case 'xxl': return 700
         default: return 300
       }
     })
