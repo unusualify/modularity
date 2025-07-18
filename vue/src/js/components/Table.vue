@@ -545,7 +545,7 @@
         </template>
 
         <!-- MARK PAGINATION BUTTONS -->
-        <template v-if="enableCustomFooter" v-slot:bottom="{page, pageCount}">
+        <template v-if="enableCustomFooter || $vuetify.display.smAndDown" v-slot:bottom="{page, pageCount}">
           <div class="d-flex justify-end py-4">
             <v-container class="max-width text-center">
               <v-pagination v-if="!loading"
@@ -554,7 +554,7 @@
 
                 density="compact"
                 size="small"
-                total-visible="3"
+                :total-visible="$vuetify.display.smAndDown ? 1 : 3"
                 show-first-last-page
                 v-bind="footerProps"
               >
