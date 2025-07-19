@@ -19,8 +19,7 @@
         @click="$toggleSidebar()">
       </v-app-bar-nav-icon>
 
-      <v-spacer></v-spacer>
-      <v-toolbar-title>
+      <v-toolbar-title class="flex-1-1-100 ml-0 text-center">
         {{ headerTitle }}
       </v-toolbar-title>
 
