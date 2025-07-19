@@ -149,19 +149,19 @@ class RegisterController extends Controller
     {
         $validator = $this->validator($request->all());
 
-        event(new ModularityUserRegistering($request));
-
         if ($validator->fails()) {
             return $request->wantsJson()
                 ? new JsonResponse([
                     'errors' => $validator->errors(),
                     'message' => $validator->messages()->first(),
                     'variant' => MessageStage::WARNING,
-                ], 200)
+                ], 422)
                 : $request->validate($this->rules());
 
             return $res;
         }
+
+        event(new ModularityUserRegistering($request));
 
         $user = Company::create([
             'name' => $request['company'] ?? '',
@@ -180,7 +180,10 @@ class RegisterController extends Controller
 
         return $request->wantsJson()
             ? new JsonResponse([
+                'status' => 'success',
+                'message' => 'User registered successfully',
                 'redirector' => route(Route::hasAdmin('register.success')),
+                'login_page' => route(Route::hasAdmin('login')),
             ], 200)
             : $this->sendLoginResponse($request);
     }
