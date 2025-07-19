@@ -4,12 +4,14 @@
       <span class="font-weight-bold text-primary text-body-1">{{ title }}</span>
     </template> -->
     <slot name="title">
-      <ue-title v-if="title" :text="title" :color="titleColor" padding="x-4" class="pt-4"/>
+      <ue-title v-if="title" :text="title" :color="titleColor" :padding="`x-${titlePXNumber}`" class="pt-4"/>
     </slot>
     <div no-gutters class="ue-configurable-card__row"
       :style="rowStyle"
       :class="[
-        $vuetify.display.smAndDown ? `ga-${mobileRowGap}` : ''
+        $vuetify.display.smAndDown ? `ga-${mobileRowGap}` : '',
+        rowMarginY ? `my-${rowMarginY}` : '',
+        rowMarginX ? `mx-${rowMarginX}` : ''
       ]"
     >
       <div
@@ -21,7 +23,9 @@
           justifyCenterColumns ? 'ue-configurable-card__col--justify-center' : '',
           alignCenterColumns ? 'ue-configurable-card__col--align-center' : '',
           $isset(columnStyles[segmentIndex]) || colRatios.length > 0 ? `ue-configurable-card__col--unset-flex-basis` : '',
-          columnClasses[segmentIndex] ?? ''
+          columnClasses[segmentIndex] ?? '',
+          colPaddingX ? `px-${colPaddingX}` : '',
+          colPaddingY ? `py-${colPaddingY}` : ''
         ]"
         :style="getEffectiveColumnStyle(segmentIndex)"
       >
@@ -79,6 +83,12 @@
       titleColor: {
         type: String,
       },
+      titlePaddingX: {
+        type: [Number, String],
+      },
+      titlePaddingY: {
+        type: [Number, String],
+      },
       items: {
         type: [Object, Array],
         required: true
@@ -116,6 +126,20 @@
         type: Boolean,
         default: false
       },
+      rowMarginY: {
+        type: [Number, String],
+        default: 4
+      },
+      rowMarginX: {
+        type: [Number, String],
+      },
+      colPaddingX: {
+        type: [Number, String],
+        default: 2
+      },
+      colPaddingY: {
+        type: [Number, String],
+      },
       columnStyles: {
         type: Object,
         default: () => ({}),
@@ -145,6 +169,26 @@
       }
     },
     computed: {
+      titlePXNumber() {
+        if (this.titlePaddingX) {
+          return parseInt(this.titlePaddingX);
+        }
+
+        let padding = 0;
+
+        if(this.rowMarginX) {
+          padding += parseInt(this.rowMarginX);
+        }
+
+        if(this.colPaddingX) {
+          padding += parseInt(this.colPaddingX);
+        }
+
+        return padding;
+      },
+      titlePYNumber() {
+        return this.titlePaddingY ? parseInt(this.titlePaddingY) : 4;
+      },
       cardClass() {
         return `ue-configurable-card--${this.effectiveSegmentCount}-columns`;
       },
@@ -235,7 +279,6 @@
       display: flex
       flex-wrap: wrap
       max-width: 100%
-      margin: calc($spacer * 4) 0
 
       .ue-configurable-card__col
         &--justify-center:not(:first-child)
@@ -246,7 +289,6 @@
       // flex: 1
       min-width: 0
       max-width: 100%
-      padding: 0 calc($spacer * 2)
 
       &--seperator
         border-right: 1px solid rgba(0, 0, 0, 0.12)

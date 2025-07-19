@@ -10,7 +10,7 @@
       <v-card
         :class="[
           'v-input-checkbox-card__item border border-sm border-opacity-75',
-          input.includes(value) ? 'bg-primary-lighten-4 border-primary' : 'border-grey-lighten-4',
+          input.includes(value) ? 'border-primary' : 'border-grey-lighten-4',
           disabled ? 'v-input-checkbox-card__item--disabled' : ''
         ]"
         :variant="input.includes(value) ? 'elevated' : 'outlined'"
@@ -31,7 +31,7 @@
           <v-card-title
             :class="[
               'v-input-checkbox-card__title',
-              input.includes(value) ? `bg-primary-lighten-5 border-primary ${activeTitleColor ? `text-${activeTitleColor}` : ''}` : '',
+              input.includes(value) ? `border-primary ${activeTitleColor ? `text-${activeTitleColor}` : ''}` : '',
               input.includes(value) ? `v-input-checkbox-card__title--selected ${activeTitleColor ? `text-${activeTitleColor}` : ''}` : '',
             ]"
           >
