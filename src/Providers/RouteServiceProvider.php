@@ -84,6 +84,7 @@ class RouteServiceProvider extends ServiceProvider
                         $router->group(
                             [
                                 // 'domain' => modularityConfig('admin_app_url'),
+                                'domain' => Modularity::getAdminAppUrl(),
                             ],
                             function ($router) {
 
@@ -161,6 +162,10 @@ class RouteServiceProvider extends ServiceProvider
         $front_controller_namespace = $controller_namespace . '\\Front';
         $routes_folder = GenerateConfigReader::read('routes')->getPath();
 
+        $apiGroupOptions = ModularityRoutes::getApiGroupOptions();
+        $apiController_namespace = GenerateConfigReader::read('controller')->getNamespace();
+        $api_controller_namespace = $apiController_namespace . '\\API';
+
         foreach (Modularity::allEnabled() as $module) {
             $_groupOptions = [
                 'prefix' => $module->fullPrefix(),
@@ -175,14 +180,14 @@ class RouteServiceProvider extends ServiceProvider
                 $module->getDirectoryPath("{$routes_folder}/web.php"),
                 true
             );
-            ModularityRoutes::registerRoutes(
-                $router,
-                $_groupOptions,
-                ['api'], // $middlewares,
-                $module->getClassNamespace("{$controller_namespace}\API"),
-                $module->getDirectoryPath("{$routes_folder}/api.php"),
-                true
-            );
+            // ModularityRoutes::registerRoutes(
+            //     $router,
+            //     $_groupOptions,
+            //     ['api'], // $middlewares,
+            //     $module->getClassNamespace("{$controller_namespace}\API"),
+            //     $module->getDirectoryPath("{$routes_folder}/api.php"),
+            //     true
+            // );
             ModularityRoutes::registerRoutes(
                 $router,
                 [
@@ -217,6 +222,45 @@ class RouteServiceProvider extends ServiceProvider
                     Route::moduleFrontRoutes($module);
                 }
             );
+
+            // Public API routes (no authentication)
+            if (file_exists($module->getDirectoryPath("{$routes_folder}/public-api.php"))) {
+                ModularityRoutes::registerRoutes(
+                    $router,
+                    ModularityRoutes::getPublicApiGroupOptions(),
+                    [],
+                    $module->getClassNamespace("{$api_controller_namespace}"),
+                    $module->getDirectoryPath("{$routes_folder}/public-api.php"),
+                    true
+                );
+            }
+
+            if (file_exists($module->getDirectoryPath("{$routes_folder}/api.php"))) {
+                ModularityRoutes::registerRoutes(
+                    $router,
+                    ModularityRoutes::getAuthApiGroupOptions(),
+                    [],
+                    $module->getClassNamespace("{$api_controller_namespace}"),
+                    $module->getDirectoryPath("{$routes_folder}/api.php"),
+                    true
+                );
+            }
+
+            // API routes
+            $apiGroupOptions = [
+                'prefix' => ModularityRoutes::getApiPrefix(),
+                'as' => 'api.',
+                // 'middleware' => ModularityRoutes::getApiMiddlewares(),
+            ];
+            // $apiGroupOptions = ModularityRoutes::getAuthApiGroupOptions();
+
+            // Module-specific API routes with macro
+            $router->group([
+                ...$apiGroupOptions,
+                'namespace' => $module->getClassNamespace("{$api_controller_namespace}"),
+            ], function ($router) use ($module) {
+                Route::moduleApiRoutes($module);
+            });
 
         }
     }
@@ -299,262 +343,11 @@ class RouteServiceProvider extends ServiceProvider
         });
 
         Route::macro('moduleRoutes', function ($module, $options = []) {
-
-            $config = $module->getConfig();
-            $moduleName = $config['name'] ?? $module->getName();
-            if ($moduleName) { // && getStringOrFalse($config['name'])
-                $pr = $module->getParentRoute();
-
-                $has_system_prefix = $module->hasSystemPrefix();
-                $system_prefix = $has_system_prefix ? systemUrlPrefix() . '/' : '';
-                $system_route_name = $has_system_prefix ? systemRouteNamePrefix() : '';
-
-                $parentStudlyName = studlyName($moduleName); // UserCompany
-                $parentCamelName = camelCase($moduleName); // userCompany
-                $parentKebabName = kebabCase($moduleName); // user-company
-                $parentSnakeName = snakeCase($moduleName);  // user_company
-
-                $parentUrlSegment = $config['url'] ?? $pr['url'] ?? pluralize($parentKebabName);
-
-                if (is_array($routes = $module->getRouteConfigs(valid: true))) {
-
-                    /**
-                     * the fix of route precedence
-                     * to define parent route the most lastly
-                     *
-                     *  */
-                    usort($routes, fn ($i, $j) => (isset($i['parent']) || isset($j['parent']))
-                            ? ((isset($i['parent']) && $i['parent']) ?: false)
-                            : false
-                    );
-
-                    foreach ($routes as $key => $item) {
-                        $middlewares = $module->getRouteMiddlewareAliases($item['name']);
-                        $isSingleton = $module->isSingleton($item['name']);
-
-                        if (isset($item['name'])) { // && getStringOrFalse($item['name'])
-                            $itemKebabName = kebabCase($item['name']);
-                            $itemStudlyName = studlyName($item['name']);
-                            $itemSnakeName = snakeCase($item['name']);
-
-                            $routeUrlSegment = $item['url'] ?? pluralize($itemKebabName);
-                            if ($isSingleton) {
-                                $routeUrlSegment = Str::singular($routeUrlSegment);
-                            }
-
-                            $controllerName = $itemStudlyName . 'Controller';
-
-                            $resourceOptionsNames = $item['route_name'] ?? $itemSnakeName;
-                            $resourceOptionsAs = [];
-                            $parameters = [];
-                            $prefixes = [];
-
-                            if ($system_prefix) {
-                                $prefixes[] = rtrim($system_prefix, '//');
-                            }
-
-                            if ($system_route_name) {
-                                $resourceOptionsAs[] = $system_route_name;
-                            }
-
-                            $parameters[$routeUrlSegment] = $itemSnakeName;
-                            // $parameters[$routeUrlSegment] = snakeCase(studlyName(Str::singular($routeUrlSegment)));
-
-                            if (isset($item['belongs']) && $item['belongs']) {
-
-                                foreach ($item['belongs'] as $key => $belong) {
-                                    $belongRoute = $module->getRouteConfigs($belong);
-                                    if ($belongRoute) {
-                                        $belongRouteName = $belongRoute['route_name'] ?? snakeCase($belongRoute['name']); // package_region
-                                        $belongRouteUrl = $belongRoute['url'] ?? pluralize(kebabCase($belongRoute['name'])); // package-regions
-                                        // Route::prefix('packages')->group(function(){
-                                        //     Route::resource('package-regions.package-countries', 'PackageCountryController', [
-                                        //         'as' => 'package_region',
-                                        //         'names' => 'package_region.nested.package_country',
-                                        //     ]);
-                                        // });
-                                        Route::prefix($parentUrlSegment)->group(function () use (
-                                            $parentSnakeName,
-                                            $routeUrlSegment,
-                                            $itemSnakeName,
-                                            $controllerName,
-                                            $belongRouteUrl,
-                                            $belongRouteName,
-                                            $parameters
-                                        ) {
-                                            $resourceRegistrar = Route::resource("{$belongRouteUrl}.{$routeUrlSegment}", $controllerName, [
-                                                'as' => $parentSnakeName,
-                                                'names' => nestedRouteNameFormat($belongRouteName, $itemSnakeName),
-                                            ])->parameters($parameters + [
-                                                $belongRouteUrl => $belongRouteName,
-                                            ]);
-                                            $resourceRegistrar->only([
-                                                'index',
-                                                'create',
-                                                'store',
-                                            ]);
-                                        });
-                                    }
-                                }
-
-                            }
-
-                            if (($isNotParent = ! (isset($item['parent']) && $item['parent'])) || $parentUrlSegment !== $routeUrlSegment) { // unless parent route
-                                // $url = $parentUrlSegment . "/" . $url;
-                                $prefixes[] = $parentUrlSegment;
-
-                                if ($isNotParent) {
-                                    $resourceOptionsAs[] = $parentSnakeName;
-                                }
-
-                            }
-
-                            $resourceOptions = [
-                                'as' => implode('.', $resourceOptionsAs),
-                                'names' => $resourceOptionsNames,
-                            ];
-
-                            $resourceOptionsAs[] = $itemSnakeName;
-                            Route::middleware($middlewares)->prefix(implode('/', $prefixes))->group(function () use (
-                                $isSingleton,
-                                $controllerName,
-                                $routeUrlSegment,
-                                $itemStudlyName,
-                                $resourceOptionsAs,
-                                $resourceOptions,
-                                $parameters,
-                            ) {
-
-                                if ($isSingleton) {
-                                    Route::singleton($routeUrlSegment, $controllerName, $resourceOptions);
-                                    // Route::get($routeUrlSegment, $controllerName . '@editSingleton')->name($itemSnakeName);
-                                } else {
-                                    Route::additionalRoutes($routeUrlSegment, $itemStudlyName, [
-                                        'as' => implode('.', $resourceOptionsAs),
-                                    ]);
-
-                                    Route::resource($routeUrlSegment, $controllerName, $resourceOptions)
-                                        // ->scoped($scoped)
-                                        ->parameters($parameters);
-                                }
-
-                            });
-                        }
-
-                    }
-                }
-            }
-
-            // Route::group($options, function() use($module, $options){
-            // });
-
+            ModularityRoutes::registerModuleRoutes($module, $options, 'admin');
         });
 
         Route::macro('moduleFrontRoutes', function ($module, $options = []) {
-
-            $config = $module->getConfig();
-            $moduleName = $config['name'] ?? $module->getName();
-            if ($moduleName) { // && getStringOrFalse($config['name'])
-                $pr = $module->getParentRoute();
-
-                $has_system_prefix = $module->hasSystemPrefix();
-                $system_prefix = $has_system_prefix ? systemUrlPrefix() . '/' : '';
-                $system_route_name = $has_system_prefix ? systemRouteNamePrefix() : '';
-
-                $parentStudlyName = studlyName($moduleName); // UserCompany
-                $parentCamelName = camelCase($moduleName); // userCompany
-                $parentKebabName = kebabCase($moduleName); // user-company
-                $parentSnakeName = snakeCase($moduleName);  // user_company
-
-                $parentUrlSegment = $config['url'] ?? $pr['url'] ?? pluralize($parentKebabName);
-
-                if (is_array($routes = $module->getRouteConfigs(valid: true))) {
-
-                    /**
-                     * the fix of route precedence
-                     * to define parent route the most lastly
-                     *
-                     *  */
-                    usort($routes, fn ($i, $j) => (isset($i['parent']) || isset($j['parent']))
-                            ? ((isset($i['parent']) && $i['parent']) ?: false)
-                            : false
-                    );
-
-                    foreach ($routes as $key => $item) {
-                        $hasFrontRoutes = $item['has_front_routes'] ?? false;
-
-                        if (! $hasFrontRoutes) {
-                            continue;
-                        }
-
-                        $isSingleton = $module->isSingleton($item['name']);
-
-                        if (isset($item['name'])) { // && getStringOrFalse($item['name'])
-                            $itemKebabName = kebabCase($item['name']);
-                            $itemStudlyName = studlyName($item['name']);
-                            $itemSnakeName = snakeCase($item['name']);
-                            $routeUrlSegment = $item['url'] ?? pluralize($itemKebabName);
-                            if ($isSingleton) {
-                                $routeUrlSegment = Str::singular($routeUrlSegment);
-                            }
-
-                            $controllerName = $itemStudlyName . 'Controller';
-
-                            $resourceOptionsNames = $item['route_name'] ?? $itemSnakeName;
-                            $resourceOptionsAs = [];
-                            $parameters = [];
-                            $prefixes = [];
-
-                            if ($system_prefix) {
-                                $prefixes[] = rtrim($system_prefix, '//');
-                            }
-
-                            if ($system_route_name) {
-                                $resourceOptionsAs[] = $system_route_name;
-                            }
-
-                            $parameters[$routeUrlSegment] = $itemSnakeName;
-
-                            if (($isNotParent = ! (isset($item['parent']) && $item['parent'])) || $parentUrlSegment !== $routeUrlSegment) { // unless parent route
-                                $prefixes[] = $parentUrlSegment;
-
-                                if ($isNotParent) {
-                                    $resourceOptionsAs[] = $parentSnakeName;
-                                }
-
-                            }
-
-                            $resourceOptions = [
-                                'as' => implode('.', $resourceOptionsAs),
-                                'names' => $resourceOptionsNames,
-                            ];
-
-                            $resourceOptionsAs[] = $itemSnakeName;
-
-                            Route::prefix(implode('/', $prefixes))->group(function () use (
-                                $isSingleton,
-                                $controllerName,
-                                $routeUrlSegment,
-                                $resourceOptions,
-                                $parameters,
-                            ) {
-                                if ($isSingleton) {
-                                    Route::singleton($routeUrlSegment, $controllerName, $resourceOptions);
-                                } else {
-                                    Route::resource($routeUrlSegment, $controllerName, $resourceOptions + ['only' => ['index', 'create', 'store', 'show']])
-                                        // ->scoped($scoped)
-                                        ->parameters($parameters);
-                                }
-                            });
-                        }
-
-                    }
-                }
-            }
-
-            // Route::group($options, function() use($module, $options){
-            // });
-
+            ModularityRoutes::registerModuleRoutes($module, $options, 'front');
         });
 
         Route::macro('additionalRoutes', function ($url, $routeName, $options) {
@@ -660,44 +453,33 @@ class RouteServiceProvider extends ServiceProvider
             }
 
         });
-    }
 
-    public static function shouldPrefixRouteName($groupPrefix, $lastRouteGroupName)
-    {
-        return ! empty($groupPrefix) && (blank($lastRouteGroupName) ||
-            modularityConfig('allow_duplicates_on_route_names', true) ||
-            (! Str::endsWith($lastRouteGroupName, ".{$groupPrefix}.")));
-    }
+        // API Route Macros
+        Route::macro('moduleApiRoutes', function ($module, $options = []) {
+            ModularityRoutes::registerModuleRoutes($module, $options, 'api');
+        });
 
-    public static function getLastRouteGroupName()
-    {
-        // Get the current route groups
-        $routeGroups = Route::getGroupStack() ?? [];
+        Route::macro('apiAdditionalRoutes', function ($url, $routeName, $options, $customRoutes = null) {
+            $customRoutes = $customRoutes ?? ModularityRoutes::getCustomApiRoutes();
 
-        // dd(Route::getGroupStack(), end($routeGroups));
+            $controllerClass = "{$routeName}Controller";
+            $snakeCase = snakeCase($routeName);
 
-        // Get the name prefix of the last group
-        return end($routeGroups)['as'] ?? '';
-    }
+            foreach ($customRoutes as $customRoute) {
+                $customRouteKebab = kebabCase($customRoute);
+                $routeSlug = "{$url}/{$customRouteKebab}";
 
-    public static function getGroupPrefix()
-    {
-        $groupPrefix = trim(
-            str_replace('/', '.', Route::getLastGroupPrefix()),
-            '.'
-        );
+                $mapping = [
+                    'as' => $options['as'] . ".{$customRoute}",
+                    'uses' => "{$controllerClass}@{$customRoute}",
+                ];
 
-        if (! empty(modularityConfig('admin_app_path'))) {
-            $groupPrefix = ltrim(
-                str_replace(
-                    modularityConfig('admin_app_path'),
-                    '',
-                    $groupPrefix
-                ),
-                '.'
-            );
-        }
-
-        return $groupPrefix;
+                if (in_array($customRoute, ['bulk', 'import'])) {
+                    Route::post($routeSlug, $mapping);
+                } else {
+                    Route::get($routeSlug, $mapping);
+                }
+            }
+        });
     }
 }

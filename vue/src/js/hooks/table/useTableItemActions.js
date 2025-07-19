@@ -21,8 +21,8 @@ export const makeTableItemActionsProps = propsFactory({
     default: 'mdi-cog-outline'
   },
   rowActions: {
-    type: Array,
-    default: []
+    type: [Array, Object],
+    default: () => []
   },
   rowActionsType: {
     type: String,
@@ -307,7 +307,7 @@ export default function useTableItemActions(props, { tableForms, loadItems }) {
             loadItems()
           }
         }, function(error) {
-          console.log(error)
+          console.error(error)
         })
       }
     }
@@ -377,12 +377,30 @@ export default function useTableItemActions(props, { tableForms, loadItems }) {
         return smAndDown.value
       }
 
-      return props.rowActionsType === 'dropdown' || shouldShowDropdown(props.rowActions.length)
+      // Get the length of actions (handle both array and object)
+      let actionsLength = 0
+      if (_.isArray(props.rowActions)) {
+        actionsLength = props.rowActions.length
+      } else if (_.isObject(props.rowActions)) {
+        actionsLength = Object.keys(props.rowActions).length
+      }
+
+      return props.rowActionsType === 'dropdown' || shouldShowDropdown(actionsLength)
         ? 'dropdown'
         : 'inline'
     }),
     visibleRowActions: computed(() => {
-      return props.rowActions.reduce((acc, action) => {
+      // Convert object to array if needed
+      let actionsArray = props.rowActions
+
+
+      if (_.isObject(props.rowActions) && !_.isArray(props.rowActions)) {
+
+        // If it's an object, convert to array using Object.values()
+        actionsArray = Object.values(props.rowActions)
+      }
+
+      return actionsArray.reduce((acc, action) => {
 
         if(Object.prototype.hasOwnProperty.call(action, 'href')){
           console.error('href is not supported in row actions', action)
@@ -432,13 +450,8 @@ export default function useTableItemActions(props, { tableForms, loadItems }) {
 
         return acc
       }, [])
-
-      return actions
     })
   })
-
-
-  console.log(states.visibleRowActions)
 
   return {
     ...toRefs(states),

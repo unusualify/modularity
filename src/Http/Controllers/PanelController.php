@@ -21,11 +21,6 @@ abstract class PanelController extends CoreController
     use MakesResponses, ManageScopes, ManageAuthorization;
 
     /**
-     * @var Application
-     */
-    protected $app;
-
-    /**
      * @var Unusualify\Modularity\Entities\Model
      */
     protected $user;
@@ -69,11 +64,6 @@ abstract class PanelController extends CoreController
      * @var \Unusualify\Modularity\Entities\Model
      */
     protected $nestedParentModel;
-
-    /**
-     * @var object
-     */
-    protected $config;
 
     /**
      * @var string
@@ -220,9 +210,7 @@ abstract class PanelController extends CoreController
         //     App::singleton(ExceptionHandler::class, ModularityHandler::class);
         // }
 
-        parent::__construct($request);
-
-        $this->app = $app;
+        parent::__construct($app, $request);
 
         $this->middleware(function ($request, $next) {
             $this->user = Auth::user();
@@ -232,8 +220,6 @@ abstract class PanelController extends CoreController
 
         // $this->setMiddlewareBasePermission();
         $this->setMiddlewarePermission();
-
-        $this->config = $this->getModuleConfig();
 
         $this->titleColumnKey = $this->getConfigFieldsByRoute('title_column_key', 'name');
 
@@ -437,7 +423,11 @@ abstract class PanelController extends CoreController
             ];
 
             $authorized = ($this->isGateable() && array_key_exists($option, $authorizableOptions))
-                ? Auth::guard(Modularity::getAuthGuardName())->user()->can($authorizableOptions[$option])
+                ? (($guard = Auth::guard(Modularity::getAuthGuardName()))
+                    ? (($user = $guard->user())
+                        ? $user->can($authorizableOptions[$option])
+                        : false)
+                    : false)
                 : true;
 
             return ($this->indexOptions[$option] ?? $this->defaultIndexOptions[$option] ?? false) && $authorized;
@@ -514,18 +504,6 @@ abstract class PanelController extends CoreController
 
         return $this->request;
         // return TwillCapsules::getCapsuleForModel($this->modelName)->getFormRequestClass();
-    }
-
-    /**
-     * getModuleConfig
-     *
-     * @return \StdClass::class
-     */
-    public function getModuleConfig()
-    {
-        $snakeCase = $this->getSnakeCase($this->moduleName);
-
-        return array_to_object(Config::get(modularityBaseKey() . '.system_modules.' . $snakeCase) ?: Config::get($snakeCase));
     }
 
     /**
@@ -710,27 +688,6 @@ abstract class PanelController extends CoreController
         );
     }
 
-    protected function getConfigFieldsByRoute($field_name, $default = null)
-    {
-        try {
-            return data_get($this->config->routes->{$this->getSnakeCase($this->routeName)}, $field_name) ?? $default;
-
-            return $this->config->routes->{$this->getSnakeCase($this->routeName)}->{$field_name};
-        } catch (\Throwable $th) {
-            return $default;
-            dd(
-                // $th,
-                $this,
-                debug_backtrace()
-            );
-        }
-
-        return $this->config->routes->{$this->getSnakeCase($this->routeName)}->{$field_name};
-        // return $this->isParentRoute()
-        //     ? $this->config->parent_route->{$field_name}
-        //     : $this->config->sub_routes->{$this->getSnakeCase($this->routeName)}->{$field_name};
-    }
-
     public function isGateable()
     {
         return ! env('PERMISSION_GATES_DEACTIVATE', false);
@@ -858,5 +815,47 @@ abstract class PanelController extends CoreController
         return TwillBlocks::getBlockCollection()->getRepeaters()->mapWithKeys(function (Block $repeater) {
             return [$repeater->name => $repeater->toList()];
         });
+    }
+
+    /**
+     * @param array $scopes
+     * @param bool $forcePagination
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    protected function getIndexItems($with = [], $scopes = [], $appends = [], $forcePagination = false)
+    {
+        $perPage = $this->request->get('itemsPerPage') ?? $this->getTableAttribute('itemsPerPage') ?? $this->perPage ?? 10;
+
+        if (! $this->request->ajax()) {
+            $perPage = 0;
+        }
+
+        return $this->transformIndexItems($this->repository->get(
+            with: ($this->indexWith ?? []) + $with,
+            scopes: $scopes,
+            orders: $this->orderScope(),
+            perPage: $perPage,
+            forcePagination: $forcePagination,
+            appends: $appends,
+            id: $this->request->get('id') ?? null
+        ));
+    }
+
+    /**
+     * @param \Illuminate\Database\Eloquent\Collection $items
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    protected function transformIndexItems($items)
+    {
+        return $items;
+    }
+
+    /**
+     * @param array $paginator
+     * @return array
+     */
+    public function getFormattedIndexItems($paginator) // getIndexTableItems
+    {
+        return $paginator;
     }
 }

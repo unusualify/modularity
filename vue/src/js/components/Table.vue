@@ -50,7 +50,7 @@
 
         :height="windowSize.y - 64 - 24 - 59 - 76 - ($vuetify.display.mdAndDown ? 80 : 0)"
 
-        :hide-default-header="hideHeaders"
+        :hide-default-header="hideHeaders || ($vuetify.display.smAndDown && !showMobileHeaders)"
         :multi-sort="multiSort"
         :must-sort="mustSort"
         :density="tableDensity ?? 'comfortable'"
@@ -71,14 +71,15 @@
             v-bind="toolbarOptions"
             :class="[
               'pt-3',
+              $vuetify.display.smAndUp ? 'd-flex' : '',
             ]"
           >
             <!-- table title -->
             <div
               :class="[
-                controlsPosition === 'bottom' || $vuetify.display.smAndDown ? 'pt-2' : 'flex-grow-1 h-100 d-flex flex-column justify-center',
+                controlsPosition === 'bottom' || $vuetify.display.smAndDown ? '' : 'flex-lg-1-1-100 h-100 d-flex flex-column',
               ]"
-              style="min-width: 20%;"
+              style="min-width: 33%;"
             >
               <!-- title -->
               <ue-title
@@ -106,8 +107,9 @@
               <div
                 key='table-controls'
                 :class="[
-                  'd-flex',
-                  controlsPosition === 'bottom' || $vuetify.display.smAndDown ? 'mb-2' : 'flex-grow-1 flex-shrink-0',
+                  'd-flex ga-2 align-md-center',
+                  controlsPosition === 'bottom' || $vuetify.display.smAndDown ? 'mb-2' : 'flex-1-1-100 justify-end',
+                  $vuetify.display.smAndDown ? 'flex-column' : '',
                 ]"
               >
                 <template v-if="someSelected">
@@ -139,17 +141,18 @@
                     single-line
                     :placeholder="searchPlaceholder"
                     :class="[
-                      'mr-2',
-                      controlsPosition === 'bottom' || $vuetify.display.smAndDown ? 'flex-grow-1' : ''
+                      controlsPosition === 'bottom' || !$vuetify.display.xs ? 'flex-sm-grow-1' : '',
                     ]"
                     :style="[
                       'display: inline',
                       // controlsPosition === 'top' || $vuetify.display.smAndDown ? 'max-width: 300px' : '',
-                      'min-width: 165px'
+                      'min-width: 200px',
+                      !(controlsPosition === 'bottom' || $vuetify.display.smAndDown) ? 'max-width: 250px' : '',
                     ]"
                     @click:append-inner="searchItems"
                     :disabled="loading"
                     @keydown.enter="searchItems"
+
                   >
                     <template #append-inner>
                       <v-btn :disabled="searchModel === search" icon="mdi-magnify" variant="plain" size="compact" color="grey-darken-5" rounded @click="searchItems()" />
@@ -157,9 +160,10 @@
                   </v-text-field>
 
                   <!-- <v-spacer v-else-if="hideSearchField"></v-spacer> -->
-                  <v-spacer v-if="$vuetify.display.mdAndUp"></v-spacer>
+                  <!-- <v-spacer v-if="$vuetify.display.mdAndUp && !(!hideSearchField && hasSearchableHeader)"></v-spacer> -->
 
                   <TableActions
+                    :class="$vuetify.display.mdAndUp ? 'flex-grow-0 flex-shrink-0' : ''"
                     :actions="actions"
                   >
                     <template #prepend>
@@ -185,7 +189,8 @@
                             :key="index"
                             v-on:click.prevent="changeFilter(filter.slug)"
                             :class="[
-                              filter.slug === activeFilterSlug ? 'bg-primary' : ''
+                              filter.slug === activeFilterSlug ? 'bg-primary' : '',
+                              filter.class ?? ''
                             ]"
                           >
                             <v-list-item-title>{{ filter.name + '(' + filter.number+ ')' }} </v-list-item-title>
@@ -243,17 +248,18 @@
                         </v-card>
                       </v-menu>
                     </template>
+                    <template #append>
+                      <!-- create button -->
+                      <v-btn v-if="$can('create', permissionName) && !noForm && !someSelected && createOnModal"
+                        v-bind="addBtnOptions"
+                        @click="createForm"
+                        :icon="$vuetify.display.smAndDown ? addBtnOptions['prepend-icon'] : null"
+                        :text="$vuetify.display.smAndDown ? null : addBtnTitle"
+                        :prepend-icon="$vuetify.display.smAndDown ? null : addBtnOptions['prepend-icon']"
+                        :density="$vuetify.display.smAndDown ? 'compact' : (addBtnOptions['density'] ?? 'comfortable')"
+                      />
+                    </template>
                   </TableActions>
-
-                  <!-- create button -->
-                  <v-btn v-if="$can('create', permissionName) && !noForm && !someSelected && createOnModal"
-                    v-bind="addBtnOptions"
-                    @click="createForm"
-                    :icon="$vuetify.display.smAndDown ? addBtnOptions['prepend-icon'] : null"
-                    :text="$vuetify.display.smAndDown ? null : addBtnTitle"
-                    :prepend-icon="$vuetify.display.smAndDown ? null : addBtnOptions['prepend-icon']"
-                    :density="$vuetify.display.smAndDown ? 'compact' : (addBtnOptions['density'] ?? 'comfortable')"
-                  />
                 </template>
               </div>
             </v-slide-x-transition>
@@ -544,7 +550,7 @@
         </template>
 
         <!-- MARK PAGINATION BUTTONS -->
-        <template v-if="enableCustomFooter" v-slot:bottom="{page, pageCount}">
+        <template v-if="enableCustomFooter || $vuetify.display.smAndDown" v-slot:bottom="{page, pageCount}">
           <div class="d-flex justify-end py-4">
             <v-container class="max-width text-center">
               <v-pagination v-if="!loading"
@@ -553,7 +559,7 @@
 
                 density="compact"
                 size="small"
-                total-visible="3"
+                :total-visible="$vuetify.display.smAndDown ? 1 : 3"
                 show-first-last-page
                 v-bind="footerProps"
               >
@@ -788,6 +794,7 @@
             <v-list>
               <template v-for="(action, k) in visibleRowActions" :key="k">
                 <v-list-item v-if="itemHasAction(item, action)"
+                  :class="action.class ?? ''"
                   @click="itemAction(item, action)"
                   >
                     <v-icon small :color="action.iconColor" left>
@@ -805,6 +812,7 @@
                 :text="$t( action.label )"
                 location="top"
                 :disabled="action.is !== 'v-icon'"
+                :class="action.class ?? ''"
                 >
                 <template v-slot:activator="{ props }">
                   <component :is="action.is"

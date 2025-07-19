@@ -9,6 +9,10 @@ import filters from '@/utils/filters'
 
 import FormEventFormatters from './formEventFormatters'
 
+const nonRunEventsOnCreate = [
+  'formatClearModel'
+]
+
 export const setSchemaInputField = (schema, value) => {
 
   for (const key in schema) {
@@ -121,7 +125,7 @@ export const handleEvents = ( model, schema, input, valueChanged = false) => {
       let methodName = args.shift()
       let runnable = true
 
-      if(methodName == 'formatSetx' && !valueChanged)
+      if(nonRunEventsOnCreate.includes(methodName) && !valueChanged)
         runnable = false
 
       if(runnable && typeof FormEventFormatters[methodName] !== 'undefined')

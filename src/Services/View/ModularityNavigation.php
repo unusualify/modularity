@@ -9,10 +9,11 @@ use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Services\Connector;
 use Unusualify\Modularity\Traits\Allowable;
 use Unusualify\Modularity\Traits\ManageNames;
+use Unusualify\Modularity\Traits\ResponsiveVisibility;
 
 class ModularityNavigation
 {
-    use ManageNames, Allowable;
+    use ManageNames, Allowable, ResponsiveVisibility;
 
     protected $request;
 
@@ -69,6 +70,7 @@ class ModularityNavigation
             if (! $result) {
                 return false;
             }
+
         }
 
         if (isset($array['items'])) {
@@ -127,6 +129,10 @@ class ModularityNavigation
                 ], $array['iconProps'] ?? []);
                 $array['class'] = $array['classOnBadge'] ?? 'text-secondary';
             }
+        }
+
+        if (isset($array['responsive'])) {
+            $array = $this->applyResponsiveClasses($array, 'responsive');
         }
 
         return array_merge_recursive_preserve([

@@ -35,7 +35,7 @@ trait FormSchema
      * @param array $inputs
      * @return array
      */
-    protected function createFormSchema($inputs)
+    public function createFormSchema($inputs)
     {
         return Collection::make($inputs)->mapWithKeys(function ($input, $key) use ($inputs) {
             return $this->getSchemaInput($input, $inputs);

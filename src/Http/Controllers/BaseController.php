@@ -97,8 +97,10 @@ abstract class BaseController extends PanelController
                 );
             }
 
+            $with = $this->request->get('eager', $this->request->get('with', []));
+
             return Response::json([
-                'resource' => $this->getJSONData(),
+                'resource' => $this->getJSONData(with: $with),
                 'mainFilters' => $this->getTableMainFilters($this->getExactScope()),
                 // 'mainFilters' => $this->getTableMainFilters(),
                 'replaceUrl' => $this->getReplaceUrl(),

@@ -224,7 +224,15 @@ class Connector
 
                                 if (preg_match('/^\[.*\]$/', $parameter)) {
                                     $parameter = str_replace(['[', ']'], '', $parameter);
-                                    $values = explode(',', $parameter);
+
+                                    // Split on commas that are not preceded by backslashes
+                                    $values = preg_split('/(?<!\\\\),/', $parameter);
+
+                                    // Unescape any remaining \, sequences
+                                    $values = array_map(function($value) {
+                                        return str_replace('\\,', ',', trim($value));
+                                    }, $values);
+
                                     $args[$argKey] = $values;
                                 } else {
                                     $args[$argKey] = $parameter;

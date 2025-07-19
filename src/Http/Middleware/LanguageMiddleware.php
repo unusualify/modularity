@@ -16,16 +16,28 @@ class LanguageMiddleware
      */
     public function handle($request, Closure $next)
     {
-        $locale = config('app.locale');
+        $defaultLocale = config('app.locale');
+        $locale = $defaultLocale;
+        $translatableLocales = config('translatable.locales');
 
-        if ($request->user() && $request->user()->language) {
+        if($request->has('language')){
+            $locale = $request->get('language');
+        }
+
+        if (!in_array($locale, $translatableLocales) && $request->user() && $request->user()->language) {
             $locale = $request->user()->language;
-        } else {
+        }
+
+        if(!in_array($locale, $translatableLocales)){
             if (env('AUTO_LOCALE_FINDER', false)) {
                 if (mb_strtolower(geoip()->getLocation($request->ip())->iso_code) === 'tr') {
                     $locale = 'tr';
                 }
             }
+        }
+
+        if(!in_array($locale, config('translatable.locales'))){
+            $locale = config('translatable.locales')[0];
         }
 
         config([modularityBaseKey() . '.locale' => $locale]);

@@ -428,8 +428,11 @@
       }
 
       const initializeInput = (input) => {
+        let forceUpdate = false
+        let mandatoryItems = null
+
         if(props.mandatory){
-          let mandatoryItems = props.items.filter((item) => __data_get(item, props.mandatory, false))
+          mandatoryItems = props.items.filter((item) => __data_get(item, props.mandatory, false))
 
           if(props.max){
             let max = parseInt(props.max)
@@ -437,6 +440,7 @@
               mandatoryItems = mandatoryItems.slice(0, max)
             }
           }
+
           if(mandatoryItems.length > 0){
             // Check if mandatory items were not in previous input
             const previous = cloneDeep(input)
@@ -451,16 +455,38 @@
             ]
 
             if (missingMandatoryItems.length > 0) {
-              context.emit('update:modelValue', input)
+              forceUpdate = true
             }
 
           }
         }
 
         if(maxSelectable.value > 1 && input.length > maxSelectable.value){
-          input = input.sort((a, b) => a - b).slice(0, maxSelectable.value)
+          if(mandatoryItems && mandatoryItems.length > 0){
+            // Separate mandatory and non-mandatory items
+            const mandatoryItemsIds = mandatoryItems.map(item => item[props.itemValue])
+            const mandatorySelectedItems = input.filter(id => mandatoryItemsIds.includes(id))
+            const nonMandatorySelectedItems = input.filter(id => !mandatoryItemsIds.includes(id))
+
+            // Keep all mandatory items and fill remaining slots with non-mandatory items
+            const remainingSlots = maxSelectable.value - mandatorySelectedItems.length
+            const limitedNonMandatoryItems = remainingSlots > 0
+              ? nonMandatorySelectedItems.slice(0, remainingSlots)
+              : []
+
+            input = [...mandatorySelectedItems, ...limitedNonMandatoryItems]
+          } else {
+            input = input.sort((a, b) => a - b).slice(0, maxSelectable.value)
+          }
+          forceUpdate = true
+
+          // context.emit('update:modelValue', input)
+        }
+
+        if(forceUpdate){
           context.emit('update:modelValue', input)
         }
+
         return input
       }
 

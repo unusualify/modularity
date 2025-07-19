@@ -2,71 +2,53 @@
 
 namespace Modules\SystemUser\Http\Controllers\API;
 
-use Illuminate\Contracts\Support\Renderable;
-use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
-use Modules\SystemUser\Repositories\UserRepository;
-use Modules\SystemUser\Transformers\UserResource;
+use Unusualify\Modularity\Http\Controllers\ApiController;
 
-class UserController extends Controller
+class UserController extends ApiController
 {
     /**
-     * This resource repository
+     * @var string
      */
-    private $repository;
-
-    public function __construct(UserRepository $repository)
-    {
-        $this->repository = $repository;
-    }
+    protected $namespace = 'Modules\SystemUser';
 
     /**
-     * Display a listing of the resource.
-     *
-     * @return Renderable
+     * @var string
      */
-    public function index(Request $request)
-    {
-        return new UserResource($this->repository->paginate($request));
-    }
+    protected $moduleName = 'SystemUser';
 
     /**
-     * Store a newly created resource in storage.
-     *
-     * @return Renderable
+     * @var string
      */
-    public function store(Request $request)
-    {
-        //
-    }
+    protected $routeName = 'User';
 
     /**
-     * Show the specified resource.
-     *
-     * @param int $id
-     * @return Renderable
+     * @var string
      */
-    public function show($id) {}
+    // protected $routePrefix = 'User';
 
     /**
-     * Update the specified resource in storage.
-     *
-     * @param int $id
-     * @return Renderable
+     * @var string
      */
-    public function update(Request $request, $id)
-    {
-        //
-    }
+    protected $modelName = 'User';
 
     /**
-     * Remove the specified resource from storage.
+     * Available includes for this resource
      *
-     * @param int $id
-     * @return Renderable
+     * @var array
      */
-    public function destroy($id)
-    {
-        //
-    }
+    protected $availableIncludes = ['roles', 'permissions', 'profile'];
+
+    /**
+     * Available filters for this resource
+     *
+     * @var array
+     */
+    protected $availableFilters = ['role', 'status', 'email_verified'];
+
+    /**
+     * Available sorts for this resource
+     *
+     * @var array
+     */
+    protected $availableSorts = ['id', 'name', 'email', 'created_at', 'updated_at'];
 }

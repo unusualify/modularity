@@ -37,6 +37,10 @@ export const makeTableFiltersProps = propsFactory({
     type: Boolean,
     default: false,
   },
+  showMobileHeaders: {
+    type: Boolean,
+    default: false
+  },
 })
 
 export default function useTableFilters(props) {

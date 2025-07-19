@@ -9,8 +9,8 @@
     <template v-slot:default="defaultSlot">
       <v-card
         :class="[
-          'v-input-checkbox-card__item',
-          input.includes(value) ? 'v-input-checkbox-card__item--selected' : '',
+          'v-input-checkbox-card__item border border-sm border-opacity-75',
+          input.includes(value) ? 'border-primary' : 'border-grey-lighten-4',
           disabled ? 'v-input-checkbox-card__item--disabled' : ''
         ]"
         :variant="input.includes(value) ? 'elevated' : 'outlined'"
@@ -31,6 +31,7 @@
           <v-card-title
             :class="[
               'v-input-checkbox-card__title',
+              input.includes(value) ? `border-primary ${activeTitleColor ? `text-${activeTitleColor}` : ''}` : '',
               input.includes(value) ? `v-input-checkbox-card__title--selected ${activeTitleColor ? `text-${activeTitleColor}` : ''}` : '',
             ]"
           >
@@ -154,12 +155,7 @@
     &__item
       width: 100%
       cursor: pointer
-      border: 1px solid rgba(var(--v-theme-grey-lighten-4), 1 )
-      // transition: all 0.3s ease
-
-      &--selected
-        border-color: rgb(var(--v-theme-primary))
-        background-color: rgb(var(--v-theme-primary-lighten-5))
+      transition: all 0.3s ease
 
       &--disabled
         opacity: 0.6

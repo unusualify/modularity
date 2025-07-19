@@ -237,6 +237,9 @@ class ProfileController extends BaseController
         // dd($data);
         $data['endpoints'] = $this->getUrls();
 
+        $data['pageTitle'] = __('Profile Settings') . ' - ' . \Unusualify\Modularity\Facades\Modularity::pageTitle();
+        $data['headerTitle'] = __('My Profile');
+
         $view = "$this->baseKey::layouts.profile";
 
         return View::make($view, $data);

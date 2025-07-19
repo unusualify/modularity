@@ -117,6 +117,9 @@ class BaseServiceProvider extends ServiceProvider
 
         $this->registerCommands();
 
+        // Register the modularity exception handler
+        $this->registerExceptionHandler();
+
         // $this->app->singleton('modularity', function (Application $app) {
         //     $path = $app['config']->get('modules.paths.modules');
 
@@ -149,11 +152,13 @@ class BaseServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton('unusualify.hosting', function (Application $app) {
-            return new \Unusualify\Modularity\Support\HostRouting($app, modularityConfig('app_url'));
+            // return new \Unusualify\Modularity\Support\HostRouting($app, modularityConfig('app_url'));
+            return new \Unusualify\Modularity\Support\HostRouting($app, $app['modularity']->getAppHost());
         });
 
         $this->app->singleton('unusualify.hostRouting', function (Application $app) {
-            return new \Unusualify\Modularity\Support\HostRouteRegistrar($app, modularityConfig('app_url'));
+            // return new \Unusualify\Modularity\Support\HostRouteRegistrar($app, modularityConfig('app_url'));
+            return new \Unusualify\Modularity\Support\HostRouteRegistrar($app, $app['modularity']->getAppHost());
         });
 
         $this->app->singleton('Filepond', function (Application $app) {
@@ -179,6 +184,25 @@ class BaseServiceProvider extends ServiceProvider
         $this->app->register(TelescopeServiceProvider::class);
 
         $this->registerTranslationService();
+    }
+
+    /**
+     * Register the modularity exception handler
+     */
+    private function registerExceptionHandler(): void
+    {
+        // Register our modularity exception handler
+        $this->app->extend(\Illuminate\Contracts\Debug\ExceptionHandler::class, function ($handler, $app) {
+            // If the current handler is the default app handler, wrap it with modularity functionality
+            if (get_class($handler) === \App\Exceptions\Handler::class) {
+                if($app['modularity']->isPanelUrl()) {
+                    return new \Unusualify\Modularity\Exceptions\Handler($app);
+                }
+            }
+
+            // Otherwise, keep the existing handler
+            return $handler;
+        });
     }
 
     /**
