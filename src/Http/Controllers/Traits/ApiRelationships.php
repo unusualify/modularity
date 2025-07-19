@@ -8,7 +8,6 @@ trait ApiRelationships
      * Load relationships dynamically
      *
      * @param mixed $model
-     * @param array $relationships
      * @return mixed
      */
     protected function loadRelationships($model, array $relationships)
@@ -28,9 +27,6 @@ trait ApiRelationships
 
     /**
      * Validate relationships against available includes
-     *
-     * @param array $relationships
-     * @return array
      */
     protected function validateRelationships(array $relationships): array
     {
@@ -39,21 +35,18 @@ trait ApiRelationships
 
     /**
      * Parse nested relationships
-     *
-     * @param array $relationships
-     * @return array
      */
     protected function parseNestedRelationships(array $relationships): array
     {
         $parsed = [];
 
         foreach ($relationships as $relationship) {
-            if (strpos($relationship, '.') !== false) {
+            if (str_contains($relationship, '.')) {
                 $parts = explode('.', $relationship);
                 $current = &$parsed;
 
                 foreach ($parts as $part) {
-                    if (!isset($current[$part])) {
+                    if (! isset($current[$part])) {
                         $current[$part] = [];
                     }
                     $current = &$current[$part];
@@ -68,9 +61,6 @@ trait ApiRelationships
 
     /**
      * Check if relationship is allowed
-     *
-     * @param string $relationship
-     * @return bool
      */
     protected function isRelationshipAllowed(string $relationship): bool
     {
@@ -81,12 +71,10 @@ trait ApiRelationships
      * Get relationship count
      *
      * @param mixed $model
-     * @param string $relationship
-     * @return int
      */
     protected function getRelationshipCount($model, string $relationship): int
     {
-        if (!method_exists($model, $relationship)) {
+        if (! method_exists($model, $relationship)) {
             return 0;
         }
 
@@ -103,13 +91,12 @@ trait ApiRelationships
      * Eager load relationships with constraints
      *
      * @param mixed $query
-     * @param array $relationships
      * @return mixed
      */
     protected function eagerLoadWithConstraints($query, array $relationships)
     {
         foreach ($relationships as $relationship) {
-            if (strpos($relationship, ':') !== false) {
+            if (str_contains($relationship, ':')) {
                 [$relation, $constraint] = explode(':', $relationship, 2);
 
                 if ($this->isRelationshipAllowed($relation)) {
@@ -131,8 +118,6 @@ trait ApiRelationships
      * Apply constraint to relationship query
      *
      * @param mixed $query
-     * @param string $constraint
-     * @return void
      */
     protected function applyRelationshipConstraint($query, string $constraint): void
     {
@@ -143,15 +128,18 @@ trait ApiRelationships
         switch ($method) {
             case 'limit':
                 $query->limit((int) $parts[0]);
+
                 break;
             case 'where':
                 if (count($parts) >= 2) {
                     $query->where($parts[0], $parts[1]);
                 }
+
                 break;
             case 'orderBy':
                 $direction = $parts[1] ?? 'asc';
                 $query->orderBy($parts[0], $direction);
+
                 break;
         }
     }

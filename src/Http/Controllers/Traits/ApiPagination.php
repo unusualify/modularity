@@ -10,11 +10,10 @@ trait ApiPagination
      * Get pagination metadata
      *
      * @param mixed $paginator
-     * @return array
      */
     protected function getPaginationMetadata($paginator): array
     {
-        if (!method_exists($paginator, 'total')) {
+        if (! method_exists($paginator, 'total')) {
             return [];
         }
 
@@ -33,11 +32,8 @@ trait ApiPagination
 
     /**
      * Get per page value from request with validation
-     *
-     * @param Request $request
-     * @return int
      */
-    protected function getPerPage(Request $request = null): int
+    protected function getPerPage(?Request $request = null): int
     {
         $request = $request ?: $this->request;
         $defaultPerPage = property_exists($this, 'defaultPerPage') ? $this->defaultPerPage : 15;
@@ -52,11 +48,10 @@ trait ApiPagination
      * Get pagination links
      *
      * @param mixed $paginator
-     * @return array
      */
     protected function getPaginationLinks($paginator): array
     {
-        if (!method_exists($paginator, 'url')) {
+        if (! method_exists($paginator, 'url')) {
             return [];
         }
 
@@ -74,7 +69,6 @@ trait ApiPagination
      * Transform paginated response
      *
      * @param mixed $paginator
-     * @return array
      */
     protected function transformPaginatedResponse($paginator): array
     {
@@ -98,11 +92,10 @@ trait ApiPagination
      * Get cursor pagination metadata
      *
      * @param mixed $paginator
-     * @return array
      */
     protected function getCursorPaginationMetadata($paginator): array
     {
-        if (!method_exists($paginator, 'hasMorePages')) {
+        if (! method_exists($paginator, 'hasMorePages')) {
             return [];
         }
 

@@ -27,8 +27,6 @@ trait ApiSorting
 
     /**
      * Get sorts from request
-     *
-     * @return array
      */
     protected function getSorts(): array
     {
@@ -39,7 +37,7 @@ trait ApiSorting
 
         // Validate sort column
         if (in_array($sortBy, $this->availableSorts)) {
-            $sorts[$sortBy] = strtolower($sortDirection) === 'asc' ? 'asc' : 'desc';
+            $sorts[$sortBy] = mb_strtolower($sortDirection) === 'asc' ? 'asc' : 'desc';
         } else {
             $sorts[$this->defaultSort] = $this->defaultSortDirection;
         }
@@ -49,8 +47,6 @@ trait ApiSorting
 
     /**
      * Validate sorting parameters from request
-     *
-     * @return array
      */
     protected function validateSorting(): array
     {

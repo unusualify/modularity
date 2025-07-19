@@ -11,7 +11,6 @@ trait ApiFiltering
      */
     protected $availableFilters = [];
 
-
     /**
      * Available search
      *
@@ -28,8 +27,6 @@ trait ApiFiltering
 
     /**
      * Get filters from request
-     *
-     * @return array
      */
     protected function getFilters(): array
     {
@@ -44,7 +41,7 @@ trait ApiFiltering
         // Handle search parameter
         $searchParam = $this->request->get('q') ?? $this->request->get('search');
 
-        if ($searchParam && !empty($this->availableSearch)) {
+        if ($searchParam && ! empty($this->availableSearch)) {
             $filters['searches'] = $this->availableSearch;
             $filters['search'] = $searchParam;
 
@@ -67,8 +64,6 @@ trait ApiFiltering
 
     /**
      * Get scopes from request
-     *
-     * @return array
      */
     protected function getScopes(): array
     {
@@ -98,7 +93,7 @@ trait ApiFiltering
         // Handle scopes parameter
         $scopesParam = $this->request->get('scopes', '');
 
-        if ($scopesParam && !empty($this->availableScopes)) {
+        if ($scopesParam && ! empty($this->availableScopes)) {
             $requestScopes = explode(',', $scopesParam);
             foreach ($requestScopes as $scope) {
                 if (in_array($scope, $this->availableScopes)) {
@@ -112,8 +107,6 @@ trait ApiFiltering
 
     /**
      * Validate filters from request
-     *
-     * @return array
      */
     protected function validateFilters(): array
     {
@@ -122,21 +115,21 @@ trait ApiFiltering
             'created_from' => 'date',
             'created_to' => 'date|after_or_equal:created_from',
             'status' => 'string|in:active,inactive,pending',
-            'published' => ['sometimes', function($attribute, $value, $fail) {
+            'published' => ['sometimes', function ($attribute, $value, $fail) {
                 if ($value !== null && $value !== 'true' && $value !== 'false') {
-                    $fail('The '.$attribute.' must be either true or false.');
+                    $fail('The ' . $attribute . ' must be either true or false.');
                 }
             }],
             'trashed' => 'string|in:only,with,without',
-            'scopes' => ['sometimes', function($attribute, $value, $fail) {
-                if (!is_string($value) && !is_array($value)) {
-                    $fail('The '.$attribute.' must be either a string or an array.');
+            'scopes' => ['sometimes', function ($attribute, $value, $fail) {
+                if (! is_string($value) && ! is_array($value)) {
+                    $fail('The ' . $attribute . ' must be either a string or an array.');
                 }
 
                 $scopes = is_string($value) ? explode(',', $value) : $value;
-                foreach($scopes as $scope) {
-                    if (!in_array($scope, $this->availableScopes)) {
-                        $fail('The '.$attribute.' contains invalid scope: '.$scope);
+                foreach ($scopes as $scope) {
+                    if (! in_array($scope, $this->availableScopes)) {
+                        $fail('The ' . $attribute . ' contains invalid scope: ' . $scope);
                     }
                 }
             }],

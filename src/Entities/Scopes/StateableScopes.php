@@ -6,7 +6,7 @@ trait StateableScopes
 {
     public function scopeIsStateables($query, $codes)
     {
-        if(is_string($codes)){
+        if (is_string($codes)) {
             $codes = explode(',', $codes);
         }
 

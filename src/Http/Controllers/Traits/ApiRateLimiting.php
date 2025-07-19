@@ -44,8 +44,6 @@ trait ApiRateLimiting
 
     /**
      * Check if rate limiting is enabled
-     *
-     * @return bool
      */
     protected function isRateLimitingEnabled(): bool
     {
@@ -54,8 +52,6 @@ trait ApiRateLimiting
 
     /**
      * Get rate limit per minute
-     *
-     * @return int
      */
     protected function getRateLimit(): int
     {
@@ -64,8 +60,6 @@ trait ApiRateLimiting
 
     /**
      * Get rate limit per hour
-     *
-     * @return int
      */
     protected function getRateLimitPerHour(): int
     {
@@ -74,8 +68,6 @@ trait ApiRateLimiting
 
     /**
      * Get rate limit blocking time
-     *
-     * @return int
      */
     protected function getRateLimitBlockingTime(): int
     {
@@ -84,8 +76,6 @@ trait ApiRateLimiting
 
     /**
      * Get rate limit blocking maximum attempts
-     *
-     * @return int
      */
     protected function getBlockingMaximumAttempts(): int
     {
@@ -94,8 +84,6 @@ trait ApiRateLimiting
 
     /**
      * Get rate limit blocking time threshold
-     *
-     * @return int
      */
     protected function getBlockingTimeThreshold(): int
     {
@@ -104,9 +92,6 @@ trait ApiRateLimiting
 
     /**
      * Get rate limit key for current request
-     *
-     * @param string $type
-     * @return string
      */
     protected function getRateLimitKey(string $type = 'minute'): string
     {
@@ -118,27 +103,24 @@ trait ApiRateLimiting
 
     /**
      * Check if user is blocked
-     *
-     * @return bool
      */
     protected function isUserBlocked(): bool
     {
-        if (!$this->isRateLimitingEnabled()) {
+        if (! $this->isRateLimitingEnabled()) {
             return false;
         }
 
         $blockKey = $this->getRateLimitKey('blocked');
+
         return RateLimiter::tooManyAttempts($blockKey, 1);
     }
 
     /**
      * Block user for configured blocking time
-     *
-     * @return void
      */
     protected function blockUser(): void
     {
-        if (!$this->isRateLimitingEnabled()) {
+        if (! $this->isRateLimitingEnabled()) {
             return;
         }
 
@@ -148,27 +130,24 @@ trait ApiRateLimiting
 
     /**
      * Get remaining block time
-     *
-     * @return int
      */
     protected function getRemainingBlockTime(): int
     {
-        if (!$this->isRateLimitingEnabled()) {
+        if (! $this->isRateLimitingEnabled()) {
             return 0;
         }
 
         $blockKey = $this->getRateLimitKey('blocked');
+
         return RateLimiter::availableIn($blockKey);
     }
 
     /**
      * Check if request is rate limited
-     *
-     * @return bool
      */
     protected function isRateLimited(): bool
     {
-        if (!$this->isRateLimitingEnabled()) {
+        if (! $this->isRateLimitingEnabled()) {
             return false;
         }
 
@@ -184,6 +163,7 @@ trait ApiRateLimiting
         // Check if blocking threshold is exceeded
         if (RateLimiter::tooManyAttempts($blockingKey, $this->getBlockingMaximumAttempts())) {
             $this->blockUser();
+
             return true;
         }
 
@@ -193,12 +173,10 @@ trait ApiRateLimiting
 
     /**
      * Apply rate limiting to request
-     *
-     * @return JsonResponse|null
      */
     protected function applyRateLimit(): ?JsonResponse
     {
-        if (!$this->isRateLimitingEnabled()) {
+        if (! $this->isRateLimitingEnabled()) {
             return null;
         }
 
@@ -235,12 +213,10 @@ trait ApiRateLimiting
 
     /**
      * Get remaining rate limit attempts
-     *
-     * @return int
      */
     protected function getRemainingAttempts(): int
     {
-        if (!$this->isRateLimitingEnabled()) {
+        if (! $this->isRateLimitingEnabled()) {
             return $this->getRateLimit();
         }
 
@@ -257,12 +233,10 @@ trait ApiRateLimiting
 
     /**
      * Get rate limit reset time
-     *
-     * @return int
      */
     protected function getRateLimitResetTime(): int
     {
-        if (!$this->isRateLimitingEnabled()) {
+        if (! $this->isRateLimitingEnabled()) {
             return 0;
         }
 
@@ -279,12 +253,10 @@ trait ApiRateLimiting
 
     /**
      * Get rate limit headers
-     *
-     * @return array
      */
     protected function getRateLimitHeaders(): array
     {
-        if (!$this->isRateLimitingEnabled()) {
+        if (! $this->isRateLimitingEnabled()) {
             return [];
         }
 

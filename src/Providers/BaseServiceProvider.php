@@ -195,7 +195,7 @@ class BaseServiceProvider extends ServiceProvider
         $this->app->extend(\Illuminate\Contracts\Debug\ExceptionHandler::class, function ($handler, $app) {
             // If the current handler is the default app handler, wrap it with modularity functionality
             if (get_class($handler) === \App\Exceptions\Handler::class) {
-                if($app['modularity']->isPanelUrl()) {
+                if ($app['modularity']->isPanelUrl()) {
                     return new \Unusualify\Modularity\Exceptions\Handler($app);
                 }
             }

@@ -13,8 +13,6 @@ trait ApiVersioning
 
     /**
      * Get API version from request
-     *
-     * @return string
      */
     protected function getApiVersion(): string
     {
@@ -31,9 +29,6 @@ trait ApiVersioning
 
     /**
      * Check if API version is supported
-     *
-     * @param string $version
-     * @return bool
      */
     protected function isVersionSupported(string $version): bool
     {
@@ -42,9 +37,6 @@ trait ApiVersioning
 
     /**
      * Get version-specific resource class
-     *
-     * @param string $baseClass
-     * @return string|null
      */
     protected function getVersionedResourceClass(string $baseClass): ?string
     {

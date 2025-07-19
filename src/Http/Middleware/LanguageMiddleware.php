@@ -20,15 +20,15 @@ class LanguageMiddleware
         $locale = $defaultLocale;
         $translatableLocales = config('translatable.locales');
 
-        if($request->has('language')){
+        if ($request->has('language')) {
             $locale = $request->get('language');
         }
 
-        if (!in_array($locale, $translatableLocales) && $request->user() && $request->user()->language) {
+        if (! in_array($locale, $translatableLocales) && $request->user() && $request->user()->language) {
             $locale = $request->user()->language;
         }
 
-        if(!in_array($locale, $translatableLocales)){
+        if (! in_array($locale, $translatableLocales)) {
             if (env('AUTO_LOCALE_FINDER', false)) {
                 if (mb_strtolower(geoip()->getLocation($request->ip())->iso_code) === 'tr') {
                     $locale = 'tr';
@@ -36,7 +36,7 @@ class LanguageMiddleware
             }
         }
 
-        if(!in_array($locale, config('translatable.locales'))){
+        if (! in_array($locale, config('translatable.locales'))) {
             $locale = config('translatable.locales')[0];
         }
 

@@ -47,5 +47,5 @@ return [
         'searching' => env('MODULARITY_API_FEATURES_SEARCHING', true),
         'including' => env('MODULARITY_API_FEATURES_INCLUDING', true),
         'field_selection' => true,
-    ]
+    ],
 ];

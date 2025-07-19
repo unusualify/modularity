@@ -108,7 +108,7 @@ trait QueryBuilder
         $query = $this->model->query();
 
         // Apply scopes first (authorization/filtering)
-        if (!empty($scopes)) {
+        if (! empty($scopes)) {
             $query = $this->filter($query, $scopes);
         }
 
@@ -563,6 +563,7 @@ trait QueryBuilder
                             } elseif ($result->{$parts[$i - 1]} instanceof \Illuminate\Database\Eloquent\Collection) {
                                 $result->{$parts[$i - 1]} = $result->{$parts[$i - 1]}->map(function ($item) use ($part) {
                                     $item->{$part};
+
                                     return $item;
                                 });
                             }

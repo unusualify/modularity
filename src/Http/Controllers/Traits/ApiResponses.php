@@ -9,11 +9,6 @@ trait ApiResponses
 {
     /**
      * Respond with success message
-     *
-     * @param string $message
-     * @param array $data
-     * @param int $status
-     * @return JsonResponse
      */
     protected function respondWithMessage(string $message, array $data = [], int $status = 200): JsonResponse
     {
@@ -22,7 +17,7 @@ trait ApiResponses
             'success' => true,
         ];
 
-        if (!empty($data)) {
+        if (! empty($data)) {
             $response['data'] = $data;
         }
 
@@ -31,11 +26,6 @@ trait ApiResponses
 
     /**
      * Respond with error
-     *
-     * @param string $message
-     * @param int $status
-     * @param array $errors
-     * @return JsonResponse
      */
     protected function respondWithError(string $message, int $status = 400, array $errors = []): JsonResponse
     {
@@ -44,7 +34,7 @@ trait ApiResponses
             'success' => false,
         ];
 
-        if (!empty($errors)) {
+        if (! empty($errors)) {
             $response['errors'] = $errors;
         }
 
@@ -53,9 +43,6 @@ trait ApiResponses
 
     /**
      * Respond with not found error
-     *
-     * @param string $message
-     * @return JsonResponse
      */
     protected function respondNotFound(string $message = 'Resource not found'): JsonResponse
     {
@@ -64,10 +51,6 @@ trait ApiResponses
 
     /**
      * Respond with validation error
-     *
-     * @param array $errors
-     * @param string $message
-     * @return JsonResponse
      */
     protected function respondWithValidationError(array $errors, string $message = 'Validation failed'): JsonResponse
     {
@@ -76,9 +59,6 @@ trait ApiResponses
 
     /**
      * Respond with unauthorized error
-     *
-     * @param string $message
-     * @return JsonResponse
      */
     protected function respondUnauthorized(string $message = 'Unauthorized'): JsonResponse
     {
@@ -87,9 +67,6 @@ trait ApiResponses
 
     /**
      * Respond with forbidden error
-     *
-     * @param string $message
-     * @return JsonResponse
      */
     protected function respondForbidden(string $message = 'Forbidden'): JsonResponse
     {

@@ -2,7 +2,6 @@
 
 namespace Unusualify\Modularity\Entities\Traits;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use PDO;
@@ -24,7 +23,7 @@ trait HasScopes
         }
 
         // Check model scope
-        $self = new static();
+        $self = new static;
         if ($self->hasNamedScope($scopeName)) {
             return true;
         }

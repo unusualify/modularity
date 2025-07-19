@@ -439,7 +439,7 @@ trait MethodTransformers
                 }
             }
 
-            if ($this->model->hasScope($column) ) {
+            if ($this->model->hasScope($column)) {
                 if (! is_bool($value)) {
                     $query->{$this->getCamelCase($column)}($value);
                 } else {

@@ -229,7 +229,7 @@ class Connector
                                     $values = preg_split('/(?<!\\\\),/', $parameter);
 
                                     // Unescape any remaining \, sequences
-                                    $values = array_map(function($value) {
+                                    $values = array_map(function ($value) {
                                         return str_replace('\\,', ',', trim($value));
                                     }, $values);
 

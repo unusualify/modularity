@@ -355,8 +355,6 @@ class Modularity extends FileRepository
 
     /**
      * Check if admin app url is set.
-     *
-     * @return bool
      */
     public function hasAdminAppUrl(): bool
     {
@@ -372,7 +370,6 @@ class Modularity extends FileRepository
     {
         $appUrl = $this->config('app_url');
         $adminAppUrl = $this->config('admin_app_url');
-
 
         $parsedUrl = parse_url($appUrl);
         $scheme = $parsedUrl['scheme'];
@@ -400,9 +397,9 @@ class Modularity extends FileRepository
     public function isPanelUrl($url = null)
     {
         $host = request()->getHost();
-        if($this->hasAdminAppUrl()) {
+        if ($this->hasAdminAppUrl()) {
 
-            if($url) {
+            if ($url) {
                 $host = parse_url($url)['host'];
             }
 
@@ -413,12 +410,12 @@ class Modularity extends FileRepository
 
         $segment = request()->segment(1);
 
-        if($url) {
+        if ($url) {
             $parsedUrl = parse_url($url);
             $host = $parsedUrl['host'];
             $path = $parsedUrl['path'] ?? null; // /admin/settings
 
-            if(!$segment) {
+            if (! $segment) {
                 return false;
             }
             // get the first segment, path can start with /

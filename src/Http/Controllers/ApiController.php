@@ -5,18 +5,16 @@ namespace Unusualify\Modularity\Http\Controllers;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Facades\Response;
-use Unusualify\Modularity\Http\Controllers\Traits\ApiResponses;
-use Unusualify\Modularity\Http\Controllers\Traits\ApiVersioning;
 use Unusualify\Modularity\Http\Controllers\Traits\ApiAuthentication;
-use Unusualify\Modularity\Http\Controllers\Traits\ApiRateLimiting;
-use Unusualify\Modularity\Http\Controllers\Traits\ApiValidation;
-use Unusualify\Modularity\Http\Controllers\Traits\ApiPagination;
 use Unusualify\Modularity\Http\Controllers\Traits\ApiFiltering;
-use Unusualify\Modularity\Http\Controllers\Traits\ApiSorting;
+use Unusualify\Modularity\Http\Controllers\Traits\ApiPagination;
+use Unusualify\Modularity\Http\Controllers\Traits\ApiRateLimiting;
 use Unusualify\Modularity\Http\Controllers\Traits\ApiRelationships;
+use Unusualify\Modularity\Http\Controllers\Traits\ApiResponses;
+use Unusualify\Modularity\Http\Controllers\Traits\ApiSorting;
+use Unusualify\Modularity\Http\Controllers\Traits\ApiValidation;
+use Unusualify\Modularity\Http\Controllers\Traits\ApiVersioning;
 
 abstract class ApiController extends CoreController
 {
@@ -124,11 +122,11 @@ abstract class ApiController extends CoreController
      */
     protected function setApiResourceClasses(): void
     {
-        if (!$this->apiResourceClass) {
+        if (! $this->apiResourceClass) {
             $this->apiResourceClass = $this->getApiResourceClass();
         }
 
-        if (!$this->apiResourceCollectionClass) {
+        if (! $this->apiResourceCollectionClass) {
             $this->apiResourceCollectionClass = $this->getApiResourceCollectionClass();
         }
     }
@@ -146,8 +144,6 @@ abstract class ApiController extends CoreController
 
     /**
      * Get per page value from request
-     *
-     * @return int
      */
     protected function getPerPage(): int
     {
@@ -158,8 +154,6 @@ abstract class ApiController extends CoreController
 
     /**
      * Get includes from request with validation and constraint support
-     *
-     * @return array
      */
     protected function getIncludes(): array
     {
@@ -175,8 +169,6 @@ abstract class ApiController extends CoreController
 
     /**
      * Get includes for eager loading with constraints
-     *
-     * @return array
      */
     protected function getIncludesForEagerLoading(): array
     {
@@ -194,8 +186,6 @@ abstract class ApiController extends CoreController
 
     /**
      * Get API resource class
-     *
-     * @return string|null
      */
     protected function getApiResourceClass(): ?string
     {
@@ -216,8 +206,6 @@ abstract class ApiController extends CoreController
 
     /**
      * Get API resource collection class
-     *
-     * @return string|null
      */
     protected function getApiResourceCollectionClass(): ?string
     {
@@ -233,18 +221,13 @@ abstract class ApiController extends CoreController
     /**
      * Get items for API with relationship loading
      *
-     * @param array $with
-     * @param array $scopes
-     * @param array $orders
-     * @param int $perPage
-     * @param bool $forcePagination
      * @return mixed
      */
     protected function getApiIndexItems(
         array $with = [],
         array $scopes = [],
         array $orders = [],
-        int $perPage = null,
+        ?int $perPage = null,
         bool $forcePagination = false
     ) {
         $perPage = $perPage ?? $this->getPerPage();
@@ -266,8 +249,6 @@ abstract class ApiController extends CoreController
     /**
      * Get single item with relationships
      *
-     * @param int $id
-     * @param array $with
      * @return mixed
      */
     protected function getApiShowItem(int $id, array $with = [])
@@ -279,7 +260,7 @@ abstract class ApiController extends CoreController
         if ($item) {
             // Load additional relationships if specified
             $additionalIncludes = $this->getIncludes();
-            if (!empty($additionalIncludes)) {
+            if (! empty($additionalIncludes)) {
                 $item = $this->loadRelationships($item, $additionalIncludes);
             }
         }
@@ -291,8 +272,6 @@ abstract class ApiController extends CoreController
      * Respond with a resource
      *
      * @param mixed $resource
-     * @param int $status
-     * @return JsonResponse
      */
     protected function respondWithResource($resource, int $status = 200): JsonResponse
     {
@@ -307,8 +286,6 @@ abstract class ApiController extends CoreController
      * Respond with a collection
      *
      * @param mixed $collection
-     * @param int $status
-     * @return JsonResponse
      */
     protected function respondWithCollection($collection, int $status = 200): JsonResponse
     {
@@ -325,14 +302,12 @@ abstract class ApiController extends CoreController
      * Respond with data
      *
      * @param mixed $data
-     * @param int $status
-     * @return JsonResponse
      */
     protected function respondWithData($data, int $status = 200): JsonResponse
     {
         $response = $this->wrapResponses ? ['data' => $data] : $data;
 
-        if (!empty($this->responseMetadata)) {
+        if (! empty($this->responseMetadata)) {
             $response['meta'] = $this->responseMetadata;
         }
 
@@ -374,8 +349,6 @@ abstract class ApiController extends CoreController
 
     /**
      * Validate API store request
-     *
-     * @return array
      */
     protected function validateApiStore(): array
     {
@@ -386,7 +359,6 @@ abstract class ApiController extends CoreController
      * Validate API update request
      *
      * @param mixed $item
-     * @return array
      */
     protected function validateApiUpdate($item): array
     {
@@ -498,8 +470,6 @@ abstract class ApiController extends CoreController
 
     /**
      * Get paginated index data for API
-     *
-     * @return JsonResponse
      */
     public function index(): JsonResponse
     {
@@ -524,9 +494,6 @@ abstract class ApiController extends CoreController
 
     /**
      * Show a single resource
-     *
-     * @param int $id
-     * @return JsonResponse
      */
     public function show(int $id): JsonResponse
     {
@@ -534,7 +501,7 @@ abstract class ApiController extends CoreController
 
         $item = $this->getApiShowItem($id);
 
-        if (!$item) {
+        if (! $item) {
             return $this->respondNotFound();
         }
 
@@ -543,8 +510,6 @@ abstract class ApiController extends CoreController
 
     /**
      * Store a new resource
-     *
-     * @return JsonResponse
      */
     public function store(): JsonResponse
     {
@@ -556,7 +521,7 @@ abstract class ApiController extends CoreController
 
         // Load relationships on created item
         $includes = $this->getIncludesForEagerLoading();
-        if (!empty($includes)) {
+        if (! empty($includes)) {
             $item = $this->loadRelationships($item, $includes);
         }
 
@@ -565,9 +530,6 @@ abstract class ApiController extends CoreController
 
     /**
      * Update an existing resource
-     *
-     * @param int $id
-     * @return JsonResponse
      */
     public function update(int $id): JsonResponse
     {
@@ -575,7 +537,7 @@ abstract class ApiController extends CoreController
 
         $item = $this->repository->getById($id);
 
-        if (!$item) {
+        if (! $item) {
             return $this->respondNotFound();
         }
 
@@ -585,7 +547,7 @@ abstract class ApiController extends CoreController
 
         // Load relationships on updated item
         $includes = $this->getIncludesForEagerLoading();
-        if (!empty($includes)) {
+        if (! empty($includes)) {
             $updatedItem = $this->loadRelationships($updatedItem, $includes);
         }
 
@@ -594,9 +556,6 @@ abstract class ApiController extends CoreController
 
     /**
      * Delete a resource
-     *
-     * @param int $id
-     * @return JsonResponse
      */
     public function destroy(int $id): JsonResponse
     {
@@ -604,7 +563,7 @@ abstract class ApiController extends CoreController
 
         $item = $this->repository->getById($id);
 
-        if (!$item) {
+        if (! $item) {
             return $this->respondNotFound();
         }
 

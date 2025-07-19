@@ -3,6 +3,7 @@
 namespace Unusualify\Modularity\Support;
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Http\Middleware\AuthenticateMiddleware;
 use Unusualify\Modularity\Http\Middleware\AuthorizationMiddleware;
@@ -13,7 +14,6 @@ use Unusualify\Modularity\Http\Middleware\LanguageMiddleware;
 use Unusualify\Modularity\Http\Middleware\LogMiddleware;
 use Unusualify\Modularity\Http\Middleware\NavigationMiddleware;
 use Unusualify\Modularity\Http\Middleware\RedirectIfAuthenticatedMiddleware;
-use Illuminate\Support\Str;
 
 class ModularityRoutes
 {
@@ -139,8 +139,6 @@ class ModularityRoutes
 
     /**
      * Get API prefix
-     *
-     * @return string
      */
     public function getApiPrefix(): string
     {
@@ -149,8 +147,6 @@ class ModularityRoutes
 
     /**
      * Get API domain
-     *
-     * @return string|null
      */
     public function getApiDomain(): ?string
     {
@@ -159,8 +155,6 @@ class ModularityRoutes
 
     /**
      * Get API middlewares
-     *
-     * @return array
      */
     public function getApiMiddlewares(): array
     {
@@ -173,8 +167,6 @@ class ModularityRoutes
 
     /**
      * Get public API middlewares
-     *
-     * @return array
      */
     public function getPublicApiMiddlewares(): array
     {
@@ -190,8 +182,6 @@ class ModularityRoutes
 
     /**
      * Get API group options
-     *
-     * @return array
      */
     public function getApiGroupOptions(): array
     {
@@ -251,7 +241,6 @@ class ModularityRoutes
      * @param string $namespace
      * @param string $routesFile
      * @param bool $instant
-     * @return void
      */
     public function registerRoutes(
         $router,
@@ -307,16 +296,14 @@ class ModularityRoutes
      * Register module routes with shared logic for admin and front routes.
      *
      * @param mixed $module
-     * @param array $options
      * @param string $type 'admin' or 'front'
-     * @return void
      */
     public function registerModuleRoutes($module, array $options, string $type): void
     {
         $config = $module->getConfig();
         $moduleName = $config['name'] ?? $module->getName();
 
-        if (!$moduleName) {
+        if (! $moduleName) {
             return;
         }
 
@@ -333,7 +320,7 @@ class ModularityRoutes
         $parentUrlSegment = $config['url'] ?? $pr['url'] ?? pluralize($parentKebabName);
 
         $routes = $module->getRouteConfigs(valid: true);
-        if (!is_array($routes)) {
+        if (! is_array($routes)) {
             return;
         }
 
@@ -347,7 +334,7 @@ class ModularityRoutes
             // Skip if front routes are required but not enabled
             if ($type === 'front') {
                 $hasFrontRoutes = $item['has_front_routes'] ?? false;
-                if (!$hasFrontRoutes) {
+                if (! $hasFrontRoutes) {
                     continue;
                 }
             }
@@ -355,12 +342,12 @@ class ModularityRoutes
             // Skip if API routes are required but not enabled
             if ($type === 'api') {
                 $hasApiRoutes = $item['has_api_routes'] ?? false;
-                if (!$hasApiRoutes) {
+                if (! $hasApiRoutes) {
                     continue;
                 }
             }
 
-            if (!isset($item['name'])) {
+            if (! isset($item['name'])) {
                 continue;
             }
 
@@ -407,7 +394,7 @@ class ModularityRoutes
             }
 
             // Handle parent route logic
-            if (($isNotParent = !(isset($item['parent']) && $item['parent'])) || $parentUrlSegment !== $routeUrlSegment) {
+            if (($isNotParent = ! (isset($item['parent']) && $item['parent'])) || $parentUrlSegment !== $routeUrlSegment) {
                 $prefixes[] = $parentUrlSegment;
 
                 if ($isNotParent) {
@@ -422,13 +409,13 @@ class ModularityRoutes
 
             $resourceOptionsAs[] = $itemSnakeName;
 
-            if($type === 'api') {
+            if ($type === 'api') {
                 $groupsStack = Route::getGroupStack();
                 $lastGroup = array_pop($groupsStack);
                 $namespace = $lastGroup['namespace'] ?? null;
                 $controllerNamespace = concatenate_namespace($namespace, $controllerName);
 
-                if(!@class_exists($controllerNamespace) || !is_subclass_of($controllerNamespace, \Unusualify\Modularity\Http\Controllers\ApiController::class)) {
+                if (! @class_exists($controllerNamespace) || ! is_subclass_of($controllerNamespace, \Unusualify\Modularity\Http\Controllers\ApiController::class)) {
                     continue;
                 }
             }
@@ -454,14 +441,6 @@ class ModularityRoutes
      * Register belongs relationships for admin routes.
      *
      * @param mixed $module
-     * @param array $item
-     * @param string $parentUrlSegment
-     * @param string $parentSnakeName
-     * @param string $routeUrlSegment
-     * @param string $itemSnakeName
-     * @param string $controllerName
-     * @param array $parameters
-     * @return void
      */
     private function registerBelongsRelationships(
         $module,
@@ -502,19 +481,6 @@ class ModularityRoutes
 
     /**
      * Register route group based on type.
-     *
-     * @param string $type
-     * @param array $middlewares
-     * @param array $prefixes
-     * @param bool $isSingleton
-     * @param string $controllerName
-     * @param string $routeUrlSegment
-     * @param string $itemStudlyName
-     * @param array $resourceOptionsAs
-     * @param array $resourceOptions
-     * @param array $parameters
-     * @param array $item
-     * @return void
      */
     private function registerRouteGroup(
         string $type,
@@ -537,7 +503,7 @@ class ModularityRoutes
             $customPublicRoutes = [];
             $customAuthenticatedRoutes = [];
 
-            if(in_array('index', $publicRoutes)){
+            if (in_array('index', $publicRoutes)) {
                 $customPublicRoutes = array_values(array_intersect($customRoutes, ['search', 'filters', 'meta']));
             }
 
@@ -545,7 +511,7 @@ class ModularityRoutes
             $customAuthenticatedRoutes = array_values(array_diff($customRoutes, $customPublicRoutes));
 
             // Register public routes if any
-            if (!empty($publicRoutes)) {
+            if (! empty($publicRoutes)) {
                 $this->registerApiRouteGroup(
                     $this->getPublicApiMiddlewares(),
                     $prefixes,
@@ -562,7 +528,7 @@ class ModularityRoutes
             }
 
             // Register authenticated routes if any
-            if (!empty($authenticatedRoutes)) {
+            if (! empty($authenticatedRoutes)) {
                 $this->registerApiRouteGroup(
                     $this->getApiAuthMiddlewares(),
                     $prefixes,
@@ -585,7 +551,6 @@ class ModularityRoutes
                 'api' => Route::middleware($middlewares)->prefix(implode('/', $prefixes)),
                 default => Route::prefix(implode('/', $prefixes))
             };
-
 
             $routeGroup->group(function () use (
                 $type,
@@ -628,18 +593,6 @@ class ModularityRoutes
 
     /**
      * Register API route group with specific middlewares and allowed routes.
-     *
-     * @param array $middlewares
-     * @param array $prefixes
-     * @param bool $isSingleton
-     * @param string $controllerName
-     * @param string $routeUrlSegment
-     * @param string $itemStudlyName
-     * @param array $resourceOptionsAs
-     * @param array $resourceOptions
-     * @param array $parameters
-     * @param array $allowedRoutes
-     * @return void
      */
     private function registerApiRouteGroup(
         array $middlewares,
@@ -681,5 +634,4 @@ class ModularityRoutes
                 }
             });
     }
-
 }

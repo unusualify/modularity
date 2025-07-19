@@ -25,7 +25,6 @@ trait ResponsiveVisibility
      *
      * @param array|Collection $items
      * @param string|null $searchKey
-     * @return array|Collection
      */
     public function getResponsiveItems($items, $searchKey = null): array|Collection
     {
@@ -106,13 +105,12 @@ trait ResponsiveVisibility
      * Generate responsive classes based on settings
      *
      * @param array $settings
-     * @return array
      */
     protected function generateResponsiveClasses($settings, $display = 'flex'): array
     {
         $classes = [];
 
-        if(is_object($settings)) {
+        if (is_object($settings)) {
             $settings = (array) $settings;
         }
 
@@ -188,7 +186,6 @@ trait ResponsiveVisibility
      *
      * @param array|object $item
      * @param string|null $searchKey
-     * @return bool
      */
     public function hasResponsiveSettings($item, $searchKey = null): bool
     {

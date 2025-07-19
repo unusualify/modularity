@@ -16,8 +16,6 @@ trait ApiAuthentication
 
     /**
      * Check if user is authenticated for API
-     *
-     * @return bool
      */
     protected function isApiAuthenticated(): bool
     {
@@ -41,22 +39,19 @@ trait ApiAuthentication
      */
     protected function requireApiAuthentication()
     {
-        if (!$this->isApiAuthenticated()) {
+        if (! $this->isApiAuthenticated()) {
             return $this->respondUnauthorized();
         }
     }
 
     /**
      * Check if user has permission for API action
-     *
-     * @param string $permission
-     * @return bool
      */
     protected function hasApiPermission(string $permission): bool
     {
         $user = $this->getApiUser();
 
-        if (!$user) {
+        if (! $user) {
             return false;
         }
 
@@ -66,12 +61,11 @@ trait ApiAuthentication
     /**
      * Require permission for API action
      *
-     * @param string $permission
      * @return JsonResponse|void
      */
     protected function requireApiPermission(string $permission)
     {
-        if (!$this->hasApiPermission($permission)) {
+        if (! $this->hasApiPermission($permission)) {
             return $this->respondForbidden();
         }
     }

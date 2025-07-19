@@ -6,7 +6,6 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model as LaravelModel;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Schema;
 use Unusualify\Modularity\Entities\Model;
 use Unusualify\Modularity\Entities\Traits\HasAuthorizable;
@@ -111,7 +110,7 @@ class AbstractModelTest extends ModelTestCase
 
     public function test_is_translation_model_returns_true_for_translation_model()
     {
-        $translationModel = new TestModelTranslation();
+        $translationModel = new TestModelTranslation;
         $reflectionMethod = new \ReflectionMethod($translationModel, 'isTranslationModel');
         $reflectionMethod->setAccessible(true);
         $this->assertTrue($reflectionMethod->invoke($translationModel));
@@ -141,7 +140,7 @@ class AbstractModelTest extends ModelTestCase
 
     public function test_get_fillable_returns_translated_attributes_for_translation_model()
     {
-        $translationModel = new TestModelTranslation();
+        $translationModel = new TestModelTranslation;
         $fillable = $translationModel->getFillable();
 
         $this->assertContains('title', $fillable);
@@ -152,7 +151,7 @@ class AbstractModelTest extends ModelTestCase
 
     public function test_get_fillable_includes_authorizable_attributes()
     {
-        $authorizableModel = new TestAuthorizableModel();
+        $authorizableModel = new TestAuthorizableModel;
         $fillable = $authorizableModel->getFillable();
 
         // This should include HasAuthorizable fillable attributes
@@ -210,7 +209,7 @@ class AbstractModelTest extends ModelTestCase
 
     public function test_model_translation_is_translation_model()
     {
-        $translationModel = new TestModelTranslation();
+        $translationModel = new TestModelTranslation;
         $reflectionMethod = new \ReflectionMethod($translationModel, 'isTranslationModel');
         $reflectionMethod->setAccessible(true);
         $this->assertTrue($reflectionMethod->invoke($translationModel));
@@ -218,8 +217,8 @@ class AbstractModelTest extends ModelTestCase
 
     public function test_model_fillable_is_dynamic()
     {
-        $model1 = new TestModel();
-        $model2 = new TestModelTranslation();
+        $model1 = new TestModel;
+        $model2 = new TestModelTranslation;
 
         $this->assertNotEquals($model1->getFillable(), $model2->getFillable());
     }

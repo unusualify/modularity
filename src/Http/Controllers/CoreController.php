@@ -95,7 +95,6 @@ abstract class CoreController extends LaravelController
         $this->namespace = $this->getNamespace();
         $this->routeName = $this->getRouteName();
 
-
         $this->modelName = $this->getModelName();
         $this->repository = $this->getRepository();
     }

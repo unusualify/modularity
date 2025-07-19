@@ -3,12 +3,10 @@
 namespace Unusualify\Modularity\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Crypt;
-use Illuminate\Pipeline\Pipeline;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
-use Throwable;
 use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Http\Middleware\AuthorizationMiddleware;
 use Unusualify\Modularity\Http\Middleware\LanguageMiddleware;
@@ -18,9 +16,6 @@ class Handler extends ExceptionHandler
 {
     /**
      * Get the view used to render HTTP exceptions.
-     *
-     * @param  \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface  $e
-     * @return string
      */
     protected function getHttpExceptionView(HttpExceptionInterface $e): string
     {
@@ -60,7 +55,7 @@ class Handler extends ExceptionHandler
             $sessionDir = storage_path('framework/sessions');
             if (is_dir($sessionDir)) {
                 $files = scandir($sessionDir);
-                $sessionFiles = array_filter($files, function($file) {
+                $sessionFiles = array_filter($files, function ($file) {
                     return $file !== '.' && $file !== '..' && $file !== '.gitignore';
                 });
 
@@ -69,7 +64,7 @@ class Handler extends ExceptionHandler
                     $userData = $this->getUserDataFromSession($sessionFile);
                     if ($userData) {
                         // Start the session if not already started
-                        if (!session()->isStarted()) {
+                        if (! session()->isStarted()) {
                             session()->start();
                         }
 
@@ -83,6 +78,7 @@ class Handler extends ExceptionHandler
                         $this->runModularityMiddleware();
 
                         Log::info('Successfully set modularity user and ran middleware:', ['file' => $sessionFile, 'user_id' => $userData->id]);
+
                         return true;
                     }
                 }
@@ -92,6 +88,7 @@ class Handler extends ExceptionHandler
             $rememberTokenCookieName = 'remember_' . Modularity::getAuthGuardName();
             if (request()->hasCookie($rememberTokenCookieName)) {
                 Log::info('Found remember token cookie');
+
                 return true;
             }
 
@@ -99,6 +96,7 @@ class Handler extends ExceptionHandler
 
         } catch (\Exception $e) {
             Log::error('Error in attemptModularityAuthentication: ' . $e->getMessage());
+
             return false;
         }
     }
@@ -125,7 +123,6 @@ class Handler extends ExceptionHandler
                 });
 
             // Execute the pipeline
-            $pipeline;
 
         } catch (\Exception $e) {
             Log::error('Error running modularity middleware: ' . $e->getMessage());
@@ -167,7 +164,7 @@ class Handler extends ExceptionHandler
                 }
 
                 // Fallback to string search if unserialization fails
-                if (strpos($sessionData, 'login_modularity_') !== false) {
+                if (str_contains($sessionData, 'login_modularity_')) {
                     // Try to extract user ID from string
                     preg_match('/login_modularity_[a-f0-9]+";i:(\d+);/', $sessionData, $matches);
                     if (isset($matches[1])) {
@@ -184,6 +181,7 @@ class Handler extends ExceptionHandler
 
         } catch (\Exception $e) {
             Log::error('Error getting user data from session: ' . $e->getMessage());
+
             return null;
         }
     }
