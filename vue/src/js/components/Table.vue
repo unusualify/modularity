@@ -77,7 +77,7 @@
             <!-- table title -->
             <div
               :class="[
-                controlsPosition === 'bottom' || $vuetify.display.smAndDown ? '' : 'flex-1-1-0 h-100 d-flex flex-column',
+                controlsPosition === 'bottom' || $vuetify.display.smAndDown ? '' : 'flex-lg-1-1-100 h-100 d-flex flex-column',
               ]"
               style="min-width: 33%;"
             >
@@ -109,7 +109,7 @@
                 :class="[
                   'd-flex ga-2 align-md-center',
                   controlsPosition === 'bottom' || $vuetify.display.smAndDown ? 'mb-2' : 'flex-1-1-100 justify-end',
-                  $vuetify.display.xs ? 'flex-column' : '',
+                  $vuetify.display.smAndDown ? 'flex-column' : '',
                 ]"
               >
                 <template v-if="someSelected">
@@ -163,6 +163,7 @@
                   <!-- <v-spacer v-if="$vuetify.display.mdAndUp && !(!hideSearchField && hasSearchableHeader)"></v-spacer> -->
 
                   <TableActions
+                    :class="$vuetify.display.mdAndUp ? 'flex-grow-0 flex-shrink-0' : ''"
                     :actions="actions"
                   >
                     <template #prepend>
