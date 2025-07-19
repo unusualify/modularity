@@ -423,7 +423,11 @@ abstract class PanelController extends CoreController
             ];
 
             $authorized = ($this->isGateable() && array_key_exists($option, $authorizableOptions))
-                ? Auth::guard(Modularity::getAuthGuardName())->user()->can($authorizableOptions[$option])
+                ? (($guard = Auth::guard(Modularity::getAuthGuardName()))
+                    ? (($user = $guard->user())
+                        ? $user->can($authorizableOptions[$option])
+                        : false)
+                    : false)
                 : true;
 
             return ($this->indexOptions[$option] ?? $this->defaultIndexOptions[$option] ?? false) && $authorized;
