@@ -137,6 +137,7 @@
         <span>{{ action.tooltip ?? action.label }}</span>
       </v-tooltip>
     </template>
+    <slot name="append"></slot>
   </div>
 </template>
 
