@@ -213,6 +213,12 @@ export default function useTable (props, context) {
     ...(isStoreTable.value ? lastParameters : {})
   }, ['itemsPerPage', 'page', 'sortBy', 'groupBy', 'search']))
 
+  watch(() => smAndDown.value, (newValue, oldValue) => {
+    if(newValue){
+      options.value.itemsPerPage = Math.min(...props.itemsPerPageOptions.map(option => option.value))
+    }
+  })
+
   const totalNumberOfElements = ref(props.total ?? -1)
   const totalNumberOfPages = computed(() => Math.ceil(totalNumberOfElements.value / options.value.itemsPerPage))
 

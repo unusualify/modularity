@@ -2,6 +2,7 @@
 
 namespace Unusualify\Modularity\Http\Controllers;
 
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -9,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as LaravelController;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Str;
 use Unusualify\Modularity\Entities\Enums\AssignmentStatus;
@@ -25,6 +27,11 @@ abstract class CoreController extends LaravelController
         ValidatesRequests,
         ManageNames,
         ManageTraits;
+
+    /**
+     * @var \Illuminate\Contracts\Foundation\Application
+     */
+    protected $app;
 
     /**
      * baseKey
@@ -59,6 +66,11 @@ abstract class CoreController extends LaravelController
     protected $modelName;
 
     /**
+     * @var object
+     */
+    protected $config;
+
+    /**
      * @var \Unusualify\Modularity\Repositories\ModuleRepository
      */
     protected $repository;
@@ -68,63 +80,23 @@ abstract class CoreController extends LaravelController
      */
     protected $module;
 
-    public function __construct(Request $request)
+    public function __construct(Application $app, Request $request)
     {
+        $this->app = $app;
+
         $this->baseKey = modularityBaseKey();
 
         $this->request = $request;
 
         $this->moduleName = $this->getModuleName();
         $this->module = Modularity::find($this->moduleName);
+        $this->config = $this->getModuleConfig();
 
         $this->namespace = $this->getNamespace();
         $this->routeName = $this->getRouteName();
 
         $this->modelName = $this->getModelName();
         $this->repository = $this->getRepository();
-
-    }
-
-    /**
-     * @param array $scopes
-     * @param bool $forcePagination
-     * @return \Illuminate\Database\Eloquent\Collection
-     */
-    protected function getIndexItems($with = [], $scopes = [], $appends = [], $forcePagination = false)
-    {
-        $perPage = $this->request->get('itemsPerPage') ?? $this->getTableAttribute('itemsPerPage') ?? $this->perPage ?? 10;
-
-        if (! $this->request->ajax()) {
-            $perPage = 0;
-        }
-
-        return $this->transformIndexItems($this->repository->get(
-            with: ($this->indexWith ?? []) + $with,
-            scopes: $scopes,
-            orders: $this->orderScope(),
-            perPage: $perPage,
-            forcePagination: $forcePagination,
-            appends: $appends,
-            id: $this->request->get('id') ?? null
-        ));
-    }
-
-    /**
-     * @param \Illuminate\Database\Eloquent\Collection $items
-     * @return \Illuminate\Database\Eloquent\Collection
-     */
-    protected function transformIndexItems($items)
-    {
-        return $items;
-    }
-
-    /**
-     * @param array $paginator
-     * @return array
-     */
-    public function getFormattedIndexItems($paginator) // getIndexTableItems
-    {
-        return $paginator;
     }
 
     /**
@@ -203,6 +175,39 @@ abstract class CoreController extends LaravelController
 
         // TODO if repository is not exists
         return TwillCapsules::getCapsuleForModel($model)->getRepositoryClass();
+    }
+
+    /**
+     * getModuleConfig
+     *
+     * @return \StdClass::class
+     */
+    public function getModuleConfig()
+    {
+        $snakeCase = $this->getSnakeCase($this->moduleName);
+
+        return array_to_object(Config::get(modularityBaseKey() . '.system_modules.' . $snakeCase) ?: Config::get($snakeCase));
+    }
+
+    protected function getConfigFieldsByRoute($field_name, $default = null)
+    {
+        try {
+            return data_get($this->config->routes->{$this->getSnakeCase($this->routeName)}, $field_name) ?? $default;
+
+            return $this->config->routes->{$this->getSnakeCase($this->routeName)}->{$field_name};
+        } catch (\Throwable $th) {
+            return $default;
+            dd(
+                // $th,
+                $this,
+                debug_backtrace()
+            );
+        }
+
+        return $this->config->routes->{$this->getSnakeCase($this->routeName)}->{$field_name};
+        // return $this->isParentRoute()
+        //     ? $this->config->parent_route->{$field_name}
+        //     : $this->config->sub_routes->{$this->getSnakeCase($this->routeName)}->{$field_name};
     }
 
     /**

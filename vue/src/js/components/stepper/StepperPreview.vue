@@ -8,7 +8,7 @@
       <!-- Preview cards -->
       <template v-for="(context, index) in formattedPreview" :key="`summary-${index}`">
         <v-col cols="12" :md="context.col || 6" class="d-flex">
-          <ue-configurable-card v-bind="context" elevation="2" title-color="primary" class="my-2 w-100 h-100"/>
+          <ue-configurable-card v-bind="context" elevation="2" title-color="primary" class="my-2 w-100 h-100" col-padding-x="4"/>
         </v-col>
       </template>
 
@@ -48,6 +48,7 @@
               ]"
               class="mb-4 py-4"
               elevation="2"
+              col-padding-x="4"
               :items="data.form_card_items || [
                 [
                   data.name || 'N/A ',

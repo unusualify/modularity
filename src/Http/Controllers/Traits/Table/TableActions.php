@@ -97,6 +97,15 @@ trait TableActions
                 $action['href'] = resolve_route($action['href']);
             }
 
+            if (isset($action['responsive'])) {
+                $action = $this->applyResponsiveClasses(
+                    item: $action,
+                    searchKey: 'responsive',
+                    display: 'flex',
+                    classNotation: 'componentProps.class'
+                );
+            }
+
             $acc[] = array_merge_recursive_preserve($defaultTableAction, $action);
 
             return $acc;

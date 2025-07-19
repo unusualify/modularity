@@ -63,7 +63,7 @@ return [
         'readonly' => false, // boolean to set the button readonly mode, can be used to disable button
         'ripple' => true, // boolean
         'rounded' => 'md', // string | number | boolean - 0, xs, sm, true, lg, xl, pill, circle, and shaped.
-        'class' => 'ml-2 text-white rounded text-capitialize text-bold',
+        'class' => 'text-white rounded text-capitialize text-bold',
         'size' => 'default', // sizes: x-small, small, default, large, and x-large.
         // 'text' => 'CREATE NEW',
         // 'icon' => 'mdi-abacus'

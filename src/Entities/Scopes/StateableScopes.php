@@ -6,6 +6,10 @@ trait StateableScopes
 {
     public function scopeIsStateables($query, $codes)
     {
+        if (is_string($codes)) {
+            $codes = explode(',', $codes);
+        }
+
         return $query->whereHas('state', function ($q) use ($codes) {
             $q->whereIn($q->getModel()->getTable() . '.code', $codes);
         });

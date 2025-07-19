@@ -19,7 +19,9 @@
         @click="$toggleSidebar()">
       </v-app-bar-nav-icon>
 
-      <v-toolbar-title>CRM</v-toolbar-title>
+      <v-toolbar-title class="flex-1-1-100 ml-0 text-center">
+        {{ headerTitle }}
+      </v-toolbar-title>
 
       <v-btn
         v-if="false"
@@ -253,6 +255,9 @@
 
   export default {
     props: {
+      headerTitle: {
+        type: String,
+      },
       navigation: {
         type: Object,
         default () {

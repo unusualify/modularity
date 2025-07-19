@@ -439,13 +439,13 @@ trait MethodTransformers
                 }
             }
 
-            if (method_exists($this->model, 'scope' . $studlyColumn)) {
+            if ($this->model->hasScope($column)) {
                 if (! is_bool($value)) {
                     $query->{$this->getCamelCase($column)}($value);
                 } else {
                     $query->{$this->getCamelCase($column)}();
                 }
-            } elseif (is_string($value) && method_exists($this->model, 'scope' . studlyName($value))) {
+            } elseif (is_string($value) && $this->model->hasScope($value)) {
                 // $query->{$this->getCamelCase($value)}(...$arguments);
                 $query->{$this->getCamelCase($value)}(...$arguments);
             } else {

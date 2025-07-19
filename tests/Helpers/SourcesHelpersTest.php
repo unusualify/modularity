@@ -173,7 +173,7 @@ class SourcesHelpersTest extends TestCase
     /** @test */
     public function test_admin_url_prefix()
     {
-        Config::set('modularity.admin_app_url', null);
+        Config::set('modularity.admin_app_url', '');
         Config::set('modularity.admin_app_path', 'admin');
         $this->assertEquals('admin', adminUrlPrefix());
 

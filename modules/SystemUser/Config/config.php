@@ -13,6 +13,9 @@ return [
             'url' => 'system-users',
             'route_name' => 'user',
             'icon' => '$users',
+            'has_api_routes' => true,
+            // 'public_api_routes' => ['index', 'show'],
+            // 'api_routes' => ['store', 'update', 'destroy'],
             'table_options' => [
                 'createOnModal' => true,
                 'editOnModal' => true,

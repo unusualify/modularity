@@ -1,5 +1,11 @@
 <template>
-  <v-stepper v-model="activeStep" color="prima" :class="['ue-stepper-form','ue-stepper--no-background', 'fill-height  d-flex flex-column']" :mobile-breakpoint="`md`">
+  <v-stepper v-model="activeStep" color="prima"
+    :class="[
+      'ue-stepper-form ue-stepper--no-background fill-height flex-column',
+      flexBreakpoint ? `d-${flexBreakpoint}-flex` : 'd-flex'
+    ]"
+    :mobile-breakpoint="`md`"
+  >
     <template v-slot:default="{ prev, next }">
       <StepperHeader
         :forms="forms"
@@ -164,6 +170,13 @@
       StepperFinalSummary
     },
     props: {
+      flexBreakpoint: {
+        type: String,
+        default: null,
+        validator: (value) => {
+          return ['sm', 'md', 'lg', 'xl', 'xxl'].includes(value)
+        }
+      },
       forms: {
         type: Object,
         default () {

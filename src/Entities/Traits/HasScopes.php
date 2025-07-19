@@ -8,6 +8,29 @@ use PDO;
 
 trait HasScopes
 {
+    public static function hasScope(string $scopeName): bool
+    {
+        $builder = static::query();
+
+        // Check method exists
+        if (method_exists($builder, $scopeName)) {
+            return true;
+        }
+
+        // Check macro exists
+        if ($builder->hasMacro($scopeName)) {
+            return true;
+        }
+
+        // Check model scope
+        $self = new static;
+        if ($self->hasNamedScope($scopeName)) {
+            return true;
+        }
+
+        return false;
+    }
+
     public function scopePublished($query)
     {
         return $query->where("{$this->getTable()}.published", true);
@@ -43,11 +66,6 @@ trait HasScopes
     public function scopeDraft($query)
     {
         return $query->where("{$this->getTable()}.published", false);
-    }
-
-    public function scopeOnlyTrashed($query)
-    {
-        return $query->whereNotNull("{$this->getTable()}.deleted_at");
     }
 
     /**

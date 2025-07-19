@@ -18,8 +18,8 @@
         :heightx="height"
         :disabled="disabled"
       >
-        <v-card-title class="d-flex w-100 py-4">
-          <ue-title :text="label" align="center" padding="a-0" transform="none" class="w-100">
+        <v-card-title class="w-100 py-4 text-wrap">
+          <ue-title :text="label" align="center" padding="a-0" transform="none" class="w-100" type="body-1" color="grey-darken-5">
             <template v-slot:rightX>
               <div class="w-100 d-flex justify-end">
                 <slot name="actions">
@@ -120,15 +120,19 @@
               </div>
             </template>
           </ue-title>
+          <ue-title v-if="subtitle" :text="$t(subtitle)" align="center" transform="none" padding="a-0"  type="caption">
+
+          </ue-title>
         </v-card-title>
 
-        <v-card-text class="">
+        <v-card-text class="mr-n2 pb-0">
 
           <!-- Pinned Message -->
           <v-list
             v-if="pinnedMessage"
             elevation="3"
             class="bg-grey-lighten-4 mx-n4"
+            style="z-index: 1000;"
             :items="[{
               title: pinnedMessage.content,
               subtitle: pinnedMessage.created_at ? $d(new Date(pinnedMessage.created_at), 'short') : '',
@@ -170,6 +174,7 @@
                   :updateEndpoint="endpoints.update"
                   :noStarring="noStarring"
                   :noPinning="noPinning"
+                  :contentTruncateLength="contentTruncateLength"
                 />
               </slot>
             </div>
@@ -189,8 +194,22 @@
 
         </v-card-text>
 
-        <v-card-actions class="pa-4" v-if="!noSendAction">
+        <v-input-filepond v-if="filepond"
+          ref="inputFilepond"
+          class="d-none"
+          v-bind="invokeRule($lodash.omit(filepond, ['type', 'rules', 'rawRules']))"
+          v-model="attachments"
 
+          :xmodelValue="attachments"
+          @xupdate:modelValue="$log('update:modelValue', $event)"
+          @loading="loadingAttachment = true"
+          @loaded="loadingAttachment = false"
+        >
+          <template v-slot:activator="activatorProps">
+          </template>
+        </v-input-filepond>
+
+        <v-card-actions class="pa-4" v-if="!noSendAction">
           <slot name="sending">
             <v-textarea
               v-model="message"
@@ -203,41 +222,19 @@
               @keyup.enter="sendMessage"
               :rows="1"
             >
-              <template v-slot:prepend>
+              <template v-slot:prepend v-if="$vuetify.display.smAndUp">
                 <div class="flex-grow-0">
                   <v-avatar class="my-aut" :image="$store.getters.userProfile.avatar_url" size="40"/>
                 </div>
-                <v-input-filepond v-if="filepond"
-                  ref="inputFilepond"
-                  class="d-non"
-                  v-bind="invokeRule($lodash.omit(filepond, ['type', 'rules', 'rawRules']))"
-                  v-model="attachments"
-
-                  :xmodelValue="attachments"
-                  @xupdate:modelValue="$log('update:modelValue', $event)"
-                  @loading="loadingAttachment = true"
-                  @loaded="loadingAttachment = false"
-                >
-                  <template v-slot:activator="activatorProps">
-                  </template>
-                </v-input-filepond>
-              </template>
-              <template v-slot:appendx>
-                <!-- <v-btn variant="elevated" density="comfortable" @click="sendMessage" :disabled="loading || !message">
-                  {{ $t('Send') }}
-                </v-btn> -->
-
               </template>
               <template v-slot:append-inner>
                 <ue-filepond-preview :source="attachments" image-size="24"/>
-                <template v-for="attachment in attachments">
-                </template>
-                <v-btn :disabled="loadingAttachment" :color="color" size="default" icon="mdi-paperclip" density="compact" @click="$refs.inputFilepond.browse()" />
+                <v-btn :disabled="loadingAttachment" :color="color" :size="$vuetify.display.smAndUp ? 'default' : 'small'" icon="mdi-paperclip" density="compact" @click="$refs.inputFilepond.browse()" />
                 <v-btn
                   variant="elevated"
                   density="compact"
                   :icon="sendButtonIcon"
-                  size="small"
+                  :size="$vuetify.display.smAndUp ? 'small' : 'x-small'"
                   :disabled="loading || !message || loadingAttachment"
                   @click="sendMessage"
                 />
@@ -261,6 +258,10 @@
     },
     props: {
       ...makeInputProps(),
+      subtitle: {
+        type: String,
+        default: null
+      },
       color: {
         type: String,
       },
@@ -339,6 +340,10 @@
       noPinning: {
         type: Boolean,
         default: false
+      },
+      contentTruncateLength: {
+        type: Number,
+        default: 50
       }
     },
     setup (props, context) {

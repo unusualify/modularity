@@ -266,33 +266,36 @@ export default {
       return { schemas, schemasChanged }
     }
 
+    const generateSchema = (item) => {
+      const baseSchema = cloneDeep(props.schema)
+
+      let protectInitialValue = props.protectInitialValue
+        && props.protectDefiner
+        && __isset(props.modelValue[item.id])
+        && __isset(props.modelValue[item.id][props.protectDefiner])
+        && props.modelValue[item.id][props.protectDefiner] !== null
+        && props.modelValue[item.id][props.protectDefiner] !== undefined
+
+      for(const inputName in props.tabFields){
+        if(protectInitialValue
+          && Array.isArray(props.protectedInputs)
+          && props.protectedInputs.length > 0
+          && (props.protectedInputs[0] === '*' || props.protectedInputs.includes(inputName))){
+          baseSchema[inputName]['protectInitialValue'] = true
+        }
+        if(__isset(baseSchema[inputName])){
+          baseSchema[inputName]['items'] = item[props.tabFields[inputName]]
+        }
+        each(baseSchema[inputName], (value, key) => {
+          baseSchema[inputName][key] = castValueMatch(value, item)
+        })
+      }
+      return getSchema(baseSchema, models.value?.[item.id] ?? {})
+    }
+
     const schemas = ref(elements.value.reduce((acc, item, index) => {
       if(!__isset(acc[item.id])){
-        const baseSchema = cloneDeep(props.schema)
-
-        let protectInitialValue = props.protectInitialValue
-          && props.protectDefiner
-          && __isset(props.modelValue[item.id])
-          && __isset(props.modelValue[item.id][props.protectDefiner])
-          && props.modelValue[item.id][props.protectDefiner] !== null
-          && props.modelValue[item.id][props.protectDefiner] !== undefined
-
-        for(const inputName in props.tabFields){
-          if(protectInitialValue
-            && Array.isArray(props.protectedInputs)
-            && props.protectedInputs.length > 0
-            && (props.protectedInputs[0] === '*' || props.protectedInputs.includes(inputName))){
-            baseSchema[inputName]['protectInitialValue'] = true
-          }
-          if(__isset(baseSchema[inputName])){
-            baseSchema[inputName]['items'] = item[props.tabFields[inputName]]
-          }
-          each(baseSchema[inputName], (value, key) => {
-            baseSchema[inputName][key] = castValueMatch(value, elements.value[index])
-          })
-        }
-        acc[item.id] = getSchema(baseSchema, models.value?.[item.id] ?? {})
-
+        acc[item.id] = generateSchema(item)
         // Process initial triggers
         const { schemas: updatedSchemas } = processTriggers(models.value[item.id], item.id, acc)
         acc = updatedSchemas
@@ -335,16 +338,9 @@ export default {
           }
 
           if(!__isset(schemas.value[item.id])){
-            const baseSchema = cloneDeep(props.schema)
-            for(const inputName in props.tabFields){
-              if(__isset(baseSchema[inputName])){
-                baseSchema[inputName]['items'] = item[props.tabFields[inputName]]
-              }
-              each(baseSchema[inputName], (value, key) => {
-                baseSchema[inputName][key] = castValueMatch(value, item)
-              })
-            }
-            schemas.value[item.id] = getSchema(baseSchema, models.value?.[item.id] ?? {})
+            schemas.value[item.id] = generateSchema(item)
+            const { schemas: updatedSchemas } = processTriggers(models.value[item.id], item.id, schemas.value)
+            schemas.value = updatedSchemas
           }
 
           valids.value[item.id] = null

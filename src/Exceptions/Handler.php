@@ -3,50 +3,186 @@
 namespace Unusualify\Modularity\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Illuminate\Support\Facades\Request;
-use Illuminate\Support\Str;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Pipeline\Pipeline;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Unusualify\Modularity\Facades\Modularity;
+use Unusualify\Modularity\Http\Middleware\AuthorizationMiddleware;
+use Unusualify\Modularity\Http\Middleware\LanguageMiddleware;
+use Unusualify\Modularity\Http\Middleware\NavigationMiddleware;
 
 class Handler extends ExceptionHandler
 {
     /**
      * Get the view used to render HTTP exceptions.
-     *
-     * @return string
      */
-    protected function getHttpExceptionView(HttpExceptionInterface $e)
+    protected function getHttpExceptionView(HttpExceptionInterface $e): string
     {
-        $usesAdminPath = ! empty(modularityConfig('admin_app_path'));
-        $adminAppUrl = modularityConfig('admin_app_url', config('app.url'));
+        $statusCode = $e->getStatusCode();
 
-        $isSubdomainAdmin = ! $usesAdminPath && Str::contains(Request::url(), $adminAppUrl);
-        $isSubdirectoryAdmin = $usesAdminPath && Str::startsWith(Request::path(), modularityConfig('admin_app_path'));
+        // For 404 errors, manually attempt authentication since middleware didn't run
+        // $isAuthenticated = $this->attemptModularityAuthentication();
 
-        return $this->getModularityErrorView($e->getStatusCode(), ! $isSubdomainAdmin && ! $isSubdirectoryAdmin);
+        $isAuthenticated = Auth::guard(Modularity::getAuthGuardName())->check();
+
+        if (in_array($statusCode, [404, 403, 500]) && $isAuthenticated) {
+            // Return custom error view for modularity authenticated users
+            $view = modularityBaseKey() . "::errors.{$statusCode}";
+
+            if (view()->exists($view)) {
+                return $view;
+            }
+        }
+
+        // For all other cases, use the default Laravel behavior
+        return parent::getHttpExceptionView($e);
     }
 
     /**
-     * Get the Twill error view used to render a specified HTTP status code.
-     *
-     * @param int $statusCode
-     * @return string
+     * Manually attempt modularity authentication by checking cookies
      */
-    protected function getModularityErrorView($statusCode, $frontend = false)
+    private function attemptModularityAuthentication(): bool
     {
-        if ($frontend) {
-            $view = modularityConfig('frontend.views_path') . ".errors.$statusCode";
+        try {
+            // Check if user is already authenticated (for 403/500 cases where middleware ran)
+            $guard = Auth::guard('modularity');
+            if ($guard->check()) {
+                return true;
+            }
 
-            return view()->exists($view) ? $view : "errors::{$statusCode}";
+            // For 404 errors, check if any session files contain modularity authentication data
+            $sessionDir = storage_path('framework/sessions');
+            if (is_dir($sessionDir)) {
+                $files = scandir($sessionDir);
+                $sessionFiles = array_filter($files, function ($file) {
+                    return $file !== '.' && $file !== '..' && $file !== '.gitignore';
+                });
+
+                // Check each session file for modularity authentication
+                foreach ($sessionFiles as $sessionFile) {
+                    $userData = $this->getUserDataFromSession($sessionFile);
+                    if ($userData) {
+                        // Start the session if not already started
+                        if (! session()->isStarted()) {
+                            session()->start();
+                        }
+
+                        // Set the user on the guard
+                        $guard->setUser($userData);
+
+                        // Also set the user on the default guard so middleware can access it
+                        Auth::setUser($userData);
+
+                        // Run the actual middleware pipeline
+                        $this->runModularityMiddleware();
+
+                        Log::info('Successfully set modularity user and ran middleware:', ['file' => $sessionFile, 'user_id' => $userData->id]);
+
+                        return true;
+                    }
+                }
+            }
+
+            // Also check for remember token cookies
+            $rememberTokenCookieName = 'remember_' . Modularity::getAuthGuardName();
+            if (request()->hasCookie($rememberTokenCookieName)) {
+                Log::info('Found remember token cookie');
+
+                return true;
+            }
+
+            return false;
+
+        } catch (\Exception $e) {
+            Log::error('Error in attemptModularityAuthentication: ' . $e->getMessage());
+
+            return false;
         }
-
-        $view = "modularity.errors.$statusCode";
-
-        return view()->exists($view) ? $view : modularityBaseKey() . "::errors.$statusCode";
     }
 
-    protected function invalidJson($request, ValidationException $exception)
+    /**
+     * Run the actual modularity middleware pipeline
+     */
+    private function runModularityMiddleware(): void
     {
-        return response()->json($exception->errors(), $exception->status);
+        try {
+            $middleware = [
+                LanguageMiddleware::class,
+                NavigationMiddleware::class,
+                AuthorizationMiddleware::class,
+            ];
+
+            // Create a pipeline to run the middleware
+            $pipeline = app(Pipeline::class)
+                ->send(request())
+                ->through($middleware)
+                ->then(function ($request) {
+                    // This function is called after all middleware has run
+                    return $request;
+                });
+
+            // Execute the pipeline
+
+        } catch (\Exception $e) {
+            Log::error('Error running modularity middleware: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Get user data from session file if it contains valid authentication data
+     */
+    private function getUserDataFromSession(string $sessionId): ?\Unusualify\Modularity\Entities\User
+    {
+        try {
+            // Try to read the session file directly
+            $sessionPath = storage_path('framework/sessions/' . $sessionId);
+
+            if (file_exists($sessionPath)) {
+                $sessionData = file_get_contents($sessionPath);
+
+                // Laravel stores session data in a serialized format
+                // Try to unserialize it
+                $unserializedData = @unserialize($sessionData);
+
+                if ($unserializedData !== false) {
+                    // Check if the session contains authentication data
+                    // Look for the modularity guard session key
+                    $userClass = \Unusualify\Modularity\Entities\User::class;
+                    $loginKey = 'login_modularity_' . sha1($userClass);
+
+                    // Check if session data contains the login key
+                    if (array_key_exists($loginKey, $unserializedData)) {
+                        $userId = $unserializedData[$loginKey];
+
+                        // Load the user from the database
+                        $user = $userClass::find($userId);
+                        if ($user) {
+                            return $user;
+                        }
+                    }
+                }
+
+                // Fallback to string search if unserialization fails
+                if (str_contains($sessionData, 'login_modularity_')) {
+                    // Try to extract user ID from string
+                    preg_match('/login_modularity_[a-f0-9]+";i:(\d+);/', $sessionData, $matches);
+                    if (isset($matches[1])) {
+                        $userId = $matches[1];
+                        $user = \Unusualify\Modularity\Entities\User::find($userId);
+                        if ($user) {
+                            return $user;
+                        }
+                    }
+                }
+            }
+
+            return null;
+
+        } catch (\Exception $e) {
+            Log::error('Error getting user data from session: ' . $e->getMessage());
+
+            return null;
+        }
     }
 }

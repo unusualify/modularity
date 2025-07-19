@@ -84,7 +84,10 @@
               v-bind="badgeProps(action)"
             >
               <v-btn
-                v-bind="{...generateButtonProps(action), ...tooltipActivatorScope.props}"
+                v-bind="{
+                  ...generateButtonProps(action),
+                  ...tooltipActivatorScope.props,
+                }"
                 @click="handleAction(action)"
               />
             </v-badge>
