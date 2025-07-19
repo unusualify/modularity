@@ -71,14 +71,15 @@
             v-bind="toolbarOptions"
             :class="[
               'pt-3',
+              $vuetify.display.smAndUp ? 'd-flex' : '',
             ]"
           >
             <!-- table title -->
             <div
               :class="[
-                controlsPosition === 'bottom' || $vuetify.display.smAndDown ? 'pt-2' : 'flex-grow-1 h-100 d-flex flex-column justify-center',
+                controlsPosition === 'bottom' || $vuetify.display.smAndDown ? '' : 'flex-1-1-0 h-100 d-flex flex-column',
               ]"
-              style="min-width: 20%;"
+              style="min-width: 33%;"
             >
               <!-- title -->
               <ue-title
@@ -106,8 +107,9 @@
               <div
                 key='table-controls'
                 :class="[
-                  'd-flex',
-                  controlsPosition === 'bottom' || $vuetify.display.smAndDown ? 'mb-2' : 'flex-grow-1 flex-shrink-0',
+                  'd-flex ga-2 align-md-center',
+                  controlsPosition === 'bottom' || $vuetify.display.smAndDown ? 'mb-2' : 'flex-1-1-100 justify-end',
+                  $vuetify.display.xs ? 'flex-column' : '',
                 ]"
               >
                 <template v-if="someSelected">
@@ -139,17 +141,18 @@
                     single-line
                     :placeholder="searchPlaceholder"
                     :class="[
-                      'mr-2',
-                      controlsPosition === 'bottom' || $vuetify.display.smAndDown ? 'flex-grow-1' : ''
+                      controlsPosition === 'bottom' || !$vuetify.display.xs ? 'flex-sm-grow-1' : '',
                     ]"
                     :style="[
                       'display: inline',
                       // controlsPosition === 'top' || $vuetify.display.smAndDown ? 'max-width: 300px' : '',
-                      'min-width: 165px'
+                      'min-width: 200px',
+                      !(controlsPosition === 'bottom' || $vuetify.display.smAndDown) ? 'max-width: 250px' : '',
                     ]"
                     @click:append-inner="searchItems"
                     :disabled="loading"
                     @keydown.enter="searchItems"
+
                   >
                     <template #append-inner>
                       <v-btn :disabled="searchModel === search" icon="mdi-magnify" variant="plain" size="compact" color="grey-darken-5" rounded @click="searchItems()" />
@@ -157,7 +160,7 @@
                   </v-text-field>
 
                   <!-- <v-spacer v-else-if="hideSearchField"></v-spacer> -->
-                  <v-spacer v-if="$vuetify.display.mdAndUp"></v-spacer>
+                  <!-- <v-spacer v-if="$vuetify.display.mdAndUp && !(!hideSearchField && hasSearchableHeader)"></v-spacer> -->
 
                   <TableActions
                     :actions="actions"
@@ -244,17 +247,18 @@
                         </v-card>
                       </v-menu>
                     </template>
+                    <template #append>
+                      <!-- create button -->
+                      <v-btn v-if="$can('create', permissionName) && !noForm && !someSelected && createOnModal"
+                        v-bind="addBtnOptions"
+                        @click="createForm"
+                        :icon="$vuetify.display.smAndDown ? addBtnOptions['prepend-icon'] : null"
+                        :text="$vuetify.display.smAndDown ? null : addBtnTitle"
+                        :prepend-icon="$vuetify.display.smAndDown ? null : addBtnOptions['prepend-icon']"
+                        :density="$vuetify.display.smAndDown ? 'compact' : (addBtnOptions['density'] ?? 'comfortable')"
+                      />
+                    </template>
                   </TableActions>
-
-                  <!-- create button -->
-                  <v-btn v-if="$can('create', permissionName) && !noForm && !someSelected && createOnModal"
-                    v-bind="addBtnOptions"
-                    @click="createForm"
-                    :icon="$vuetify.display.smAndDown ? addBtnOptions['prepend-icon'] : null"
-                    :text="$vuetify.display.smAndDown ? null : addBtnTitle"
-                    :prepend-icon="$vuetify.display.smAndDown ? null : addBtnOptions['prepend-icon']"
-                    :density="$vuetify.display.smAndDown ? 'compact' : (addBtnOptions['density'] ?? 'comfortable')"
-                  />
                 </template>
               </div>
             </v-slide-x-transition>
