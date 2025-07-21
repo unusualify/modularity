@@ -68,13 +68,19 @@ const impersonateRoute = computed(() => {
       <v-btn v-if="impersonated" color="red" :href="stopRoute">
           Stop Impersonating
       </v-btn>
-      <v-select
-        v-if="!impersonated" class="mt-5"
-        v-model="selected" :items="users"
-        variant="outlined" density="compact"
-        item-title="name" item-value="id"
+      <v-select v-if="!impersonated"
+        class="mt-5"
+        v-model="selected"
+        :items="users"
+        variant="outlined"
+        density="compact"
+        item-title="name"
+        item-value="id"
         clearable
         >
+        <template v-slot:item="{ props: itemProps, item }">
+          <v-list-item v-bind="itemProps" :title="`${item.raw.name} (${item.raw.company_name})`" :subtitle="item.raw.email"></v-list-item>
+        </template>
       </v-select>
       <v-btn v-if="!impersonated" :href="impersonateRoute" :disabled="!selected">Impersonate</v-btn>
     </div>
