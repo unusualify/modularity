@@ -14,8 +14,10 @@ class AssignableListener implements ShouldHandleEventsAfterCommit
 
     /**
      * Handle the event.
+     *
+     * @param \Modules\SystemNotification\Events\AssignmentCreated|\Modules\SystemNotification\Events\AssignmentUpdated $event
      */
-    public function handle($event): void
+    public function handle(\Modules\SystemNotification\Events\AssignmentCreated|\Modules\SystemNotification\Events\AssignmentUpdated $event): void
     {
         $isCreated = get_class($event) === AssignmentCreated::class;
         $model = $event->model;

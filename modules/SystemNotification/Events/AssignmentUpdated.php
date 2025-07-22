@@ -26,7 +26,7 @@ class AssignmentUpdated implements ShouldDispatchAfterCommit
      */
     public $queue = 'default';
 
-    public function __construct(public $model)
+    public function __construct(public \Unusualify\Modularity\Entities\Assignment $model)
     {
         //
     }

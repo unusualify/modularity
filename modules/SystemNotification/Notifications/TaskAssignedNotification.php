@@ -9,7 +9,13 @@ class TaskAssignedNotification extends FeatureNotification implements ShouldQueu
 {
     use Queueable;
 
-    public function __construct($model)
+    /**
+     * Create a new notification instance.
+     *
+     * @param \Modules\SystemTask\Entities\Assignment $model
+     * @return void
+     */
+    public function __construct(\Unusualify\Modularity\Entities\Assignment $model)
     {
         // $model is a assignment model
         parent::__construct($model);
