@@ -42,25 +42,57 @@ class TaskAssignedNotification extends FeatureNotification implements ShouldQueu
 
     public function getModuleRouteHeadline(\Illuminate\Database\Eloquent\Model $model): string
     {
-        return parent::getModuleRouteHeadline($model->assignable);
+        $assignable = $model->assignable;
+
+        $default = parent::getModuleRouteHeadline($assignable);
+
+        if (isset(static::$moduleRouteHeadlineCallbacks[static::class]) && is_callable(static::$moduleRouteHeadlineCallbacks[static::class])) {
+            return call_user_func(static::$moduleRouteHeadlineCallbacks[static::class], $assignable, $default);
+        }
+
+        return $default;
     }
 
     public function getModelTitleField(\Illuminate\Database\Eloquent\Model $model): string
     {
-        return parent::getModelTitleField($model->assignable);
+        $assignable = $model->assignable;
+
+        $default = parent::getModelTitleField($assignable);
+
+        if (isset(static::$modelTitleFieldCallbacks[static::class]) && is_callable(static::$modelTitleFieldCallbacks[static::class])) {
+            return call_user_func(static::$modelTitleFieldCallbacks[static::class], $assignable, $default);
+        }
+
+        return $default;
     }
 
     public function getNotificationMailSubject(object $notifiable, \Illuminate\Database\Eloquent\Model $model): string
     {
-        return __('A Task Has Been Assigned To You');
+        $assignable = $model->assignable;
+
+        $default = __('A Task Has Been Assigned To You');
+
+        if (isset(static::$mailSubjectCallbacks[static::class]) && is_callable(static::$mailSubjectCallbacks[static::class])) {
+            return call_user_func(static::$mailSubjectCallbacks[static::class], $notifiable, $assignable, $default);
+        }
+
+        return $default;
     }
 
     public function getNotificationMessage(object $notifiable, \Illuminate\Database\Eloquent\Model $model): string
     {
-        return __('The :moduleRouteHeadline :modelTitleField has been assigned to you as a task.', [
+        $assignable = $model->assignable;
+
+        $default = __('The :moduleRouteHeadline :modelTitleField has been assigned to you as a task.', [
             'moduleRouteHeadline' => $this->getModuleRouteHeadline($model),
             'modelTitleField' => "'{$this->getModelTitleField($model)}'",
         ]);
+
+        if (isset(static::$messageCallbacks[static::class]) && is_callable(static::$messageCallbacks[static::class])) {
+            return call_user_func(static::$messageCallbacks[static::class], $notifiable, $assignable, $default);
+        }
+
+        return $default;
     }
 
     public function getNotificationRedirector(object $notifiable, \Illuminate\Database\Eloquent\Model $model)

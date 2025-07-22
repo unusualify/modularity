@@ -36,24 +36,41 @@ class ChatableUnreadNotification extends FeatureNotification implements ShouldQu
 
     public function getNotificationSubject(object $notifiable, \Illuminate\Database\Eloquent\Model $model): string
     {
-        return __('Press Release', [
+        $default = __(':moduleRouteHeadline', [
             'moduleRouteHeadline' => $this->getModuleRouteHeadline($model),
         ]);
+
+        if (isset(static::$mailSubjectCallbacks[static::class]) && is_callable(static::$mailSubjectCallbacks[static::class])) {
+            return call_user_func(static::$mailSubjectCallbacks[static::class], $notifiable, $model, $default);
+        }
+
+        return $default;
     }
 
     public function getNotificationMailSubject(object $notifiable, \Illuminate\Database\Eloquent\Model $model): string
     {
-        return __('New Message on :moduleRouteHeadline', [
+        $default = __('New Message on :moduleRouteHeadline', [
             'moduleRouteHeadline' => $this->getModuleRouteHeadline($model),
         ]);
+
+        if (isset(static::$mailSubjectCallbacks[static::class]) && is_callable(static::$mailSubjectCallbacks[static::class])) {
+            return call_user_func(static::$mailSubjectCallbacks[static::class], $notifiable, $model, $default);
+        }
+
+        return $default;
     }
 
     public function getNotificationMessage(object $notifiable, \Illuminate\Database\Eloquent\Model $model): string
     {
-        return __('You have a new message.', [
+        $default = __('You have a new message.', [
             'moduleRouteHeadline' => $this->getModuleRouteHeadline($model),
-            'modelTitleField' => $this->getModelTitleField($model) ?? __('the'),
         ]);
+
+        if (isset(static::$messageCallbacks[static::class]) && is_callable(static::$messageCallbacks[static::class])) {
+            return call_user_func(static::$messageCallbacks[static::class], $notifiable, $model);
+        }
+
+        return $default;
     }
 
     public function afterNotificationSent(): void

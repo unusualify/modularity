@@ -40,42 +40,81 @@ class PaymentFailedNotification extends FeatureNotification implements ShouldQue
         ];
     }
 
-    public function getNotificationMailSubject(object $notifiable, \Illuminate\Database\Eloquent\Model $model): string
-    {
-        return __('Payment Failed');
-    }
-
     public function getModelTitleField(\Illuminate\Database\Eloquent\Model $model): string
     {
-        return parent::getModelTitleField($model->price && $model->price->priceable ? $model->price->priceable : $model);
+        $priceableModel = $model->price && $model->price->priceable ? $model->price->priceable : $model;
+
+        $default = parent::getModelTitleField($priceableModel);
+
+        if (isset(static::$modelTitleFieldCallbacks[static::class]) && is_callable(static::$modelTitleFieldCallbacks[static::class])) {
+            return call_user_func(static::$modelTitleFieldCallbacks[static::class], $priceableModel, $default);
+        }
+
+        return $default;
     }
 
     public function getModuleRouteHeadline(\Illuminate\Database\Eloquent\Model $model): string
     {
-        return parent::getModuleRouteHeadline($model->price && $model->price->priceable ? $model->price->priceable : $model);
+        $priceableModel = $model->price && $model->price->priceable ? $model->price->priceable : $model;
+
+        $default = parent::getModuleRouteHeadline($priceableModel);
+
+        if (isset(static::$moduleRouteHeadlineCallbacks[static::class]) && is_callable(static::$moduleRouteHeadlineCallbacks[static::class])) {
+            return call_user_func(static::$moduleRouteHeadlineCallbacks[static::class], $priceableModel, $default);
+        }
+
+        return $default;
     }
 
+    public function getNotificationMailSubject(object $notifiable, \Illuminate\Database\Eloquent\Model $model): string
+    {
+        $priceableModel = $model->price && $model->price->priceable ? $model->price->priceable : $model;
+
+        $default = __('Payment Failed');
+
+        if (isset(static::$mailSubjectCallbacks[static::class]) && is_callable(static::$mailSubjectCallbacks[static::class])) {
+            return call_user_func(static::$mailSubjectCallbacks[static::class], $notifiable, $priceableModel, $default);
+        }
+
+        return $default;
+    }
     public function getNotificationMessage(object $notifiable, \Illuminate\Database\Eloquent\Model $model): string
     {
-        return __('The :moduleRouteHeadline :modelTitleField\'s payment has been failed.', [
-            'moduleRouteHeadline' => $this->getModuleRouteHeadline($model),
-            'modelTitleField' => "'{$this->getModelTitleField($model)}'",
+        $priceableModel = $model->price && $model->price->priceable ? $model->price->priceable : $model;
+
+        $default = __('The :moduleRouteHeadline :modelTitleField\'s payment has been failed.', [
+            'moduleRouteHeadline' => $this->getModuleRouteHeadline($priceableModel),
+            'modelTitleField' => "'{$this->getModelTitleField($priceableModel)}'",
         ]);
+
+        if (isset(static::$messageCallbacks[static::class]) && is_callable(static::$messageCallbacks[static::class])) {
+            return call_user_func(static::$messageCallbacks[static::class], $notifiable, $priceableModel, $default);
+        }
+
+        return $default;
     }
 
     public function getNotificationRedirector(object $notifiable, \Illuminate\Database\Eloquent\Model $model)
     {
-        return parent::getNotificationRedirector($notifiable, $model->price && $model->price->priceable ? $model->price->priceable : $model);
+        $priceableModel = $model->price && $model->price->priceable ? $model->price->priceable : $model;
+
+        return parent::getNotificationRedirector($notifiable, $priceableModel);
     }
 
-    public function getMailMessage(object $notifiable, MailMessage $mailMessage, \Illuminate\Database\Eloquent\Model $model): MailMessage
+    public function getMailMessage(MailMessage $mailMessage, object $notifiable, \Illuminate\Database\Eloquent\Model $model): MailMessage
     {
-        return $mailMessage
+        $mailMessage = $mailMessage
             ->line('Price: ' . $model->amount_formatted)
             ->line('Payment ID: ' . $model->id)
             ->line('Payment Order ID: ' . $model->order_id)
             ->line('Payment Service: ' . ($model->paymentService ? $model->paymentService->name : $model->payment_gateway))
             ->line('Payment Request: ' . json_encode($model->parameters, JSON_PRETTY_PRINT))
             ->line('Payment Response: ' . json_encode($model->response, JSON_PRETTY_PRINT));
+
+        if (isset(static::$mailMessageClassCallbacks[static::class]) && is_callable(static::$mailMessageClassCallbacks[static::class])) {
+            return call_user_func(static::$mailMessageClassCallbacks[static::class], $mailMessage, $notifiable, $model);
+        }
+
+        return $mailMessage;
     }
 }

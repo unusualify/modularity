@@ -14,6 +14,7 @@ class StateableUpdatedNotification extends FeatureNotification implements Should
     public function __construct($model, public $newState, public $oldState)
     {
         parent::__construct($model);
+
     }
 
     public function via($notifiable): array
@@ -38,36 +39,50 @@ class StateableUpdatedNotification extends FeatureNotification implements Should
         $moduleRouteHeadline = $this->getModuleRouteHeadline($model);
         $titleField = $this->getModelTitleField($model);
 
-        return __('The status of the :moduleRouteHeadline :titleField has been changed to ', [
+        $default = __('The status of the :moduleRouteHeadline :titleField has been changed to ', [
             'moduleRouteHeadline' => $moduleRouteHeadline,
             'titleField' => "'$titleField'",
         ]);
+
+        if (isset(static::$messageCallbacks[static::class]) && is_callable(static::$messageCallbacks[static::class])) {
+            return call_user_func(static::$messageCallbacks[static::class], $notifiable, $model, $default);
+        }
+
+        return $default;
     }
 
     public function getNotificationHtmlMessage(object $notifiable, \Illuminate\Database\Eloquent\Model $model): string
     {
-        return $this->getNotificationMessage($notifiable, $model) . $model->state_formatted;
+        $default = $this->getNotificationMessage($notifiable, $model) . $model->state_formatted;
+
+        if (isset(static::$htmlMessageCallbacks[static::class]) && is_callable(static::$htmlMessageCallbacks[static::class])) {
+            return call_user_func(static::$htmlMessageCallbacks[static::class], $notifiable, $model, $default);
+        }
+
+        return $default;
     }
 
     public function getNotificationMailSubject(object $notifiable, \Illuminate\Database\Eloquent\Model $model): string
     {
-        return __(':moduleRouteHeadline Status Changed', [
+        $default = __(':moduleRouteHeadline Status Changed', [
             'moduleRouteHeadline' => $this->getModuleRouteHeadline($model),
         ]);
+
+        if (isset(static::$mailSubjectCallbacks[static::class]) && is_callable(static::$mailSubjectCallbacks[static::class])) {
+            return call_user_func(static::$mailSubjectCallbacks[static::class], $notifiable, $model, $default);
+        }
+
+        return $default;
     }
 
-    public function getMailMessage(object $notifiable, MailMessage $mailMessage, \Illuminate\Database\Eloquent\Model $model): MailMessage
+    public function getMailMessage(MailMessage $mailMessage, object $notifiable, \Illuminate\Database\Eloquent\Model $model): MailMessage
     {
         $redirector = $this->getNotificationRedirector($notifiable, $this->getModel());
 
         // Get the latest notification record from database
         $mailRedirector = $this->getNotificationMailRedirector($notifiable, $this->getModel());
 
-        // dd($mailRedirector, $redirector, $this->getToken());
-
-        // return (new MailMessage)
-        //     ->subject($moduleRouteHeadline . ' Status Changed'))
-        return $mailMessage
+        $mailMessage = $mailMessage
             ->markdown('modularity::mails.stateable', [
                 'userName' => $notifiable->name,
                 'message' => $this->getNotificationMessage($notifiable, $this->getModel()),
@@ -76,7 +91,14 @@ class StateableUpdatedNotification extends FeatureNotification implements Should
                 'actionUrl' => $mailRedirector ?? $redirector,
                 'level' => 'success',
                 'displayableActionUrl' => $mailRedirector ?? $redirector,
+                'salutation' => $this->getMailSalutation(),
             ]);
+
+        if (isset(static::$mailMessageClassCallbacks[static::class]) && is_callable(static::$mailMessageClassCallbacks[static::class])) {
+            return call_user_func(static::$mailMessageClassCallbacks[static::class], $mailMessage, $notifiable, $this->model);
+        }
+
+        return $mailMessage;
     }
 
     /**
