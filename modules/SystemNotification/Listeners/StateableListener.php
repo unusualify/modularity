@@ -29,16 +29,6 @@ class StateableListener implements ShouldHandleEventsAfterCommit
 
         if ($model->creator) {
             $model->creator->notify(new StateableUpdatedNotification($model, $newState, $oldState));
-        } else {
-            // Notification::route('mail', 'oguz.bukcuoglu@gmail.com')
-            //     ->notifyNow(new StateableUpdatedNotification($model, $newState, $oldState));
-
-            // Notification::send(
-            //     User::role('superadmin')->get(),
-            //     new StateableUpdatedNotification($model, $newState, $oldState)
-            // );
         }
-
-        // $model->notify(new StateableUpdatedNotification($model, $newState, $oldState));
     }
 }
