@@ -47,6 +47,27 @@ abstract class FeatureNotification extends Notification implements ShouldQueue
         $this->token = uniqid();
     }
 
+    /**
+     * Determine which connections should be used for each notification channel.
+     *
+     * @return array<string, string>
+     */
+    public function viaConnections(): array
+    {
+        return [
+            'mail' => modularityConfig('notifications.mail_connection'),
+            'database' => modularityConfig('notifications.database_connection'),
+        ];
+    }
+
+    public function viaQueues(): array
+    {
+        return [
+            'mail' => modularityConfig('notifications.mail_queue'),
+            'database' => modularityConfig('notifications.database_queue'),
+        ];
+    }
+
     public function getModel(): \Illuminate\Database\Eloquent\Model
     {
         return $this->model;
