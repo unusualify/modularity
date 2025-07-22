@@ -10,6 +10,13 @@ class PaymentCompletedNotification extends FeatureNotification implements Should
 {
     use Queueable;
 
+
+    /**
+     * Create a new notification instance.
+     *
+     * @param \Modules\SystemPayment\Entities\Payment $model
+     * @return void
+     */
     public function __construct($model)
     {
         parent::__construct($model);

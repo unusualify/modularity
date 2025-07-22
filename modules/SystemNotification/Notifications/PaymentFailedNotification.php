@@ -10,6 +10,12 @@ class PaymentFailedNotification extends FeatureNotification implements ShouldQue
 {
     use Queueable;
 
+    /**
+     * Create a new notification instance.
+     *
+     * @param \Modules\SystemPayment\Entities\Payment $model
+     * @return void
+     */
     public function __construct($model)
     {
         parent::__construct($model);
