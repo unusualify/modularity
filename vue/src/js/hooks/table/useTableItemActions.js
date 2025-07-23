@@ -16,6 +16,10 @@ import useGenerate from '@/hooks/utils/useGenerate.js'
 
 export const makeTableItemActionsProps = propsFactory({
   isRowEditing: Boolean,
+  hideMobileActions: {
+    type: Boolean,
+    default: false
+  },
   rowActionsIcon:{
     type: String,
     default: 'mdi-cog-outline'
@@ -41,7 +45,7 @@ export default function useTableItemActions(props, { tableForms, loadItems }) {
   const DynamicModal = useDynamicModal()
   const { castObjectAttributes } = useCastAttributes()
   const { generateButtonProps } = useGenerate()
-  const { smAndDown, mdAndDown, lgAndDown } = useDisplay()
+  const { xs, smAndDown, mdAndDown, lgAndDown, xlAndDown } = useDisplay()
 
   // Create a reactive object to store action events
   const actionEvents = reactive({
@@ -372,9 +376,13 @@ export default function useTableItemActions(props, { tableForms, loadItems }) {
   const states = reactive({
     actionShowingType: computed(() => {
       const shouldShowDropdown = (actionsLength) => {
-        if (actionsLength > 7) return lgAndDown.value
-        if (actionsLength > 4) return mdAndDown.value
-        return smAndDown.value
+        if (actionsLength > 6) return xlAndDown.value // desktop if actions greater than 6
+        if (actionsLength > 5) return lgAndDown.value // desktop if actions greater than 5
+        if (actionsLength > 4) return mdAndDown.value // desktop if actions greater than 4
+        if (actionsLength > 3) return smAndDown.value // tablet if actions greater than 3
+        if (actionsLength > 2) return xs.value // mobile
+
+        return false
       }
 
       // Get the length of actions (handle both array and object)

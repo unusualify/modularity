@@ -642,7 +642,7 @@
 
         <!-- #header actions slot -->
         <template v-slot:header.actions="_obj">
-          <v-menu
+          <v-menu v-if="!(hideHeaders || (hideMobileActions && $vuetify.display.xs))"
             :close-on-content-click="false"
             location="bottom"
             >
@@ -664,7 +664,7 @@
               <v-card-title>
                 <v-list class="">
                   <template v-for="(item, index) in headersModel" :key="index">
-                    <v-checkbox v-if="item.key !== 'actions'"
+                    <v-checkbox v-if="item.key !== 'actions' && !($vuetify.display.xs && item.noMobile === true)"
                       v-model="headersModel[index].visible"
                       color="primary"
                       class="ml-n2"
@@ -775,67 +775,69 @@
 
         <!-- #item actions slot-->
         <template v-slot:item.actions="{ item }">
-          <v-menu v-if="actionShowingType === 'dropdown'"
-            :close-on-content-click="false"
-            left
-            offset-x
-            class="action-dropdown"
-            >
-            <template v-slot:activator="{ props }">
-              <v-icon
-                size="large"
-                color="primary"
-                icon="$list"
-                v-bind="props"
-                >
-              </v-icon>
-            </template>
-
-            <v-list>
-              <template v-for="(action, k) in visibleRowActions" :key="k">
-                <v-list-item v-if="itemHasAction(item, action)"
-                  :class="action.class ?? ''"
-                  @click="itemAction(item, action)"
+          <template v-if="!( (hideMobileActions && $vuetify.display.xs) || (visibleRowActions.length === 0) )">
+            <v-menu v-if="actionShowingType === 'dropdown'"
+              :close-on-content-click="false"
+              left
+              offset-x
+              class="action-dropdown"
+              >
+              <template v-slot:activator="{ props }">
+                <v-icon
+                  size="large"
+                  color="primary"
+                  icon="$list"
+                  v-bind="props"
                   >
-                    <v-icon small :color="action.iconColor" left>
-                      {{ action.icon }}
-                    </v-icon>
-                    {{ $t( action.label ) }}
-                </v-list-item>
+                </v-icon>
               </template>
-            </v-list>
-          </v-menu>
 
-          <div v-else>
-            <template v-for="(action, k) in visibleRowActions" :key="k">
-              <v-tooltip v-if="itemHasAction(item, action)"
-                :text="$t( action.label )"
-                location="top"
-                :disabled="action.is !== 'v-icon'"
-                :class="action.class ?? ''"
-                >
-                <template v-slot:activator="{ props }">
-                  <component :is="action.is"
+              <v-list>
+                <template v-for="(action, k) in visibleRowActions" :key="k">
+                  <v-list-item v-if="itemHasAction(item, action)"
+                    :class="action.class ?? ''"
                     @click="itemAction(item, action)"
-                    v-bind="{
-                      ...(action.hasTooltip ? props : {}),
-                      ...(action.componentProps ?? {}),
-                    }"
-                  >
-                    <template #prepend>
-                      <v-icon small :color="action.iconColor" left :icon="action.icon" />
-                    </template>
-                    <template v-if="action.is !== 'v-icon'">
+                    >
+                      <v-icon small :color="action.iconColor" left>
+                        {{ action.icon }}
+                      </v-icon>
                       {{ $t( action.label ) }}
-                    </template>
-                    <template v-else>
-                      {{ action.icon }}
-                    </template>
-                  </component>
+                  </v-list-item>
                 </template>
-              </v-tooltip>
-            </template>
-          </div>
+              </v-list>
+            </v-menu>
+
+            <div v-else>
+              <template v-for="(action, k) in visibleRowActions" :key="k">
+                <v-tooltip v-if="itemHasAction(item, action)"
+                  :text="$t( action.label )"
+                  location="top"
+                  :disabled="action.is !== 'v-icon'"
+                  :class="action.class ?? ''"
+                  >
+                  <template v-slot:activator="{ props }">
+                    <component :is="action.is"
+                      @click="itemAction(item, action)"
+                      v-bind="{
+                        ...(action.hasTooltip ? props : {}),
+                        ...(action.componentProps ?? {}),
+                      }"
+                    >
+                      <template #prepend>
+                        <v-icon small :color="action.iconColor" left :icon="action.icon" />
+                      </template>
+                      <template v-if="action.is !== 'v-icon'">
+                        {{ $t( action.label ) }}
+                      </template>
+                      <template v-else>
+                        {{ action.icon }}
+                      </template>
+                    </component>
+                  </template>
+                </v-tooltip>
+              </template>
+            </div>
+          </template>
         </template>
 
         <!-- MARK: Infinite Scroll Triggering Component -->
