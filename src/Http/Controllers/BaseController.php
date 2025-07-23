@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Session;
@@ -189,10 +190,6 @@ abstract class BaseController extends PanelController
         //     ));
         // }
 
-        // dd(
-        //     $input
-        // );
-
         $item = $this->repository->create($input + $optionalParent, $this->getPreviousRouteSchema());
 
         activity()->performedOn($item)->log('created');
@@ -221,8 +218,24 @@ abstract class BaseController extends PanelController
             ), ['variant' => MessageStage::SUCCESS, 'forceRedirect' => true]);
         }
 
+        $moduleName = $this->module->getSnakeName();
+        $routeName = Str::snake($this->routeName);
+
+        $storeSuccessTranslation = Collection::make([
+            "$moduleName::messages.$routeName.store-success",
+            "$moduleName::messages.$routeName.save-success",
+            "$moduleName::messages.store-success",
+            "$moduleName::messages.save-success",
+            "messages.store-success",
+            "messages.save-success",
+        ])->first(function ($notation) {
+            return Lang::has($notation);
+        });
+
+        $message = Lang::get($storeSuccessTranslation);
+
         return $this->request->ajax()
-            ? $this->respondWithSuccess(___('messages.save-success'))
+            ? $this->respondWithSuccess($message)
             : $this->respondWithRedirect(moduleRoute($this->routeName,
                 $this->generateRoutePrefix(noNested: true),
                 'edit',
@@ -395,18 +408,32 @@ abstract class BaseController extends PanelController
                 }
             }
 
+            $moduleName = $this->module->getSnakeName();
+            $routeName = Str::snake($this->routeName);
+
+            $updateSuccessTranslation = Collection::make([
+                "$moduleName::messages.$routeName.update-success",
+                "$moduleName::messages.$routeName.save-success",
+                "$moduleName::messages.update-success",
+                "$moduleName::messages.save-success",
+                "messages.update-success",
+                "messages.save-success",
+            ])->first(function ($notation) {
+                return Lang::has($notation);
+            });
+
+            $message = Lang::get($updateSuccessTranslation);
+
             if ($this->routeHasTrait('revisions')) {
                 return Response::json([
-                    'message' => ___('messages.save-success'),
+                    'message' => $message,
                     'variant' => MessageStage::SUCCESS,
                     'revisions' => $item->revisionsArray(),
                 ]);
             }
 
-            // if()
-
             if ($this->request->ajax()) {
-                return $this->respondWithSuccess(___('messages.save-success'));
+                return $this->respondWithSuccess($message);
             }
 
             return redirect()->back();
@@ -428,15 +455,37 @@ abstract class BaseController extends PanelController
 
         // $this->handleActionEvent($item, __FUNCTION__);
 
+        $moduleName = $this->module->getSnakeName();
+        $routeName = Str::snake($this->routeName);
+
         if ($this->repository->delete($id)) {
             // $this->fireEvent();
             // activity()->performedOn($item)->log('deleted');
 
-            return $this->respondWithSuccess(___('listing.delete.success', ['modelTitle' => $this->modelTitle]));
+
+            $deleteSuccessTranslation = Collection::make([
+                "$moduleName::messages.$routeName.delete-success",
+                "$moduleName::messages.delete-success",
+                "listing.delete.success",
+            ])->first(function ($notation) {
+                return Lang::has($notation);
+            });
+
+            $message = Lang::get($deleteSuccessTranslation, ['modelTitle' => $this->modelTitle]);
+
+            return $this->respondWithSuccess($message);
             // return $this->respondWithSuccess(___("$this->baseKey::lang.listing.delete.success", ['modelTitle' => $this->modelTitle]));
         }
 
-        return $this->respondWithError(___('listing.delete.error', ['modelTitle' => $this->modelTitle]));
+        $deleteErrorTranslation = Collection::make([
+            "$moduleName::messages.$routeName.delete-error",
+            "$moduleName::messages.delete-error",
+            "listing.delete.error",
+        ])->first(function ($notation) {
+            return Lang::has($notation);
+        });
+
+        return $this->respondWithError(Lang::get($deleteErrorTranslation, ['modelTitle' => $this->modelTitle]));
         // return $this->respondWithError(modularityTrans("$this->baseKey::lang.listing.delete.error", ['modelTitle' => $this->modelTitle]));
     }
 
@@ -447,14 +496,35 @@ abstract class BaseController extends PanelController
     {
         $item = $this->repository->getById($this->request->get('id'));
 
+        $moduleName = $this->module->getSnakeName();
+        $routeName = Str::snake($this->routeName);
+
+
         if ($this->repository->forceDelete($this->request->get('id'))) {
             // $this->fireEvent();
             // $this->handleActionEvent($item, __FUNCTION__);
 
-            return $this->respondWithSuccess(__('listing.force-delete.success', ['modelTitle' => $this->modelTitle]));
+            $forceDeleteSuccessTranslation = Collection::make([
+                "$moduleName::messages.$routeName.force-delete-success",
+                "$moduleName::messages.force-delete-success",
+            ])->first(function ($notation) {
+                return Lang::has($notation);
+            });
+
+            $message = Lang::get($forceDeleteSuccessTranslation, ['modelTitle' => $this->modelTitle]);
+
+            return $this->respondWithSuccess($message);
         }
 
-        return $this->respondWithError(__('listing.force-delete.error', ['modelTitle' => $this->modelTitle]));
+        $forceDeleteErrorTranslation = Collection::make([
+            "$moduleName::messages.$routeName.force-delete-error",
+            "$moduleName::messages.force-delete-error",
+            "listing.force-delete.error",
+        ])->first(function ($notation) {
+            return Lang::has($notation);
+        });
+
+        return $this->respondWithError(Lang::get($forceDeleteErrorTranslation, ['modelTitle' => $this->modelTitle]));
     }
 
     /**
