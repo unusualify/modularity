@@ -42,6 +42,17 @@ return [
                 // 'event' => '_triggerOpenMediaLibrary',
                 'event' => 'openFreeMediaLibrary',
             ],
+            '_tests' => [
+                'name' => 'Tests',
+                'icon' => '$header',
+                'items' => [
+                    'notifications' => [
+                        'name' => 'Notifications',
+                        'route_name' => 'admin.tests.notification.index',
+                        'icon' => '$mail',
+                    ],
+                ],
+            ],
             '_vendor' => [
                 'name' => 'Vendor',
                 'icon' => '$header',

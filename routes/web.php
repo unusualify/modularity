@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Symfony\Component\Finder\Finder;
+use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Http\Controllers\ChatController;
 use Unusualify\Modularity\Http\Controllers\ProcessController;
 use Unusualify\Modularity\Http\Controllers\ProfileController;
@@ -46,6 +48,114 @@ Route::resource('', 'DashboardController', ['as' => 'dashboard', 'names' => ['in
 
 Route::get('users/impersonate/stop', 'ImpersonateController@stopImpersonate')->name('impersonate.stop');
 Route::get('users/impersonate/{id}', 'ImpersonateController@impersonate')->name('impersonate');
+
+Route::get('tests/notifications/{notification}', function ($notification) {
+    if(!@class_exists($notification)) {
+        return 'Notification class not found';
+    }
+
+    $reflector = new \ReflectionClass($notification);
+
+    if($reflector->isAbstract() || $reflector->isInterface() || $reflector->isTrait()) {
+        return 'Notification class is abstract, interface or trait';
+    }
+
+    // get the constructor parameters
+    $constructor = $reflector->getConstructor();
+    $constructorParameters = $constructor->getParameters();
+    $arguments = [];
+
+    foreach($constructorParameters as $parameter) {
+        if($parameter->isOptional()) {
+            $arguments[] = $parameter->getDefaultValue();
+            continue;
+        }
+
+        if($parameter->getName() === 'token') {
+            $arguments[] = uniqid();
+            continue;
+        }
+
+        if(@class_exists($parameter->getType()->getName())) {
+            $reflector = new \ReflectionClass($parameter->getType()->getName());
+
+            // $reflector is subclass of \Illuminate\Database\Eloquent\Model
+            if($reflector->isSubclassOf(\Illuminate\Database\Eloquent\Model::class)) {
+                $class = $parameter->getType()->getName();
+                $instance = $class::first();
+
+                if(!$instance) {
+                    throw new \Exception('Any instance of ' . $class . ' not found');
+                }
+
+                $arguments[] = $instance;
+                continue;
+            }
+            dd($instance, $arguments);
+            $instance = $reflector->newInstanceWithoutConstructor();
+            dd($instance);
+            $arguments[] = \Unusualify\Modularity\Entities\User::role(['superadmin'], Modularity::getAuthGuardName())->first();
+
+            continue;
+        }
+    }
+
+    $notification = new $notification(...$arguments);
+
+    $notification = $notification->toMail(\Unusualify\Modularity\Entities\User::role(['superadmin'], Modularity::getAuthGuardName())->first());
+
+    echo $notification->subject;
+
+    echo $notification->render();
+
+    die();
+})->name('tests.notification.show');
+Route::get('tests/notifications', function () {
+
+    $notificationPaths = [];
+
+    if(file_exists(base_path('app/Notifications'))) {
+        $notificationPaths[] = base_path('app/Notifications');
+    }
+    if(file_exists(Modularity::getVendorPath('/src/Notifications'))) {
+        $notificationPaths[] = Modularity::getVendorPath('/src/Notifications');
+    }
+
+    $allModules = Modularity::all();
+
+    foreach ($allModules as $module) {
+        if (file_exists($moduleNotificationsPath = $module->getTargetClassPath('notifications'))) {
+            $notificationPaths[] = $moduleNotificationsPath;
+        }
+    }
+
+    // get all classes in the notification paths but not abstract or interface or trait
+    $notificationClasses = collect();
+
+    collect(Finder::create()->files()->depth(0)->in($notificationPaths))->reduce(function ($carry, $file) {
+        $content = get_file_string($file->getRealPath());
+        $className = get_file_class($file->getRealPath());
+
+        if ($className) {
+            $reflector = new \ReflectionClass(get_file_class($file->getRealPath()));
+            if (! $reflector->isAbstract() && ! $reflector->isInterface() && ! $reflector->isTrait()) {
+                $carry[$className] = $file;
+            }
+        }
+
+        return $carry;
+    }, $notificationClasses);
+
+
+    // create for each notification class a anchor link list
+    $notificationLinks = [];
+    foreach ($notificationClasses as $notificationClass => $file) {
+        $notificationLinks[] = '<a href="' . route('admin.tests.notification.show', $notificationClass) . '">' . $file . '</a>';
+    }
+
+    return implode('<br>', $notificationLinks);
+})->name('tests.notification.index');
+
 
 // system internal api routes (for ajax web routes)
 Route::prefix('api')->group(function () {
