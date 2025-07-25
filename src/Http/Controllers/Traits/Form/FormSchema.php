@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Str;
 use Unusualify\Modularity\Facades\Modularity;
+use Unusualify\Modularity\Facades\ModularityLog;
 use Unusualify\Modularity\Support\Finder;
 use Unusualify\Modularity\Traits\Allowable;
 
@@ -27,6 +28,44 @@ trait FormSchema
     protected function __beforeConstructFormSchema($app, $request)
     {
         $this->inputTypes = modularityConfig('input_types', []);
+    }
+
+    protected function transformClosureValues(object|array $array)
+    {
+        try {
+            if (is_object($array)) {
+                $array = object_to_array($array);
+            }
+
+            return Arr::map($array, function ($value, $key) {
+                $value = $this->transformClosureValue($value);
+
+                if (is_array($value) && count($value) > 0) {
+                    return $this->transformClosureValues($value);
+                }
+
+                return $value;
+            });
+
+        } catch (\Throwable $th) {
+            //throw $th;
+            ModularityLog::error('Error transforming closure values', [
+                'error' => $th->getMessage(),
+                'trace' => $th->getTraceAsString(),
+                'array' => $array,
+            ]);
+
+            return $array;
+        }
+    }
+
+    protected function transformClosureValue($value)
+    {
+        if ($value instanceof \Closure) {
+            return $value();
+        }
+
+        return $value;
     }
 
     /**
@@ -54,8 +93,9 @@ trait FormSchema
         // $default_input = collect(Config::get(modularityBaseKey() . '.default_input'))->mapWithKeys(function($v, $k){return is_numeric($k) ? [$v => true] : [$k => $v];});
         // $default_input = $this->configureInput(array_to_object(Config::get(modularityBaseKey() . '.default_input')));
         $default_input = (array) Config::get(modularityBaseKey() . '.default_input');
-        // dd($default_input);
-        [$hydrated, $spreaded] = $this->hydrateInput(object_to_array($input), $inputs);
+        $input = $this->transformClosureValues($input);
+
+        [$hydrated, $spreaded] = $this->hydrateInput($input, $inputs);
 
         if ($spreaded) {
             return $hydrated;
@@ -64,6 +104,7 @@ trait FormSchema
         $type = getValueOrNull($hydrated, 'type');
         $name = getValueOrNull($hydrated, 'name');
         $_input = null;
+
 
         if (in_array($type, ['divider', 'title']) || (bool) $name) {
             if ($default_input['color'] && in_array($hydrated['type'], ['morphTo', 'relationship', 'wrap', 'group'])) {
