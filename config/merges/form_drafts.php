@@ -81,7 +81,7 @@ return [
             'label' => 'Current Password',
             'default' => '',
             'col' => ['sm' => 6],
-            'rules' => 'sometimes|required|current_password',
+            'rules' => 'sometimes|current_password',
         ],
         'gap-1' => [
             'type' => 'v-sheet',
@@ -102,7 +102,7 @@ return [
             'name' => 'password',
             'label' => 'Confirm Password',
             'col' => ['sm' => 6],
-            'rules' => 'sometimes|min:6|confirmed',
+            'rules' => 'sometimes|min:8|confirmed',
         ],
     ],
     'company' => [

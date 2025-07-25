@@ -63,7 +63,7 @@ return [
         'slotHandlers' => [
             'appendInner' => 'password',
         ],
-        'rules' => 'sometimes|min:6',
+        'rules' => 'sometimes|min:8',
     ],
     '_password' => [
         'type' => 'password',
