@@ -367,8 +367,8 @@ return [
             'label' => 'Name',
             'default' => '',
             'col' => [
-                'cols' => 6,
-                'lg' => 6,
+                'cols' => 12,
+                'sm' => 6,
             ],
             'rules' => 'min:3',
         ],
@@ -378,8 +378,8 @@ return [
             'label' => 'Surname',
             'default' => '',
             'col' => [
-                'cols' => 6,
-                'lg' => 6,
+                'cols' => 12,
+                'sm' => 6,
             ],
             'rules' => 'min:2',
         ],
@@ -389,8 +389,8 @@ return [
             'label' => 'Company',
             'default' => '',
             'col' => [
-                'cols' => 6,
-                'lg' => 6,
+                'cols' => 12,
+                'sm' => 6,
             ],
             // 'rules' => 'min:2',
         ],
@@ -400,8 +400,8 @@ return [
             'label' => 'E-mail',
             'default' => '',
             'col' => [
-                'cols' => 6,
-                'lg' => 6,
+                'cols' => 12,
+                'sm' => 6,
             ],
             'rules' => 'email',
         ],
@@ -415,8 +415,8 @@ return [
                 'appendInner' => 'password',
             ],
             'col' => [
-                'cols' => 6,
-                'lg' => 6,
+                'cols' => 12,
+                'sm' => 6,
             ],
             'rules' => [
                 ['required', 'classic', null, null, 'Password is required'],
@@ -434,8 +434,8 @@ return [
                 'appendInner' => 'password',
             ],
             'col' => [
-                'cols' => 6,
-                'lg' => 6,
+                'cols' => 12,
+                'sm' => 6,
             ],
             'rules' => [
                 ['required', 'classic', null, null, 'Confirm Password'],
