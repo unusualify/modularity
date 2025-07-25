@@ -17,8 +17,13 @@
 
 Thank you for using our application.
 
-Best Regards,<br>
+{{-- Salutation --}}
+@if (! empty($salutation))
+{!! $salutation !!}
+@else
+@lang('Regards'),<br>
 {{ config('app.name') }}
+@endif
 
 {{-- Subcopy --}}
 @isset($actionText)

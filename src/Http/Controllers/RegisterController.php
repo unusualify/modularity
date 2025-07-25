@@ -199,7 +199,7 @@ class RegisterController extends Controller
             // 'company' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:' . $usersTable . ',email'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'tos' => ['required', 'boolean'],
+            // 'tos' => ['required', 'boolean'],
         ];
     }
 

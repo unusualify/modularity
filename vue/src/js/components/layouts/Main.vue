@@ -3,8 +3,7 @@
 
     <slot name="top"></slot>
 
-    <v-chip
-      v-if="$store.getters.isHot"
+    <v-chip v-if="$store.getters.isHot"
       color="green"
       class="position-absolute"
       style="top: 4px; right: 0;  z-index: 10000;"
@@ -12,58 +11,55 @@
     >
       Development Mode
     </v-chip>
-    <v-app-bar app v-if="$vuetify.display.mdAndDown">
-      <v-app-bar-nav-icon
-        v-if="!$vuetify.display.lgAndUp"
-        :icon="!$store.getters.sidebarStatus ? '$menu' : '$close'"
-        @click="$toggleSidebar()">
-      </v-app-bar-nav-icon>
 
-      <v-toolbar-title class="flex-1-1-100 ml-0 text-center">
-        {{ headerTitle }}
-      </v-toolbar-title>
+    <!-- Mobile Header -->
+    <v-app-bar v-if="$vuetify.display.mdAndDown || fixedAppBar"
+      app
+      :order="appBarOrder"
+    >
+      <slot name="app-bar">
+        <v-app-bar-nav-icon v-if="!$vuetify.display.lgAndUp && !hideDefaultSidebar"
+          :icon="!$store.getters.sidebarStatus ? '$menu' : '$close'"
+          @click="$toggleSidebar()">
+        </v-app-bar-nav-icon>
 
-      <v-btn
-        v-if="false"
-        class="ma-2"
-        :loading="loading"
-        :disabled="loading"
-        color="secondary"
-        @click="addSidebarItem"
-      >
-        Add Sidebar Item
-      </v-btn>
+        <v-toolbar-title class="flex-1-1-100 ml-0 text-center">
+          {{ headerTitle }}
+        </v-toolbar-title>
 
-      <v-spacer></v-spacer>
-      <div class="d-flex justify-end mr-4">
-        <div class="d-flex align-center">
-          <v-avatar
-            :image="$store.getters.userProfile.avatar_url"
-            @click="$openProfileDialog"
-          />
+        <v-spacer></v-spacer>
+
+        <div class="d-flex justify-end mr-4">
+          <!-- User Profile Image-->
+          <div class="d-flex align-center">
+            <v-avatar
+              :image="$store.getters.userProfile.avatar_url"
+              @click="$openProfileDialog"
+            />
+          </div>
         </div>
-      </div>
-      <!-- #language selector -->
-      <v-toolbar-title v-if="false">
-        <!-- {{ $t('fields.list') }}
-        {{ $n(100.77, 'currency') }} -->
-        {{ $t('fields.language-select') }}
-        <select v-model="$i18n.locale">
-          <option v-for="(lang, i) in langs" :key="`Lang${i}`" :value="lang">
-            {{ lang }}
-          </option>
-        </select>
-      </v-toolbar-title>
+
+        <!-- #language selector -->
+        <v-toolbar-title v-if="false">
+          <!-- {{ $t('fields.list') }}
+          {{ $n(100.77, 'currency') }} -->
+          {{ $t('fields.language-select') }}
+          <select v-model="$i18n.locale">
+            <option v-for="(lang, i) in langs" :key="`Lang${i}`" :value="lang">
+              {{ lang }}
+            </option>
+          </select>
+        </v-toolbar-title>
+      </slot>
 
     </v-app-bar>
 
-    <ue-sidebar
-      :items="sidebarItems"
+    <ue-sidebar v-if="!hideDefaultSidebar"
       ref="sidebar"
+      :items="sidebarItems"
     >
       <template v-slot:bottom>
-        <ue-impersonate-toolbar
-          v-if="impersonation.active"
+        <ue-impersonate-toolbar v-if="impersonation.active"
           v-model="showImpersonateToolbar"
           v-bind="impersonation"
         />
@@ -73,7 +69,6 @@
     <v-main>
       <slot name="main-top"></slot>
 
-      <!--  -->
       <!-- <ue-footer :items="footerLinks" /> -->
       <div v-if="false">
         <v-breadcrumbs :items="breadcrumbs">
@@ -82,170 +77,160 @@
           </template>
         </v-breadcrumbs>
       </div>
+
       <slot></slot>
+    </v-main>
 
-      <!-- Media Library -->
-      <ue-modal-media v-if="$store.getters.mediaLibraryAccessible"
-        ref="mediaLibrary"
-        v-model="$store.state.mediaLibrary.showModal"
-      ></ue-modal-media>
+    <!-- MODALS -->
+    <!-- Media Library -->
+    <ue-modal-media v-if="$store.getters.mediaLibraryAccessible"
+      ref="mediaLibrary"
+      v-model="$store.state.mediaLibrary.showModal"
+    ></ue-modal-media>
 
-      <!-- Delete Warning Media Modal -->
-      <ue-modal
-        ref="deleteWarningMediaModal"
-        v-model="showDeleteWarning"
-        transition="dialog-bottom-transition"
-        width-type="sm"
-        :confirm-text="$t('media-library.dialogs.delete.delete-media-confirm')"
-        :cancel-text="`Cancel`"
-        >
-        <template v-slot:body.description>
-          <p class="modal--tiny-title"><strong>{{ $t("media-library.dialogs.delete.delete-media-title") }}</strong></p>
-          <p v-html="$t('media-library.dialogs.delete.delete-media-desc')"></p>
-        </template>
-      </ue-modal>
-
-      <!-- Profile Dialog -->
-      <ue-modal
-        ref="profileDialog"
-        v-model="$store.state.user.profileDialog"
-        Xwidth="500"
-        scrollable
+    <!-- Delete Warning Media Modal -->
+    <ue-modal
+      ref="deleteWarningMediaModal"
+      v-model="showDeleteWarning"
+      transition="dialog-bottom-transition"
+      width-type="sm"
+      :confirm-text="$t('media-library.dialogs.delete.delete-media-confirm')"
+      :cancel-text="`Cancel`"
       >
-        <template v-slot:body="{ isActive, toggleFullscreen, close , isFullActive}">
-          <v-card>
-            <v-card-title>
-              <ue-title padding="y-3" :text="$t('Upload Profile Image')" color="grey-darken-5" transform="none" align="center" justify="space-between">
-                <template #right>
-                  <div class="d-flex align-center">
-                    <v-icon :icon="isFullActive ? 'mdi-fullscreen-exit' : 'mdi-fullscreen'" variant="plain" color="grey-darken-5" size="default" @click="toggleFullscreen()"/>
-                    <v-icon icon="$close" variant="plain" color="grey-darken-5" size="default" @click="close()"/>
-                  </div>
-                </template>
-              </ue-title>
-              <v-divider/>
-            </v-card-title>
+      <template v-slot:body.description>
+        <p class="modal--tiny-title"><strong>{{ $t("media-library.dialogs.delete.delete-media-title") }}</strong></p>
+        <p v-html="$t('media-library.dialogs.delete.delete-media-desc')"></p>
+      </template>
+    </ue-modal>
 
-            <v-card-text Xstyle="height: 30vh;">
-              <div class="d-flex">
-                <div class="my-3 flex-grow-0">
-                  <v-avatar class="my-aut" :image="$store.getters.userProfile.avatar_url" size="100"/>
+    <!-- Profile Dialog -->
+    <ue-modal
+      ref="profileDialog"
+      v-model="$store.state.user.profileDialog"
+      Xwidth="500"
+      scrollable
+    >
+      <template v-slot:body="{ isActive, toggleFullscreen, close , isFullActive}">
+        <v-card>
+          <v-card-title>
+            <ue-title padding="y-3" :text="$t('Upload Profile Image')" color="grey-darken-5" transform="none" align="center" justify="space-between">
+              <template #right>
+                <div class="d-flex align-center">
+                  <v-icon :icon="isFullActive ? 'mdi-fullscreen-exit' : 'mdi-fullscreen'" variant="plain" color="grey-darken-5" size="default" @click="toggleFullscreen()"/>
+                  <v-icon icon="$close" variant="plain" color="grey-darken-5" size="default" @click="close()"/>
                 </div>
-                <ue-form
-                  class="flex-grow-1 pl-6"
-                  :schema="$store.state.user.profileShortcutSchema"
-                  v-model="$store.state.user.profileShortcutModel"
-                  :action-url="$store.state.user.profileRoute"
-
-                  :async="true"
-                  :hasSubmit="true"
-                  no-default-form-padding
-                  is-editing
-                  buttonText="fields.save"
-
-                  @submitted="profileFormSubmitted"
-                >
-                </ue-form>
-              </div>
-              <!-- <div class="">
-                <v-radio-group
-                  v-model="dialog"
-                  messages="Select a Country from the radio group"
-                >
-                  <v-radio v-for="([label, value]) in [['1', 1], ['2', 2], ['3', 3], ['4', 4], ['5', 5], ['6', 6], ['7', 7], ['8', 8], ['9', 9], ['10', 10]]"
-                    :key="value"
-                    :label="label"
-                    :value="value"
-                  ></v-radio>
-                </v-radio-group>
-              </div> -->
-            </v-card-text>
-
-          </v-card>
-        </template>
-      </ue-modal>
-
-      <!-- <a17-dialog
-        ref="deleteWarningMediaLibrary"
-        modal-title="{{ twillTrans("twill::lang.media-library.dialogs.delete.delete-media-title") }}"
-        confirm-label="{{ twillTrans("twill::lang.media-library.dialogs.delete.delete-media-confirm") }}">
-          <p class="modal--tiny-title"><strong>{{ twillTrans("twill::lang.media-library.dialogs.delete.delete-media-title") }}</strong></p>
-          <p>{!! twillTrans("twill::lang.media-library.dialogs.delete.delete-media-desc") !!}</p>
-      </a17-dialog>
-      <a17-dialog ref="replaceWarningMediaLibrary" modal-title="{{ twillTrans("twill::lang.media-library.dialogs.replace.replace-media-title") }}" confirm-label="{{ twillTrans("twill::lang.media-library.dialogs.replace.replace-media-confirm") }}">
-          <p class="modal--tiny-title"><strong>{{ twillTrans("twill::lang.media-library.dialogs.replace.replace-media-title") }}</strong></p>
-          <p>{!! twillTrans("twill::lang.media-library.dialogs.replace.replace-media-desc") !!}</p>
-      </a17-dialog> -->
-
-      <ue-alert ref='alert'></ue-alert>
-      <ue-dynamic-modal></ue-dynamic-modal>
-
-      <ue-modal
-        ref='dialog'
-        v-model="alertDialog"
-        scrollable
-        transition="dialog-bottom-transition"
-        width-type="lg"
-        persistent
-        >
-        <template v-slot:body="props">
-          <v-card >
-            <v-card-text class="text-center" style="word-break: break-word;" >
-              <div v-html="alertDialogMessage"></div>
-            </v-card-text>
+              </template>
+            </ue-title>
             <v-divider/>
-            <v-card-actions class="justify-center">
-                <v-btn-secondary  @click="closeAlertDialog">
-                  {{ $t('fields.close') }}
-                </v-btn-secondary>
-            </v-card-actions>
-          </v-card>
-        </template>
-      </ue-modal>
+          </v-card-title>
 
-      <!-- Login Modal -->
-      <ue-modal
-        ref="loginModal"
-        v-model="$store.state.user.showLoginModal"
-        scrollable
-        transition="dialog-bottom-transition"
-        width-type="sm"
-        persistent
-      >
-        <template v-slot:body="{ isActive, toggleFullscreen, close , isFullActive}">
-          <v-card>
-            <v-card-title>
-              <ue-title padding="y-3" color="grey-darken-5" transform="none" align="center" justify="space-between">
-                <div>
-                  {{ $t('Login') }}
-                  <br>
-                  <span class="text-grey-darken-2 text-caption" >{{ $t('Your session has expired, please login again.') }}</span>
-                </div>
-              </ue-title>
-              <v-divider/>
-            </v-card-title>
-
-            <v-card-text>
+          <v-card-text Xstyle="height: 30vh;">
+            <div class="d-flex">
+              <div class="my-3 flex-grow-0">
+                <v-avatar class="my-aut" :image="$store.getters.userProfile.avatar_url" size="100"/>
+              </div>
               <ue-form
-                class="flex-grow-1"
-                :schema="$store.state.user.loginShortcutSchema"
-                v-model="$store.state.user.loginShortcutModel"
-                :action-url="$store.state.user.loginRoute"
+                class="flex-grow-1 pl-6"
+                :schema="$store.state.user.profileShortcutSchema"
+                v-model="$store.state.user.profileShortcutModel"
+                :action-url="$store.state.user.profileRoute"
 
                 :async="true"
                 :hasSubmit="true"
                 no-default-form-padding
-                buttonText="fields.login"
+                is-editing
+                buttonText="fields.save"
 
-                @submitted="loginFormSubmitted"
+                @submitted="profileFormSubmitted"
               >
               </ue-form>
-            </v-card-text>
+            </div>
+            <!-- <div class="">
+              <v-radio-group
+                v-model="dialog"
+                messages="Select a Country from the radio group"
+              >
+                <v-radio v-for="([label, value]) in [['1', 1], ['2', 2], ['3', 3], ['4', 4], ['5', 5], ['6', 6], ['7', 7], ['8', 8], ['9', 9], ['10', 10]]"
+                  :key="value"
+                  :label="label"
+                  :value="value"
+                ></v-radio>
+              </v-radio-group>
+            </div> -->
+          </v-card-text>
 
-          </v-card>
-        </template>
-      </ue-modal>
-    </v-main>
+        </v-card>
+      </template>
+    </ue-modal>
+
+    <ue-alert ref='alert'></ue-alert>
+    <ue-dynamic-modal></ue-dynamic-modal>
+
+    <ue-modal
+      ref='dialog'
+      v-model="alertDialog"
+      scrollable
+      transition="dialog-bottom-transition"
+      width-type="lg"
+      persistent
+      >
+      <template v-slot:body="props">
+        <v-card >
+          <v-card-text class="text-center" style="word-break: break-word;" >
+            <div v-html="alertDialogMessage"></div>
+          </v-card-text>
+          <v-divider/>
+          <v-card-actions class="justify-center">
+              <v-btn-secondary  @click="closeAlertDialog">
+                {{ $t('fields.close') }}
+              </v-btn-secondary>
+          </v-card-actions>
+        </v-card>
+      </template>
+    </ue-modal>
+
+    <!-- Login Modal -->
+    <ue-modal
+      ref="loginModal"
+      v-model="$store.state.user.showLoginModal"
+      scrollable
+      transition="dialog-bottom-transition"
+      width-type="sm"
+      persistent
+    >
+      <template v-slot:body="{ isActive, toggleFullscreen, close , isFullActive}">
+        <v-card>
+          <v-card-title>
+            <ue-title padding="y-3" color="grey-darken-5" transform="none" align="center" justify="space-between">
+              <div>
+                {{ $t('Login') }}
+                <br>
+                <span class="text-grey-darken-2 text-caption" >{{ $t('Your session has expired, please login again.') }}</span>
+              </div>
+            </ue-title>
+            <v-divider/>
+          </v-card-title>
+
+          <v-card-text>
+            <ue-form
+              class="flex-grow-1"
+              :schema="$store.state.user.loginShortcutSchema"
+              v-model="$store.state.user.loginShortcutModel"
+              :action-url="$store.state.user.loginRoute"
+
+              :async="true"
+              :hasSubmit="true"
+              no-default-form-padding
+              buttonText="fields.login"
+
+              @submitted="loginFormSubmitted"
+            >
+            </ue-form>
+          </v-card-text>
+
+        </v-card>
+      </template>
+    </ue-modal>
   </v-app>
 </template>
 
@@ -255,8 +240,20 @@
 
   export default {
     props: {
+      fixedAppBar: {
+        type: Boolean,
+        default: false
+      },
+      appBarOrder: {
+        type: Number,
+        default: 0
+      },
       headerTitle: {
         type: String,
+      },
+      hideDefaultSidebar: {
+        type: Boolean,
+        default: false
       },
       navigation: {
         type: Object,
@@ -399,7 +396,7 @@
           }
         ],
 
-        sidebarItems: this.navigation.sidebar,
+        sidebarItems: (this.navigation && this.navigation.sidebar) ? this.navigation.sidebar : [],
         // activeItem: this.navigation.activeItem ?? 0,
         // activeSubItem: this.navigation.activeSubItem ?? -1,
         breadcrumbs: this.navigation.breadcrumbs ?? [],

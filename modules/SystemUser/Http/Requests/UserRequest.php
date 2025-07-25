@@ -60,6 +60,10 @@ class UserRequest extends Request
             'email' => 'sometimes|required|email|unique_table',
             'country_id' => 'sometimes|required|exists:um_countries,id',
             // 'roles' => 'missing',
+
+            'current_password' => ['sometimes', 'string', 'min:8', 'current_password'],
+            'password' => ['sometimes', 'required', 'string', 'min:8', 'confirmed'],
+            'password_confirmation' => ['sometimes', 'required', 'string', 'min:8'],
         ];
     }
 

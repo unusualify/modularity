@@ -40,7 +40,6 @@ export const makeTableProps = propsFactory({
   tableRounded: {
     type: [Boolean, String],
   },
-
   fillHeight: {
     type: Boolean,
     default: false,
@@ -185,6 +184,22 @@ export const makeTableProps = propsFactory({
     type: Object,
     default: {},
   },
+  noFetch: {
+    type: Boolean,
+    default: false,
+  },
+  isClickableRows: {
+    type: Boolean,
+    default: false,
+  },
+  clickableItemAttribute: {
+    type: String,
+    default: 'href',
+  },
+  mobileBreakpoint: {
+    type: [String, Number],
+    default: 'sm',
+  },
 })
 
 // by convention, composable function names start with "use"
@@ -220,7 +235,9 @@ export default function useTable (props, context) {
   })
 
   const totalNumberOfElements = ref(props.total ?? -1)
-  const totalNumberOfPages = computed(() => Math.ceil(totalNumberOfElements.value / options.value.itemsPerPage))
+  const totalNumberOfPages = computed(() => {
+    return Math.ceil(totalNumberOfElements.value / (options.value.itemsPerPage ?? 10))
+  })
 
   const setElements = (data) => {
     elements.value = data
@@ -279,6 +296,8 @@ export default function useTable (props, context) {
   }
 
   const loadItems = async (customOptions = null) => {
+    if(props.noFetch) return
+
     state.loading = true
 
     const payload = {
@@ -450,7 +469,9 @@ export default function useTable (props, context) {
 
       const customOptions = _.pick(queryParameters, ['id'])
 
-      loadItems(customOptions)
+      if(!props.noFetch){
+        loadItems(customOptions)
+      }
     },
     goNextPage () {
       if (state.options.page < numberOfPages.value) { state.options.page += 1 }

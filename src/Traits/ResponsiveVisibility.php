@@ -58,8 +58,8 @@ trait ResponsiveVisibility
      */
     public function applyResponsiveClasses($item, $searchKey = null, $display = 'flex', $classNotation = 'class')
     {
-        if (! in_array($display, ['flex', 'block', 'inline-block', 'inline'])) {
-            throw new \Exception('Invalid display value, must be one of: flex, block, inline-block, inline');
+        if (! in_array($display, ['flex', 'block', 'inline-block', 'inline', 'table-cell'])) {
+            throw new \Exception('Invalid display value, must be one of: flex, block, inline-block, inline, table-cell');
         }
 
         $searchKey = $searchKey ?? $this->responsiveSearchKey;

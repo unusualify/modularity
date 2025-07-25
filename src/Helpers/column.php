@@ -1,53 +1,12 @@
 <?php
 
-if (! function_exists('hydrate_table_column')) {
-    function hydrate_table_column(array $column)
-    {
-        // $this->hydrateHeaderSuffix($header);
-        // add edit functionality to table title cell
-        // if ($this->titleColumnKey == $header['key'] && ! isset($header['formatter'])) {
-        //     $header['formatter'] = [
-        //         'edit',
-        //     ];
-        // }
-
-        // switch column
-        if (isset($column['formatter']) && count($column['formatter']) && $column['formatter'][0] == 'switch') {
-            $column['width'] = '20px';
-        }
-
-        // if (isset($header['sortable']) && $header['sortable']) {
-        //     if (preg_match('/(.*)(_relation)/', $header['key'], $matches)) {
-        //         $header['sortable'] = false;
-        //     }
-        // }
-
-        if ($column['key'] == 'actions') {
-            $column['width'] ??= '100px';
-            $column['align'] ??= 'center';
-            $column['sortable'] ??= false;
-        }
-
-        $column['visible'] ??= true;
-
-        return $column;
-    }
-}
-
-if (! function_exists('configure_table_column')) {
-    function configure_table_column(array $column)
-    {
-        return array_merge_recursive_preserve(
-            modularityConfig('default_header'),
-            hydrate_table_column($column)
-        );
-    }
-}
+use Unusualify\Modularity\Hydrates\HeaderHydrator;
+use Unusualify\Modularity\Module;
 
 if (! function_exists('configure_table_columns')) {
-    function configure_table_columns(array $columns)
+    function configure_table_columns(array $columns, ?Module $module = null, ?string $routeName = null)
     {
-        return array_map('configure_table_column', $columns);
+        return array_map(fn ($column) => (new HeaderHydrator($column, $module, $routeName))->hydrate(), $columns);
     }
 }
 

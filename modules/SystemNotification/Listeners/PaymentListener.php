@@ -15,7 +15,7 @@ class PaymentListener implements ShouldHandleEventsAfterCommit
     /**
      * Handle the event.
      */
-    public function handle($event): void
+    public function handle(\Modules\SystemNotification\Events\PaymentCompleted|\Modules\SystemNotification\Events\PaymentFailed $event): void
     {
         $activeUser = auth()->user();
         $isSuccess = get_class($event) === PaymentCompleted::class;

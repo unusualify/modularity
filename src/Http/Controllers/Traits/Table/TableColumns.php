@@ -3,6 +3,7 @@
 namespace Unusualify\Modularity\Http\Controllers\Traits\Table;
 
 use Illuminate\Support\Collection;
+use Unusualify\Modularity\Hydrates\HeaderHydrator;
 use Unusualify\Modularity\Traits\Allowable;
 
 trait TableColumns
@@ -34,9 +35,6 @@ trait TableColumns
             return $this->indexTableColumns = $headers->reduce(function ($carry, $item) {
                 $header = $this->getHeader((array) $item);
                 if (isset($item->key)) {
-                    // if ($item->key !== 'actions' && ! in_array($item->key, $visibleColumns)) {
-                    //     $header['visible'] = false;
-                    // }
                     $carry[] = $header;
                 }
 
@@ -54,21 +52,8 @@ trait TableColumns
      */
     protected function getHeader($header)
     {
-        return array_merge_recursive_preserve(
-            modularityConfig('default_header'),
-            $this->hydrateHeader($header)
-        );
-    }
-
-    /**
-     * Hydrate the header
-     *
-     * @param array $header
-     * @return array
-     */
-    protected function hydrateHeader($header)
-    {
         $this->hydrateHeaderSuffix($header);
+
         // add edit functionality to table title cell
         if ($this->titleColumnKey == $header['key'] && ! isset($header['formatter'])) {
             $header['formatter'] = [
@@ -76,24 +61,7 @@ trait TableColumns
             ];
         }
 
-        // switch column
-        if (isset($header['formatter']) && count($header['formatter']) && $header['formatter'][0] == 'switch') {
-            $header['width'] = '20px';
-            // $header['align'] = 'center';
-        }
-
-        if (isset($header['sortable']) && $header['sortable']) {
-            if (preg_match('/(.*)(_relation)/', $header['key'], $matches)) {
-                $header['sortable'] = false;
-            }
-
-        }
-
-        if ($header['key'] == 'actions') {
-            $header['width'] ??= 100;
-            $header['align'] ??= 'center';
-            $header['sortable'] ??= false;
-        }
+        $header = (new HeaderHydrator($header, $this->module, $this->routeName))->hydrate();
 
         return $header;
     }

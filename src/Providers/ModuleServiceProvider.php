@@ -96,7 +96,7 @@ class ModuleServiceProvider extends ServiceProvider implements DeferrableProvide
             } else {
                 $this->loadTranslationsFrom(
                     $module->getDirectoryPath('Resources/lang'),
-                    $module->getLowerName()
+                    $module->getSnakeName()
                 );
             }
         }

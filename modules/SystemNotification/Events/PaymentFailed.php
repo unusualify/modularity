@@ -26,7 +26,12 @@ class PaymentFailed implements ShouldDispatchAfterCommit
      */
     public $queue = 'default';
 
-    public function __construct(public $model)
+    /**
+     * Create a new event instance.
+     *
+     * @return void
+     */
+    public function __construct(public \Modules\SystemPayment\Entities\Payment $model)
     {
         //
     }

@@ -12,6 +12,44 @@ class Component extends LaravelComponent
 {
     use ManageNames;
 
+    protected static $htmlElements = [
+        // Main root
+        'Html',
+        // Document metadata
+        'Base', 'Head', 'Link', 'Meta', 'Style', 'Title',
+        // Sectioning root
+        'Body',
+        // Content sectioning
+        'Address', 'Article', 'Aside', 'Footer', 'Header', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6',
+        'Main', 'Nav', 'Section',
+        // Text content
+        'Blockquote', 'Dd', 'Div', 'Dl', 'Dt', 'Figcaption', 'Figure', 'Hr', 'Li', 'Menu',
+        'Ol', 'P', 'Pre', 'Ul',
+        // Inline text semantics
+        'A', 'Abbr', 'B', 'Bdi', 'Bdo', 'Br', 'Cite', 'Code', 'Data', 'Dfn', 'Em', 'I',
+        'Kbd', 'Mark', 'Q', 'Rp', 'Rt', 'Ruby', 'S', 'Samp', 'Small', 'Span', 'Strong',
+        'Sub', 'Sup', 'Time', 'U', 'Var', 'Wbr',
+        // Image and multimedia
+        'Area', 'Audio', 'Img', 'Map', 'Track', 'Video',
+        // Embedded content
+        'Embed', 'Iframe', 'Object', 'Picture', 'Portal', 'Source',
+        // SVG and MathML
+        'Svg', 'Math',
+        // Scripting
+        'Canvas', 'Noscript', 'Script',
+        // Demarcating edits
+        'Del', 'Ins',
+        // Table content
+        'Caption', 'Col', 'Colgroup', 'Table', 'Tbody', 'Td', 'Tfoot', 'Th', 'Thead', 'Tr',
+        // Forms
+        'Button', 'Datalist', 'Fieldset', 'Form', 'Input', 'Label', 'Legend', 'Meter',
+        'Optgroup', 'Option', 'Output', 'Progress', 'Select', 'Textarea',
+        // Interactive elements
+        'Details', 'Dialog', 'Summary',
+        // Web Components
+        'Slot', 'Template',
+    ];
+
     /**
      * The tag of the component
      *
@@ -260,7 +298,7 @@ class Component extends LaravelComponent
             $newElement = ___($element);
         } elseif (is_array($element)) {
             $newElement = $element;
-        } elseif (get_class($element) === get_class($this)) {
+        } elseif (is_subclass_of($element, self::class)) {
             $newElement = $element->render();
         } else {
             $newElement = $element;
@@ -304,6 +342,10 @@ class Component extends LaravelComponent
             $connectorInfo = find_module_and_route($attributes['connector']);
             $attributes['_module'] = $connectorInfo['module'];
             $attributes['_routeName'] = $connectorInfo['route'];
+        }
+
+        if (isset($attributes['href'])) {
+            $attributes['href'] = resolve_route($attributes['href']);
         }
 
         return $attributes;
@@ -365,15 +407,17 @@ class Component extends LaravelComponent
     public function __call($method, $args)
     {
 
-        if (preg_match('/make([V|Ue][A-Za-z]+)/', $method, $match)) {
+        if (preg_match('/make([V|Ue][A-Za-z]{1,20}|' . implode('|', static::$htmlElements) . ')/', $method, $match)) {
             $tag = $this->getKebabCase($match[1]);
 
             return $this->makeComponent($tag, ...$args);
         }
-        if (preg_match('/addChildren([V|Ue][A-Za-z]+)/', $method, $match)) {
+        if (preg_match('/addChildren([V|Ue][A-Za-z]{1,20}|' . implode('|', static::$htmlElements) . ')/', $method, $match)) {
             $tag = $this->getKebabCase($match[1]);
 
-            return $this->addChildren($tag, ...$args);
+            return $this->addChildren(array_merge([
+                'tag' => $tag,
+            ], ...$args));
         }
 
         if (! in_array($method, get_class_methods($this))) {
@@ -394,7 +438,7 @@ class Component extends LaravelComponent
     {
         $instance = new static;
 
-        if (preg_match('/make([V|Ue][A-Za-z]{1,20}|Template|Div|Span)/', $method, $match)) {
+        if (preg_match('/make([V|Ue][A-Za-z]{1,20}|' . implode('|', static::$htmlElements) . ')/', $method, $match)) {
             $tag = $instance->getKebabCase($match[1]);
 
             return $instance->makeComponent($tag, ...$args);

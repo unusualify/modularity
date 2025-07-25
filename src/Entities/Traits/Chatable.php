@@ -195,9 +195,9 @@ trait Chatable
 
             if ($messageCreator) {
                 if ($chatableCreator && in_array('Illuminate\Notifications\RoutesNotifications', class_uses_recursive($chatableCreator)) && ! $chatableCreator->is($messageCreator)) {
-                    $chatableCreator->notifyNow(new ChatableUnreadNotification($this));
+                    $chatableCreator->notifyNow(new ChatableUnreadNotification($this->chat));
                 } elseif ($chatableAuthorizedUser && in_array('Illuminate\Notifications\RoutesNotifications', class_uses_recursive($chatableAuthorizedUser)) && ! $chatableAuthorizedUser->is($messageCreator)) {
-                    $chatableAuthorizedUser->notifyNow(new ChatableUnreadNotification($this));
+                    $chatableAuthorizedUser->notifyNow(new ChatableUnreadNotification($this->chat));
                 }
             }
         }

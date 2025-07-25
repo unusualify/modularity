@@ -24,7 +24,7 @@
 
                 <v-sheet
                   class=""
-                  :width="width"
+                  :style="{ width: width }"
                 >
                   <slot v-bind="{}">
                     <ue-form
@@ -45,8 +45,7 @@
                   </slot>
                 </v-sheet>
 
-                <div
-                  v-if="!noDivider && $isset($slots.bottom)"
+                <div v-if="!noDivider && $isset($slots.bottom)"
                   class="d-flex w-100 align-center justify-center"
                 >
                   <v-divider />
@@ -174,11 +173,11 @@ export default {
       // must use .value
 
       switch (name.value) {
-        case 'xs': return 300
-        case 'sm': return 450
-        case 'md': return 450
-        case 'lg': return 500
-        case 'xl': return 600
+        case 'xs': return '85vw'
+        case 'sm': return '450px'
+        case 'md': return '450px'
+        case 'lg': return '500px'
+        case 'xl': return '600px'
         case 'xxl': return 700
         default: return 300
       }

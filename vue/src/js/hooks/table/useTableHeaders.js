@@ -6,7 +6,8 @@ import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
 
 export const makeTableHeadersProps = propsFactory({
   columns: {
-    type: Array
+    type: Array,
+    default: () => []
   },
   hideHeaders: {
     type: Boolean,

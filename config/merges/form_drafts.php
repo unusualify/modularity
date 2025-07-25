@@ -81,7 +81,7 @@ return [
             'label' => 'Current Password',
             'default' => '',
             'col' => ['sm' => 6],
-            'rules' => 'sometimes|required|current_password',
+            'rules' => 'sometimes|current_password',
         ],
         'gap-1' => [
             'type' => 'v-sheet',
@@ -102,7 +102,7 @@ return [
             'name' => 'password',
             'label' => 'Confirm Password',
             'col' => ['sm' => 6],
-            'rules' => 'sometimes|min:6|confirmed',
+            'rules' => 'sometimes|min:8|confirmed',
         ],
     ],
     'company' => [
@@ -367,8 +367,8 @@ return [
             'label' => 'Name',
             'default' => '',
             'col' => [
-                'cols' => 6,
-                'lg' => 6,
+                'cols' => 12,
+                'sm' => 6,
             ],
             'rules' => 'min:3',
         ],
@@ -378,8 +378,8 @@ return [
             'label' => 'Surname',
             'default' => '',
             'col' => [
-                'cols' => 6,
-                'lg' => 6,
+                'cols' => 12,
+                'sm' => 6,
             ],
             'rules' => 'min:2',
         ],
@@ -389,8 +389,8 @@ return [
             'label' => 'Company',
             'default' => '',
             'col' => [
-                'cols' => 6,
-                'lg' => 6,
+                'cols' => 12,
+                'sm' => 6,
             ],
             // 'rules' => 'min:2',
         ],
@@ -400,8 +400,8 @@ return [
             'label' => 'E-mail',
             'default' => '',
             'col' => [
-                'cols' => 6,
-                'lg' => 6,
+                'cols' => 12,
+                'sm' => 6,
             ],
             'rules' => 'email',
         ],
@@ -415,8 +415,8 @@ return [
                 'appendInner' => 'password',
             ],
             'col' => [
-                'cols' => 6,
-                'lg' => 6,
+                'cols' => 12,
+                'sm' => 6,
             ],
             'rules' => [
                 ['required', 'classic', null, null, 'Password is required'],
@@ -434,8 +434,8 @@ return [
                 'appendInner' => 'password',
             ],
             'col' => [
-                'cols' => 6,
-                'lg' => 6,
+                'cols' => 12,
+                'sm' => 6,
             ],
             'rules' => [
                 ['required', 'classic', null, null, 'Confirm Password'],
