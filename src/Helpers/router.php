@@ -118,7 +118,8 @@ if (! function_exists('resolve_route')) {
             $params = $definition[1] ?? [];
         }
 
-        if (($routeName = Route::hasAdmin($routeName))) {
+        if ((method_exists(Route::class, 'hasAdmin') && ($routeName = Route::hasAdmin($routeName)))
+            || Route::has($routeName)) {
             $route = Route::getRoutes()->getByName($routeName);
 
             $routeParameters = [];
