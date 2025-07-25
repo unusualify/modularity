@@ -298,7 +298,7 @@ class Component extends LaravelComponent
             $newElement = ___($element);
         } elseif (is_array($element)) {
             $newElement = $element;
-        } elseif (get_class($element) === get_class($this)) {
+        } elseif (is_subclass_of($element, self::class)) {
             $newElement = $element->render();
         } else {
             $newElement = $element;
@@ -342,6 +342,10 @@ class Component extends LaravelComponent
             $connectorInfo = find_module_and_route($attributes['connector']);
             $attributes['_module'] = $connectorInfo['module'];
             $attributes['_routeName'] = $connectorInfo['route'];
+        }
+
+        if (isset($attributes['href'])) {
+            $attributes['href'] = resolve_route($attributes['href']);
         }
 
         return $attributes;
