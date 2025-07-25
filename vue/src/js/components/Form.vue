@@ -320,7 +320,7 @@
       <!-- Bottom Section -->
       <div :class="['px-1',scrollable ? 'flex-grow-0' : '']" v-if="(hasSubmit && isSubmittable) || $slots.submit || $slots.options || $slots.bottom">
         <v-divider v-if="hasSubmit && !stickyButton && hasDivider" class=""></v-divider>
-        <div class="d-flex pt-6" v-if="hasSubmit && !stickyButton">
+        <div class="d-flex flex-wrap justify-center justify-md-start pt-6 w-100 ga-4" v-if="hasSubmit && !stickyButton">
           <slot name="submit"
             v-bind="{
               isSubmittable,
@@ -328,15 +328,18 @@
               buttonDefaultText,
               loading
             }">
-            <slot name="options" v-bind="{
-              isSubmittable,
-              validForm: validModel || !serverValid,
-              loading
-            }"></slot>
+            <div class="d-flex justify-center justify-md-start flex-wrap flex-1-1-100 flex-md-1-1-0" >
+              <slot name="options" v-bind="{
+                isSubmittable,
+                validForm: validModel || !serverValid,
+                loading
+              }"></slot>
+            </div>
             <v-btn v-if="isSubmittable"
               type="submit"
               :disabled="!(validModel || !serverValid) || loading || !isSubmittable"
-              class="ml-auto mb-5"
+              class="ml-auto mb-5 flex-1-1-100 flex-md-1-1-0 flex-lg-0-1-0"
+              :block="$vuetify.display.smAndDown"
               :loading="loading"
               :color="!isSubmittable ? 'warning' : 'primary'"
               >
