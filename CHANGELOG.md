@@ -2,6 +2,56 @@
 
 All notable changes to `modularity` will be documented in this file
 
+## v0.40.0 - 2025-07-25
+
+### :rocket: Features
+
+- enhance notification configuration and extend FeatureNotification capabilities by @OoBook in https://github.com/unusualify/modularity/commit/e50c2ece25f0e7acc78051bd638a681480705c9f
+- add customizable salutation to email template by @OoBook in https://github.com/unusualify/modularity/commit/c6ede94f889643acda9802e52559f79cd7c77a9c
+- enhance notification handling with customizable callbacks by @OoBook in https://github.com/unusualify/modularity/commit/c1b813b976e2c10ec9d1a77fa0d174edc88b734a
+- implement dynamic success and error messages for CRUD operations by @OoBook in https://github.com/unusualify/modularity/commit/e0385081bff7bc2d5e3633dee92e8adf146628f6
+- introduce HeaderHydrator for dynamic header management by @OoBook in https://github.com/unusualify/modularity/commit/fce4314bb6ffa2fa1b0d90bbd2b2b84bf33cff67
+- add 'table-cell' to valid display values by @OoBook in https://github.com/unusualify/modularity/commit/07b5900488829f3a9c6e32a2cfe8b2ad51ab2433
+- enhance mobile action visibility and responsiveness by @OoBook in https://github.com/unusualify/modularity/commit/9a9297b361d5a9b76f2520bbadb1f1349071eece
+- add support for HTML elements and enhance method handling by @OoBook in https://github.com/unusualify/modularity/commit/c706f5968436b32fba52b6e8c5107b98d37f5e56
+- add closure value transformation for dynamic input handling by @OoBook in https://github.com/unusualify/modularity/commit/615f50c6be775c3ab98ef23397260742e686ff0b
+- add marked library for markdown parsing by @OoBook in https://github.com/unusualify/modularity/commit/54e20055f7b521803e49764e7e5748279a686675
+- enhance table interactivity and responsiveness by @OoBook in https://github.com/unusualify/modularity/commit/4b0e1677dc01979b7e37d75ac454e31e22b65e2f
+- enhance checkbox functionality and styling by @OoBook in https://github.com/unusualify/modularity/commit/3b0c3683d5f91cf38d47fed731158a3da5b36572
+- implement markdown rendering component with table of contents by @OoBook in https://github.com/unusualify/modularity/commit/6378dad76cd1d34c265b879fb64b4982f000046c
+
+### :wrench: Bug Fixes
+
+- update notification handling to use chat model by @OoBook in https://github.com/unusualify/modularity/commit/3468c7873410834a82264dbb487658f6da31cfb4
+- update password rules for enhanced security by @OoBook in https://github.com/unusualify/modularity/commit/1c963ab7ae5d754b6ddb53b69d1b5304b7f2d300
+- integrate OauthTrait and enhance user creation logic by @OoBook in https://github.com/unusualify/modularity/commit/6ab4da808499df9c385410a5b8789b18370e6f1c
+- add password validation rules for user updates by @OoBook in https://github.com/unusualify/modularity/commit/69c28e9d9660555848b6361c3bf74238004e306d
+
+### :recycle: Refactors
+
+- enhance user fetching logic and toolbar display by @OoBook in https://github.com/unusualify/modularity/commit/5f0a48ad82667c2cff94bf9de458d297778b5a9c
+- specify Assignment model type in constructors and enhance event handling by @OoBook in https://github.com/unusualify/modularity/commit/f6de7426c698ae018acb40b3b29efad6be350490
+- enhance type safety and improve notification methods by @OoBook in https://github.com/unusualify/modularity/commit/c2720b2f5946f9cc397fe8230de9cf2991f49edb
+- clean up unused notification code in StateableListener by @OoBook in https://github.com/unusualify/modularity/commit/fc3f77109d786ee4893710b01f6bde55f1b54a96
+- streamline column configuration with HeaderHydrator by @OoBook in https://github.com/unusualify/modularity/commit/4bb8a42b7a03f5ad7493d1a7f69f5341a7cf914a
+- enhance route resolution logic for admin and general routes by @OoBook in https://github.com/unusualify/modularity/commit/687e862a782c74a09297dfa9c146886571ef0316
+- improve element handling and attribute hydration by @OoBook in https://github.com/unusualify/modularity/commit/38f8eae40e5fcf6df861d3ad97e0d784115eb279
+- enhance navigation and configuration handling by @OoBook in https://github.com/unusualify/modularity/commit/41ee2f89a0aa95d01f3d3587d3ec1db808abf4ab
+- streamline layout structure and enhance mobile responsiveness by @OoBook in https://github.com/unusualify/modularity/commit/6e28a7ac287ed0a7ebec08fc8e350e1584ffc09b
+- update column layout for form fields to improve responsiveness by @OoBook in https://github.com/unusualify/modularity/commit/d28056f5ad709058bd0413e710e83f25d5b89deb
+- improve route resolution logic for better error handling by @OoBook in https://github.com/unusualify/modularity/commit/d0b5877f1bd7c1ece4a2c3eb56dbb8c66e8fcc41
+- update styling and layout for improved responsiveness by @OoBook in https://github.com/unusualify/modularity/commit/2dc3c9179599fa7dd35a5bb142a9b5f250ed8417
+- enhance layout and responsiveness of submit section by @OoBook in https://github.com/unusualify/modularity/commit/f0aa3b3e151b35c1e96f25d8c1c81df533fdbe67
+- comment out terms of service validation rule by @OoBook in https://github.com/unusualify/modularity/commit/8a818316f259a4671aa063e004068a0c020f04c2
+
+### :lipstick: Styling
+
+- lint coding styles for v0.40.0 by @OoBook in https://github.com/unusualify/modularity/commit/e7c1a19d76da3bbc448f866e1497c31c04215097
+
+### :package: Build
+
+- update build artifacts for v0.40.0 by @OoBook in https://github.com/unusualify/modularity/commit/868192c6215861b344ace4e4559a9814dc093872
+
 ## v0.39.0 - 2025-07-19
 
 ### :rocket: Features
