@@ -20,7 +20,7 @@ trait OauthTrait
      */
     public function oauthIsUserLinked($oauthUser, $provider)
     {
-        $user = $this->model->whereEmail($oauthUser->email)->first();
+        $user = $this->oauthUser($oauthUser);
 
         return $user->providers()
             ->where(['provider' => $provider, 'oauth_id' => $oauthUser->id])
@@ -34,7 +34,7 @@ trait OauthTrait
      */
     public function oauthUpdateProvider($oauthUser, $provider)
     {
-        $user = $this->model->whereEmail($oauthUser->email)->first();
+        $user = $this->oauthUser($oauthUser);
         $provider = $user->providers()
             ->where(['provider' => $provider, 'oauth_id' => $oauthUser->id])
             ->first();
@@ -52,7 +52,6 @@ trait OauthTrait
      */
     public function oauthCreateUser($oauthUser)
     {
-
         $user = $this->model->firstOrNew([
             'name' => $oauthUser->name,
             'email' => $oauthUser->email,
