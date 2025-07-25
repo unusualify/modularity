@@ -12,7 +12,8 @@ import { useTableItem } from '@/hooks/table'
 
 export const makeTableFormsProps = propsFactory({
   inputFields: {
-    type: Array
+    type: Array,
+    default: () => []
   },
   formWidth: {
     type: [String, Number],

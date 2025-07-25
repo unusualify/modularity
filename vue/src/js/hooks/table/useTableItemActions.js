@@ -345,7 +345,21 @@ export default function useTableItemActions(props, { tableForms, loadItems }) {
         handleDuplicateAction(item)
         break
       case 'link':
-        window.open(_action.url.replace(':id', item.id), '_blank')
+        let target = item.target ?? _action.target ?? '_blank'
+
+        if(!['_self', '_blank', '_parent', '_top'].includes(target)){
+          target = '_blank'
+        }
+
+        let link = item.href ?? (_action.url ? _action.url.replace(':id', item.id) : props.endpoints.show ? props.endpoints.show.replace(':id', item.id) : null)
+
+        if(!link){
+          console.error('No link found in item or action', item, _action)
+          return
+        }
+
+        window.open(link, target)
+
         break
       case 'switch':
         handleSwitchAction(item, args[0], args[1])

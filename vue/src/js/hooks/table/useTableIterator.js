@@ -18,8 +18,6 @@ export const makeTableIteratorProps = propsFactory({
     type: String,
     default: 'name'
   },
-
-
   item: {
     type: Object,
     default: {}
