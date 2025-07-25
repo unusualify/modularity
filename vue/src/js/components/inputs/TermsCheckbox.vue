@@ -6,41 +6,46 @@
     :variant="boundProps.variant"
     :rules="checkboxRules"
     :label="label"
-    class="v-input-terms-checkbox"
+    :class="[
+      'v-input-terms-checkbox',
+      noCheckbox ? 'v-input-terms-checkbox-no-checkbox' : ''
+    ]"
     @click.prevent="handleCheckboxClick"
 
     :true-value="trueValue"
     :false-value="falseValue"
   >
-    <template v-slot:label>
-      <span class="text-grey-lighten-2">
-        {{ $t('I agree with') }}
-        <v-tooltip location="bottom">
-          <template v-slot:activator="{ props }">
-            <a
-              class="text-decoration-underline"
-              v-bind="props"
-              @click="handleReadTerms('terms')"
-            >
-              {{ $t('Terms') }}
-            </a>
-          </template>
-          {{ $t('Show Terms') }}
-        </v-tooltip>
-        {{ ' and '}}
-        <v-tooltip location="bottom">
-          <template v-slot:activator="{ props }">
-            <a
-              class="text-decoration-underline"
-              v-bind="props"
-              @click="handleReadTerms('conditions')"
-            >
-              {{ $t('Conditions') }}
-            </a>
-          </template>
-          {{ $t('Show Conditions') }}
-        </v-tooltip>
-      </span>
+    <template v-slot:label="labelScope">
+      <slot name="label" v-bind="labelScope">
+        <span class="text-grey-lighten-2">
+          {{ $t('I agree with') }}
+          <v-tooltip location="bottom">
+            <template v-slot:activator="{ props }">
+              <a
+                class="text-decoration-underline"
+                v-bind="props"
+                @click="handleReadTerms('terms')"
+              >
+                {{ $t('Terms') }}
+              </a>
+            </template>
+            {{ $t('Show Terms') }}
+          </v-tooltip>
+          {{ ' and '}}
+          <v-tooltip location="bottom">
+            <template v-slot:activator="{ props }">
+              <a
+                class="text-decoration-underline"
+                v-bind="props"
+                @click="handleReadTerms('conditions')"
+              >
+                {{ $t('Conditions') }}
+              </a>
+            </template>
+            {{ $t('Show Conditions') }}
+          </v-tooltip>
+        </span>
+      </slot>
     </template>
     <template v-slot:append>
       <ue-modal
@@ -114,6 +119,14 @@ export default {
     falseValue: {
       type: [Boolean, String, Number],
       default: 0
+    },
+    noCheckbox: {
+      type: Boolean,
+      default: false
+    },
+    noHandleClick: {
+      type: Boolean,
+      default: false
     }
   },
   setup (props, context) {
@@ -156,6 +169,9 @@ export default {
       this.readType = type
     },
     handleCheckboxClick() {
+      if (this.noHandleClick) {
+        return
+      }
       if (!this.isRead) {
         this.readType ??= 'terms'
         this.showDialog = true
@@ -173,7 +189,9 @@ export default {
 
 <style lang="sass">
   .v-input-terms-checkbox
-    // color: var(--v-primary-base) !important;
+    &.v-input-terms-checkbox-no-checkbox
+      .v-selection-control__wrapper
+        display: none !important
 
 
 </style>
