@@ -2,17 +2,29 @@
 
 @section('body')
     @php
-        $navigation ??= [];
+        $defaultMainNavigationConfiguration = [
+            'profileMenu' => [],
+            'breadcrumbs' => [],
+            'sidebar' => [],
+        ];
+        $navigation = array_merge(
+            $defaultMainNavigationConfiguration,
+            $navigation ?? []
+        );
         $impersonation ??= [];
         $authorization ??= [];
         $headerTitle ??= config('app.name');
 
-        $_mainConfiguration = [
+        $_mainConfiguration = array_merge_recursive_preserve([
+            'headerTitle' => $headerTitle,
+            'hideDefaultSidebar' => $hideDefaultSidebar ?? false,
+            'fixedAppBar' => $fixedAppBar ?? false,
+            'appBarOrder' => $appBarOrder ?? 0,
+
             'navigation' => $navigation,
             'impersonation' => $impersonation,
             'authorization' => $authorization,
-            'headerTitle' => $headerTitle
-        ];
+        ], $_mainConfiguration ?? []);
     @endphp
     <div id="admin">
         <ue-main
@@ -48,6 +60,8 @@
                     {{-- <ue-modal-test></ue-modal-test> --}}
                 </div>
             </div>
+
+            @yield('slots')
         </ue-main>
     </div>
 
