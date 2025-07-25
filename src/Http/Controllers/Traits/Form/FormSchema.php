@@ -48,7 +48,7 @@ trait FormSchema
             });
 
         } catch (\Throwable $th) {
-            //throw $th;
+            // throw $th;
             ModularityLog::error('Error transforming closure values', [
                 'error' => $th->getMessage(),
                 'trace' => $th->getTraceAsString(),
@@ -104,7 +104,6 @@ trait FormSchema
         $type = getValueOrNull($hydrated, 'type');
         $name = getValueOrNull($hydrated, 'name');
         $_input = null;
-
 
         if (in_array($type, ['divider', 'title']) || (bool) $name) {
             if ($default_input['color'] && in_array($hydrated['type'], ['morphTo', 'relationship', 'wrap', 'group'])) {

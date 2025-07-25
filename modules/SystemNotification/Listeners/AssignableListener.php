@@ -14,8 +14,6 @@ class AssignableListener implements ShouldHandleEventsAfterCommit
 
     /**
      * Handle the event.
-     *
-     * @param \Modules\SystemNotification\Events\AssignmentCreated|\Modules\SystemNotification\Events\AssignmentUpdated $event
      */
     public function handle(\Modules\SystemNotification\Events\AssignmentCreated|\Modules\SystemNotification\Events\AssignmentUpdated $event): void
     {

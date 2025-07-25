@@ -226,8 +226,8 @@ abstract class BaseController extends PanelController
             "$moduleName::messages.$routeName.save-success",
             "$moduleName::messages.store-success",
             "$moduleName::messages.save-success",
-            "messages.store-success",
-            "messages.save-success",
+            'messages.store-success',
+            'messages.save-success',
         ])->first(function ($notation) {
             return Lang::has($notation);
         });
@@ -416,8 +416,8 @@ abstract class BaseController extends PanelController
                 "$moduleName::messages.$routeName.save-success",
                 "$moduleName::messages.update-success",
                 "$moduleName::messages.save-success",
-                "messages.update-success",
-                "messages.save-success",
+                'messages.update-success',
+                'messages.save-success',
             ])->first(function ($notation) {
                 return Lang::has($notation);
             });
@@ -462,11 +462,10 @@ abstract class BaseController extends PanelController
             // $this->fireEvent();
             // activity()->performedOn($item)->log('deleted');
 
-
             $deleteSuccessTranslation = Collection::make([
                 "$moduleName::messages.$routeName.delete-success",
                 "$moduleName::messages.delete-success",
-                "listing.delete.success",
+                'listing.delete.success',
             ])->first(function ($notation) {
                 return Lang::has($notation);
             });
@@ -480,7 +479,7 @@ abstract class BaseController extends PanelController
         $deleteErrorTranslation = Collection::make([
             "$moduleName::messages.$routeName.delete-error",
             "$moduleName::messages.delete-error",
-            "listing.delete.error",
+            'listing.delete.error',
         ])->first(function ($notation) {
             return Lang::has($notation);
         });
@@ -498,7 +497,6 @@ abstract class BaseController extends PanelController
 
         $moduleName = $this->module->getSnakeName();
         $routeName = Str::snake($this->routeName);
-
 
         if ($this->repository->forceDelete($this->request->get('id'))) {
             // $this->fireEvent();
@@ -519,7 +517,7 @@ abstract class BaseController extends PanelController
         $forceDeleteErrorTranslation = Collection::make([
             "$moduleName::messages.$routeName.force-delete-error",
             "$moduleName::messages.force-delete-error",
-            "listing.force-delete.error",
+            'listing.force-delete.error',
         ])->first(function ($notation) {
             return Lang::has($notation);
         });

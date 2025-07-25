@@ -7,9 +7,6 @@ use Unusualify\Modularity\Facades\ModularityLog;
 
 class ChatableUnreadNotification extends FeatureNotification implements ShouldQueue
 {
-    /**
-     * @param \Unusualify\Modularity\Entities\Chat $model
-     */
     public function __construct(\Unusualify\Modularity\Entities\Chat $model)
     {
         parent::__construct($model->chatable);

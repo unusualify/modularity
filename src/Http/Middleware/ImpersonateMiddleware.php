@@ -42,10 +42,9 @@ class ImpersonateMiddleware
                 $canFetchUsers = $activeUser->isSuperAdmin() || $activeUser->isImpersonating();
             }
 
-
             $impersonation = [
                 'active' => $activeUser ? $activeUser->isSuperAdmin() || $activeUser->isImpersonating() : false,
-                'users' => $canFetchUsers ? $userRepository->whereNot(fn($query) => $query->role(['superadmin']))->get(['id', 'name', 'email', 'company_id'])->toArray() : [],
+                'users' => $canFetchUsers ? $userRepository->whereNot(fn ($query) => $query->role(['superadmin']))->get(['id', 'name', 'email', 'company_id'])->toArray() : [],
                 'impersonated' => $activeUser ? $activeUser->isImpersonating() : false,
                 'stopRoute' => route(Route::hasAdmin('impersonate.stop')),
                 'route' => route(Route::hasAdmin('impersonate'), ['id' => ':id']),

@@ -127,7 +127,7 @@ if (! function_exists('resolve_route')) {
             if ($routeName) {
                 $routeExists = true;
             }
-        }catch(\Exception $e) {
+        } catch (\Exception $e) {
             $routeExists = Route::has($routeName);
         }
 

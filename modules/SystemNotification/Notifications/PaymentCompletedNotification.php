@@ -10,7 +10,6 @@ class PaymentCompletedNotification extends FeatureNotification implements Should
 {
     use Queueable;
 
-
     /**
      * Create a new notification instance.
      *

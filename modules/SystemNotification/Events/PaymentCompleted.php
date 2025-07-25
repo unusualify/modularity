@@ -29,7 +29,6 @@ class PaymentCompleted implements ShouldDispatchAfterCommit
     /**
      * Create a new event instance.
      *
-     * @param \Modules\SystemPayment\Entities\Payment $model
      * @return void
      */
     public function __construct(public \Modules\SystemPayment\Entities\Payment $model)

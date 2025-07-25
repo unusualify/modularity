@@ -47,7 +47,7 @@ class Component extends LaravelComponent
         // Interactive elements
         'Details', 'Dialog', 'Summary',
         // Web Components
-        'Slot', 'Template'
+        'Slot', 'Template',
     ];
 
     /**

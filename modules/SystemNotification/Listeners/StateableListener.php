@@ -3,10 +3,8 @@
 namespace Modules\SystemNotification\Listeners;
 
 use Illuminate\Contracts\Events\ShouldHandleEventsAfterCommit;
-use Illuminate\Support\Facades\Notification;
 use Modules\SystemNotification\Events\StateableUpdated;
 use Modules\SystemNotification\Notifications\StateableUpdatedNotification;
-use Unusualify\Modularity\Entities\User;
 
 class StateableListener implements ShouldHandleEventsAfterCommit
 {

@@ -20,6 +20,7 @@ class UserRepository extends Repository
     {
         $this->model = $model;
     }
+
     /**
      * @param \Laravel\Socialite\Contracts\User $oauthUser
      * @return \A17\Twill\Models\User

@@ -36,14 +36,14 @@ class HeaderHydrator
             $header['sortable'] ??= false;
         }
 
-        if(isset($header['noMobile']) && $header['noMobile']) {
+        if (isset($header['noMobile']) && $header['noMobile']) {
             $header['responsive'] ??= [];
             $header['responsive'] = [
                 'hideBelow' => 'md',
             ];
         }
 
-        if(isset($header['responsive']) && $header['responsive']) {
+        if (isset($header['responsive']) && $header['responsive']) {
             $header = $this->applyResponsiveClasses($header, 'responsive', 'table-cell', 'cellProps.class');
         }
 

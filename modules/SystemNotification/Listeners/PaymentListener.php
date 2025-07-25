@@ -14,9 +14,6 @@ class PaymentListener implements ShouldHandleEventsAfterCommit
 
     /**
      * Handle the event.
-     *
-     * @param \Modules\SystemNotification\Events\PaymentCompleted|\Modules\SystemNotification\Events\PaymentFailed $event
-     * @return void
      */
     public function handle(\Modules\SystemNotification\Events\PaymentCompleted|\Modules\SystemNotification\Events\PaymentFailed $event): void
     {

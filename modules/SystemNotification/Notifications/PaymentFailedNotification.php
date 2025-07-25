@@ -78,6 +78,7 @@ class PaymentFailedNotification extends FeatureNotification implements ShouldQue
 
         return $default;
     }
+
     public function getNotificationMessage(object $notifiable, \Illuminate\Database\Eloquent\Model $model): string
     {
         $priceableModel = $model->price && $model->price->priceable ? $model->price->priceable : $model;
