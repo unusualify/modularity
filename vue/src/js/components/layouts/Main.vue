@@ -57,6 +57,7 @@
     <ue-sidebar v-if="!hideDefaultSidebar"
       ref="sidebar"
       :items="sidebarItems"
+      :profileMenu="profileMenu"
     >
       <template v-slot:bottom>
         <ue-impersonate-toolbar v-if="impersonation.active"
@@ -400,6 +401,7 @@
         // activeItem: this.navigation.activeItem ?? 0,
         // activeSubItem: this.navigation.activeSubItem ?? -1,
         breadcrumbs: this.navigation.breadcrumbs ?? [],
+        profileMenu: this.navigation.profileMenu ?? [],
 
         footerLinks: [
           {
