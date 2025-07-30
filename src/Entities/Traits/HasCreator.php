@@ -98,6 +98,7 @@ trait HasCreator
 
         $class = new $this->creatableClass;
 
+        $class->setAttribute($this->getKeyName(), $this->getKey());
         $class->fill($this->getAttributes());
         $class->setRelations($this->getRelations());
 
@@ -136,7 +137,7 @@ trait HasCreator
         $throughInstance = $creatableClass->newRelatedThroughInstance($through); // throughInstance
         $relatedQuery = $creatableClass->newRelatedInstance($related)->newQuery(); // relatedQuery
 
-        return new \Illuminate\Database\Eloquent\Relations\HasOneThrough(
+        $relation = new \Illuminate\Database\Eloquent\Relations\HasOneThrough(
             $relatedQuery,
             $creatableClass,
             $throughInstance,
@@ -146,14 +147,18 @@ trait HasCreator
             secondLocalKey: 'creator_id'
         );
 
-        return $this->hasOneThrough(
-            related: $this->getCreatorModel(), // User
-            through: $this->getCreatorRecordModel(), // CreatorRecord
-            firstKey: 'creatable_id',
-            secondKey: 'id',
-            localKey: 'id',
-            secondLocalKey: 'creator_id'
-        );
+        // Add the where condition for creatable_type
+        return $relation->where($throughInstance->getTable() . '.creatable_type', get_class($creatableClass));
+
+        // Remove the unreachable code below
+        // return $this->hasOneThrough(
+        //     related: $this->getCreatorModel(), // User
+        //     through: $this->getCreatorRecordModel(), // CreatorRecord
+        //     firstKey: 'creatable_id',
+        //     secondKey: 'id',
+        //     localKey: 'id',
+        //     secondLocalKey: 'creator_id'
+        // );
     }
 
     public function company(): \Illuminate\Database\Eloquent\Relations\HasOne
