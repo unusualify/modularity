@@ -195,6 +195,16 @@ return [
                     'itemTitle' => 'id',
                 ],
                 [
+                    'title' => 'User Email',
+                    'key' => 'creator',
+                    'itemTitle' => 'email',
+                ],
+                [
+                    'title' => 'Company',
+                    'key' => 'company',
+                    'itemTitle' => 'name',
+                ],
+                [
                     'title' => 'Service',
                     'key' => 'paymentService',
                     // 'itemTitle' => 'title',
@@ -262,7 +272,7 @@ return [
                     'label' => 'Invoice',
                     'max' => 1,
                     'conditions' => [
-                        ['status', '=', 'COMPLETED'],
+                        ['status', '=', 'COMPLETED', 'REFUNDED', 'CANCELLED'],
                     ],
                     'allowedRoles' => ['superadmin', 'admin', 'manager', 'account-executive'],
                     'acceptedExtensions' => ['pdf'],
