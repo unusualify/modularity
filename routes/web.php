@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Unusualify\Modularity\Http\Controllers\ChatController;
+use Unusualify\Modularity\Http\Controllers\DemandController;
 use Unusualify\Modularity\Http\Controllers\ProcessController;
 use Unusualify\Modularity\Http\Controllers\ProfileController;
 
@@ -62,6 +63,14 @@ Route::prefix('api')->group(function () {
     Route::group(['prefix' => 'process', 'as' => 'process.'], function () {
         Route::get('{process}', [ProcessController::class, 'show'])->name('show');
         Route::put('{process}', [ProcessController::class, 'update'])->name('update');
+    });
+
+    Route::group(['prefix' => 'demand', 'as' => 'demand.'], function () {
+        Route::get('{demandableType}/{demandableId}', [DemandController::class, 'index'])->name('index');
+        Route::get('{demand}', [DemandController::class, 'show'])->name('show');
+        Route::post('', [DemandController::class, 'store'])->name('store');
+        Route::put('{demand}', [DemandController::class, 'update'])->name('update');
+        Route::delete('{demand}', [DemandController::class, 'destroy'])->name('destroy');
     });
 
     if (modularityConfig('enabled.media-library')) {

@@ -30,4 +30,5 @@ return [
     'email_verification_tokens' => 'um_email_verification_tokens',
     'countries' => 'um_countries',
     'country_translations' => 'um_country_translations',
+    'demands' => 'um_demands',
 ];
