@@ -1,8 +1,5 @@
 <template>
   <v-app id="inspire">
-
-    <slot name="top"></slot>
-
     <v-chip v-if="$store.getters.isHot"
       color="green"
       class="position-absolute"
@@ -67,7 +64,7 @@
     </ue-sidebar>
 
     <v-main>
-      <slot name="main-top"></slot>
+      <slot name="top"></slot>
 
       <!-- <ue-footer :items="footerLinks" /> -->
       <div v-if="false">
@@ -79,6 +76,8 @@
       </div>
 
       <slot></slot>
+
+      <slot name="bottom"></slot>
     </v-main>
 
     <!-- MODALS -->
