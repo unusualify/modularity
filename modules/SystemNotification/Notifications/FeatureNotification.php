@@ -485,6 +485,10 @@ abstract class FeatureNotification extends Notification implements ShouldQueue
      */
     protected function getNotificationRedirector(object $notifiable, \Illuminate\Database\Eloquent\Model $model)
     {
+        if(method_exists($this, 'redirectorModel')){
+            $model = $this->redirectorModel($model);
+        }
+
         $moduleName = method_exists($model, 'moduleName') ? $model->moduleName() : null;
         $routeName = method_exists($model, 'routeName') ? $model->routeName() : null;
 
