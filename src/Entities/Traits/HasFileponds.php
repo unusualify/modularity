@@ -8,7 +8,7 @@ trait HasFileponds
 {
     public function getFilepondableClass()
     {
-        if(!$this->filepondableClass) {
+        if (! $this->filepondableClass) {
             return $this;
         }
 

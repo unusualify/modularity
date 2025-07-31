@@ -423,7 +423,7 @@ return [
                 ],
             ],
         ],
-    	'my_payment' => [
+        'my_payment' => [
             'name' => 'MyPayment',
             'headline' => 'Payments',
             'url' => 'my-payments',
@@ -503,14 +503,14 @@ return [
                     'name' => 'files',
                     'noSubmit' => true,
                     'default' => null,
-                    'col' => ['cols' => 12,'class' => 'mb-4'],
+                    'col' => ['cols' => 12, 'class' => 'mb-4'],
                     'configuration' => [
                         'tag' => 'v-card',
                         'attributes' => [
                             'link' => true,
                             'class' => 'mx-auto py-4 mb-4 h-100',
                             'variant' => 'elevated',
-                            'title' => 'Invoices'
+                            'title' => 'Invoices',
                         ],
                         'elements' => [
                             'tag' => 'v-card-text',
@@ -530,7 +530,7 @@ return [
                     // ],
                     'creatable' => 'hidden',
                 ],
-            ]
-        ]
-	]
+            ],
+        ],
+    ],
 ];

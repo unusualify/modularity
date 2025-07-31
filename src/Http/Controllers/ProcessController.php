@@ -2,8 +2,8 @@
 
 namespace Unusualify\Modularity\Http\Controllers;
 
-use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\App;
 use Unusualify\Modularity\Entities\Process;

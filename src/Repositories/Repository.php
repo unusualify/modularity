@@ -563,7 +563,7 @@ abstract class Repository implements RepositoryContract
                     $relationshipName = $parts[0];
                     $relationshipColumn = $parts[1];
 
-                    if (!isset($relationshipGroups[$relationshipName])) {
+                    if (! isset($relationshipGroups[$relationshipName])) {
                         $relationshipGroups[$relationshipName] = [];
                     }
                     $relationshipGroups[$relationshipName][] = $relationshipColumn;
@@ -596,7 +596,7 @@ abstract class Repository implements RepositoryContract
 
                     $q->where(function ($q) use ($regularColumns, $translatedColumns, $searchValue, $relatedModel) {
                         // Search in regular columns
-                        if (!empty($regularColumns)) {
+                        if (! empty($regularColumns)) {
                             $tableName = $relatedModel->getTable();
                             foreach ($regularColumns as $column) {
                                 $q->orWhere($tableName . '.' . $column, $this->getLikeOperator(), '%' . $searchValue . '%');
@@ -604,7 +604,7 @@ abstract class Repository implements RepositoryContract
                         }
 
                         // Search in translated columns
-                        if (!empty($translatedColumns)) {
+                        if (! empty($translatedColumns)) {
                             $q->orWhereHas('translations', function ($translationQuery) use ($translatedColumns, $searchValue) {
                                 $translationQuery->where(function ($tq) use ($translatedColumns, $searchValue) {
                                     foreach ($translatedColumns as $column) {

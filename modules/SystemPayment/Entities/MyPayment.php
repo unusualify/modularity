@@ -2,8 +2,6 @@
 
 namespace Modules\SystemPayment\Entities;
 
-
-
 use Unusualify\Modularity\Entities\Traits\ModelHelpers;
 
 class MyPayment extends \Modules\SystemPayment\Entities\Payment
@@ -15,12 +13,12 @@ class MyPayment extends \Modules\SystemPayment\Entities\Payment
     protected $filepondableClass = \Modules\SystemPayment\Entities\Payment::class;
 
     /**
-	 * The attributes that are mass assignable.
-	 *
-	 * @var array<int, string>
-	 */
-	protected $fillable = [
-		'name',
-		'published'
-	];
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'name',
+        'published',
+    ];
 }

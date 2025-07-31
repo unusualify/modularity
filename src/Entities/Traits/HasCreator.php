@@ -92,7 +92,7 @@ trait HasCreator
     public function getCreatableClass()
     {
         // if $this is a table row, fill attributes and relations new class
-        if(!$this->creatableClass) {
+        if (! $this->creatableClass) {
             return $this;
         }
 
@@ -120,8 +120,8 @@ trait HasCreator
         return new \Illuminate\Database\Eloquent\Relations\MorphOne(
             $instance->newQuery(),
             $creatableClass,
-            $table.'.'.$type,
-            $table.'.'.$id,
+            $table . '.' . $type,
+            $table . '.' . $id,
             $localKey
         );
     }
@@ -312,7 +312,7 @@ trait HasCreator
         $guardName = null;
         $userId = -1;
 
-        if(Auth::check()) {
+        if (Auth::check()) {
             $guardName = Auth::guard()->name;
             $userId = Auth::id();
         }

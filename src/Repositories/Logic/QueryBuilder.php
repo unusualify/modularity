@@ -36,7 +36,7 @@ trait QueryBuilder
             $regularFields = [];
 
             foreach ($scopes['searches'] as $field) {
-                if (strpos($field, '.') !== false) {
+                if (str_contains($field, '.')) {
                     $relationshipFields[] = $field;
                 } else {
                     $regularFields[] = $field;
@@ -44,13 +44,13 @@ trait QueryBuilder
             }
 
             // Handle relationship field searching
-            if (!empty($relationshipFields) && isset($scopes['search'])) {
+            if (! empty($relationshipFields) && isset($scopes['search'])) {
                 $this->searchInRelationships($query, $scopes, 'search', $relationshipFields);
             }
 
             // Remove translated attributes from regular fields for main table searching
             $searches = array_filter($regularFields, function ($field) use ($translatedAttributes) {
-                return !in_array($field, $translatedAttributes);
+                return ! in_array($field, $translatedAttributes);
             });
 
             // Search in main table fields (non-translated, non-relationship)

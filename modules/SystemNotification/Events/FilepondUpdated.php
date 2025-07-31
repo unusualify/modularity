@@ -29,13 +29,9 @@ class FilepondUpdated implements ShouldDispatchAfterCommit
     /**
      * Create a new event instance.
      *
-     * @param \Unusualify\Modularity\Entities\Filepond $model
      * @return void
      */
-    public function __construct(public \Unusualify\Modularity\Entities\Filepond $model)
-    {
-
-    }
+    public function __construct(public \Unusualify\Modularity\Entities\Filepond $model) {}
 
     public function broadcastOn(): array
     {

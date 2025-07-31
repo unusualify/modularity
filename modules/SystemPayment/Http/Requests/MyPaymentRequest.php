@@ -14,7 +14,7 @@ class MyPaymentRequest extends Request
     public function rulesForAll()
     {
         return [
-		];
+        ];
     }
 
     /**

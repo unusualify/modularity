@@ -7,4 +7,3 @@ return [
     'card_type' => 'Card Type | Card Types | {n} Card Types',
     'my_payment' => 'Payment | Payments | {n} Payments',
 ];
-
