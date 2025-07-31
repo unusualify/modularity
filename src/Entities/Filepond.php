@@ -40,6 +40,11 @@ class Filepond extends Model
         // return DB::table(modularityConfig('tables.fileponds'))->where('file_id', $this->id)->count() === 0;
     }
 
+    public function filepondable()
+    {
+        return $this->morphTo();
+    }
+
     public function mediableFormat()
     {
         return [
