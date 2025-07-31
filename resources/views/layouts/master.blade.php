@@ -30,17 +30,7 @@
         <ue-main
             ref='main'
             v-bind='@json($_mainConfiguration)'
-
             >
-            @if(auth()->check() && auth()->user()->invalidCompany)
-                <template v-slot:main-top>
-                    <v-alert
-                        density="compact"
-                        type="warning"
-                        text="{{ ___('messages.invalid-company') }}"
-                    ></v-alert>
-                </template>
-            @endif
             <div id="ue-main-body" class="ue--main-container pa-3 h-100">
 
                 @yield('content')
@@ -62,6 +52,10 @@
             </div>
 
             @yield('slots')
+
+            @if(view()->exists('modularity::layouts.slots'))
+                @include('modularity::layouts.slots')
+            @endif
         </ue-main>
     </div>
 
