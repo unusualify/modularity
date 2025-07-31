@@ -53,7 +53,7 @@
 
                 setTimeout(() => {
                     loadingSpinner.style.display = 'none';
-                }, 300);
+                }, 700);
             }
         });
     </script>
