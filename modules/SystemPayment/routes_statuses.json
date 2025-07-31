@@ -2,5 +2,6 @@
     "PaymentService": true,
     "Payments": true,
     "Currency": true,
-    "CardType": true
+    "CardType": true,
+    "MyPayment": true
 }

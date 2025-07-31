@@ -6,15 +6,17 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Modules\SystemPricing\Entities\Price;
 use Oobook\Priceable\Models\Currency;
+use Unusualify\Modularity\Entities\Traits\HasCreator;
 use Unusualify\Modularity\Entities\Traits\HasFileponds;
 use Unusualify\Modularity\Entities\Traits\ModelHelpers;
 
 class Payment extends \Unusualify\Payable\Models\Payment
 {
-    use ModelHelpers, HasFileponds;
+    use ModelHelpers, HasFileponds, HasCreator;
 
     protected $fillable = [
         'payment_service_id',
+        'payment_gateway',
         'price_id',
         'order_id',
         'amount',
@@ -30,6 +32,7 @@ class Payment extends \Unusualify\Payable\Models\Payment
     protected $appends = [
         'invoice_file',
         'amount_formatted',
+        'invoices',
     ];
 
     /**
@@ -111,6 +114,13 @@ class Payment extends \Unusualify\Payable\Models\Payment
 
         return Attribute::make(
             get: fn ($value) => $file ? $file->mediableFormat() : null,
+        );
+    }
+
+    protected function invoices(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $this->fileponds()->where('role', 'invoice')->get()->map(fn ($file) => $file->mediableFormat()),
         );
     }
 }

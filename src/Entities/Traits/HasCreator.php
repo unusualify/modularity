@@ -29,6 +29,8 @@ trait HasCreator
      */
     protected $customHasCreatorFields = [];
 
+    protected $creatableClass;
+
     protected static function bootHasCreator()
     {
         static::created(function ($model) {
@@ -87,14 +89,40 @@ trait HasCreator
         $this->mergeFillable(static::$hasCreatorFillable ?? []);
     }
 
+    public function getCreatableClass()
+    {
+        // if $this is a table row, fill attributes and relations new class
+        if(!$this->creatableClass) {
+            return $this;
+        }
+
+        $class = new $this->creatableClass;
+
+        $class->setAttribute($this->getKeyName(), $this->getKey());
+        $class->fill($this->getAttributes());
+        $class->setRelations($this->getRelations());
+
+        return $class;
+    }
+
     /**
      * Get the creator record associated with this model
      */
     public function creatorRecord(): \Illuminate\Database\Eloquent\Relations\MorphOne
     {
-        return $this->morphOne(
-            $this->getCreatorRecordModel(),
-            'creatable',
+        $creatableClass = $this->getCreatableClass();
+        [$type, $id] = $creatableClass->getMorphs('creatable', null, null);
+        $creatorRecordModel = new ($this->getCreatorRecordModel());
+        $instance = $creatableClass->newRelatedInstance($creatorRecordModel);
+        $table = $instance->getTable();
+        $localKey = $this->getKeyName();
+
+        return new \Illuminate\Database\Eloquent\Relations\MorphOne(
+            $instance->newQuery(),
+            $creatableClass,
+            $table.'.'.$type,
+            $table.'.'.$id,
+            $localKey
         );
     }
 
@@ -103,14 +131,34 @@ trait HasCreator
      */
     public function creator(): \Illuminate\Database\Eloquent\Relations\HasOneThrough
     {
-        return $this->hasOneThrough(
-            $this->getCreatorModel(),
-            $this->getCreatorRecordModel(),
-            'creatable_id',
-            'id',
-            'id',
-            'creator_id'
+        $creatableClass = $this->getCreatableClass(); // farParent
+        $related = $this->getCreatorModel(); // related
+        $through = $this->getCreatorRecordModel(); // through
+        $throughInstance = $creatableClass->newRelatedThroughInstance($through); // throughInstance
+        $relatedQuery = $creatableClass->newRelatedInstance($related)->newQuery(); // relatedQuery
+
+        $relation = new \Illuminate\Database\Eloquent\Relations\HasOneThrough(
+            $relatedQuery,
+            $creatableClass,
+            $throughInstance,
+            firstKey: 'creatable_id',
+            secondKey: 'id',
+            localKey: 'id',
+            secondLocalKey: 'creator_id'
         );
+
+        // Add the where condition for creatable_type
+        return $relation->where($throughInstance->getTable() . '.creatable_type', get_class($creatableClass));
+
+        // Remove the unreachable code below
+        // return $this->hasOneThrough(
+        //     related: $this->getCreatorModel(), // User
+        //     through: $this->getCreatorRecordModel(), // CreatorRecord
+        //     firstKey: 'creatable_id',
+        //     secondKey: 'id',
+        //     localKey: 'id',
+        //     secondLocalKey: 'creator_id'
+        // );
     }
 
     public function company(): \Illuminate\Database\Eloquent\Relations\HasOne
@@ -250,6 +298,28 @@ trait HasCreator
 
         return $query->whereHas('creatorRecord', function ($query) use ($creator_id, $guardName) {
             $query->where('creator_id', $creator_id)->where('guard_name', $guardName);
+        });
+    }
+
+    /**
+     * Scope a query to only include the current user's creations.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeIsMyCreation($query)
+    {
+        $guardName = null;
+        $userId = -1;
+
+        if(Auth::check()) {
+            $guardName = Auth::guard()->name;
+            $userId = Auth::id();
+        }
+
+        return $query->whereHas('creatorRecord', function ($query) use ($userId, $guardName) {
+            $query->where('creator_id', $userId)
+                ->where('guard_name', $guardName);
         });
     }
 

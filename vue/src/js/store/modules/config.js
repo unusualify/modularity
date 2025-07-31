@@ -22,9 +22,9 @@ const getters = {
   secondarySidebarOptions: state => {
     return state.secondarySidebarOptions
   },
-  profileMenu: state => {
-    return state.profileMenu
-  },
+  // profileMenu: state => {
+  //   return state.profileMenu
+  // },
   isRequestInProgress: state => state.isRequestInProgress, // New getter for request state
   ongoingAxiosRequests: state => state.ongoingAxiosRequests, // New getter for request state
 }

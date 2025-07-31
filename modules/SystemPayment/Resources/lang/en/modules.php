@@ -5,4 +5,6 @@ return [
     'payment_service' => 'Payment Service | Payment Services | {n} Payment Services',
     'payment' => 'Payment | Payments | {n} Payments',
     'card_type' => 'Card Type | Card Types | {n} Card Types',
+    'my_payment' => 'Payment | Payments | {n} Payments',
 ];
+
