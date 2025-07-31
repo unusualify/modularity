@@ -39,6 +39,10 @@ export default {
     return this.$root.$refs.sidebar.$refs.profileDialog
   },
   $openProfileDialog: function () {
+    if(this.$store.getters.isGuest){
+      return
+    }
+
     return this.$store.state.user.profileDialog = true
   },
   $closeProfileDialog: function () {

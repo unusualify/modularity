@@ -1,5 +1,64 @@
 @extends("{$MODULARITY_VIEW_NAMESPACE}::layouts.base")
 
+@push('head_css')
+    <style>
+        .ue-loading-spinner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 1);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            animation: opacity 1s ease-in-out;
+        }
+
+        @keyframes opacity {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .ue-loading-spinner .ue-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(var(--v-theme-primary), 1);
+            border-top: 4px solid #fff;
+            border-radius: 50%;
+            animation: spin 0.3s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .ue-loading-spinner .ue-loading-text {
+            color: rgba(var(--v-theme-primary), 1);
+            font-size: 16px;
+            font-weight: bold;
+        }
+    </style>
+@endpush
+
+@push('head_js')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const loadingSpinner = document.getElementById('loading-spinner');
+            if (loadingSpinner) {
+                loadingSpinner.style.opacity = '0';
+
+                setTimeout(() => {
+                    loadingSpinner.style.display = 'none';
+                }, 700);
+            }
+        });
+    </script>
+@endpush
+
 @section('body')
     @php
         $defaultMainNavigationConfiguration = [
@@ -30,17 +89,7 @@
         <ue-main
             ref='main'
             v-bind='@json($_mainConfiguration)'
-
             >
-            @if(auth()->check() && auth()->user()->invalidCompany)
-                <template v-slot:main-top>
-                    <v-alert
-                        density="compact"
-                        type="warning"
-                        text="{{ ___('messages.invalid-company') }}"
-                    ></v-alert>
-                </template>
-            @endif
             <div id="ue-main-body" class="ue--main-container pa-3 h-100">
 
                 @yield('content')
@@ -62,7 +111,15 @@
             </div>
 
             @yield('slots')
+
+            @if(view()->exists('modularity::layouts.slots'))
+                @include('modularity::layouts.slots')
+            @endif
         </ue-main>
+    </div>
+
+    <div class="ue-loading-spinner" id="loading-spinner">
+        <div class="ue-spinner"></div>
     </div>
 
 @endsection

@@ -76,7 +76,17 @@
           >
             <template v-slot:prepend="prependScope">
               <v-avatar :image="$store.getters.userProfile.avatar_url"
-                @click="$openProfileDialog"/>
+                @click="$openProfileDialog"
+              />
+            </template>
+            <template v-slot:subtitle>
+              <v-tooltip :text="$store.getters.userProfile.email" location="top">
+                <template v-slot:activator="tooltipActivator">
+                  <div class="v-list-item-subtitle" v-bind="tooltipActivator.props">
+                    {{ $store.getters.userProfile.email }}
+                  </div>
+                </template>
+              </v-tooltip>
             </template>
             <template v-slot:append>
               <v-btn
@@ -89,8 +99,7 @@
           </v-list-item>
 
           <v-expand-transition>
-            <ue-navigation-group
-              v-if="profileMenuOpen"
+            <ue-navigation-group v-if="profileMenuOpen"
               :items="profileMenu"
               :profileMenu="true"
               @activateMenu="handleMenu($event)"
@@ -200,6 +209,11 @@
         type: Array,
         required: true,
       },
+      profileMenu: {
+        type: Array,
+        required: false,
+        default: () => [],
+      },
       rating: {
         type: Number,
         default: 0,
@@ -225,6 +239,10 @@
         })
       } catch (e) {
         console.log(e)
+      }
+
+      if(this.profileMenu.length > 0) {
+        this.profileMenuOpen = this.profileMenu.some(item => item.is_active == 1);
       }
     },
     methods: {

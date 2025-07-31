@@ -1,8 +1,5 @@
 <template>
   <v-app id="inspire">
-
-    <slot name="top"></slot>
-
     <v-chip v-if="$store.getters.isHot"
       color="green"
       class="position-absolute"
@@ -57,6 +54,7 @@
     <ue-sidebar v-if="!hideDefaultSidebar"
       ref="sidebar"
       :items="sidebarItems"
+      :profileMenu="profileMenu"
     >
       <template v-slot:bottom>
         <ue-impersonate-toolbar v-if="impersonation.active"
@@ -67,7 +65,7 @@
     </ue-sidebar>
 
     <v-main>
-      <slot name="main-top"></slot>
+      <slot name="top"></slot>
 
       <!-- <ue-footer :items="footerLinks" /> -->
       <div v-if="false">
@@ -79,6 +77,8 @@
       </div>
 
       <slot></slot>
+
+      <slot name="bottom"></slot>
     </v-main>
 
     <!-- MODALS -->
@@ -400,6 +400,7 @@
         // activeItem: this.navigation.activeItem ?? 0,
         // activeSubItem: this.navigation.activeSubItem ?? -1,
         breadcrumbs: this.navigation.breadcrumbs ?? [],
+        profileMenu: this.navigation.profileMenu ?? [],
 
         footerLinks: [
           {

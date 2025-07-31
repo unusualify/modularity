@@ -543,6 +543,83 @@ abstract class Repository implements RepositoryContract
     }
 
     /**
+     * Search in relationship fields
+     *
+     * @param \Illuminate\Database\Query\Builder $query
+     * @param array $scopes
+     * @param string $scopeField
+     * @param string[] $relationshipFields
+     */
+    public function searchInRelationships($query, &$scopes, $scopeField, $relationshipFields = [])
+    {
+        if (isset($scopes[$scopeField]) && is_string($scopes[$scopeField])) {
+            $searchValue = $scopes[$scopeField];
+
+            // Group relationship fields by relationship name
+            $relationshipGroups = [];
+            foreach ($relationshipFields as $field) {
+                $parts = explode('.', $field, 2);
+                if (count($parts) === 2) {
+                    $relationshipName = $parts[0];
+                    $relationshipColumn = $parts[1];
+
+                    if (! isset($relationshipGroups[$relationshipName])) {
+                        $relationshipGroups[$relationshipName] = [];
+                    }
+                    $relationshipGroups[$relationshipName][] = $relationshipColumn;
+
+                    // Remove the relationship field value from scopes
+                    unset($scopes[$field]);
+                }
+            }
+
+            // Add whereHas for each relationship group
+            foreach ($relationshipGroups as $relationshipName => $columns) {
+                $query->orWhereHas($relationshipName, function ($q) use ($columns, $searchValue) {
+                    $relatedModel = $q->getModel();
+
+                    // Check if the related model is translatable
+                    $isTranslatable = method_exists($relatedModel, 'isTranslatable') && $relatedModel->isTranslatable();
+                    $translatedAttributes = $isTranslatable ? ($relatedModel->translatedAttributes ?? []) : [];
+
+                    // Separate translated and non-translated columns
+                    $regularColumns = [];
+                    $translatedColumns = [];
+
+                    foreach ($columns as $column) {
+                        if ($isTranslatable && in_array($column, $translatedAttributes)) {
+                            $translatedColumns[] = $column;
+                        } else {
+                            $regularColumns[] = $column;
+                        }
+                    }
+
+                    $q->where(function ($q) use ($regularColumns, $translatedColumns, $searchValue, $relatedModel) {
+                        // Search in regular columns
+                        if (! empty($regularColumns)) {
+                            $tableName = $relatedModel->getTable();
+                            foreach ($regularColumns as $column) {
+                                $q->orWhere($tableName . '.' . $column, $this->getLikeOperator(), '%' . $searchValue . '%');
+                            }
+                        }
+
+                        // Search in translated columns
+                        if (! empty($translatedColumns)) {
+                            $q->orWhereHas('translations', function ($translationQuery) use ($translatedColumns, $searchValue) {
+                                $translationQuery->where(function ($tq) use ($translatedColumns, $searchValue) {
+                                    foreach ($translatedColumns as $column) {
+                                        $tq->orWhere($column, $this->getLikeOperator(), '%' . $searchValue . '%');
+                                    }
+                                });
+                            });
+                        }
+                    });
+                });
+            }
+        }
+    }
+
+    /**
      * @return bool
      */
     public function isUniqueFeature()

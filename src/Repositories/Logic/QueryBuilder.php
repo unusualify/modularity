@@ -31,20 +31,38 @@ trait QueryBuilder
         if (isset($scopes['searches']) && isset($scopes['search']) && is_array($scopes['searches'])) {
             $translatedAttributes = $this->model->translatedAttributes ?? [];
 
-            $searches = Arr::where($scopes['searches'], function (string|int $value, int $key) use ($translatedAttributes) {
-                return ! in_array($value, $translatedAttributes);
+            // First, extract relationship fields (containing dots)
+            $relationshipFields = [];
+            $regularFields = [];
+
+            foreach ($scopes['searches'] as $field) {
+                if (str_contains($field, '.')) {
+                    $relationshipFields[] = $field;
+                } else {
+                    $regularFields[] = $field;
+                }
+            }
+
+            // Handle relationship field searching
+            if (! empty($relationshipFields) && isset($scopes['search'])) {
+                $this->searchInRelationships($query, $scopes, 'search', $relationshipFields);
+            }
+
+            // Remove translated attributes from regular fields for main table searching
+            $searches = array_filter($regularFields, function ($field) use ($translatedAttributes) {
+                return ! in_array($field, $translatedAttributes);
             });
 
+            // Search in main table fields (non-translated, non-relationship)
             $this->searchIn($query, $scopes, 'search', $searches);
 
-            $scope['searches'] = Arr::where($scopes['searches'], function (string|int $value, int $key) use ($translatedAttributes) {
-                return in_array($value, $translatedAttributes);
+            // Handle translated fields (existing logic)
+            $scope['searches'] = array_filter($regularFields, function ($field) use ($translatedAttributes) {
+                return in_array($field, $translatedAttributes);
             });
-            // unset($scopes['searches']);
         }
 
         $query = $this->filter($query, $scopes);
-        // $query = $this->filterBack($query, $scopes);
 
         $query = $this->order($query, $orders);
 

@@ -195,6 +195,16 @@ return [
                     'itemTitle' => 'id',
                 ],
                 [
+                    'title' => 'User Email',
+                    'key' => 'creator',
+                    'itemTitle' => 'email',
+                ],
+                [
+                    'title' => 'Company',
+                    'key' => 'company',
+                    'itemTitle' => 'name',
+                ],
+                [
                     'title' => 'Service',
                     'key' => 'paymentService',
                     // 'itemTitle' => 'title',
@@ -262,7 +272,7 @@ return [
                     'label' => 'Invoice',
                     'max' => 1,
                     'conditions' => [
-                        ['status', '=', 'COMPLETED'],
+                        ['status', '=', 'COMPLETED', 'REFUNDED', 'CANCELLED'],
                     ],
                     'allowedRoles' => ['superadmin', 'admin', 'manager', 'account-executive'],
                     'acceptedExtensions' => ['pdf'],
@@ -410,6 +420,115 @@ return [
                     'name' => 'logo',
                     'rules' => 'sometimes|required:array',
                     'isIcon' => true,
+                ],
+            ],
+        ],
+        'my_payment' => [
+            'name' => 'MyPayment',
+            'headline' => 'Payments',
+            'url' => 'my-payments',
+            'route_name' => 'my_payment',
+            'icon' => '$submodule',
+            'title_column_key' => 'name',
+            'scopes' => [
+                'isMyCreation' => true,
+            ],
+            'table_options' => [
+                'subtitle' => __('You can check all the payments that you receive and the invoices related to the payments here according to company list.'),
+                'formEditTitleTranslationKey' => 'messages.my_payment.edit',
+
+                'createOnModal' => true,
+                'editOnModal' => true,
+                'isRowEditing' => false,
+                'rowActionsType' => 'inline',
+            ],
+            'table_row_actions' => [
+                'show' => [
+                    'name' => 'edit',
+                    'merge' => true,
+                    'icon' => 'mdi-eye',
+                    'label' => __('Show'),
+                ],
+            ],
+            'headers' => [
+                [
+                    'title' => 'Amount',
+                    'key' => 'amount_formatted',
+                ],
+                [
+                    'title' => 'Status',
+                    'key' => 'status',
+                    'formatter' => [
+                        'chip',
+                        [
+                            'size' => 'small',
+                        ],
+                    ],
+                ],
+                [
+                    'title' => 'User Email',
+                    'key' => 'creator',
+                    'itemTitle' => 'email',
+                ],
+                [
+                    'title' => 'Created Time',
+                    'key' => 'created_at',
+                    'visible' => false,
+                    'formatter' => [
+                        'date',
+                        'medium',
+                    ],
+                    'searchable' => false,
+                    'sortable' => true,
+                ],
+                [
+                    'title' => 'Last Update',
+                    'key' => 'updated_at',
+                    'formatter' => [
+                        'date',
+                        'numeric',
+                    ],
+                    'searchable' => false,
+                    'sortable' => true,
+                ],
+                [
+                    'title' => 'Actions',
+                    'key' => 'actions',
+                    'sortable' => false,
+                ],
+            ],
+            'inputs' => [
+                [
+                    'type' => 'preview',
+                    'name' => 'files',
+                    'noSubmit' => true,
+                    'default' => null,
+                    'col' => ['cols' => 12, 'class' => 'mb-4'],
+                    'configuration' => [
+                        'tag' => 'v-card',
+                        'attributes' => [
+                            'link' => true,
+                            'class' => 'mx-auto py-4 mb-4 h-100',
+                            'variant' => 'elevated',
+                            'title' => 'Invoices',
+                        ],
+                        'elements' => [
+                            'tag' => 'v-card-text',
+                            'elements' => [
+                                'tag' => 'ue-filepond-preview',
+                                'attributes' => [
+                                    'source' => '$invoices',
+                                    'show-inline-file-name' => true,
+                                    'max-file-name-length' => 20,
+                                    'image-size' => 24,
+                                ],
+                            ],
+                        ],
+                    ],
+                    // 'conditions' => [
+                    //     ['invoice', '>', 0],
+                    // ],
+                    'creatable' => 'hidden',
                 ],
             ],
         ],

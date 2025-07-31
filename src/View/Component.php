@@ -13,41 +13,29 @@ class Component extends LaravelComponent
     use ManageNames;
 
     protected static $htmlElements = [
-        // Main root
-        'Html',
-        // Document metadata
-        'Base', 'Head', 'Link', 'Meta', 'Style', 'Title',
-        // Sectioning root
-        'Body',
-        // Content sectioning
-        'Address', 'Article', 'Aside', 'Footer', 'Header', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6',
-        'Main', 'Nav', 'Section',
-        // Text content
-        'Blockquote', 'Dd', 'Div', 'Dl', 'Dt', 'Figcaption', 'Figure', 'Hr', 'Li', 'Menu',
-        'Ol', 'P', 'Pre', 'Ul',
-        // Inline text semantics
-        'A', 'Abbr', 'B', 'Bdi', 'Bdo', 'Br', 'Cite', 'Code', 'Data', 'Dfn', 'Em', 'I',
-        'Kbd', 'Mark', 'Q', 'Rp', 'Rt', 'Ruby', 'S', 'Samp', 'Small', 'Span', 'Strong',
-        'Sub', 'Sup', 'Time', 'U', 'Var', 'Wbr',
-        // Image and multimedia
-        'Area', 'Audio', 'Img', 'Map', 'Track', 'Video',
-        // Embedded content
-        'Embed', 'Iframe', 'Object', 'Picture', 'Portal', 'Source',
-        // SVG and MathML
-        'Svg', 'Math',
-        // Scripting
-        'Canvas', 'Noscript', 'Script',
-        // Demarcating edits
-        'Del', 'Ins',
-        // Table content
-        'Caption', 'Col', 'Colgroup', 'Table', 'Tbody', 'Td', 'Tfoot', 'Th', 'Thead', 'Tr',
-        // Forms
-        'Button', 'Datalist', 'Fieldset', 'Form', 'Input', 'Label', 'Legend', 'Meter',
-        'Optgroup', 'Option', 'Output', 'Progress', 'Select', 'Textarea',
-        // Interactive elements
-        'Details', 'Dialog', 'Summary',
-        // Web Components
-        'Slot', 'Template',
+        // Sorted by length (descending) to ensure longer matches come first
+        // 11 characters
+        'Figcaption',
+        // 10 characters
+        'Blockquote',
+        // 9 characters
+        'Colgroup', 'Fieldset', 'Noscript', 'Optgroup', 'Textarea',
+        // 8 characters
+        'Address', 'Article', 'Caption', 'Datalist', 'Progress', 'Template',
+        // 7 characters
+        'Details', 'Summary', 'Section', 'Header', 'Footer', 'Legend', 'Picture', 'Portal', 'Canvas', 'Dialog', 'Object', 'Button', 'Output', 'Select', 'Iframe',
+        // 6 characters
+        'Figure', 'Strong', 'Source', 'Script',
+        // 5 characters
+        'Small', 'Title', 'Style', 'Table', 'Tbody', 'Tfoot', 'Thead', 'Track', 'Video', 'Audio', 'Input', 'Label', 'Meter', 'Aside',
+        // 4 characters
+        'Main', 'Menu', 'Form', 'Html', 'Base', 'Head', 'Link', 'Meta', 'Body', 'Area', 'Cite', 'Code', 'Data', 'Mark', 'Ruby', 'Samp', 'Span', 'Time', 'Abbr', 'Slot', 'Math', 'Embed',
+        // 3 characters
+        'Nav', 'Div', 'Pre', 'Del', 'Ins', 'Col', 'Img', 'Map', 'Svg',
+        // 2 characters
+        'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'Dd', 'Dl', 'Dt', 'Hr', 'Li', 'Ol', 'Br', 'Em', 'Kbd', 'Sub', 'Sup', 'Var', 'Wbr', 'Bdi', 'Bdo', 'Dfn', 'Rp', 'Rt', 'Th', 'Td', 'Tr', 'Ul',
+        // 1 character
+        'A', 'B', 'I', 'P', 'Q', 'S', 'U',
     ];
 
     /**
