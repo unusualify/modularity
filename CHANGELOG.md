@@ -2,6 +2,42 @@
 
 All notable changes to `modularity` will be documented in this file
 
+## v0.41.0 - 2025-07-31
+
+### :rocket: Features
+
+- integrate profile menu into layout and sidebar components by @OoBook in https://github.com/unusualify/modularity/commit/2b3e35fb35dde1df0125e2b7d974ed87272e336d
+- enhance payment module with new features and attributes by @OoBook in https://github.com/unusualify/modularity/commit/05d72abec59d899e3e1b91a960ccad8db6a2baa2
+- introduce MyPayment module with CRUD functionality by @OoBook in https://github.com/unusualify/modularity/commit/6c20d78d7299554c37825168bd2db88b5c10efae
+- add support for searching in relationship fields by @OoBook in https://github.com/unusualify/modularity/commit/baf0d1bec62b4c3fda53cfa9519fde3a607e3fa4
+- add loading spinner for improved user experience by @OoBook in https://github.com/unusualify/modularity/commit/9127e46372ad721137d619d11f5353797279ef1f
+- prevent profile dialog opening for guest users by @OoBook in https://github.com/unusualify/modularity/commit/c171d2618eded23fd06b6f84895901afc54f130b
+- add events for Filepond lifecycle management by @OoBook in https://github.com/unusualify/modularity/commit/96e581a069c103f6695b8c3b85a1597aaf2895b9
+- enhance notification redirection logic by @OoBook in https://github.com/unusualify/modularity/commit/a2c54b2f9fec5a19a72af6298e3cf5ea28ceb14c
+- add filepondable method for polymorphic relationships by @OoBook in https://github.com/unusualify/modularity/commit/2876c356fe6f828ecd5fa981c10c8cdaaf7adfb3
+
+### :wrench: Bug Fixes
+
+- improve creator relationship logic and clean up unreachable code by @OoBook in https://github.com/unusualify/modularity/commit/65735e15dc10f2bdc0a66843a2db995372b1bad5
+- reorder HTML elements by length for improved matching by @OoBook in https://github.com/unusualify/modularity/commit/843ddc04d58fe194a4c0f7f2b94f95de06309168
+- extend loading spinner duration for better user experience by @OoBook in https://github.com/unusualify/modularity/commit/2483c234cc7a35dbbaba1a5bdaf5427f8fbc34e7
+
+### :recycle: Refactors
+
+- add getFilepondableClass method for improved filepond handling by @OoBook in https://github.com/unusualify/modularity/commit/cdbaf86470aa754d0c1eadf2650f7f10dffa29bb
+- enhance creator relationship handling and add user-specific creation scope by @OoBook in https://github.com/unusualify/modularity/commit/8c5037d6d1ece6b5bf5312e0055d04411a0ec62a
+- update controller namespace for improved compatibility by @OoBook in https://github.com/unusualify/modularity/commit/b95cbcc79267bf0e674c8def9f0f2809634f78b3
+- update slot structure for improved layout flexibility by @OoBook in https://github.com/unusualify/modularity/commit/46af081423788d070a65a35c429b840ec3d9ba09
+- streamline layout and include modular slots by @OoBook in https://github.com/unusualify/modularity/commit/458abda47f15c9157742b01f020a49f4ef024600
+
+### :lipstick: Styling
+
+- lint coding styles for v0.41.0 by @OoBook in https://github.com/unusualify/modularity/commit/098a7a3d28775567c80b8f8f87514cb1c16e808f
+
+### :package: Build
+
+- update build artifacts for v0.41.0 by @OoBook in https://github.com/unusualify/modularity/commit/99910da8a627574288e705d5af8edd9e65c6cedd
+
 ## v0.40.0 - 2025-07-25
 
 ### :rocket: Features
