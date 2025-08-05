@@ -100,6 +100,12 @@ class ProcessController extends Controller
             $process->processable->setProcessStatus($request->get('status'), $request->get('reason') ?? null);
         }
 
-        return response()->json(['variant' => 'success', 'message' => 'Process updated successfully']);
+        $process->refresh();
+
+        return response()->json([
+            'variant' => 'success',
+            'message' => 'Process updated successfully',
+            'process_status' => $process->status,
+        ]);
     }
 }

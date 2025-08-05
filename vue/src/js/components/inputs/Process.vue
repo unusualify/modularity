@@ -7,7 +7,6 @@
       transition="dialog-bottom-transition"
       width-type="md"
       full
-
       eager
     >
       <template v-slot:body="formModalBodyScope">
@@ -60,11 +59,10 @@
     </ue-modal>
 
     <v-card
-      :color="processModel?.status_card_color ?? color"
-      :variant="processModel?.status_card_variant ?? cardVariant"
+      :color="status.card_color"
+      :variant="status.card_variant"
       class="mb-4 w-100 h-100 d-flex flex-column"
     >
-
       <v-skeleton-loader v-if="loading" type="table-heading, list-item-three-line" class="mb-4 w-100 h-100" style="min-height: 300px;"></v-skeleton-loader>
 
       <template v-else-if="processModel">
@@ -77,11 +75,11 @@
             </v-col>
             <v-col cols="12" sm="6" md="6" lg="4" xl="3" class="d-flex justify-sm-end">
               <v-chip
-                :prepend-icon="processModel.status_icon"
-                :color="processModel.status_color"
+                :prepend-icon="status.icon"
+                :color="status.color"
                 class="text-subtitle-1"
               >
-                {{ processModel.status_label }}
+                {{ status.label }}
               </v-chip>
             </v-col>
           </v-row>
@@ -89,7 +87,7 @@
           <v-spacer class="flex-grow-0"></v-spacer>
 
           <!-- Edit Button -->
-          <v-row v-if="$hasRoles(processableEditableRoles)">
+          <v-row v-if="hasProcessableEditing">
             <v-col cols="12" class="text-center" v-if="formSchema && processableModel">
               <v-btn
                 ref="editButton"
@@ -189,26 +187,11 @@
 
         <v-spacer></v-spacer>
 
-        <v-card-actions class="px-4" v-if="$hasRoles(processEditableRoles)" >
+        <v-card-actions v-if="$hasRoles(processEditableRoles)" class="px-4">
           <v-row>
-            <v-col cols="12" class="text-center" v-if="processModel && processModel.status">
-
-              <!-- Preparing -->
-              <template v-if="processModel.status === 'preparing' && canAction(processModel.status)">
-                <v-btn
-                  :color="processModel.next_action_color"
-                  variant="elevated"
-                  :loading="updating"
-                  @click="updateProcess('waiting_for_confirmation')"
-
-                  :disabled="!bothFormAndProcessableValid"
-                >
-                  {{ processModel.next_action_label }}
-                </v-btn>
-              </template>
-
+            <v-col v-if="processModel && processModel.status" cols="12" class="text-center">
               <!-- Waiting for Confirmation -->
-              <template v-else-if="processModel.status.match(/waiting_for_confirmation|waiting_for_reaction/) && canAction(processModel.status)">
+              <template v-if="processModel.status.match(/waiting_for_confirmation|waiting_for_reaction/) && canAction(processModel.status)">
                 <ue-modal
                   ref="promptModal"
                   v-model="promptModalActive"
@@ -247,7 +230,7 @@
                           variant="elevated"
                           :disabled="!reason"
                           :loading="updating"
-                          @click="confirmPrompt('rejected')"
+                          @click="updateProcess('rejected')"
                         >
                           {{ $t('Reject') }}
                         </v-btn>
@@ -259,23 +242,27 @@
                   color="success"
                   variant="elevated"
                   :loading="updating"
-                  @click="updateProcess('confirmed')"
+                  @click="confirmUpdateProcess('confirmed')"
                 >
                   <v-icon left>mdi-check</v-icon>
                 </v-btn>
               </template>
 
-              <!-- Rejected -->
-              <template v-else-if="processModel.status === 'rejected' && canAction(processModel.status)">
+              <!-- Process Status Actions -->
+              <template v-else-if="canAction(processModel.status)">
                 <v-btn
-                  :color="processModel.next_action_color"
+                  :color="status.next_action_color"
                   variant="elevated"
                   :loading="updating"
-                  @click="updateProcess('waiting_for_reaction')"
+                  :disabled="processModel.status === 'preparing' && !bothFormAndProcessableValid"
+                  @click="confirmUpdateProcess(
+                    processModel.status === 'preparing' ? 'waiting_for_confirmation' : 'waiting_for_reaction'
+                  )"
                 >
-                  {{ processModel.next_action_label }}
+                  {{ status.next_action_label }}
                 </v-btn>
               </template>
+
 
             </v-col>
           </v-row>
@@ -288,11 +275,12 @@
 </template>
 
 <script>
-import { ref, reactive, computed, toRefs } from 'vue'
+import { ref, reactive, computed, toRefs, nextTick, onMounted } from 'vue'
 import _ from 'lodash-es'
 import { useI18n } from 'vue-i18n'
+import { useStore } from 'vuex'
 
-import { useInput, makeInputProps, makeInputEmits, useAuthorization } from '@/hooks'
+import { useInput, makeInputProps, makeInputEmits, useAuthorization, useDynamicModal } from '@/hooks'
 import { ALERT } from '@/store/mutations'
 
 
@@ -339,7 +327,7 @@ export default {
       required: true,
     },
     processableEditableRoles: {
-      type: Array,
+      type: [Array, Object],
       default: () => ['superadmin']
     },
     processEditableRoles: {
@@ -362,11 +350,36 @@ export default {
       type: Array,
       default: null
     },
+    statusConfiguration: {
+      type: Object,
+      default: () => {},
+      value: () => {
+        return {
+          preparing: {
+            title: 'Preparing',
+            icon: 'mdi-progress-clock',
+            color: 'secondary',
+            card_color: 'grey',
+            card_variant: 'outlined',
+            next_action_label: 'Preparing',
+            next_action_color: 'secondary',
+            dialog_title: 'Preparing',
+            dialog_message: 'The contents are being prepared or updated. Please check back later.',
+            response_message: 'The contents are being prepared or updated. Please check back later.',
+          }
+        }
+      },
+    },
+    responseLocation: {
+      type: String,
+      default: 'top',
+    },
   },
   setup (props, context) {
     const { t } = useI18n()
-
+    const store = useStore()
     const { hasRoles } = useAuthorization()
+    const DynamicModal = useDynamicModal()
 
     const initializeInput = (val) => {
       return val
@@ -375,6 +388,8 @@ export default {
     const updateModelValue = (val) => {
       context.emit('update:modelValue', val)
     }
+
+    const Input = useInput(props, { ...context, initializeInput, updateModelValue })
 
     const processModel = ref(props.process)
     const processableModel = ref(props.process?.processable ?? null)
@@ -432,12 +447,140 @@ export default {
     const reason = ref('')
     const promptModalActive = ref(false)
 
-    const hasProcessableEditing = computed(() => {
-      let editingRoles = props.processableEditableRoles
+    const openDialog = (title, message, callback) => {
+      DynamicModal.open(null, {
+        'modalProps': {
+          'widthType': 'md',
+          'description': message,
+          'title': title,
+          'confirmText': t('Yes'),
+          'cancelText': t('No'),
+          'confirmCallback': async () => {
+            await callback()
+          }
+        }
+      })
+    }
 
-      if(__isString(editingRoles) && editingRoles === '*'){
-        return true
+    const fetchProcess = () => {
+
+      if (Input.input.value > 0 && !props.process) {
+        const endpoint = props.fetchEndpoint.replace(':id', Input.input.value);
+
+        loading.value = true
+
+        axios.get(endpoint)
+          .then(response => {
+            loading.value = false
+            if(response.status === 200) {
+
+              processModel.value = response.data
+              processableModel.value = processModel.value?.processable ?? {}
+              setSchema()
+
+              nextTick().then(async () => {
+                if(UeForm.value){
+                  await UeForm.value.validate()
+                  await UeForm.value.VForm.resetValidation()
+                  processableValid.value = UeForm.value.validModel
+                }
+              })
+            }
+          }).catch(error => {
+
+          }).finally(() => {
+            loading.value = false
+          })
       }
+    }
+
+    const updateProcess = async (status) => {
+      if (Input.input.value) {
+
+        if(hasProcessableEditing.value){
+          await UeForm.value.validate()
+          const isValid = UeForm.value.validModel
+
+          if(!isValid){
+
+            store.commit(ALERT.SET_ALERT, { message: t('Please fill all the required fields'), variant: 'error', location: 'top', timeout: 2000 })
+
+            return
+          }
+        }
+
+        updating.value = true
+        const endpoint = props.updateEndpoint.replace(':id', Input.input.value);
+
+        const data = {
+          status: status,
+          reason: reason.value,
+        }
+
+        axios.put(endpoint, data).then(response => {
+          if(response.status === 200) {
+            promptModalActive.value = false
+            reason.value = ''
+            let newStatus = response.data.process_status
+
+            let message = props.statusConfiguration?.[newStatus]?.response_message ?? response.data.message
+
+            store.commit(ALERT.SET_ALERT, { message: message, variant: response.data.variant, location: props.responseLocation })
+            fetchProcess()
+          }
+        }).finally(() => {
+          updating.value = false
+        })
+      }
+    }
+
+    const confirmUpdateProcess = async (status) => {
+      let title = t('Are you sure you want to update the process?')
+      let message = t('This action cannot be undone.')
+
+      if(props.statusConfiguration && props.statusConfiguration[status] && props.statusConfiguration[status].dialog_title){
+        title = props.statusConfiguration[status].dialog_title
+      }else if(processModel.value?.status_dialog_titles && processModel.value.status_dialog_titles[status]){
+        title = processModel.value.status_dialog_titles[status]
+      }
+
+      if(props.statusConfiguration && props.statusConfiguration[status] && props.statusConfiguration[status].dialog_message){
+        message = props.statusConfiguration[status].dialog_message
+      }else if(processModel.value?.status_dialog_messages && processModel.value.status_dialog_messages[status]){
+        message = processModel.value.status_dialog_messages[status]
+      }
+
+      openDialog(title, message, () => updateProcess(status))
+    }
+
+    const canAction = (status) => {
+      return (!props.actionRoles[status] || hasRoles(props.actionRoles[status]))
+    }
+
+    const getProcessableEditableRoles = () => {
+      let processableEditableRoles = props.processableEditableRoles
+
+      if(__isString(processableEditableRoles) && processableEditableRoles === '*'){
+        return ['*']
+      }
+
+      if(Array.isArray(processableEditableRoles) && processableEditableRoles.includes('*')){
+        return ['*']
+      }
+
+      if(Array.isArray(processableEditableRoles)){
+        return processableEditableRoles
+      }
+
+      if(__isObject(processableEditableRoles)){
+        return processableEditableRoles[processModel.value?.status] ?? []
+      }
+
+      return []
+    }
+
+    const hasProcessableEditing = computed(() => {
+      let editingRoles = getProcessableEditableRoles()
 
       if(Array.isArray(editingRoles) && editingRoles.includes('*')){
         return true
@@ -551,23 +694,61 @@ export default {
       onlyOneValid: computed(() => {
         return (processableValid.value && !formIsValid.value) || (!processableValid.value && formIsValid.value)
       }),
+
+      status: computed(() => {
+        const status = {
+          label: '',
+          icon: '',
+          color: '',
+          card_color: '',
+          card_variant: '',
+          next_action_label: '',
+          next_action_color: '',
+          dialog_title: '',
+          dialog_message: '',
+          response_message: null,
+        }
+
+        if(!processModel.value){
+          return status
+        }
+
+        let process = processModel.value
+
+        status.label = props.statusConfiguration?.[process.status]?.title ?? process.status_label
+        status.icon = props.statusConfiguration?.[process.status]?.icon ?? process.status_icon
+        status.color = props.statusConfiguration?.[process.status]?.color ?? process.status_color
+        status.card_color = props.statusConfiguration?.[process.status]?.card_color ?? process.status_card_color ?? props.color
+        status.card_variant = props.statusConfiguration?.[process.status]?.card_variant ?? process.status_card_variant ?? props.cardVariant
+        status.next_action_label = props.statusConfiguration?.[process.status]?.next_action_label ?? process.next_action_label
+        status.next_action_color = props.statusConfiguration?.[process.status]?.next_action_color ?? process.next_action_color
+        status.dialog_title = props.statusConfiguration?.[process.status]?.dialog_title ?? process.status_dialog_title
+        status.dialog_message = props.statusConfiguration?.[process.status]?.dialog_message ?? process.status_dialog_message
+
+        status.response_message = props.statusConfiguration?.[process.status]?.response_message
+
+        return status
+      }),
     })
 
     const methods = reactive({
-      setSchema
+      setSchema,
+      canAction,
+      fetchProcess,
+      updateProcess,
+      confirmUpdateProcess,
+    })
+
+    onMounted(() => {
+      fetchProcess()
     })
 
     return {
-      ...useInput(props, { ...context, initializeInput, updateModelValue }),
+      ...Input,
       ...toRefs(states),
       formSchema,
       processModel,
       ...toRefs(methods),
-    }
-  },
-  data: function () {
-    return {
-
     }
   },
   watch: {
@@ -589,77 +770,6 @@ export default {
     }
   },
   methods: {
-    fetchProcess() {
-      if (this.input > 0 && !this.process) {
-        const endpoint = this.fetchEndpoint.replace(':id', this.input);
-
-        this.loading = true
-
-        const self = this
-
-        axios.get(endpoint)
-          .then(response => {
-            self.loading = false
-            if(response.status === 200) {
-
-              self.processModel = response.data
-              self.processableModel = self.processModel?.processable ?? {}
-              self.setSchema()
-
-              self.$nextTick(async () => {
-                if(self.UeForm){
-                  await self.UeForm.validate()
-                  await self.UeForm.VForm.resetValidation()
-                  self.processableValid = self.UeForm.validModel
-                }
-              })
-            }
-          }).catch(error => {
-
-          }).finally(() => {
-            self.loading = false
-          })
-      }
-    },
-    async updateProcess(status) {
-
-      if (this.input) {
-
-        if(this.hasProcessableEditing){
-          await this.UeForm.validate()
-          const isValid = this.UeForm.validModel
-
-          if(!isValid){
-
-            this.$store.commit(ALERT.SET_ALERT, { message: this.$t('Please fill all the required fields'), variant: 'error', location: 'top', timeout: 2000 })
-
-            return
-          }
-        }
-
-        this.updating = true
-        const endpoint = this.updateEndpoint.replace(':id', this.input);
-
-        const data = {
-          status: status,
-          reason: this.reason
-        }
-
-        const self = this
-
-        axios.put(endpoint, data).then(response => {
-          if(response.status === 200) {
-            self.promptModalActive = false
-            self.reason = ''
-
-            self.$store.commit(ALERT.SET_ALERT, { message: response.data.message, variant: response.data.variant })
-            self.fetchProcess()
-          }
-        }).finally(() => {
-          self.updating = false
-        })
-      }
-    },
     async updateProcessable() {
 
       if(this.input){
@@ -686,17 +796,7 @@ export default {
 
 
     },
-    canAction(status) {
-      return (!this.$isset(this.actionRoles[status]) || this.$hasRoles(this.actionRoles[status]))
-    },
-    confirmPrompt(status) {
-      // this.promptModalActive = false
-      this.updateProcess(status)
-    }
   },
-  created() {
-    this.fetchProcess()
-  }
 }
 </script>
 
