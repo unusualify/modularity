@@ -401,4 +401,25 @@ trait HasStateable
             StateableUpdated::dispatch($cloneModel, $cloneModel->state, $oldState);
         }
     }
+
+    public static function syncStateData() : array
+    {
+        $defaultStates = self::getDefaultStates();
+        $defaultStateCodes = array_column($defaultStates, 'code');
+
+        $absentStateCodes = array_diff($defaultStateCodes, State::pluck('code')->toArray());
+
+        $absentStates = array_values(array_filter($defaultStates, function ($state) use ($absentStateCodes) {
+            return in_array($state['code'], $absentStateCodes);
+        }));
+
+        $newStates = [];
+
+        foreach ($absentStates as $absentState) {
+            $newState = State::create($absentState);
+            $newStates[] = $newState;
+        }
+
+        return $newStates;
+    }
 }
