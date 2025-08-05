@@ -525,7 +525,12 @@ export default {
 
             let message = props.statusConfiguration?.[newStatus]?.response_message ?? response.data.message
 
-            store.commit(ALERT.SET_ALERT, { message: message, variant: response.data.variant, location: props.responseLocation })
+            store.commit(ALERT.SET_ALERT, {
+              message: message,
+              variant: response.data.variant,
+              location: props.responseLocation
+            })
+
             fetchProcess()
           }
         }).finally(() => {
@@ -701,7 +706,7 @@ export default {
           icon: '',
           color: '',
           card_color: '',
-          card_variant: '',
+          card_variant: 'outlined',
           next_action_label: '',
           next_action_color: '',
           dialog_title: '',
