@@ -59,12 +59,14 @@ vi.mock('vue-i18n', () => ({
 }))
 
 // Mock only useAuthorization from @/hooks
+let mockHasRoles = vi.fn(() => true)
+
 vi.mock('@/hooks', async () => {
   const actual = await vi.importActual('@/hooks')
   return {
     ...actual,
     useAuthorization: () => ({
-      hasRoles: vi.fn(() => true) // Mock hasRoles to return true by default
+      hasRoles: mockHasRoles
     })
   }
 })
@@ -81,11 +83,49 @@ const mockStore = {
   commit: vi.fn()
 }
 
-async function factory(props = {}, options = {}) {
+// Add this helper function after the mockStore definition
+function createMockStore(overrides = {}) {
+  return {
+    getters: {
+      isSuperAdmin: false,
+      userRoles: ['admin'],
+      userPermissions: {},
+      userProfile: { id: 1 },
+      ...overrides
+    },
+    commit: vi.fn(),
+    dispatch: vi.fn(),
+    state: {}
+  }
+}
+
+// Update your factory function to accept a custom store
+async function factory(props = {}, options = {}, customStore = null) {
+  const store = customStore || mockStore
+
   return await mount(VInputProcess, {
     global: {
+      // Add provide to mock both modalService and store injections
+      provide: {
+        modalService: {
+          open: vi.fn(),
+          close: vi.fn(),
+          state: {
+            visible: false,
+            component: null,
+            props: {},
+            emits: {},
+            slots: {},
+            data: undefined,
+            onClose: undefined,
+            modalProps: {}
+          }
+        },
+        // Add store injection for useStore() hook
+        store: store
+      },
       mocks: {
-        $store: mockStore,
+        $store: store, // Keep this for Options API compatibility
         $t: (key) => key,
         $log: vi.fn(),
         $lodash: {
@@ -98,7 +138,13 @@ async function factory(props = {}, options = {}) {
             return result
           }
         },
-        $hasRoles: () => true,
+        $hasRoles: (roles) => {
+          if (typeof roles === 'string') {
+            roles = roles.split(',').map(role => role.trim())
+          }
+          const userRoles = store.getters.userRoles || []
+          return userRoles.some(role => roles.includes(role))
+        },
         $isset: (val) => val !== undefined && val !== null
       },
       stubs: {
@@ -117,7 +163,10 @@ async function factory(props = {}, options = {}) {
         'v-row': true,
         'v-col': true,
         'v-spacer': true,
-        'v-divider': true
+        'v-divider': true,
+        'v-alert': true,
+        'v-textarea': true,
+        'v-icon': true
       }
     },
     ...options,
@@ -248,33 +297,46 @@ describe('VInputProcess tests', () => {
       }
     }
 
+    // Mock axios.put to track the call
+    const axiosPutSpy = vi.spyOn(global.axios, 'put').mockResolvedValue({
+      status: 200,
+      data: {
+        message: 'Process updated successfully',
+        variant: 'success',
+        process_status: 'waiting_for_confirmation'
+      }
+    })
+
     const wrapper = await factory({
       modelValue: 1,
       process: processData,
       schema: schema
     })
 
-    // Mock methods
-    wrapper.vm.canAction = () => true
-    const updateProcessSpy = vi.spyOn(wrapper.vm, 'updateProcess')
-
-    // Properly mock UeForm with validate method
+    // Mock methods and form
     wrapper.vm.UeForm = {
       validModel: true,
       model: {
         id: 101,
         name: 'Updated Test Process'
       },
-      validate: vi.fn().mockResolvedValue(true), // Add mock validate method
+      validate: vi.fn().mockResolvedValue(true),
       VForm: {
         resetValidation: vi.fn()
       }
     }
-    // Call the method directly since we're stubbing the button
+
+    // Call the method directly instead of spying
     await wrapper.vm.updateProcess('waiting_for_confirmation')
 
-    expect(updateProcessSpy).toHaveBeenCalledWith('waiting_for_confirmation')
-    expect(global.axios.put).toHaveBeenCalled()
+    // Verify the axios call was made with correct parameters
+    await expect(axiosPutSpy).toHaveBeenCalledWith('/api/process/1', {
+      status: 'waiting_for_confirmation',
+      reason: ''
+    })
+
+    // Verify the updating state was handled
+    expect(wrapper.vm.updating).toBe(false)
   })
 
   test('updates processable when form is submitted', async () => {
@@ -342,21 +404,241 @@ describe('VInputProcess tests', () => {
       }
     })
 
-    // console.log('wrapper.vm.canAction',
-    //   wrapper.vm.canAction('preparing'),
-    //   wrapper.vm.actionRoles,
-    //   wrapper.vm.$store.getters.userRoles
-    // )
     // Test when user has the role
-    wrapper.vm.$hasRoles = () => true
+    mockHasRoles.mockReturnValue(true)
     expect(wrapper.vm.canAction('preparing')).toBe(true)
+    expect(mockHasRoles).toHaveBeenCalledWith(['admin'])
 
     // Test when user doesn't have the role
-    wrapper.vm.$hasRoles = () => false
+    mockHasRoles.mockReturnValue(false)
     expect(wrapper.vm.canAction('preparing')).toBe(false)
 
     // Test when no roles are specified for the status
     expect(wrapper.vm.canAction('confirmed')).toBe(true)
+    // hasRoles shouldn't be called when no roles are specified
   })
+})
+
+describe('Role-based authorization tests', () => {
+  test('hasRoles returns true when user has required role', async () => {
+    const store = createMockStore({
+      userRoles: ['admin', 'editor']
+    })
+
+    const wrapper = await factory({
+      modelValue: 1,
+      process: {
+        id: 1,
+        status: 'preparing',
+        processable: { id: 101, name: 'Test Process' }
+      },
+      actionRoles: {
+        preparing: ['admin']
+      }
+    }, {}, store)
+
+    mockHasRoles.mockImplementation((roles) => {
+      if(global.__isString(roles)){
+        roles = roles.split(',').map(role => role.trim())
+      }
+      return store.getters.userRoles.some(role => roles.includes(role))
+    })
+
+    expect(wrapper.vm.canAction('preparing')).toBe(true)
+  })
+
+  test('hasRoles returns false when user lacks required role', async () => {
+    const store = createMockStore({
+      userRoles: ['viewer']
+    })
+
+    const wrapper = await factory({
+      modelValue: 1,
+      process: {
+        id: 1,
+        status: 'preparing',
+        processable: { id: 101, name: 'Test Process' }
+      },
+      actionRoles: {
+        preparing: ['admin', 'editor']
+      }
+    }, {}, store)
+
+    mockHasRoles.mockImplementation((roles) => {
+      if(global.__isString(roles)){
+        roles = roles.split(',').map(role => role.trim())
+      }
+      return store.getters.userRoles.some(role => roles.includes(role))
+    })
+
+    expect(wrapper.vm.canAction('preparing')).toBe(false)
+  })
+
+  test('canAction returns true when no roles specified for status', async () => {
+    const store = createMockStore({
+      userRoles: ['viewer']
+    })
+
+    const wrapper = await factory({
+      modelValue: 1,
+      process: {
+        id: 1,
+        status: 'preparing',
+        processable: { id: 101, name: 'Test Process' }
+      },
+      actionRoles: {} // No roles specified for any status
+    }, {}, store)
+
+    expect(wrapper.vm.canAction('preparing')).toBe(true)
+  })
+
+  test('hasRoles works with string roles', async () => {
+    const store = createMockStore({
+      userRoles: ['admin', 'editor']
+    })
+
+    const wrapper = await factory({
+      modelValue: 1,
+      process: {
+        id: 1,
+        status: 'preparing',
+        processable: { id: 101, name: 'Test Process' }
+      },
+      actionRoles: {
+        preparing: 'admin,editor' // String format
+      }
+    }, {}, store)
+
+    mockHasRoles.mockImplementation((roles) => {
+      if(global.__isString(roles)){
+        roles = roles.split(',').map(role => role.trim())
+      }
+      return store.getters.userRoles.some(role => roles.includes(role))
+    })
+
+    expect(wrapper.vm.canAction('preparing')).toBe(true)
+  })
+
+  test('processableEditableRoles works correctly', async () => {
+    const store = createMockStore({
+      userRoles: ['editor']
+    })
+
+    const wrapper = await factory({
+      modelValue: 1,
+      process: {
+        id: 1,
+        status: 'preparing',
+        processable: { id: 101, name: 'Test Process' }
+      },
+      processableEditableRoles: ['admin', 'editor']
+    }, {}, store)
+
+    expect(wrapper.vm.hasProcessableEditing).toBe(true)
+  })
+
+  test('processableEditableRoles denies access when user lacks role', async () => {
+    const store = createMockStore({
+      userRoles: ['viewer']
+    })
+
+    mockHasRoles.mockImplementation((roles) => {
+      if(global.__isString(roles)){
+        roles = roles.split(',').map(role => role.trim())
+      }
+      return store.getters.userRoles.some(role => roles.includes(role))
+    })
+
+    const wrapper = await factory({
+      modelValue: 1,
+      process: {
+        id: 1,
+        status: 'preparing',
+        processable: { id: 101, name: 'Test Process' }
+      },
+      processableEditableRoles: ['admin', 'editor']
+    }, {}, store)
+
+
+
+    expect(wrapper.vm.hasProcessableEditing).toBe(false)
+  })
+
+  test('processableEditableRoles supports status-based roles', async () => {
+    const store = createMockStore({
+      userRoles: ['reviewer']
+    })
+
+    mockHasRoles.mockImplementation((roles) => {
+      if(global.__isString(roles)){
+        roles = roles.split(',').map(role => role.trim())
+      }
+      return store.getters.userRoles.some(role => roles.includes(role))
+    })
+
+    const wrapper = await factory({
+      modelValue: 1,
+      process: {
+        id: 1,
+        status: 'reviewing',
+        processable: { id: 101, name: 'Test Process' }
+      },
+      processableEditableRoles: {
+        preparing: ['admin'],
+        reviewing: ['reviewer'],
+        completed: ['admin']
+      }
+    }, {}, store)
+
+    expect(wrapper.vm.hasProcessableEditing).toBe(true)
+  })
+})
+
+test('edit button is shown only when user has processableEditableRoles', async () => {
+  const store = createMockStore({
+    userRoles: ['editor']
+  })
+
+  mockHasRoles.mockImplementation((roles) => {
+    if(global.__isString(roles)){
+      roles = roles.split(',').map(role => role.trim())
+    }
+    return store.getters.userRoles.some(role => roles.includes(role))
+  })
+
+  const wrapper = await factory({
+    modelValue: 1,
+    process: {
+      id: 1,
+      status: 'preparing',
+      processable: { id: 101, name: 'Test Process' }
+    },
+    schema: { name: { type: 'text', label: 'Name' } },
+    processableEditableRoles: ['editor']
+  }, {}, store)
+
+  // The edit button should be available
+  expect(wrapper.vm.hasProcessableEditing).toBe(true)
+})
+
+test('process actions are disabled when user lacks actionRoles', async () => {
+  const store = createMockStore({
+    userRoles: ['viewer']
+  })
+
+  const wrapper = await factory({
+    modelValue: 1,
+    process: {
+      id: 1,
+      status: 'waiting_for_confirmation',
+      processable: { id: 101, name: 'Test Process' }
+    },
+    actionRoles: {
+      waiting_for_confirmation: ['admin']
+    },
+    processEditableRoles: ['admin', 'viewer'] // User can see the section but not act
+  }, {}, store)
+
+  expect(wrapper.vm.canAction('waiting_for_confirmation')).toBe(false)
 })
 
