@@ -155,7 +155,7 @@ class LoginController extends Controller
                     'elements' => [
                         [
                             'tag' => 'v-btn',
-                            'elements' => ___('authentication.sign-in-google'),
+                            'elements' => ___('authentication.sign-in-oauth', ['provider' => 'Google']),
                             'attributes' => [
                                 'variant' => 'outlined',
                                 'href' => route('admin.login.provider', ['provider' => 'google']),

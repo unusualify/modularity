@@ -23,10 +23,10 @@ return [
     'repeat_password' => 'Repeat Password',
     'tos' => 'I agree with Terms and Conditions.',
     'create-an-account' => 'CREATE AN ACCOUNT',
-    'sign-in-apple' => 'Sign in with Apple',
-    'sign-in-google' => 'Sign in with Google',
     'have-an-account' => 'Already have an account?',
     'sign-in' => 'Sign In',
+    'sign-in-oauth' => 'Sign in with :provider',
+    'sign-up-oauth' => 'Sign up with :provider',
 
     'password-sent' => 'Password is sent',
     'success-reset-email' => 'Please check your email for the password reset link.',
