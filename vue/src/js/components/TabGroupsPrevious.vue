@@ -38,6 +38,7 @@
   </v-sheet>
 </template>
 <script>
+  import { get } from 'lodash-es'
   import {
     makeModuleProps,
     useModule,
@@ -99,6 +100,10 @@
         default: () => {
           return {}
         }
+      },
+      responseResourceKey: {
+        type: String,
+        default: 'resource.data'
       }
     },
     setup (props, context) {
@@ -163,7 +168,7 @@
 
         api.get(this.endpoints.index, options, function(response, _raw){
           const parameters = getParameters(_raw.request.responseURL)
-          self.elements = response.resource.data
+          self.elements = get(response, self.responseResourceKey)
 
           self.activeTab = Object.keys(self.groupedItems ?? {})?.[0] ?? 0
           self.loading = false
