@@ -77,7 +77,7 @@ enum ProcessStatus: string
             self::WAITING_FOR_CONFIRMATION => __('Confirm'),
             self::WAITING_FOR_REACTION => __('Confirm'),
             self::REJECTED => __('Resend'),
-            self::CONFIRMED => __('Confirmed'),
+            self::CONFIRMED => __('Revert'),
             default => __('Process'),
         };
     }
@@ -101,7 +101,7 @@ enum ProcessStatus: string
             self::WAITING_FOR_CONFIRMATION => 'success',
             self::WAITING_FOR_REACTION => 'success',
             self::REJECTED => 'secondary',
-            self::CONFIRMED => 'success',
+            self::CONFIRMED => 'grey-lighten-2',
             default => 'primary',
         };
     }

@@ -36,6 +36,8 @@ class Process extends Model
         'status_informational_message',
         'next_action_label',
         'next_action_color',
+        'status_dialog_titles',
+        'status_dialog_messages',
     ];
 
     protected $casts = [
@@ -126,6 +128,32 @@ class Process extends Model
     {
         return new Attribute(
             get: fn () => $this->status->informationalMessage(),
+        );
+    }
+
+    protected function statusDialogTitles(): Attribute
+    {
+        return new Attribute(
+            get: fn () => [
+                ProcessStatus::PREPARING->value => 'Preparing',
+                ProcessStatus::WAITING_FOR_CONFIRMATION->value => 'Waiting for Confirmation',
+                ProcessStatus::WAITING_FOR_REACTION->value => 'Waiting for Reaction',
+                ProcessStatus::REJECTED->value => 'Rejected',
+                ProcessStatus::CONFIRMED->value => 'Confirmed',
+            ],
+        );
+    }
+
+    protected function statusDialogMessages(): Attribute
+    {
+        return new Attribute(
+            get: fn () => [
+                ProcessStatus::PREPARING->value => __('The contents are being prepared or updated. Please check back later.'),
+                ProcessStatus::WAITING_FOR_CONFIRMATION->value => __('Are you sure you want to send the process for confirmation?'),
+                ProcessStatus::WAITING_FOR_REACTION->value => __('Are you sure you want to send the process for reaction?'),
+                ProcessStatus::REJECTED->value => __('Are you sure you want to reject the process?'),
+                ProcessStatus::CONFIRMED->value => __('Are you sure you want to confirm the process?'),
+            ],
         );
     }
 
