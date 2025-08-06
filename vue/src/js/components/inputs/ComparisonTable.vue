@@ -12,7 +12,8 @@
     <template v-slot:default="defaultSlot">
       <v-data-table
         :class="[
-          'h-100'
+          'h-100',
+          selectable && !noFixedSelectable ? 'v-data-table--fixed-selectable' : ''
         ]"
         :style="inputAndTableStyle"
 
@@ -23,28 +24,27 @@
         hide-default-footer
         :items-per-page="itemsPerPage"
         :mobile-breakpoint="`md`"
+        fixed-header
         >
         <!-- header slots -->
-        <template
-          v-for="(header, i) in headers"
+        <template v-for="(header, i) in headers"
           :key="`header-${header.key}`"
           v-slot:[`header.${header.key}`]="headerScope"
           >
-          <div v-if="$isset(header.id) && input == header.id" class="v-input-comparison-table__header--selected">
+          <span v-if="$isset(header.id) && input == header.id" class="v-input-comparison-table__header--selected">
             {{ header.title }}
-          </div>
-          <div v-else v-html="header.title"></div>
+          </span>
+          <span v-else v-html="header.title"></span>
         </template>
         <!-- item slots -->
-        <template
-          v-for="(header, i) in headers"
+        <template v-for="(header, i) in headers"
           :key="`item-${header.key}`"
           v-slot:[`item.${header.key}`]="{ item }"
           >
-          <v-btn class="ma-2" v-if="item[header.key] == '__input'" @click="input=header.id" :variant="input == header.id ? 'elevated' : 'outlined'" :readonly="protectInitialValue">
+          <v-btn class="my-2" v-if="item[header.key] == '__input'" @click="input=header.id" :variant="input == header.id ? 'elevated' : 'outlined'" :readonly="protectInitialValue">
               {{ $t('Select') }}
           </v-btn>
-          <div v-else v-html="item[header.key]"></div>
+          <span v-else v-html="item[header.key]"></span>
         </template>
 
       </v-data-table>
@@ -89,6 +89,10 @@
         type: Boolean,
         default: true
       },
+      noFixedSelectable: {
+        type: Boolean,
+        default: false
+      },
       striped: {
         type: Boolean,
         default: true
@@ -120,7 +124,7 @@
     },
     computed: {
       headers() {
-        return [{title: this.label, key: 'comparator_name'}].concat( this.items.map((item) => {
+        return [{title: this.label, key: 'comparator_name', width: 400, fixed: true, cellProps: {class: 'py-2', style: {minWidth: `250px`}}}].concat( this.items.map((item) => {
           return {title: item.name, key: item.name, align: 'center', id: item.id}
         }))
       },
@@ -260,12 +264,6 @@
 
       }
     },
-    methods: {
-
-    },
-    created() {
-
-    }
   }
 </script>
 
@@ -273,10 +271,11 @@
   $borderWidth: 1px
   $borderColor: rgba(var(--v-theme-primary), .7 )
   $stripedColor: rgba(var(--v-theme-primary), .1 )
+  $rowHeight: 40px
 
   .v-table
     --v-table-header-height: 50px
-    --v-table-row-height: 40px
+    --v-table-row-height: $rowHeight
 
   .v-input-comparison-table
     .v-input__control
@@ -317,6 +316,20 @@
               > td
                 &:not(:first-child)
                   border-bottom: $borderWidth solid $borderColor !important
+
+    .v-data-table--fixed-selectable
+      .v-table__wrapper
+        > table
+          > tbody
+            // fixed last tr of tbody just like vuetify datatable fixed header
+            tr:last-child
+              position: sticky
+              bottom: 0
+              left: 0
+              right: 0
+              z-index: 1000
+              background-color: white
+              border-top: $borderWidth solid $borderColor
 
 
 </style>
