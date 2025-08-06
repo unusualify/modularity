@@ -57,6 +57,9 @@
       :profileMenu="profileMenu"
     >
       <template v-slot:bottom>
+        <ue-navigation-group v-if="sidebarBottom.length > 0"
+          :items="sidebarBottom"
+        />
         <ue-impersonate-toolbar v-if="impersonation.active"
           v-model="showImpersonateToolbar"
           v-bind="impersonation"
@@ -401,6 +404,7 @@
         // activeSubItem: this.navigation.activeSubItem ?? -1,
         breadcrumbs: this.navigation.breadcrumbs ?? [],
         profileMenu: this.navigation.profileMenu ?? [],
+        sidebarBottom: this.navigation.sidebarBottom ?? [],
 
         footerLinks: [
           {
