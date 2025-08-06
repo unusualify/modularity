@@ -19,8 +19,9 @@
       <div :class="[(hasDivider || title) ? 'pb-2 px-1' : '', scrollable ? 'flex-grow-0' : '']">
         <ue-title v-if="!noTitle && title"
           padding="b-3"
-          align="center"
-          justify="space-between"
+          align="start"
+          justify="start"
+          class="flex-md-row flex-column justify-md-space-between align-md-center"
           v-bind="titleOptions"
         >
           <template v-slot:default>
@@ -40,7 +41,7 @@
             </slot>
           </template>
           <template v-slot:right>
-            <div class="d-flex align-center">
+            <div class="d-flex align-center mt-2 mt-md-0">
               <!-- Title Center Form Actions -->
               <FormActions v-if="actionsPosition == 'title-center' && isEditing"
                 :modelValue="formItem"
@@ -98,6 +99,17 @@
                   variant="outlined"
                 ></v-chip>
               </v-chip-group>
+
+              <!-- Mobile dialog/modal for right section -->
+              <v-btn v-if="hasAdditionalSection && $vuetify.display.mdAndDown"
+                density="compact"
+                :rounded="true"
+                size="default"
+                icon="mdi-book-information-variant"
+                class=""
+                @click="showAdditionalSectionDialog = true"
+              >
+              </v-btn>
 
               <!-- Slot for headerRight -->
               <slot name="header.right">
@@ -261,16 +273,6 @@
               </slot>
             </div>
           </div>
-
-          <!-- Mobile dialog/modal for right section -->
-          <v-btn
-            v-if="hasAdditionalSection && $vuetify.display.mdAndDown"
-            icon
-            class="mt-2"
-            @click="showAdditionalSectionDialog = true"
-          >
-            <v-icon>mdi-menu-right</v-icon>
-          </v-btn>
 
           <v-dialog
             v-if="hasAdditionalSection"
