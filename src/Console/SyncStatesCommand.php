@@ -65,6 +65,8 @@ class SyncStatesCommand extends BaseCommand
             $this->info('New state created: ' . $newState->code);
         }
 
+        $this->info('States synced for ' . $model);
+
         return 0;
     }
 }
