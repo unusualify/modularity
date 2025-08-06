@@ -65,7 +65,7 @@
     </ue-navigation-group>
 
     <template v-slot:append>
-      <template v-if="!$store.getters.isGuest || true">
+      <template v-if="!$store.getters.isGuest">
         <v-divider></v-divider>
         <v-list class="">
           <v-list-item
@@ -162,9 +162,11 @@
           </v-dialog>
 
           <!-- Bottom Slot -->
-          <slot name="bottom"> </slot>
         </v-list>
       </template>
+      <slot name="bottom">
+
+      </slot>
     </template>
 
     <!-- <template v-slot:append>
