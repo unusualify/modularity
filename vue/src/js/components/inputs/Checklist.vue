@@ -8,8 +8,7 @@
     <template v-slot:default="defaultSlot">
       <div
         :class="[
-          'v-input-checklist__field d-flex',
-          flexColumn && $vuetify.display.mdAndUp ? 'flex-wrap' : 'flex-wrap'
+          'w-100 d-flex flex-wrap',
         ]"
         style="max-width: 100%;"
       >
@@ -72,14 +71,20 @@
                         :modelValue="isAllSelected(group)"
                         @update:modelValue="updatedParent($event, group)"
                         :readonly="isMandatoryItem(group) || readonly"
+
+                        v-bind="props"
                       >
-                        <template v-slot:prepend>
+                        <template v-if="!chunkField" v-slot:prepend>
                           <v-icon
-                            v-if="!chunkField"
                             v-bind="props"
                             :icon="!isOpen ? '$expand' : '$collapse'"
                             >
                           </v-icon>
+                        </template>
+                        <template #label="labelScope">
+                          <label v-bind="props">
+                            {{ labelScope.label }}
+                          </label>
                         </template>
                       </v-checkbox>
                       <ue-title v-else
@@ -122,14 +127,6 @@
                           <div
                             :class="getCheckboxContainerClasses(item)"
                           >
-                            <!-- checkbox is on right -->
-                            <span v-if="checkboxOnRight"
-                              :class="getItemLabelClasses(item)"
-                            >
-                              {{ item[itemTitle] }}
-                            </span>
-                            <v-spacer v-if="checkboxOnRight"></v-spacer>
-
                             <!-- checkbox -->
                             <v-checkbox
                               data-test="checkbox"
@@ -141,12 +138,7 @@
                               :label="item[itemTitle]"
                               :class="getCheckboxClasses(item)"
                               :readonly="isMandatoryItem(item) || isProtected(item[itemValue]) || readonly"
-                            >
-                              <!-- checkbox is on right -->
-                              <template v-if="checkboxOnRight" #label>
-                                <span></span>
-                              </template>
-                            </v-checkbox>
+                            />
 
                           </div>
                         </v-col>
@@ -232,12 +224,6 @@
                 <div v-else
                   :class="getCheckboxContainerClasses(item)"
                 >
-                  <span v-if="checkboxOnRight"
-                    :class="getItemLabelClasses(item)"
-                  >
-                    {{ item[itemTitle] }}
-                  </span>
-                  <v-spacer v-if="checkboxOnRight"></v-spacer>
                   <v-checkbox
                     data-test="checkbox"
                     v-model="input"
@@ -248,11 +234,7 @@
                     :label="item[itemTitle]"
                     :class="getCheckboxClasses(item)"
                     :readonly="isMandatoryItem(item) || isProtected(item[itemValue]) || readonly"
-                  >
-                    <template v-if="checkboxOnRight" #label>
-                      <span></span>
-                    </template>
-                  </v-checkbox>
+                  />
                 </div>
               </v-col>
               <!-- <v-spacer></v-spacer> -->
@@ -342,7 +324,6 @@
         type: String,
         default: null
       },
-
       truncateItemLabel: {
         type: Boolean,
         default: false
@@ -567,27 +548,26 @@
           // Base classes for all screen sizes
           'd-flex align-center rounded-sm',
           // Responsive padding
-          // this.checkboxOnRight ? 'pl-2 pl-sm-3 pl-md-4 pr-1' : 'px-2',
-          this.checkboxOnRight ? 'pl-2' : 'px-2',
+          this.checkboxOnRight ? 'pl-2' : '',
           // Selection state
           this.checkboxOnRight && isSelected ? 'checked' : '',
           // Highlighted state with responsive background
           this.checkboxHighlighted && isSelected ? `bg-${this.checkboxHighlightedColor}` : '',
         ];
       },
-      getItemLabelClasses(item) {
-        const isSelected = Array.isArray(this.input) && this.input.includes(item[this.itemValue]);
-        return [
-          (this.$attrs.disabled ?? false) || (!this.canSelectMore() && !this.input.includes(item[this.itemValue])) ? 'v-input-checklist__label--disabled' : '',
-          isSelected ? `font-weight-bold ${this.activeTextColor ? `text-${this.activeTextColor}` : ''}` : '',
-          this.truncateItemLabel ? 'text-truncate text-wrap' : '',
-        ]
+
+      isSelectedItem(item) {
+        return Array.isArray(this.input) && this.input.includes(item[this.itemValue]);
       },
       getCheckboxClasses(item) {
         const isSelected = Array.isArray(this.input) && this.input.includes(item[this.itemValue]);
+
         return [
           'flex-shrink-0 flex-grow-0',
-          this.checkboxOnLeft ? 'rounded-sm' : '',
+          this.isSelectedItem(item) ? `v-input-checklist__checkbox--selected ${this.activeTextColor ? `text-${this.activeTextColor}` : ''}` : '',
+
+          this.truncateItemLabel ? 'v-input-checklist__checkbox--truncate' : '',
+          this.checkboxOnLeft ? 'rounded-sm' : 'v-input-checklist__checkbox--right',
           this.checkboxOnLeft && isSelected ? 'checked' : '',
           // this.checkboxHighlighted && isSelected ? 'font-weight-bold' : '',
         ];
@@ -748,10 +728,37 @@
 
 <style lang="sass">
   .v-input-checklist
-    .v-input-checklist__field
-      width: 100%
-    .v-input-checklist__label--disabled
-      opacity: 0.5
+    .v-checkbox
+      max-width: 100%
+      .v-input__control
+        max-width: 100%
+        .v-checkbox-btn
+          max-width: 100%
+          flex: 1 1 100%
+          > label
+            flex: 1 0
+            width: calc(100% - 40px)
+
+    &__checkbox
+      &--right
+        width: 100%
+        .v-checkbox-btn
+          flex-direction: row-reverse
+          flex: 1 1 100%
+
+      &--selected
+        .v-checkbox-btn
+          > label
+            font-weight: 600
+
+      &--truncate
+        .v-checkbox-btn
+          // max-width: 75%
+          > label
+            white-space: nowrap !important
+            overflow: hidden !important
+            text-overflow: ellipsis !important
+
     .v-input--horizontal .v-input__prepend
         margin-inline-end: 0px
 
