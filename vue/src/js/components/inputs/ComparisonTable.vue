@@ -267,17 +267,18 @@
   }
 </script>
 
-<style lang="sass">
+<style scoped lang="sass">
   $borderWidth: 1px
   $borderColor: rgba(var(--v-theme-primary), .7 )
   $stripedColor: rgba(var(--v-theme-primary), .1 )
   $rowHeight: 40px
 
-  .v-table
-    --v-table-header-height: 50px
-    --v-table-row-height: $rowHeight
 
   .v-input-comparison-table
+    .v-table
+      --v-table-header-height: 50px
+      --v-table-row-height: $rowHeight
+
     .v-input__control
       display: block
 
