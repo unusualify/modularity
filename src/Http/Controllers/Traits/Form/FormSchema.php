@@ -23,11 +23,27 @@ trait FormSchema
     protected $inputTypes = [];
 
     /**
+     * @var array
+     */
+    protected static $formSchemaCallbacks = [];
+
+    /**
      * @return void
      */
     protected function __beforeConstructFormSchema($app, $request)
     {
         $this->inputTypes = modularityConfig('input_types', []);
+    }
+
+    /**
+     * Update the form schema
+     *
+     * @param callable $callback
+     * @return void
+     */
+    public static function updateFormSchema(callable $callback)
+    {
+        static::$formSchemaCallbacks[static::class] = $callback;
     }
 
     protected function transformClosureValues(object|array $array)
@@ -66,6 +82,21 @@ trait FormSchema
         }
 
         return $value;
+    }
+
+    protected function getModuleFormSchema()
+    {
+        $inputs = $this->getConfigFieldsByRoute('inputs');
+
+        $inputs = method_exists($this, 'formSchema')
+            ? $this->formSchema($inputs)
+            : $inputs;
+
+        if (isset(static::$formSchemaCallbacks[static::class]) && is_callable(static::$formSchemaCallbacks[static::class])) {
+            $inputs = call_user_func(static::$formSchemaCallbacks[static::class], object_to_array($inputs));
+        }
+
+        return $this->createFormSchema($inputs);
     }
 
     /**

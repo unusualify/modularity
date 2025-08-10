@@ -58,7 +58,7 @@ abstract class BaseController extends PanelController
 
     public function index($parentId = null)
     {
-        $this->formSchema = $this->createFormSchema($this->getConfigFieldsByRoute('inputs'));
+        $this->formSchema = $this->getModuleFormSchema();
 
         $this->addWiths();
 
@@ -132,7 +132,7 @@ abstract class BaseController extends PanelController
      */
     public function create($parentModuleId = null)
     {
-        $this->formSchema = $this->createFormSchema($this->getConfigFieldsByRoute('inputs'));
+        $this->formSchema = $this->getModuleFormSchema();
 
         $this->addWiths();
 
@@ -171,7 +171,7 @@ abstract class BaseController extends PanelController
     {
         // $parentId = $this->parentId ?? $parentId;
 
-        $this->formSchema = $this->createFormSchema($this->getConfigFieldsByRoute('inputs'));
+        $this->formSchema = $this->getModuleFormSchema();
 
         $this->addWiths();
 
@@ -253,7 +253,7 @@ abstract class BaseController extends PanelController
     {
         $params = $this->request->route()->parameters();
 
-        $this->formSchema = $this->createFormSchema($this->getConfigFieldsByRoute('inputs'));
+        $this->formSchema = $this->getModuleFormSchema();
 
         $this->addWiths();
 
@@ -315,7 +315,7 @@ abstract class BaseController extends PanelController
     {
         $params = $this->request->route()->parameters();
 
-        $this->formSchema = $this->createFormSchema($this->getConfigFieldsByRoute('inputs'));
+        $this->formSchema = $this->getModuleFormSchema();
 
         $this->addWiths();
 
@@ -349,7 +349,7 @@ abstract class BaseController extends PanelController
      */
     public function update($id, $submoduleId = null)
     {
-        $this->formSchema = $this->createFormSchema($this->getConfigFieldsByRoute('inputs'));
+        $this->formSchema = $this->getModuleFormSchema();
 
         $this->addWiths();
 
@@ -947,7 +947,7 @@ abstract class BaseController extends PanelController
     {
         $params = $this->request->route()->parameters();
 
-        $this->formSchema = $this->createFormSchema($this->getConfigFieldsByRoute('inputs'));
+        $this->formSchema = $this->getModuleFormSchema();
 
         $this->addWiths();
 
