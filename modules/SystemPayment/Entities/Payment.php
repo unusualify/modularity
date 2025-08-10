@@ -33,7 +33,32 @@ class Payment extends \Unusualify\Payable\Models\Payment
         'invoice_file',
         'amount_formatted',
         'invoices',
+
+        'status_label',
+        'status_color',
+        'status_icon',
+        'status_vuetify_icon',
+        'status_vuetify_chip',
     ];
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope('paymentable_morph_keys', function (\Illuminate\Database\Eloquent\Builder $builder) {
+            $paymentTable = (new static)->getTable();
+            $pricesTable = (new Price)->getTable();
+
+            // Ensure base columns plus our subselects are always present
+            $builder->addSelect($paymentTable . '.*')
+                ->addSelect([
+                    'paymentable_type' => Price::select('priceable_type')
+                        ->whereColumn($pricesTable . '.id', $paymentTable . '.price_id')
+                        ->limit(1),
+                    'paymentable_id' => Price::select('priceable_id')
+                        ->whereColumn($pricesTable . '.id', $paymentTable . '.price_id')
+                        ->limit(1),
+                ]);
+        });
+    }
 
     /**
      * Get the paymentService that owns the Payment.
@@ -61,25 +86,11 @@ class Payment extends \Unusualify\Payable\Models\Payment
     }
 
     /**
-     * Get the polymorphic model that the price belongs to.
+     * Behaves like a real morphTo by providing the morph keys via subselects.
      */
     public function paymentable(): \Illuminate\Database\Eloquent\Relations\MorphTo
     {
-        // Use a custom MorphTo relation with dynamic keys
-        return \Illuminate\Database\Eloquent\Relations\MorphTo::noConstraints(function () {
-            // This will create a MorphTo relation with dynamic foreign key and owner key
-            // based on the Price relation
-            // UGLY MANIPULATION
-            return $this->price->priceable();
-            // return new \Illuminate\Database\Eloquent\Relations\MorphTo(
-            //     $this->newQuery(),
-            //     $this,
-            //     $pricesTable . '.priceable_type',
-            //     $pricesTable . '.priceable_id',
-            //     null,
-            //     null
-            // );
-        });
+        return $this->morphTo('paymentable');
     }
 
     protected function amountFormatted(): Attribute
@@ -123,4 +134,42 @@ class Payment extends \Unusualify\Payable\Models\Payment
             get: fn ($value) => $this->fileponds()->where('role', 'invoice')->get()->map(fn ($file) => $file->mediableFormat()),
         );
     }
+
+    protected function statusLabel(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $this->status->label(),
+        );
+    }
+
+    protected function statusColor(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $this->status->color(),
+        );
+    }
+
+    protected function statusIcon(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $this->status->icon(),
+        );
+    }
+
+    protected function statusVuetifyIcon(): Attribute
+    {
+        return new Attribute(
+            get: fn ($value) => $this->status ? "<v-icon icon='{$this->status_icon}' color='{$this->status_color}'/>" : null,
+        );
+    }
+
+    protected function statusVuetifyChip(): Attribute
+    {
+        return new Attribute(
+            get: fn ($value) => $this->status
+                ? "<v-chip variant='text' color='{$this->status_color}' prepend-icon='{$this->status_icon}'>{$this->status_label}</v-chip>"
+                : null
+        );
+    }
+
 }
