@@ -204,9 +204,15 @@ if (! function_exists('add_route_to_config')) {
         array_pop($parts);
         $export = "\t" . ltrim(implode("\n", $parts));
 
-        $pattern = "/(?<='routes'\s\=\>\s\[)([^\;]*)(\]\,[\n\s\t]?\]\;)/";
+        // Match content inside 'routes' => [ ... ] right up to the closing of routes array and the outer array.
+        // - DOTALL (?s) allows newlines
+        // - Non-greedy to stop at the first closing "] , ];" or "] ];" (comma optional)
+        $pattern = "/(?s)('routes'\s*=>\s*\[)(.*?)(\],\s*\];|\]\s*\];)/";
 
-        return preg_replace($pattern, '$1' . $export . "\n\t" . '$2', $content);
+        return preg_replace_callback($pattern, function (array $m) use ($export) {
+            // Preserve prefix and existing inner content, append new export, then the closing brackets
+            return $m[1] . $m[2] . $export . "\n\t" . $m[3];
+        }, $content);
     }
 }
 
