@@ -193,6 +193,7 @@ return [
                     'title' => 'Related',
                     'key' => 'paymentable',
                     'itemTitle' => 'id',
+                    'allowedRoles' => ['superadmin'],
                 ],
                 [
                     'title' => 'Company',
@@ -279,7 +280,7 @@ return [
                     'type' => 'filepond',
                     'name' => 'invoice',
                     'label' => 'Invoice',
-                    'max' => 1,
+                    'max' => 3,
                     'conditions' => [
                         ['status', '=', 'COMPLETED', 'REFUNDED', 'CANCELLED'],
                     ],
