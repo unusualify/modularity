@@ -195,11 +195,6 @@ return [
                     'itemTitle' => 'id',
                 ],
                 [
-                    'title' => 'User Email',
-                    'key' => 'creator',
-                    'itemTitle' => 'email',
-                ],
-                [
                     'title' => 'Company',
                     'key' => 'company',
                     'itemTitle' => 'name',
@@ -217,18 +212,20 @@ return [
                     ],
                 ],
                 [
-                    'title' => 'Amount',
+                    'title' => 'Total Price',
                     'key' => 'amount_formatted',
                 ],
                 [
                     'title' => 'Status',
-                    'key' => 'status',
+                    'key' => 'status_vuetify_chip',
                     'formatter' => [
-                        'chip',
-                        [
-                            'size' => 'small',
-                        ],
+                        'dynamic',
                     ],
+                ],
+                [
+                    'title' => 'User Email',
+                    'key' => 'creator',
+                    'itemTitle' => 'email',
                 ],
                 [
                     'title' => 'Created Time',
@@ -262,9 +259,21 @@ return [
                     'type' => 'select',
                     'name' => 'payment_service_id',
                     'label' => 'Payment Service',
+                    'col' => ['cols' => 12, 'lg' => 6],
                     'repository' => 'Modules\\SystemPayment\\Repositories\\PaymentServiceRepository',
                     'rules' => 'sometimes|required',
                     'editable' => false,
+                ],
+                [
+                    'type' => 'select',
+                    'name' => 'status',
+                    'label' => 'Status',
+                    'col' => ['cols' => 12, 'lg' => 6],
+                    'itemTitle' => 'name',
+                    'itemValue' => 'value',
+                    'items' => PaymentStatus::cases(),
+                    'allowedRoles' => ['superadmin', 'admin', 'manager', 'account-executive'],
+                    'rules' => 'required',
                 ],
                 [
                     'type' => 'filepond',
@@ -276,15 +285,6 @@ return [
                     ],
                     'allowedRoles' => ['superadmin', 'admin', 'manager', 'account-executive'],
                     'acceptedExtensions' => ['pdf'],
-                ],
-                [
-                    'type' => 'select',
-                    'name' => 'status',
-                    'label' => 'Status',
-                    'itemTitle' => 'name',
-                    'itemValue' => 'value',
-                    'items' => PaymentStatus::cases(),
-                    'allowedRoles' => ['superadmin', 'admin', 'manager', 'account-executive'],
                 ],
             ],
         ],
