@@ -675,6 +675,7 @@ abstract class BaseController extends PanelController
             $exploded = explode('.', $relationshipName);
 
             $relation = null;
+
             if (count($exploded) > 1) {
                 $relationshipName = $exploded[1];
                 $item = $item->{$exploded[0]};
@@ -683,49 +684,94 @@ abstract class BaseController extends PanelController
             }
 
             $itemTitle = $column['itemTitle'] ?? 'name';
+            $isSole = $column['isSole'] ?? false;
             $maxItems = $column['maxItems'] ?? 3;
 
             $count = 0;
 
-            try {
-                $relationshipType = get_class($item->{$relationshipName}());
+            $relationshipType = get_class($item->{$relationshipName}());
 
-                if (in_array($relationshipType, [
-                    'Illuminate\Database\Eloquent\Relations\BelongsTo',
-                    'Illuminate\Database\Eloquent\Relations\HasOne',
-                    'Illuminate\Database\Eloquent\Relations\HasOneThrough',
-                    'Illuminate\Database\Eloquent\Relations\MorphOne',
-                    'Illuminate\Database\Eloquent\Relations\MorphTo',
-                ])) {
-                    $result = $item->{$relationshipName};
-                } elseif (in_array($relationshipType, [
-                    'Illuminate\Database\Eloquent\Relations\BelongsToMany',
-                    'Illuminate\Database\Eloquent\Relations\HasMany',
-                    'Illuminate\Database\Eloquent\Relations\HasManyThrough',
-                    'Illuminate\Database\Eloquent\Relations\MorphMany',
-                    'Illuminate\Database\Eloquent\Relations\MorphToMany',
-                ])) {
-                    $count = $item->{$relationshipName}()->count();
-                    $result = $item->{$relationshipName}()
-                        ->take($maxItems)
-                        ->get();
-                } else {
-                    $result = $item->{$relationshipName};
+            if (in_array($relationshipType, [
+                'Illuminate\Database\Eloquent\Relations\BelongsTo',
+                'Illuminate\Database\Eloquent\Relations\HasOne',
+                'Illuminate\Database\Eloquent\Relations\HasOneThrough',
+                'Illuminate\Database\Eloquent\Relations\MorphOne',
+                'Illuminate\Database\Eloquent\Relations\MorphTo',
+            ])) {
+
+                // Allow overriding the relation via "relation.field" or "relation->field"
+                if (preg_match('/^([\w_]+)(?:\.|->)(.+)$/', $itemTitle, $m) && method_exists($item, $m[1])) {
+                    $relationshipName = $m[1];
+                    $itemTitle = $m[2];
                 }
 
-                if ($result instanceof Collection) {
-                    $value = $result
-                        ->pluck($itemTitle)
-                        ->join(', ');
+                $relation = $item->{$relationshipName}();
+                $related = $relation->getRelated();
+                $table = $related->getTable();
+                $driver = $related->getConnection()->getDriverName();
 
-                    if ($count > $maxItems) {
-                        $value .= ' ...';
+                // Handle nested JSON like "field.headline" or "field->headline"
+                if (preg_match('/^([\w_]+)(?:\.|->)(.+)$/', $itemTitle, $jm)) {
+                    $jsonCol = $jm[1];
+                    $jsonPathDots = str_replace('->', '.', $jm[2]);
+                    $jsonPathEsc = str_replace("'", "''", $jsonPathDots);
+
+                    switch ($driver) {
+                        case 'pgsql':
+                            $segments = explode('.', $jsonPathDots);
+                            $expr = $table . '.' . $jsonCol . " #>> '{" . implode(',', $segments) . "}'";
+                            break;
+                        case 'sqlsrv':
+                            $expr = "JSON_VALUE($table.$jsonCol, '$.$jsonPathEsc')";
+                            break;
+                        case 'sqlite':
+                            $expr = "json_extract($table.$jsonCol, '$.$jsonPathEsc')";
+                            break;
+                        default: // mysql / mariadb
+                            $expr = "JSON_UNQUOTE(JSON_EXTRACT($table.$jsonCol, '$.$jsonPathEsc'))";
+                            break;
                     }
-                } elseif ($result instanceof Model) {
-                    $value = $result->{$itemTitle};
+
+                    // Use an alias so value('_val') works reliably
+                    $result = $relation->selectRaw("$expr as _val")->value('_val');
                 } else {
-                    $value = $result;
+                    // Simple column on the related model
+                    $result = $isSole ?
+                        $item->{$relationshipName}()->value($itemTitle) :
+                        $item->{$relationshipName};
                 }
+            } elseif (in_array($relationshipType, [
+                'Illuminate\Database\Eloquent\Relations\BelongsToMany',
+                'Illuminate\Database\Eloquent\Relations\HasMany',
+                'Illuminate\Database\Eloquent\Relations\HasManyThrough',
+                'Illuminate\Database\Eloquent\Relations\MorphMany',
+                'Illuminate\Database\Eloquent\Relations\MorphToMany',
+            ])) {
+                $count = $item->{$relationshipName}()->count();
+                $result = $item->{$relationshipName}()
+                    ->take($maxItems)
+                    // ->pluck($itemTitle)
+                    ->get();
+            } else {
+                $result = $item->{$relationshipName}()->value($itemTitle);
+            }
+
+            if ($result instanceof Collection) {
+                $value = $result
+                    ->pluck($itemTitle)
+                    ->join(', ');
+
+                if ($count > $maxItems) {
+                    $value .= ' ...';
+                }
+            } elseif ($result instanceof Model) {
+                // itemTitle is for example content->headline how to get nested json fields?
+                $value = $result->{$itemTitle};
+                // dd($value);
+            } else {
+                $value = $result;
+            }
+            try {
             } catch (\Throwable $th) {
                 ModularityLog::error('Error getting item column data', [
                     'relationshipName' => $relationshipName,
