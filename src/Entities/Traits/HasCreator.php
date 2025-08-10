@@ -166,6 +166,7 @@ trait HasCreator
         $creatorRecordModel = new ($this->getCreatorRecordModel());
         $creatorModel = new ($this->getCreatorModel());
 
+
         $companyModel = new Company;
         $query = Company::query()
             ->select($companyModel->getTable() . '.*')  // Only select company fields
@@ -179,14 +180,14 @@ trait HasCreator
                 $creatorRecordModel->getTable(),
                 function ($join) use ($creatorRecordModel, $creatorModel) {
                     $join->on($creatorRecordModel->getTable() . '.creator_id', '=', $creatorModel->getTable() . '.id')
-                        ->where($creatorRecordModel->getTable() . '.creatable_type', '=', get_class($this))
+                        ->where($creatorRecordModel->getTable() . '.creatable_type', '=', get_class($this->getCreatableClass()))
                         ->where($creatorRecordModel->getTable() . '.creatable_id', '=', $this->id);
                 }
             );
 
         return new \Illuminate\Database\Eloquent\Relations\HasOne(
             $query,
-            $this,
+            $this->getCreatableClass(),
             $creatorRecordModel->getTable() . '.creatable_id',
             'id'
         );
