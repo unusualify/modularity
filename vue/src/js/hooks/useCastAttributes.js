@@ -39,8 +39,13 @@ export default function useCastAttributes () {
 
       if(newValue){
         let _value
-        if(isArray(newValue) && newValue.length > 0){
-          _value = newValue.join(',')
+
+        if(isArray(newValue) && newValue.length > 0 ){
+          _value = newValue
+
+          if(newValue.every(item => isString(item) || isNumber(item))) {
+            _value = newValue.join(',')
+          }
         }else if(isString(newValue)){
           _value = newValue
 
@@ -53,7 +58,7 @@ export default function useCastAttributes () {
           _value = newValue.toString()
         }
 
-        if(_value){
+        if(_value && isString(_value)){
           let remainingQuote = '\\w\\s' + __preg_quote('çşıİğüö.,;?|:_')
           let pattern = new RegExp( String.raw`^([${remainingQuote}]+)?(${quoted})([${remainingQuote}]+)?$`)
 
@@ -67,6 +72,8 @@ export default function useCastAttributes () {
               value.match(pattern)
             )
           }
+        } else if(isArray(_value) ) {
+          returnValue = _value
         }
       }
     }else if(EvalPattern.test(value)){
