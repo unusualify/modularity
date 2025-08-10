@@ -5,6 +5,8 @@
     :transition="transition"
     :fullscreen="full"
     :width="modalWidth"
+
+    style="max-height: 100vh"
     >
     <template v-for="(_, name) in $slots" v-slot:[name]="slotProps">
       <slot :name="name" v-bind="slotProps || {}"></slot>
@@ -21,16 +23,18 @@
         }"
       >
         <slot name="systembar">
-          <v-layout v-if="hasSystembar" style="height: 40px">
+          <v-system-bar v-if="hasSystembar"  dark class="mb-4">
+            <v-icon @click="toggleFullscreen()" :x-small="full">
+              mdi-checkbox-blank-outline
+            </v-icon>
+            <v-icon @click="close()">mdi-close</v-icon>
+          </v-system-bar>
+          <!-- <v-row v-if="hasSystembar" class="mb-4" no-gutters>
             <v-col>
-              <v-system-bar dark>
-                <v-icon @click="toggleFullscreen()" :x-small="full">
-                  mdi-checkbox-blank-outline
-                </v-icon>
-                <v-icon @click="close()">mdi-close</v-icon>
-              </v-system-bar>
             </v-col>
-          </v-layout>
+          </v-row> -->
+          <!-- <v-layout v-if="hasSystembar" style="height: 40px">
+          </v-layout> -->
         </slot>
         <slot name="body"
             v-bind="{
