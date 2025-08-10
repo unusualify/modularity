@@ -1,15 +1,15 @@
 <template>
-  <template v-if="!configuration.tag && isTextable(configuration.elements)">
-    {{ applyCasting(configuration.elements) }}
+  <template v-if="!configuration.tag && isTextable(castedElements)">
+    {{ applyCasting(castedElements) }}
   </template>
-  <template v-else-if="!configuration.tag && isArray(configuration.elements)">
+  <template v-else-if="!configuration.tag && isArray(castedElements)">
     <component
-      v-for="(element, index) in configuration.elements"
+      v-for="(element, index) in castedElements"
       :key="`tag-${level}-${index}`"
       :is="element.tag"
       v-bind="element.attributes"
     >
-      {{ element.elements }}
+      {{ castObjectAttributes(element.elements, bindData) }}
     </component>
   </template>
   <component v-else-if="configuration.tag"
@@ -20,26 +20,26 @@
         ...castedAttributes
       }"
     >
-    <template v-if="isArray(configuration.elements)">
+    <template v-if="isArray(castedElements)">
       <ue-recursive-stuff
-        v-for="(_configuration, i) in configuration.elements"
+        v-for="(_configuration, i) in castedElements"
         :key="`tag-${level}-${i}`"
         :level="level+1"
         :configuration="_configuration"
         :bind-data="bindData ?? {}"
       />
     </template>
-    <template v-if="isObject(configuration.elements)">
+    <template v-if="isObject(castedElements)">
       <ue-recursive-stuff
         :key="`tag-${level}-${i}`"
         :level="level+1"
-        :configuration="configuration.elements"
+        :configuration="castObjectAttributes(configuration.elements, bindData)"
         :bind-data="bindData ?? {}"
       />
     </template>
 
-    <template v-else-if="isTextable(configuration.elements)">
-      {{ applyCasting(configuration.elements) }}
+    <template v-else-if="isTextable(castedElements)">
+      {{ applyCasting(castedElements) }}
     </template>
 
     <template v-for="(slotConf,slotName) in slots"
@@ -64,6 +64,8 @@
 import { computed, ref } from 'vue'
 import { reduce, get, cloneDeep, isArray, isString, isNumber } from 'lodash-es'
 
+import { useCastAttributes } from '@/hooks'
+
 export default {
   props: {
     configuration: {
@@ -87,6 +89,8 @@ export default {
     // const vFitGrid = resolveDirective('fit-grid')
     // const directives = [vFitGrid];
     // const directives = props.configuration.directives ? props.configuration.directives.map((v) => resolveDirective(v)) : []
+
+    const { castObjectAttributes } = useCastAttributes()
 
     const FuncPattern = /^\{(.*)\}$/
     const CastPattern = /\$([\w|.|\_|\-]+)/
@@ -190,7 +194,11 @@ export default {
     const filteredAttributes = cloneDeep(props.configuration.attributes)
 
     const castedAttributes = computed(() => {
-      const attrs = cloneDeep(props.configuration.attributes)
+      const attributes = props.configuration.attributes ?? {}
+      const attrs = cloneDeep(attributes)
+
+      return castObjectAttributes(attrs, props.bindData)
+
       return reduce(attrs, (o, v, k) => {
         if (!(isArray(v) || isString(v) || isObject(v))) {
           return o
@@ -248,6 +256,15 @@ export default {
       return boundAttributes
     })
 
+    const castedElements = computed(() => {
+      let elements = props.configuration.elements ?? ''
+
+      if(!elements)
+        return elements
+
+      return castObjectAttributes(elements, props.bindData)
+    })
+
     // const stringValue = computed(() => {
     //   let bindData = props.bindData
 
@@ -260,9 +277,11 @@ export default {
       isObject,
 
       applyCasting,
+      castObjectAttributes,
       hasSlot,
       filteredAttributes,
       castedAttributes,
+      castedElements,
       bindAttributes,
       slots
     }
