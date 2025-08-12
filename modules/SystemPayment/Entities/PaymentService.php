@@ -5,10 +5,11 @@ namespace Modules\SystemPayment\Entities;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Unusualify\Modularity\Entities\Model;
 use Unusualify\Modularity\Entities\Traits\HasImages;
+use Unusualify\Modularity\Entities\Traits\HasSpreadable;
 
 class PaymentService extends Model
 {
-    use HasImages;
+    use HasImages, HasSpreadable;
 
     /**
      * The attributes that are mass assignable.
