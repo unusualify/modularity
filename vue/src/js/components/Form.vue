@@ -327,6 +327,7 @@
             v-bind="{
               isSubmittable,
               validForm: validModel || !serverValid,
+              saveForm,
               buttonDefaultText,
               loading
             }">
