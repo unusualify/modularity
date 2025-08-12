@@ -74,11 +74,11 @@
         >
           <!-- Message content -->
           <div :class="['d-flex mt-2 text-break', reverse ? 'flex-row-reverse' : 'flex-row']">
-            <div class="w-100">
+            <div class="w-100" style="color: #32454A; font-weight: 400; font-size: 12px;">
               <template v-if="message.content.length > contentTruncateLength">
-                <div v-if="isExpanded" v-html="message.content"></div>
+                <div v-if="isExpanded" v-html="formattedContent"></div>
                 <div v-else>
-                  <span v-html="truncatedContent"></span>
+                  <span v-html="formattedTruncatedContent"></span>
                   <span class="text-grey-darken-1">...</span>
                 </div>
 
@@ -95,7 +95,7 @@
                 </v-expand-transition>
               </template>
               <template v-else>
-                {{ message.content }}
+                <div v-html="formattedContent"></div>
               </template>
             </div>
           </div>
@@ -180,6 +180,16 @@
           return this.message.content.substring(0, this.contentTruncateLength);
         }
         return this.message.content;
+      },
+      // FormattedContent and formattedTruncatedContent are used to format the content of the message with the new lines.
+      formattedContent() {
+        return this.message.content.replace(/\n/g, '<br>');
+      },
+      formattedTruncatedContent() {
+        if (this.message.content.length > this.contentTruncateLength) {
+          return this.message.content.substring(0, this.contentTruncateLength).replace(/\n/g, '<br>');
+        }
+        return this.message.content.replace(/\n/g, '<br>');
       }
     },
     methods: {
