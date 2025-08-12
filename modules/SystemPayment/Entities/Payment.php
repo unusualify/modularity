@@ -30,6 +30,7 @@ class Payment extends \Unusualify\Payable\Models\Payment
     ];
 
     protected $appends = [
+        'bank_receipts',
         'invoice_file',
         'amount_formatted',
         'invoices',
@@ -117,6 +118,13 @@ class Payment extends \Unusualify\Payable\Models\Payment
     public function currencies(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(\Modules\SystemPayment\Entities\PaymentCurrency::class);
+    }
+
+    protected function bankReceipts(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $this->fileponds()->where('role', 'receipts')->get()->map(fn ($file) => $file->mediableFormat()),
+        );
     }
 
     protected function invoiceFile(): Attribute

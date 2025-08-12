@@ -27,6 +27,8 @@ class PaymentService extends Model
 
     protected $appends = [
         'button_logo_url',
+        'transferrable',
+        'bank_details',
     ];
 
     /**
@@ -63,5 +65,44 @@ class PaymentService extends Model
         return Attribute::make(
             get: fn ($value) => $this->image('button_logo', locale: app()->getLocale(), has_fallback: true) ?? $this->image('logo', locale: app()->getLocale()),
         );
+    }
+
+    protected function transferrable(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $this->spreadable ? ($this->spreadable->content['type'] == 2 ? true : false) : false,
+        );
+    }
+
+    protected function bankDetails(): Attribute
+    {
+        $keys = ['account_holder', 'iban', 'swift_code', 'description', 'address'];
+
+        return Attribute::make(
+            get: fn ($value) => collect($keys)->reduce(function ($acc, $key) {
+                $transferDetails = $this->spreadable->content['transfer_details'] ?? [];
+                if ($transferDetails && isset($transferDetails[$key])) {
+                    $acc[$key] = $transferDetails[$key];
+                }
+                return $acc;
+            }, []),
+        );
+    }
+
+    public function scopeIsExternal($query)
+    {
+        return $query->published()->where('is_external', 1);
+    }
+
+    public function scopeIsTransfer($query)
+    {
+        return $query->published()->whereHas('spreadable', function ($query) {
+            $query->where('content->type', 2);
+        });
+    }
+
+    public function scopeIsInternal($query)
+    {
+        return $query->published()->where('is_internal', 1);
     }
 }

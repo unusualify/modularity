@@ -72,11 +72,13 @@ return [
                     'name' => 'name',
                     'label' => 'Payment Service Name',
                     'rules' => 'sometimes|required',
+                    'col' => ['cols' => 12, 'lg' => 6],
                 ],
                 [
                     'name' => 'key',
                     'label' => 'Payment Service Slug',
                     'type' => 'text',
+                    'col' => ['cols' => 12, 'lg' => 6],
                 ],
                 // [
                 //     'name' => 'payment-service',
@@ -92,14 +94,95 @@ return [
                     'repository' => 'Modules\\SystemPayment\\Repositories\\PaymentCurrencyRepository',
                 ],
                 [
+                    'type' => 'radio-group',
+                    'name' => 'type',
+                    'label' => 'Service Type',
+                    'spreadable' => true,
+                    'items' => [
+                        [
+                            'name' => 'Standard',
+                            'id' => 1,
+                            'transfer_details_toggleInputValue' => false,
+                        ],
+                        [
+                            'name' => 'Transfer',
+                            'id' => 2,
+                            'transfer_details_toggleInputValue' => true,
+                        ],
+                    ],
+                    'ext' => [
+                        [
+                            'toggleInput',
+                            'transfer_details',
+                            'items.*.transfer_details_toggleInputValue',
+                        ],
+                    ],
+                ],
+                [
+                    'type' => 'group',
+                    'col' => ['cols' => 12, 'lg' => 12],
+                    'name' => 'transfer_details',
+                    'label' => 'Transfer Details',
+                    'class' => 'd-none',
+                    'spreadable' => true,
+                    'schema' => [
+                        [
+                            'type' => 'text',
+                            'name' => 'account_holder',
+                            'label' => 'Account Holder',
+                            'col' => ['cols' => 12, 'lg' => 6],
+                            'rules' => '',
+                            '_cached-rawRules' => 'required',
+                            // '_cached-rules' => 'required',
+                        ],
+                        [
+                            'type' => 'text',
+                            'name' => 'iban',
+                            'label' => 'IBAN',
+                            'col' => ['cols' => 12, 'lg' => 6],
+                            'rules' => '',
+                            // '_cached-rawRules' => 'required',
+                            '_cached-rules' => 'required',
+                        ],
+                        [
+                            'type' => 'text',
+                            'name' => 'swift_code',
+                            'label' => 'SWIFT/BIC',
+                            'col' => ['cols' => 12, 'lg' => 6],
+                            'rules' => '',
+                            '_cached-rawRules' => 'required',
+                            // '_cached-rules' => 'required',
+                        ],
+                        [
+                            'type' => 'text',
+                            'name' => 'description',
+                            'label' => 'Payment Description',
+                            'col' => ['cols' => 12, 'lg' => 6],
+                            'rules' => '',
+                            '_cached-rawRules' => 'required',
+                        ],
+                        [
+                            'type' => 'textarea',
+                            'name' => 'address',
+                            'label' => 'Bank Name & Address',
+                            'col' => ['cols' => 12],
+                            'rules' => '',
+                            '_cached-rawRules' => 'required',
+                        ],
+                    ]
+                ],
+
+                [
                     'name' => 'is_external',
                     'label' => 'Is an external service ?',
                     'type' => 'checkbox',
+                    'col' => ['cols' => 12, 'lg' => 6],
                 ],
                 [
                     'name' => 'is_internal',
                     'label' => 'Is an internal service ?',
                     'type' => 'checkbox',
+                    'col' => ['cols' => 12, 'lg' => 6],
                 ],
                 [
                     'label' => 'Logo',
@@ -107,6 +190,7 @@ return [
                     'name' => 'logo',
                     // 'rules' => 'sometimes|required:array',
                     'isIcon' => true,
+                    'col' => ['cols' => 12, 'lg' => 6],
                 ],
                 [
                     'label' => 'Button Logo',
@@ -114,11 +198,12 @@ return [
                     'name' => 'button_logo',
                     'rules' => '',
                     'isIcon' => true,
+                    'col' => ['cols' => 12, 'lg' => 6],
                 ],
                 [
                     'name' => 'button_style',
                     'label' => 'Button Style',
-                    'type' => 'text',
+                    'type' => 'textarea',
                 ],
             ],
         ],
@@ -286,6 +371,38 @@ return [
                     ],
                     'allowedRoles' => ['superadmin', 'admin', 'manager', 'account-executive'],
                     'acceptedExtensions' => ['pdf'],
+                ],
+                [
+                    'type' => 'preview',
+                    'name' => 'bank_receipts',
+                    'noSubmit' => true,
+                    'default' => null,
+                    'col' => ['cols' => 12, 'class' => 'mb-4'],
+                    'configuration' => [
+                        'elements' => [
+                            [
+                                'tag' => 'ue-title',
+                                'attributes' => [
+                                    'classes' => 'mb-4',
+                                    'padding' => 'a-0'
+                                ],
+                                'elements' => 'Bank Receipts',
+                            ],
+                            [
+                                'tag' => 'ue-filepond-preview',
+                                'attributes' => [
+                                    'source' => '$bank_receipts',
+                                    'show-inline-file-name' => true,
+                                    'max-file-name-length' => 30,
+                                    'image-size' => 24,
+                                ],
+                            ]
+                        ]
+                    ],
+                    'conditions' => [
+                        ['bank_receipts', '>', 0],
+                    ],
+                    'creatable' => 'hidden',
                 ],
             ],
         ],
