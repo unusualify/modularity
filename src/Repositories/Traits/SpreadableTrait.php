@@ -39,7 +39,7 @@ trait SpreadableTrait
         $newJson = array_merge($currentJson, $fields[$spreadableSavingKey] ?? []);
 
         // Update the spreadable JSON
-        foreach ($this->getSpreadableInputKeys($this->inputs()) as $key) {
+        foreach ($this->getSpreadableInputKeys($this->inputs(noGroupChunk: true)) as $key) {
             if (isset($fields[$key])) {
                 $newJson[$key] = $fields[$key];
             }
