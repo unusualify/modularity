@@ -26,23 +26,22 @@ class RegisterBroker extends PasswordBroker implements RegisterBrokerContract
     public function sendVerificationLink(array $credentials, ?Closure $callback = null)
     {
         $user = $this->getUser($credentials);
-        if (! is_null($user)) {
+
+        if (! is_null($user))
             return static::ALREADY_REGISTERED;
-        } else {
-            $email = $credentials['email'];
-            $user = new \Unusualify\Modularity\Entities\User;
-            $user->email = $email;
 
-            if ($this->tokens->recentlyCreatedToken($user)) {
-                // dd("reset throttled");
-                return static::RESET_THROTTLED;
-            }
+        $email = $credentials['email'];
+        $user = new \Unusualify\Modularity\Entities\User;
+        $user->email = $email;
 
-            $token = $this->tokens->create($user);
+        if ($this->tokens->recentlyCreatedToken($user)) {
+            return static::RESET_THROTTLED;
+        }
 
-            if ($callback) {
-                return $callback($user, $token) ?? static::VERIFICATION_LINK_SENT;
-            }
+        $token = $this->tokens->create($user);
+
+        if ($callback) {
+            return $callback($user, $token) ?? static::VERIFICATION_LINK_SENT;
         }
 
         $user->sendRegisterNotification($token);
