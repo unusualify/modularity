@@ -22,8 +22,8 @@ trait CanRegister
      * @param string $token
      * @return void
      */
-    public function sendRegisterNotification($token)
+    public function sendRegisterNotification($token, $parameters = [])
     {
-        $this->notify(new EmailVerification($token));
+        $this->notify(new EmailVerification($token, $parameters));
     }
 }
