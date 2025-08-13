@@ -366,7 +366,7 @@ trait HasCreator
 
                 if ($hasSpatiePermission) {
                     $existingRoles = $spatieRoleModel::whereIn('name', $this->getAuthorizedUserRolesForCreatorRecord())->get();
-                    if ($user->hasRole($existingRoles->map(fn ($role) => $role->name)->toArray())) {
+                    if ($user->company_id && $user->hasRole($existingRoles->map(fn ($role) => $role->name)->toArray())) {
                         $query = $query->orWhere('company_id', $user->company_id);
                     }
                 }
