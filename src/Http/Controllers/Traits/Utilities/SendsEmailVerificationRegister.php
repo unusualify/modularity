@@ -10,13 +10,42 @@ use Unusualify\Modularity\Services\MessageStage;
 
 trait SendsEmailVerificationRegister
 {
+    protected static $notificationLinkParameters = [];
+
+    public static function addNotificationLinkParameters(callable $callback)
+    {
+        if (! isset(static::$notificationLinkParameters[static::class])) {
+            static::$notificationLinkParameters[static::class] = [];
+        }
+
+        static::$notificationLinkParameters[static::class][] = $callback;
+    }
+
+    public function getNotificationLinkParameters(Request $request)
+    {
+        $parameters = [];
+
+        foreach (static::$notificationLinkParameters[static::class] ?? [] as $callback) {
+            $parameters = array_merge($parameters, $callback($request));
+        }
+
+        return $parameters;
+    }
+
+    public function broker()
+    {
+        return Register::broker('register_verified_users');
+    }
+
     public function sendVerificationLinkEmail(Request $request)
     {
         $this->validateEmail($request);
 
-        $response = $this->broker()->sendVerificationLink(
-            $this->credentials($request)
-        );
+        $parameters = $this->getNotificationLinkParameters($request);
+
+        $response = $this->broker()->sendVerificationLink($this->credentials($request), function ($user, $token) use ($parameters) {
+            $user->sendRegisterNotification($token, $parameters);
+        });
 
         return $response == RegisterBroker::VERIFICATION_LINK_SENT
             ? $this->sendVerificationLinkResponse($request, $response)
@@ -32,7 +61,7 @@ trait SendsEmailVerificationRegister
     {
         return $request->wantsJson()
                     ? new JsonResponse([
-                        'message' => ___($response),
+                        'message' => __($response),
                         'variant' => MessageStage::SUCCESS,
                     ], 200)
                     : back()->with('status', ___($response));
@@ -42,24 +71,19 @@ trait SendsEmailVerificationRegister
     {
         if ($request->wantsJson()) {
             return new JsonResponse([
-                'email' => [___($response)],
+                'email' => [__($response)],
                 'message' => __($response),
                 'variant' => MessageStage::WARNING,
-            ]);
+            ], 422);
         }
 
         return back()
             ->withInput($request->only('email'))
-            ->withErrors(['email' => ___($response)]);
+            ->withErrors(['email' => __($response)]);
     }
 
     public function credentials(Request $request)
     {
         return $request->only('email');
-    }
-
-    public function broker()
-    {
-        return Register::broker('register_verified_users');
     }
 }
