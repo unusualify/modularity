@@ -21,7 +21,6 @@
           padding="b-3"
           align="start"
           justify="start"
-          class="flex-md-row flex-column justify-md-space-between align-md-center"
           v-bind="titleOptions"
         >
           <template v-slot:default>
@@ -322,7 +321,7 @@
       <!-- Bottom Section -->
       <div :class="['px-1',scrollable ? 'flex-grow-0' : '']" v-if="(hasSubmit && isSubmittable) || $slots.submit || $slots.options || $slots.bottom">
         <v-divider v-if="hasSubmit && !stickyButton && hasDivider" class=""></v-divider>
-        <div class="d-flex flex-wrap justify-center justify-md-start pt-6 w-100 ga-4" v-if="hasSubmit && !stickyButton">
+        <div class="d-flex flex-wrap justify-center justify-md-start pt-6 w-100 ga-4 flex-md-row mb-5" v-if="hasSubmit && !stickyButton">
           <slot name="submit"
             v-bind="{
               isSubmittable,
@@ -340,7 +339,7 @@
             <v-btn v-if="isSubmittable"
               type="submit"
               :disabled="!(validModel || !serverValid) || loading || !isSubmittable"
-              class="ml-auto mb-5 flex-1-1-100 flex-md-1-1-0 flex-lg-0-1-0"
+              class="ml-auto flex-1-1-100 flex-md-1-1-0 flex-lg-0-1-0 order-md-last order-first"
               :block="$vuetify.display.smAndDown"
               :loading="loading"
               :color="!isSubmittable ? 'warning' : 'primary'"
@@ -545,6 +544,7 @@ export default {
           margin: props.title.margin || 'a-0',
           align: props.title.align || 'left',
           justify: props.title.justify || 'start',
+          ...(props.title.class ? {class: props.title.class} : {class: 'flex-md-row flex-column justify-md-space-between align-md-center'})
         }
       }
       return options
