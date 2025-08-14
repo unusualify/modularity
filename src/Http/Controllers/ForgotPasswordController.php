@@ -60,9 +60,10 @@ class ForgotPasswordController extends Controller
                     'color' => 'primary',
                     'type' => 'h5',
                     'weight' => 'bold',
-                    'transform' => '',
+                    'transform' => 'uppercase',
                     'align' => 'center',
                     'justify' => 'center',
+                    'class' => 'justify-md-center',
                 ],
                 'schema' => $this->createFormSchema(getFormDraft('forgot_password_form')),
 
@@ -164,11 +165,11 @@ class ForgotPasswordController extends Controller
     protected function sendResetLinkResponse(Request $request, $response)
     {
         return $request->wantsJson()
-                    ? new JsonResponse([
-                        'message' => ___($response),
-                        'variant' => MessageStage::SUCCESS,
-                    ], 200)
-                    : back()->with('status', ___($response));
+            ? new JsonResponse([
+                'message' => ___($response),
+                'variant' => MessageStage::SUCCESS,
+            ], 200)
+            : back()->with('status', ___($response));
     }
 
     /**
