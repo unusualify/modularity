@@ -3,6 +3,7 @@
 namespace Unusualify\Modularity\Http\Controllers;
 
 use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Route;
 use Unusualify\Modularity\Facades\Register;
 use Unusualify\Modularity\Http\Controllers\Traits\ManageUtilities;
@@ -28,6 +29,14 @@ class PreRegisterController extends Controller
     public function showEmailForm()
     {
         return view(modularityBaseKey() . '::auth.register', [
+            'attributes' => [
+                'bannerDescription' => ___('authentication.banner-description'),
+                'bannerSubDescription' => Lang::has('authentication.banner-sub-description') ? ___('authentication.banner-sub-description') : null,
+                'redirectButtonText' => ___('authentication.redirect-button-text'),
+                'redirectUrl' => Route::has(modularityConfig('auth_guest_route'))
+                    ? route(modularityConfig('auth_guest_route'))
+                    : null,
+            ],
             'formAttributes' => [
                 'title' => [
                     'text' => __('authentication.create-an-account'),
@@ -38,65 +47,25 @@ class PreRegisterController extends Controller
                     'transform' => '',
                     'align' => 'center',
                     'justify' => 'center',
+                    'class' => 'justify-md-center',
                 ],
-                'schema' => ($schema = $this->createFormSchema([
-                    'email' => [
-                        'type' => 'text',
-                        'name' => 'email',
-                        'label' => ___('authentication.email'),
-                        'default' => '',
-                        'rules' => [
-                            ['email'],
-                        ],
-                    ],
-                    'tos' => [
-                        'type' => 'checkbox',
-                        'name' => 'tos',
-                        'label' => __('authentication.tos'),
-                        'default' => '',
-                        'col' => [
-                            'cols' => 12,
-                            'lg' => 12,
-                        ],
-                    ],
-                ])),
-
-                'actionUrl' => route(Route::hasAdmin('pre-register')),
+                'schema' => $this->createFormSchema(getFormDraft('pre_register_form')),
+                'actionUrl' => route(Route::hasAdmin('register.verification')),
                 'buttonText' => 'authentication.register',
                 'formClass' => 'py-6',
                 'no-default-form-padding' => true,
+                'hasSubmit' => true,
             ],
             'formSlots' => [
-                'bottom' => [
-                    'tag' => 'v-sheet',
+                'options' => [
+                    'tag' => 'v-btn',
+                    'elements' => __('authentication.have-an-account'),
                     'attributes' => [
-                        'class' => 'd-flex pb-5 justify-space-between w-100 text-black my-5',
-                    ],
-                    'elements' => [
-                        [
-                            'tag' => 'v-btn',
-                            'elements' => __('authentication.sign-in'),
-                            'attributes' => [
-                                'variant' => 'text',
-                                'href' => route(Route::hasAdmin('login.form')),
-                                'class' => 'v-col-5 justify-content-start',
-                                'color' => 'grey-lighten-1',
-                                'density' => 'default',
-
-                            ],
-                        ],
-                        [
-                            'tag' => 'v-btn',
-                            'elements' => __('authentication.register'),
-                            'attributes' => [
-                                'variant' => 'elevated',
-                                'href' => '',
-                                'class' => 'v-col-5',
-                                'type' => 'submit',
-                                'density' => 'default',
-
-                            ],
-                        ],
+                        'variant' => 'text',
+                        'href' => route(Route::hasAdmin('login.form')),
+                        'class' => 'd-flex flex-1-0 flex-md-grow-0',
+                        'color' => 'grey-lighten-1',
+                        'density' => 'default',
                     ],
                 ],
             ],
@@ -109,10 +78,10 @@ class PreRegisterController extends Controller
                     'elements' => [
                         [
                             'tag' => 'v-btn',
-                            'elements' => ___('authentication.sign-in-google'),
+                            'elements' => ___('authentication.sign-up-oauth', ['provider' => 'Google']),
                             'attributes' => [
                                 'variant' => 'outlined',
-                                'href' => route(Route::hasAdmin('login.form')),
+                                'href' => route('admin.login.provider', ['provider' => 'google']),
                                 'class' => 'mt-5 mb-2 custom-auth-button',
                                 'color' => 'grey-lighten-1',
                                 'density' => 'default',
@@ -129,30 +98,7 @@ class PreRegisterController extends Controller
                                 ],
                             ],
                         ],
-                        [
-                            'tag' => 'v-btn',
-                            'elements' => ___('authentication.sign-in-apple'),
-                            'attributes' => [
-                                'variant' => 'outlined',
-                                'href' => route(Route::hasAdmin('login.form')),
-                                'class' => 'my-2 custom-auth-button',
-                                'color' => 'grey-lighten-1',
-                                'density' => 'default',
-                            ],
-                            'slots' => [
-                                'prepend' => [
-                                    'tag' => 'ue-svg-icon',
-                                    'attributes' => [
-                                        'symbol' => 'apple',
-                                        'width' => '16',
-                                        'height' => '16',
-                                    ],
-                                ],
-                            ],
-                        ],
-
                     ],
-
                 ],
             ],
         ]);
