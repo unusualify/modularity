@@ -141,6 +141,8 @@ return [
                     'label' => 'Published',
                     'isEvent' => true,
                     'type' => 'switch',
+                    'class' => 'mt-n2',
+                    'density' => 'compact',
                 ],
                 [
                     'type' => 'text',
