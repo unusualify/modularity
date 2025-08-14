@@ -10,7 +10,6 @@
           hide-details
           :modelValue="input[event.name] ?? event.default ?? false"
           @update:modelValue="updateValue(event.name, $event)"
-          class="mr-2"
         />
         <ue-recursive-stuff v-else-if="event.viewOnlyComponent"
           :configuration="event.viewOnlyComponent"
@@ -19,14 +18,12 @@
             ...formItem
           }"
           v-bind="tooltipActivatorScope.props"
-          class="mr-2"
         />
         <component v-else-if="event.component"
           :is="event.component"
           v-bind="{...tooltipActivatorScope.props, ...getEventProps(event)}"
           :modelValue="input[event.name] ?? event.default ?? false"
           @update:modelValue="updateValue(event.name, $event)"
-          class="mr-2"
         />
         <v-menu v-else-if="event.items && Array.isArray(event.items) && event.items.length"
           :close-on-content-click="false"
@@ -35,7 +32,6 @@
         >
           <template v-slot:activator="menuActivatorScope">
             <v-btn
-              class="mr-2"
               variant="outlined"
               append-icon="mdi-chevron-down"
               v-bind="menuActivatorScope.props"
