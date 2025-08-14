@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\View\Factory as ViewFactory;
+use Unusualify\Modularity\Events\ModularityUserRegistering;
 use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Facades\Register;
 use Unusualify\Modularity\Http\Controllers\Traits\ManageUtilities;
@@ -71,7 +72,17 @@ class CompleteRegisterController extends Controller
         $email = $request->email;
 
         if ($email && $token && Register::broker('register_verified_users')->emailTokenExists(email: $email, token: $token)) {
+            event(new ModularityUserRegistering($request));
+
+            $rawSchema = getFormDraft('complete_register_form');
+            $keys = array_map(fn($key) => $key['name'], $rawSchema);
+            $defaultValues = $request->only(array_diff($keys, ['password', 'password_confirmation']));
+            $defaultValues['token'] = $token;
+
             return $this->viewFactory->make(modularityBaseKey() . '::auth.register')->with([
+                'attributes' => [
+                    'noSecondSection' => true,
+                ],
                 'formAttributes' => [
                     'title' => [
                         'text' => __('authentication.complete-registration'),
@@ -79,152 +90,38 @@ class CompleteRegisterController extends Controller
                         'color' => 'primary',
                         'type' => 'h5',
                         'weight' => 'bold',
+                        'transform' => 'uppercase',
                         'align' => 'center',
                         'justify' => 'center',
+                        'class' => 'justify-md-center',
                     ],
-                    'modelValue' => [
-                        'email' => $email,
-                        'token' => $token,
-                    ],
-                    'schema' => ($schema = $this->createFormSchema([
-                        'email' => [
-                            'type' => 'text',
-                            'name' => 'email',
-                            'label' => 'Email',
-                            'default' => $email,
-                            'col' => [
-                                'cols' => 6,
-                                'lg' => 6,
-                            ],
-                            'rules' => [
-                                ['email'],
-                            ],
-                            'readonly' => true,
-                            'clearable' => false,
-                        ],
-                        'name' => [
-                            'type' => 'text',
-                            'name' => 'name',
-                            'label' => 'Name',
-                            'default' => '',
-                            'col' => [
-                                'cols' => 6,
-                                'lg' => 6,
-                            ],
-                            'rules' => [
-                                ['min', 3],
-                            ],
-                        ],
-                        'surname' => [
-                            'type' => 'text',
-                            'name' => 'surname',
-                            'label' => 'Surname',
-                            'default' => '',
-                            'col' => [
-                                'cols' => 6,
-                                'lg' => 6,
-                            ],
-                            'rules' => [
-                                ['min', 2],
-                            ],
-                        ],
-                        'company' => [
-                            'type' => 'text',
-                            'name' => 'company',
-                            'label' => 'Company',
-                            'default' => '',
-                            'col' => [
-                                'cols' => 6,
-                                'lg' => 6,
-                            ],
-                            'rules' => [
-                                ['min', 2],
-                            ],
-                        ],
-                        'password' => [
-                            'type' => 'password',
-                            'name' => 'password',
-                            'label' => 'Password',
-                            'default' => '',
-                            'appendInnerIcon' => '$non-visibility',
-                            'slotHandlers' => [
-                                'appendInner' => 'password',
-                            ],
-                            'col' => [
-                                'cols' => 6,
-                                'lg' => 6,
-                            ],
-                            'rules' => [
-                                ['min', 8],
-                            ],
-                        ],
-                        'password_confirmation' => [
-                            'type' => 'password',
-                            'name' => 'password_confirmation',
-                            'label' => ___('authentication.password-confirmation'),
-                            'default' => '',
-                            'appendInnerIcon' => '$non-visibility',
-                            'slotHandlers' => [
-                                'appendInner' => 'password',
-                            ],
-                            'col' => [
-                                'cols' => 6,
-                                'lg' => 6,
-                            ],
-
-                        ],
-                        'token' => [
-                            'type' => 'hidden',
-                            'name' => 'token',
-                        ],
-
-                    ])),
+                    'modelValue' => $defaultValues,
+                    'schema' => $this->createFormSchema(getFormDraft('complete_register_form')),
 
                     'actionUrl' => route(Route::hasAdmin('complete.register')),
-                    'buttonText' => 'authentication.register',
+                    'buttonText' => 'Complete',
                     'formClass' => 'py-6',
                     'no-default-form-padding' => true,
-
+                    'hasSubmit' => true,
                 ],
 
                 'formSlots' => [
-                    'bottom' => [
-                        'tag' => 'v-sheet',
+                    'options' => [
+                        'tag' => 'v-btn',
+                        'elements' => __('Restart'),
                         'attributes' => [
-                            'class' => 'd-flex pb-5 justify-space-between w-100 text-black my-5',
-                        ],
-                        'elements' => [
-                            [
-                                'tag' => 'v-btn',
-                                'elements' => __('authentication.have-an-account'),
-                                'attributes' => [
-                                    'variant' => 'text',
-                                    'href' => route(Route::hasAdmin('login.form')),
-                                    'class' => 'v-col-5 justify-content-start',
-                                    'color' => 'grey-lighten-1',
-                                    'density' => 'default',
-
-                                ],
-                            ],
-                            [
-                                'tag' => 'v-btn',
-                                'elements' => __('authentication.register'),
-                                'attributes' => [
-                                    'variant' => 'elevated',
-                                    'href' => '',
-                                    'class' => 'v-col-5',
-                                    'type' => 'submit',
-                                    'density' => 'default',
-
-                                ],
-                            ],
+                            'variant' => 'text',
+                            'href' => route(Route::hasAdmin('register.email_form')),
+                            'class' => 'd-flex flex-1-0 flex-md-grow-0',
+                            'color' => 'grey-lighten-1',
+                            'density' => 'default',
                         ],
                     ],
                 ],
             ]);
         }
 
-        return $this->redirector->to(route(Route::hasAdmin('pre-register.email-form')))->withErrors([
+        return $this->redirector->to(route(Route::hasAdmin('register.email_form')))->withErrors([
             'token' => 'Your email verification token has expired or could not be found, please retry.',
         ]);
     }
@@ -235,12 +132,12 @@ class CompleteRegisterController extends Controller
 
         if ($validator->fails()) {
             return $request->wantsJson()
-            ? new JsonResponse([
-                'errors' => $validator->errors(),
-                'message' => $validator->messages()->first(),
-                'variant' => MessageStage::WARNING,
-            ], 200)
-            : $request->validate($this->rules(), $this->validationErrorMessages());
+                ? new JsonResponse([
+                    'errors' => $validator->errors(),
+                    'message' => $validator->messages()->first(),
+                    'variant' => MessageStage::WARNING,
+                ], 200)
+                : $request->validate($this->rules(), $this->validationErrorMessages());
         }
 
         $response = $this->broker()->register(
@@ -250,8 +147,8 @@ class CompleteRegisterController extends Controller
         );
 
         return $response == Register::VERIFIED_EMAIL_REGISTER
-                    ? $this->sendRegisterResponse($request, $response)
-                    : $this->sendRegisterFailedResponse($request, $response);
+            ? $this->sendRegisterResponse($request, $response)
+            : $this->sendRegisterFailedResponse($request, $response);
 
     }
 
@@ -283,9 +180,6 @@ class CompleteRegisterController extends Controller
                 'message' => trans($response),
                 'variant' => MessageStage::WARNING,
             ], 200);
-            // throw ValidationException::withMessages([
-            //     'email' => [trans($response)],
-            // ]);
         }
 
         return redirect()->back()
