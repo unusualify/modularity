@@ -30,6 +30,7 @@ class Payment extends \Unusualify\Payable\Models\Payment
     ];
 
     protected $appends = [
+        'bank_receipts',
         'invoice_file',
         'amount_formatted',
         'invoices',
@@ -93,6 +94,37 @@ class Payment extends \Unusualify\Payable\Models\Payment
         return $this->morphTo('paymentable');
     }
 
+    protected function serviceClass(): Attribute
+    {
+        $serviceClass = null;
+        $paymentGateway = $this->paymentService->key;
+        try {
+            $serviceClass = \Unusualify\Payable\Payable::getServiceClass($paymentGateway);
+        } catch (\Exception $e) {
+            if ($e->getMessage() == 'Service class not found for slug: ' . $paymentGateway && $this->paymentService->transferrable) {
+                $serviceClass = new class extends \Unusualify\Payable\Services\PaymentService {
+
+                    public function __construct()
+                    {
+                        $this->mode = 'test';
+                        $this->config = [];
+                    }
+
+                    public function hydrateParams(array|object $params): array
+                    {
+                        return $params;
+                    }
+                };
+            } else {
+                throw $e;
+            }
+        }
+
+        return Attribute::make(
+            get: fn ($value) => $serviceClass,
+        );
+    }
+
     protected function amountFormatted(): Attribute
     {
         $currency = Currency::find($this->currency_id);
@@ -117,6 +149,13 @@ class Payment extends \Unusualify\Payable\Models\Payment
     public function currencies(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(\Modules\SystemPayment\Entities\PaymentCurrency::class);
+    }
+
+    protected function bankReceipts(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $this->fileponds()->where('role', 'receipts')->get()->map(fn ($file) => $file->mediableFormat()),
+        );
     }
 
     protected function invoiceFile(): Attribute

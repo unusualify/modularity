@@ -78,6 +78,19 @@ class Price extends \Oobook\Priceable\Models\Price
         return $this->payments('COMPLETED');
     }
 
+    public function updateOrNewPayment($payload)
+    {
+        $payment = $this->payments()->whereIn('status', ['PENDING', 'FAILED'])->latest()->first();
+
+        if($payment){
+            $payment->update($payload);
+        } else {
+            $payment = $this->payment()->create($payload);
+        }
+
+        return $payment;
+    }
+
     public function failedPayments(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->payments('FAILED');

@@ -52,6 +52,11 @@ export const getSchema = (inputs, model = null, isEditing = false) => {
   // }
 
   _inputs = _.reduce(_inputs, (acc, input, key) => {
+    let parsedKey = parseInt(key)
+    if(!_.isNaN(parsedKey) && input.name){
+      key = input.name
+    }
+
     input.col.class = input._originalClass || input.col?.class || [];
     input._originalClass = input.col.class || [];
     input.disabled = __isset(input._originalDisabled)
@@ -59,6 +64,7 @@ export const getSchema = (inputs, model = null, isEditing = false) => {
       : __isset(input.disabled)
         ? input.disabled
         : false
+
     input._originalDisabled = input.disabled
 
     let inputColClass = input.col?.class || [];

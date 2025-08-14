@@ -590,6 +590,7 @@ export default function useForm(props, context) {
     handleBlur: (e) => {
 
     },
+    saveForm,
     submit: (e, callback = null, errorCallback = null) => {
       if (validations.validModel.value) {
         if (props.async) {

@@ -30,10 +30,9 @@ class PaymentServiceHydrate extends InputHydrate
         $input['type'] = 'input-payment-service';
 
         $input['default_payment_service'] = config('modularity.default_payment_service');
+        $input['currencyConversionEndpoint'] = route('currency.convert');
 
-        $input['api'] = route('currency.convert');
-
-        $input['currencies'] = ! $this->skipQueries
+        $input['supportedCurrencies'] = ! $this->skipQueries
             ? PaymentCurrency::whereHas('paymentServices')
                 ->orWhereHas('paymentService')
                 ->with('paymentServices', 'paymentService')
@@ -41,8 +40,9 @@ class PaymentServiceHydrate extends InputHydrate
             : [];
 
         $input['items'] = ! $this->skipQueries
-            ? PaymentService::published()->where('is_external', 1)->with('paymentCurrencies')->get()->toArray()
+            ? PaymentService::isExternal()->orWhere(fn($query) => $query->isTransfer())->with('paymentCurrencies')->get()->toArray()
             : [];
+
         $paymentServices = ! $this->skipQueries
             ? PaymentService::published()->where('is_internal', 1)->with(['paymentCurrencies', 'cardTypes'])->get()->all()
             : [];
@@ -69,7 +69,42 @@ class PaymentServiceHydrate extends InputHydrate
                 }
             }
         }
+
         $input['currencyCardTypes'] = $mappedData;
+
+        $input['transferFormSchema'] = modularity_format_inputs([
+            [
+                'type' => 'hidden',
+                'name' => 'price_id',
+            ],
+            [
+                'type' => 'hidden',
+                'name' => 'payment_service_id',
+            ],
+            [
+                'type' => 'hidden',
+                'name' => 'currency_id',
+            ],
+            [
+                'type' => 'filepond',
+                'name' => 'bank_receipt',
+                'label' => 'Upload Transfer Receipt',
+                'col' => ['cols' => 12],
+                'acceptedExtensions' => ['pdf'],
+                'max-files' => 2,
+                'min' => 1,
+                'default' => [],
+            ],
+            [
+                'type' => 'checkbox',
+                'name' => 'tos',
+                'col' => ['cols' => 12],
+                'label' => 'I have made the transfer',
+                'rules' => 'required',
+            ],
+        ]);
+
+        $input['paymentUrl'] = route('admin.system.system_payment.payment');
 
         return $input;
     }
