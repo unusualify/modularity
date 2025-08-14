@@ -118,7 +118,7 @@ trait CreateVerifiedEmailAccount
         $company = Company::create([
             'name' => $credentials['company'] ?? '',
             'spread_payload' => [
-                'is_personal' => $credentials['company'] ? false : true,
+                'is_personal' => ($credentials['company'] ?? false) ? false : true,
             ],
         ]);
 
