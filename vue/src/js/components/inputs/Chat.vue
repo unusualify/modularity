@@ -19,7 +19,7 @@
         :disabled="disabled"
       >
         <v-card-title class="w-100 py-4 text-wrap">
-          <ue-title :text="label" align="center" padding="b-2" transform="none" class="w-100" type="body-1" color="grey-darken-4" weight="medium">
+          <ue-title :text="label" align="center" padding="a-0" transform="none" class="w-100" type="body-1" color="grey-darken-4" weight="medium">
             <template v-slot:rightX>
               <div class="w-100 d-flex justify-end">
                 <slot name="actions">
@@ -123,9 +123,8 @@
           <ue-title v-if="subtitle" :text="$t(subtitle)" align="center" transform="none" padding="a-0"  type="caption" weight="regular" color="grey-darken-4" l>
 
           </ue-title>
-        </v-card-title>
 
-        <v-card-text class="mr-n2 pb-0">
+          <v-divider class="mt-2" v-if="!noDivider"></v-divider>
 
           <!-- Pinned Message -->
           <v-list
@@ -151,8 +150,9 @@
               </v-tooltip>
             </template>
           </v-list>
-          <v-divider v-else-if="!noDivider"></v-divider>
+        </v-card-title>
 
+        <v-card-text class="mr-n2 mb-n4 mt-n4 pb-0">
           <v-infinite-scroll
             ref="infiniteScroll"
             :height="bodyHeight ? `calc(${bodyHeight})` : `calc(${height}*0.65)`"
