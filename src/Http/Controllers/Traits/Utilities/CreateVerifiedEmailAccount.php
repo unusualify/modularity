@@ -8,8 +8,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Unusualify\Modularity\Entities\Company;
 use Unusualify\Modularity\Entities\Traits\Auth\RedirectsUsers;
 use Unusualify\Modularity\Entities\User;
+use Unusualify\Modularity\Events\ModularityUserRegistered;
+use Unusualify\Modularity\Events\ModularityUserRegistering;
 use Unusualify\Modularity\Events\VerifiedEmailRegister;
 use Unusualify\Modularity\Facades\Register;
 
@@ -102,20 +105,27 @@ trait CreateVerifiedEmailAccount
         // the application's home authenticated view. If there is an error we can
         // redirect them back to where they came from with their error message.
         return $response == Register::VERIFIED_EMAIL_REGISTER
-                    ? $this->sendRegisterResponse($request, $response)
-                    : $this->sendRegisterFailedResponse($request, $response);
+            ? $this->sendRegisterResponse($request, $response)
+            : $this->sendRegisterFailedResponse($request, $response);
     }
 
     public function registerEmail(array $credentials)
     {
+        event(new ModularityUserRegistering(request()));
+
         $user = $this->setUserRegister($credentials);
 
-        // $user->setRememberToken(Str::random(60));
-        // $user->save();
+        $company = Company::create([
+            'name' => $credentials['company'] ?? '',
+            'spread_payload' => [
+                'is_personal' => $credentials['company'] ? false : true,
+            ],
+        ]);
 
-        // $freshUser = User::find($user->id);
-        // $freshUser->assignRole('client-manager');
-        $user->company()->create();
+        $user->company_id = $company->id;
+        $user->save();
+
+        event(new ModularityUserRegistered($user, request()));
 
         event(new VerifiedEmailRegister($user));
 
@@ -131,15 +141,10 @@ trait CreateVerifiedEmailAccount
             'email_verified_at' => now(),
             'password' => Hash::make($credentials['password']),
         ]);
+
         $user->setRememberToken(Str::random(60));
 
         $user->assignRole('client-manager');
-        // $user = new User();
-        // $user->name = $credentials['name'];
-        // $user->surname = $credentials['surname'];
-        // $user->email = $credentials['email'];
-        // $user->email_verified_at = now();
-        // $user->password = Hash::make($credentials['password']);
 
         return $user;
     }
