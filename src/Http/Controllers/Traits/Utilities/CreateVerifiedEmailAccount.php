@@ -116,11 +116,13 @@ trait CreateVerifiedEmailAccount
         $user = $this->setUserRegister($credentials);
 
         $company = Company::create([
-            'name' => $credentials['company'] ?? '',
-            'spread_payload' => [
-                'is_personal' => ($credentials['company'] ?? false) ? false : true,
-            ],
+            'name' => $credentials['company'] ?? ''
         ]);
+
+        $company->spread_payload = [
+            'is_personal' => ($credentials['company'] ?? false) ? false : true,
+        ];
+        $company->save();
 
         $user->company_id = $company->id;
         $user->save();
