@@ -49,6 +49,7 @@ class RegisterController extends Controller
                     'transform' => '',
                     'align' => 'center',
                     'justify' => 'center',
+                    'class' => 'justify-md-center',
                 ],
                 'schema' => $this->createFormSchema(getFormDraft('register_form')),
                 'actionUrl' => route(Route::hasAdmin('register')),
@@ -64,7 +65,7 @@ class RegisterController extends Controller
                     'attributes' => [
                         'variant' => 'text',
                         'href' => route(Route::hasAdmin('login.form')),
-                        'class' => '',
+                        'class' => 'd-flex flex-1-0 flex-md-grow-0',
                         'color' => 'grey-lighten-1',
                         'density' => 'default',
                     ],
@@ -174,9 +175,9 @@ class RegisterController extends Controller
             'password' => Hash::make($request['password']),
         ]);
 
-        event(new ModularityUserRegistered($user, $request));
-
         $user->assignRole('client-manager');
+
+        event(new ModularityUserRegistered($user, $request));
 
         return $request->wantsJson()
             ? new JsonResponse([
