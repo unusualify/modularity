@@ -13,17 +13,17 @@
         style="max-width: 100%;"
       >
         <div v-if="label"
-          class="d-flex flex-column"
+          class="d-flex flex-column mb-2 mr-md-3"
           :style="[
             'max-width: 100%;',
-            (flexColumn && $vuetify.display.mdAndUp) ? 'flex: 0 1 30%;' : 'flex: 1 0 100%;'
+            (flexColumn && $vuetify.display.mdAndUp) ? 'flex: 0 1 auto;' : 'flex: 1 0 100%;'
           ]"
         >
-          <ue-title v-if="label" padding="x-3" data-test="title" :color="labelColor" transform="none">
+          <ue-title v-if="label" padding="" data-test="title" :color="labelColor" transform="none">
             <span v-html="label"></span>
           </ue-title>
           <ue-title v-if="subtitle"
-            padding="x-3"
+            padding=""
             type="caption"
             weight="medium"
             transform="none"
@@ -34,7 +34,7 @@
           </ue-title>
         </div>
 
-        <v-divider v-if="(flexColumn && $vuetify.display.mdAndUp) && (label || subtitle)" vertical class="mr-4"></v-divider>
+        <v-divider v-if="(flexColumn && $vuetify.display.mdAndUp) && (label || subtitle)" vertical class="mr-3 border-current"></v-divider>
 
         <!-- treeview -->
         <v-row v-if="isTreeview"
