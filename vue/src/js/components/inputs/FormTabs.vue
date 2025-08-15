@@ -157,7 +157,7 @@ export default {
           }
 
           if(_value){
-            let remainingQuote = '\\w\\s' + __preg_quote('çşıİğüö.,;?|:_')
+            let remainingQuote = '\\w\\s' + __preg_quote('çşıİğüö.,;?|:_-=<>/"\'')
             let pattern = new RegExp( String.raw`^([${remainingQuote}]+)?(${quoted})([${remainingQuote}]+)?$`)
 
             if(value.match(pattern)){

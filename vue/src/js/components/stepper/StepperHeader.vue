@@ -11,6 +11,10 @@
         complete-icon="$complete"
         class="ue-stepper-item__icon--border25"
       >
+        <template #icon="iconScope">
+          <v-icon v-if="iconScope.hasCompleted" icon="$check" color="white" @click="$emit('step-click', iconScope.step)"></v-icon>
+          <template v-else>{{ iconScope.step }}</template>
+        </template>
         <template v-slot:title="titleScope">
           <div @click="$emit('step-click', i+1)" style="cursor: pointer">
             <span :class="[ (titleScope.hasCompleted || titleScope.step == activeStep) ? 'text-primary font-weight-bold' : '' ]">
