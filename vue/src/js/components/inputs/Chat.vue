@@ -64,8 +64,7 @@
                   </v-dialog>
 
                   <!-- Show All ATTACHMENTS IN A DIALOG-->
-                  <v-dialog
-                    v-if="uploadedAttachments.length > 0"
+                  <v-dialog v-if="uploadedAttachments.length > 0"
                     width="70%"
                     :height="dialogHeight"
                     v-model="uploadedAttachmentsDialog"
@@ -682,7 +681,7 @@
 
         const newMessage = {
           loading: true,
-          content: this.message || (this.attachments.length > 0 ? '[Attachment]' : ''), // Fallback content for attachment-only messages
+          content: this.message, // Fallback content for attachment-only messages
           tempId: Date.now(), // Add unique tempId to identify this message later
           attachments: [...this.attachments] // Ensure attachments are included in the temporary message
         };
@@ -693,7 +692,7 @@
 
         // Log the request payload for debugging
         const requestPayload = {
-          content: this.message || (this.attachments.length > 0 ? '[Attachment]' : ''), // Fallback content for attachment-only messages
+          content: this.message, // Fallback content for attachment-only messages
           attachments: this.attachments
         };
         // console.log('Sending message with payload:', requestPayload);
@@ -972,7 +971,7 @@
         // console.log('File processing started:', file);
         this.loadingAttachment = true;
       },
-            handleFileProcessed(file) {
+      handleFileProcessed(file) {
         // Handle when a file is processed
         // console.log('File processed:', file);
         // console.log('File details:', {
@@ -1135,10 +1134,6 @@
 
 .upload-modal-card .v-card-text {
   padding: 32px !important;
-}
-
-.upload-modal-card .v-progress-circular {
-  box-shadow: 0 4px 20px rgba(var(--v-theme-primary), 0.3);
 }
 
 </style>
