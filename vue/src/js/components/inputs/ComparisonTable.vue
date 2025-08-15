@@ -23,8 +23,8 @@
         disable-sort
         hide-default-footer
         :items-per-page="itemsPerPage"
-        :mobile-breakpoint="`md`"
-        fixed-header
+        :mobile-breakpoint="`sm`"
+        :fixed-header="!noFixedHeader"
         >
         <!-- header slots -->
         <template v-for="(header, i) in headers"
@@ -89,10 +89,6 @@
         type: Boolean,
         default: true
       },
-      noFixedSelectable: {
-        type: Boolean,
-        default: false
-      },
       striped: {
         type: Boolean,
         default: true
@@ -128,7 +124,19 @@
       height: {
         type: [String, Number],
         default: null
-      }
+      },
+      noFixedHeader: {
+        type: Boolean,
+        default: false
+      },
+      noFixedComparator: {
+        type: Boolean,
+        default: false
+      },
+      noFixedSelectable: {
+        type: Boolean,
+        default: false
+      },
     },
     setup (props, context) {
       return {
@@ -144,7 +152,7 @@
     },
     computed: {
       headers() {
-        return [{title: this.label, key: 'comparator_name', width: this.comparatorWidth, fixed: true, cellProps: {class: 'py-2', style: {minWidth: `${this.minComparatorWidth}px`}}}].concat( this.items.map((item) => {
+        return [{title: this.label, key: 'comparator_name', width: this.comparatorWidth, fixed: !this.noFixedComparator, cellProps: {class: 'py-2', style: {minWidth: `${this.minComparatorWidth}px`}}}].concat( this.items.map((item) => {
           return {title: item.name, key: item.name, align: 'center', id: item.id, width: this.itemWidth, cellProps: {style: { ...(this.$vuetify.display.mobile ? {} : {maxWidth: `${this.maxItemWidth}px`})}}}
         }))
       },
@@ -154,7 +162,7 @@
 
         let style = {}
 
-        if(!this.$vuetify.display.mobile){
+        if(!this.$vuetify.display.smAndDown){
           if(maxHeight){
             if(isNumber(maxHeight)){
               maxHeight = `${maxHeight}px`
@@ -337,7 +345,7 @@
         &:nth-of-type(2n)
           background-color: $stripedColor //TODO: table action border must be variable
           td.v-data-table-column--fixed
-            background-color: unset !important
+            background-color: $stripedCellColor !important
 
     &--highlighted
       .v-table__wrapper
