@@ -76,7 +76,7 @@
       },
       maxHeight: {
         type: String,
-        default: '80vh'
+        default: '84vh'
       },
       coverHeight: {
         type: Number,
