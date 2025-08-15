@@ -133,7 +133,7 @@
             <v-btn
               variant="elevated"
               color="secondary"
-              @click="goStep(activeStep + 1)"
+              @click="nextForm(activeStep - 1)"
               :disabled="$hasRequestInProgress()"
               >
               {{ $t('next').toUpperCase() }}
