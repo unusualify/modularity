@@ -55,7 +55,7 @@
 <script>
   import { useInput, makeInputProps, makeInputEmits } from '@/hooks'
   import Table from '../Table.vue'
-  import { find, toUpper, isNumber, isString, get } from 'lodash-es';
+  import { find, toUpper, isNumber, isString, get, isNaN } from 'lodash-es';
 
   export default {
     name: 'v-input-comparison-table',
@@ -105,7 +105,27 @@
         type: Number,
         default: 50
       },
+      comparatorWidth: {
+        type: Number,
+        default: 400
+      },
+      minComparatorWidth: {
+        type: Number,
+        default: 250
+      },
+      itemWidth: {
+        type: Number,
+        default: 80
+      },
+      maxItemWidth: {
+        type: Number,
+        default: 100
+      },
       maxHeight: {
+        type: [String, Number],
+        default: null
+      },
+      height: {
         type: [String, Number],
         default: null
       }
@@ -124,31 +144,57 @@
     },
     computed: {
       headers() {
-        return [{title: this.label, key: 'comparator_name', width: 400, fixed: true, cellProps: {class: 'py-2', style: {minWidth: `250px`}}}].concat( this.items.map((item) => {
-          return {title: item.name, key: item.name, align: 'center', id: item.id}
+        return [{title: this.label, key: 'comparator_name', width: this.comparatorWidth, fixed: true, cellProps: {class: 'py-2', style: {minWidth: `${this.minComparatorWidth}px`}}}].concat( this.items.map((item) => {
+          return {title: item.name, key: item.name, align: 'center', id: item.id, width: this.itemWidth, cellProps: {style: { ...(this.$vuetify.display.mobile ? {} : {maxWidth: `${this.maxItemWidth}px`})}}}
         }))
       },
       inputAndTableStyle() {
+        let heightPattern = /(\d+)(vh|px|rem|em|%)/
         let maxHeight = this.maxHeight
 
         let style = {}
 
-        if(maxHeight){
-          if(isNumber(maxHeight)){
-            maxHeight = `${maxHeight}px`
-          }
-
-          if(isString(maxHeight)){
-            let isNumberable = isNumber(parseInt(maxHeight))
-            if(isNumberable){
-              maxHeight = `${parseInt(maxHeight)}px`
-            } else {
-              maxHeight = maxHeight
+        if(!this.$vuetify.display.mobile){
+          if(maxHeight){
+            if(isNumber(maxHeight)){
+              maxHeight = `${maxHeight}px`
             }
+
+            if(isString(maxHeight)){
+              let match = maxHeight.match(heightPattern)
+
+              if(!match){
+                let isNumberable = !isNaN(parseInt(match[1]))
+                if(isNumberable){
+                  maxHeight = `${parseInt(match[1])}px`
+                }
+              }
+            }
+
+            style.maxHeight = maxHeight
           }
 
-          style.maxHeight = maxHeight
+          if(this.height){
+            let height = this.height
+
+            if(isNumber(height)){
+              height = `${height}vh`
+            }
+
+            if(isString(height)){
+              let match = height.match(heightPattern)
+              if(!match){
+                let isNumberable = !isNaN(parseInt(match[1]))
+                if(isNumberable){
+                  height = `${parseInt(match[1])}vh`
+                }
+              }
+            }
+
+            style.height = height
+          }
         }
+
 
         return style
       },
@@ -267,12 +313,13 @@
   }
 </script>
 
-<style scoped lang="sass">
+<style lang="sass">
   $borderWidth: 1px
   $borderColor: rgba(var(--v-theme-primary), .7 )
   $stripedColor: rgba(var(--v-theme-primary), .1 )
+  $stripedCellColor: rgba(var(--v-theme-primary), .01 )
   $rowHeight: 40px
-
+  $tableHeaderHeight: 50px
 
   .v-input-comparison-table
     .v-table
@@ -289,20 +336,28 @@
       tr
         &:nth-of-type(2n)
           background-color: $stripedColor //TODO: table action border must be variable
+          td.v-data-table-column--fixed
+            background-color: unset !important
 
     &--highlighted
       .v-table__wrapper
         > table
           tr
+            > td.v-data-table-column--last-fixed, th.v-data-table-column--last-fixed
+              border-right: unset !important
+
             &:first-child
               > th
                 &:not(:first-child)
                   color: $borderColor
                   text-transform: uppercase
+
                   border-top: $borderWidth solid $borderColor !important
                   border-top-left-radius: 8px !important
                   border-top-right-radius: 8px !important
                   border-bottom: $borderWidth solid $borderColor !important
+                  border-left: $borderWidth solid $borderColor
+                  box-shadow: 3px -2rem 0 3px white
                   // +smooth-wave-border( $position: bottom, $wave-height: 5px, $color: rgba(var(--v-theme-primary), 1), $border-width: 1px )
                   // +wavy-border( $position: bottom, $wave-height: 15px, $wave-width: 50%,$border-width: 1px ,$color: rgba(var(--v-theme-primary), 1))
                   // +sine-wave-border( $position: bottom, $wave-height: 20px,$color: $borderColor, $border-width: 1px, $amplitude: 4, $height: 25px, $phase: -5)
@@ -316,7 +371,11 @@
             &:last-child
               > td
                 &:not(:first-child)
+                  border-bottom-left-radius: 8px !important
+                  border-bottom-right-radius: 8px !important
                   border-bottom: $borderWidth solid $borderColor !important
+                  // box-shadow: 3.1rem 0 3px 0 red
+                  box-shadow: 0px 7px white
 
     .v-data-table--fixed-selectable
       .v-table__wrapper
