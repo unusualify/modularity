@@ -1,6 +1,6 @@
 <template>
   <v-sheet-rounded class="ue-stepper-form__body d-flex w-100 flex-column justify-space-between elevation-2">
-    <v-stepper-window id="ue-stepper-content-window" class="fill-height overflow-y-auto px-6" style="max-height: 80vh;">
+    <v-stepper-window id="ue-stepper-content-window" class="fill-height overflow-y-auto px-4" :style="`max-height: calc(${maxHeight} - ${coverHeight}px)`">
       <!-- Form steps -->
       <v-stepper-window-item
         v-for="(form, i) in forms"
@@ -73,7 +73,16 @@
       isEditing: {
         type: Boolean,
         default: false
+      },
+      maxHeight: {
+        type: String,
+        default: '80vh'
+      },
+      coverHeight: {
+        type: Number,
+        default: 0
       }
+
     },
     emits: ['form-input', 'form-valid', 'update:modelValue', 'update:schemas'],
 
@@ -133,7 +142,6 @@
         },
         deep: true
       },
-
       schemas: {
         handler(newVal) {
           if (!isEqual(newVal, this.localSchemas)) {
