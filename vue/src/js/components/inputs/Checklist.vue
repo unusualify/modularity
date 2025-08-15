@@ -20,7 +20,7 @@
           ]"
         >
           <ue-title v-if="label" padding="x-3" data-test="title" :color="labelColor" transform="none">
-            {{ label }}
+            <span v-html="label"></span>
           </ue-title>
           <ue-title v-if="subtitle"
             padding="x-3"
@@ -30,7 +30,7 @@
             :color="subtitleColor"
             data-test="title"
           >
-            {{ subtitle }}
+            <span v-html="subtitle"></span>
           </ue-title>
         </div>
 
