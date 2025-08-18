@@ -283,8 +283,7 @@
             </div>
           </div>
 
-          <v-dialog
-            v-if="hasAdditionalSection"
+          <v-dialog v-if="hasAdditionalSection"
             v-model="showAdditionalSectionDialog"
             max-width="500px"
           >
@@ -396,7 +395,7 @@ const AdditionalSectionContent = {
   },
   emits: ['action-complete'],
   template: `
-    <div>
+    <div class="mb-2">
       <!-- Right Top Form Actions -->
       <FormActions v-if="actionsPosition == 'right-top' && isEditing"
         :modelValue="formItem"
