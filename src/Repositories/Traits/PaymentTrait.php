@@ -3,6 +3,8 @@
 namespace Unusualify\Modularity\Repositories\Traits;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
+use Modules\SystemPayment\Entities\PaymentService;
 use Modules\SystemPricing\Entities\Price;
 
 trait PaymentTrait
@@ -147,6 +149,41 @@ trait PaymentTrait
                 } else {
                     // dd($calculated, $totalAmount, $object->paymentPrice->raw_amount, $object->paymentPrice);
                 }
+            }
+        }
+
+        // in order to create a payment record, we need to have a payment service
+        if (isset($fields['payment_service_id'])) {
+            $paymentService = PaymentService::find($fields['payment_service_id']);
+            $paymentPrice = $object->paymentPrice()->first();
+
+            if ($paymentService->transferrable && $paymentPrice) {
+                $paymentPayload = [
+                    'payment_service_id' => $paymentService->id,
+                    'email' => $fields['email'] ?? null,
+                ];
+                $extraPayload = [];
+                $user = null;
+                if(Auth::check()){
+                    $user = Auth::user();
+                }
+
+                if(classHasTrait($object, 'Unusualify\Modularity\Entities\Traits\HasCreator')){
+                    $paymentPayload['custom_creator_id'] = $object->creator->id;
+                    $paymentPayload['email'] = $object->creator->email;
+                } else if($user) {
+                    $paymentPayload['email'] = $user->email;
+                }
+
+                if(isset($fields['payment_receipts'])){
+                    $extraPayload['receipts'] = $fields['payment_receipts'];
+                }
+
+                if(isset($fields['payment_description'])){
+                    $paymentPayload['spread_payload']['description'] = $fields['payment_description'];
+                }
+
+                $paymentPrice->updateOrNewPayment($paymentPayload, $extraPayload);
             }
         }
     }
