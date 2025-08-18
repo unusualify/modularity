@@ -8,8 +8,7 @@ import { isMatchingPattern, replacePattern } from '@/utils/notation'
 export default function useCastAttributes () {
   const { t, te } = useI18n()
   const AttributePattern = /\$([\w\d\.\*\_]+)/
-  const NewAttributePattern = /\${([\w\d\.\*\_]+)}/
-  const EvalPattern = /^\{(.*)\}$/
+  const EvalPattern = /^\$\((.*)\)\$/
 
   const castObjectAttribute = (value, ownerItem) => {
     if(!isString(value))
@@ -20,6 +19,30 @@ export default function useCastAttributes () {
 
     if(isMatchingPattern(value)){
       returnValue = replacePattern(value, ownerItem)
+    } else if(EvalPattern.test(value)){
+      let matches = value.match(EvalPattern)
+      let evalText = matches[1]
+
+      let evalParts = evalText.split(' ').map((v) => {
+        if(AttributePattern.test(v)) {
+          let evalPartMatches = v.match(AttributePattern)
+          let evalPart = evalPartMatches[1]
+
+          let evalPartCastedValue = __data_get(ownerItem, evalPart, undefined)
+
+          if(evalPartCastedValue !== undefined) {
+            return evalPartCastedValue
+          }
+        }
+
+        return v
+      })
+
+      try {
+        return eval(evalParts.join(' '))
+      } catch (e) {
+        console.error('Error in eval', e)
+      }
     } else if(AttributePattern.test(value)){
       let matches = value.match(AttributePattern)
       let notation = matches[1]
@@ -79,30 +102,6 @@ export default function useCastAttributes () {
         } else if(isArray(_value) ) {
           returnValue = _value
         }
-      }
-    }else if(EvalPattern.test(value)){
-      let matches = value.match(EvalPattern)
-      let evalText = matches[1]
-
-      let evalParts = evalText.split(' ').map((v) => {
-        if(AttributePattern.test(v)) {
-          let evalPartMatches = v.match(AttributePattern)
-          let evalPart = evalPartMatches[1]
-
-          let evalPartCastedValue = __data_get(ownerItem, evalPart, undefined)
-
-          if(evalPartCastedValue !== undefined) {
-            return evalPartCastedValue
-          }
-        }
-
-        return v
-      })
-
-      try {
-        return eval(evalParts.join(' '))
-      } catch (e) {
-        console.error('Error in eval', e)
       }
     }
 
