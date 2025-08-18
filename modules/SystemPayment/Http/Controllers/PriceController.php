@@ -16,11 +16,11 @@ use Modules\SystemPayment\Entities\PaymentCurrency;
 use Modules\SystemPayment\Entities\PaymentService;
 use Modules\SystemPricing\Entities\Currency;
 use Modules\SystemPricing\Entities\Price;
+use Unusualify\Modularity\Entities\Enums\PaymentStatus;
 use Unusualify\Modularity\Facades\CurrencyExchange;
 use Unusualify\Modularity\Facades\Filepond;
 use Unusualify\Modularity\Services\MessageStage;
 use Unusualify\Modularity\View\Component;
-use Unusualify\Payable\Models\Enums\PaymentStatus;
 use Unusualify\Payable\Payable;
 
 class PriceController extends Controller
@@ -36,6 +36,28 @@ class PriceController extends Controller
 
         $params = $request->all();
         $price = Price::with('currency', 'vatRate')->find($params['price_id']);
+
+        $previousUrl = url()->previous();
+
+        if($price->payment && $price->payment->status == PaymentStatus::COMPLETED){
+            $modalService = $this->createModalService('warning', 'mdi-alert-circle-outline', 'Paid Before', 'This price has already been paid! Please check the payment status.', [
+                'noCancelButton' => true,
+            ]);
+
+            if($request->ajax()){
+                return response()->json([
+                    'status' => MessageStage::ERROR,
+                    'message' => 'Payment already completed',
+                    'redirector' => merge_url_query($previousUrl ?? route('admin.dashboard'), [
+                        'modalService' => $modalService,
+                    ]),
+                ], 403);
+            }
+
+            return redirect(merge_url_query($previousUrl ?? route('admin.dashboard'), [
+                'modalService' => $modalService,
+            ]));
+        }
 
         $user = Auth::user();
         $company = $user->company;
@@ -173,6 +195,8 @@ class PriceController extends Controller
             $payment = $price->updateOrNewPayment($paymentPayload);
 
             Filepond::saveFile($payment, $request->bank_receipt, 'receipts');
+
+            PaymentCompleted::dispatch($payment);
 
             if($request->ajax()){
                 return response()->json([
