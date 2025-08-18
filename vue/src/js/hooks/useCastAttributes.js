@@ -3,10 +3,12 @@
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { isString, isArray, isObject, isNumber, snakeCase } from 'lodash-es'
+import { isMatchingPattern, replacePattern } from '@/utils/notation'
 
 export default function useCastAttributes () {
   const { t, te } = useI18n()
   const AttributePattern = /\$([\w\d\.\*\_]+)/
+  const NewAttributePattern = /\${([\w\d\.\*\_]+)}/
   const EvalPattern = /^\{(.*)\}$/
 
   const castObjectAttribute = (value, ownerItem) => {
@@ -16,7 +18,9 @@ export default function useCastAttributes () {
     let returnValue = value
     let matches
 
-    if(AttributePattern.test(value)){
+    if(isMatchingPattern(value)){
+      returnValue = replacePattern(value, ownerItem)
+    } else if(AttributePattern.test(value)){
       let matches = value.match(AttributePattern)
       let notation = matches[1]
       let quoted = __preg_quote(matches[0])
