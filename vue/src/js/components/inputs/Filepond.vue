@@ -534,12 +534,12 @@
   }
 
   :deep(.filepond--panel-root) {
-    background-color: white;
+    background-color: inherit;
     border: 1px solid #ccc;
   }
 
   :deep(.filepond--drop-label) {
-    color: #666;
+    color: inherit;
     font-size: 14px;
   }
 
