@@ -45,7 +45,7 @@
             </slot>
           </template>
           <template v-slot:right>
-            <div class="d-flex mt-2 mt-md-0 ">
+            <div class="d-flex mt-2 mt-md-0 gc-2">
               <!-- Title Center Form Actions -->
               <FormActions v-if="actionsPosition == 'title-center' && isEditing"
                 :modelValue="formItem"
