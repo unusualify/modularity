@@ -8,7 +8,7 @@ import ACTIONS from '@/store/actions'
 import { FORM, ALERT } from '@/store/mutations/index'
 import api from '@/store/api/form'
 
-import { useFormatter } from '@/hooks'
+import { useFormatter, useCastAttributes } from '@/hooks'
 import { checkItemConditions } from '@/utils/itemConditions';
 
 export const makeItemActionsProps = propsFactory({
@@ -25,6 +25,7 @@ export const makeItemActionsProps = propsFactory({
 export default function useItemActions(props, context) {
   const store = useStore()
   const { castMatch } = useFormatter(props, context)
+  const { castObjectAttributes } = useCastAttributes()
 
   const Actions = _.cloneDeep(props.actions)
 
@@ -173,6 +174,10 @@ export default function useItemActions(props, context) {
         })
       }
 
+      if(props.isEditing && editingItem){
+        action = castObjectAttributes(action, editingItem)
+      }
+
       if(!validateAction(action)) {
         action.disabled = true
       }
@@ -186,7 +191,16 @@ export default function useItemActions(props, context) {
       : Actions
   )
 
-  const allActions = computed(() => formatActions(flattenedActions.value))
+  const filteredActions = computed(() => flattenedActions.value.filter(action => {
+    if(!validateAction(action) ) {
+      if(action.hideOnCondition) {
+        return false
+      }
+    }
+    return true
+  }))
+
+  const allActions = computed(() => formatActions(filteredActions.value))
   const visibleActions = computed(() => allActions.value.filter(action => !(window.__isset(action.disabled) && action.disabled)))
 
   const states = reactive({
