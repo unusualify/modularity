@@ -37,6 +37,16 @@ class PaymentServiceSeeder extends Seeder
                 'is_external' => false,
                 'is_internal' => false,
                 'image' => 'iyzico.png',
+                'spread_payload' => [
+                    'type' => 1,
+                    'transfer_details' => [
+                        'account_holder' => '',
+                        'iban' => '',
+                        'swift_code' => '',
+                        'description' => '',
+                        'address' => '',
+                    ],
+                ],
             ],
             [
                 'name' => 'Paypal',
@@ -49,6 +59,16 @@ class PaymentServiceSeeder extends Seeder
 
                 'paymentCurrencies' => [
                     PaymentCurrency::where('iso_4217', 'USD')->first()->id ?? null,
+                ],
+                'spread_payload' => [
+                    'type' => 1,
+                    'transfer_details' => [
+                        'account_holder' => '',
+                        'iban' => '',
+                        'swift_code' => '',
+                        'description' => '',
+                        'address' => '',
+                    ],
                 ],
             ],
             [
@@ -66,6 +86,16 @@ class PaymentServiceSeeder extends Seeder
                     'USD',
                     'EUR',
                 ],
+                'spread_payload' => [
+                    'type' => 1,
+                    'transfer_details' => [
+                        'account_holder' => '',
+                        'iban' => '',
+                        'swift_code' => '',
+                        'description' => '',
+                        'address' => '',
+                    ],
+                ],
             ],
             [
                 'name' => 'TebPOS',
@@ -73,6 +103,16 @@ class PaymentServiceSeeder extends Seeder
                 'is_external' => false,
                 'is_internal' => true,
                 'image' => 'credit-card.png',
+                'spread_payload' => [
+                    'type' => 1,
+                    'transfer_details' => [
+                        'account_holder' => '',
+                        'iban' => '',
+                        'swift_code' => '',
+                        'description' => '',
+                        'address' => '',
+                    ],
+                ],
             ],
             [
                 'name' => 'TebCommonPOS',
@@ -81,6 +121,16 @@ class PaymentServiceSeeder extends Seeder
                 'is_internal' => true,
                 'image' => 'credit-card.png',
                 // 'currency' => 'TRY',
+                'spread_payload' => [
+                    'type' => 1,
+                    'transfer_details' => [
+                        'account_holder' => '',
+                        'iban' => '',
+                        'swift_code' => '',
+                        'description' => '',
+                        'address' => '',
+                    ],
+                ],
             ],
             [
                 'name' => 'iDEAL',
@@ -94,6 +144,16 @@ class PaymentServiceSeeder extends Seeder
                 'paymentCurrencies' => [
                     PaymentCurrency::where('iso_4217', 'EUR')->first()->id ?? null,
                 ],
+                'spread_payload' => [
+                    'type' => 1,
+                    'transfer_details' => [
+                        'account_holder' => '',
+                        'iban' => '',
+                        'swift_code' => '',
+                        'description' => '',
+                        'address' => '',
+                    ],
+                ],
             ],
             [
                 'name' => 'iDEAL QR',
@@ -106,6 +166,34 @@ class PaymentServiceSeeder extends Seeder
 
                 'paymentCurrencies' => [
                     PaymentCurrency::where('iso_4217', 'EUR')->first()->id ?? null,
+                ],
+                'spread_payload' => [
+                    'type' => 1,
+                    'transfer_details' => [
+                        'account_holder' => '',
+                        'iban' => '',
+                        'swift_code' => '',
+                        'description' => '',
+                        'address' => '',
+                    ],
+                ],
+            ],
+            [
+                'name' => 'Bank Transfer',
+                'key' => 'bank-transfer',
+                'published' => false,
+                'is_external' => false,
+                'is_internal' => false,
+                'image' => 'bank-transfer.png',
+                'spread_payload' => [
+                    'type' => 2,
+                    'transfer_details' => [
+                        'account_holder' => 'Test Account Holder',
+                        'iban' => '',
+                        'swift_code' => '',
+                        'description' => '',
+                        'address' => '',
+                    ],
                 ],
             ],
         ];
@@ -121,7 +209,7 @@ class PaymentServiceSeeder extends Seeder
         Auth::guard(Modularity::getAuthGuardName())->login($superadmin);
 
         foreach ($paymentServices as $_paymentService) {
-            $paymentService = PaymentService::create(Arr::only($_paymentService, ['name', 'key', 'is_external', 'is_internal', 'published', 'button_style']));
+            $paymentService = PaymentService::create(Arr::only($_paymentService, ['name', 'key', 'is_external', 'is_internal', 'published', 'button_style', 'spread_payload']));
 
             $this->createAndAssociateImage($paymentService, $_paymentService['image']);
 
