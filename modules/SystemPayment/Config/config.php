@@ -342,6 +342,66 @@ return [
             ],
             'inputs' => [
                 [
+                    'type' => 'preview',
+                    'name' => 'description',
+                    'label' => 'Description',
+                    'col' => ['cols' => 12, 'lg' => 12],
+                    'configuration' => [
+                        'elements' => [
+                            [
+                                'tag' => 'ue-title',
+                                'attributes' => [
+                                    'classes' => 'mb-2',
+                                    'padding' => 'a-0',
+                                    'type' => 'body-2',
+                                ],
+                                'elements' => 'Description',
+                            ],
+                            [
+                                'tag' => 'p',
+                                'elements' => '${description??N/A}$',
+                            ]
+                        ]
+                    ],
+                    'conditions' => [
+                        ['description', '!=', ''],
+                        ['description', '!=', null],
+                    ],
+                ],
+                [
+                    'type' => 'preview',
+                    'name' => 'bank_receipts',
+                    'noSubmit' => true,
+                    'default' => null,
+                    'col' => ['cols' => 12, 'class' => 'mb-4'],
+                    'configuration' => [
+                        'elements' => [
+                            [
+                                'tag' => 'ue-title',
+                                'attributes' => [
+                                    'classes' => 'mb-2',
+                                    'padding' => 'a-0',
+                                    'type' => 'body-2',
+                                ],
+                                'elements' => 'Bank Receipts',
+                            ],
+                            [
+                                'tag' => 'ue-filepond-preview',
+                                'attributes' => [
+                                    'source' => '${bank_receipts??N/A}$',
+                                    'show-inline-file-name' => true,
+                                    'max-file-name-length' => 30,
+                                    'image-size' => 24,
+                                ],
+                            ]
+                        ]
+                    ],
+                    'conditions' => [
+                        ['bank_receipts', '>', 0],
+                    ],
+                    'creatable' => 'hidden',
+                ],
+                [
                     'type' => 'select',
                     'name' => 'payment_service_id',
                     'label' => 'Payment Service',
@@ -372,38 +432,7 @@ return [
                     'allowedRoles' => ['superadmin', 'admin', 'manager', 'account-executive'],
                     'acceptedExtensions' => ['pdf'],
                 ],
-                [
-                    'type' => 'preview',
-                    'name' => 'bank_receipts',
-                    'noSubmit' => true,
-                    'default' => null,
-                    'col' => ['cols' => 12, 'class' => 'mb-4'],
-                    'configuration' => [
-                        'elements' => [
-                            [
-                                'tag' => 'ue-title',
-                                'attributes' => [
-                                    'classes' => 'mb-4',
-                                    'padding' => 'a-0'
-                                ],
-                                'elements' => 'Bank Receipts',
-                            ],
-                            [
-                                'tag' => 'ue-filepond-preview',
-                                'attributes' => [
-                                    'source' => '$bank_receipts',
-                                    'show-inline-file-name' => true,
-                                    'max-file-name-length' => 30,
-                                    'image-size' => 24,
-                                ],
-                            ]
-                        ]
-                    ],
-                    'conditions' => [
-                        ['bank_receipts', '>', 0],
-                    ],
-                    'creatable' => 'hidden',
-                ],
+
             ],
         ],
         'payment_currency' => [
