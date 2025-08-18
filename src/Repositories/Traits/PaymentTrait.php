@@ -6,6 +6,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Modules\SystemPayment\Entities\PaymentService;
 use Modules\SystemPricing\Entities\Price;
+use Unusualify\Modularity\Entities\Enums\PaymentStatus;
 
 trait PaymentTrait
 {
@@ -220,6 +221,56 @@ trait PaymentTrait
                 'label' => 'Payment',
                 // 'connector' => 'SystemPayment:PaymentService|repository:listAll',
             ],
+        ];
+    }
+
+    public function getFormActionsConditionsForPayment()
+    {
+        return method_exists($this->model, 'getFormActionsConditionsForPayment') ? $this->model->getFormActionsConditionsForPayment() : [];
+    }
+
+    public function getFormActionsPaymentTrait($scope = [])
+    {
+        return [
+            'paymentTrait' => [
+                'type' => 'modal',
+                'label' => __('Pay'),
+                'icon' => 'mdi-credit-card-outline',
+                'tooltip' => __('Pay'),
+                'color' => 'success',
+                'density' => 'compact',
+                'endpoint' => route('admin.system.system_payment.payment'),
+                'schema' => modularity_format_inputs([
+                    [
+                        'type' => 'hidden',
+                        'name' => 'price_id',
+                        'label' => 'price_id',
+                        'default' => '${payment_price.id}$',
+                    ],
+                    [
+                        'type' => 'payment-service',
+                        'name' => 'payment_service',
+                        'label' => 'Payment',
+                        'price_object' => '${payment_price}$',
+                    ],
+                ]),
+                'formTitle' => __('Complete Payment'),
+                'formAttributes' => [
+                    'hasSubmit' => false,
+                    'hasDivider' => false,
+                    'refreshOnSaved' => true,
+                    'async' => false,
+                ],
+                'creatable' => false,
+                'isEditing' => false,
+                'modalAttributes' => [
+                    'widthType' => 'lg',
+                ],
+                'conditions' => array_merge($this->getFormActionsConditionsForPayment(), [
+                    ['payment.status', 'not in', [PaymentStatus::COMPLETED]],
+                ]),
+                'hideOnCondition' => true,
+            ]
         ];
     }
 }
