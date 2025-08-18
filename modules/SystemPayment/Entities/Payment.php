@@ -8,11 +8,12 @@ use Modules\SystemPricing\Entities\Price;
 use Oobook\Priceable\Models\Currency;
 use Unusualify\Modularity\Entities\Traits\HasCreator;
 use Unusualify\Modularity\Entities\Traits\HasFileponds;
+use Unusualify\Modularity\Entities\Traits\HasSpreadable;
 use Unusualify\Modularity\Entities\Traits\ModelHelpers;
 
 class Payment extends \Unusualify\Payable\Models\Payment
 {
-    use ModelHelpers, HasFileponds, HasCreator;
+    use ModelHelpers, HasFileponds, HasCreator, HasSpreadable;
 
     protected $fillable = [
         'payment_service_id',
