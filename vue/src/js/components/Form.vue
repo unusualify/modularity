@@ -543,8 +543,6 @@ export default {
     const titleOptions = computed(() => {
       let options = {}
 
-      console.log(props.title)
-
       if(__isObject(props.title)){
         options = {
           tag: props.title.tag || 'div',
