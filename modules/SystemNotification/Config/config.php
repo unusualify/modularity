@@ -130,12 +130,12 @@ return [
                                         ->setAttributes([
                                             'tag' => 'div',
                                             'type' => 'text-body-2',
-                                            'text' => '$html_message',
                                             // 'color' => 'primary',
                                             'weight' => 'regular',
                                             'transform' => 'none',
                                             'justify' => 'center',
-                                        ]),
+                                        ])
+                                        ->setElements('${html_message}$'),
                                     Component::makeDiv()
                                         ->setAttributes([
                                             'class' => 'd-flex justify-center my-4',
@@ -144,10 +144,10 @@ return [
                                             Component::makeVBtn()
                                                 ->setAttributes([
                                                     'variant' => 'elevated',
-                                                    'href' => '$redirector',
+                                                    'href' => '${redirector}$',
                                                     'target' => '_blank',
                                                 ])
-                                                ->setElements('$redirector_text'),
+                                                ->setElements('${redirector_text}$'),
                                         ]),
                                 ]),
                         ],
@@ -180,12 +180,12 @@ return [
                                         ->setAttributes([
                                             'tag' => 'div',
                                             'type' => 'text-body-2',
-                                            'text' => '$html_message',
                                             // 'color' => 'primary',
                                             'weight' => 'regular',
                                             'transform' => 'none',
                                             'justify' => 'center',
-                                        ]),
+                                        ])
+                                        ->setElements('${html_message}$'),
                                     Component::makeDiv()
                                         ->setAttributes([
                                             'class' => 'd-flex justify-center my-4',
@@ -194,10 +194,10 @@ return [
                                             Component::makeVBtn()
                                                 ->setAttributes([
                                                     'variant' => 'elevated',
-                                                    'href' => '$redirector',
+                                                    'href' => '${redirector}$',
                                                     'target' => '_blank',
                                                 ])
-                                                ->setElements('$redirector_text'),
+                                                ->setElements('${redirector_text}$'),
                                         ]),
                                 ]),
                         ],
@@ -206,7 +206,7 @@ return [
                         [
                             'type' => 'put',
                             'payload' => [
-                                'read_at' => '{new Date()}',
+                                'read_at' => '$(new Date())$',
                             ],
                             'conditions' => [
                                 ['is_mine', '=', true],
