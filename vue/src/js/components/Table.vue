@@ -743,9 +743,9 @@
                   class="pa-0 justify-start text-none text-wrap text-primary darken-1 cursor-pointer"
                   @click="itemAction(item, ...col.formatter)"
                 >
-                  {{ window.__isset(item[col.key]) ? window.__shorten(item[col.key], item[col.key]?.textLength ?? 8) : '' }}
+                  {{ window.__isset(item[col.key]) ? window.__shorten(item[col.key], col?.textLength ?? 8) : '' }}
                 </span>
-                <template v-if="col.key.match(/^id|uuid$/)">
+                <template v-if="(col.hasCopy ?? false) || col.key.match(/^id|uuid$/)">
                   <ue-copy-text :text="item[col.key]" />
                 </template>
               </template>
