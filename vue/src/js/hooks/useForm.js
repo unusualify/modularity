@@ -69,7 +69,7 @@ export const makeFormProps = propsFactory({
     default () {
       return {
         noGutters: false,
-        class: 'py-4',
+        class: 'py-2',
         // justify:'center',
         // align:'center'
       }

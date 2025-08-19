@@ -132,7 +132,7 @@
       <v-divider v-if="hasDivider" class="pb-2"></v-divider>
 
       <!-- Scrollable Content Section -->
-      <div :class="['d-flex', scrollable ? 'flex-grow-1 overflow-hidden mr-n5' : '']">
+      <div :class="['d-flex', scrollable ? 'flex-grow-1 overflow-hidden mr-n4' : '']">
         <div :class="['w-100 d-flex', scrollable ? 'overflow-y-auto pr-3' : '']"
         >
           <div class="flex-grow-1 px-1">
