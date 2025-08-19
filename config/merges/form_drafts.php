@@ -256,7 +256,7 @@ return [
             // 'label' => 'Profile Avatar',
             'name' => 'avatar',
             'max' => 1,
-            'allow-image-preview' => true,
+            'allowImagePreview' => true,
             'label-idle' => 'Drop files here...',
             'rules' => 'sometimes|required:array',
         ],
