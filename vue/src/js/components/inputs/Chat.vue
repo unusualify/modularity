@@ -126,11 +126,11 @@
           <v-divider class="mt-2" v-if="!noDivider"></v-divider>
 
           <!-- Pinned Message -->
-          <v-list
-            v-if="pinnedMessage"
+          <v-list v-if="pinnedMessage"
+            id="PinnedMessage"
             elevation="3"
             class="bg-grey-lighten-4 mx-n4"
-            style="z-index: 1000;"
+            style="z-index: 1000; height: 92px;"
             :items="[{
               title: pinnedMessage.content,
               subtitle: pinnedMessage.created_at ? $d(new Date(pinnedMessage.created_at), 'short') : '',
@@ -140,6 +140,18 @@
             prependIcon="mdi-pin"
             item-props
           >
+            <template #title="{ title }">
+
+              <div v-if="pinnedMessageExpanded || title.length < 20">
+                <span class="text-wrap" v-html="title"></span>
+                <v-btn v-if="title.length >= 20" density="compact" variant="plain" size="x-small" @click="togglePinnedMessageExpand"> {{ $t('Show less') }}</v-btn>
+              </div>
+              <div v-else>
+                <span class="text-wrap" v-html="title.slice(0, 20)"></span>
+                <span class="text-grey-darken-1">...</span>
+                <v-btn variant="plain" size="small" @click="togglePinnedMessageExpand"> {{ $t('Show more') }}</v-btn>
+              </div>
+            </template>
             <template #prepend="prependScope">
               <v-icon size="small" color="primary" class="mr-2" style="transform: rotate(325deg)" @click="unpinMessage(pinnedMessage)">mdi-pin</v-icon>
               <v-tooltip :text="pinnedMessage.user_profile.name" location="top">
@@ -154,7 +166,7 @@
         <v-card-text class="mr-n2 mb-n4 mt-n4 pb-0">
           <v-infinite-scroll
             ref="infiniteScroll"
-            :height="bodyHeight ? `calc(${bodyHeight})` : `calc(${height}*0.65)`"
+            :height="calculatedBodyHeight"
             mode="manual"
             side="start"
             @load="loadMoreMessages"
@@ -214,9 +226,11 @@
           </template>
         </v-input-filepond>
 
-        <v-card-actions class="pa-4" v-if="!noSendAction">
+        <v-card-actions class="bg-surface" v-if="!noSendAction">
           <slot name="sending">
             <v-textarea
+              class="position-absolute bg-surface px-4 pb-4"
+              style="bottom: 0; left: 0; right: 0; z-index: 1000;"
               ref="messageBox"
               v-model="message"
               :variant="inputVariant"
@@ -458,6 +472,7 @@
         refreshInterval: null,
         pinnedMessage: null,
         showEmojiPicker: false,
+        pinnedMessageExpanded: false,
 
       }
     },
@@ -504,6 +519,20 @@
 
         return 'mdi-send';
       },
+      calculatedBodyHeight() {
+        let extraHeight = 0;
+        let minusHeight = '';
+
+        if(this.pinnedMessage) {
+          extraHeight += this.$jquery('#PinnedMessage').outerHeight(true);
+        }
+
+        if(extraHeight > 0) {
+          minusHeight = ` - ${extraHeight}px`;
+        }
+
+        return this.bodyHeight ? `calc(${this.bodyHeight}${minusHeight})` : `calc(${this.height}*0.65${minusHeight})`;
+      }
 
     },
     watch: {
@@ -559,6 +588,9 @@
       }
     },
     methods: {
+      togglePinnedMessageExpand() {
+        this.pinnedMessageExpanded = !this.pinnedMessageExpanded;
+      },
       scrollEndInfiniteScroll() {
         this.$nextTick(() => {
           const container = this.$refs.infiniteScroll.$el;
