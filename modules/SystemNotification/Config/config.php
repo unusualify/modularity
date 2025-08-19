@@ -110,6 +110,7 @@ return [
                     'variant' => 'flat',
                     'componentProps' => [
                         'variant' => 'elevated',
+                        'density' => 'compact',
                     ],
                     // 'href' => 'notification.read',
                     // 'target' => '_blank',
@@ -162,6 +163,7 @@ return [
                     'variant' => 'flat',
                     'componentProps' => [
                         'variant' => 'elevated',
+                        'density' => 'compact',
                     ],
                     'conditions' => [
                         ['is_read', '!=', true],
