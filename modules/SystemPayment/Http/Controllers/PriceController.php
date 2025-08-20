@@ -40,7 +40,7 @@ class PriceController extends Controller
         $previousUrl = url()->previous();
 
         if($price->payment && $price->payment->status == PaymentStatus::COMPLETED){
-            $modalService = $this->createModalService('warning', 'mdi-alert-circle-outline', 'Paid Before', 'This price has already been paid! Please check the payment status.', [
+            $modalService = modularity_modal_service('warning', 'mdi-alert-circle-outline', 'Paid Before', 'This price has already been paid! Please check the payment status.', [
                 'noCancelButton' => true,
             ]);
 
@@ -325,7 +325,7 @@ class PriceController extends Controller
         $modularityPayload = $payment ? $payment->parameters->modularity ?? new \stdClass : new \stdClass;
 
         return redirect(merge_url_query($modularityPayload->previous_url ?? route('admin.dashboard'), [
-            'modalService' => $this->createModalService($color, $icon, $title, $description, $modalProps),
+            'modalService' => modularity_modal_service($color, $icon, $title, $description, $modalProps),
         ]));
     }
 
