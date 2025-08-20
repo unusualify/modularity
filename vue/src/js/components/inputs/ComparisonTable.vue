@@ -152,8 +152,27 @@
     },
     computed: {
       headers() {
-        return [{title: this.label, key: 'comparator_name', width: this.comparatorWidth, fixed: !this.noFixedComparator, cellProps: {class: 'py-2', style: {minWidth: `${this.minComparatorWidth}px`}}}].concat( this.items.map((item) => {
-          return {title: item.name, key: item.name, align: 'center', id: item.id, width: this.itemWidth, cellProps: {style: { ...(this.$vuetify.display.mobile ? {} : {maxWidth: `${this.maxItemWidth}px`})}}}
+        return [{
+          title: this.label,
+          key: 'comparator_name',
+          width: this.comparatorWidth,
+          fixed: !this.noFixedComparator,
+          cellProps: {
+            class: 'py-2',
+            style: {minWidth: `${this.minComparatorWidth}px`}}}
+          ].concat( this.items.map((item) => {
+          return {
+            title: item.name,
+            key: item.name,
+            align: 'center',
+            id: item.id,
+            width: this.itemWidth,
+            cellProps: {
+              style: {
+                ...(this.$vuetify.display.mobile ? {} : {maxWidth: `${this.maxItemWidth}px`})
+              }
+            }
+          }
         }))
       },
       inputAndTableStyle() {
