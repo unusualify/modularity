@@ -194,7 +194,7 @@
     },
     computed: {
       normalizedSource() {
-        return Array.isArray(this.source) ? this.source : [this.source];
+        return !!this.source ? Array.isArray(this.source) ? this.source : (window.__isObject(this.source) ? [this.source] : []) : [];
       },
     },
     methods: {

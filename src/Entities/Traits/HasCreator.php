@@ -179,14 +179,14 @@ trait HasCreator
                 $creatorRecordModel->getTable(),
                 function ($join) use ($creatorRecordModel, $creatorModel) {
                     $join->on($creatorRecordModel->getTable() . '.creator_id', '=', $creatorModel->getTable() . '.id')
-                        ->where($creatorRecordModel->getTable() . '.creatable_type', '=', get_class($this))
+                        ->where($creatorRecordModel->getTable() . '.creatable_type', '=', get_class($this->getCreatableClass()))
                         ->where($creatorRecordModel->getTable() . '.creatable_id', '=', $this->id);
                 }
             );
 
         return new \Illuminate\Database\Eloquent\Relations\HasOne(
             $query,
-            $this,
+            $this->getCreatableClass(),
             $creatorRecordModel->getTable() . '.creatable_id',
             'id'
         );
@@ -365,7 +365,7 @@ trait HasCreator
 
                 if ($hasSpatiePermission) {
                     $existingRoles = $spatieRoleModel::whereIn('name', $this->getAuthorizedUserRolesForCreatorRecord())->get();
-                    if ($user->hasRole($existingRoles->map(fn ($role) => $role->name)->toArray())) {
+                    if ($user->company_id && $user->hasRole($existingRoles->map(fn ($role) => $role->name)->toArray())) {
                         $query = $query->orWhere('company_id', $user->company_id);
                     }
                 }

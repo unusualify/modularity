@@ -172,7 +172,7 @@ abstract class ApiController extends CoreController
      */
     protected function getIncludesForEagerLoading(): array
     {
-        $includes = $this->request->get('include', []);
+        $includes = $this->request->get('includes', $this->request->get('include', []));
 
         if (is_string($includes)) {
             $includes = explode(',', $includes);

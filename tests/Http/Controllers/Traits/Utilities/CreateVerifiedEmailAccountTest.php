@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Hash;
 use Modules\SystemUser\Entities\Role;
 use Unusualify\Modularity\Brokers\RegisterBroker;
 use Unusualify\Modularity\Entities\User;
+use Unusualify\Modularity\Events\ModularityUserRegistered;
+use Unusualify\Modularity\Events\ModularityUserRegistering;
 use Unusualify\Modularity\Events\VerifiedEmailRegister;
 use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Tests\Http\Controllers\ControllerUsingCreateVerifiedEmailAccount;
@@ -145,13 +147,19 @@ class CreateVerifiedEmailAccountTest extends ModelTestCase
 
     public function test_register_email()
     {
-        Event::fake();
+        Event::fake([
+            ModularityUserRegistering::class,
+            ModularityUserRegistered::class,
+            VerifiedEmailRegister::class,
+        ]);
+
         $credentials = [
             'name' => 'Name',
             'surname' => 'Surname',
             'email' => 'email@email.com',
             'email_verified_at' => now(),
             'password' => 'password',
+            'company' => 'Test Company', // Add company for spread_payload test
         ];
 
         $this->controller->registerEmail($credentials);
@@ -167,8 +175,38 @@ class CreateVerifiedEmailAccountTest extends ModelTestCase
         $user = DB::table(modularityConfig('tables.users', 'um_users'))->where('email', $credentials['email'])->first();
         $this->assertTrue(Hash::check($credentials['password'], $user->password));
 
+        // Test that events were dispatched
         Event::assertDispatched(VerifiedEmailRegister::class);
+        Event::assertDispatched(ModularityUserRegistered::class);
+        Event::assertDispatched(ModularityUserRegistering::class);
+    }
 
+    public function test_register_email_creates_company_with_spread_data()
+    {
+        // Don't fake events for this test - we want to test the actual observers
+        $credentials = [
+            'name' => 'John',
+            'surname' => 'Doe',
+            'email' => 'john@example.com',
+            'password' => 'password123',
+            'company' => 'Test Company',
+        ];
+
+        $this->controller->registerEmail($credentials);
+
+        // Verify company was created
+        $this->assertDatabaseHas(modularityConfig('tables.companies', 'um_companies'), [
+            'name' => 'Test Company',
+        ]);
+
+        // Verify the HasSpreadable observer worked - spread data should be in the spreads table
+        $company = \Unusualify\Modularity\Entities\Company::where('name', 'Test Company')->first();
+        $this->assertNotNull($company, 'Company should be created');
+
+        // Test that the spreadable relationship was created by the observer
+        $this->assertNotNull($company->spreadable, 'Spreadable relationship should exist');
+        $this->assertArrayHasKey('is_personal', $company->spreadable->content);
+        $this->assertFalse($company->spreadable->content['is_personal']);
     }
 
     public function test_register()

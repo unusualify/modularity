@@ -18,10 +18,12 @@ use Modules\SystemPayment\Http\Controllers\PriceController;
 Route::middleware(['web.auth', ...\Unusualify\Modularity\Facades\ModularityRoutes::defaultMiddlewares()])->group(function () {
 
     Route::middleware((\Unusualify\Modularity\Facades\ModularityRoutes::defaultPanelMiddlewares()))->group(function () {});
-    Route::controller(PriceController::class)->group(function () {
-        Route::post('/pay', 'pay')->name('payment');
-    });
 
+    Route::middleware(modularityConfig('payment_middlewares', []))->group(function () {
+        Route::controller(PriceController::class)->group(function () {
+            Route::post('/pay', 'pay')->name('payment');
+        });
+    });
 });
 Route::controller(PriceController::class)->group(function () {
     Route::group([

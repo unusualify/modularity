@@ -13,9 +13,9 @@
         @step-click="goStep"
       />
 
-      <v-row class="mt-4 flex-fill">
+      <v-row class="mt-2 flex-fil">
         <!-- left side -->
-        <v-col cols="12" lg="8" md="8" v-fit-grid order-md="1" order="2">
+        <v-col v-bind="formCol" v-fit-grid order-md="1" order="2">
           <StepperContent
             v-model="models"
             :schemas="schemas"
@@ -28,6 +28,8 @@
 
             @form-input="handleInput($event)"
             @form-valid="updateFormValid($event)"
+
+            :cover-height="calculateHeights"
           >
             <template #preview>
               <StepperPreview v-if="!lastFormPreviewLoading && isLastStep"
@@ -47,13 +49,23 @@
                 <v-progress-circular model-value="20" indeterminate/>
               </div>
             </template>
+
+            <!-- <template v-if="activeStepIsFullWidth" #bottom>
+              <div class="d-flex justify-space-between">
+                <v-btn color="secondary" @click="goStep(activeStep - 1)">
+                  {{ $t('previous').toUpperCase() }}
+                </v-btn>
+                <v-btn color="secondary" @click="goStep(activeStep + 1)">
+                  {{ $t('next').toUpperCase() }}
+                </v-btn>
+              </div>
+            </template> -->
           </StepperContent>
         </v-col>
 
         <!-- right side -->
-        <v-col cols="12" lg="4" md="4" order-md="2" order="1">
+        <v-col v-bind="summaryCol" order-md="2" order="1">
           <StepperSummary
-
             :is-last-step="isLastStep"
             :forms="forms"
             :active-step="activeStep"
@@ -112,6 +124,24 @@
           </StepperSummary>
         </v-col>
       </v-row>
+
+      <v-sheet-rounded v-if="activeStepIsFullWidth" class="mt-4 elevation-2 pt-4">
+        <v-stepper-actions
+          click:prev @click:prev="goStep(activeStep - 1)"
+        >
+          <template #next>
+            <v-btn
+              variant="elevated"
+              color="secondary"
+              @click="nextForm(activeStep - 1)"
+              :disabled="$hasRequestInProgress()"
+              >
+              {{ $t('next').toUpperCase() }}
+            </v-btn>
+          </template>
+        </v-stepper-actions>
+      </v-sheet-rounded>
+
 
       <ue-modal
         ref="modal"
@@ -394,12 +424,16 @@
       },
       goStep(step){
         // all previous steps are valid
+        if(step < this.activeStep){
+          this.activeStep = step
+          return
+        }
+
         if(this.valids.slice(0, step-1).every(v => v === true)){
           this.activeStep = step
         }
       },
       async nextForm(index) {
-
         await this.validateForm(index)
 
         if(this.formRefs[index].value[0].validModel === true){
@@ -708,6 +742,51 @@
             }
           return acc
         }, {})
+      },
+      activeStepIsFullWidth(){
+        if(!this.forms[this.activeStep - 1]){
+          return false
+        }
+
+        return this.forms[this.activeStep - 1]?.fullWidth === true ?? false
+      },
+      formCol(){
+        let defaultCol = {
+          cols: 12,
+          lg: 8,
+          md: 8,
+        }
+        return this.activeStepIsFullWidth ? {
+          cols: 12,
+          lg: 12,
+          md: 12,
+        } : defaultCol
+      },
+      summaryCol(){
+        let defaultCol = {
+          cols: 12,
+          lg: 4,
+          md: 4,
+        }
+        return this.activeStepIsFullWidth  ? {
+          class: 'd-none'
+        } : defaultCol
+      },
+      calculateHeights(){
+        let height = 0
+        let headerHeight = 72
+        let stepperActionsHeight = 76
+        let topToolbarHeight = 64
+
+        if(this.activeStepIsFullWidth){
+          height += stepperActionsHeight
+        }
+
+        if(this.$vuetify.display.mobile){
+          height += topToolbarHeight
+        }
+
+        return height
       }
     },
     watch: {

@@ -3,7 +3,10 @@
 namespace Unusualify\Modularity\Repositories\Traits;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
+use Modules\SystemPayment\Entities\PaymentService;
 use Modules\SystemPricing\Entities\Price;
+use Unusualify\Modularity\Entities\Enums\PaymentStatus;
 
 trait PaymentTrait
 {
@@ -149,6 +152,41 @@ trait PaymentTrait
                 }
             }
         }
+
+        // in order to create a payment record, we need to have a payment service
+        if (isset($fields['payment_service_id'])) {
+            $paymentService = PaymentService::find($fields['payment_service_id']);
+            $paymentPrice = $object->paymentPrice()->first();
+
+            if ($paymentService->transferrable && $paymentPrice) {
+                $paymentPayload = [
+                    'payment_service_id' => $paymentService->id,
+                    'email' => $fields['email'] ?? null,
+                ];
+                $extraPayload = [];
+                $user = null;
+                if (Auth::check()) {
+                    $user = Auth::user();
+                }
+
+                if (classHasTrait($object, 'Unusualify\Modularity\Entities\Traits\HasCreator')) {
+                    $paymentPayload['custom_creator_id'] = $object->creator->id;
+                    $paymentPayload['email'] = $object->creator->email;
+                } elseif ($user) {
+                    $paymentPayload['email'] = $user->email;
+                }
+
+                if (isset($fields['payment_receipts'])) {
+                    $extraPayload['receipts'] = $fields['payment_receipts'];
+                }
+
+                if (isset($fields['payment_description'])) {
+                    $paymentPayload['spread_payload']['description'] = $fields['payment_description'];
+                }
+
+                $paymentPrice->updateOrNewPayment($paymentPayload, $extraPayload);
+            }
+        }
     }
 
     public function getFormFieldsPaymentTrait($object, $fields)
@@ -182,6 +220,56 @@ trait PaymentTrait
                 'name' => 'payment_service',
                 'label' => 'Payment',
                 // 'connector' => 'SystemPayment:PaymentService|repository:listAll',
+            ],
+        ];
+    }
+
+    public function getFormActionsConditionsForPayment()
+    {
+        return method_exists($this->model, 'getFormActionsConditionsForPayment') ? $this->model->getFormActionsConditionsForPayment() : [];
+    }
+
+    public function getFormActionsPaymentTrait($scope = [])
+    {
+        return [
+            'paymentTrait' => [
+                'type' => 'modal',
+                'label' => __('Pay'),
+                'icon' => 'mdi-credit-card-outline',
+                'tooltip' => __('Pay'),
+                'color' => 'success',
+                'density' => 'compact',
+                'endpoint' => route('admin.system.system_payment.payment'),
+                'schema' => modularity_format_inputs([
+                    [
+                        'type' => 'hidden',
+                        'name' => 'price_id',
+                        'label' => 'price_id',
+                        'default' => '${payment_price.id}$',
+                    ],
+                    [
+                        'type' => 'payment-service',
+                        'name' => 'payment_service',
+                        'label' => 'Payment',
+                        'price_object' => '${payment_price}$',
+                    ],
+                ]),
+                'formTitle' => __('Complete Payment'),
+                'formAttributes' => [
+                    'hasSubmit' => false,
+                    'hasDivider' => false,
+                    'refreshOnSaved' => true,
+                    'async' => false,
+                ],
+                'creatable' => false,
+                'isEditing' => false,
+                'modalAttributes' => [
+                    'widthType' => 'lg',
+                ],
+                'conditions' => array_merge($this->getFormActionsConditionsForPayment(), [
+                    ['payment.status', 'not in', [PaymentStatus::COMPLETED]],
+                ]),
+                'hideOnCondition' => true,
             ],
         ];
     }

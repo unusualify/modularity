@@ -13,6 +13,11 @@ trait TableColumns
     /**
      * @var array
      */
+    protected static $tableHeadersCallbacks = [];
+
+    /**
+     * @var array
+     */
     protected $indexTableColumns;
 
     /**
@@ -30,18 +35,41 @@ trait TableColumns
             $headers = Collection::make($this->getConfigFieldsByRoute('headers'))
                 ->map(fn ($item) => (object) [...(array) $item, 'visible' => true]);
 
-            $visibleColumns = explode(',', $this->request->get('columns') ?? $headers->pluck('key')->implode(','));
+            $headers = method_exists($this, 'tableHeaders')
+                ? $this->tableHeaders($headers)
+                : $headers;
 
-            return $this->indexTableColumns = $headers->reduce(function ($carry, $item) {
+            if (isset(static::$tableHeadersCallbacks[static::class]) && is_callable(static::$tableHeadersCallbacks[static::class])) {
+                $headers = call_user_func(static::$tableHeadersCallbacks[static::class], $headers->toArray());
+            }
+
+            if (is_array($headers)) {
+                $headers = Collection::make($headers);
+            }
+
+            $headers = $headers->reduce(function ($carry, $item) {
                 $header = $this->getHeader((array) $item);
+
                 if (isset($item->key)) {
                     $carry[] = $header;
                 }
 
                 return $carry;
             }, []);
+
+            return $this->indexTableColumns = $headers;
         }
 
+    }
+
+    /**
+     * Update the table headers
+     *
+     * @return void
+     */
+    public static function updateTableHeaders(callable $callback)
+    {
+        static::$tableHeadersCallbacks[static::class] = $callback;
     }
 
     /**
@@ -75,7 +103,8 @@ trait TableColumns
     protected function hydrateHeaderSuffix(&$header)
     {
         if ($this->isRelationField($header['key'])) {
-            $header['key'] .= '_relation';
+            $itemTitle = $header['itemTitle'] ?? 'name';
+            $header['key'] .= '_relation_' . $itemTitle;
         }
 
         if (method_exists($this->repository->getModel(), 'isTimestampColumn') && $this->repository->isTimestampColumn($header['key'])) {

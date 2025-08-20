@@ -14,9 +14,15 @@ class EmailVerification extends Notification
 
     public $token;
 
-    public function __construct($token)
+    /**
+     * @var array
+     */
+    public $parameters;
+
+    public function __construct($token, $parameters = [])
     {
         $this->token = $token;
+        $this->parameters = $parameters;
     }
 
     public function via($notifiable)
@@ -38,8 +44,8 @@ class EmailVerification extends Notification
 
     protected function verificationUrl($notifiable)
     {
-        // dd('Verification Url');
         return route(Route::hasAdmin('complete.register.form'), [
+            ...$this->parameters,
             'token' => $this->token,
             'email' => $notifiable->email,
         ]);

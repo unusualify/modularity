@@ -72,11 +72,13 @@ return [
                     'name' => 'name',
                     'label' => 'Payment Service Name',
                     'rules' => 'sometimes|required',
+                    'col' => ['cols' => 12, 'lg' => 6],
                 ],
                 [
                     'name' => 'key',
                     'label' => 'Payment Service Slug',
                     'type' => 'text',
+                    'col' => ['cols' => 12, 'lg' => 6],
                 ],
                 // [
                 //     'name' => 'payment-service',
@@ -92,14 +94,95 @@ return [
                     'repository' => 'Modules\\SystemPayment\\Repositories\\PaymentCurrencyRepository',
                 ],
                 [
+                    'type' => 'radio-group',
+                    'name' => 'type',
+                    'label' => 'Service Type',
+                    'spreadable' => true,
+                    'items' => [
+                        [
+                            'name' => 'Standard',
+                            'id' => 1,
+                            'transfer_details_toggleInputValue' => false,
+                        ],
+                        [
+                            'name' => 'Transfer',
+                            'id' => 2,
+                            'transfer_details_toggleInputValue' => true,
+                        ],
+                    ],
+                    'ext' => [
+                        [
+                            'toggleInput',
+                            'transfer_details',
+                            'items.*.transfer_details_toggleInputValue',
+                        ],
+                    ],
+                ],
+                [
+                    'type' => 'group',
+                    'col' => ['cols' => 12, 'lg' => 12],
+                    'name' => 'transfer_details',
+                    'label' => 'Transfer Details',
+                    'class' => 'd-none',
+                    'spreadable' => true,
+                    'schema' => [
+                        [
+                            'type' => 'text',
+                            'name' => 'account_holder',
+                            'label' => 'Account Holder',
+                            'col' => ['cols' => 12, 'lg' => 6],
+                            'rules' => '',
+                            '_cached-rawRules' => 'required',
+                            // '_cached-rules' => 'required',
+                        ],
+                        [
+                            'type' => 'text',
+                            'name' => 'iban',
+                            'label' => 'IBAN',
+                            'col' => ['cols' => 12, 'lg' => 6],
+                            'rules' => '',
+                            // '_cached-rawRules' => 'required',
+                            '_cached-rules' => 'required',
+                        ],
+                        [
+                            'type' => 'text',
+                            'name' => 'swift_code',
+                            'label' => 'SWIFT/BIC',
+                            'col' => ['cols' => 12, 'lg' => 6],
+                            'rules' => '',
+                            '_cached-rawRules' => 'required',
+                            // '_cached-rules' => 'required',
+                        ],
+                        [
+                            'type' => 'text',
+                            'name' => 'description',
+                            'label' => 'Payment Description',
+                            'col' => ['cols' => 12, 'lg' => 6],
+                            'rules' => '',
+                            '_cached-rawRules' => 'required',
+                        ],
+                        [
+                            'type' => 'textarea',
+                            'name' => 'address',
+                            'label' => 'Bank Name & Address',
+                            'col' => ['cols' => 12],
+                            'rules' => '',
+                            '_cached-rawRules' => 'required',
+                        ],
+                    ],
+                ],
+
+                [
                     'name' => 'is_external',
                     'label' => 'Is an external service ?',
                     'type' => 'checkbox',
+                    'col' => ['cols' => 12, 'lg' => 6],
                 ],
                 [
                     'name' => 'is_internal',
                     'label' => 'Is an internal service ?',
                     'type' => 'checkbox',
+                    'col' => ['cols' => 12, 'lg' => 6],
                 ],
                 [
                     'label' => 'Logo',
@@ -107,6 +190,8 @@ return [
                     'name' => 'logo',
                     // 'rules' => 'sometimes|required:array',
                     'isIcon' => true,
+                    'col' => ['cols' => 12, 'lg' => 6],
+                    'imageCol' => ['cols' => 12, 'md' => 6, 'lg' => 6],
                 ],
                 [
                     'label' => 'Button Logo',
@@ -114,11 +199,13 @@ return [
                     'name' => 'button_logo',
                     'rules' => '',
                     'isIcon' => true,
+                    'col' => ['cols' => 12, 'lg' => 6],
+                    'imageCol' => ['cols' => 12, 'md' => 6, 'lg' => 6],
                 ],
                 [
                     'name' => 'button_style',
                     'label' => 'Button Style',
-                    'type' => 'text',
+                    'type' => 'textarea',
                 ],
             ],
         ],
@@ -193,11 +280,7 @@ return [
                     'title' => 'Related',
                     'key' => 'paymentable',
                     'itemTitle' => 'id',
-                ],
-                [
-                    'title' => 'User Email',
-                    'key' => 'creator',
-                    'itemTitle' => 'email',
+                    'allowedRoles' => ['superadmin'],
                 ],
                 [
                     'title' => 'Company',
@@ -217,18 +300,20 @@ return [
                     ],
                 ],
                 [
-                    'title' => 'Amount',
+                    'title' => 'Total Price',
                     'key' => 'amount_formatted',
                 ],
                 [
                     'title' => 'Status',
-                    'key' => 'status',
+                    'key' => 'status_vuetify_chip',
                     'formatter' => [
-                        'chip',
-                        [
-                            'size' => 'small',
-                        ],
+                        'dynamic',
                     ],
+                ],
+                [
+                    'title' => 'User Email',
+                    'key' => 'creator',
+                    'itemTitle' => 'email',
                 ],
                 [
                     'title' => 'Created Time',
@@ -259,33 +344,97 @@ return [
             ],
             'inputs' => [
                 [
+                    'type' => 'preview',
+                    'name' => 'description',
+                    'label' => 'Description',
+                    'col' => ['cols' => 12, 'lg' => 12],
+                    'configuration' => [
+                        'elements' => [
+                            [
+                                'tag' => 'ue-title',
+                                'attributes' => [
+                                    'classes' => 'mb-2',
+                                    'padding' => 'a-0',
+                                    'type' => 'body-2',
+                                ],
+                                'elements' => 'Description',
+                            ],
+                            [
+                                'tag' => 'p',
+                                'elements' => '${description??N/A}$',
+                            ],
+                        ],
+                    ],
+                    'conditions' => [
+                        ['description', '!=', ''],
+                        ['description', '!=', null],
+                    ],
+                ],
+                [
+                    'type' => 'preview',
+                    'name' => 'bank_receipts',
+                    'noSubmit' => true,
+                    'default' => null,
+                    'col' => ['cols' => 12, 'class' => 'mb-4'],
+                    'configuration' => [
+                        'elements' => [
+                            [
+                                'tag' => 'ue-title',
+                                'attributes' => [
+                                    'classes' => 'mb-2',
+                                    'padding' => 'a-0',
+                                    'type' => 'body-2',
+                                ],
+                                'elements' => 'Bank Receipts',
+                            ],
+                            [
+                                'tag' => 'ue-filepond-preview',
+                                'attributes' => [
+                                    'source' => '${bank_receipts??N/A}$',
+                                    'show-inline-file-name' => true,
+                                    'max-file-name-length' => 30,
+                                    'image-size' => 24,
+                                ],
+                            ],
+                        ],
+                    ],
+                    'conditions' => [
+                        ['bank_receipts', '>', 0],
+                    ],
+                    'creatable' => 'hidden',
+                ],
+                [
                     'type' => 'select',
                     'name' => 'payment_service_id',
                     'label' => 'Payment Service',
+                    'col' => ['cols' => 12, 'lg' => 6],
                     'repository' => 'Modules\\SystemPayment\\Repositories\\PaymentServiceRepository',
                     'rules' => 'sometimes|required',
                     'editable' => false,
                 ],
                 [
+                    'type' => 'select',
+                    'name' => 'status',
+                    'label' => 'Status',
+                    'col' => ['cols' => 12, 'lg' => 6],
+                    'itemTitle' => 'name',
+                    'itemValue' => 'value',
+                    'items' => PaymentStatus::cases(),
+                    'allowedRoles' => ['superadmin', 'admin', 'manager', 'account-executive'],
+                    'rules' => 'required',
+                ],
+                [
                     'type' => 'filepond',
                     'name' => 'invoice',
                     'label' => 'Invoice',
-                    'max' => 1,
+                    'max' => 3,
                     'conditions' => [
                         ['status', '=', 'COMPLETED', 'REFUNDED', 'CANCELLED'],
                     ],
                     'allowedRoles' => ['superadmin', 'admin', 'manager', 'account-executive'],
                     'acceptedExtensions' => ['pdf'],
                 ],
-                [
-                    'type' => 'select',
-                    'name' => 'status',
-                    'label' => 'Status',
-                    'itemTitle' => 'name',
-                    'itemValue' => 'value',
-                    'items' => PaymentStatus::cases(),
-                    'allowedRoles' => ['superadmin', 'admin', 'manager', 'account-executive'],
-                ],
+
             ],
         ],
         'payment_currency' => [

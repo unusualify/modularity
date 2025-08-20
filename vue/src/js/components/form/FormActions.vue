@@ -52,12 +52,12 @@
                 <ue-form
                   :ref="`extra-form-${key}`"
 
-                  :modelValue="createModel(action.schema)"
+                  :modelValue="createModel(action.schema, action)"
                   :title="action.formTitle ?? null"
                   :schema="action.schema"
                   :action-url="action.endpoint.replace(':id', modelValue.id)"
                   :valid="valids[key]"
-                  :is-editing="isEditing"
+                  :is-editing="action.isEditing ?? isEditing"
 
                   :style="formModalBodyScope.isFullActive ? 'height: 90vh !important;' : 'height: 70vh !important;'"
 
@@ -139,8 +139,12 @@ export default {
     const valids = computed(() => allActions.value.map(action => true))
 
 
-    const createModel = (schema) => {
-      return getModel(schema, props.modelValue)
+    const createModel = (schema, action) => {
+      const model = getModel(schema, props.modelValue)
+      if (action.isEditing === false) {
+        delete model.id
+      }
+      return model
     }
 
     return {

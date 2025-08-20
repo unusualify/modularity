@@ -4,6 +4,7 @@ namespace Unusualify\Modularity\Http\Controllers\Traits;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\RateLimiter;
+use Unusualify\Modularity\Facades\Modularity;
 
 trait ApiRateLimiting
 {
@@ -176,6 +177,13 @@ trait ApiRateLimiting
      */
     protected function applyRateLimit(): ?JsonResponse
     {
+        // get request origin
+        $host = $this->request->header('host');
+
+        if (str_contains($host, Modularity::getAppHost()) || str_contains($host, Modularity::getAdminAppHost())) {
+            return null;
+        }
+
         if (! $this->isRateLimitingEnabled()) {
             return null;
         }

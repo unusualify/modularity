@@ -119,21 +119,6 @@ trait ModelHelpers
         });
     }
 
-    /**
-     * Checks if this model is soft deletable.
-     *
-     * @param array|string|null $columns Optionally limit the check to a set of columns.
-     */
-    public static function isSoftDeletable(): bool
-    {
-        // Model must have the trait
-        if (! classHasTrait(static::class, 'Illuminate\Database\Eloquent\SoftDeletes')) {
-            return false;
-        }
-
-        return true;
-    }
-
     public function getTitleValue()
     {
         return $this->{$this->getRouteTitleColumnKey()};
@@ -314,8 +299,21 @@ trait ModelHelpers
                 // if(is_plural($matches[1])) {
                 // }
             }
+
+            if (isset($this->spreadableMutatorMethods) && array_key_exists($method, $this->spreadableMutatorMethods)) {
+                return $this->spreadableMutatorMethods[$method];
+            }
         }
 
         return parent::__call($method, $arguments);
+    }
+
+    public function __get($key)
+    {
+        if (isset($this->spreadableMutatorAttributes) && array_key_exists($key, $this->spreadableMutatorAttributes)) {
+            return $this->spreadableMutatorAttributes[$key];
+        }
+
+        return parent::__get($key);
     }
 }

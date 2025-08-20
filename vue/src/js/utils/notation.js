@@ -1,5 +1,6 @@
 import { find, omitBy, reduce, cloneDeep, map, findIndex, snakeCase, orderBy, get, filter, includes, set, each, isEmpty, unset, omit, pick } from 'lodash-es'
 
+const variablePattern = /\${([^}]+)}\$/g;
 
 const searchInData = (data, pattern) => {
   const results = [];
@@ -583,27 +584,62 @@ export function replacePatternInObject(obj, pattern, replacement) {
   }, {});
 }
 
+export function isMatchingPattern(key) {
+  return variablePattern.test(key);
+}
+
+export function changeVariablePattern(key, value) {
+  return key.replace(variablePattern, value);
+}
+
+export function replaceCallback(haystack, match, variable) {
+  let variableParts = variable.split('??')
+  let variableNames = variableParts[0].split('|')
+  let defaultValue = variableParts[1] ?? '';
+
+  for(const variableName of variableNames){
+    let res = __data_get(haystack, variableName, false)
+
+    if(res){
+      return res
+    }
+  }
+  return defaultValue;
+}
+
+export function replacePattern(value, haystack) {
+  // Check if the entire value is just a single variable pattern
+  const singleVariableMatch = value.match(/^\${([^}]+)}\$$/);
+  if (singleVariableMatch) {
+    // If the entire value is a single variable, return the actual value (could be array/object)
+    const variable = singleVariableMatch[1];
+    return replaceCallback(haystack, singleVariableMatch[0], variable);
+  }
+
+  // For mixed content or multiple variables, convert non-strings to appropriate string representation
+  return value.replace(variablePattern, (match, variable) => {
+    const result = replaceCallback(haystack, match, variable);
+
+    // If result is array or object, convert to appropriate string representation
+    if (Array.isArray(result)) {
+      return result.join(', ');
+    } else if (typeof result === 'object' && result !== null) {
+      return JSON.stringify(result);
+    }
+
+    return result;
+  });
+}
+
+
 export function replaceVariablesFromHaystack(obj, haystack) {
   if (!obj || typeof obj !== 'object') return obj;
-
-  const variablePattern = /\${([^}]+)}\$/g;
 
   return Object.keys(obj).reduce((acc, key) => {
     const value = obj[key];
 
     if (typeof value === 'string') {
-      acc[key] = value.replace(variablePattern, (match, variable) => {
-        let variableParts = variable.split('??')
-        let variableNames = variableParts[0].split('|')
-        let defaultValue = variableParts[1] ?? '';
-
-        for(const variableName of variableNames){
-          if(haystack.hasOwnProperty(variableName)){
-            return haystack[variableName]
-          }
-        }
-        return defaultValue;
-      });
+      acc[key] = value.replace(variablePattern, replaceCallback.bind(null, haystack));
     } else if (Array.isArray(value)) {
       acc[key] = value.map(item => replaceVariablesFromHaystack(item, haystack));
     } else if (typeof value === 'object') {

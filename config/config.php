@@ -36,6 +36,7 @@ return [
     'timezone' => 'Europe/London',
 
     'log_dir' => storage_path('logs/modularity'),
+    'email_verified_register' => env('MODULARITY_EMAIL_VERIFIED_REGISTER', true),
 
     'benchmark_enabled' => env('MODULARITY_BENCHMARK_ENABLED', false),
     'benchmark_log_level' => env('MODULARITY_BENCHMARK_LOG_LEVEL', null),
@@ -43,13 +44,9 @@ return [
     'benchmark_emergency_time' => env('MODULARITY_BENCHMARK_EMERGENCY_TIME', 1000), // in milliseconds
 
     'base_model' => \Unusualify\Modularity\Entities\Model::class,
-
     'base_repository' => \Unusualify\Modularity\Repositories\Repository::class,
-
     'base_controller' => \Unusualify\Modularity\Http\Controllers\BaseController::class,
-
     'base_request' => \Unusualify\Modularity\Http\Requests\Request::class,
-
     'route_patterns' => [
         'id' => '[0-9]+',
         'payment' => '[0-9]+',
@@ -116,4 +113,5 @@ return [
             ],
         ],
     ],
+    'payment_middlewares' => [],
 ];

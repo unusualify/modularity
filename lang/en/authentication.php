@@ -23,10 +23,10 @@ return [
     'repeat_password' => 'Repeat Password',
     'tos' => 'I agree with Terms and Conditions.',
     'create-an-account' => 'CREATE AN ACCOUNT',
-    'sign-in-apple' => 'Sign in with Apple',
-    'sign-in-google' => 'Sign in with Google',
     'have-an-account' => 'Already have an account?',
     'sign-in' => 'Sign In',
+    'sign-in-oauth' => 'Sign in with :provider',
+    'sign-up-oauth' => 'Sign up with :provider',
 
     'password-sent' => 'Password is sent',
     'success-reset-email' => 'Please check your email for the password reset link.',
@@ -35,6 +35,10 @@ return [
     'register-title' => 'Registration Complete',
     'register-description' => 'Congratulations! Your registration is complete.',
     'register-button_text' => 'Go to Sign In?',
+
+    'pre-register-title' => 'Verify Your Email',
+    'pre-register-description' => 'Please check your email for the verification link.',
+    'pre-register-button_text' => 'Go to Sign In',
 
     'generate-password' => 'Generate Password',
 

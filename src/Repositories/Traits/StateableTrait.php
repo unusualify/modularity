@@ -48,13 +48,15 @@ trait StateableTrait
     public function getTableFiltersStateableTrait($scope): array
     {
         $model = $this->getModel();
+        $modelInstance = new $model;
 
         $defaultStates = $model::getDefaultStates();
         $defaultStateCodes = array_column($defaultStates, 'code');
 
         return $model::getStateModel()::whereIn('code', $defaultStateCodes)
             ->get()
-            ->map(function ($state) use ($scope) {
+            ->map(function ($state) use ($scope, $modelInstance) {
+                $state = $modelInstance->hydrateState($state);
                 $studlyCode = Str::studly($state->code);
 
                 return [
@@ -98,6 +100,7 @@ trait StateableTrait
     public function getStateableList($itemValue = 'name')
     {
         $model = $this->getModel();
+        $modelInstance = new $model;
         $defaultStates = $model::getDefaultStates();
         $defaultStateCodes = array_column($defaultStates, 'code');
 
@@ -106,7 +109,9 @@ trait StateableTrait
             ->sortBy(function ($state) use ($defaultStateCodes) {
                 return array_search($state->code, $defaultStateCodes);
             })
-            ->map(function ($state) use ($itemValue) {
+            ->map(function ($state) use ($itemValue, $modelInstance) {
+                $state = $modelInstance->hydrateState($state);
+
                 return [
                     'id' => $state->id,
                     $itemValue => $state->name,

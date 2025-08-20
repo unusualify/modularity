@@ -1,6 +1,6 @@
 <template>
   <v-input v-model="input">
-    <v-row>
+    <v-row no-gutters>
       <v-col class="d-flex flex-column justify-center px-0">
         <v-card class="pa-4 payment-container" elevation="0">
           <v-card-text class="pa-0">
@@ -80,17 +80,41 @@
       </v-col>
 
       <!-- Payment Form Section -->
-      <v-col class="px-0 d-flex align-center justify-center">
-        <CreditCardForm
-          v-if="showCreditCardForm"
+      <v-col class="pa-4 pa-sm-0 d-flex align-center justify-center">
+        <CreditCardForm v-if="isCreditCardForm"
           v-model:cardName="localCreditCard.card_name"
           v-model:cardNumber="localCreditCard.card_number"
           v-model:cardMonth="localCreditCard.card_month"
           v-model:cardYear="localCreditCard.card_year"
           v-model:cardCvv="localCreditCard.card_cvv"
         />
-        <v-btn
-          v-else
+        <template v-else-if="isTransferrableForm">
+          <div class="w-100 h-100 d-flex border-thin d-flex flex-column pa-4 ga-4">
+            <div v-for="(value, key) in selectedService?.bank_details ?? {}" :key="key" class="">
+              <h6 class="text-body-1 font-weight-bold " >{{ $headline(key) }}</h6>
+              <p class="text-body-1" >{{ value }}</p>
+            </div>
+            <ue-form
+              ref="transferForm"
+              :schema="transferSchema"
+              :modelValue="createTransferModel()"
+              :action-url="paymentUrl"
+
+              noDefaultSurface
+              noDefaultFormPadding
+              hasSubmit
+              buttonText="I Have Completed The Transfer"
+              @submitted="handleTransferSubmit"
+            >
+              <template #submit="{ validForm, loading, saveForm }">
+                <v-btn color="success" block :disabled="!validForm" :loading="loading" @click="saveForm">
+                  {{ $t('I Have Completed The Transfer') }}
+                </v-btn>
+              </template>
+            </ue-form>
+          </div>
+        </template>
+        <v-btn v-else
           :style="selectedService?.button_style"
           @click="submitForm"
           density="comfortable"
@@ -116,6 +140,8 @@
 
 <script>
 import { computed, ref, reactive, watch, inject } from 'vue';
+import _ from 'lodash-es';
+import { getModel, getSchema } from '@/utils/getFormData.js'
 import { makeInputProps, makeInputEmits, useCurrency } from '@/hooks';
 import CreditCardForm from '@/components/inputs/CreditCardForm';
 
@@ -146,7 +172,7 @@ export default {
       type: Array,
       default: () => []
     },
-    currencies: {
+    supportedCurrencies: {
       type: Array,
       default: () => []
     },
@@ -155,7 +181,7 @@ export default {
       type: [Object, Array, Proxy],
       default: () => ({})
     },
-    api: {
+    currencyConversionEndpoint: {
       type: String,
       default: ''
     },
@@ -166,6 +192,14 @@ export default {
     baseCurrency: {
       type: String,
       default: 'EUR'
+    },
+    transferFormSchema: {
+      type: [Array, Object],
+      default: () => []
+    },
+    paymentUrl: {
+      type: String,
+      default: ''
     }
   },
 
@@ -176,8 +210,8 @@ export default {
     // Refs
     const localPaymentMethod = ref('');
     const localDefaultPaymentMethod = ref("-1");
-    const selectedCurrency = ref(props.price_object.currency_id || props.currencies[0]?.id);
-    const displayPrice = ref(formatPrice.value(props.price_object.total_amount / 100, props.currencies[0]?.symbol || ''));
+    const selectedCurrency = ref(props.price_object.currency_id || props.supportedCurrencies[0]?.id);
+    const displayPrice = ref(formatPrice.value(props.price_object.total_amount / 100, props.supportedCurrencies[0]?.symbol || ''));
 
     // Reactive state
     const localCreditCard = reactive({
@@ -190,7 +224,7 @@ export default {
 
     // Computed
     const selectedCurrencyObj = computed(() =>
-      props.currencies.find(curr => curr.id === selectedCurrency.value)
+      props.supportedCurrencies.find(curr => curr.id === selectedCurrency.value)
     );
 
     const selectedCurrencyIso = computed(() =>
@@ -198,7 +232,7 @@ export default {
     );
 
     const formattedCurrencies = computed(() =>
-      props.currencies.map(currency => ({
+      props.supportedCurrencies.map(currency => ({
         id: currency.id,
         display: `${currency.symbol} - ${currency.name}`,
       }))
@@ -212,13 +246,46 @@ export default {
       });
     });
 
-    const selectedService = computed(() =>
-      filteredServiceItems.value.find(service => service[props.itemValue] === localPaymentMethod.value)
-    );
+    const selectedService = computed(() => {
+      // ensure dependency tracking and avoid type mismatch issues
+      const items = filteredServiceItems.value;
+      const methodValue = localPaymentMethod.value;
 
-    const showCreditCardForm = computed(() =>
-      !selectedService.value?.is_external
-    );
+      if (methodValue == null || methodValue === '') return null;
+
+      return items.find(service => service[props.itemValue] === methodValue) || null;
+    });
+
+    const transferFormModel = ref({
+      ...getModel(props.transferFormSchema),
+      price_id: props.price_object.id,
+      payment_service_id: localPaymentMethod.value,
+      currency_id: selectedCurrencyObj.value?.id ?? null,
+    })
+
+    const transferSchema = computed(() => {
+      return getSchema(props.transferFormSchema, transferFormModel.value)
+    })
+
+    const serviceIsTransferrable = (service) => {
+      if (!service) return false;
+
+      return service.transferrable
+    };
+
+    const serviceHasCreditCard = (service) => {
+      if (!service) return true;
+
+      return service.is_internal && !serviceIsTransferrable(service)
+    };
+
+    const isCreditCardForm = computed(() => {
+      return serviceHasCreditCard(selectedService.value)
+    });
+
+    const isTransferrableForm = computed(() => {
+      return serviceIsTransferrable(selectedService.value)
+    });
 
     const input = computed({
       get: () => props.modelValue,
@@ -231,16 +298,34 @@ export default {
 
     const exchangeRate = ref(0);
 
+    const updateTransferModel = (event) => {
+      // console.log('updateTransferModel', event)
+      transferFormModel.value = event;
+    }
+
+    const createTransferModel = () => {
+      return {
+        ...getModel(props.transferFormSchema),
+        price_id: props.price_object.id,
+        payment_service_id: localPaymentMethod.value,
+        currency_id: selectedCurrencyObj.value?.id ?? null,
+      }
+    }
+
+    const handleTransferSubmit = (data) => {
+      console.log('transfer submitted', data);
+    }
+
     // Methods
     const handleCurrencyChange = async (newCurrencyId) => {
       selectedCurrency.value = newCurrencyId;
       localPaymentMethod.value = localDefaultPaymentMethod.value;
 
-      const selectedCurrencyObject = props.currencies.find(curr => curr.id === newCurrencyId);
-      if (!selectedCurrencyObject || !props.api) return;
+      const selectedCurrencyObject = props.supportedCurrencies.find(curr => curr.id === newCurrencyId);
+      if (!selectedCurrencyObject || !props.currencyConversionEndpoint) return;
 
       try {
-        const response = await axios.post(props.api, {
+        const response = await axios.post(props.currencyConversionEndpoint, {
           currency: selectedCurrencyObject.iso_4217,
           amount: props.price_object.discounted_raw_amount / 100
         });
@@ -277,17 +362,40 @@ export default {
       };
     }, { deep: true });
 
+    watch(isTransferrableForm, (newValue) => {
+      if(newValue){
+        let paymentServiceID = localPaymentMethod.value;
+        transferFormModel.value.payment_service_id = paymentServiceID;
+        transferFormModel.value.currency_id = selectedCurrencyObj.value.id;
+
+        console.log('transferFormModel', transferFormModel.value)
+      }
+    }, { deep: true });
+
+
     return {
       input,
       localPaymentMethod,
       localDefaultPaymentMethod,
       localCreditCard,
-      showCreditCardForm,
+
+      isCreditCardForm,
+      isTransferrableForm,
+
       submitForm,
+
       selectedCurrency,
       selectedCurrencyIso,
       formattedCurrencies,
       filteredServiceItems,
+
+      transferSchema,
+      transferFormModel,
+      createTransferModel,
+      updateTransferModel,
+      handleTransferSubmit,
+
+
       handleCurrencyChange,
       displayPrice,
       selectedService,

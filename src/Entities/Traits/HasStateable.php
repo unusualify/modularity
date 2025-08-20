@@ -90,9 +90,7 @@ trait HasStateable
             static::$stateModel,
             'id',
             'created_at'
-        )
-            ->orWhereIn('code', $defaultStateCodes);
-        // ->withPivot('is_active');
+        )->orWhereIn('code', $defaultStateCodes);
     }
 
     public function state(): \Illuminate\Database\Eloquent\Relations\HasOneThrough
@@ -116,6 +114,38 @@ trait HasStateable
         return $this->morphOne(Stateable::class, 'stateable');
     }
 
+    public function hydrateState(State $state)
+    {
+        $stateConfig = $this->getRawStateConfiguration($state->code);
+
+        // Fill with icon and color from configuration
+        $state->fill(Arr::only($stateConfig, ['icon', 'color']));
+
+        // Set translation fields if they exist in configuration
+        if (! empty($stateConfig)) {
+            foreach (self::getStateableTranslationLanguages() as $locale) {
+                if (isset($stateConfig[$locale])) {
+                    // Get or create translation for this locale
+                    $findIndex = $state->translations->search(function ($translation) use ($locale) {
+                        return $translation->locale === $locale;
+                    });
+                    if ($findIndex !== false) {
+                        // Fill translation with data from configuration
+                        foreach ($stateConfig[$locale] as $field => $value) {
+                            if (in_array($field, $state->getTranslatedAttributes())) {
+                                $state->translations[$findIndex]->setAttribute($field, $value);
+                            }
+                        }
+
+                    }
+
+                }
+            }
+        }
+
+        return $state;
+    }
+
     /**
      * Get the state relationship with configuration applied.
      *
@@ -129,9 +159,7 @@ trait HasStateable
             return null;
         }
 
-        $originalState->fill($this->getStateConfiguration($originalState->code));
-
-        return $originalState;
+        return $this->hydrateState($originalState);
     }
 
     public static function getStateModel()
@@ -155,13 +183,14 @@ trait HasStateable
 
     protected function stateFormatted(): Attribute
     {
-        $state = $this->state;
+        // $state = $this->state;
+        $state = $this->getStateAttribute();
 
         return new Attribute(
             get: fn () => method_exists($this, 'setStateFormatted')
                 ? $this->setStateFormatted($state)
                 : ($state
-                    ? "<span class='text-{$state->color} mdi-{$state->icon}'>{$state->translatedAttribute('name')[app()->getLocale()]}</span>"
+                    ? "<span class='text-{$state->color} mdi-{$state->icon}'>{$state->name}</span>"
                     : "<span class='text-grey mdi-alert-circle-outline'>No State</span>")
         );
     }
@@ -252,7 +281,7 @@ trait HasStateable
         }, static::$default_states ?? []);
     }
 
-    public static function getStateConfiguration($code)
+    public static function getRawStateConfiguration($code)
     {
         $state = [];
 
@@ -269,6 +298,13 @@ trait HasStateable
                 }
             }
         }
+
+        return $state;
+    }
+
+    public static function getStateConfiguration($code)
+    {
+        $state = self::getRawStateConfiguration($code);
 
         return Arr::only($state, ['icon', 'color']);
     }
@@ -400,5 +436,26 @@ trait HasStateable
             $cloneModel->refresh();
             StateableUpdated::dispatch($cloneModel, $cloneModel->state, $oldState);
         }
+    }
+
+    public static function syncStateData(): array
+    {
+        $defaultStates = self::getDefaultStates();
+        $defaultStateCodes = array_column($defaultStates, 'code');
+
+        $absentStateCodes = array_diff($defaultStateCodes, State::pluck('code')->toArray());
+
+        $absentStates = array_values(array_filter($defaultStates, function ($state) use ($absentStateCodes) {
+            return in_array($state['code'], $absentStateCodes);
+        }));
+
+        $newStates = [];
+
+        foreach ($absentStates as $absentState) {
+            $newState = State::create($absentState);
+            $newStates[] = $newState;
+        }
+
+        return $newStates;
     }
 }

@@ -64,7 +64,7 @@ class ChatHydrate extends InputHydrate
         ]);
 
         $input['name'] = '_chat_id';
-        $input['label'] = 'Messages';
+        $input['label'] ??= 'Messages';
 
         $input['noSubmit'] = true;
         $input['creatable'] = 'hidden';

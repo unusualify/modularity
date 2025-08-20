@@ -122,9 +122,10 @@ class LoginController extends Controller
                     'color' => 'primary',
                     'type' => 'h5',
                     'weight' => 'bold',
-                    'transform' => '',
+                    'transform' => 'uppercase',
                     'align' => 'center',
                     'justify' => 'center',
+                    'class' => 'justify-md-center',
                 ],
                 'schema' => ($schema = $this->createFormSchema(getFormDraft('login_form'))),
                 'actionUrl' => route(Route::hasAdmin('login')),
@@ -155,7 +156,7 @@ class LoginController extends Controller
                     'elements' => [
                         [
                             'tag' => 'v-btn',
-                            'elements' => ___('authentication.sign-in-google'),
+                            'elements' => ___('authentication.sign-in-oauth', ['provider' => 'Google']),
                             'attributes' => [
                                 'variant' => 'outlined',
                                 'href' => route('admin.login.provider', ['provider' => 'google']),
@@ -202,7 +203,9 @@ class LoginController extends Controller
                             'elements' => ___('authentication.create-an-account'),
                             'attributes' => [
                                 'variant' => 'outlined',
-                                'href' => route('admin.register.form'),
+                                'href' => modularityConfig('email_verified_register')
+                                    ? route('admin.register.email_form')
+                                    : route('admin.register.form'),
                                 'class' => 'my-2 custom-auth-button',
                                 'color' => 'grey-lighten-1',
                                 'density' => 'default',

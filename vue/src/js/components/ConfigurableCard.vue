@@ -9,7 +9,7 @@
     <div no-gutters class="ue-configurable-card__row"
       :style="rowStyle"
       :class="[
-        $vuetify.display.smAndDown ? `ga-${mobileRowGap}` : '',
+        isMobile ? `ga-${mobileRowGap}` : '',
         rowMarginY ? `my-${rowMarginY}` : '',
         rowMarginX ? `mx-${rowMarginX}` : ''
       ]"
@@ -24,6 +24,8 @@
           alignCenterColumns ? 'ue-configurable-card__col--align-center' : '',
           $isset(columnStyles[segmentIndex]) || colRatios.length > 0 ? `ue-configurable-card__col--unset-flex-basis` : '',
           columnClasses[segmentIndex] ?? '',
+
+          isMobile ? `px-${mobileColPaddingX} py-${mobileColPaddingY}` : '',
           colPaddingX ? `px-${colPaddingX}` : '',
           colPaddingY ? `py-${colPaddingY}` : ''
         ]"
@@ -163,10 +165,22 @@
         type: Boolean,
         default: false
       },
+      mobileBreakpoint: {
+        type: String,
+        default: 'md'
+      },
       mobileRowGap: {
         type: [Number, String],
         default: 4
-      }
+      },
+      mobileColPaddingX: {
+        type: [Number, String],
+        default: 0
+      },
+      mobileColPaddingY: {
+        type: [Number, String],
+        default: 0
+      },
     },
     computed: {
       titlePXNumber() {
@@ -226,6 +240,15 @@
           const value = ratio || 1;
           return sum + value;
         }, 0);
+      },
+      isMobile() {
+        let breakpoint = 'smAndDown';
+
+        if(['sm', 'md', 'lg', 'xl'].includes(this.mobileBreakpoint)) {
+          breakpoint = this.mobileBreakpoint + 'AndDown';
+        }
+
+        return this.$vuetify.display[breakpoint];
       }
     },
     methods: {
@@ -313,7 +336,6 @@
       &__col
         flex-basis: 100% !important
         max-width: 100% !important
-        padding: calc( 12 * $spacer/ 2) 0
         &--seperator
           border-right: none
           border-bottom: 1px solid rgba(0, 0, 0, 0.12)

@@ -92,6 +92,9 @@ const deactivateLoading = () => {
     :subtitle-weight="subtitleWeight"
     :accepted-file-types="acceptedFileTypes"
 
+    :allow-multiple="false"
+    :allow-replace="true"
+
     @loadingFile="activateLoading"
     @loadedFile="deactivateLoading"
   >

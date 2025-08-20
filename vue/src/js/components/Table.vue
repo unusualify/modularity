@@ -289,11 +289,11 @@
             v-bind="formModalAttributes"
           >
             <template v-slot:body="formModalBodyScope">
-              <v-card class="fill-height d-flex flex-column">
+              <v-card class="fill-height d-flex flex-column py-4">
                 <ue-form
                   ref="UeForm"
 
-                  form-class="px-6 pt-6 pb-0"
+                  form-class="px-4"
                   fill-height
                   scrollable
                   has-divider
@@ -306,7 +306,7 @@
                   }"
                   :subtitle="formSubtitle"
                   :isEditing="editedIndex > -1"
-                  :style="formModalBodyScope.isFullActive ? 'height: 90vh !important;' : 'height: 70vh !important;'"
+                  :style="formModalBodyScope.isFullActive ? 'height: 95vh !important;' : 'height: 70vh !important;'"
                   :actions="formActions"
                   has-submit
                   :button-text="editedIndex > -1 ? $t('fields.update') : $t('fields.create')"
@@ -322,8 +322,10 @@
 
                   <template v-slot:header.right>
                     <slot name="form.header.right">
-                      <v-btn :icon="formModalBodyScope.isFullActive ? 'mdi-fullscreen-exit' : 'mdi-fullscreen'" variant="plain" color="grey-darken-5" size="compact" @click="formModalBodyScope.toggleFullscreen()"/>
-                      <v-btn icon="$close" variant="plain" size="compact" color="grey-darken-5" rounded @click="closeForm()" />
+                      <div class="d-flex align-start">
+                        <v-btn :icon="formModalBodyScope.isFullActive ? 'mdi-fullscreen-exit' : 'mdi-fullscreen'" variant="plain" color="grey-darken-5" size="compact" @click="formModalBodyScope.toggleFullscreen()"/>
+                        <v-btn icon="$close" variant="plain" size="compact" color="grey-darken-5" rounded @click="closeForm()" />
+                      </div>
                     </slot>
                   </template>
 
@@ -741,9 +743,9 @@
                   class="pa-0 justify-start text-none text-wrap text-primary darken-1 cursor-pointer"
                   @click="itemAction(item, ...col.formatter)"
                 >
-                  {{ window.__isset(item[col.key]) ? window.__shorten(item[col.key], item[col.key]?.textLength ?? 8) : '' }}
+                  {{ window.__isset(item[col.key]) ? window.__shorten(item[col.key], col?.textLength ?? 8) : '' }}
                 </span>
-                <template v-if="col.key.match(/^id|uuid$/)">
+                <template v-if="(col.hasCopy ?? false) || col.key.match(/^id|uuid$/)">
                   <ue-copy-text :text="item[col.key]" />
                 </template>
               </template>

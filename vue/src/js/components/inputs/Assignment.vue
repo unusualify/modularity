@@ -317,7 +317,7 @@
           type="list-item-two-line"
         />
         <template v-else>
-          <div class="d-flex flex-wrap gc-4 align-center px-4">
+          <div class="d-flex flex-wrap gc-4 align-center">
 
             <!-- Assignee Details -->
             <v-menu v-if="hasAssignment"
@@ -448,7 +448,7 @@
                     rounded
                     color="success"
                     density="compact"
-                    class="flex-grow-0 flex-shrink-1 my-2"
+                    class="flex-grow-0 flex-shrink-1"
                     v-bind="props"
                     :disabled="!input || updating"
                     :loading="updating"
@@ -484,7 +484,7 @@
                         rounded
                         color="info"
                         density="compact"
-                        class="flex-grow-0 flex-shrink-1 my-2"
+                        class="flex-grow-0 flex-shrink-1"
 
                         :disabled="!input || updating"
                         :loading="updating"

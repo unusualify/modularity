@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Str;
 use Unusualify\Modularity\Facades\Modularity;
-use Unusualify\Modularity\Facades\ModularityLog;
 use Unusualify\Modularity\Support\Finder;
 use Unusualify\Modularity\Traits\Allowable;
 
@@ -23,6 +22,11 @@ trait FormSchema
     protected $inputTypes = [];
 
     /**
+     * @var array
+     */
+    protected static $formSchemaCallbacks = [];
+
+    /**
      * @return void
      */
     protected function __beforeConstructFormSchema($app, $request)
@@ -30,42 +34,29 @@ trait FormSchema
         $this->inputTypes = modularityConfig('input_types', []);
     }
 
-    protected function transformClosureValues(object|array $array)
+    /**
+     * Update the form schema
+     *
+     * @return void
+     */
+    public static function updateFormSchema(callable $callback)
     {
-        try {
-            if (is_object($array)) {
-                $array = object_to_array($array);
-            }
-
-            return Arr::map($array, function ($value, $key) {
-                $value = $this->transformClosureValue($value);
-
-                if (is_array($value) && count($value) > 0) {
-                    return $this->transformClosureValues($value);
-                }
-
-                return $value;
-            });
-
-        } catch (\Throwable $th) {
-            // throw $th;
-            ModularityLog::error('Error transforming closure values', [
-                'error' => $th->getMessage(),
-                'trace' => $th->getTraceAsString(),
-                'array' => $array,
-            ]);
-
-            return $array;
-        }
+        static::$formSchemaCallbacks[static::class] = $callback;
     }
 
-    protected function transformClosureValue($value)
+    protected function getModuleFormSchema()
     {
-        if ($value instanceof \Closure) {
-            return $value();
+        $inputs = $this->getConfigFieldsByRoute('inputs');
+
+        $inputs = method_exists($this, 'formSchema')
+            ? $this->formSchema($inputs)
+            : $inputs;
+
+        if (isset(static::$formSchemaCallbacks[static::class]) && is_callable(static::$formSchemaCallbacks[static::class])) {
+            $inputs = call_user_func(static::$formSchemaCallbacks[static::class], object_to_array($inputs));
         }
 
-        return $value;
+        return $this->createFormSchema($inputs);
     }
 
     /**
@@ -93,7 +84,7 @@ trait FormSchema
         // $default_input = collect(Config::get(modularityBaseKey() . '.default_input'))->mapWithKeys(function($v, $k){return is_numeric($k) ? [$v => true] : [$k => $v];});
         // $default_input = $this->configureInput(array_to_object(Config::get(modularityBaseKey() . '.default_input')));
         $default_input = (array) Config::get(modularityBaseKey() . '.default_input');
-        $input = $this->transformClosureValues($input);
+        $input = transform_closure_values($input, forceArray: true);
 
         [$hydrated, $spreaded] = $this->hydrateInput($input, $inputs);
 

@@ -16,11 +16,16 @@
       <input v-if="!async" type="hidden" name="_token" :value="$csrf"/>
 
       <!-- Header Section -->
-      <div :class="[(hasDivider || title) ? 'pb-2 px-1' : '', scrollable ? 'flex-grow-0' : '']">
+      <div :class="[
+        (hasDivider || title) ? 'px-1' : '',
+        scrollable ? 'flex-grow-0' : '',
+        'd-flex flex-row pb-2'
+      ]">
         <ue-title v-if="!noTitle && title"
-          padding="b-3"
-          align="center"
-          justify="space-between"
+          padding="a-0"
+          align="start"
+          justify="start"
+          class="flex-1-1-100"
           v-bind="titleOptions"
         >
           <template v-slot:default>
@@ -40,7 +45,7 @@
             </slot>
           </template>
           <template v-slot:right>
-            <div class="d-flex align-center">
+            <div class="d-flex mt-2 mt-md-0 gc-2">
               <!-- Title Center Form Actions -->
               <FormActions v-if="actionsPosition == 'title-center' && isEditing"
                 :modelValue="formItem"
@@ -81,37 +86,53 @@
                 v-model="model"
                 :form-item="formItem"
               />
-
-              <!-- Language Selector -->
-              <v-chip-group
-                v-if="hasTraslationInputs && languages && languages.length && languages.length > 1"
-                :modelValue="currentLocale.value"
-                @update:modelValue="updateLocale($event)"
-                selected-class="bg-primary"
-                mandatory
-              >
-                <v-chip
-                  v-for="language in languages"
-                  :key="language.value"
-                  :text="language.shortlabel"
-                  :value="language.value"
-                  variant="outlined"
-                ></v-chip>
-              </v-chip-group>
-
-              <!-- Slot for headerRight -->
-              <slot name="header.right">
-
-              </slot>
             </div>
           </template>
         </ue-title>
+        <div :class="[
+          'flex-1-0 d-flex',
+          (hasTraslationInputs && languages && languages.length && languages.length > 1
+            || (hasAdditionalSection && $vuetify.display.mdAndDown)
+            || ($slots['header.right'])
+          ) ? 'pl-2' : ''
+        ]">
+          <!-- Language Selector -->
+          <v-chip-group v-if="hasTraslationInputs && languages && languages.length && languages.length > 1"
+            :modelValue="currentLocale.value"
+            @update:modelValue="updateLocale($event)"
+            selected-class="bg-primary"
+            mandatory
+          >
+            <v-chip
+              v-for="language in languages"
+              :key="language.value"
+              :text="language.shortlabel"
+              :value="language.value"
+              variant="outlined"
+            ></v-chip>
+          </v-chip-group>
 
-        <v-divider v-if="hasDivider"></v-divider>
+          <!-- Mobile dialog/modal for right section -->
+          <v-btn v-if="hasAdditionalSection && $vuetify.display.mdAndDown"
+            density="compact"
+            :rounded="true"
+            size="default"
+            icon="mdi-book-information-variant"
+            class=""
+            @click="showAdditionalSectionDialog = true"
+          >
+          </v-btn>
+          <!-- Slot for headerRight -->
+          <slot name="header.right">
+
+          </slot>
+        </div>
       </div>
 
+      <v-divider v-if="hasDivider" class="pb-2"></v-divider>
+
       <!-- Scrollable Content Section -->
-      <div :class="['d-flex', scrollable ? 'flex-grow-1 overflow-hidden mr-n5' : '']">
+      <div :class="['d-flex', scrollable ? 'flex-grow-1 overflow-hidden mr-n4' : '']">
         <div :class="['w-100 d-flex', scrollable ? 'overflow-y-auto pr-3' : '']"
         >
           <div class="flex-grow-1 px-1">
@@ -262,18 +283,7 @@
             </div>
           </div>
 
-          <!-- Mobile dialog/modal for right section -->
-          <v-btn
-            v-if="hasAdditionalSection && $vuetify.display.mdAndDown"
-            icon
-            class="mt-2"
-            @click="showAdditionalSectionDialog = true"
-          >
-            <v-icon>mdi-menu-right</v-icon>
-          </v-btn>
-
-          <v-dialog
-            v-if="hasAdditionalSection"
+          <v-dialog v-if="hasAdditionalSection"
             v-model="showAdditionalSectionDialog"
             max-width="500px"
           >
@@ -320,11 +330,12 @@
       <!-- Bottom Section -->
       <div :class="['px-1',scrollable ? 'flex-grow-0' : '']" v-if="(hasSubmit && isSubmittable) || $slots.submit || $slots.options || $slots.bottom">
         <v-divider v-if="hasSubmit && !stickyButton && hasDivider" class=""></v-divider>
-        <div class="d-flex flex-wrap justify-center justify-md-start pt-6 w-100 ga-4" v-if="hasSubmit && !stickyButton">
+        <div class="d-flex flex-wrap justify-center justify-md-start pt-6 w-100 ga-4 flex-md-row" v-if="hasSubmit && !stickyButton">
           <slot name="submit"
             v-bind="{
               isSubmittable,
               validForm: validModel || !serverValid,
+              saveForm,
               buttonDefaultText,
               loading
             }">
@@ -338,7 +349,7 @@
             <v-btn v-if="isSubmittable"
               type="submit"
               :disabled="!(validModel || !serverValid) || loading || !isSubmittable"
-              class="ml-auto mb-5 flex-1-1-100 flex-md-1-1-0 flex-lg-0-1-0"
+              class="ml-auto flex-1-1-100 flex-md-1-1-0 flex-lg-0-1-0 order-md-last order-first"
               :block="$vuetify.display.smAndDown"
               :loading="loading"
               :color="!isSubmittable ? 'warning' : 'primary'"
@@ -384,7 +395,7 @@ const AdditionalSectionContent = {
   },
   emits: ['action-complete'],
   template: `
-    <div>
+    <div class="mb-2">
       <!-- Right Top Form Actions -->
       <FormActions v-if="actionsPosition == 'right-top' && isEditing"
         :modelValue="formItem"
@@ -475,7 +486,7 @@ export default {
     // const i18n = useI18n()
 
     const formClasses = computed(() => [
-      props.noDefaultFormPadding ? '' : 'px-6 py-6',
+      props.noDefaultFormPadding ? '' : 'pa-4',
       props.noDefaultSurface ? '' : 'bg-surface',
       props.fillHeight ? 'd-flex flex-column h-100' : '',
       props.formClass,
@@ -543,6 +554,11 @@ export default {
           margin: props.title.margin || 'a-0',
           align: props.title.align || 'left',
           justify: props.title.justify || 'start',
+          ...(props.title.class ? {class: props.title.class} : {class: 'flex-md-row flex-column justify-md-space-between'})
+        }
+      } else {
+        options = {
+          class: 'flex-md-row flex-column justify-md-space-between'
         }
       }
       return options

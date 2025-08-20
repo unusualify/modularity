@@ -7,11 +7,12 @@
 /* width */
 ::-webkit-scrollbar
   width: 14px
-
+  height: 14px
 
 /* Track */
 ::-webkit-scrollbar-track
   background: transparent
+
 
 
 /* Handle */
@@ -19,13 +20,18 @@
   background: $scrollbar-thumb-color
   border-right: 4px transparent solid
   border-left: 4px transparent solid
+  border-top: 4px transparent solid
+  border-bottom: 4px transparent solid
   background-clip: padding-box
   border-radius: 9999px
-
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover
   background: $scrollbar-thumb-hover-color
+  border-right: 4px transparent solid
+  border-left: 4px transparent solid
+  background-clip: padding-box
+  border-radius: 9999px
 
 // .v-pagination__list
 //   padding-inline-start: 0px

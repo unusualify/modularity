@@ -12,7 +12,8 @@
     <template v-slot:default="defaultSlot">
       <v-data-table
         :class="[
-          'h-100'
+          'h-100',
+          selectable && !noFixedSelectable ? 'v-data-table--fixed-selectable' : ''
         ]"
         :style="inputAndTableStyle"
 
@@ -22,29 +23,28 @@
         disable-sort
         hide-default-footer
         :items-per-page="itemsPerPage"
-        :mobile-breakpoint="`md`"
+        :mobile-breakpoint="`sm`"
+        :fixed-header="!noFixedHeader"
         >
         <!-- header slots -->
-        <template
-          v-for="(header, i) in headers"
+        <template v-for="(header, i) in headers"
           :key="`header-${header.key}`"
           v-slot:[`header.${header.key}`]="headerScope"
           >
-          <div v-if="$isset(header.id) && input == header.id" class="v-input-comparison-table__header--selected">
+          <span v-if="$isset(header.id) && input == header.id" class="v-input-comparison-table__header--selected">
             {{ header.title }}
-          </div>
-          <div v-else v-html="header.title"></div>
+          </span>
+          <span v-else v-html="header.title"></span>
         </template>
         <!-- item slots -->
-        <template
-          v-for="(header, i) in headers"
+        <template v-for="(header, i) in headers"
           :key="`item-${header.key}`"
           v-slot:[`item.${header.key}`]="{ item }"
           >
-          <v-btn class="ma-2" v-if="item[header.key] == '__input'" @click="input=header.id" :variant="input == header.id ? 'elevated' : 'outlined'" :readonly="protectInitialValue">
+          <v-btn class="my-2" v-if="item[header.key] == '__input'" @click="input=header.id" :variant="input == header.id ? 'elevated' : 'outlined'" :readonly="protectInitialValue">
               {{ $t('Select') }}
           </v-btn>
-          <div v-else v-html="item[header.key]"></div>
+          <span v-else v-html="item[header.key]"></span>
         </template>
 
       </v-data-table>
@@ -55,7 +55,7 @@
 <script>
   import { useInput, makeInputProps, makeInputEmits } from '@/hooks'
   import Table from '../Table.vue'
-  import { find, toUpper, isNumber, isString, get } from 'lodash-es';
+  import { find, toUpper, isNumber, isString, get, isNaN } from 'lodash-es';
 
   export default {
     name: 'v-input-comparison-table',
@@ -101,10 +101,42 @@
         type: Number,
         default: 50
       },
+      comparatorWidth: {
+        type: Number,
+        default: 400
+      },
+      minComparatorWidth: {
+        type: Number,
+        default: 250
+      },
+      itemWidth: {
+        type: Number,
+        default: 80
+      },
+      maxItemWidth: {
+        type: Number,
+        default: 100
+      },
       maxHeight: {
         type: [String, Number],
         default: null
-      }
+      },
+      height: {
+        type: [String, Number],
+        default: null
+      },
+      noFixedHeader: {
+        type: Boolean,
+        default: false
+      },
+      noFixedComparator: {
+        type: Boolean,
+        default: false
+      },
+      noFixedSelectable: {
+        type: Boolean,
+        default: false
+      },
     },
     setup (props, context) {
       return {
@@ -120,31 +152,76 @@
     },
     computed: {
       headers() {
-        return [{title: this.label, key: 'comparator_name'}].concat( this.items.map((item) => {
-          return {title: item.name, key: item.name, align: 'center', id: item.id}
+        return [{
+          title: this.label,
+          key: 'comparator_name',
+          width: this.comparatorWidth,
+          fixed: !this.noFixedComparator,
+          cellProps: {
+            class: 'py-2',
+            style: {minWidth: `${this.minComparatorWidth}px`}}}
+          ].concat( this.items.map((item) => {
+          return {
+            title: item.name,
+            key: item.name,
+            align: 'center',
+            id: item.id,
+            width: this.itemWidth,
+            cellProps: {
+              style: {
+                ...(this.$vuetify.display.mobile ? {} : {maxWidth: `${this.maxItemWidth}px`})
+              }
+            }
+          }
         }))
       },
       inputAndTableStyle() {
+        let heightPattern = /(\d+)(vh|px|rem|em|%)/
         let maxHeight = this.maxHeight
 
         let style = {}
 
-        if(maxHeight){
-          if(isNumber(maxHeight)){
-            maxHeight = `${maxHeight}px`
-          }
-
-          if(isString(maxHeight)){
-            let isNumberable = isNumber(parseInt(maxHeight))
-            if(isNumberable){
-              maxHeight = `${parseInt(maxHeight)}px`
-            } else {
-              maxHeight = maxHeight
+        if(!this.$vuetify.display.smAndDown){
+          if(maxHeight){
+            if(isNumber(maxHeight)){
+              maxHeight = `${maxHeight}px`
             }
+
+            if(isString(maxHeight)){
+              let match = maxHeight.match(heightPattern)
+
+              if(!match){
+                let isNumberable = !isNaN(parseInt(match[1]))
+                if(isNumberable){
+                  maxHeight = `${parseInt(match[1])}px`
+                }
+              }
+            }
+
+            style.maxHeight = maxHeight
           }
 
-          style.maxHeight = maxHeight
+          if(this.height){
+            let height = this.height
+
+            if(isNumber(height)){
+              height = `${height}vh`
+            }
+
+            if(isString(height)){
+              let match = height.match(heightPattern)
+              if(!match){
+                let isNumberable = !isNaN(parseInt(match[1]))
+                if(isNumberable){
+                  height = `${parseInt(match[1])}vh`
+                }
+              }
+            }
+
+            style.height = height
+          }
         }
+
 
         return style
       },
@@ -260,12 +337,6 @@
 
       }
     },
-    methods: {
-
-    },
-    created() {
-
-    }
   }
 </script>
 
@@ -273,12 +344,15 @@
   $borderWidth: 1px
   $borderColor: rgba(var(--v-theme-primary), .7 )
   $stripedColor: rgba(var(--v-theme-primary), .1 )
-
-  .v-table
-    --v-table-header-height: 50px
-    --v-table-row-height: 40px
+  $stripedCellColor: rgba(var(--v-theme-primary), .01 )
+  $rowHeight: 40px
+  $tableHeaderHeight: 50px
 
   .v-input-comparison-table
+    .v-table
+      --v-table-header-height: 50px
+      --v-table-row-height: $rowHeight
+
     .v-input__control
       display: block
 
@@ -289,20 +363,28 @@
       tr
         &:nth-of-type(2n)
           background-color: $stripedColor //TODO: table action border must be variable
+          td.v-data-table-column--fixed
+            background-color: $stripedCellColor !important
 
     &--highlighted
       .v-table__wrapper
         > table
           tr
+            > td.v-data-table-column--last-fixed, th.v-data-table-column--last-fixed
+              border-right: unset !important
+
             &:first-child
               > th
                 &:not(:first-child)
                   color: $borderColor
                   text-transform: uppercase
+
                   border-top: $borderWidth solid $borderColor !important
                   border-top-left-radius: 8px !important
                   border-top-right-radius: 8px !important
                   border-bottom: $borderWidth solid $borderColor !important
+                  border-left: $borderWidth solid $borderColor
+                  box-shadow: 3px -2rem 0 3px white
                   // +smooth-wave-border( $position: bottom, $wave-height: 5px, $color: rgba(var(--v-theme-primary), 1), $border-width: 1px )
                   // +wavy-border( $position: bottom, $wave-height: 15px, $wave-width: 50%,$border-width: 1px ,$color: rgba(var(--v-theme-primary), 1))
                   // +sine-wave-border( $position: bottom, $wave-height: 20px,$color: $borderColor, $border-width: 1px, $amplitude: 4, $height: 25px, $phase: -5)
@@ -316,7 +398,25 @@
             &:last-child
               > td
                 &:not(:first-child)
+                  border-bottom-left-radius: 8px !important
+                  border-bottom-right-radius: 8px !important
                   border-bottom: $borderWidth solid $borderColor !important
+                  // box-shadow: 3.1rem 0 3px 0 red
+                  box-shadow: 0px 7px white
+
+    .v-data-table--fixed-selectable
+      .v-table__wrapper
+        > table
+          > tbody
+            // fixed last tr of tbody just like vuetify datatable fixed header
+            tr:last-child
+              position: sticky
+              bottom: 0
+              left: 0
+              right: 0
+              z-index: 1000
+              background-color: white
+              border-top: $borderWidth solid $borderColor
 
 
 </style>

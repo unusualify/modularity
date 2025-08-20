@@ -32,7 +32,7 @@ trait ManageTraits
         });
     }
 
-    public function inputs()
+    public function inputs($noGroupChunk = false)
     {
         $moduleName = $this->moduleName();
 
@@ -42,7 +42,7 @@ trait ManageTraits
             $module = Modularity::find($moduleName);
             $route_config = $module->getRouteConfig($routeName);
 
-            return $this->chunkInputs($route_config['inputs']);
+            return $this->chunkInputs($route_config['inputs'], noGroupChunk: $noGroupChunk);
             // return $route_config['inputs'];
         }
 
@@ -66,12 +66,16 @@ trait ManageTraits
         return $hasTranslated;
     }
 
-    public function chunkInputs($schema = null, $all = false)
+    public function chunkInputs($schema = null, $all = false, $noGroupChunk = false)
     {
-        return Arr::mapWithKeys($schema ?? $this->inputs(), function ($input, $key) use ($all) {
+        return Arr::mapWithKeys($schema ?? $this->inputs(), function ($input, $key) use ($all, $noGroupChunk) {
             if (isset($input['type'])) {
                 switch ($input['type']) {
                     case 'group':
+
+                        if ($noGroupChunk) {
+                            break;
+                        }
 
                         return Arr::mapWithKeys($this->chunkInputs($input['schema'] ?? []), function ($_input) use ($input) {
                             $name = "{$input['name']}.{$_input['name']}";

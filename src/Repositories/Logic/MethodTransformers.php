@@ -352,6 +352,21 @@ trait MethodTransformers
     }
 
     /**
+     * @param array $scope
+     * @return array
+     */
+    public function getFormActions($scope = [])
+    {
+        $formActions = [];
+
+        foreach ($this->traitsMethods(__FUNCTION__) as $method) {
+            $formActions = array_merge($formActions, $this->$method($scope));
+        }
+
+        return $formActions;
+    }
+
+    /**
      * @param \Illuminate\Database\Query\Builder $query
      * @return \Illuminate\Database\Query\Builder
      */

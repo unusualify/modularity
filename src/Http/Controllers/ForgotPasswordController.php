@@ -60,9 +60,10 @@ class ForgotPasswordController extends Controller
                     'color' => 'primary',
                     'type' => 'h5',
                     'weight' => 'bold',
-                    'transform' => '',
+                    'transform' => 'uppercase',
                     'align' => 'center',
                     'justify' => 'center',
+                    'class' => 'justify-md-center',
                 ],
                 'schema' => $this->createFormSchema(getFormDraft('forgot_password_form')),
 
@@ -113,10 +114,10 @@ class ForgotPasswordController extends Controller
                     'elements' => [
                         [
                             'tag' => 'v-btn',
-                            'elements' => ___('authentication.sign-in-google'),
+                            'elements' => ___('authentication.sign-in-oauth', ['provider' => 'Google']),
                             'attributes' => [
                                 'variant' => 'outlined',
-                                'href' => route(Route::hasAdmin('login.form')),
+                                'href' => route('admin.login.provider', ['provider' => 'google']),
                                 'class' => 'mt-5 mb-2 custom-auth-button',
                                 'color' => 'grey-lighten-1',
                                 'density' => 'default',
@@ -127,27 +128,6 @@ class ForgotPasswordController extends Controller
                                     'tag' => 'ue-svg-icon',
                                     'attributes' => [
                                         'symbol' => 'google',
-                                        'width' => '16',
-                                        'height' => '16',
-                                    ],
-                                ],
-                            ],
-                        ],
-                        [
-                            'tag' => 'v-btn',
-                            'elements' => ___('authentication.sign-in-apple'),
-                            'attributes' => [
-                                'variant' => 'outlined',
-                                'href' => route(Route::hasAdmin('login.form')),
-                                'class' => 'my-2 custom-auth-button',
-                                'color' => 'grey-lighten-1',
-                                'density' => 'default',
-                            ],
-                            'slots' => [
-                                'prepend' => [
-                                    'tag' => 'ue-svg-icon',
-                                    'attributes' => [
-                                        'symbol' => 'apple',
                                         'width' => '16',
                                         'height' => '16',
                                     ],
@@ -185,11 +165,11 @@ class ForgotPasswordController extends Controller
     protected function sendResetLinkResponse(Request $request, $response)
     {
         return $request->wantsJson()
-                    ? new JsonResponse([
-                        'message' => ___($response),
-                        'variant' => MessageStage::SUCCESS,
-                    ], 200)
-                    : back()->with('status', ___($response));
+            ? new JsonResponse([
+                'message' => ___($response),
+                'variant' => MessageStage::SUCCESS,
+            ], 200)
+            : back()->with('status', ___($response));
     }
 
     /**

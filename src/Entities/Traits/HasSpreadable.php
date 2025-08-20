@@ -151,22 +151,4 @@ trait HasSpreadable
     {
         return static::$spreadableSavingKey ?? 'spread_payload';
     }
-
-    public function __call($method, $arguments)
-    {
-        if (array_key_exists($method, $this->spreadableMutatorMethods)) {
-            return $this->spreadableMutatorMethods[$method];
-        }
-
-        return parent::__call($method, $arguments);
-    }
-
-    public function __get($key)
-    {
-        if (array_key_exists($key, $this->spreadableMutatorAttributes)) {
-            return $this->spreadableMutatorAttributes[$key];
-        }
-
-        return parent::__get($key);
-    }
 }

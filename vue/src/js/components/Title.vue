@@ -13,14 +13,6 @@
     <slot name="right">
 
     </slot>
-    <!-- <slot v-bind="{right}">
-
-    </slot> -->
-    <!-- <slot name="description" v-bind="{subTitle}">
-      <div :class="[(!paddingReset ? paddingClasses: []), descriptionClasses]">
-        {{ subTitle ?? '' }}
-      </div>
-    </slot> -->
   </component>
 </template>
 

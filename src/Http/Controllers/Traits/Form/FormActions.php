@@ -39,6 +39,8 @@ trait FormActions
             }
         }
 
+        $formActions = array_merge_recursive_preserve($this->repository ? $this->repository->getFormActions() : [], $formActions);
+
         $this->formActions = array_merge_recursive_preserve($formActions, $this->formActions ?? []);
     }
 
