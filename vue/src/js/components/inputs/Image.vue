@@ -14,9 +14,7 @@
               <div class="_media__field ">
                 <v-row dense class="" no-gutters>
                   <v-col v-for="(index) in totalElementCount" :key="index"
-                    cols="12"
-                    md="6"
-                    lg="4"
+                    v-bind="imageCol"
                     v-fit-grid
                     >
                     <v-card color="" class="w-100 d-flex flex-column justify-end" style="box-shadow: unset;">
@@ -228,7 +226,15 @@ export default {
   },
   mixins: [mediaLibrayMixin, mediaFieldMixin],
   props: {
-    ...makeImageProps()
+    ...makeImageProps(),
+    imageCol: {
+      type: Object,
+      default: () => ({
+        cols: 12,
+        md: 6,
+        lg: 4
+      })
+    }
   },
   setup (props, context) {
     return {
