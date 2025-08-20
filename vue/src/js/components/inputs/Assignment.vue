@@ -317,7 +317,7 @@
           type="list-item-two-line"
         />
         <template v-else>
-          <div class="d-flex flex-wrap gc-4 align-center">
+          <div class="d-flex flex-wrap gc-4">
 
             <!-- Assignee Details -->
             <v-menu v-if="hasAssignment"
@@ -500,7 +500,7 @@
                 </template>
                 <template v-slot:body.description>
                   <v-list
-                    class="pb-4 text-start"
+                    class="pb-4 flex-1-0"
                     :items="formattedAssignments"
                     lines="ten"
                     item-props
