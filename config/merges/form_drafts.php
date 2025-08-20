@@ -112,18 +112,14 @@ return [
             'color' => 'primary',
             'label' => 'I don\'t have a company',
             'col' => ['cols' => 12],
-            'hideDetails' => false,
-
+            'hideDetails' => true,
+            'default' => false,
+            'trueValue' => true,
+            'falseValue' => false,
             'ext' => [
                 [
                     'set',
                     'name',
-                    'disabled',
-                    'disable_value.*.value',
-                ],
-                [
-                    'set',
-                    'tax_id',
                     'disabled',
                     'disable_value.*.value',
                 ],
@@ -161,7 +157,7 @@ return [
         'tax_id' => [
             'type' => 'text',
             'name' => 'tax_id',
-            'label' => 'Tax ID',
+            'label' => 'Tax ID / Personal ID',
             'default' => '',
             'col' => ['sm' => 6],
             // 'rules' => 'sometimes|min:3',
