@@ -4,6 +4,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Unusualify\Modularity\Entities\Model;
+use Unusualify\Modularity\Facades\ModularityLog;
 
 if (! function_exists('lowerName')) {
     function lowerName($string)
@@ -138,13 +139,13 @@ if (! function_exists('abbreviation')) {
     }
 }
 
-/**
- * Get the short name of class from class namespace
- *
- * @param string $class
- * @return string
- */
 if (! function_exists('get_class_short_name')) {
+    /**
+     * Get the short name of class from class namespace
+     *
+     * @param string $class
+     * @return string
+     */
     function get_class_short_name($class)
     {
         return (new \ReflectionClass($class))->getShortName();
@@ -846,5 +847,62 @@ if (! function_exists('name_surname_resolver')) {
         // ]);
 
         return $nameWithSurname;
+    }
+}
+
+if (! function_exists('transform_closure_value')) {
+    /**
+     * Transform a closure value to its result
+     *
+     * @param mixed $value The value to transform
+     * @return mixed The transformed value
+     */
+    function transform_closure_value($value)
+    {
+        if ($value instanceof \Closure) {
+            return $value();
+        }
+
+        return $value;
+    }
+}
+
+if (! function_exists('transform_closure_values')) {
+    /**
+     * Transform all closure values in an array or object to their results
+     *
+     * @param object|array $haystack The array or object to transform
+     * @return object|array The transformed array or object
+     */
+    function transform_closure_values(object|array $haystack, $forceArray = false)
+    {
+        try {
+            $wasObject = is_object($haystack);
+            if ($wasObject) {
+                $haystack = object_to_array($haystack);
+            }
+
+            $result = Arr::map($haystack, function ($value, $key) use ($forceArray) {
+                $value = transform_closure_value($value);
+
+                if (is_array($value) && count($value) > 0) {
+                    return transform_closure_values($value, $forceArray);
+                }
+
+                return $value;
+            });
+
+            return $wasObject && !$forceArray ? array_to_object($result) : $result;
+
+        } catch (\Throwable $th) {
+            // throw $th;
+            ModularityLog::error('Error transforming closure values', [
+                'error' => $th->getMessage(),
+                'trace' => $th->getTraceAsString(),
+                'haystack' => $haystack,
+            ]);
+
+            return $haystack;
+        }
     }
 }
