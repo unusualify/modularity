@@ -60,11 +60,12 @@ trait SendsEmailVerificationRegister
     protected function sendVerificationLinkResponse(Request $request, $response)
     {
         return $request->wantsJson()
-                    ? new JsonResponse([
-                        'message' => __($response),
-                        'variant' => MessageStage::SUCCESS,
-                    ], 200)
-                    : back()->with('status', ___($response));
+            ? new JsonResponse([
+                'message' => __($response),
+                'variant' => MessageStage::SUCCESS,
+                'redirector' => route('admin.register.verification.success'),
+            ], 200)
+            : back()->with('status', ___($response));
     }
 
     protected function sendVerificationLinkFailedResponse(Request $request, $response)
@@ -85,5 +86,18 @@ trait SendsEmailVerificationRegister
     public function credentials(Request $request)
     {
         return $request->only('email');
+    }
+
+    public function showSuccessForm()
+    {
+        return view(modularityBaseKey() . '::auth.success', [
+            'taskState' => [
+                'status' => 'success',
+                'title' => __('authentication.pre-register-title'),
+                'description' => __('authentication.pre-register-description'),
+                'button_text' => __('authentication.pre-register-button_text'),
+                'button_url' => route('admin.login'),
+            ],
+        ]);
     }
 }
