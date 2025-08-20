@@ -113,4 +113,5 @@ return [
             ],
         ],
     ],
+    'payment_middlewares' => [],
 ];
