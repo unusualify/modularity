@@ -153,9 +153,11 @@
         v-bind="responseModalOptions"
       >
         <template v-slot:body.description>
-          <v-icon size="64" color="success" class="mb-4">{{ responseModalIcon }}</v-icon>
-          <h2 class="text-h4 mb-4 text-success">{{ responseModalTitle }}</h2>
-          <p class="text-subtitle-1 grey--text">{{ responseModalMessage }}</p>
+          <div class="d-flex flex-column align-center justify-center">
+            <v-icon size="64" color="success" class="mb-4">{{ responseModalIcon }}</v-icon>
+            <h2 class="text-h4 mb-4 text-success">{{ responseModalTitle }}</h2>
+            <p class="text-subtitle-1 grey--text">{{ responseModalMessage }}</p>
+          </div>
         </template>
         <template v-slot:body.options>
           <div class="d-flex justify-center w-100">

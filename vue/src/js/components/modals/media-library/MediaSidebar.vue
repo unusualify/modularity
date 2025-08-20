@@ -182,10 +182,12 @@
       :cancel-text="`Cancel`"
       >
       <template v-slot:body.description>
-        <p class="modal--tiny-title">
-          <strong>{{ $trans('media-library.dialogs.delete.title', 'Are you sure ?') }}</strong>
-        </p>
-        <p> {{ warningDeleteMessage }} </p>
+        <div class="d-flex flex-column align-center justify-center">
+          <p class="modal--tiny-title">
+            <strong>{{ $trans('media-library.dialogs.delete.title', 'Are you sure ?') }}</strong>
+          </p>
+          <p> {{ warningDeleteMessage }} </p>
+        </div>
       </template>
     </ue-modal>
   </div>
