@@ -57,11 +57,11 @@ class ChatHydrate extends InputHydrate
         $maxAttachments = $input['max-attachments'] ?? 3;
         $input['filepond'] = modularity_format_input([
             'type' => 'filepond',
-            // 'name' => 'attachments',
+            'name' => 'filepond',
             'accepted-file-types' => $acceptedFileTypes,
             'max' => $maxAttachments,
             'noRules' => true,
-        ]);
+        ])['filepond'];
 
         $input['name'] = '_chat_id';
         $input['label'] ??= 'Messages';

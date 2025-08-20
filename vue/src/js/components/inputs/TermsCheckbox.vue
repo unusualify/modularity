@@ -70,11 +70,13 @@
           </v-btn>
         </template>
         <template v-slot:body.description>
-          <ue-title justify="center" :text="$t(`${readType}`)" class="mb-4"></ue-title>
-          <v-sheet class="pa-4 overflow-y-auto" max-height="400px">
-            <!-- Replace this with your actual terms and conditions content -->
-            <div v-html="modalContent"></div>
-          </v-sheet>
+          <div class="d-flex flex-column align-center justify-center">
+            <ue-title justify="center" :text="$t(`${readType}`)" class="mb-4"></ue-title>
+            <v-sheet class="pa-4 overflow-y-auto" max-height="400px">
+              <!-- Replace this with your actual terms and conditions content -->
+              <div v-html="modalContent"></div>
+            </v-sheet>
+          </div>
         </template>
       </ue-modal>
     </template>

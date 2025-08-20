@@ -78,7 +78,7 @@ class AssignmentHydrate extends InputHydrate
 
         $filepondAcceptedFileTypes = isset($input['acceptedExtensions']) && is_array($input['acceptedExtensions'])
             ? $input['acceptedExtensions']
-            : ['pdf', 'doc', 'docx', 'pages'];
+            : ['pdf'];
 
         $acceptedFileTypes = $input['accepted-file-types']
             ?? $this->getAcceptedFileTypes($filepondAcceptedFileTypes);
@@ -89,7 +89,9 @@ class AssignmentHydrate extends InputHydrate
             'accepted-file-types' => $acceptedFileTypes,
             'max' => $maxAttachments,
             'noRules' => true,
-        ]);
+        ])['attachments'];
+
+        // dd($input);
 
         return $input;
     }

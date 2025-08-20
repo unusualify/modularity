@@ -101,8 +101,10 @@
       :cancel-text="`Cancel`"
       >
       <template v-slot:body.description>
-        <p class="modal--tiny-title"><strong>{{ $t("media-library.dialogs.delete.delete-media-title") }}</strong></p>
-        <p v-html="$t('media-library.dialogs.delete.delete-media-desc')"></p>
+        <div class="d-flex flex-column align-center justify-center">
+          <p class="modal--tiny-title"><strong>{{ $t("media-library.dialogs.delete.delete-media-title") }}</strong></p>
+          <p v-html="$t('media-library.dialogs.delete.delete-media-desc')"></p>
+        </div>
       </template>
     </ue-modal>
 
