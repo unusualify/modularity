@@ -2,6 +2,24 @@
 
 All notable changes to `modularity` will be documented in this file
 
+## v0.42.1 - 2025-08-20
+
+### :wrench: Bug Fixes
+
+- simplify accepted file types in AssignmentHydrate and update filepond name in ChatHydrate by @OoBook in https://github.com/unusualify/modularity/commit/6149b805ff301715730958889270e7c6cfc67815
+- refine layout classes for improved UI consistency by @OoBook in https://github.com/unusualify/modularity/commit/c3cba2ee3d493903c3856a33c6b2fd4b4f2ade1f
+- wrap modal content in flex container for improved alignment by @OoBook in https://github.com/unusualify/modularity/commit/2c7753ef74558e357b3362e56451e0fe87abfca8
+- update default class for improved spacing in form component by @OoBook in https://github.com/unusualify/modularity/commit/37bf51e2d55abd125dbfa688cd3d3dc1f2e4ed2b
+
+### :lipstick: Styling
+
+- lint coding styles for v0.42.0 by @invalid-email-address in https://github.com/unusualify/modularity/commit/7e9ff30fb36e22518df17c4e3c9f3885cd0c23b3
+
+### :package: Build
+
+- update build artifacts for v0.42.0 by @invalid-email-address in https://github.com/unusualify/modularity/commit/1a7b5d1278b79c734cc4ef687469946491fbf3be
+- update build artifacts for v0.42.1 by @OoBook in https://github.com/unusualify/modularity/commit/b67c3cd0872987ace2832cbcdca0a9f461566522
+
 ## v0.42.0 - 2025-08-20
 
 ### :rocket: Features
