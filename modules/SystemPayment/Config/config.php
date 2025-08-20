@@ -191,6 +191,7 @@ return [
                     // 'rules' => 'sometimes|required:array',
                     'isIcon' => true,
                     'col' => ['cols' => 12, 'lg' => 6],
+                    'imageCol' => ['cols' => 12, 'md' => 6, 'lg' => 6],
                 ],
                 [
                     'label' => 'Button Logo',
@@ -199,6 +200,7 @@ return [
                     'rules' => '',
                     'isIcon' => true,
                     'col' => ['cols' => 12, 'lg' => 6],
+                    'imageCol' => ['cols' => 12, 'md' => 6, 'lg' => 6],
                 ],
                 [
                     'name' => 'button_style',
