@@ -892,7 +892,7 @@ if (! function_exists('transform_closure_values')) {
                 return $value;
             });
 
-            return $wasObject && !$forceArray ? array_to_object($result) : $result;
+            return $wasObject && ! $forceArray ? array_to_object($result) : $result;
 
         } catch (\Throwable $th) {
             // throw $th;

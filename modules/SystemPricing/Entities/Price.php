@@ -121,7 +121,7 @@ class Price extends \Oobook\Priceable\Models\Price
 
         $payment = $this->payments()->whereIn('status', ['PENDING', 'FAILED'])->latest()->first();
 
-        if($payment){
+        if ($payment) {
             $payment->update($payload);
             $payment->refresh();
         } else {
@@ -129,7 +129,7 @@ class Price extends \Oobook\Priceable\Models\Price
         }
 
         // if it is a transfer payment, we need to save the receipts
-        if(isset($extraPayload['receipts'])){
+        if (isset($extraPayload['receipts'])) {
             Filepond::saveFile($payment, $extraPayload['receipts'], 'receipts');
         }
 

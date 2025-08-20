@@ -75,7 +75,7 @@ class CompleteRegisterController extends Controller
             event(new ModularityUserRegistering($request));
 
             $rawSchema = getFormDraft('complete_register_form');
-            $keys = array_map(fn($key) => $key['name'], $rawSchema);
+            $keys = array_map(fn ($key) => $key['name'], $rawSchema);
             $defaultValues = $request->only(array_diff($keys, ['password', 'password_confirmation']));
             $defaultValues['token'] = $token;
 

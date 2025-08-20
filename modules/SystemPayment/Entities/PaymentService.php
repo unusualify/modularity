@@ -84,6 +84,7 @@ class PaymentService extends Model
                 if ($transferDetails && isset($transferDetails[$key])) {
                     $acc[$key] = $transferDetails[$key];
                 }
+
                 return $acc;
             }, []),
         );

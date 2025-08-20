@@ -12,17 +12,15 @@ use Unusualify\Modularity\Services\RedirectService;
 
 final class RedirectorMiddleware
 {
-	public function __construct(private readonly RedirectService $redirectService)
-	{
-	}
+    public function __construct(private readonly RedirectService $redirectService) {}
 
-	public function handle(Request $request, Closure $next): Response
-	{
-		$redirectUrl = $this->redirectService->pull();
-		if ($redirectUrl) {
-			return Redirect::to($redirectUrl);
-		}
+    public function handle(Request $request, Closure $next): Response
+    {
+        $redirectUrl = $this->redirectService->pull();
+        if ($redirectUrl) {
+            return Redirect::to($redirectUrl);
+        }
 
-		return $next($request);
-	}
+        return $next($request);
+    }
 }

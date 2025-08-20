@@ -169,7 +169,7 @@ return [
                             'rules' => '',
                             '_cached-rawRules' => 'required',
                         ],
-                    ]
+                    ],
                 ],
 
                 [
@@ -362,8 +362,8 @@ return [
                             [
                                 'tag' => 'p',
                                 'elements' => '${description??N/A}$',
-                            ]
-                        ]
+                            ],
+                        ],
                     ],
                     'conditions' => [
                         ['description', '!=', ''],
@@ -395,8 +395,8 @@ return [
                                     'max-file-name-length' => 30,
                                     'image-size' => 24,
                                 ],
-                            ]
-                        ]
+                            ],
+                        ],
                     ],
                     'conditions' => [
                         ['bank_receipts', '>', 0],

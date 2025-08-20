@@ -103,8 +103,8 @@ class Payment extends \Unusualify\Payable\Models\Payment
             $serviceClass = \Unusualify\Payable\Payable::getServiceClass($paymentGateway);
         } catch (\Exception $e) {
             if ($e->getMessage() == 'Service class not found for slug: ' . $paymentGateway && $this->paymentService->transferrable) {
-                $serviceClass = new class extends \Unusualify\Payable\Services\PaymentService {
-
+                $serviceClass = new class extends \Unusualify\Payable\Services\PaymentService
+                {
                     public function __construct()
                     {
                         $this->mode = 'test';
@@ -211,5 +211,4 @@ class Payment extends \Unusualify\Payable\Models\Payment
                 : null
         );
     }
-
 }

@@ -27,8 +27,9 @@ class RegisterBroker extends PasswordBroker implements RegisterBrokerContract
     {
         $user = $this->getUser($credentials);
 
-        if (! is_null($user))
+        if (! is_null($user)) {
             return static::ALREADY_REGISTERED;
+        }
 
         $email = $credentials['email'];
         $user = new \Unusualify\Modularity\Entities\User;

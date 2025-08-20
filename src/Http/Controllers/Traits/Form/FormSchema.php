@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Str;
 use Unusualify\Modularity\Facades\Modularity;
-use Unusualify\Modularity\Facades\ModularityLog;
 use Unusualify\Modularity\Support\Finder;
 use Unusualify\Modularity\Traits\Allowable;
 
@@ -38,7 +37,6 @@ trait FormSchema
     /**
      * Update the form schema
      *
-     * @param callable $callback
      * @return void
      */
     public static function updateFormSchema(callable $callback)

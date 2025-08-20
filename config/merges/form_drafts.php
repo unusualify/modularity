@@ -477,7 +477,7 @@ return [
             'type' => 'text',
             'name' => 'email',
             'label' => 'Email',
-            'col' => [ 'cols' => 12, 'lg' => 12],
+            'col' => ['cols' => 12, 'lg' => 12],
             'readonly' => true,
             'clearable' => false,
             'validateOn' => 'lazy input',
@@ -487,7 +487,7 @@ return [
             'name' => 'name',
             'label' => 'Name',
             'default' => '',
-            'col' => [ 'cols' => 12, 'lg' => 12],
+            'col' => ['cols' => 12, 'lg' => 12],
             'rules' => 'min:2',
             'validateOn' => 'lazy input',
         ],
@@ -496,7 +496,7 @@ return [
             'name' => 'surname',
             'label' => 'Surname',
             'default' => '',
-            'col' => [ 'cols' => 12, 'lg' => 12],
+            'col' => ['cols' => 12, 'lg' => 12],
             'rules' => 'min:2',
             'validateOn' => 'lazy input',
         ],
@@ -505,7 +505,7 @@ return [
             'name' => 'company',
             'label' => 'Company',
             'default' => '',
-            'col' => [ 'cols' => 12, 'lg' => 12],
+            'col' => ['cols' => 12, 'lg' => 12],
             'rules' => 'min:2',
         ],
         'password' => [
@@ -517,7 +517,7 @@ return [
             'slotHandlers' => [
                 'appendInner' => 'password',
             ],
-            'col' => [ 'cols' => 12, 'lg' => 12],
+            'col' => ['cols' => 12, 'lg' => 12],
             'rules' => 'min:8',
         ],
         'password_confirmation' => [
@@ -529,7 +529,7 @@ return [
             'slotHandlers' => [
                 'appendInner' => 'password',
             ],
-            'col' => [ 'cols' => 12, 'lg' => 12],
+            'col' => ['cols' => 12, 'lg' => 12],
             'rules' => 'min:8',
         ],
         'token' => [

@@ -192,13 +192,13 @@ if (! function_exists('hydrate_input_extension')) {
                             $events[] = 'formatPermalinkPrefix:' . $inputToFormat . ':' . $this->getSnakeCase($this->routeName());
                         }
 
-                    break;
+                        break;
                     case 'lock': // 'lock:url:url'
                         $inputToFormat = array_shift($args);
                         $parentColumnName = array_shift($args);
                         $events[] = "formatLock:{$inputToFormat}:{$parentColumnName}";
 
-                    break;
+                        break;
                     case 'permalink': // 'permalink:slug',
                         $inputToFormat = array_shift($args);
                         $permalinkPrefix = getHost() . '/';
@@ -235,7 +235,7 @@ if (! function_exists('hydrate_input_extension')) {
                         unset($input['ext']);
                         $events[] = 'formatPermalink:' . $inputToFormat;
 
-                    break;
+                        break;
                     case 'filter': // 'filter:{target_input_name}:{target_prop_name}:{followed_key_name}'
                         $inputToFormat = array_shift($args);
                         $targetPropName = array_shift($args) ?? 'inputs';
@@ -290,7 +290,7 @@ if (! function_exists('hydrate_input_extension')) {
                             $events[] = 'formatFilter:' . implode(':', [$inputToFormat, $targetPropName, ...$args]);
                         }
 
-                    break;
+                        break;
                     case 'preview': //
                         $inputToFormat = array_shift($args) ?? '';
                         $previewFieldPatterns = array_shift($args) ?? null;
@@ -303,7 +303,7 @@ if (! function_exists('hydrate_input_extension')) {
                             $events[] = "formatPreview:{$inputToFormat}{$previewFieldPatterns}";
                         }
 
-                    break;
+                        break;
                     case 'set': //
                         $inputToFormat = array_shift($args) ?? '';
                         $inputPropToFormat = array_shift($args) ?? null;
@@ -327,7 +327,7 @@ if (! function_exists('hydrate_input_extension')) {
                             $events[] = "formatSet:{$inputToFormat}:{$inputPropToFormat}:{$setProp}";
                         }
 
-                    break;
+                        break;
                     case 'clearModel': //
                         $inputToFormat = array_shift($args) ?? '';
 
@@ -335,7 +335,7 @@ if (! function_exists('hydrate_input_extension')) {
                             $events[] = "formatClearModel:{$inputToFormat}";
                         }
 
-                    break;
+                        break;
                     case 'resetItems': //
                         $inputToFormat = array_shift($args) ?? '';
 
@@ -343,7 +343,7 @@ if (! function_exists('hydrate_input_extension')) {
                             $events[] = "formatResetItems:{$inputToFormat}";
                         }
 
-                    break;
+                        break;
                     case 'prependSchema': //
                         $inputToFormat = array_shift($args) ?? '';
                         $prependKey = array_shift($args) ?? null;
@@ -354,7 +354,7 @@ if (! function_exists('hydrate_input_extension')) {
                             $events[] = "formatPrependSchema:{$inputToFormat}:{$prependKey}:{$setterSchemaKey}:{$orderKey}";
                         }
 
-                    break;
+                        break;
                     case 'removeValue': //
                         $inputToFormat = array_shift($args) ?? '';
 
@@ -362,7 +362,7 @@ if (! function_exists('hydrate_input_extension')) {
                             $events[] = "formatRemoveValue:{$inputToFormat}";
                         }
 
-                    break;
+                        break;
                     case 'toggleInput': // to toggle d-none class and rawRules
                         $inputToFormat = array_shift($args) ?? '';
                         $toggleValue = array_shift($args) ?? 'toggleValue';
@@ -372,10 +372,10 @@ if (! function_exists('hydrate_input_extension')) {
                             $events[] = "formatToggleInput:{$inputToFormat}:{$toggleValue}:{$toggleLevel}";
                         }
 
-                    break;
+                        break;
                     default:
                         // code...
-                    break;
+                        break;
                 }
             }
 
@@ -487,7 +487,7 @@ if (! function_exists('format_input')) {
                 // if($input['name'] == 'wrap-content')
                 $data = $input;
 
-            break;
+                break;
             case 'morphTo':
 
                 $data = [];
@@ -575,7 +575,7 @@ if (! function_exists('format_input')) {
                     $input = $data;
                 }
 
-            break;
+                break;
             case 'polymorphic':
                 $arrayable = true;
 
@@ -678,7 +678,7 @@ if (! function_exists('format_input')) {
                 ];
 
                 // $input = [];
-            break;
+                break;
             case 'title':
                 $input['padding'] ??= 'a-0';
                 $input['margin'] ??= 'b-0';
@@ -688,9 +688,9 @@ if (! function_exists('format_input')) {
                 $input['color'] ??= null;
 
                 // $input = [];
-            break;
+                break;
             default:
-            break;
+                break;
         }
 
         if (isset($input['type'])) {
@@ -734,13 +734,13 @@ if (! function_exists('modularity_format_input')) {
 
         [$formatted, $spreaded] = format_input($input, $module, $routeName, $skipQueries, $inputs);
 
-        if ($spreaded)
+        if ($spreaded) {
             return $formatted;
+        }
 
         $type = getValueOrNull($formatted, 'type');
         $name = getValueOrNull($formatted, 'name');
         $_input = null;
-
 
         if (in_array($type, ['divider', 'title']) || (bool) $name) {
             if ($defaultInput['color'] && in_array($type, ['morphTo', 'relationship', 'wrap', 'group'])) {

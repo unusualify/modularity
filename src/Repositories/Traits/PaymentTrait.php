@@ -165,22 +165,22 @@ trait PaymentTrait
                 ];
                 $extraPayload = [];
                 $user = null;
-                if(Auth::check()){
+                if (Auth::check()) {
                     $user = Auth::user();
                 }
 
-                if(classHasTrait($object, 'Unusualify\Modularity\Entities\Traits\HasCreator')){
+                if (classHasTrait($object, 'Unusualify\Modularity\Entities\Traits\HasCreator')) {
                     $paymentPayload['custom_creator_id'] = $object->creator->id;
                     $paymentPayload['email'] = $object->creator->email;
-                } else if($user) {
+                } elseif ($user) {
                     $paymentPayload['email'] = $user->email;
                 }
 
-                if(isset($fields['payment_receipts'])){
+                if (isset($fields['payment_receipts'])) {
                     $extraPayload['receipts'] = $fields['payment_receipts'];
                 }
 
-                if(isset($fields['payment_description'])){
+                if (isset($fields['payment_description'])) {
                     $paymentPayload['spread_payload']['description'] = $fields['payment_description'];
                 }
 
@@ -270,7 +270,7 @@ trait PaymentTrait
                     ['payment.status', 'not in', [PaymentStatus::COMPLETED]],
                 ]),
                 'hideOnCondition' => true,
-            ]
+            ],
         ];
     }
 }

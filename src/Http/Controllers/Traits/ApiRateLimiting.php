@@ -180,7 +180,7 @@ trait ApiRateLimiting
         // get request origin
         $host = $this->request->header('host');
 
-        if(str_contains($host, Modularity::getAppHost()) || str_contains($host, Modularity::getAdminAppHost())){
+        if (str_contains($host, Modularity::getAppHost()) || str_contains($host, Modularity::getAdminAppHost())) {
             return null;
         }
 

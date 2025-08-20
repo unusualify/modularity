@@ -3,7 +3,7 @@
 use Unusualify\Modularity\View\Component;
 
 if (! function_exists('modularity_response_modal_body_component')) {
-    function modularity_response_modal_body_component($color = 'success', $icon = 'mdi-check-decagram-outline', string $title, string $description, $redirector = null, array $modalProps = [])
+    function modularity_response_modal_body_component($color, $icon, string $title, string $description, $redirector = null, array $modalProps = [])
     {
         return Component::makeDiv()
             ->setElements([
@@ -44,7 +44,7 @@ if (! function_exists('modularity_response_modal_body_component')) {
 }
 
 if (! function_exists('modularity_modal_service')) {
-    function modularity_modal_service(string $color = 'success', string $icon = 'mdi-check-decagram-outline', string $title, string $description, array $modalProps = [])
+    function modularity_modal_service(string $color, string $icon, string $title, string $description, array $modalProps = [])
     {
         return [
             'component' => 'ue-recursive-stuff',

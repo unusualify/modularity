@@ -166,7 +166,6 @@ trait HasCreator
         $creatorRecordModel = new ($this->getCreatorRecordModel());
         $creatorModel = new ($this->getCreatorModel());
 
-
         $companyModel = new Company;
         $query = Company::query()
             ->select($companyModel->getTable() . '.*')  // Only select company fields

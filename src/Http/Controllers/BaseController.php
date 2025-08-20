@@ -720,15 +720,19 @@ abstract class BaseController extends PanelController
                         case 'pgsql':
                             $segments = explode('.', $jsonPathDots);
                             $expr = $table . '.' . $jsonCol . " #>> '{" . implode(',', $segments) . "}'";
+
                             break;
                         case 'sqlsrv':
                             $expr = "JSON_VALUE($table.$jsonCol, '$.$jsonPathEsc')";
+
                             break;
                         case 'sqlite':
                             $expr = "json_extract($table.$jsonCol, '$.$jsonPathEsc')";
+
                             break;
                         default: // mysql / mariadb
                             $expr = "JSON_UNQUOTE(JSON_EXTRACT($table.$jsonCol, '$.$jsonPathEsc'))";
+
                             break;
                     }
 

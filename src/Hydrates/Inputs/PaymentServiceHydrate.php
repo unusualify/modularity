@@ -40,7 +40,7 @@ class PaymentServiceHydrate extends InputHydrate
             : [];
 
         $input['items'] = ! $this->skipQueries
-            ? PaymentService::isExternal()->orWhere(fn($query) => $query->isTransfer())->with('paymentCurrencies')->get()->toArray()
+            ? PaymentService::isExternal()->orWhere(fn ($query) => $query->isTransfer())->with('paymentCurrencies')->get()->toArray()
             : [];
 
         $paymentServices = ! $this->skipQueries

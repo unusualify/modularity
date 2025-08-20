@@ -109,8 +109,9 @@ trait StateableTrait
             ->sortBy(function ($state) use ($defaultStateCodes) {
                 return array_search($state->code, $defaultStateCodes);
             })
-            ->map(function ($state) use ($itemValue, $modelInstance ) {
+            ->map(function ($state) use ($itemValue, $modelInstance) {
                 $state = $modelInstance->hydrateState($state);
+
                 return [
                     'id' => $state->id,
                     $itemValue => $state->name,

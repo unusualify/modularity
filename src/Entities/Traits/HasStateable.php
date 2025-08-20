@@ -106,7 +106,7 @@ trait HasStateable
             'state_id'
         )
         // ->where(modularityConfig('tables.stateables', 'um_stateables') . '.is_active', 1)
-        ->where($stateableTable . '.stateable_type', get_class($this));
+            ->where($stateableTable . '.stateable_type', get_class($this));
     }
 
     public function stateable(): \Illuminate\Database\Eloquent\Relations\MorphOne
@@ -122,14 +122,14 @@ trait HasStateable
         $state->fill(Arr::only($stateConfig, ['icon', 'color']));
 
         // Set translation fields if they exist in configuration
-        if (!empty($stateConfig)) {
+        if (! empty($stateConfig)) {
             foreach (self::getStateableTranslationLanguages() as $locale) {
                 if (isset($stateConfig[$locale])) {
                     // Get or create translation for this locale
                     $findIndex = $state->translations->search(function ($translation) use ($locale) {
                         return $translation->locale === $locale;
                     });
-                    if($findIndex !== false){
+                    if ($findIndex !== false) {
                         // Fill translation with data from configuration
                         foreach ($stateConfig[$locale] as $field => $value) {
                             if (in_array($field, $state->getTranslatedAttributes())) {
@@ -290,7 +290,7 @@ trait HasStateable
                 if ($state === $code) {
                     break;
                 }
-            }elseif (is_array($state) && isset($state['code'])) {
+            } elseif (is_array($state) && isset($state['code'])) {
                 if ($state['code'] === $code) {
                     $state = $state;
 
@@ -438,7 +438,7 @@ trait HasStateable
         }
     }
 
-    public static function syncStateData() : array
+    public static function syncStateData(): array
     {
         $defaultStates = self::getDefaultStates();
         $defaultStateCodes = array_column($defaultStates, 'code');

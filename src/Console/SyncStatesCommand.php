@@ -11,11 +11,11 @@ class SyncStatesCommand extends BaseCommand
     protected $hidden = true;
 
     /**
-	 * The name and signature of the console command.
-	 *
-	 * @var string
-	 */
-	protected $signature = 'modularity:sync:states
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'modularity:sync:states
         {model? : The model to sync states}
     ';
 
@@ -46,13 +46,14 @@ class SyncStatesCommand extends BaseCommand
     public function handle(): int
     {
         // check model class exists if defined
-        if($this->argument('model')){
+        if ($this->argument('model')) {
             $model = $this->argument('model');
-            if(!class_exists($model)){
+            if (! class_exists($model)) {
                 $this->error($model . ' class does not exist');
+
                 return 1;
             }
-        }else{
+        } else {
             // get all stateable models
             $models = ModularityFinder::getModelsWithTrait(\Unusualify\Modularity\Entities\Traits\HasStateable::class);
 

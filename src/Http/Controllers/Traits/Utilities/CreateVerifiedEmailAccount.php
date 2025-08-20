@@ -116,7 +116,7 @@ trait CreateVerifiedEmailAccount
         $user = $this->setUserRegister($credentials);
 
         $company = Company::create([
-            'name' => $credentials['company'] ?? ''
+            'name' => $credentials['company'] ?? '',
         ]);
 
         $company->spread_payload = [

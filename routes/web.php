@@ -54,7 +54,7 @@ Route::prefix('api')->group(function () {
     Route::get('modal-service/{key}', function (Request $request, string $key) {
         $modalService = Session::get($key);
 
-        if (!$modalService) {
+        if (! $modalService) {
             return response()->json(['error' => 'Modal service data not found'], 404);
         }
 

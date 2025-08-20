@@ -43,7 +43,7 @@ trait TableColumns
                 $headers = call_user_func(static::$tableHeadersCallbacks[static::class], $headers->toArray());
             }
 
-            if(is_array($headers)) {
+            if (is_array($headers)) {
                 $headers = Collection::make($headers);
             }
 
@@ -65,7 +65,6 @@ trait TableColumns
     /**
      * Update the table headers
      *
-     * @param callable $callback
      * @return void
      */
     public static function updateTableHeaders(callable $callback)

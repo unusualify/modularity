@@ -6,7 +6,6 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 use Modules\SystemNotification\Events\PaymentCompleted;
@@ -39,12 +38,12 @@ class PriceController extends Controller
 
         $previousUrl = url()->previous();
 
-        if($price->payment && $price->payment->status == PaymentStatus::COMPLETED){
+        if ($price->payment && $price->payment->status == PaymentStatus::COMPLETED) {
             $modalService = modularity_modal_service('warning', 'mdi-alert-circle-outline', 'Paid Before', 'This price has already been paid! Please check the payment status.', [
                 'noCancelButton' => true,
             ]);
 
-            if($request->ajax()){
+            if ($request->ajax()) {
                 return response()->json([
                     'status' => MessageStage::ERROR,
                     'message' => 'Payment already completed',
@@ -78,16 +77,16 @@ class PriceController extends Controller
 
             $isTransfer = true;
             $request->validate([
-                'bank_receipt' => function($attribute, $value, $fail){
-                    if(!$value){
+                'bank_receipt' => function ($attribute, $value, $fail) {
+                    if (! $value) {
                         $fail('The bank receipt is required.');
                     }
 
-                    if(!is_array($value)){
+                    if (! is_array($value)) {
                         $fail('The bank receipt must be an array.');
                     }
 
-                    if(count($value) == 0){
+                    if (count($value) == 0) {
                         $fail('There must be at least one file.');
                     }
 
@@ -95,12 +94,12 @@ class PriceController extends Controller
                 'tos' => 'required|in:true,1',
             ]);
 
-            if(isset($params['currency_id'])){
+            if (isset($params['currency_id'])) {
                 $requestCurrencyIso4217 = PaymentCurrency::find($params['currency_id'])->iso_4217;
             }
 
-        } else if(!isset($params['payment_service'])) {
-            if($request->ajax()) {
+        } elseif (! isset($params['payment_service'])) {
+            if ($request->ajax()) {
                 return response()->json([
                     'status' => MessageStage::ERROR,
                     'message' => 'Not compatible payment service',
@@ -152,7 +151,7 @@ class PriceController extends Controller
             'exchange_rate' => $exchangeRate,
         ];
 
-        if(!$isTransfer){
+        if (! $isTransfer) {
             if (isset($params['payment_service']) && $params['payment_service']['payment_method'] == -1) {
                 $paymentCurrency = PaymentCurrency::find($currency->id);
                 $paymentService = $paymentCurrency->paymentService;
@@ -160,10 +159,10 @@ class PriceController extends Controller
                 if (! $paymentService) {
                     throw new \Exception('Payment service not found for currency ' . $paymentCurrency->iso_4217);
                 }
-            } else if(isset($params['payment_service'])){
+            } elseif (isset($params['payment_service'])) {
                 $paymentService = PaymentService::find($params['payment_service']['payment_method']);
             }
-        }  else {
+        } else {
             // get the url host
             $modularityPayload['previous_url'] = $request->header('referer');
 
@@ -198,7 +197,7 @@ class PriceController extends Controller
 
             PaymentCompleted::dispatch($payment);
 
-            if($request->ajax()){
+            if ($request->ajax()) {
                 return response()->json([
                     'status' => MessageStage::SUCCESS,
                     'message' => 'Payment created',
@@ -329,7 +328,7 @@ class PriceController extends Controller
         ]));
     }
 
-    protected function createModalBody(string $color = 'success', $icon = 'mdi-check-decagram-outline', string $title, string $description, array $modalProps = [])
+    protected function createModalBody(string $color, $icon, string $title, string $description, array $modalProps = [])
     {
         return Component::makeDiv()
             ->setElements([
@@ -362,7 +361,7 @@ class PriceController extends Controller
             ->render();
     }
 
-    protected function createModalService(string $color = 'success', $icon = 'mdi-check-decagram-outline', string $title, string $description, array $modalProps = [])
+    protected function createModalService(string $color, $icon, string $title, string $description, array $modalProps = [])
     {
         return [
             'component' => 'ue-recursive-stuff',

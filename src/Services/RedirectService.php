@@ -9,45 +9,48 @@ use Illuminate\Support\Facades\Session;
 
 final class RedirectService
 {
-	public const SESSION_KEY = 'modularity.redirect_url';
-	public const CACHE_KEY = 'modularity.redirect_url';
+    public const SESSION_KEY = 'modularity.redirect_url';
 
-	public function set(string $url, ?int $ttlSeconds = null, bool $useCache = false): void
-	{
-		if ($useCache) {
-			$ttl = $ttlSeconds ?? 600; // default 10 minutes
-			Cache::put(self::CACHE_KEY, $url, $ttl);
-			return;
-		}
+    public const CACHE_KEY = 'modularity.redirect_url';
 
-		Session::put(self::SESSION_KEY, $url);
-	}
+    public function set(string $url, ?int $ttlSeconds = null, bool $useCache = false): void
+    {
+        if ($useCache) {
+            $ttl = $ttlSeconds ?? 600; // default 10 minutes
+            Cache::put(self::CACHE_KEY, $url, $ttl);
 
-	public function get(): ?string
-	{
-		$url = Session::get(self::SESSION_KEY);
-		if (is_string($url) && $url !== '') {
-			return $url;
-		}
+            return;
+        }
 
-		$url = Cache::get(self::CACHE_KEY);
-		return is_string($url) && $url !== '' ? $url : null;
-	}
+        Session::put(self::SESSION_KEY, $url);
+    }
 
-	public function clear(): void
-	{
-		Session::forget(self::SESSION_KEY);
-		Cache::forget(self::CACHE_KEY);
-	}
+    public function get(): ?string
+    {
+        $url = Session::get(self::SESSION_KEY);
+        if (is_string($url) && $url !== '') {
+            return $url;
+        }
 
-	public function pull(): ?string
-	{
-		$url = $this->get();
+        $url = Cache::get(self::CACHE_KEY);
+
+        return is_string($url) && $url !== '' ? $url : null;
+    }
+
+    public function clear(): void
+    {
+        Session::forget(self::SESSION_KEY);
+        Cache::forget(self::CACHE_KEY);
+    }
+
+    public function pull(): ?string
+    {
+        $url = $this->get();
 
         if ($url !== null) {
-			$this->clear();
-		}
+            $this->clear();
+        }
 
         return $url;
-	}
+    }
 }
