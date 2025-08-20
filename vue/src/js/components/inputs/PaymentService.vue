@@ -80,7 +80,7 @@
       </v-col>
 
       <!-- Payment Form Section -->
-      <v-col class="px-0 d-flex align-center justify-center">
+      <v-col class="pa-4 pa-sm-0 d-flex align-center justify-center">
         <CreditCardForm v-if="isCreditCardForm"
           v-model:cardName="localCreditCard.card_name"
           v-model:cardNumber="localCreditCard.card_number"
