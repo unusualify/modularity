@@ -1,6 +1,8 @@
 <?php
 
+use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Session;
 use Unusualify\Modularity\Http\Controllers\ChatController;
 use Unusualify\Modularity\Http\Controllers\ProcessController;
 use Unusualify\Modularity\Http\Controllers\ProfileController;
@@ -49,6 +51,18 @@ Route::get('users/impersonate/{id}', 'ImpersonateController@impersonate')->name(
 
 // system internal api routes (for ajax web routes)
 Route::prefix('api')->group(function () {
+    Route::get('modal-service/{key}', function (Request $request, string $key) {
+        $modalService = Session::get($key);
+
+        if (!$modalService) {
+            return response()->json(['error' => 'Modal service data not found'], 404);
+        }
+
+        // Remove from session after retrieval to prevent reuse
+        Session::forget($key);
+
+        return response()->json(['modalService' => $modalService]);
+    })->name('modal_service.get');
     Route::group(['prefix' => 'chatable', 'as' => 'chatable.', 'controller' => ChatController::class], function () {
         Route::get('{chat}', 'index')->name('index');
         Route::get('{chat}/attachments', 'attachments')->name('attachments');
