@@ -69,11 +69,48 @@ export default {
     window.$modalService = service
 
     // Handle URL query parameters to open modals
-    const handleUrlQueryParameters = () => {
+    const handleUrlQueryParameters = async () => {
       const urlParams = new URLSearchParams(window.location.search)
       const modalParam = urlParams.get('modalService')
+      const modalServiceKey = urlParams.get('modalServiceKey')
 
-      const modalData = JSON.parse(modalParam)
+      let modalData = null
+
+      // Handle direct modalService parameter (legacy)
+      if (modalParam) {
+        try {
+          modalData = JSON.parse(modalParam)
+        } catch (error) {
+          console.error('Failed to parse modalService parameter:', error)
+          return
+        }
+      }
+
+      // Handle modalServiceKey parameter (session-based)
+      if (modalServiceKey) {
+        try {
+          const response = await fetch(`/api/modal-service/${modalServiceKey}`, {
+            method: 'GET',
+            headers: {
+              'Accept': 'application/json',
+              'X-Requested-With': 'XMLHttpRequest',
+              'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+            }
+          })
+
+          if (response.ok) {
+            const result = await response.json()
+            modalData = result.modalService
+          } else {
+            console.error('Failed to fetch modal service data from session')
+            return
+          }
+          removeParameterFromHistory('modalServiceKey')
+        } catch (error) {
+          console.error('Failed to fetch modal service data:', error)
+          return
+        }
+      }
 
       if (isObject(modalData)) {
         // Get all other parameters to pass as data
@@ -84,6 +121,7 @@ export default {
           // You'll need to implement this function to map modal names to components
           // const modalComponent = app.config.globalProperties.$modalComponents?.[modalParam]
 
+          console.log(modalData)
           service.open(modalData.component ?? null, omit(modalData, ['component']))
 
           removeParameterFromHistory('modalService')
