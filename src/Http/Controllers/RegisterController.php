@@ -29,6 +29,12 @@ class RegisterController extends Controller
 
     public function showForm()
     {
+        $emailVerifiedRegister = modularityConfig('email_verified_register');
+
+        if ($emailVerifiedRegister) {
+            return redirect()->route(Route::hasAdmin('register.email_form'));
+        }
+
         return view(modularityBaseKey() . '::auth.register', [
             'attributes' => [
                 'bannerDescription' => ___('authentication.banner-description'),
@@ -148,7 +154,21 @@ class RegisterController extends Controller
      */
     protected function register(Request $request)
     {
+        $emailVerifiedRegister = modularityConfig('email_verified_register');
+
+        if ($emailVerifiedRegister) {
+            return $request->wantsJson()
+                ? new JsonResponse([
+                    'variant' => MessageStage::ERROR,
+                    'message' => 'Restricted Registration',
+                    'redirector' => route(Route::hasAdmin('register.email_form')),
+                    'login_page' => route(Route::hasAdmin('login.form')),
+                ], 200)
+                : redirect()->route(Route::hasAdmin('register.email_form'));
+        }
+
         $validator = $this->validator($request->all());
+
 
         if ($validator->fails()) {
             return $request->wantsJson()
