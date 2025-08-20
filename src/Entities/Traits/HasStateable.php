@@ -90,9 +90,7 @@ trait HasStateable
             static::$stateModel,
             'id',
             'created_at'
-        )
-            ->orWhereIn('code', $defaultStateCodes);
-        // ->withPivot('is_active');
+        )->orWhereIn('code', $defaultStateCodes);
     }
 
     public function state(): \Illuminate\Database\Eloquent\Relations\HasOneThrough
@@ -108,12 +106,44 @@ trait HasStateable
             'state_id'
         )
         // ->where(modularityConfig('tables.stateables', 'um_stateables') . '.is_active', 1)
-            ->where($stateableTable . '.stateable_type', get_class($this));
+        ->where($stateableTable . '.stateable_type', get_class($this));
     }
 
     public function stateable(): \Illuminate\Database\Eloquent\Relations\MorphOne
     {
         return $this->morphOne(Stateable::class, 'stateable');
+    }
+
+    public function hydrateState(State $state)
+    {
+        $stateConfig = $this->getRawStateConfiguration($state->code);
+
+        // Fill with icon and color from configuration
+        $state->fill(Arr::only($stateConfig, ['icon', 'color']));
+
+        // Set translation fields if they exist in configuration
+        if (!empty($stateConfig)) {
+            foreach (self::getStateableTranslationLanguages() as $locale) {
+                if (isset($stateConfig[$locale])) {
+                    // Get or create translation for this locale
+                    $findIndex = $state->translations->search(function ($translation) use ($locale) {
+                        return $translation->locale === $locale;
+                    });
+                    if($findIndex !== false){
+                        // Fill translation with data from configuration
+                        foreach ($stateConfig[$locale] as $field => $value) {
+                            if (in_array($field, $state->getTranslatedAttributes())) {
+                                $state->translations[$findIndex]->setAttribute($field, $value);
+                            }
+                        }
+
+                    }
+
+                }
+            }
+        }
+
+        return $state;
     }
 
     /**
@@ -129,9 +159,7 @@ trait HasStateable
             return null;
         }
 
-        $originalState->fill($this->getStateConfiguration($originalState->code));
-
-        return $originalState;
+        return $this->hydrateState($originalState);
     }
 
     public static function getStateModel()
@@ -155,13 +183,14 @@ trait HasStateable
 
     protected function stateFormatted(): Attribute
     {
-        $state = $this->state;
+        // $state = $this->state;
+        $state = $this->getStateAttribute();
 
         return new Attribute(
             get: fn () => method_exists($this, 'setStateFormatted')
                 ? $this->setStateFormatted($state)
                 : ($state
-                    ? "<span class='text-{$state->color} mdi-{$state->icon}'>{$state->translatedAttribute('name')[app()->getLocale()]}</span>"
+                    ? "<span class='text-{$state->color} mdi-{$state->icon}'>{$state->name}</span>"
                     : "<span class='text-grey mdi-alert-circle-outline'>No State</span>")
         );
     }
@@ -252,7 +281,7 @@ trait HasStateable
         }, static::$default_states ?? []);
     }
 
-    public static function getStateConfiguration($code)
+    public static function getRawStateConfiguration($code)
     {
         $state = [];
 
@@ -261,7 +290,7 @@ trait HasStateable
                 if ($state === $code) {
                     break;
                 }
-            } elseif (is_array($state) && isset($state['code'])) {
+            }elseif (is_array($state) && isset($state['code'])) {
                 if ($state['code'] === $code) {
                     $state = $state;
 
@@ -269,6 +298,13 @@ trait HasStateable
                 }
             }
         }
+
+        return $state;
+    }
+
+    public static function getStateConfiguration($code)
+    {
+        $state = self::getRawStateConfiguration($code);
 
         return Arr::only($state, ['icon', 'color']);
     }

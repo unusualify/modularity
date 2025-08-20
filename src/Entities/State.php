@@ -53,6 +53,16 @@ class State extends Model
         throw new \Exception('State translation model not found');
     }
 
+    // public function getTranslation(?string $locale = null, ?bool $withFallback = null): ?Model
+    // {
+    //     // how to know whether the model is coming from a parent relationship or sole record
+    //     dd(
+    //         get_class_methods($this),
+    //     );
+
+    //     return parent::getTranslation($locale, $withFallback);
+    // }
+
     public function getTable()
     {
         return modularityConfig('tables.states', 'um_states');
