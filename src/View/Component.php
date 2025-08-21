@@ -8,6 +8,38 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\View\Component as LaravelComponent;
 use Unusualify\Modularity\Traits\ManageNames;
 
+/**
+ * The View Component class for creating dynamic Vue components from PHP
+ *
+ * Example usage with directives:
+ *
+ * // Create a component with directives
+ * $component = Component::make()
+ *     ->setTag('v-btn')
+ *     ->setAttributes(['color' => 'primary'])
+ *     ->addDirective('ripple')
+ *     ->addDirective('html', '<strong>Bold text</strong>')
+ *     ->setElements('Click me');
+ *
+ * // Or using the create method
+ * $component = Component::create([
+ *     'tag' => 'div',
+ *     'attributes' => ['class' => 'content'],
+ *     'directives' => [
+ *         'html' => '${html_message}$',
+ *         'show' => '${is_visible}$'
+ *     ],
+ *     'elements' => 'Default content'
+ * ]);
+ *
+ * // The rendered output will be:
+ * // {
+ * //   "tag": "div",
+ * //   "attributes": {"class": "content"},
+ * //   "directives": {"html": "${html_message}$", "show": "${is_visible}$"},
+ * //   "elements": "Default content"
+ * // }
+ */
 class Component extends LaravelComponent
 {
     use ManageNames;
@@ -242,6 +274,33 @@ class Component extends LaravelComponent
     public function setDirectives($directives)
     {
         $this->directives = $directives;
+
+        return $this;
+    }
+
+    /**
+     * Merge directives of the component
+     *
+     * @param array $directives
+     * @return self
+     */
+    public function mergeDirectives($directives)
+    {
+        $this->directives = array_merge($this->directives, $directives);
+
+        return $this;
+    }
+
+    /**
+     * Add a single directive to the component
+     *
+     * @param string $directive
+     * @param mixed $value
+     * @return self
+     */
+    public function addDirective($directive, $value = true)
+    {
+        $this->directives[$directive] = $value;
 
         return $this;
     }
