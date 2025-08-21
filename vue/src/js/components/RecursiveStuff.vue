@@ -12,6 +12,9 @@
       {{ castObjectAttributes(element.elements, bindData) }}
     </component>
   </template>
+  <!-- Use render function for components with directives -->
+  <component v-else-if="configuration.tag && hasDirectives" :is="renderComponentWithDirectives" />
+  <!-- Use template for components without directives -->
   <component v-else-if="configuration.tag"
       :is="configuration.tag"
       v-bind="{
@@ -51,17 +54,11 @@
         :bind-data="{...bindData, ...slotScope}"
       />
     </template>
-    <!-- <ue-recursive-stuff
-      v-for="(_configuration, i) in configuration.slots"
-      :key="`tag-${level}-${i}`"
-      :level="level+1"
-      :configuration="_configuration"
-    /> -->
   </component>
 </template>
 
 <script>
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted, resolveDirective, withDirectives, h, getCurrentInstance, vShow } from 'vue'
 import { reduce, get, cloneDeep, isArray, isString, isNumber } from 'lodash-es'
 
 import { useCastAttributes } from '@/hooks'
@@ -86,11 +83,9 @@ export default {
     },
   },
   setup (props, context) {
-    // const vFitGrid = resolveDirective('fit-grid')
-    // const directives = [vFitGrid];
-    // const directives = props.configuration.directives ? props.configuration.directives.map((v) => resolveDirective(v)) : []
-
     const { castObjectAttributes } = useCastAttributes()
+    const componentElement = ref(null)
+    const instance = getCurrentInstance()
 
     const FuncPattern = /^\{(.*)\}$/
     const CastPattern = /\$([\w|.|\_|\-]+)/
@@ -105,9 +100,6 @@ export default {
     function isTextable (value) {
       return isString(value) || isNumber(value)
     }
-    // function isArray (value) {
-    //   return Array.isArray(value, (value))
-    // }
 
     function hasSlot(value) {
       return value.hasOwnProperty('slots');
@@ -265,13 +257,162 @@ export default {
       return castObjectAttributes(elements, props.bindData)
     })
 
-    // const stringValue = computed(() => {
-    //   let bindData = props.bindData
+    // Check if component has directives
+    const hasDirectives = computed(() => {
+      return props.configuration.directives && Object.keys(props.configuration.directives).length > 0
+    })
 
-    //   return props.configuration.elements
-    // })
+    // Built-in Vue directives that don't need resolveDirective
+    const builtInDirectives = {
+      'html': true,
+      'text': true,
+      'show': true,
+      'if': true,
+      'else': true,
+      'else-if': true,
+      'for': true,
+      'on': true,
+      'bind': true,
+      'model': true,
+      'slot': true,
+      'pre': true,
+      'cloak': true,
+      'once': true
+    }
+
+    // Get built-in directives that can be applied with withDirectives
+    const builtInDirectivesForWithDirectives = computed(() => {
+      if (!props.configuration.directives) return []
+
+      const directives = []
+      Object.entries(props.configuration.directives).forEach(([directiveName, value]) => {
+        if (builtInDirectives.hasOwnProperty(directiveName)) {
+          if (directiveName === 'html') {
+            // For v-html, we need to create a custom directive-like object
+            directives.push([{
+              beforeMount(el, binding) {
+                el.innerHTML = binding.value
+              },
+              updated(el, binding) {
+                el.innerHTML = binding.value
+              }
+            }, applyCasting(value)])
+          } else if (directiveName === 'text') {
+            directives.push([{
+              beforeMount(el, binding) {
+                el.textContent = binding.value
+              },
+              updated(el, binding) {
+                el.textContent = binding.value
+              }
+            }, applyCasting(value)])
+          } else if (directiveName === 'show') {
+            directives.push([vShow, applyCasting(value)])
+          }
+          // Add other built-in directives as needed
+        }
+      })
+      return directives
+    })
+
+    // Get only custom directives for withDirectives
+    const customDirectives = computed(() => {
+      if (!props.configuration.directives) return []
+
+      return Object.entries(props.configuration.directives)
+        .filter(([directiveName]) => !builtInDirectives.hasOwnProperty(directiveName))
+        .map(([directiveName, value]) => {
+
+          try {
+            const directive = resolveDirective(directiveName)
+            let val = applyCasting(value)
+            return [directive, val]
+          } catch (error) {
+            console.error(`Custom directive '${directiveName}' could not be resolved:`, error)
+            return null
+          }
+
+        }).filter(Boolean)
+    })
+
+    // Combine all directives
+    const allDirectives = computed(() => {
+      return [...builtInDirectivesForWithDirectives.value, ...customDirectives.value]
+    })
+
+    // Separate built-in directives that should be handled as attributes (deprecated approach)
+    const builtInDirectiveAttributes = computed(() => {
+      return {} // We're now handling all directives properly with withDirectives
+    })
+
+    // Render component with directives using render function
+    const renderComponentWithDirectives = () => {
+      const componentAttributes = {
+        ...filteredAttributes,
+        ...bindAttributes.value,
+        ...castedAttributes.value,
+        ...builtInDirectiveAttributes.value
+      }
+
+      // Create child elements
+      const children = []
+
+      // Handle array elements
+      if (isArray(castedElements.value)) {
+        castedElements.value.forEach((_configuration, i) => {
+          children.push(
+            h('ue-recursive-stuff', {
+              key: `tag-${props.level}-${i}`,
+              level: props.level + 1,
+              configuration: _configuration,
+              'bind-data': props.bindData ?? {}
+            })
+          )
+        })
+      }
+      // Handle object elements
+      else if (isObject(castedElements.value)) {
+        children.push(
+          h('ue-recursive-stuff', {
+            key: `tag-${props.level}-object`,
+            level: props.level + 1,
+            configuration: castObjectAttributes(props.configuration.elements, props.bindData),
+            'bind-data': props.bindData ?? {}
+          })
+        )
+      }
+      // Handle text elements
+      else if (isTextable(castedElements.value)) {
+        children.push(applyCasting(castedElements.value))
+      }
+
+      // Handle slots
+      const slotElements = {}
+      Object.entries(slots.value).forEach(([slotName, slotConf]) => {
+        slotElements[slotName] = (slotScope = {}) =>
+          h('ue-recursive-stuff', {
+            level: props.level + 1,
+            configuration: slotConf,
+            'bind-data': {...props.bindData, ...slotScope}
+          })
+      })
+
+      // Create the base component
+      const component = h(
+        props.configuration.tag,
+        componentAttributes,
+        children.length > 0 ? children : slotElements
+      )
+
+      // Apply custom directives if they exist
+      if (allDirectives.value.length > 0) {
+        return withDirectives(component, allDirectives.value)
+      }
+
+      return component
+    }
+
     return {
-      // directives: props.configuration.directives ? props.configuration.directives.map((v) => resolveDirective(v)) : [],
       isTextable,
       isArray,
       isObject,
@@ -283,7 +424,10 @@ export default {
       castedAttributes,
       castedElements,
       bindAttributes,
-      slots
+      slots,
+      componentElement,
+      hasDirectives,
+      renderComponentWithDirectives
     }
   },
   data () {
@@ -292,7 +436,6 @@ export default {
     }
   },
   created () {
-
   }
 }
 </script>

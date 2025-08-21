@@ -127,16 +127,13 @@ return [
                         'props' => [
                             'configuration' => Component::makeDiv()
                                 ->setElements([
-                                    Component::makeUeTitle()
+                                    Component::makeDiv()
                                         ->setAttributes([
-                                            'tag' => 'div',
-                                            'type' => 'text-body-2',
-                                            // 'color' => 'primary',
-                                            'weight' => 'regular',
-                                            'transform' => 'none',
-                                            'justify' => 'center',
+                                            'class' => 'd-flex flex-column align-center justify-center',
                                         ])
-                                        ->setElements('${html_message}$'),
+                                        ->setDirectives([
+                                            'html' => '${html_message}$',
+                                        ]),
                                     Component::makeDiv()
                                         ->setAttributes([
                                             'class' => 'd-flex justify-center my-4',
@@ -178,16 +175,13 @@ return [
                         'props' => [
                             'configuration' => Component::makeDiv()
                                 ->setElements([
-                                    Component::makeUeTitle()
+                                    Component::makeDiv()
                                         ->setAttributes([
-                                            'tag' => 'div',
-                                            'type' => 'text-body-2',
-                                            // 'color' => 'primary',
-                                            'weight' => 'regular',
-                                            'transform' => 'none',
-                                            'justify' => 'center',
+                                            'class' => 'd-flex flex-column align-center justify-center',
                                         ])
-                                        ->setElements('${html_message}$'),
+                                        ->setDirectives([
+                                            'html' => '${html_message}$',
+                                        ]),
                                     Component::makeDiv()
                                         ->setAttributes([
                                             'class' => 'd-flex justify-center my-4',
