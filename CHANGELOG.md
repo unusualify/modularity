@@ -2,6 +2,21 @@
 
 All notable changes to `modularity` will be documented in this file
 
+## v0.42.2 - 2025-08-21
+
+### :rocket: Features
+
+- enhance dynamic Vue component creation and directive handling by @OoBook in https://github.com/unusualify/modularity/commit/5f659327e8991f381d42185a92d72a032f75ae1f
+
+### :recycle: Refactors
+
+- update component structure for improved directive handling by @OoBook in https://github.com/unusualify/modularity/commit/5fede90dab8bfea98d63e3348d3045d7508cfcbd
+
+### :package: Build
+
+- update build artifacts for v0.42.1 by @invalid-email-address in https://github.com/unusualify/modularity/commit/2a897b6f22c40c2f6db5a7f7248524aa18a1ce97
+- update build artifacts for v0.42.2 by @OoBook in https://github.com/unusualify/modularity/commit/3c3b7ccd2b810125d3e5702a72d8dfcfe1e17721
+
 ## v0.42.1 - 2025-08-20
 
 ### :wrench: Bug Fixes
