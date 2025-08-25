@@ -202,14 +202,14 @@ class PriceController extends Controller
                     'status' => MessageStage::SUCCESS,
                     'message' => 'Payment created',
                     'redirector' => merge_url_query($modularityPayload['previous_url'] ?? route('admin.dashboard'), [
-                        'modalService' => $this->createModalService($color, $icon, $title, $description, $modalProps),
+                        'modalService' => modularity_modal_service($color, $icon, $title, $description, $modalProps),
                     ]),
                     // 'payment' => $payment,
                 ]);
             }
 
             return redirect(merge_url_query($modularityPayload['previous_url'] ?? route('admin.dashboard'), [
-                'modalService' => $this->createModalService($color, $icon, $title, $description, $modalProps),
+                'modalService' => modularity_modal_service($color, $icon, $title, $description, $modalProps),
             ]));
         }
 
