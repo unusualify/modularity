@@ -3,13 +3,13 @@
     "file": "js/awesome-phonenumber.CPpBdrPW.js",
     "name": "awesome-phonenumber"
   },
-  "_datatable.331L3DPw.js": {
-    "file": "js/datatable.331L3DPw.js",
+  "_datatable.CgKbg1Hq.js": {
+    "file": "js/datatable.CgKbg1Hq.js",
     "name": "datatable",
     "imports": [
-      "_vendor.DPO5kOd2.js",
-      "_form.DOJneYbg.js",
-      "_vuetify.B1voXSYe.js"
+      "_vendor.BUpvGIn9.js",
+      "_form.qiqZm9_W.js",
+      "_vuetify.BNg_JC9m.js"
     ]
   },
   "_fine-uploader.C8t-Jhyu.js": {
@@ -20,20 +20,20 @@
     ]
   },
   "_form.!~{00a}~.js": {
-    "file": "css/form.DvesClfi.css",
+    "file": "css/form.DLT0As37.css",
     "src": "_form.!~{00a}~.js"
   },
-  "_form.DOJneYbg.js": {
-    "file": "js/form.DOJneYbg.js",
+  "_form.qiqZm9_W.js": {
+    "file": "js/form.qiqZm9_W.js",
     "name": "form",
     "imports": [
-      "_vendor.DPO5kOd2.js",
-      "_vuetify.B1voXSYe.js",
+      "_vendor.BUpvGIn9.js",
+      "_vuetify.BNg_JC9m.js",
       "_fine-uploader.C8t-Jhyu.js",
       "_awesome-phonenumber.CPpBdrPW.js"
     ],
     "css": [
-      "css/form.DvesClfi.css"
+      "css/form.DLT0As37.css"
     ],
     "assets": [
       "fonts/fa-brands-400.O7nZalfM.woff2",
@@ -50,8 +50,8 @@
       "fonts/materialdesignicons-webfont.jCYKvYgh.ttf"
     ]
   },
-  "_vendor.DPO5kOd2.js": {
-    "file": "js/vendor.DPO5kOd2.js",
+  "_vendor.BUpvGIn9.js": {
+    "file": "js/vendor.BUpvGIn9.js",
     "name": "vendor",
     "imports": [
       "_awesome-phonenumber.CPpBdrPW.js",
@@ -62,11 +62,11 @@
     "file": "css/vuetify.wWriebzW.css",
     "src": "_vuetify.!~{009}~.js"
   },
-  "_vuetify.B1voXSYe.js": {
-    "file": "js/vuetify.B1voXSYe.js",
+  "_vuetify.BNg_JC9m.js": {
+    "file": "js/vuetify.BNg_JC9m.js",
     "name": "vuetify",
     "imports": [
-      "_vendor.DPO5kOd2.js"
+      "_vendor.BUpvGIn9.js"
     ],
     "css": [
       "css/vuetify.wWriebzW.css"
@@ -125,71 +125,71 @@
     "src": "node_modules/@mdi/font/fonts/materialdesignicons-webfont.woff2"
   },
   "src/js/core-auth.js": {
-    "file": "entries/core-auth.f5qh9L70.js",
+    "file": "entries/core-auth.CcUU-QFL.js",
     "name": "core-auth",
     "src": "src/js/core-auth.js",
     "isEntry": true,
     "imports": [
-      "_vendor.DPO5kOd2.js",
-      "_form.DOJneYbg.js",
+      "_vendor.BUpvGIn9.js",
+      "_form.qiqZm9_W.js",
       "_awesome-phonenumber.CPpBdrPW.js",
       "_fine-uploader.C8t-Jhyu.js",
-      "_vuetify.B1voXSYe.js"
+      "_vuetify.BNg_JC9m.js"
     ]
   },
   "src/js/core-dashboard.js": {
-    "file": "entries/core-dashboard.Bo9PO4Hj.js",
+    "file": "entries/core-dashboard.DxvlZ5Yo.js",
     "name": "core-dashboard",
     "src": "src/js/core-dashboard.js",
     "isEntry": true,
     "imports": [
-      "_vendor.DPO5kOd2.js",
-      "_form.DOJneYbg.js",
-      "_datatable.331L3DPw.js",
+      "_vendor.BUpvGIn9.js",
+      "_form.qiqZm9_W.js",
+      "_datatable.CgKbg1Hq.js",
       "_awesome-phonenumber.CPpBdrPW.js",
       "_fine-uploader.C8t-Jhyu.js",
-      "_vuetify.B1voXSYe.js"
+      "_vuetify.BNg_JC9m.js"
     ]
   },
   "src/js/core-form.js": {
-    "file": "entries/core-form.CNnDltSM.js",
+    "file": "entries/core-form.jZOwa3Z3.js",
     "name": "core-form",
     "src": "src/js/core-form.js",
     "isEntry": true,
     "imports": [
-      "_vendor.DPO5kOd2.js",
-      "_form.DOJneYbg.js",
+      "_vendor.BUpvGIn9.js",
+      "_form.qiqZm9_W.js",
       "_awesome-phonenumber.CPpBdrPW.js",
       "_fine-uploader.C8t-Jhyu.js",
-      "_vuetify.B1voXSYe.js"
+      "_vuetify.BNg_JC9m.js"
     ]
   },
   "src/js/core-free.js": {
-    "file": "entries/core-free.B0D9X_DM.js",
+    "file": "entries/core-free.Cj6dKLOS.js",
     "name": "core-free",
     "src": "src/js/core-free.js",
     "isEntry": true,
     "imports": [
-      "_vendor.DPO5kOd2.js",
-      "_form.DOJneYbg.js",
-      "_datatable.331L3DPw.js",
-      "_awesome-phonenumber.CPpBdrPW.js",
+      "_form.qiqZm9_W.js",
+      "_vendor.BUpvGIn9.js",
+      "_datatable.CgKbg1Hq.js",
+      "_vuetify.BNg_JC9m.js",
       "_fine-uploader.C8t-Jhyu.js",
-      "_vuetify.B1voXSYe.js"
+      "_awesome-phonenumber.CPpBdrPW.js"
     ]
   },
   "src/js/core-index.js": {
-    "file": "entries/core-index.Dme9RyGD.js",
+    "file": "entries/core-index.CqFT6QK-.js",
     "name": "core-index",
     "src": "src/js/core-index.js",
     "isEntry": true,
     "imports": [
-      "_vendor.DPO5kOd2.js",
-      "_form.DOJneYbg.js",
-      "_datatable.331L3DPw.js",
+      "_vendor.BUpvGIn9.js",
+      "_form.qiqZm9_W.js",
+      "_datatable.CgKbg1Hq.js",
       "_awesome-phonenumber.CPpBdrPW.js",
       "_fine-uploader.C8t-Jhyu.js",
-      "_vuetify.B1voXSYe.js"
+      "_vuetify.BNg_JC9m.js"
     ]
   }
 }
