@@ -520,7 +520,7 @@ return [
             ],
             'col' => ['cols' => 12, 'lg' => 12],
             'rules' => 'min:8',
-            'validateOn' => 'lazy invalid-input',
+            'validateOn' => '',
         ],
         'password_confirmation' => [
             'type' => 'password',
@@ -533,7 +533,7 @@ return [
             ],
             'col' => ['cols' => 12, 'lg' => 12],
             'rules' => 'min:8',
-            'validateOn' => 'lazy invalid-input',
+            'validateOn' => '',
         ],
         'token' => [
             'type' => 'hidden',
