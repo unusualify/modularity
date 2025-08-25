@@ -11,6 +11,7 @@ use Unusualify\Modularity\Entities\Enums\ProcessStatus;
 class ProcessHistory extends Model
 {
     protected $fillable = [
+        'process_id',
         'status',
         'reason',
         'user_id',
