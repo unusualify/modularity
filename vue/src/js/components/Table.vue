@@ -734,24 +734,32 @@
           :key="`formatter-${i}`"
           v-slot:[`item.${col.key}`]="{ item }"
         >
-          <template v-if="col.formatter == 'edit' || col.formatter == 'activate'">
-            <v-tooltip :text="item[col.key]" :key="i">
+          <template v-if="col.formatterName == 'edit' || col.formatterName == 'activate'">
+            <v-tooltip :text="item[col.key]" :key="i" :disabled="col.isFormatting">
               <template v-slot:activator="{ props }">
                 <span
                   :key="i"
                   v-bind="props"
                   class="pa-0 justify-start text-none text-wrap text-primary darken-1 cursor-pointer"
-                  @click="itemAction(item, ...col.formatter)"
+                  @click="itemAction(item, col.formatterName)"
                 >
-                  {{ window.__isset(item[col.key]) ? window.__shorten(item[col.key], col?.textLength ?? 8) : '' }}
+                  <template v-if="col.isFormatting">
+                    <ue-recursive-stuff
+                      v-bind="handleFormatter(col.formatter, window.__shorten(item[col.key] ?? '', cellOptions.maxChars))"
+                    />
+                  </template>
+                  <template v-else>
+                    {{ window.__isset(item[col.key]) ? window.__shorten(item[col.key], col?.textLength ?? 8) : '' }}
+                  </template>
                 </span>
+
                 <template v-if="(col.hasCopy ?? false) || col.key.match(/^id|uuid$/)">
                   <ue-copy-text :text="item[col.key]" />
                 </template>
               </template>
             </v-tooltip>
           </template>
-          <template v-else-if="col.formatter == 'switch'">
+          <template v-else-if="col.formatterName == 'switch'">
             <v-switch
               :key="i"
               :model-value="item[col.key]"
@@ -764,7 +772,7 @@
               <template v-slot:label></template>
             </v-switch>
           </template>
-          <template v-else-if="col.formatter == 'dynamic'">
+          <template v-else-if="col.formatterName == 'dynamic'">
             <ue-dynamic-component-renderer
               :subject="item[col.key]"
               :key="item[col.key]"

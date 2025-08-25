@@ -27,6 +27,11 @@ export function globalError (component = null, error = { message: '', value: nul
         + document.location
         + '" target="_blank">login in another tab</a>',
     })
+  } else if(error?.value && error.value?.response && error.value.response?.data) {
+    window.vm.config.globalProperties.$notif({
+      message: error.value.response.data.message ?? 'An error occurred',
+      variant: error.value.response.data.variant ?? 'error'
+    })
   } else {
     window.vm.config.globalProperties.$notif({
       message: error.message,

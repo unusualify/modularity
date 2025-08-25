@@ -480,7 +480,7 @@ return [
             'col' => ['cols' => 12, 'lg' => 12],
             'readonly' => true,
             'clearable' => false,
-            'validateOn' => 'lazy input',
+            'validateOn' => 'input',
         ],
         'name' => [
             'type' => 'text',
@@ -489,7 +489,7 @@ return [
             'default' => '',
             'col' => ['cols' => 12, 'lg' => 12],
             'rules' => 'min:2',
-            'validateOn' => 'lazy input',
+            'validateOn' => 'input',
         ],
         'surname' => [
             'type' => 'text',
@@ -498,7 +498,7 @@ return [
             'default' => '',
             'col' => ['cols' => 12, 'lg' => 12],
             'rules' => 'min:2',
-            'validateOn' => 'lazy input',
+            'validateOn' => 'input',
         ],
         'company' => [
             'type' => 'text',
@@ -507,6 +507,7 @@ return [
             'default' => '',
             'col' => ['cols' => 12, 'lg' => 12],
             'rules' => 'min:2',
+            'validateOn' => 'input',
         ],
         'password' => [
             'type' => 'password',
@@ -519,6 +520,7 @@ return [
             ],
             'col' => ['cols' => 12, 'lg' => 12],
             'rules' => 'min:8',
+            'validateOn' => '',
         ],
         'password_confirmation' => [
             'type' => 'password',
@@ -531,6 +533,7 @@ return [
             ],
             'col' => ['cols' => 12, 'lg' => 12],
             'rules' => 'min:8',
+            'validateOn' => '',
         ],
         'token' => [
             'type' => 'hidden',

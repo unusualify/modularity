@@ -27,5 +27,8 @@ export const handleSuccessResponse = (response) => {
 }
 
 export const handleErrorResponse = (error) => {
-  __log(error)
+  if (error.response?.status === 403) {
+    window.$modalService.handleObject(error.response.data)
+  }
+  redirector(error.response.data, 1000)
 }
