@@ -1,6 +1,6 @@
 import { reactive, inject } from 'vue'
 import { isObject, omit } from 'lodash-es'
-import { removeParameterFromHistory } from '@/utils/pushState'
+import { removeParameterFromHistory, getParameters } from '@/utils/pushState'
 
 /**
  * Manages a single, global dialog state.
@@ -54,6 +54,90 @@ class ModalService {
       cb(returnData)
     }
   }
+
+  getModalServiceData(parameters) {
+    if(parameters.modalService) {
+      return parameters.modalService
+    }
+
+    return null
+  }
+
+  getModalServiceKey(parameters) {
+
+    if(parameters.modalServiceKey) {
+      return parameters.modalServiceKey
+    }
+
+    return null
+  }
+
+  async handleObject(parameters) {
+    const modalServiceKey = this.getModalServiceKey(parameters)
+    const modalServiceData = this.getModalServiceData(parameters)
+    let modalData = null
+    let openedModal = null
+
+    if(modalServiceKey) {
+      // Handle modalServiceKey parameter (session-based)
+      try {
+        const response = await fetch(`/api/modal-service/${modalServiceKey}`, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+          }
+        })
+
+        if (response.ok) {
+          const result = await response.json()
+          modalData = result.modalService
+        } else {
+          console.error('Failed to fetch modal service data from session')
+          return
+        }
+        removeParameterFromHistory('modalServiceKey')
+      } catch (error) {
+        console.error('Failed to fetch modal service data:', error)
+        return
+      }
+    }
+
+    if(!modalData && modalServiceData) {
+      try {
+        modalData = JSON.parse(modalServiceData)
+      } catch (error) {
+        console.error('Failed to parse modalService parameter:', error)
+        return
+      }
+    }
+
+    if (isObject(modalData)) {
+      // Get all other parameters to pass as data
+
+      // Dispatch modal opening based on the modal parameter
+      // This needs to be adapted based on how your modals are registered/loaded
+      try {
+        // You'll need to implement this function to map modal names to components
+        // const modalComponent = app.config.globalProperties.$modalComponents?.[modalParam]
+        this.open(modalData.component ?? null, omit(modalData, ['component']))
+
+        removeParameterFromHistory('modalService')
+
+      } catch (error) {
+        console.error('Failed to open modal from URL parameters:', error)
+      }
+    }
+
+    return null
+  }
+
+  async handleUrlQueryParameters(url = null) {
+    const urlParams = getParameters(url ?? window.location)
+
+    await this.handleObject(urlParams)
+  }
 }
 
 /**
@@ -68,72 +152,10 @@ export default {
     app.config.globalProperties.$modalService = service
     window.$modalService = service
 
-    // Handle URL query parameters to open modals
-    const handleUrlQueryParameters = async () => {
-      const urlParams = new URLSearchParams(window.location.search)
-      const modalParam = urlParams.get('modalService')
-      const modalServiceKey = urlParams.get('modalServiceKey')
-
-      let modalData = null
-
-      // Handle direct modalService parameter (legacy)
-      if (modalParam) {
-        try {
-          modalData = JSON.parse(modalParam)
-        } catch (error) {
-          console.error('Failed to parse modalService parameter:', error)
-          return
-        }
-      }
-
-      // Handle modalServiceKey parameter (session-based)
-      if (modalServiceKey) {
-        try {
-          const response = await fetch(`/api/modal-service/${modalServiceKey}`, {
-            method: 'GET',
-            headers: {
-              'Accept': 'application/json',
-              'X-Requested-With': 'XMLHttpRequest',
-              'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
-            }
-          })
-
-          if (response.ok) {
-            const result = await response.json()
-            modalData = result.modalService
-          } else {
-            console.error('Failed to fetch modal service data from session')
-            return
-          }
-          removeParameterFromHistory('modalServiceKey')
-        } catch (error) {
-          console.error('Failed to fetch modal service data:', error)
-          return
-        }
-      }
-
-      if (isObject(modalData)) {
-        // Get all other parameters to pass as data
-
-        // Dispatch modal opening based on the modal parameter
-        // This needs to be adapted based on how your modals are registered/loaded
-        try {
-          // You'll need to implement this function to map modal names to components
-          // const modalComponent = app.config.globalProperties.$modalComponents?.[modalParam]
-
-          console.log(modalData)
-          service.open(modalData.component ?? null, omit(modalData, ['component']))
-
-          removeParameterFromHistory('modalService')
-
-        } catch (error) {
-          console.error('Failed to open modal from URL parameters:', error)
-        }
-      }
-    }
-
     // Execute once the application is mounted
-    setTimeout(handleUrlQueryParameters, 0)
+    setTimeout(async () => {
+      await service.handleUrlQueryParameters()
+    }, 0)
 
   }
 }
