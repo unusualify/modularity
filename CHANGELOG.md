@@ -2,6 +2,29 @@
 
 All notable changes to `modularity` will be documented in this file
 
+## v0.43.0 - 2025-08-25
+
+### :rocket: Features
+
+- enhance modal handling with URL parameters by @OoBook in https://github.com/unusualify/modularity/commit/a979910fee094d033e65804a4dc03c564965b283
+
+### :wrench: Bug Fixes
+
+- update validation triggers for form fields by @OoBook in https://github.com/unusualify/modularity/commit/464017aa88762d2d30b12f96d47b2855db22ca5d
+- enhance global error handling notifications by @OoBook in https://github.com/unusualify/modularity/commit/6743fbe22fa34f9d54a717f746ec3808a7454fc0
+- improve error handling for 403 status by @OoBook in https://github.com/unusualify/modularity/commit/f71c41043e283a6aeff135bf50568eefadb276a7
+- remove validation triggers for password fields by @OoBook in https://github.com/unusualify/modularity/commit/fca871f6e9db79422187285e7cd2d733c5a20387
+
+### :recycle: Refactors
+
+- unify formatter handling and improve tooltip functionality by @OoBook in https://github.com/unusualify/modularity/commit/e9e4ce1a76b9cbf1d91da0b8b87512a3b7ccc8e3
+- replace createModalService with modularity_modal_service by @OoBook in https://github.com/unusualify/modularity/commit/768cbf40f698fc9389d14045b1a3d028e1572f03
+
+### :package: Build
+
+- update build artifacts for v0.42.2 by @invalid-email-address in https://github.com/unusualify/modularity/commit/9e8faa8f7d989e856140c061aad42b990df77db8
+- update build artifacts for v0.43.0 by @OoBook in https://github.com/unusualify/modularity/commit/b1c9d2267a1f007daa53048494515b348a56abc7
+
 ## v0.42.2 - 2025-08-21
 
 ### :rocket: Features
