@@ -226,10 +226,10 @@
           </template>
         </v-input-filepond>
 
-        <v-card-actions class="bg-surface" v-if="!noSendAction">
+        <v-card-actions class="bg-surface" v-if="!noSendAction" id="messageBox">
           <slot name="sending">
             <v-textarea
-              class="position-absolute bg-surface px-4 pb-4"
+              _class="position-absolute bg-surface px-4 pb-4"
               style="bottom: 0; left: 0; right: 0; z-index: 1000;"
               ref="messageBox"
               v-model="message"
@@ -444,6 +444,10 @@
       noEmoji: {
         type: Boolean,
         default: false
+      },
+      maxMessageboxRows: {
+        type: Number,
+        default: 5
       }
     },
     setup (props, context) {
@@ -527,6 +531,13 @@
           extraHeight += this.$jquery('#PinnedMessage').outerHeight(true);
         }
 
+        if(this.textareaRows > 0) {
+          const messageBoxHeight = this.$jquery('#messageBox').height();
+          console.log(messageBoxHeight)
+
+          extraHeight += this.textareaRows * 20;
+        }
+
         if(extraHeight > 0) {
           minusHeight = ` - ${extraHeight}px`;
         }
@@ -546,7 +557,6 @@
         },
         deep: true
       },
-
       attachments: {
         handler(newValue) {
           // console.log('Attachments changed:', newValue);
@@ -585,6 +595,17 @@
           }
         },
         deep: true
+      },
+      message: {
+        handler(newVal) {
+          if(newVal.includes('\n')) {
+            // count the number of \n in newVal
+            const count = (newVal.match(/\n/g) || []).length;
+            this.textareaRows = count > this.maxMessageboxRows ? this.maxMessageboxRows : count;
+          } else {
+            this.textareaRows = 1;
+          }
+        },
       }
     },
     methods: {
@@ -975,7 +996,7 @@
         // Log the update for debugging
         this.$log('update:modelValue', event);
       },
-            handleFileLoaded(file) {
+      handleFileLoaded(file) {
         // Handle when a file is loaded
         // console.log('File loaded:', file);
         // console.log('File details:', {
@@ -1031,14 +1052,12 @@
         // console.log('File upload error:', file);
         this.loadingAttachment = false;
       },
-
       // Handle when a file is added to filepond
       handleAddFile(file) {
         // console.log('File added to filepond:', file);
         // Set loading state when file is actually added
         this.loadingAttachment = true;
       },
-
       // Handle when a file is removed from filepond
       handleRemoveFile(file) {
         // console.log('File removed from filepond:', file);
@@ -1053,7 +1072,13 @@
       },
       handleFieldFocus() {
         // Expand textarea to 3 rows when any part of the field gets focus
-        this.textareaRows = 3;
+        // this.textareaRows = 3;
+        if(this.message.includes('\n')) {
+          let count = (this.message.match(/\n/g) || []).length;
+          this.textareaRows = count > this.maxMessageboxRows ? this.maxMessageboxRows : count;
+        } else {
+          this.textareaRows = 1;
+        }
       },
       handleFieldBlur() {
         // Use setTimeout to check if any other part of the field is focused
@@ -1069,7 +1094,6 @@
           }
         }, 100);
       },
-
       // Focus on textarea after file upload completion
       focusOnTextarea() {
         if (this.$refs.messageBox) {
@@ -1079,9 +1103,6 @@
           // console.log('Textarea ref not found for focus');
         }
       }
-    },
-    created() {
-
     },
     mounted() {
 
