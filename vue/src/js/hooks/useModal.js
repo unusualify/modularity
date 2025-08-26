@@ -26,6 +26,18 @@ export const makeModalProps = propsFactory({
     type: String,
     default: null
   },
+  titleClass: {
+    type: String,
+    default: ''
+  },
+  titlePadding: {
+    type: String,
+    default: 'a-4'
+  },
+  titleJustify: {
+    type: String,
+    default: 'space-between'
+  },
   hasCloseButton: {
     type: Boolean,
     default: false
@@ -57,6 +69,10 @@ export const makeModalProps = propsFactory({
   description: {
     type: String,
     default: null
+  },
+  descriptionBodyClass: {
+    type: String, Array,
+    default: 'd-flex justify-center'
   },
   transition: {
     type: String,
@@ -125,7 +141,6 @@ export const makeModalProps = propsFactory({
       variant: 'elevated',
     })
   },
-
   confirmClosing: {
     type: Boolean,
     default: true

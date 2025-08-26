@@ -47,8 +47,8 @@
             :closeDialog="close"
           >
           <v-card >
-            <v-card-title v-if="title" class="text-h5 text-center" style="word-break: break-word;">
-              <ue-title justify="space-between" padding="y-2">
+            <div v-if="title" class="text-h5 text-center" style="word-break: break-word;">
+              <ue-title :justify="titleJustify" :padding="titlePadding" :class="titleClass">
                 {{ title }}
                 <template #right>
                   <div class="d-flex align-center">
@@ -58,14 +58,14 @@
                 </template>
               </ue-title>
               <v-divider v-if="hasTitleDivider"/>
-            </v-card-title>
-            <v-card-text v-if="description || $slots['body.description']" class="d-flex justify-center" style="word-break: break-word;" :class="{'pa-0': noDefaultBodyPadding}">
+            </div>
+            <v-card-text v-if="description || $slots['body.description']" :class="[descriptionBodyClass, {'pa-0': noDefaultBodyPadding}]" style="word-break: break-word;">
               <slot name="body.description" v-bind="{description}">
                 <div v-html="description" />
               </slot>
             </v-card-text>
             <template v-if="!noActions">
-              <v-divider/>
+              <v-divider class="my-2"/>
               <v-card-actions>
                 <slot name="body.options" v-bind="{description}">
                   <v-spacer/>
