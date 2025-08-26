@@ -80,6 +80,7 @@ return [
         'name' => 'published',
         'label' => 'Status',
         'default' => true,
+        'density' => 'compact',
     ],
     '_timezone' => [
         'type' => 'hidden',
