@@ -224,9 +224,14 @@ trait PaymentTrait
         ];
     }
 
-    public function getFormActionsConditionsForPayment()
+    public function getFormActionsConditionsForPayment(): array
     {
         return method_exists($this->model, 'getFormActionsConditionsForPayment') ? $this->model->getFormActionsConditionsForPayment() : [];
+    }
+
+    public function getFormActionPropsForPaymentTrait(): array
+    {
+        return method_exists($this->model, 'getFormActionPropsForPaymentTrait') ? $this->model->getFormActionPropsForPaymentTrait() : [];
     }
 
     public function getFormActionsPaymentTrait($scope = [])
@@ -254,7 +259,7 @@ trait PaymentTrait
                         'price_object' => '${payment_price}$',
                     ],
                 ]),
-                'formTitle' => __('Complete Payment'),
+                // 'formTitle' => __('Complete Payment'),
                 'formAttributes' => [
                     'hasSubmit' => false,
                     'hasDivider' => false,
@@ -264,12 +269,15 @@ trait PaymentTrait
                 'creatable' => false,
                 'isEditing' => false,
                 'modalAttributes' => [
+                    'title' => __('Complete Payment'),
                     'widthType' => 'lg',
+                    'persistent' => true,
                 ],
                 'conditions' => array_merge($this->getFormActionsConditionsForPayment(), [
                     ['payment.status', 'not in', [PaymentStatus::COMPLETED]],
                 ]),
                 'hideOnCondition' => true,
+                ...$this->getFormActionPropsForPaymentTrait(),
             ],
         ];
     }

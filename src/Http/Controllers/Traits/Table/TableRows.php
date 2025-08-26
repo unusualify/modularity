@@ -32,20 +32,12 @@ trait TableRows
                     // 'can' => 'pay',
                     // 'color' => 'red darken-2',
                     'color' => 'success',
+                    'modalAttributes' => [
+                        'title' => __('PAYMENT AND INVOICES'),
+                        'hasTitleDivider' => true,
+                    ],
                     'form' => [
                         'attributes' => [
-                            'title' => [
-                                'text' => 'PAYMENT AND INVOICES',
-                                'tag' => 'div',
-                                // 'type' => 'p',
-                                'weight' => 'medium',
-                                'align' => 'center',
-                                'justify' => 'space-between',
-                                'margin' => 'a-2',
-                                'color' => 'default',
-                                'classes' => 'justify-content-between',
-                            ],
-                            // 'systembar' => true,
                             'schema' => $this->createFormSchema($this->repository->getPaymentFormSchema()),
                             'actionUrl' => route('admin.system.system_payment.payment'),
                             'async' => false,
