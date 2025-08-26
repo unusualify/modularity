@@ -9,7 +9,7 @@ return new class extends Migration
 {
     public function up()
     {
-        $modularitySpreadsTable = modularityConfig('tables.spreads', 'modularity_spreads');
+        $modularitySpreadsTable = modularityConfig('tables.spreads', 'um_spreads');
 
         if (! Schema::hasTable($modularitySpreadsTable)) {
             Schema::create($modularitySpreadsTable, function (Blueprint $table) {
@@ -26,6 +26,6 @@ return new class extends Migration
 
     public function down()
     {
-        Schema::dropIfExists(modularityConfig('tables.spreads', 'modularity_spreads'));
+        Schema::dropIfExists(modularityConfig('tables.spreads', 'um_spreads'));
     }
 };

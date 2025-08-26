@@ -55,14 +55,17 @@ class Assignment extends Model
 
         'due_at' => 'datetime',
         'completed_at' => 'datetime',
+        'accepted_at' => 'datetime',
     ];
 
     public static function booted()
     {
         static::creating(function ($assignment) {
-            $guard = Auth::guard();
-            $assignment->assigner_id = $guard->id();
-            $assignment->assigner_type = get_class(auth()->user());
+            if (Auth::check()) {
+                $guard = Auth::guard();
+                $assignment->assigner_id = $assignment->assigner_id ?? $guard->id();
+                $assignment->assigner_type = $assignment->assigner_type ?? get_class(Auth::user());
+            }
         });
 
         static::created(function ($assignment) {

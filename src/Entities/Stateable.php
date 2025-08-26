@@ -15,9 +15,6 @@ class Stateable extends Model
         'state_id',
         'stateable_id',
         'stateable_type',
-        // 'color',
-        // 'icon',
-        'is_active',
     ];
 
     public $timestamps = false;

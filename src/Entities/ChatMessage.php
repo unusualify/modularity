@@ -21,6 +21,7 @@ class ChatMessage extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        'chat_id',
         'content',
         'is_read',
         'is_starred',

@@ -210,6 +210,12 @@ export default function useTableItemActions(props, { tableForms, loadItems }) {
       }
     }
 
+    if(action.hasOwnProperty('modalAttributes')){
+      tableForms.customFormModalAttributes.value = _.cloneDeep(action.modalAttributes)
+    } else {
+      tableForms.customFormModalAttributes.value = {}
+    }
+
     tableForms.customFormModalActive.value = true
     actionEvents.event = 'showCustomForm'
     actionEvents.payload = { action, item }

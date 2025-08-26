@@ -17,7 +17,7 @@ namespace Unusualify\Modularity\Entities;
 class Repeater extends Model
 {
     protected $fillable = [
-        'repatable_id',
+        'repeatable_id',
         'content',
         'repeatable_type',
         'role',

@@ -12,8 +12,8 @@ class Spread extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
-        'published',
+        'spreadable_id',
+        'spreadable_type',
         'content',
     ];
 
@@ -21,15 +21,13 @@ class Spread extends Model
         'content' => 'array',
     ];
 
-    // protected function casts(): array
-    // {
-    //     return [
-    //         'json' => 'object',
-    //     ];
-    // }
+    public function spreadable(): \Illuminate\Database\Eloquent\Relations\MorphTo
+    {
+        return $this->morphTo();
+    }
 
     public function getTable()
     {
-        return modularityConfig('tables.spreads', 'modularity_spreads');
+        return modularityConfig('tables.spreads', 'um_spreads');
     }
 }

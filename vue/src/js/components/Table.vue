@@ -469,28 +469,35 @@
             <ue-modal v-model="customFormModalActive"
               ref="customFormModal"
               :width-type="'lg'"
+              v-bind="customFormModalAttributes"
               persistent
+              description-body-class="d-flex flex-column fill-height w-100 px-4"
+              no-default-body-padding
+              no-actions
+              has-close-button
+
             >
               <!-- <slot name="systembar">
                 test
               </slot> -->
-              <ue-form
-                ref="customForm"
-                v-model="customFormModel"
-                v-bind="customFormAttributes"
-                fill-height
-                scrollable
-                has-divider
-                no-default-form-padding
-                form-class="px-6 pb-0"
-                style="height: 90vh !important;"
-              >
-                <template v-slot:header.right>
-                  <v-btn class="ml-auto" variant="text" icon="$close" density="compact" color="deafult"
-                    @click="customFormModalActive = false"
-                  ></v-btn>
-                </template>
-              </ue-form>
+              <template v-slot:body.description>
+                <ue-form
+                  ref="customForm"
+                  v-model="customFormModel"
+                  v-bind="customFormAttributes"
+                  :title="null"
+                  fill-height
+                  scrollable
+                  no-default-form-padding
+                  style="height: 80vh !important;"
+                >
+                  <!-- <template v-slot:header.right>
+                    <v-btn class="ml-auto" variant="text" icon="$close" density="compact" color="deafult"
+                      @click="customFormModalActive = false"
+                    ></v-btn>
+                  </template> -->
+                </ue-form>
+              </template>
             </ue-modal>
 
           </div>
