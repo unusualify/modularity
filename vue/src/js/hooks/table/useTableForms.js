@@ -57,6 +57,7 @@ export default function useTableForms(props, context) {
   const customFormModalActive = ref(false)
 
   // Form state
+  const customFormModalAttributes = ref({})
   const customFormAttributes = ref({})
   const customFormSchema = ref({})
   const customFormModel = ref({})
@@ -66,6 +67,7 @@ export default function useTableForms(props, context) {
     formActive,
     customFormModalActive,
 
+    customFormModalAttributes,
     customFormAttributes,
     customFormSchema,
     customFormModel,
@@ -118,8 +120,8 @@ export default function useTableForms(props, context) {
   }
 
   const handleFormSubmission = (data) => {
-    if (Object.prototype.hasOwnProperty.call(data, 'variant') &&
-        data.variant.toLowerCase() === 'success') {
+    if (Object.prototype.hasOwnProperty.call(data, 'variant')
+      && data.variant.toLowerCase() === 'success') {
       closeForm()
       context.loadItems()
     }
