@@ -23,8 +23,14 @@
             :close-on-content-click="false"
             transition="scale-transition"
             widthType="md"
-            :use-model-value="false"
             v-bind="action.modalAttributes ?? {}"
+            :use-model-value="false"
+            no-actions
+            description-body-class="d-flex flex-column fill-height w-100"
+            no-default-body-padding
+            has-close-button
+            has-fullscreen-button
+            has-title-divider
           >
             <template v-slot:activator="modalActivatorScope">
               <v-badge v-if="isBadge(action)"
@@ -47,35 +53,34 @@
               />
             </template>
 
-            <template v-slot:body="formModalBodyScope">
-              <v-card class="fill-height d-flex flex-column">
-                <ue-form
-                  :ref="`extra-form-${key}`"
+            <template v-slot:body.description="formModalBodyScope">
+              <ue-form
+                :ref="`extra-form-${key}`"
 
-                  :modelValue="createModel(action.schema, action)"
-                  :title="action.formTitle ?? null"
-                  :schema="action.schema"
-                  :action-url="action.endpoint.replace(':id', modelValue.id)"
-                  :valid="valids[key]"
-                  :is-editing="action.isEditing ?? isEditing"
+                :modelValue="createModel(action.schema, action)"
+                :title="action.formTitle ?? null"
+                :schema="action.schema"
+                :action-url="action.endpoint.replace(':id', modelValue.id)"
+                :valid="valids[key]"
+                :is-editing="action.isEditing ?? isEditing"
 
-                  :style="formModalBodyScope.isFullActive ? 'height: 90vh !important;' : 'height: 70vh !important;'"
+                class="w-100"
+                :style="formModalBodyScope.isFullActive ? 'height: 90vh !important;' : 'height: 70vh !important;'"
 
-                  fill-height
-                  scrollable
+                fill-height
+                scrollable
 
-                  has-divider
-                  has-submit
-                  button-text="Save"
+                has-divider
+                has-submit
+                button-text="Save"
 
-                  @submitted="$emit('actionComplete', { action })"
-                  @update:valid="valids[key] = $event"
+                @submitted="$emit('actionComplete', { action })"
+                @update:valid="valids[key] = $event"
 
-                  @updatex:modelValue="$log($event)"
+                @updatex:modelValue="$log($event)"
 
-                  v-bind="action.formAttributes ?? {}"
-                />
-              </v-card>
+                v-bind="action.formAttributes ?? {}"
+              />
             </template>
 
           </ue-modal>
