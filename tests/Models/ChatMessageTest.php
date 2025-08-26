@@ -3,8 +3,8 @@
 namespace Unusualify\Modularity\Tests\Models;
 
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Unusualify\Modularity\Entities\Chat;
 use Unusualify\Modularity\Entities\ChatMessage;
 use Unusualify\Modularity\Entities\User;
@@ -96,6 +96,7 @@ class ChatMessageTest extends ModelTestCase
         $this->assertTrue($chatMessage->is_sent);
         $this->assertFalse($chatMessage->is_received);
     }
+
     public function test_update_chat_message()
     {
         $user = User::factory()->create();

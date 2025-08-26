@@ -50,8 +50,8 @@ class SingletonTest extends ModelTestCase
             'tagline' => 'Welcome to our site',
             'settings' => [
                 'maintenance_mode' => false,
-                'max_users' => 1000
-            ]
+                'max_users' => 1000,
+            ],
         ];
 
         $singleton = Singleton::create([
@@ -67,13 +67,13 @@ class SingletonTest extends ModelTestCase
     {
         $initialContent = [
             'site_name' => 'Initial Site',
-            'theme' => 'light'
+            'theme' => 'light',
         ];
 
         $updatedContent = [
             'site_name' => 'Updated Site',
             'theme' => 'dark',
-            'features' => ['feature1', 'feature2']
+            'features' => ['feature1', 'feature2'],
         ];
 
         $singleton = Singleton::create([
@@ -138,19 +138,19 @@ class SingletonTest extends ModelTestCase
                 'features' => [
                     'user_management' => true,
                     'notifications' => false,
-                    'analytics' => true
-                ]
+                    'analytics' => true,
+                ],
             ],
             'ui_settings' => [
                 'theme' => 'dark',
                 'language' => 'en',
-                'timezone' => 'UTC'
+                'timezone' => 'UTC',
             ],
             'integrations' => [
                 'payment' => ['stripe', 'paypal'],
                 'email' => 'mailgun',
-                'storage' => 's3'
-            ]
+                'storage' => 's3',
+            ],
         ];
 
         $singleton = Singleton::create([
@@ -174,7 +174,7 @@ class SingletonTest extends ModelTestCase
             'api_config' => ['base_url' => 'https://api.example.com', 'timeout' => 30],
             'email_settings' => ['smtp_host' => 'mail.example.com', 'port' => 587],
             'seo_config' => ['meta_title' => 'SEO Title', 'meta_description' => 'SEO Description'],
-            'social_media' => ['facebook' => 'fb_page', 'twitter' => 'twitter_handle']
+            'social_media' => ['facebook' => 'fb_page', 'twitter' => 'twitter_handle'],
         ];
 
         $singletons = [];
@@ -232,40 +232,40 @@ class SingletonTest extends ModelTestCase
                 'name' => 'My CMS',
                 'version' => '2.1.0',
                 'environment' => 'production',
-                'debug' => false
+                'debug' => false,
             ],
             'database' => [
                 'connections' => [
                     'mysql' => [
                         'host' => 'localhost',
                         'port' => 3306,
-                        'database' => 'cms_db'
+                        'database' => 'cms_db',
                     ],
                     'redis' => [
                         'host' => 'localhost',
                         'port' => 6379,
-                        'database' => 0
-                    ]
-                ]
+                        'database' => 0,
+                    ],
+                ],
             ],
             'services' => [
                 'mail' => [
                     'driver' => 'smtp',
                     'host' => 'smtp.example.com',
                     'port' => 587,
-                    'encryption' => 'tls'
+                    'encryption' => 'tls',
                 ],
                 'queue' => [
                     'driver' => 'redis',
-                    'retry_after' => 90
-                ]
+                    'retry_after' => 90,
+                ],
             ],
             'features' => [
                 'user_registration' => true,
                 'email_verification' => true,
                 'two_factor_auth' => false,
-                'api_rate_limiting' => true
-            ]
+                'api_rate_limiting' => true,
+            ],
         ];
 
         $singleton = Singleton::create([
@@ -290,9 +290,9 @@ class SingletonTest extends ModelTestCase
                 'theme' => 'light',
                 'notifications' => [
                     'email' => true,
-                    'push' => false
+                    'push' => false,
                 ],
-                'features' => ['feature1', 'feature2']
+                'features' => ['feature1', 'feature2'],
             ],
         ]);
 
@@ -369,13 +369,13 @@ class SingletonTest extends ModelTestCase
             'settings' => [
                 'debug' => true,
                 'cache_enabled' => false,
-                'features' => ['auth', 'api', 'admin']
+                'features' => ['auth', 'api', 'admin'],
             ],
             'metadata' => [
                 'created_by' => 'system',
                 'last_updated' => '2024-01-01',
-                'version' => '1.0.0'
-            ]
+                'version' => '1.0.0',
+            ],
         ];
 
         $singleton = Singleton::create([
@@ -404,23 +404,23 @@ class SingletonTest extends ModelTestCase
                 'default' => 'mysql',
                 'connections' => [
                     'mysql' => ['host' => 'localhost', 'database' => 'app_db'],
-                    'sqlite' => ['database' => 'storage/database.sqlite']
-                ]
+                    'sqlite' => ['database' => 'storage/database.sqlite'],
+                ],
             ],
             'mail_config' => [
                 'default' => 'smtp',
                 'mailers' => [
                     'smtp' => ['transport' => 'smtp', 'host' => 'localhost'],
-                    'log' => ['transport' => 'log']
-                ]
+                    'log' => ['transport' => 'log'],
+                ],
             ],
             'cache_config' => [
                 'default' => 'redis',
                 'stores' => [
                     'redis' => ['driver' => 'redis', 'connection' => 'cache'],
-                    'file' => ['driver' => 'file', 'path' => 'storage/cache']
-                ]
-            ]
+                    'file' => ['driver' => 'file', 'path' => 'storage/cache'],
+                ],
+            ],
         ];
 
         $singletons = [];
@@ -450,7 +450,7 @@ class SingletonTest extends ModelTestCase
             'content' => [
                 'new_ui' => false,
                 'beta_features' => false,
-                'maintenance_mode' => false
+                'maintenance_mode' => false,
             ],
         ]);
 

@@ -2,8 +2,8 @@
 
 namespace Unusualify\Modularity\Tests\Models;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Unusualify\Modularity\Entities\Spread;
 use Unusualify\Modularity\Entities\User;
@@ -55,7 +55,7 @@ class SpreadTest extends ModelTestCase
             'sections' => [
                 ['type' => 'hero', 'data' => ['image' => 'hero.jpg', 'text' => 'Hero text']],
                 ['type' => 'features', 'data' => ['items' => ['Feature 1', 'Feature 2']]],
-            ]
+            ],
         ];
 
         $spread = Spread::create([
@@ -74,7 +74,7 @@ class SpreadTest extends ModelTestCase
         $user = User::factory()->create();
         $initialContent = [
             'title' => 'Initial Title',
-            'sections' => [['type' => 'intro', 'data' => ['text' => 'Initial text']]]
+            'sections' => [['type' => 'intro', 'data' => ['text' => 'Initial text']]],
         ];
 
         $updatedContent = [
@@ -82,8 +82,8 @@ class SpreadTest extends ModelTestCase
             'subtitle' => 'New Subtitle',
             'sections' => [
                 ['type' => 'intro', 'data' => ['text' => 'Updated text']],
-                ['type' => 'gallery', 'data' => ['images' => ['img1.jpg', 'img2.jpg']]]
-            ]
+                ['type' => 'gallery', 'data' => ['images' => ['img1.jpg', 'img2.jpg']]],
+            ],
         ];
 
         $spread = Spread::create([
@@ -174,7 +174,7 @@ class SpreadTest extends ModelTestCase
             'page_settings' => [
                 'layout' => 'full-width',
                 'theme' => 'dark',
-                'animations' => true
+                'animations' => true,
             ],
             'sections' => [
                 [
@@ -185,9 +185,9 @@ class SpreadTest extends ModelTestCase
                         'background' => 'hero-bg.jpg',
                         'buttons' => [
                             ['text' => 'Get Started', 'url' => '/start'],
-                            ['text' => 'Learn More', 'url' => '/learn']
-                        ]
-                    ]
+                            ['text' => 'Learn More', 'url' => '/learn'],
+                        ],
+                    ],
                 ],
                 [
                     'type' => 'features',
@@ -195,16 +195,16 @@ class SpreadTest extends ModelTestCase
                         'title' => 'Our Features',
                         'items' => [
                             ['icon' => 'mdi-rocket', 'title' => 'Fast', 'description' => 'Lightning fast'],
-                            ['icon' => 'mdi-shield', 'title' => 'Secure', 'description' => 'Bank-level security']
-                        ]
-                    ]
-                ]
+                            ['icon' => 'mdi-shield', 'title' => 'Secure', 'description' => 'Bank-level security'],
+                        ],
+                    ],
+                ],
             ],
             'meta' => [
                 'seo_title' => 'Page Title',
                 'seo_description' => 'Page Description',
-                'og_image' => 'og-image.jpg'
-            ]
+                'og_image' => 'og-image.jpg',
+            ],
         ];
 
         $spread = Spread::create([
@@ -254,7 +254,7 @@ class SpreadTest extends ModelTestCase
                 'sections' => [
                     ['type' => 'hero', 'data' => ['title' => 'Welcome Home']],
                     ['type' => 'features', 'data' => ['items' => ['Feature 1', 'Feature 2']]],
-                ]
+                ],
             ],
         ]);
 
@@ -266,7 +266,7 @@ class SpreadTest extends ModelTestCase
                 'sections' => [
                     ['type' => 'story', 'data' => ['title' => 'Our Story']],
                     ['type' => 'team', 'data' => ['members' => ['John', 'Jane']]],
-                ]
+                ],
             ],
         ]);
 
@@ -284,7 +284,7 @@ class SpreadTest extends ModelTestCase
             'settings' => [
                 'layout' => 'landing',
                 'full_width' => true,
-                'sticky_header' => true
+                'sticky_header' => true,
             ],
             'sections' => [
                 [
@@ -299,9 +299,9 @@ class SpreadTest extends ModelTestCase
                         'features' => [
                             'Easy to use',
                             'Secure & reliable',
-                            '24/7 support'
-                        ]
-                    ]
+                            '24/7 support',
+                        ],
+                    ],
                 ],
                 [
                     'type' => 'testimonials',
@@ -314,17 +314,17 @@ class SpreadTest extends ModelTestCase
                                 'company' => 'Tech Corp',
                                 'quote' => 'Amazing service and support!',
                                 'rating' => 5,
-                                'avatar' => 'john.jpg'
+                                'avatar' => 'john.jpg',
                             ],
                             [
                                 'name' => 'Jane Doe',
                                 'company' => 'Innovation Inc',
                                 'quote' => 'Transformed our workflow completely.',
                                 'rating' => 5,
-                                'avatar' => 'jane.jpg'
-                            ]
-                        ]
-                    ]
+                                'avatar' => 'jane.jpg',
+                            ],
+                        ],
+                    ],
                 ],
                 [
                     'type' => 'pricing',
@@ -336,18 +336,18 @@ class SpreadTest extends ModelTestCase
                                 'name' => 'Starter',
                                 'price' => 29,
                                 'features' => ['Feature 1', 'Feature 2'],
-                                'popular' => false
+                                'popular' => false,
                             ],
                             [
                                 'name' => 'Pro',
                                 'price' => 99,
                                 'features' => ['All Starter features', 'Feature 3', 'Feature 4'],
-                                'popular' => true
-                            ]
-                        ]
-                    ]
-                ]
-            ]
+                                'popular' => true,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
         ];
 
         $spread = Spread::create([
@@ -378,9 +378,9 @@ class SpreadTest extends ModelTestCase
                 'title' => 'Original Title',
                 'sections' => [
                     ['type' => 'intro', 'data' => ['text' => 'Original text']],
-                    ['type' => 'gallery', 'data' => ['images' => ['img1.jpg']]]
+                    ['type' => 'gallery', 'data' => ['images' => ['img1.jpg']]],
                 ],
-                'settings' => ['theme' => 'light']
+                'settings' => ['theme' => 'light'],
             ],
         ]);
 
@@ -456,12 +456,12 @@ class SpreadTest extends ModelTestCase
                     'type' => 'text',
                     'data' => [
                         'content' => '<h1>Welcome to Our Website</h1><p>This is a text block.</p>',
-                        'alignment' => 'center'
+                        'alignment' => 'center',
                     ],
                     'settings' => [
                         'padding' => ['top' => 20, 'bottom' => 20],
-                        'background' => 'transparent'
-                    ]
+                        'background' => 'transparent',
+                    ],
                 ],
                 [
                     'id' => 'block-2',
@@ -469,12 +469,12 @@ class SpreadTest extends ModelTestCase
                     'data' => [
                         'src' => 'featured-image.jpg',
                         'alt' => 'Featured Image',
-                        'caption' => 'Our featured image'
+                        'caption' => 'Our featured image',
                     ],
                     'settings' => [
                         'width' => '100%',
-                        'alignment' => 'center'
-                    ]
+                        'alignment' => 'center',
+                    ],
                 ],
                 [
                     'id' => 'block-3',
@@ -483,25 +483,25 @@ class SpreadTest extends ModelTestCase
                         'columns' => [
                             [
                                 'content' => '<h3>Column 1</h3><p>First column content</p>',
-                                'width' => 6
+                                'width' => 6,
                             ],
                             [
                                 'content' => '<h3>Column 2</h3><p>Second column content</p>',
-                                'width' => 6
-                            ]
-                        ]
+                                'width' => 6,
+                            ],
+                        ],
                     ],
                     'settings' => [
                         'gap' => 20,
-                        'responsive' => true
-                    ]
-                ]
+                        'responsive' => true,
+                    ],
+                ],
             ],
             'page_settings' => [
                 'container_width' => 1200,
                 'mobile_responsive' => true,
-                'seo_optimized' => true
-            ]
+                'seo_optimized' => true,
+            ],
         ];
 
         $spread = Spread::create([
@@ -549,16 +549,16 @@ class SpreadTest extends ModelTestCase
                         'title' => 'Hero Section',
                         'buttons' => [
                             ['text' => 'Button 1', 'url' => '/link1'],
-                            ['text' => 'Button 2', 'url' => '/link2']
-                        ]
-                    ]
-                ]
+                            ['text' => 'Button 2', 'url' => '/link2'],
+                        ],
+                    ],
+                ],
             ],
             'metadata' => [
                 'author' => 'admin',
                 'last_modified' => '2024-01-01',
-                'version' => '1.0'
-            ]
+                'version' => '1.0',
+            ],
         ];
 
         $spread = Spread::create([
@@ -589,18 +589,18 @@ class SpreadTest extends ModelTestCase
             'homepage' => [
                 'template' => 'home',
                 'sections' => ['hero', 'features', 'testimonials', 'cta'],
-                'layout' => 'full-width'
+                'layout' => 'full-width',
             ],
             'product-page' => [
                 'template' => 'product',
                 'sections' => ['product-hero', 'specifications', 'reviews'],
-                'layout' => 'container'
+                'layout' => 'container',
             ],
             'blog-post' => [
                 'template' => 'article',
                 'sections' => ['article-header', 'content', 'related-posts'],
-                'layout' => 'sidebar'
-            ]
+                'layout' => 'sidebar',
+            ],
         ];
 
         $spreads = [];
@@ -632,7 +632,7 @@ class SpreadTest extends ModelTestCase
             'content' => [
                 'version' => '1.0',
                 'title' => 'Version 1.0 Title',
-                'sections' => [['type' => 'intro', 'data' => ['text' => 'Version 1.0 content']]]
+                'sections' => [['type' => 'intro', 'data' => ['text' => 'Version 1.0 content']]],
             ],
         ]);
 
@@ -663,21 +663,21 @@ class SpreadTest extends ModelTestCase
             'content' => [
                 'en' => [
                     'title' => 'English Title',
-                    'description' => 'English description'
+                    'description' => 'English description',
                 ],
                 'tr' => [
                     'title' => 'Turkish Title',
-                    'description' => 'Turkish description'
+                    'description' => 'Turkish description',
                 ],
                 'fr' => [
                     'title' => 'French Title',
-                    'description' => 'French description'
-                ]
+                    'description' => 'French description',
+                ],
             ],
             'shared_settings' => [
                 'layout' => 'standard',
-                'theme' => 'light'
-            ]
+                'theme' => 'light',
+            ],
         ];
 
         $spread = Spread::create([

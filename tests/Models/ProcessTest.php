@@ -2,15 +2,14 @@
 
 namespace Unusualify\Modularity\Tests\Models;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Support\Facades\Event;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Unusualify\Modularity\Entities\Enums\ProcessStatus;
 use Unusualify\Modularity\Entities\Process;
 use Unusualify\Modularity\Entities\ProcessHistory;
 use Unusualify\Modularity\Entities\User;
-use Unusualify\Modularity\Entities\Enums\ProcessStatus;
 use Unusualify\Modularity\Tests\ModelTestCase;
 
 class ProcessTest extends ModelTestCase

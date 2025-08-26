@@ -52,7 +52,7 @@ class RepeaterTest extends ModelTestCase
         $content = [
             'title' => 'Test Title',
             'description' => 'Test Description',
-            'items' => ['item1', 'item2', 'item3']
+            'items' => ['item1', 'item2', 'item3'],
         ];
 
         $repeater = Repeater::create([
@@ -159,8 +159,8 @@ class RepeaterTest extends ModelTestCase
             'settings' => [
                 'display' => true,
                 'color' => '#FF5722',
-                'count' => 5
-            ]
+                'count' => 5,
+            ],
         ];
 
         $repeater = Repeater::create([
@@ -212,7 +212,7 @@ class RepeaterTest extends ModelTestCase
                 'items' => [
                     ['title' => 'Feature 1', 'description' => 'Description 1'],
                     ['title' => 'Feature 2', 'description' => 'Description 2'],
-                ]
+                ],
             ],
             'role' => 'features',
             'locale' => 'en',
@@ -225,7 +225,7 @@ class RepeaterTest extends ModelTestCase
                 'items' => [
                     ['name' => 'John Doe', 'quote' => 'Great service!'],
                     ['name' => 'Jane Smith', 'quote' => 'Excellent quality!'],
-                ]
+                ],
             ],
             'role' => 'testimonials',
             'locale' => 'en',
@@ -305,20 +305,20 @@ class RepeaterTest extends ModelTestCase
                     'icon' => 'mdi-rocket',
                     'title' => 'Fast Performance',
                     'description' => 'Lightning fast loading times',
-                    'benefits' => ['Speed', 'Efficiency', 'User Experience']
+                    'benefits' => ['Speed', 'Efficiency', 'User Experience'],
                 ],
                 [
                     'icon' => 'mdi-shield',
                     'title' => 'Secure',
                     'description' => 'Enterprise-grade security',
-                    'benefits' => ['Encryption', 'Privacy', 'Compliance']
-                ]
+                    'benefits' => ['Encryption', 'Privacy', 'Compliance'],
+                ],
             ],
             'settings' => [
                 'display_icons' => true,
                 'layout' => 'grid',
-                'columns' => 3
-            ]
+                'columns' => 3,
+            ],
         ];
 
         $testimonialsContent = [
@@ -329,7 +329,7 @@ class RepeaterTest extends ModelTestCase
                     'company' => 'Tech Corp',
                     'quote' => 'Amazing product that transformed our business',
                     'rating' => 5,
-                    'avatar' => 'john-doe.jpg'
+                    'avatar' => 'john-doe.jpg',
                 ],
                 [
                     'name' => 'Jane Smith',
@@ -337,14 +337,14 @@ class RepeaterTest extends ModelTestCase
                     'company' => 'Innovation Ltd',
                     'quote' => 'Excellent support and great features',
                     'rating' => 5,
-                    'avatar' => 'jane-smith.jpg'
-                ]
+                    'avatar' => 'jane-smith.jpg',
+                ],
             ],
             'settings' => [
                 'show_ratings' => true,
                 'show_avatars' => true,
-                'autoplay' => false
-            ]
+                'autoplay' => false,
+            ],
         ];
 
         $featuresRepeater = Repeater::create([
@@ -439,7 +439,7 @@ class RepeaterTest extends ModelTestCase
                 'items' => [
                     ['title' => 'Item 1', 'active' => true],
                     ['title' => 'Item 2', 'active' => false],
-                ]
+                ],
             ],
             'role' => 'features',
             'locale' => 'en',
@@ -459,7 +459,6 @@ class RepeaterTest extends ModelTestCase
         $this->assertTrue($repeater->content['settings']['show_all']);
     }
 
-
     public function test_repeater_json_serialization()
     {
         $user = User::factory()->create();
@@ -472,8 +471,8 @@ class RepeaterTest extends ModelTestCase
             'metadata' => [
                 'created_by' => 'system',
                 'version' => '1.0',
-                'tags' => ['important', 'featured']
-            ]
+                'tags' => ['important', 'featured'],
+            ],
         ];
 
         $repeater = Repeater::create([

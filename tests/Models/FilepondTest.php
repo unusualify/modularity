@@ -2,8 +2,8 @@
 
 namespace Unusualify\Modularity\Tests\Models;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Modules\SystemNotification\Events\FilepondCreated;
 use Modules\SystemNotification\Events\FilepondDeleted;

@@ -2,8 +2,8 @@
 
 namespace Unusualify\Modularity\Tests\Models;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Unusualify\Modularity\Entities\State;
 use Unusualify\Modularity\Entities\Stateable;
 use Unusualify\Modularity\Entities\User;

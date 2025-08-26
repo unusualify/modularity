@@ -3,15 +3,15 @@
 namespace Unusualify\Modularity\Tests\Models;
 
 use Carbon\Carbon;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Support\Facades\Event;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Event;
 use Modules\SystemNotification\Events\AssignmentCreated;
 use Modules\SystemNotification\Events\AssignmentUpdated;
 use Unusualify\Modularity\Entities\Assignment;
-use Unusualify\Modularity\Entities\User;
 use Unusualify\Modularity\Entities\Enums\AssignmentStatus;
+use Unusualify\Modularity\Entities\User;
 use Unusualify\Modularity\Tests\ModelTestCase;
 
 class AssignmentTest extends ModelTestCase
@@ -201,7 +201,7 @@ class AssignmentTest extends ModelTestCase
         $assignee = User::factory()->create();
         $assigner = User::factory()->create();
 
-                $assignment = Assignment::create([
+        $assignment = Assignment::create([
             'assignable_id' => $assignable->id,
             'assignable_type' => get_class($assignable),
             'assignee_id' => $assignee->id,
@@ -224,7 +224,7 @@ class AssignmentTest extends ModelTestCase
         $assigner = User::factory()->create();
         $assignable = User::factory()->create();
 
-                $assignment = Assignment::create([
+        $assignment = Assignment::create([
             'assignable_id' => $assignable->id,
             'assignable_type' => get_class($assignable),
             'assignee_id' => $assignee->id,
@@ -247,7 +247,7 @@ class AssignmentTest extends ModelTestCase
         $assigner = User::factory()->create();
         $assignable = User::factory()->create();
 
-                $assignment = Assignment::create([
+        $assignment = Assignment::create([
             'assignable_id' => $assignable->id,
             'assignable_type' => get_class($assignable),
             'assignee_id' => $assignee->id,
@@ -270,7 +270,7 @@ class AssignmentTest extends ModelTestCase
         $assigner = User::factory()->create();
         $assignable = User::factory()->create();
 
-                $assignment = Assignment::create([
+        $assignment = Assignment::create([
             'assignable_id' => $assignable->id,
             'assignable_type' => get_class($assignable),
             'assignee_id' => $assignee->id,

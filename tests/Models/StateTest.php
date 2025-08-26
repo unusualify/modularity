@@ -5,7 +5,6 @@ namespace Unusualify\Modularity\Tests\Models;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Unusualify\Modularity\Entities\State;
-use Unusualify\Modularity\Entities\User;
 use Unusualify\Modularity\Tests\ModelTestCase;
 
 class StateTest extends ModelTestCase

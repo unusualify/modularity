@@ -2,15 +2,15 @@
 
 namespace Unusualify\Modularity\Tests\Models;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Modules\SystemNotification\Events\ProcessHistoryCreated;
 use Modules\SystemNotification\Events\ProcessHistoryUpdated;
+use Unusualify\Modularity\Entities\Enums\ProcessStatus;
 use Unusualify\Modularity\Entities\Process;
 use Unusualify\Modularity\Entities\ProcessHistory;
 use Unusualify\Modularity\Entities\User;
-use Unusualify\Modularity\Entities\Enums\ProcessStatus;
 use Unusualify\Modularity\Tests\ModelTestCase;
 
 class ProcessHistoryTest extends ModelTestCase
@@ -156,7 +156,7 @@ class ProcessHistoryTest extends ModelTestCase
         $this->assertEquals($process->id, $processHistory->process->id);
     }
 
-        public function test_user_relationship()
+    public function test_user_relationship()
     {
         $user = User::factory()->create();
         $process = Process::create([
