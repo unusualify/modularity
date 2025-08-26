@@ -2,6 +2,49 @@
 
 All notable changes to `modularity` will be documented in this file
 
+## v0.44.0 - 2025-08-26
+
+### :rocket: Features
+
+- enhance value assignment logic for various input types by @OoBook in https://github.com/unusualify/modularity/commit/b4a11c985038860f8c151c4e7bd1278a2b056ffa
+- enhance message box functionality and textarea behavior by @OoBook in https://github.com/unusualify/modularity/commit/00273292e20e58c406078fb551e7a4bee45c81c5
+- add 'density' property to published input type configuration by @OoBook in https://github.com/unusualify/modularity/commit/11b6d050e3e9b80a577d12937f4f05ffe6dd72bf
+- enhance modal title customization and layout by @OoBook in https://github.com/unusualify/modularity/commit/99dd9beeb7c765bf2d3cdc2ff7e20aff91196558
+- enhance modal functionality and layout by @OoBook in https://github.com/unusualify/modularity/commit/63faece7e701773db027bed71b68842d381ef0e6
+- enhance custom form modal attributes and structure by @OoBook in https://github.com/unusualify/modularity/commit/337c23cad94865ce703ebfc6d9dd9ef9391ab23b
+- enhance payment form modal attributes and structure by @OoBook in https://github.com/unusualify/modularity/commit/6f07b25e99f43143f1a10c6214a2183ae2985376
+
+### :wrench: Bug Fixes
+
+- add accepted_at field and improve assigner assignment logic by @OoBook in https://github.com/unusualify/modularity/commit/39609d1dbcaf8b422547b5b62b1d2b08f9887bd5
+- correct typo in fillable attribute name from 'repatable_id' to 'repeatable_id' by @OoBook in https://github.com/unusualify/modularity/commit/0e27104bbb47caa59a6120ff81d6fde5d16898da
+
+### :recycle: Refactors
+
+- add chat_id to fillable attributes by @OoBook in https://github.com/unusualify/modularity/commit/9011bcfb0ab00030e081d7d6e07a74ee26f94273
+- add process_id to fillable attributes by @OoBook in https://github.com/unusualify/modularity/commit/0cd94b8481ddedd2d4aa8b90fe63256f66b68193
+- remove unused attributes from fillable array by @OoBook in https://github.com/unusualify/modularity/commit/26920bdfefd716e23331a723f078f9ac51ae080d
+- update table name and fillable attributes in Spread model by @OoBook in https://github.com/unusualify/modularity/commit/d8bf8588813788c50ddfbdc0dfbebc7dfd3b970a
+
+### :white_check_mark: Testing
+
+- add comprehensive tests for Assignment model functionality by @OoBook in https://github.com/unusualify/modularity/commit/c026e041c5abdb575fd898c35676c29f2b5dbd1e
+- add comprehensive test suites for ChatMessage and Chat models by @OoBook in https://github.com/unusualify/modularity/commit/38c49f9d21bb409127b3a9e158dc00e33aeaf079
+- add comprehensive tests for Filepond model functionality by @OoBook in https://github.com/unusualify/modularity/commit/be81654b25ec806873001d451ec561d25fbb2112
+- add comprehensive tests for TemporaryFilepond model functionality by @OoBook in https://github.com/unusualify/modularity/commit/cca080b37ef62c57985cd55513ed2cc1c8463b48
+- add comprehensive test suites for Process and ProcessHistory models by @OoBook in https://github.com/unusualify/modularity/commit/a57244152352c7da75257538a9fecb31c4ebeb67
+- add comprehensive test suites for Stateable and State models by @OoBook in https://github.com/unusualify/modularity/commit/80dab314fe859e9b7ccb9a1e45f3949ec55fa73d
+- add comprehensive tests for Authorization model functionality by @OoBook in https://github.com/unusualify/modularity/commit/bc6c115260cc6d856bdf9a20b594b68403bc5080
+- add comprehensive tests for CreatorRecord model functionality by @OoBook in https://github.com/unusualify/modularity/commit/3e03cd2c3f9f5222edf87be738fda079dbaffdda
+- add comprehensive tests for Repeater model functionality by @OoBook in https://github.com/unusualify/modularity/commit/f6d76ad191a688f2e28c24c9227e7ca01d82bdff
+- add comprehensive tests for Singleton model functionality by @OoBook in https://github.com/unusualify/modularity/commit/04532237fdb8f9af8281150315641fa198e606c5
+- add comprehensive tests for Spread model functionality by @OoBook in https://github.com/unusualify/modularity/commit/41e77f67a7b2ca66b32f39499ce208716f43ede9
+
+### :package: Build
+
+- update build artifacts for v0.43.0 by @invalid-email-address in https://github.com/unusualify/modularity/commit/bdaaa10c77ec9868d8171e5fa46e8cd1c12f0ead
+- update build artifacts for v0.44.0 by @OoBook in https://github.com/unusualify/modularity/commit/ba0786f2a6f304424c30970759c7db7347a339dd
+
 ## v0.43.0 - 2025-08-25
 
 ### :rocket: Features
