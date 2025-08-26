@@ -225,6 +225,22 @@ export default {
       };
 
       switch (input.type) {
+        default:
+          if (__isObject(value)) {
+            displayData[key]._value = value;
+          } else if (Array.isArray(value) && input.items) {
+            displayData[key]._value = value.map(id => {
+              const item = input.items.find(i => i[input.itemValue] === id);
+              return item ? item[input.itemTitle] : id;
+            });
+          } else {
+            if (!!input.items) {
+              const item = input.items.find(i => i[input.itemValue] === value);
+              displayData[key]._value = item ? item[input.itemTitle] : value;
+            } else {
+              displayData[key]._value = value;
+            }
+          }
         case 'wrap':
           // Wrap only affects schema, not model
           if (input.schema) {
@@ -332,22 +348,17 @@ export default {
             { style: 'currency', currency: currencyInfo.currency }
           )
         break;
-        default:
-          if (__isObject(value)) {
-            displayData[key]._value = value;
-          } else if (Array.isArray(value) && input.items) {
-            displayData[key]._value = value.map(id => {
-              const item = input.items.find(i => i[input.itemValue] === id);
-              return item ? item[input.itemTitle] : id;
-            });
-          } else {
-            if (!!input.items) {
-              const item = input.items.find(i => i[input.itemValue] === value);
-              displayData[key]._value = item ? item[input.itemTitle] : value;
-            } else {
-              displayData[key]._value = value;
+        case 'date-input':
+        case 'text':
+          if(! (input.type == 'text' && input.ext !== 'date')){
+            try{
+              displayData[key]._value = this.$d(value, input.displayDateFormat ?? 'numeric')
+            }catch(e){
+              console.log(e)
+              displayData[key]._value = value
             }
           }
+
         break;
       }
     }
