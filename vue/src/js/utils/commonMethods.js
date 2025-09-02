@@ -349,6 +349,7 @@ export default {
           )
         break;
         case 'date-input':
+        case 'input-date':
         case 'text':
           if(! (input.type == 'text' && input.ext !== 'date')){
             try{
