@@ -39,7 +39,7 @@ trait TableRows
                     'form' => [
                         'attributes' => [
                             'schema' => $this->createFormSchema($this->repository->getPaymentFormSchema()),
-                            'actionUrl' => route('admin.system.system_payment.payment'),
+                            'actionUrl' => route('admin.system.system_payment.pay'),
                             'async' => false,
                         ],
                         'model_formatter' => [

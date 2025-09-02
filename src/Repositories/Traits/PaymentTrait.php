@@ -244,7 +244,7 @@ trait PaymentTrait
                 'tooltip' => __('Pay'),
                 'color' => 'success',
                 'density' => 'compact',
-                'endpoint' => route('admin.system.system_payment.payment'),
+                'endpoint' => route('admin.system.system_payment.pay'),
                 'schema' => modularity_format_inputs([
                     [
                         'type' => 'hidden',
