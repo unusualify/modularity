@@ -1,6 +1,9 @@
 <?php
 
 return [
+    'auth' => [
+        'logoSymbol' => 'main-logo',
+    ],
     'sidebar' => [
         'width' => 264,
         'expandOnHover' => true,
@@ -23,11 +26,9 @@ return [
         'permanent' => true,
         'max-width' => '10em',
     ],
-
     'dashboard' => [
         'blocks' => [
 
         ],
     ],
-
 ];
