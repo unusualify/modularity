@@ -455,7 +455,7 @@
               scrollable
             >
               <template v-slot:body.description>
-                <div class="d-flex text-start">
+                <div>
                   <ue-recursive-data-viewer
                     :data="modals['show'].data"
                     :all-array-items-open="false"
