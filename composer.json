@@ -56,7 +56,7 @@
         "timokoerber/laravel-one-time-operations": "^1.0",
         "torann/geoip": "^3.0",
         "tymon/jwt-auth": "^1.0|^2.0",
-        "unusualify/payable": "^0",
+        "unusualify/payable": "^0.12",
         "wikimedia/composer-merge-plugin": "^2.1"
     },
     "require-dev": {
