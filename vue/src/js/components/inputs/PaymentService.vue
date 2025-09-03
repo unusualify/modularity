@@ -9,7 +9,7 @@
 
           <!-- Currency Selector -->
           <v-select
-            v-model="selectedCurrency"
+            v-model="currencyModel"
             :items="formattedCurrencies"
             label="Currency"
             variant="outlined"
@@ -35,7 +35,7 @@
               <v-row align="center">
                 <v-col class="d-flex justify-content-end">
                   <v-img-icon
-                    v-for="(currencyCardType, key) in currencyCardTypes[selectedCurrencyIso]"
+                    v-for="(currencyCardType, key) in currencyCardTypes[selectedCurrency.iso_4217]"
                     :key="`type-${key}`"
                     :src="currencyCardType.logo"
                     style="max-width: 64px;"
@@ -81,13 +81,49 @@
 
       <!-- Payment Form Section -->
       <v-col class="pa-4 pa-sm-0 d-flex align-center justify-center">
-        <CreditCardForm v-if="isCreditCardForm"
-          v-model:cardName="localCreditCard.card_name"
-          v-model:cardNumber="localCreditCard.card_number"
-          v-model:cardMonth="localCreditCard.card_month"
-          v-model:cardYear="localCreditCard.card_year"
-          v-model:cardCvv="localCreditCard.card_cvv"
-        />
+        <template v-if="isCreditCardForm">
+          <template v-if="selectedCurrency.has_built_in_form">
+            <v-progress-circular v-if="builtInFormLoading" indeterminate />
+            <!-- <ue-revolut-checkout v-else
+              v-bind="builtInFormAttributes"
+            /> -->
+            <ue-revolut-checkout-modal v-else
+              v-bind="builtInFormAttributes"
+              :complete-url="completeUrl"
+            >
+              <template #button="{ pay }">
+                <v-btn
+                  :style="selectedCurrency?.payment_service?.button_style"
+                  block
+                  density="comfortable"
+                  max-width="300px"
+                  max-height=""
+                  min-width="80%"
+                  class="d-flex align-center justify-center py-8"
+                  @click="pay"
+                >
+                  <v-img v-if="selectedCurrency?.payment_service?.button_logo_url"
+                    contain
+                    :width="100"
+                    style="max-height: 36px; max-width: 100px;"
+                    aspect-ratio="16/9"
+                    :src="selectedCurrency?.payment_service?.button_logo_url"
+                  />
+                  <span class="ml-2 font-weight-bold text-body-2 text-align-center" >
+                    {{ displayPrice }}
+                  </span>
+                </v-btn>
+              </template>
+            </ue-revolut-checkout-modal>
+          </template>
+          <CreditCardForm v-else
+            v-model:cardName="localCreditCard.card_name"
+            v-model:cardNumber="localCreditCard.card_number"
+            v-model:cardMonth="localCreditCard.card_month"
+            v-model:cardYear="localCreditCard.card_year"
+            v-model:cardCvv="localCreditCard.card_cvv"
+          />
+        </template>
         <template v-else-if="isTransferrableForm">
           <div class="w-100 h-100 d-flex border-thin d-flex flex-column pa-4 ga-4">
             <div v-for="(value, key) in selectedService?.bank_details ?? {}" :key="key" class="">
@@ -123,9 +159,10 @@
           class="d-flex align-center justify-center"
         >
           <v-img
-            width="100px"
             contain
-            max-height="36px"
+            width="100px"
+            height="36px"
+            style="max-width: 100px; max-height: 36px;"
             :src="selectedService?.button_logo_url"
           />
           <span class="ml-2 font-weight-bold text-body-2 text-align-center" >
@@ -200,6 +237,14 @@ export default {
     paymentUrl: {
       type: String,
       default: ''
+    },
+    checkoutUrl: {
+      type: String,
+      default: null
+    },
+    completeUrl: {
+      type: String,
+      default: null
     }
   },
 
@@ -210,8 +255,11 @@ export default {
     // Refs
     const localPaymentMethod = ref('');
     const localDefaultPaymentMethod = ref("-1");
-    const selectedCurrency = ref(props.price_object.currency_id || props.supportedCurrencies[0]?.id);
+    const currencyModel = ref(props.price_object.currency_id || props.supportedCurrencies[0]?.id);
     const displayPrice = ref(formatPrice.value(props.price_object.total_amount / 100, props.supportedCurrencies[0]?.symbol || ''));
+
+    const builtInFormLoading = ref(true);
+    const builtInFormAttributes = ref({});
 
     // Reactive state
     const localCreditCard = reactive({
@@ -223,12 +271,8 @@ export default {
     });
 
     // Computed
-    const selectedCurrencyObj = computed(() =>
-      props.supportedCurrencies.find(curr => curr.id === selectedCurrency.value)
-    );
-
-    const selectedCurrencyIso = computed(() =>
-      selectedCurrencyObj.value?.iso_4217
+    const selectedCurrency = computed(() =>
+      props.supportedCurrencies.find(curr => curr.id === currencyModel.value)
     );
 
     const formattedCurrencies = computed(() =>
@@ -239,10 +283,10 @@ export default {
     );
 
     const filteredServiceItems = computed(() => {
-      if (!selectedCurrency.value) return [];
+      if (!currencyModel.value) return [];
 
       return props.items.filter(service => {
-        return service.payment_currencies?.some(currency => currency.id === selectedCurrency.value)
+        return service.payment_currencies?.some(currency => currency.id === currencyModel.value)
       });
     });
 
@@ -260,7 +304,7 @@ export default {
       ...getModel(props.transferFormSchema),
       price_id: props.price_object.id,
       payment_service_id: localPaymentMethod.value,
-      currency_id: selectedCurrencyObj.value?.id ?? null,
+      currency_id: selectedCurrency.value?.id ?? null,
     })
 
     const transferSchema = computed(() => {
@@ -293,7 +337,7 @@ export default {
     });
 
     const isExchanged = computed(() =>
-      selectedCurrencyObj.value?.iso_4217 !== props.baseCurrency
+      selectedCurrency.value?.iso_4217 !== props.baseCurrency
     );
 
     const exchangeRate = ref(0);
@@ -308,7 +352,7 @@ export default {
         ...getModel(props.transferFormSchema),
         price_id: props.price_object.id,
         payment_service_id: localPaymentMethod.value,
-        currency_id: selectedCurrencyObj.value?.id ?? null,
+        currency_id: selectedCurrency.value?.id ?? null,
       }
     }
 
@@ -316,9 +360,33 @@ export default {
       console.log('transfer submitted', data);
     }
 
+    const setBuiltInFormAttributes = (attributes) => {
+      builtInFormAttributes.value = attributes;
+    }
+
+    const runBuiltInForm = () => {
+      axios.post(props.checkoutUrl, {
+        price_id: props.price_object.id,
+        payment_service: {
+          payment_method: selectedCurrency.value.payment_service_id,
+          credit_card: {
+            card_name: localCreditCard.card_name,
+            card_number: localCreditCard.card_number,
+            card_month: localCreditCard.card_month,
+            card_year: localCreditCard.card_year,
+            card_cvv: localCreditCard.card_cvv,
+          },
+          currency: selectedCurrency.value,
+        }
+      }).then(response => {
+        setBuiltInFormAttributes({...response.data, orderId: response.data.order_id});
+        builtInFormLoading.value = false;
+      });
+    }
+
     // Methods
     const handleCurrencyChange = async (newCurrencyId) => {
-      selectedCurrency.value = newCurrencyId;
+      currencyModel.value = newCurrencyId;
       localPaymentMethod.value = localDefaultPaymentMethod.value;
 
       const selectedCurrencyObject = props.supportedCurrencies.find(curr => curr.id === newCurrencyId);
@@ -354,11 +422,15 @@ export default {
       }
     }, { immediate: true, deep: true });
 
-    watch([localPaymentMethod, localCreditCard, selectedCurrencyObj], () => {
+    watch([localPaymentMethod, localCreditCard, selectedCurrency], () => {
+      if(selectedCurrency.value.has_built_in_form){
+        runBuiltInForm();
+      }
+
       input.value = {
         payment_method: localPaymentMethod.value,
         credit_card: { ...localCreditCard },
-        currency: selectedCurrencyObj.value,
+        currency: selectedCurrency.value,
       };
     }, { deep: true });
 
@@ -366,12 +438,13 @@ export default {
       if(newValue){
         let paymentServiceID = localPaymentMethod.value;
         transferFormModel.value.payment_service_id = paymentServiceID;
-        transferFormModel.value.currency_id = selectedCurrencyObj.value.id;
-
-        console.log('transferFormModel', transferFormModel.value)
+        transferFormModel.value.currency_id = selectedCurrency.value.id;
       }
     }, { deep: true });
 
+    if(selectedCurrency.value.has_built_in_form){
+      runBuiltInForm();
+    }
 
     return {
       input,
@@ -384,8 +457,8 @@ export default {
 
       submitForm,
 
+      currencyModel,
       selectedCurrency,
-      selectedCurrencyIso,
       formattedCurrencies,
       filteredServiceItems,
 
@@ -395,12 +468,16 @@ export default {
       updateTransferModel,
       handleTransferSubmit,
 
-
       handleCurrencyChange,
       displayPrice,
       selectedService,
       exchangeRate,
       isExchanged,
+
+      builtInFormLoading,
+      builtInFormAttributes,
+      setBuiltInFormAttributes,
+      runBuiltInForm,
     };
   }
 };
