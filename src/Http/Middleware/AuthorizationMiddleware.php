@@ -56,12 +56,7 @@ class AuthorizationMiddleware
 
             $profileShortcutModel = $userRepository->getFormFields($user, $profileShortcutSchema);
 
-            $loginShortcutSchema = getFormDraft('login_shortcut');
-            $loginShortcutSchema = collect($loginShortcutSchema)->mapWithKeys(function ($v, $k) use ($defaultInput) {
-                return [$k => configure_input(hydrate_input(array_merge($defaultInput, $v)))];
-            })->toArray();
-            // $loginShortcutModel = $userRepository->getFormFields($user, $loginShortcutSchema);
-            // dd($loginShortcutSchema);
+            $loginShortcutSchema = modularity_format_inputs(getFormDraft('login_shortcut'));
 
             $view->with('profileShortcutModel', $profileShortcutModel);
             $view->with('profileShortcutSchema', $profileShortcutSchema);
