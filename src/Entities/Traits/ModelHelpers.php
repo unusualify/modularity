@@ -9,11 +9,12 @@ use Spatie\Activitylog\Facades\LogBatch;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Unusualify\Modularity\Entities\Traits\Relationships\ChangeRelationships;
 use Unusualify\Modularity\Traits\ManageModuleRoute;
 
 trait ModelHelpers
 {
-    use ManageEloquent, ManageModuleRoute, HasScopes, LogsActivity;
+    use ManageEloquent, ManageModuleRoute, HasScopes, LogsActivity, ChangeRelationships;
 
     public $oldTranslations = [];
 
