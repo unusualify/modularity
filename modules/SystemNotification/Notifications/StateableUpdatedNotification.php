@@ -20,8 +20,8 @@ class StateableUpdatedNotification extends FeatureNotification implements Should
     public function via($notifiable): array
     {
         $via = explode(',', config('modularity.notifications.stateable.channels', 'database,mail'));
-
-        return $via;
+        // clean values not being 'mail' 'database' 'broadcast' 'vonage' 'slack'
+        return $this->getValidChannels($via);
     }
 
     public function toArray($notifiable): array
