@@ -251,4 +251,9 @@ class User extends Authenticatable implements MustVerifyEmailContract
     {
         $this->notify(new \Unusualify\Modularity\Notifications\EmailVerification($token));
     }
+
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new \Unusualify\Modularity\Notifications\ResetPasswordNotification($token));
+    }
 }
