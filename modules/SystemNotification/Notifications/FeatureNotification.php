@@ -43,6 +43,8 @@ abstract class FeatureNotification extends Notification implements ShouldQueue
      */
     public $salutationMessage;
 
+    public $validChannels = ['mail', 'database', 'broadcast', 'vonage', 'slack'];
+
     /**
      * The module route headline of the model.
      *
@@ -161,6 +163,22 @@ abstract class FeatureNotification extends Notification implements ShouldQueue
     public function getToken(): string
     {
         return $this->token;
+    }
+
+    public function isValidChannel(string $channel): bool
+    {
+        return in_array($channel, $this->validChannels);
+    }
+
+    public function getValidChannels($channels): array
+    {
+        if(!is_array($channels)){
+            $channels = explode(',', $channels);
+        }
+
+        return array_filter($channels, function($channel) {
+            return $this->isValidChannel($channel);
+        });
     }
 
     /**
