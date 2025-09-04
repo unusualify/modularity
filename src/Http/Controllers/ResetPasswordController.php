@@ -165,7 +165,7 @@ class ResetPasswordController extends Controller
                     ],
                     'schema' => $this->createFormSchema($resetPasswordSchema),
                     'actionUrl' => route(Route::hasAdmin('password.reset.update')),
-                    'buttonText' => 'authentication.reset-password',
+                    'buttonText' => 'authentication.reset',
                     'formClass' => 'px-5',
                 ],
                 'formSlots' => $formSlots,
