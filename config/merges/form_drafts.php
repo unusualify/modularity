@@ -152,6 +152,7 @@ return [
             'type' => '_name',
             'label' => 'Company Name',
             'col' => ['sm' => 6],
+            'rules' => 'max:99',
             // 'rules' => 'sometimes|min:3',
         ],
         'tax_id' => [
@@ -160,6 +161,8 @@ return [
             'label' => 'Tax ID / Personal ID',
             'default' => '',
             'col' => ['sm' => 6],
+            //San Marino and Liechtenstein have a 6 character personal id
+            'rules' => 'min:6|max:30',
             // 'rules' => 'sometimes|min:3',
         ],
         'address' => [
@@ -170,6 +173,7 @@ return [
                 'cols' => 12,
                 'sm' => 12,
             ],
+            'rules' => 'min:5',
         ],
         'country_id' => [
             'type' => 'select',
@@ -186,7 +190,7 @@ return [
             'label' => 'State/Province',
             'default' => '',
             'col' => ['sm' => 6],
-            'rules' => 'sometimes|min:3',
+            'rules' => 'sometimes|min:3|max:50',
         ],
         'city' => [
             'type' => 'text',
@@ -194,7 +198,7 @@ return [
             'label' => 'City',
             'default' => '',
             'col' => ['sm' => 6],
-            'rules' => 'sometimes|min:3',
+            'rules' => 'sometimes|min:3|max:50',
         ],
         'zip_code' => [
             'type' => 'text',
@@ -202,7 +206,7 @@ return [
             'label' => 'ZIP/Postal Code',
             'default' => '',
             'col' => ['sm' => 6],
-            'rules' => 'sometimes|min:3',
+            'rules' => 'sometimes|min:5|max:30',
         ],
         'phone' => [
             'type' => '_phone',

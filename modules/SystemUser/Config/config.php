@@ -1462,6 +1462,7 @@ return [
                         'sm' => 8,
                         'md' => 6,
                     ],
+                    'rules' => 'max:99',
                     // 'rules' => 'sometimes|required|min:3',
                 ],
                 [
@@ -1476,6 +1477,7 @@ return [
                         'sm' => 8,
                         'md' => 6,
                     ],
+                    'rules' => 'min:6|max:30',
                     // 'rules' => 'sometimes|required|min:5',
                 ],
                 [
@@ -1517,7 +1519,7 @@ return [
                         'sm' => 8,
                         'md' => 6,
                     ],
-                    'rules' => 'sometimes|required|min:3',
+                    'rules' => 'sometimes|required|min:3|max:50',
                 ],
                 [
                     'type' => 'text',
@@ -1531,7 +1533,7 @@ return [
                         'sm' => 8,
                         'md' => 6,
                     ],
-                    'rules' => 'sometimes|required|min:3',
+                    'rules' => 'sometimes|required|min:3|max:50',
                 ],
                 [
                     'type' => 'text',
@@ -1545,7 +1547,7 @@ return [
                         'sm' => 8,
                         'md' => 6,
                     ],
-                    'rules' => 'sometimes|required|min:3',
+                    'rules' => 'sometimes|required|min:5|max:30',
                 ],
                 [
                     'type' => 'input-phone',
