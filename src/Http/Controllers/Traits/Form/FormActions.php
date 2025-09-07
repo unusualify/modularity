@@ -68,6 +68,16 @@ trait FormActions
                 // $action['endpoint'] = route($routeName, ['{id}' => '{id}']);
             }
 
+            if (isset($action['formDraft'])) {
+                $formDraft = $action['formDraft'];
+                if($formDraft === 'company'){
+                    $action['formAttributes'] = array_merge($action['formAttributes'] ?? [], [
+                        'modelValue' => $this->user->company,
+                    ]);
+                }
+                $action['schema'] = $this->createFormSchema(getFormDraft($action['formDraft']));
+            }
+
             if (isset($action['schema'])) {
                 $action['schema'] = $this->createFormSchema($action['schema']);
             }
