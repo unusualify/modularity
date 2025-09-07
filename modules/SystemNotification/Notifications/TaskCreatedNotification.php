@@ -5,7 +5,7 @@ namespace Modules\SystemNotification\Notifications;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-class TaskAssignedNotification extends FeatureNotification implements ShouldQueue
+class TaskCreatedNotification extends FeatureNotification implements ShouldQueue
 {
     use Queueable;
 
@@ -19,13 +19,6 @@ class TaskAssignedNotification extends FeatureNotification implements ShouldQueu
     {
         // $model is a assignment model
         parent::__construct($model);
-    }
-
-    public function via($notifiable): array
-    {
-        $via = explode(',', config('modularity.notifications.assignable.channels', 'mail,database'));
-
-        return $via;
     }
 
     public function shouldSend(object $notifiable, string $channel): bool

@@ -5,7 +5,7 @@ namespace Modules\SystemNotification\Listeners;
 use Illuminate\Contracts\Events\ShouldHandleEventsAfterCommit;
 use Illuminate\Queue\InteractsWithQueue;
 use Modules\SystemNotification\Events\AssignmentCreated;
-use Modules\SystemNotification\Notifications\TaskAssignedNotification;
+use Modules\SystemNotification\Notifications\TaskCreatedNotification;
 use Modules\SystemNotification\Notifications\TaskUpdatedNotification;
 
 class AssignableListener implements ShouldHandleEventsAfterCommit
@@ -26,7 +26,7 @@ class AssignableListener implements ShouldHandleEventsAfterCommit
 
         if ($assignee) {
             if ($isCreated) {
-                $assignee->notify(new TaskAssignedNotification($model));
+                $assignee->notify(new TaskCreatedNotification($model));
             } else {
                 if ($assignee->id == $activeUser->id) {
                     $assigner->notify(new TaskUpdatedNotification($model));
