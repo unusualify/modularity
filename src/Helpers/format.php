@@ -47,6 +47,7 @@ if (! function_exists('pluralize')) {
         return Str::plural($string);
     }
 }
+
 if (! function_exists('singularize')) {
     function singularize($string)
     {
@@ -528,7 +529,7 @@ if (! function_exists('get_user_profile')) {
      */
     function get_user_profile($user)
     {
-        return $user->only(['id', 'name', 'email']) + [
+        return $user->only(['id', 'name', 'email', 'company_name', 'valid_company', 'name_with_company']) + [
             'avatar_url' => $user->fileponds()
                 ->where('role', 'avatar')
                 ->first()
