@@ -3,6 +3,7 @@
 namespace Unusualify\Modularity\Entities\Traits;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -14,6 +15,8 @@ use Unusualify\Modularity\Entities\Stateable;
 trait HasStateable
 {
     use StateableScopes;
+
+    protected static $cachedStates = [];
 
     public $_preserved_stateable;
 
@@ -59,38 +62,31 @@ trait HasStateable
 
     public function initializeHasStateable()
     {
-        $this->append(['state_formatted']);
+        $this->append(['state_formatted', 'states']);
 
         $this->mergeFillable(static::$hasStateableFillable);
     }
 
-    public function statees(): \Illuminate\Database\Eloquent\Relations\MorphToMany
+    public static function getStates(): Collection
     {
-        $defaultStates = $this->getDefaultStates();
+        $defaultStates = self::getDefaultStates();
         $defaultStateCodes = array_column($defaultStates, 'code');
+        $stateModel = static::$stateModel;
 
-        return $this->morphToMany(
-            static::$stateModel,
-            'stateable',
-            // config('modularity.states.table', 'stateables'),
-            modularityConfig('tables.stateables', 'um_stateables'),
-            'stateable_id',
-            'state_id'
-        )
-            ->orWhereIn('code', $defaultStateCodes);
-        // ->withPivot('is_active');
+        $states = static::$cachedStates[static::class] ?? $stateModel::whereIn('code', $defaultStateCodes)->get();
+
+        if (! isset(static::$cachedStates[static::class])) {
+            static::$cachedStates[static::class] = $states;
+        }
+
+        return $states;
     }
 
-    public function states(): \Illuminate\Database\Eloquent\Relations\HasMany
+    protected function states(): Attribute
     {
-        $defaultStates = $this->getDefaultStates();
-        $defaultStateCodes = array_column($defaultStates, 'code');
-
-        return $this->hasMany(
-            static::$stateModel,
-            'id',
-            'created_at'
-        )->orWhereIn('code', $defaultStateCodes);
+        return new Attribute(
+            get: fn () => self::getStates(),
+        );
     }
 
     public function state(): \Illuminate\Database\Eloquent\Relations\HasOneThrough

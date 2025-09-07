@@ -137,10 +137,15 @@ trait Relationships
                                 if ($hasRepository) {
                                     if (isset($data[$relatedLocalKey])) {
                                         array_splice($idsDeleted, array_search($data[$relatedLocalKey], $idsDeleted), 1);
-
-                                        $repository->update($data[$relatedLocalKey], $data + [$foreignKey => $object->id]);
+                                        $nestedObject = $repository->update($data[$relatedLocalKey], $data + [$foreignKey => $object->id]);
+                                        // TODO: check if this is needed
+                                        // if($nestedObject->wasChanged()){
+                                        //     $object->addChangedRelationships($relationName, $data);
+                                        // }
                                     } else {
                                         $repository->create(array_merge($data, [$foreignKey => $object->id]));
+
+                                        $object->addChangedRelationships($relationName, $data);
                                     }
                                 } else {
                                     $idsDeleted = [];
@@ -161,6 +166,7 @@ trait Relationships
 
                         if (count($idsDeleted) > 0) {
                             $repository->bulkDelete($idsDeleted);
+                            $object->addChangedRelationships($relationName, $idsDeleted);
                         }
                     }
                 }

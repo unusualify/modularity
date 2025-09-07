@@ -83,8 +83,6 @@ class PaymentServiceSeeder extends Seeder
                 ],
                 'internalPaymentCurrencies' => [
                     'TRY',
-                    'USD',
-                    'EUR',
                 ],
                 'spread_payload' => [
                     'type' => 1,
@@ -195,6 +193,32 @@ class PaymentServiceSeeder extends Seeder
                         'address' => '',
                     ],
                 ],
+            ],
+            [
+                'name' => 'Revolut',
+                'key' => 'revolut',
+                'is_external' => false,
+                'is_internal' => true,
+                'image' => 'revolut.png',
+                'published' => true,
+                'paymentCurrencies' => [
+                    PaymentCurrency::where('iso_4217', 'EUR')->first()->id ?? null,
+                ],
+                'internalPaymentCurrencies' => [
+                    'EUR',
+                    'USD',
+                ],
+                'spread_payload' => [
+                    'type' => 1,
+                    'transfer_details' => [
+                        'account_holder' => '',
+                        'iban' => '',
+                        'swift_code' => '',
+                        'description' => '',
+                        'address' => '',
+                    ],
+                ],
+                'button_style' => 'background-color: rgb(var(--v-theme-grey-lighten-1)) !important; height: 24px;',
             ],
         ];
 

@@ -54,4 +54,9 @@ return [
 
     'terms-policy' => 'Terms Policy',
     'conditions-policy' => 'Conditions Policy',
+
+    'logout-title' => 'Log Out',
+    'logout-description' => 'Are you sure you want to log out?',
+    'logout-cancel' => 'Cancel',
+    'logout-confirm' => 'Confirm',
 ];

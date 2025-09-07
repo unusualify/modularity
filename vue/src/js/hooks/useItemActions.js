@@ -8,7 +8,7 @@ import ACTIONS from '@/store/actions'
 import { FORM, ALERT } from '@/store/mutations/index'
 import api from '@/store/api/form'
 
-import { useFormatter, useCastAttributes } from '@/hooks'
+import { useCastAttributes, useDynamicModal } from '@/hooks'
 import { checkItemConditions } from '@/utils/itemConditions';
 
 export const makeItemActionsProps = propsFactory({
@@ -24,8 +24,8 @@ export const makeItemActionsProps = propsFactory({
 
 export default function useItemActions(props, context) {
   const store = useStore()
-  const { castMatch } = useFormatter(props, context)
   const { castObjectAttributes } = useCastAttributes()
+  const dynamicModal = useDynamicModal()
 
   const Actions = _.cloneDeep(props.actions)
 
@@ -83,12 +83,34 @@ export default function useItemActions(props, context) {
     api[method](endpoint, params,
       (response) => {
         if (response.data.message) {
+          let actionResponseMessage = action.responseMessage || {};
+          let message = response.data.message;
+          let variant = response.data.variant;
+
+          if(_.isString(actionResponseMessage)) {
+            actionResponseMessage = {
+              success: actionResponseMessage,
+              error: actionResponseMessage
+            }
+          }
+
+          if(window.__isset(actionResponseMessage[variant])) {
+            message = actionResponseMessage[variant];
+          }
+
           store.commit(ALERT.SET_ALERT, {
-            message: response.data.message,
-            variant: response.data.variant
+            message: message,
+            variant: variant
           });
         }
         context.emit('actionComplete', { action, response });
+
+        // Reload the page after successful operation
+        if (action.reloadOnSuccess === true) {
+          setTimeout(() => {
+            window.location.reload();
+          }, action.reloadDelay || 1000); // 1 second delay to show the success message
+        }
       },
       (error) => {
         store.commit(ALERT.SET_ALERT, {
@@ -160,19 +182,13 @@ export default function useItemActions(props, context) {
     }
 
     // Check all conditions
-    return baseCondition && checkItemConditions(action.conditions, editingItem);
+    return baseCondition
+      && checkItemConditions(action.conditions, editingItem)
+      && checkItemConditions(action.userConditions ?? [], store.getters.userProfile);
   }
 
   const formatActions = (_actions) => {
     return _actions.map(action => {
-
-      if(editingItem) {
-        Object.keys(action).forEach(key => {
-          if (key === 'badge') {
-            action[key] = castMatch.value(action[key], editingItem)
-          }
-        })
-      }
 
       if(props.isEditing && editingItem){
         action = castObjectAttributes(action, editingItem)
@@ -214,9 +230,16 @@ export default function useItemActions(props, context) {
     // methods
     shouldShowAction: validateAction,
     handleAction(action) {
+      let needToConfirm = false;
+      let confirmCallback = null;
+
       if (!action.type) {
         console.warn('Action type not specified:', action);
         return;
+      }
+
+      if(window.__isset(action.hasConfirmation) && action.hasConfirmation === true) {
+        needToConfirm = true;
       }
 
       // Replace any URL parameters
@@ -224,23 +247,45 @@ export default function useItemActions(props, context) {
 
       switch (action.type) {
         case 'request':
-          handleRequestAction(action, endpoint);
-          break;
+          if(needToConfirm) {
+            confirmCallback = async () => {
+              handleRequestAction(action, endpoint);
 
+              return true;
+            }
+          } else {
+            handleRequestAction(action, endpoint);
+          }
+        break;
         case 'modal':
           handleModalAction(action, endpoint);
-          break;
-
+        break;
         case 'download':
           handleDownloadAction(endpoint);
-          break;
-
+        break;
         case 'blank':
-          handleBlankAction(endpoint);
-          break;
+          if(needToConfirm) {
+            confirmCallback = async () => {
+              handleBlankAction(endpoint);
 
+              return true;
+            }
+          } else {
+            handleBlankAction(endpoint);
+          }
+        break;
         default:
           console.warn('Unknown action type:', action.type);
+      }
+
+      if(needToConfirm) {
+        dynamicModal.open(null, {
+
+          modalProps: {
+            ...action.confirmationModalAttributes ?? {},
+            confirmCallback: confirmCallback,
+          }
+        })
       }
     }
   })

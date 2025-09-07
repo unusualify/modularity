@@ -70,10 +70,10 @@
 
           <!-- Processable Title -->
           <v-row no-gutters class="pb-4">
-            <v-col cols="12" sm="6" md="6" lg="8" xl="9" class="text-h5 font-weight-medium text-wrap">
+            <v-col cols="12" sm="6" md="6" lg="7" xl="8" class="text-h5 font-weight-medium text-wrap">
               {{ title }}
             </v-col>
-            <v-col cols="12" sm="6" md="6" lg="4" xl="3" class="d-flex justify-sm-end">
+            <v-col cols="12" sm="6" md="6" lg="5" xl="4" class="d-flex justify-sm-end">
               <v-chip
                 :prepend-icon="status.icon"
                 :color="status.color"
@@ -212,9 +212,15 @@
                   <template v-slot:body="modalBodyScope">
                     <v-card>
                       <v-card-text>
+                        <ue-title padding="b-6" justify="center">
+                          {{ getStatusConfigurationValue('rejected', 'dialog_title', $t('Confirm Rejection')) }}
+                        </ue-title>
+                        <p class="text-subtitle-1 mb-4" v-if="getStatusConfigurationValue('rejected', 'dialog_message')">
+                          {{ getStatusConfigurationValue('rejected', 'dialog_message') }}
+                        </p>
                         <v-textarea v-model="reason" variant="outlined" label="Reason" />
                       </v-card-text>
-                      <v-card-actions>
+                      <v-card-actions class="justify-center">
                         <v-btn
                           :slim="false"
                           color="grey"
@@ -222,7 +228,7 @@
                           :disabled="updating"
                           @click="promptModalActive = false"
                         >
-                          {{ $t('Close') }}
+                          {{ getStatusConfigurationValue('rejected', 'dialog_cancel_text', $t('Close')) }}
                         </v-btn>
                         <v-btn
                           color="error"
@@ -232,7 +238,7 @@
                           :loading="updating"
                           @click="updateProcess('rejected')"
                         >
-                          {{ $t('Reject') }}
+                          {{ getStatusConfigurationValue('rejected', 'dialog_confirm_text', $t('Reject')) }}
                         </v-btn>
                       </v-card-actions>
                     </v-card>
@@ -365,6 +371,8 @@ export default {
             next_action_color: 'secondary',
             dialog_title: 'Preparing',
             dialog_message: 'The contents are being prepared or updated. Please check back later.',
+            dialog_confirm_text: 'Preparing',
+            dialog_cancel_text: 'The contents are being prepared or updated. Please check back later.',
             response_message: 'The contents are being prepared or updated. Please check back later.',
           }
         }
@@ -447,14 +455,33 @@ export default {
     const reason = ref('')
     const promptModalActive = ref(false)
 
-    const openDialog = (title, message, callback) => {
+    const openDialog = (status, callback) => {
+      let title = t('Are you sure you want to update the process?')
+      let message = t('This action cannot be undone.')
+
+      if(props.statusConfiguration && props.statusConfiguration[status] && props.statusConfiguration[status].dialog_title){
+        title = props.statusConfiguration[status].dialog_title
+      }else if(processModel.value?.status_dialog_titles && processModel.value.status_dialog_titles[status]){
+        title = processModel.value.status_dialog_titles[status]
+      }
+
+      if(props.statusConfiguration && props.statusConfiguration[status] && props.statusConfiguration[status].dialog_message){
+        message = props.statusConfiguration[status].dialog_message
+      }else if(processModel.value?.status_dialog_messages && processModel.value.status_dialog_messages[status]){
+        message = processModel.value.status_dialog_messages[status]
+      }
+
+      let confirmText = getStatusConfigurationValue(status, 'dialog_confirm_text', t('Yes'))
+      let cancelText = getStatusConfigurationValue(status, 'dialog_cancel_text', t('No'))
+
       DynamicModal.open(null, {
         'modalProps': {
           'widthType': 'md',
-          'description': message,
           'title': title,
-          'confirmText': t('Yes'),
-          'cancelText': t('No'),
+          'description': message,
+          'confirmText': confirmText,
+          'cancelText': cancelText,
+          'titleJustify': 'center',
           'confirmCallback': async () => {
             await callback()
           }
@@ -539,23 +566,15 @@ export default {
       }
     }
 
+    const getStatusConfigurationValue = (status, key, defaultValue = null) => {
+      if(props.statusConfiguration && props.statusConfiguration[status] && props.statusConfiguration[status][key]){
+        return props.statusConfiguration[status][key]
+      }
+      return defaultValue
+    }
+
     const confirmUpdateProcess = async (status) => {
-      let title = t('Are you sure you want to update the process?')
-      let message = t('This action cannot be undone.')
-
-      if(props.statusConfiguration && props.statusConfiguration[status] && props.statusConfiguration[status].dialog_title){
-        title = props.statusConfiguration[status].dialog_title
-      }else if(processModel.value?.status_dialog_titles && processModel.value.status_dialog_titles[status]){
-        title = processModel.value.status_dialog_titles[status]
-      }
-
-      if(props.statusConfiguration && props.statusConfiguration[status] && props.statusConfiguration[status].dialog_message){
-        message = props.statusConfiguration[status].dialog_message
-      }else if(processModel.value?.status_dialog_messages && processModel.value.status_dialog_messages[status]){
-        message = processModel.value.status_dialog_messages[status]
-      }
-
-      openDialog(title, message, () => updateProcess(status))
+      openDialog(status, () => updateProcess(status))
     }
 
     const canAction = (status) => {
@@ -742,6 +761,7 @@ export default {
       fetchProcess,
       updateProcess,
       confirmUpdateProcess,
+      getStatusConfigurationValue,
     })
 
     onMounted(() => {

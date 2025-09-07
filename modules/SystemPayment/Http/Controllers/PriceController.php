@@ -184,8 +184,8 @@ class PriceController extends Controller
 
             $color = 'success';
             $icon = 'mdi-check-decagram-outline';
-            $title = 'Payment Complete';
-            $description = 'Thank you for your payment. When your transfer is completed, you will be informed.';
+            $title = __('payment.success-title');
+            $description = __('payment.transfer-description');
             $modalProps = [
                 'noCancelButton' => true,
                 'confirmText' => __('Continue'),
@@ -462,8 +462,8 @@ class PriceController extends Controller
     public function response(Request $request)
     {
         $color = 'error';
-        $title = 'Payment Failed';
-        $description = 'Your payment has been failed. Please try again later or contact with administrator.';
+        $title = __('payment.error-title');
+        $description =  __('payment.failed-description');
         $icon = 'mdi-alert-circle-outline';
         $modalProps = [];
 
@@ -474,8 +474,8 @@ class PriceController extends Controller
 
         if ($request->status == 'success') {
             $color = 'success';
-            $title = 'Payment Complete';
-            $description = 'Congratulations! Your has been successfully completed.';
+            $title = __('payment.success-title');
+            $description = __('payment.success-description');
             $icon = 'mdi-check-decagram-outline';
             $modalProps = [
                 'noCancelButton' => true,

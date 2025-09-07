@@ -4,6 +4,7 @@ namespace Unusualify\Modularity\Entities\Traits;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
+use Modules\SystemNotification\Events\UnreadChatMessage;
 use Modules\SystemNotification\Notifications\ChatableUnreadNotification;
 use Unusualify\Modularity\Entities\Chat;
 use Unusualify\Modularity\Entities\ChatMessage;
@@ -182,6 +183,8 @@ trait Chatable
             && $latestChatMessage->created_at->diffInMinutes(now()) > static::getChatableNotificationInterval()
             && ! $latestChatMessage->notified_at
         ) {
+            UnreadChatMessage::dispatch($latestChatMessage);
+
             $chatableCreator = null;
             if (in_array('Unusualify\Modularity\Entities\Traits\HasCreator', class_uses_recursive($this))) {
                 $chatableCreator = $this->creator;

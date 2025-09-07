@@ -223,7 +223,7 @@
         (response) => {
           if(response.status === 200) {
             Alert.openAlert({
-              message: 'Assignment created successfully',
+              message: 'You have successfully assigned a task!',
               location: 'top',
               variant: 'success',
               ...response.data,

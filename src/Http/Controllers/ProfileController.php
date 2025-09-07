@@ -274,7 +274,7 @@ class ProfileController extends BaseController
 
         activity()->performedOn($item)->log('updated');
 
-        return $this->respondWithSuccess(___('messages.save-success'), $response);
+        return $this->respondWithSuccess(__('messages.profile-update-success'), $response);
 
     }
 

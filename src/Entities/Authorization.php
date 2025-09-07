@@ -3,6 +3,8 @@
 namespace Unusualify\Modularity\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Modules\SystemNotification\Events\AuthorizableCreated;
+use Modules\SystemNotification\Events\AuthorizableUpdated;
 
 class Authorization extends Model
 {
@@ -18,6 +20,23 @@ class Authorization extends Model
         'authorizable_id',
         'authorizable_type',
     ];
+
+    /**
+     * Perform any actions when booting the trait
+     */
+    public static function booted(): void
+    {
+
+        static::created(function (Model $model) {
+            AuthorizableCreated::dispatch($model);
+        });
+
+        static::updated(function (Model $model) {
+            if ($model->isDirty('authorized_id') || $model->isDirty('authorized_type')) {
+                AuthorizableUpdated::dispatch($model);
+            }
+        });
+    }
 
     public function authorized()
     {

@@ -76,6 +76,7 @@ class User extends Authenticatable implements MustVerifyEmailContract
     protected $appends = [
         'company_name',
         'name_with_company',
+        'valid_company'
     ];
 
     protected $isCreatingCompany = false;
@@ -166,15 +167,35 @@ class User extends Authenticatable implements MustVerifyEmailContract
         $valid = true;
 
         if ($this->company_id != null) {
-            $valid = true;
-            foreach ($this->company->getAttributes() as $attr => $value) {
-                if (! str_contains($attr, '_at') && $attr != 'id') {
-                    if (! $value) {
-                        $valid = false;
 
-                        break;
+            $company = $this->company;
+            $companyType = $company->is_personal ? 'personal' : 'company';
+
+            switch($companyType){
+                case 'personal':
+                    if(!$company->address
+                        || !$company->city
+                        || !$company->state
+                        || !$company->zip_code
+                        || !$company->country_id
+                    ){
+                        $valid = false;
                     }
-                }
+                    break;
+                default:
+                    if(!$company->name
+                        || !$company->tax_id
+                        || !$company->phone
+                        || !$company->email
+                        || !$company->address
+                        || !$company->country_id
+                        || !$company->city
+                        || !$company->state
+                        || !$company->zip_code
+                    ){
+                        $valid = false;
+                    }
+                    break;
             }
         }
 
@@ -204,7 +225,7 @@ class User extends Authenticatable implements MustVerifyEmailContract
 
     public function isClient()
     {
-        return preg_match('/client-/', $this->roles[0]->name);
+        return (bool) preg_match('/client-/', $this->roles[0]->name);
     }
 
     protected function avatar(): Attribute
@@ -250,5 +271,10 @@ class User extends Authenticatable implements MustVerifyEmailContract
     public function sendEmailVerification($token)
     {
         $this->notify(new \Unusualify\Modularity\Notifications\EmailVerification($token));
+    }
+
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new \Unusualify\Modularity\Notifications\ResetPasswordNotification($token));
     }
 }

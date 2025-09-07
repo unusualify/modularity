@@ -22,11 +22,11 @@
       <v-card class="text-center">
         <v-card-title class="">
           <ue-title type="h5" weight="medium" justify="center" color="primary" padding="t-3">
-            {{ $t('Log Out') }}
+            {{ $t('authentication.logout-title') }}
           </ue-title>
         </v-card-title>
         <v-card-text>
-          {{ $t('Are you sure you want to logout?') }}
+          {{ $t('authentication.logout-description') }}
         </v-card-text>
 
         <!-- <v-divider></v-divider> -->
@@ -34,12 +34,12 @@
         <v-card-actions class="justify-center">
           <!-- <v-spacer></v-spacer> -->
           <v-btn class="" variant="outlined" @click="dialog=false" density="compact">
-            {{ $t('Cancel') }}
+            {{ $t('authentication.logout-cancel') }}
           </v-btn>
           <v-form method="post" action="/logout">
             <input type="hidden" name="_token" :value="$csrf()">
             <v-btn variant="elevated" type="submit" density="compact">
-              {{ $t('Log Out') }}
+              {{ $t('authentication.logout-confirm') }}
             </v-btn>
           </v-form>
         </v-card-actions>
