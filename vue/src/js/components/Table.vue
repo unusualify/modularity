@@ -429,8 +429,6 @@
               :width-type="'sm'"
 
               v-bind="modals['dialog'].modalAttributes ?? {}"
-
-              has-fullscreen-button
             >
             </ue-modal>
 

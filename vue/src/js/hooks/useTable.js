@@ -628,7 +628,9 @@ export default function useTable (props, context) {
             switch(payload.type){
               case 'delete':
               case 'forceDelete':
-                attributes.description = tableNames.deleteQuestion.value
+                attributes.description = tableNames.deleteDialogDescription.value
+                attributes.title = tableNames.deleteDialogTitle.value
+                attributes.titleJustify = 'center'
                 break
               case 'bulkPublish':
               case 'bulkDelete':
