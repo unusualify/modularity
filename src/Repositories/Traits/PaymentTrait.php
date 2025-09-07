@@ -226,12 +226,16 @@ trait PaymentTrait
 
     public function getFormActionsConditionsForPayment(): array
     {
-        return method_exists($this->model, 'getFormActionsConditionsForPayment') ? $this->model->getFormActionsConditionsForPayment() : [];
+        return method_exists($this->model, 'getFormActionsConditionsForPayment')
+            ? $this->model->getFormActionsConditionsForPayment()
+            : [];
     }
 
     public function getFormActionPropsForPaymentTrait(): array
     {
-        return method_exists($this->model, 'getFormActionPropsForPaymentTrait') ? $this->model->getFormActionPropsForPaymentTrait() : [];
+        return method_exists($this->model, 'getFormActionPropsForPaymentTrait')
+            ? $this->model->getFormActionPropsForPaymentTrait()
+            : [];
     }
 
     public function getFormActionsPaymentTrait($scope = [])
