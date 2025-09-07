@@ -23,14 +23,14 @@
             :close-on-content-click="false"
             transition="scale-transition"
             widthType="md"
-            v-bind="action.modalAttributes ?? {}"
-            :use-model-value="false"
-            no-actions
-            description-body-class="d-flex flex-column fill-height w-100"
             no-default-body-padding
             has-close-button
             has-fullscreen-button
             has-title-divider
+            no-actions
+            v-bind="action.modalAttributes ?? {}"
+            :use-model-value="false"
+            description-body-class="d-flex flex-column fill-height w-100"
           >
             <template v-slot:activator="modalActivatorScope">
               <v-badge v-if="isBadge(action)"
