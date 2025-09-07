@@ -300,68 +300,6 @@ import { handleSuccessResponse, handleErrorResponse } from '@/utils/response'
   }
 
   // TODO: inputs/FormTabs.vue
-  window.__cast_value_match = (value, ownerItem ) => {
-    let matches
-
-    let returnValue = value
-
-    if(__isString(value) && (matches = value.match(/\$([\w\.\*]+)/))){
-      let notation = matches[1]
-      let quoted = __preg_quote(matches[0])
-      let parts = notation.split('.')
-
-      let newParts = []
-      for(const j in parts){
-        let part = parts[j]
-        if(part === '*'){
-          // let searchedValue =
-          let _id = ownerItem.id
-          // parts[j] = `*id=${_id}`
-        }else{
-          newParts.push(part)
-        }
-      }
-
-      notation = newParts.join('.')
-
-      let newValue = __data_get(ownerItem, notation)
-
-      if(newValue){
-        let _value
-        if(Array.isArray(newValue) && newValue.length > 0){
-          _value = newValue.join(',')
-        }else if(__isString(newValue)){
-          _value = newValue
-
-          let snakeCased = snakeCase(_value)
-
-          if(this.$te(`modules.${snakeCased}`)){
-            _value = this.$t(`modules.${snakeCased}`)
-          }
-        }else if(__isNumber(newValue)){
-          _value = newValue.toString()
-        }
-
-        if(_value){
-          let remainingQuote = '\\w\\s' + __preg_quote('çşıİğüö.,;?|:_')
-          let pattern = new RegExp( String.raw`^([${remainingQuote}]+)?(${quoted})([${remainingQuote}]+)?$`)
-
-          if(value.match(pattern)){
-            returnValue = value.replace(pattern, '$1' + _value + '$3')
-          }else{
-            __log(
-              'Not matched sentence',
-              pattern,
-              value,
-              value.match(pattern)
-            )
-          }
-        }
-      }
-    }
-
-    return returnValue
-  },
 
   window.__snakeToHeadline = (str) => {
     return str
