@@ -21,13 +21,6 @@ class PaymentCompletedNotification extends FeatureNotification implements Should
         parent::__construct($model);
     }
 
-    public function via($notifiable): array
-    {
-        $via = explode(',', config('modularity.notifications.payment.channels', 'mail,database'));
-
-        return $via;
-    }
-
     public function shouldSend(object $notifiable, string $channel): bool
     {
         return true;
