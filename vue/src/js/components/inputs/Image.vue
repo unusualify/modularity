@@ -4,6 +4,7 @@
     hideDetails="auto"
     appendIcon="mdi-close"
     :variant="boundProps.variant"
+    class="v-input-image"
     >
     <template v-slot:default="defaultSlot">
       <div class="v-field v-field--active v-field--center-affix v-field--dirty v-field--variant-outlined v-locale--is-ltr">
@@ -656,6 +657,11 @@ export default {
   $input-bg: #FCFCFC;
   $input-border: #DFDFDF;
   $height_input: 45px;
+
+  .v-input-image {
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
 
   .media--slide {
     border: 0 none;
