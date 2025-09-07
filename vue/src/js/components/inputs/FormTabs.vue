@@ -59,14 +59,15 @@
 
 <script>
 import { toRefs, reactive, ref, computed, watch } from 'vue';
-import { cloneDeep, each, filter, startCase, snakeCase } from 'lodash-es';
+import { cloneDeep, each, filter, startCase, snakeCase, isString } from 'lodash-es';
 import { useI18n } from 'vue-i18n';
 import { useInput,
   makeInputProps,
   makeInputEmits,
   makeInputInjects,
   useInputHandlers,
-  useValidation
+  useValidation,
+  useCastAttributes
 } from '@/hooks'
 
 import { getModel, getSchema } from '@/utils/getFormData.js'
@@ -111,71 +112,10 @@ export default {
     const { t, te } = useI18n()
     const inputHook = useInput(props, { emit })
 
+    const { matchStandardAttribute, castStandardAttribute, castEvalAttribute, castAttribute, castObjectAttribute } = useCastAttributes()
+
     const elements = ref(props.items)
     const loading = ref(true)
-
-    const castValueMatch = (value, ownerItem) => {
-      let matches
-
-      let returnValue = value
-
-      if(__isString(value) && (matches = value.match(/\$([\w\.\*]+)/))){
-        let notation = matches[1]
-        let quoted = __preg_quote(matches[0])
-        let parts = notation.split('.')
-
-        let newParts = []
-        for(const j in parts){
-          let part = parts[j]
-          if(part === '*'){
-            // let searchedValue =
-            let _id = ownerItem.id
-            // parts[j] = `*id=${_id}`
-          }else{
-            newParts.push(part)
-          }
-        }
-
-        notation = newParts.join('.')
-
-        let newValue = __data_get(ownerItem, notation)
-
-        if(newValue){
-          let _value
-          if(Array.isArray(newValue) && newValue.length > 0){
-            _value = newValue.join(',')
-          }else if(__isString(newValue)){
-            _value = newValue
-
-            let snakeCased = snakeCase(_value)
-
-            if(te(`modules.${snakeCased}`)){
-              _value = t(`modules.${snakeCased}`)
-            }
-          }else if(__isNumber(newValue)){
-            _value = newValue.toString()
-          }
-
-          if(_value){
-            let remainingQuote = '\\w\\s' + __preg_quote('çşıİğüö.,;?|:_-=<>/"\'')
-            let pattern = new RegExp( String.raw`^([${remainingQuote}]+)?(${quoted})([${remainingQuote}]+)?$`)
-
-            if(value.match(pattern)){
-              returnValue = value.replace(pattern, '$1' + _value + '$3')
-            }else{
-              __log(
-                'Not matched sentence',
-                pattern,
-                value,
-                value.match(pattern)
-              )
-            }
-          }
-        }
-      }
-
-      return returnValue
-    }
 
     const formRefs = reactive(new Map())
 
@@ -251,7 +191,9 @@ export default {
               if (actionName === 'items') {
                 targetInput[actionName] = __data_get(triggerItem, actionValue, [])
               } else if (triggerItem) {
-                targetInput[actionName] = castValueMatch(actionValue, triggerItem)
+                targetInput[actionName] = matchStandardAttribute(actionValue)
+                  ? castStandardAttribute(actionValue, triggerItem)
+                  : actionValue
               }
             }
           })
@@ -283,13 +225,22 @@ export default {
           && (props.protectedInputs[0] === '*' || props.protectedInputs.includes(inputName))){
           baseSchema[inputName]['protectInitialValue'] = true
         }
+
         if(__isset(baseSchema[inputName])){
           baseSchema[inputName]['items'] = item[props.tabFields[inputName]]
         }
+
         each(baseSchema[inputName], (value, key) => {
-          baseSchema[inputName][key] = castValueMatch(value, item)
+          if(isString(value)){
+            baseSchema[inputName][key] = matchStandardAttribute(value)
+              ? castStandardAttribute(value, item)
+              : value
+          } else {
+            baseSchema[inputName][key] = value
+          }
         })
       }
+
       return getSchema(baseSchema, models.value?.[item.id] ?? {})
     }
 
