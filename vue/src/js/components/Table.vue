@@ -466,14 +466,14 @@
             <!-- custom form modal -->
             <ue-modal v-model="customFormModalActive"
               ref="customFormModal"
-              :width-type="'lg'"
-              v-bind="customFormModalAttributes"
+              width-type="lg"
               persistent
-              description-body-class="d-flex flex-column fill-height w-100 px-4"
+              description-body-class="d-flex flex-column fill-height w-100 pa-4"
               no-default-body-padding
               no-actions
               has-close-button
-
+              scrollable
+              v-bind="customFormModalAttributes"
             >
               <!-- <slot name="systembar">
                 test
@@ -482,12 +482,12 @@
                 <ue-form
                   ref="customForm"
                   v-model="customFormModel"
-                  v-bind="customFormAttributes"
                   :title="null"
                   fill-height
                   scrollable
                   no-default-form-padding
                   style="height: 80vh !important;"
+                  v-bind="customFormAttributes"
                 >
                   <!-- <template v-slot:header.right>
                     <v-btn class="ml-auto" variant="text" icon="$close" density="compact" color="deafult"
@@ -894,6 +894,7 @@
                   :class="action.class ?? ''"
                   >
                   <template v-slot:activator="{ props }">
+                    {{ $log(action) }}
                     <component :is="action.is"
                       @click="itemAction(item, action)"
                       v-bind="{
