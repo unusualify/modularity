@@ -12,14 +12,6 @@ class ChatableUnreadNotification extends FeatureNotification implements ShouldQu
     {
         parent::__construct($model->chatable);
     }
-
-    public function via($notifiable): array
-    {
-        $via = explode(',', config('modularity.notifications.chatable.channels', 'database,mail'));
-
-        return $this->getValidChannels($via);
-    }
-
     public function shouldSend(object $notifiable, string $channel): bool
     {
         return true;
@@ -71,7 +63,7 @@ class ChatableUnreadNotification extends FeatureNotification implements ShouldQu
         return $default;
     }
 
-    public function afterNotificationSent(): void
+    public function afterNotificationSent($notifiable): void
     {
         try {
             $this->model->latestChatMessage()->first()->touchQuietly('notified_at');
