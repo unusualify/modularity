@@ -22,7 +22,9 @@ trait TableRows
 
         $noDefaultTableRowActions = $this->getConfigFieldsByRoute('no_default_table_row_actions', false);
 
+
         if (! $noDefaultTableRowActions) {
+            $model = $this->repository->getModel();
             // if $this->repository has hasPayment
             if (classHasTrait($this->repository->getModel(), 'Unusualify\Modularity\Entities\Traits\HasPayment')) {
                 $tableActions[] = [
@@ -41,6 +43,7 @@ trait TableRows
                             'schema' => $this->createFormSchema($this->repository->getPaymentFormSchema()),
                             'actionUrl' => route('admin.system.system_payment.pay'),
                             'async' => false,
+                            'style' => 'height: 70vh !important;',
                         ],
                         'model_formatter' => [
                             'price_id' => 'payment_price.id', // lodash get method
@@ -52,12 +55,17 @@ trait TableRows
                         ],
                     ],
                     'conditions' => [
-                        ['state.code', 'in', ['pending-payment']],
+                        // ['state.code', 'in', ['pending-payment']],
                         // ['payable_price.total_amount', '>', 0],
                         ['payment.status', 'not in', ['COMPLETED']],
+                        ...(method_exists($model, 'getTableRowConditionsForPayment')
+                            ? $model->getTableRowConditionsForPayment() : []),
                     ],
                     //  admin.system.system_payment.payment routeName
                     //  admin.crm.template/system/system-payments/pay/{price}
+                    ...(method_exists($model, 'getTableRowPropsForPayment')
+                        ? $model->getTableRowPropsForPayment() : []),
+
                 ];
                 // dd($actions);
             }
@@ -216,6 +224,16 @@ trait TableRows
 
             if (! $isAllowed) {
                 return $acc;
+            }
+
+            if (isset($action['formDraft'])) {
+                $formDraft = $action['formDraft'];
+                if($formDraft === 'company'){
+                    $action['form']['attributes'] = array_merge($action['form']['attributes'] ?? [], [
+                        'modelValue' => $this->user->company,
+                    ]);
+                }
+                $action['form']['attributes']['schema'] = $this->createFormSchema(getFormDraft($formDraft));
             }
 
             if (isset($action['href'])) {
