@@ -182,7 +182,9 @@ export default function useItemActions(props, context) {
     }
 
     // Check all conditions
-    return baseCondition && checkItemConditions(action.conditions, editingItem);
+    return baseCondition
+      && checkItemConditions(action.conditions, editingItem)
+      && checkItemConditions(action.userConditions ?? [], store.getters.userProfile);
   }
 
   const formatActions = (_actions) => {
