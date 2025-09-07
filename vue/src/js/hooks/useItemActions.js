@@ -8,7 +8,7 @@ import ACTIONS from '@/store/actions'
 import { FORM, ALERT } from '@/store/mutations/index'
 import api from '@/store/api/form'
 
-import { useFormatter, useCastAttributes, useDynamicModal } from '@/hooks'
+import { useCastAttributes, useDynamicModal } from '@/hooks'
 import { checkItemConditions } from '@/utils/itemConditions';
 
 export const makeItemActionsProps = propsFactory({
@@ -24,7 +24,6 @@ export const makeItemActionsProps = propsFactory({
 
 export default function useItemActions(props, context) {
   const store = useStore()
-  const { castMatch } = useFormatter(props, context)
   const { castObjectAttributes } = useCastAttributes()
   const dynamicModal = useDynamicModal()
 
@@ -188,14 +187,6 @@ export default function useItemActions(props, context) {
 
   const formatActions = (_actions) => {
     return _actions.map(action => {
-
-      if(editingItem) {
-        Object.keys(action).forEach(key => {
-          if (key === 'badge') {
-            action[key] = castMatch.value(action[key], editingItem)
-          }
-        })
-      }
 
       if(props.isEditing && editingItem){
         action = castObjectAttributes(action, editingItem)
