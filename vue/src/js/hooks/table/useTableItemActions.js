@@ -1,5 +1,6 @@
 // hooks/table/useTableItemActions.js
 import { computed, reactive, toRefs } from 'vue'
+import { useStore } from 'vuex'
 import { useDisplay } from 'vuetify'
 import _ from 'lodash-es'
 
@@ -39,6 +40,7 @@ export const makeTableItemActionsProps = propsFactory({
 })
 
 export default function useTableItemActions(props, { tableForms, loadItems }) {
+  const store = useStore()
   const tableItem = useTableItem()
   const tableNames = useTableNames(props)
   const { can } = useAuthorization()
@@ -79,7 +81,9 @@ export default function useTableItemActions(props, { tableForms, loadItems }) {
         break
     }
 
-    return hasAction && checkItemConditions(action.conditions, item)
+    return hasAction
+      && checkItemConditions(action.conditions, item)
+      && checkItemConditions(action.userConditions ?? [], store.getters.userProfile);
 
   }
 
