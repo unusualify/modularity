@@ -2,6 +2,22 @@
 
 All notable changes to `modularity` will be documented in this file
 
+## v0.45.1 - 2025-09-08
+
+### :recycle: Refactors
+
+- rename v-date-input to v-input-date for consistency by @OoBook in https://github.com/unusualify/modularity/commit/c2c383ba157453c98c2fc2d85823f134ae43a392
+- streamline date input handling and improve readability by @OoBook in https://github.com/unusualify/modularity/commit/4682f5eba166f2d5555ebe464a5cf50ac473fbdd
+
+### :lipstick: Styling
+
+- lint coding styles for v0.45.0 by @invalid-email-address in https://github.com/unusualify/modularity/commit/07b93c8906dc23da8d3a47bb57c3b2cdf0f267df
+
+### :package: Build
+
+- update build artifacts for v0.45.0 by @invalid-email-address in https://github.com/unusualify/modularity/commit/7868fc76c31ab21e3003b472ba663e1f3e582360
+- update build artifacts for v0.45.1 by @OoBook in https://github.com/unusualify/modularity/commit/3e7e9746bf6d0d747ffe20e3419728d650784504
+
 ## v0.45.0 - 2025-09-08
 
 ### :rocket: Features
