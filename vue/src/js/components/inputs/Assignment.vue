@@ -566,7 +566,7 @@
                       auto-select-first="exact"
                     ></v-select>
 
-                    <v-date-input
+                    <v-input-date
                       v-model="createFormModel.due_at"
                       :variant="variant"
                       :label="$t('Due Date')"
@@ -594,7 +594,7 @@
                       <!-- <template v-slot:actions="{ save, cancel, isPristine }">
                         sss
                       </template> -->
-                    </v-date-input>
+                    </v-input-date>
 
                   </div>
 

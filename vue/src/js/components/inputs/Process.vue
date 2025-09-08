@@ -134,20 +134,17 @@
             >
               <template v-slot:field.1="slotScope">
                 <!-- <div class="d-flex" style=""> -->
-                  <ue-filepond-preview
-                    v-if="formInput.type === 'input-filepond'"
+                  <ue-filepond-preview v-if="formInput.type === 'input-filepond'"
                     :source="slotScope.value"
                     show-inline-file-name
                     image-size="24"
                     style="width: 155px;"
                   />
-                  <template
-                    v-else-if="(formInput.type === 'text' && formInput.ext === 'date') || (formInput.type === 'date-input')"
+                  <template v-else-if="(formInput.type === 'text' && formInput.ext === 'date') || (['input-date', 'date-input'].includes(formInput.type))"
                   >
-                    {{ slotScope.value ? $d(slotScope.value, 'numeric') : '' }}
+                    {{ slotScope.value ? $d(slotScope.value, formInput.displayDateFormat ?? 'numeric') : '' }}
                   </template>
-                  <template
-                    v-else
+                  <template v-else
                     class="text-subtitle-1"
                   >
                     {{ slotScope.value }}
