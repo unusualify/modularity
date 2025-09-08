@@ -223,7 +223,7 @@
         (response) => {
           if(response.status === 200) {
             Alert.openAlert({
-              message: 'Assignment created successfully',
+              message: 'You have successfully assigned a task!',
               location: 'top',
               variant: 'success',
               ...response.data,
@@ -499,26 +499,28 @@
                   </v-tooltip>
                 </template>
                 <template v-slot:body.description>
-                  <v-list
-                    class="pb-4 flex-1-0"
-                    :items="formattedAssignments"
-                    lines="ten"
-                    item-props
-                  >
-                    <template v-slot:title="{ title }">
-                      <div v-html="title"></div>
-                    </template>
-                    <template v-slot:subtitle="{ item, subtitle }">
-                      <div v-html="subtitle"></div>
-                      <ue-filepond-preview class="my-2" v-if="item.attachments && item.attachments.length > 0" :source="item.attachments" show-inline-file-name image-size="24"/>
+                  <div>
+                    <v-list
+                      class="pb-4 flex-1-0"
+                      :items="formattedAssignments"
+                      lines="ten"
+                      item-props
+                    >
+                      <template v-slot:title="{ title }">
+                        <div v-html="title"></div>
+                      </template>
+                      <template v-slot:subtitle="{ item, subtitle }">
+                        <div class="w-100" style="word-break: break-word;white-space: pre-wrap;" v-html="subtitle"></div>
+                        <ue-filepond-preview class="my-2" v-if="item.attachments && item.attachments.length > 0" :source="item.attachments" show-inline-file-name image-size="24"/>
 
-                    </template>
-                    <template v-slot:append="appendScope" >
-                      <ue-dynamic-component-renderer
-                        :subject="appendScope.item.appendInnerIcon"
-                      />
+                      </template>
+                      <template v-slot:append="appendScope" >
+                        <ue-dynamic-component-renderer
+                          :subject="appendScope.item.appendInnerIcon"
+                        />
                       </template>
                     </v-list>
+                  </div>
                 </template>
               </ue-modal>
             </template>

@@ -14,14 +14,6 @@ class StateableUpdatedNotification extends FeatureNotification implements Should
     public function __construct($model, public $newState, public $oldState)
     {
         parent::__construct($model);
-
-    }
-
-    public function via($notifiable): array
-    {
-        $via = explode(',', config('modularity.notifications.stateable.channels', 'database,mail'));
-
-        return $via;
     }
 
     public function toArray($notifiable): array

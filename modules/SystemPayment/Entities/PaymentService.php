@@ -26,6 +26,7 @@ class PaymentService extends Model
     ];
 
     protected $appends = [
+        'has_built_in_form',
         'button_logo_url',
         'transferrable',
         'bank_details',
@@ -60,6 +61,63 @@ class PaymentService extends Model
         return $this->belongsToMany(\Modules\SystemPayment\Entities\CardType::class);
     }
 
+    protected function serviceClass(): Attribute
+    {
+        $serviceClass = null;
+        $paymentGateway = null;
+
+        try {
+            $paymentGateway = $this->key;
+        } catch (\Throwable $th) {
+            // throw $th;
+        }
+
+        if ($paymentGateway) {
+
+            try {
+                $serviceClass = \Unusualify\Payable\Payable::getServiceClass($paymentGateway);
+            } catch (\Exception $e) {
+
+                try {
+                    // code...
+                    // Check transferrable status directly from spreadable relationship instead of using the accessor
+                    $isTransferrable = $this->spreadable && isset($this->spreadable->content['type']) && $this->spreadable->content['type'] == 2;
+
+                    if ($e->getMessage() == 'Service class not found for slug: ' . $paymentGateway && $isTransferrable) {
+                        $serviceClass = new class extends \Unusualify\Payable\Services\PaymentService
+                        {
+                            public function __construct()
+                            {
+                                $this->mode = 'test';
+                                $this->config = [];
+                            }
+
+                            public function hydrateParams(array|object $params): array
+                            {
+                                return $params;
+                            }
+                        };
+                    } else {
+                        throw $e;
+                    }
+                } catch (\Throwable $th) {
+                    dd($th, $this, $serviceClass, $paymentGateway);
+                }
+            }
+        }
+
+        return Attribute::make(
+            get: fn ($value) => $serviceClass,
+        );
+    }
+
+    protected function hasBuiltInForm(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $this->serviceClass ? $this->serviceClass::$hasBuiltInForm : false,
+        );
+    }
+
     protected function buttonLogoUrl(): Attribute
     {
         return Attribute::make(
@@ -69,8 +127,16 @@ class PaymentService extends Model
 
     protected function transferrable(): Attribute
     {
+        $type = 1;
+
+        try {
+            $type = $this->spreadable->content['type'] ?? 1;
+        } catch (\Throwable $th) {
+            // throw $th;
+        }
+
         return Attribute::make(
-            get: fn ($value) => $this->spreadable ? ($this->spreadable->content['type'] == 2 ? true : false) : false,
+            get: fn ($value) => $type == 2,
         );
     }
 
@@ -92,18 +158,18 @@ class PaymentService extends Model
 
     public function scopeIsExternal($query)
     {
-        return $query->published()->where('is_external', 1);
+        return $query->where("{$this->getTable()}.is_external", 1);
     }
 
     public function scopeIsTransfer($query)
     {
-        return $query->published()->whereHas('spreadable', function ($query) {
+        return $query->whereHas('spreadable', function ($query) {
             $query->where('content->type', 2);
         });
     }
 
     public function scopeIsInternal($query)
     {
-        return $query->published()->where('is_internal', 1);
+        return $query->where("{$this->getTable()}.is_internal", 1);
     }
 }

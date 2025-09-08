@@ -37,10 +37,13 @@ class PaymentServiceHydrate extends InputHydrate
                 ->orWhereHas('paymentService')
                 ->with('paymentServices', 'paymentService')
                 ->get()
+                ->each(function ($item) {
+                    $item->append('has_built_in_form');
+                })
             : [];
 
         $input['items'] = ! $this->skipQueries
-            ? PaymentService::isExternal()->orWhere(fn ($query) => $query->isTransfer())->with('paymentCurrencies')->get()->toArray()
+            ? PaymentService::published()->isExternal()->orWhere(fn ($query) => $query->published()->isTransfer())->with('paymentCurrencies')->get()->toArray()
             : [];
 
         $paymentServices = ! $this->skipQueries
@@ -104,7 +107,11 @@ class PaymentServiceHydrate extends InputHydrate
             ],
         ]);
 
-        $input['paymentUrl'] = route('admin.system.system_payment.payment');
+        $input['paymentUrl'] = route('admin.system.system_payment.pay');
+        $input['checkoutUrl'] = route('admin.system.system_payment.checkout');
+        $input['completeUrl'] = route('admin.system.system_payment.payment.response');
+
+        // dd($input['supportedCurrencies']->toArray());
 
         return $input;
     }

@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::create(modularityConfig('tables.companies', 'modularity_companies'), function (Blueprint $table) {
+        Schema::create(modularityConfig('tables.companies', 'um_companies'), function (Blueprint $table) {
             // this will create an id, a "published" column, and soft delete and timestamps columns
             createDefaultTableFields($table);
             // $table->{modularityIntegerMethod()}("_id")->unsigned();

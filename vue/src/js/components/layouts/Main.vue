@@ -229,6 +229,7 @@
               buttonText="fields.login"
 
               @submitted="loginFormSubmitted"
+              titleJustify="center"
             >
             </ue-form>
           </v-card-text>

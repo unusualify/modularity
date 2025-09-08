@@ -16,7 +16,7 @@
           :width="showInlineFileName || showFileName ? '100%' : `${imageSize}`"
           :height="imageSize"
           :elevation="isHovering ? 4 : 0"
-          @click="previewFile(index)"
+          @click="canPreviewFile(index) ? previewFile(index) : downloadFile(item.uuid)"
         >
           <!-- Left side: Icon/Image -->
           <div :style="{ width: `${imageSize}px`, height: `${imageSize}px` }" class="position-relative flex-grow-0">
@@ -93,6 +93,7 @@
               :loading="downloadingStates[index]"
             ></v-btn>
             <v-btn
+              v-if="canPreviewFile(index)"
               icon="mdi-eye"
               size="x-small"
               color="white"
@@ -270,6 +271,9 @@
           default:
             return 'grey';
         }
+      },
+      canPreviewFile(index) {
+        return ['jpg', 'jpeg', 'png', 'gif', 'webp', 'pdf'].includes(this.normalizedSource[index].file_name.split('.').pop().toLowerCase());
       },
       async previewFile(index) {
         this.previewDialogs[index] = true;

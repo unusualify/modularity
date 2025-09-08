@@ -21,7 +21,8 @@ Route::middleware(['web.auth', ...\Unusualify\Modularity\Facades\ModularityRoute
 
     Route::middleware(modularityConfig('payment_middlewares', []))->group(function () {
         Route::controller(PriceController::class)->group(function () {
-            Route::post('/pay', 'pay')->name('payment');
+            Route::post('/pay', 'pay')->name('pay');
+            Route::post('/checkout', 'checkout')->name('checkout');
         });
     });
 });

@@ -44,6 +44,15 @@ abstract class FeatureNotification extends Notification implements ShouldQueue
     public $salutationMessage;
 
     /**
+     * The valid channels of the notification.
+     *
+     * @var array<string>
+     */
+    public $validChannels = ['mail', 'database', 'broadcast', 'vonage', 'slack'];
+
+    public $defaultChannels = [];
+
+    /**
      * The module route headline of the model.
      *
      * @var array<string, \Closure>
@@ -161,6 +170,40 @@ abstract class FeatureNotification extends Notification implements ShouldQueue
     public function getToken(): string
     {
         return $this->token;
+    }
+
+    public function isValidChannel(string $channel): bool
+    {
+        return in_array($channel, $this->validChannels);
+    }
+
+    public function getValidChannels($channels): array
+    {
+        if (! is_array($channels)) {
+            $channels = explode(',', $channels);
+        }
+
+        return array_filter($channels, function ($channel) {
+            return $this->isValidChannel($channel);
+        });
+    }
+
+    public function getClassChannels(): array
+    {
+        $class = static::class;
+
+        $channels = config("modularity.notifications.{$class}.channels", null);
+
+        if ($channels !== null && is_string($channels)) {
+            return $this->getValidChannels(explode(',', $channels));
+        }
+
+        return $this->defaultChannels;
+    }
+
+    public function via($notifiable): array
+    {
+        return $this->getClassChannels();
     }
 
     /**
@@ -483,7 +526,7 @@ abstract class FeatureNotification extends Notification implements ShouldQueue
      *
      * @return string|null
      */
-    protected function getNotificationRedirector(object $notifiable, \Illuminate\Database\Eloquent\Model $model)
+    public function getNotificationRedirector(object $notifiable, \Illuminate\Database\Eloquent\Model $model)
     {
         if (method_exists($this, 'redirectorModel')) {
             $model = $this->redirectorModel($model);
@@ -532,7 +575,7 @@ abstract class FeatureNotification extends Notification implements ShouldQueue
      *
      * @return string|null
      */
-    protected function getNotificationMailRedirector(object $notifiable, \Illuminate\Database\Eloquent\Model $model)
+    public function getNotificationMailRedirector(object $notifiable, \Illuminate\Database\Eloquent\Model $model)
     {
         $notificationRecord = $notifiable->notifications()
             ->where('type', get_class($this))

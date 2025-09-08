@@ -8,13 +8,13 @@
       <div class="card-input">
         <label for="cardNumber" class="card-input__label">{{ $t('Card Number') }}</label>
         <v-text-field :id="fields.cardNumber" v-model="formData.cardNumber" @input="changeNumber"
-          @focus="focusCardNumber" @blur="blurCardNumber" data-card-field type="tel" variant="outlined" v-number-only :maxlength="cardNumberMaxLength">
+          @focus="focusCardNumber" @blur="blurCardNumber" data-card-field type="tel" variant="outlined" v-number-only :maxlength="cardNumberMaxLength" :density="inputDensity">
         </v-text-field>
       </div>
       <div class="card-input">
         <label for="cardName" class="card-input__label">{{ $t('Card Holder') }}</label>
         <v-text-field :id="fields.cardName" v-model="formData.cardName" @input="changeName" data-card-field
-          variant="outlined">
+          variant="outlined" :density="inputDensity">
         </v-text-field>
       </div>
       <div class="card-form__row">
@@ -23,16 +23,16 @@
             <label for="cardMonth" class="card-input__label">{{ $t('Expire Date') }}</label>
             <v-select :id="fields.cardMonth" :items="months" :label="$t('Month')" v-model="formData.cardMonth"
               @change="changeMonth" :disabled-item="month => month < minCardMonth" data-card-field
-              variant="outlined"></v-select>
+              variant="outlined" :density="inputDensity"></v-select>
             <v-select :id="fields.cardYear" :items="years" :label="$t('Year')" v-model="formData.cardYear"
-              @change="changeYear" data-card-field variant="outlined"></v-select>
+              @change="changeYear" data-card-field variant="outlined" :density="inputDensity"></v-select>
           </div>
         </div>
         <div class="card-form__col -cvv">
           <div class="card-input">
             <label for="cardCvv" class="card-input__label">{{ $t('CVV') }}</label>
             <v-text-field type="tel" v-model="formData.cardCvv" v-number-only :id="fields.cardCvv" maxlength="4"
-              @input="changeCvv" data-card-field autocomplete="off" variant="outlined">
+              @input="changeCvv" data-card-field autocomplete="off" variant="outlined" :density="inputDensity">
             </v-text-field>
           </div>
         </div>
@@ -97,6 +97,10 @@ export default {
     randomBackgrounds: {
       type: Boolean,
       default: true
+    },
+    inputDensity: {
+      type: String,
+      default: 'default'
     }
   },
   components: {
@@ -380,7 +384,7 @@ export default {
     border-radius: 4px;
     border:1px solid #54AF4C;
     padding: 35px;
-    padding-top: 180px;
+    padding-top: 160px;
 
     @media screen and (max-width: 480px) {
       padding: 25px;
@@ -752,7 +756,7 @@ export default {
     flex-wrap: wrap;
     font-size: 1rem;
     margin-left: auto;
-    padding: 10px;
+    padding: 10px 0;
     display: inline-flex;
     width: 80px;
     white-space: nowrap;
@@ -860,7 +864,6 @@ export default {
 }
 
 .card-input {
-  margin-bottom: 20px;
   position: relative;
 
   &__label {

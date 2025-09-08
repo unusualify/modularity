@@ -153,6 +153,47 @@ export default function useTableNames(props, context) {
       name: itemName.toLocaleUpperCase()
     })
   })
+  const deleteDialogTitle = computed(() => {
+    const deletionSpecifierKey = isSoftDeletableItem.value
+      ? 'confirm-soft-deletion-title'
+      : 'confirm-deletion-title'
+
+    const langKey = te(`messages.${Module.snakeName.value}.${deletionSpecifierKey}`)
+      ? `messages.${Module.snakeName.value}.${deletionSpecifierKey}`
+      : `fields.${deletionSpecifierKey}`
+
+    const itemName = editedItem.value[props.titleKey]
+      ? (_.isObject(editedItem.value[props.titleKey])
+          ? editedItem.value[props.titleKey][store.state.user.locale]
+          : editedItem.value[props.titleKey])
+      : ''
+
+    return t(langKey, {
+      route: Module.transNameSingular.value,
+      name: itemName.toLocaleUpperCase()
+    })
+  })
+
+  const deleteDialogDescription = computed(() => {
+    const deletionSpecifierKey = isSoftDeletableItem.value
+      ? 'confirm-soft-deletion-description'
+      : 'confirm-deletion-description'
+
+    const langKey = te(`messages.${Module.snakeName.value}.${deletionSpecifierKey}`)
+      ? `messages.${Module.snakeName.value}.${deletionSpecifierKey}`
+      : `fields.${deletionSpecifierKey}`
+
+    const itemName = editedItem.value[props.titleKey]
+      ? (_.isObject(editedItem.value[props.titleKey])
+          ? editedItem.value[props.titleKey][store.state.user.locale]
+          : editedItem.value[props.titleKey])
+      : ''
+
+    return t(langKey, {
+      route: Module.transNameSingular.value,
+      name: itemName.toLocaleUpperCase()
+    })
+  })
 
   return {
     // Base names
@@ -169,6 +210,8 @@ export default function useTableNames(props, context) {
     tableSubtitle,
 
     deleteQuestion,
+    deleteDialogTitle,
+    deleteDialogDescription,
 
     // Form
     formTitle,

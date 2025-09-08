@@ -10,6 +10,8 @@ class PaymentFailedNotification extends FeatureNotification implements ShouldQue
 {
     use Queueable;
 
+    public $defaultChannels = ['database', 'mail'];
+
     /**
      * Create a new notification instance.
      *
@@ -19,13 +21,6 @@ class PaymentFailedNotification extends FeatureNotification implements ShouldQue
     public function __construct($model)
     {
         parent::__construct($model);
-    }
-
-    public function via($notifiable): array
-    {
-        $via = explode(',', config('modularity.notifications.payment.channels', 'mail,database'));
-
-        return $via;
     }
 
     public function shouldSend(object $notifiable, string $channel): bool

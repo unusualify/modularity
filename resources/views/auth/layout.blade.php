@@ -6,6 +6,10 @@
     }}
 @endpush
 
+@php
+    $logoSymbol = modularityConfig('ui_settings.auth.logoSymbol');
+@endphp
+
 {{-- @dd(get_defined_vars()) --}}
 @section('body')
     <div id="auth">
@@ -13,6 +17,7 @@
         <ue-auth
             title="'{{ __('authentication.create-an-account') ?? 'CREATE AN ACCOUNT' }}'"
             v-bind='@json($attributes ?? [])'
+            logoSymbol="{{ $logoSymbol }}"
             @if(isset($taskState))
                 no-divider
             @endif

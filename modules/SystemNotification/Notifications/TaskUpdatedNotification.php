@@ -21,13 +21,6 @@ class TaskUpdatedNotification extends FeatureNotification implements ShouldQueue
         parent::__construct($model);
     }
 
-    public function via($notifiable): array
-    {
-        $via = explode(',', config('modularity.notifications.assignable.channels', 'mail,database'));
-
-        return $via;
-    }
-
     public function shouldSend(object $notifiable, string $channel): bool
     {
         return true;

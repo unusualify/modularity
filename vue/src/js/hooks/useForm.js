@@ -351,7 +351,7 @@ export default function useForm(props, context) {
           if (Object.prototype.hasOwnProperty.call(response.data, 'exception')) {
             store.commit(ALERT.SET_ALERT, { message: 'Your submission could not be processed.', variant: 'error' })
           } else {
-            store.dispatch(ACTIONS.HANDLE_ERRORS, response.response.data)
+            store.dispatch(ACTIONS.HANDLE_ERRORS, response.data)
             store.commit(ALERT.SET_ALERT, { message: 'Your submission could not be validated, please fix and retry', variant: 'error' })
           }
 

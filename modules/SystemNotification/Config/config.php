@@ -120,8 +120,10 @@ return [
                     'modalService' => [
                         'modalProps' => [
                             'title' => '$subject',
-                            'hasCloseButton' => true,
+                            // 'hasCloseButton' => true,
+                            'persistent' => false,
                             'noActions' => true,
+                            'titleJustify' => 'center',
                         ],
                         'component' => 'ue-recursive-stuff',
                         'props' => [
@@ -168,8 +170,10 @@ return [
                     'modalService' => [
                         'modalProps' => [
                             'title' => '$subject',
-                            'hasCloseButton' => true,
+                            // 'hasCloseButton' => true,
+                            'persistent' => false,
                             'noActions' => true,
+                            'titleJustify' => 'center',
                         ],
                         'component' => 'ue-recursive-stuff',
                         'props' => [
@@ -259,16 +263,16 @@ return [
                     'searchKey' => 'data->subject',
                     'searchable' => true,
                 ],
-                [
-                    'title' => 'Message',
-                    'key' => 'message',
-                    'formatter' => [
-                        'shorten',
-                        30,
-                    ],
-                    'searchKey' => 'data->message',
-                    'searchable' => true,
-                ],
+                // [
+                //     'title' => 'Message',
+                //     'key' => 'message',
+                //     'formatter' => [
+                //         'shorten',
+                //         30,
+                //     ],
+                //     'searchKey' => 'data->message',
+                //     'searchable' => true,
+                // ],
                 [
                     'title' => 'Read',
                     'key' => 'is_read',

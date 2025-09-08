@@ -8,8 +8,11 @@ return [
     'city' => 'City',
     'complete' => 'Complete',
     'confirm' => 'Confirm',
-    'confirm-deletion' => 'Are you sure want to delete {name} {route}?',
-    'confirm-soft-deletion' => 'Are you sure want to delete {name} {route} permanently?',
+
+    'confirm-deletion-title' => 'Confirm Delete',
+    'confirm-deletion-description' => 'Are you sure to delete {name} {route}?',
+    'confirm-soft-deletion-title' => 'Confirm Permanent Delete',
+    'confirm-soft-deletion-description' => 'Are you sure to delete {name} {route} permanently?',
 
     'confirm-bulk-publish' => 'Are you sure want to publish {count} {route}?',
     'confirm-bulk-delete' => 'Are you sure want to delete {count} {route}?',

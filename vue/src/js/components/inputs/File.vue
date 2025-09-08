@@ -3,6 +3,7 @@
     hideDetails="auto"
     appendIcon="mdi-close"
     :variant="boundProps.variant"
+    class="v-input-file"
   >
     <template v-slot:default="defaultSlot">
       <div class="v-field v-field--active v-field--center-affix v-field--dirty v-field--variant-outlined v-locale--is-ltr">
@@ -126,6 +127,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
+  .v-input-file {
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
 
   .fileField {
     width: 100%;

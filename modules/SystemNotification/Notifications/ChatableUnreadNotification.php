@@ -3,20 +3,14 @@
 namespace Modules\SystemNotification\Notifications;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Modules\SystemNotification\Notifications\Contracts\AfterSendable;
 use Unusualify\Modularity\Facades\ModularityLog;
 
-class ChatableUnreadNotification extends FeatureNotification implements ShouldQueue
+class ChatableUnreadNotification extends FeatureNotification implements AfterSendable, ShouldQueue
 {
     public function __construct(\Unusualify\Modularity\Entities\Chat $model)
     {
         parent::__construct($model->chatable);
-    }
-
-    public function via($notifiable): array
-    {
-        $via = explode(',', config('modularity.notifications.chatable.channels', 'database,mail'));
-
-        return $via;
     }
 
     public function shouldSend(object $notifiable, string $channel): bool
@@ -70,7 +64,7 @@ class ChatableUnreadNotification extends FeatureNotification implements ShouldQu
         return $default;
     }
 
-    public function afterNotificationSent(): void
+    public function afterNotificationSent($notifiable): void
     {
         try {
             $this->model->latestChatMessage()->first()->touchQuietly('notified_at');
