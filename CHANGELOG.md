@@ -2,6 +2,101 @@
 
 All notable changes to `modularity` will be documented in this file
 
+## v0.45.0 - 2025-09-08
+
+### :rocket: Features
+
+- integrate logo symbol into authentication layout by @OoBook in https://github.com/unusualify/modularity/commit/88e23216809d2c818eee52b050aee66931bb4f7c
+- add DateHydrate class and Vue component for date input handling by @OoBook in https://github.com/unusualify/modularity/commit/3251afc3b9e5537e24f104bea0d50ede208cc0ca
+- integrate Revolut Checkout components and update dependencies by @OoBook in https://github.com/unusualify/modularity/commit/59bdcc03f1091c0673cf4dc3016c62cd8f694b0a
+- enhance input fields with density prop and adjust styles by @OoBook in https://github.com/unusualify/modularity/commit/b77410a59eaf93ce0af3a8eee5358970f8e1f32e
+- add service class and built-in form attributes by @OoBook in https://github.com/unusualify/modularity/commit/0241f06d57a892867b400c424ffd5f2a60ea2026
+- add attributes for credit card payment service and built-in form by @OoBook in https://github.com/unusualify/modularity/commit/e58c07a09744ba692d137b5a5a85cf763297e20b
+- implement checkout method for payment processing by @OoBook in https://github.com/unusualify/modularity/commit/0b43fe7f0fb66cf47b3b90dfb1369860c3245cf7
+- refactor currency handling and integrate built-in payment form by @OoBook in https://github.com/unusualify/modularity/commit/8f0d2b6c2f7a1ff4f38c4af8d55933394a51afbd
+- add logout confirmation messages and titles by @celikerde in https://github.com/unusualify/modularity/commit/1db313b671e18a69a345145cbdaa28535544172d
+- add English language support for payment messages by @celikerde in https://github.com/unusualify/modularity/commit/fb73b95c0c80c9eacf0298a8b0f6d77545e30ca4
+- enhance dialog messages and layout for process updates by @celikerde in https://github.com/unusualify/modularity/commit/b0ad89eec7b29f4afa9da70f7c07898669a05308
+- enhance action handling with dynamic confirmation modals by @celikerde in https://github.com/unusualify/modularity/commit/8b70896f8dbfb9b12dac7b9f4e2cb8e954edec5c
+- add trait for managing changed relationships by @celikerde in https://github.com/unusualify/modularity/commit/baf86c4ae20663cb122c2b29719320677f7c6a51
+- dispatch unread chat message event on notification handling by @celikerde in https://github.com/unusualify/modularity/commit/484612dc1238012bf47d36c150ea8990e6ff3c85
+- enhance afterSaveRelationships method to track changes by @celikerde in https://github.com/unusualify/modularity/commit/3724fecfee3b9c5d8c5a261bd7fe12072821a72b
+- integrate ChangeRelationships trait for enhanced relationship management by @celikerde in https://github.com/unusualify/modularity/commit/9bf4de13facb322c661e6a9f886b71667cc9c05d
+- add custom ResetPasswordNotification for enhanced user experience by @celikerde in https://github.com/unusualify/modularity/commit/54a625fafb7392ac48a338221dea5936a0447c7d
+- add sendPasswordResetNotification method for password reset functionality by @celikerde in https://github.com/unusualify/modularity/commit/661b5ce2ed508e195e5af7770b8d17abcc83ac6d
+- add event dispatching for model creation and updates by @celikerde in https://github.com/unusualify/modularity/commit/507d8984bc8653a81f7ca0e381186335657e8523
+- introduce AfterSendable interface for notification handling by @celikerde in https://github.com/unusualify/modularity/commit/bf8be5dbdb9619449699d23c20d155ec12610f0d
+- add valid channels and validation methods for notifications by @celikerde in https://github.com/unusualify/modularity/commit/dafd9fc5889939e176f591c32b4428157fe90e71
+- add events for authorizable creation and updates, and unread chat messages by @celikerde in https://github.com/unusualify/modularity/commit/3b9d8a791ab7df519ea515b499d3b7b605df875d
+- add title justification property to form component by @OoBook in https://github.com/unusualify/modularity/commit/55ca4e482762ead1511915f8b10b548180867e57
+- add computed properties for delete dialog title and description by @OoBook in https://github.com/unusualify/modularity/commit/b1cc8a4c7c31fda5a9b410cac6de5c557956e6cf
+- add valid_company attribute and enhance company validation logic by @OoBook in https://github.com/unusualify/modularity/commit/3a0f74d0d0033deca184f24eccdf369b48ff4e72
+- include additional user attributes in profile data by @OoBook in https://github.com/unusualify/modularity/commit/9b9485c1c9c4d03ab7b952bdf82cae191d76b805
+- enhance condition checks for item actions by @OoBook in https://github.com/unusualify/modularity/commit/669b1c1e023d1a7496595fa154bfb406520f4c17
+- enhance form action handling with draft support by @OoBook in https://github.com/unusualify/modularity/commit/2712858d995a04b411a8bcc833af4210ac94a4d7
+- enhance notification channel handling by @OoBook in https://github.com/unusualify/modularity/commit/313842ebb49fe8cb26fab0ca4e0dea31faeb721f
+- add Revolut payment service configuration and image by @OoBook in https://github.com/unusualify/modularity/commit/3b871543e62ac73e4a8d22310a906fb235e46810
+- enhance condition evaluation with support for complex logic by @OoBook in https://github.com/unusualify/modularity/commit/089a98c581f14fc9c35e319298fae8e6ea6c1675
+
+### :wrench: Bug Fixes
+
+- simplify body description structure in modal by @OoBook in https://github.com/unusualify/modularity/commit/f0c112515d2313feb9c4a7ddb0a3094200f99b80
+- improve body description structure in modal by @OoBook in https://github.com/unusualify/modularity/commit/80174d46920ec4a022510b18185c7d703a826c76
+- update success message for task assignment notification by @celikerde in https://github.com/unusualify/modularity/commit/cae2087c16e91ed8334fc20b833ae7228ea5823e
+- correct error handling response data structure by @celikerde in https://github.com/unusualify/modularity/commit/5747cb79a5e8e73a0efd04e3851bec0abd6e4d36
+- update response modal message styling for better readability by @celikerde in https://github.com/unusualify/modularity/commit/ca022c244b42905e4592d04afd4b14093ca7d5d7
+- update button text for password reset form by @celikerde in https://github.com/unusualify/modularity/commit/bea43f000a84ee5e4c3b4af9ec5cc882bbfdd080
+- update success message for profile update response by @celikerde in https://github.com/unusualify/modularity/commit/699077df333459a3e2a6a0c524d5665c52152a13
+- enhance validation rules for form fields by @celikerde in https://github.com/unusualify/modularity/commit/96ea09a24c55b6f2eb655f0abe7953f1dea5df75
+- update companies name field length and related fields by @celikerde in https://github.com/unusualify/modularity/commit/ed3d93c05667953bab4ae3c79ed8ef52ef8cb531
+- reorder modal attributes for consistent rendering by @OoBook in https://github.com/unusualify/modularity/commit/d36f4ce2bf60a25fd08ef3736d2605fbfd697a4e
+- add padding to input components by @OoBook in https://github.com/unusualify/modularity/commit/750acd3263652f90cbbbfe9c65143fdf73af6a87
+- enhance file preview functionality with conditional download by @OoBook in https://github.com/unusualify/modularity/commit/55ab5a9070437fce517ae5bdd03ced079637e16f
+
+### :recycle: Refactors
+
+- update payment routes and enhance payment service hydration by @OoBook in https://github.com/unusualify/modularity/commit/8c5860f24c1ea2050a2095ee1c00d75af2f5b78a
+- update logout messages for localization by @celikerde in https://github.com/unusualify/modularity/commit/fa22f3d5098f435670429ca7a0496fd1d9955df0
+- enhance state management with caching and attribute access by @celikerde in https://github.com/unusualify/modularity/commit/848b199e13339a91408c9ef37356f878de2556b6
+- update modal configuration and comment out unused message field by @celikerde in https://github.com/unusualify/modularity/commit/30500b79b1b9f40dcc1a6a6b3a5fe97d1e40c2fb
+- localize payment success and error messages by @celikerde in https://github.com/unusualify/modularity/commit/076d14dee9cb3a84b27bce1deb36aae942ed82b6
+- clean notification channel values for improved validation by @celikerde in https://github.com/unusualify/modularity/commit/553a6124a61b8cecb9813c62ab9f815ee0c9adb4
+- implement AfterSendable interface and enhance channel validation by @celikerde in https://github.com/unusualify/modularity/commit/42da0a372a6caf461347351ef8bcdd94a2347ad3
+- streamline login shortcut schema handling by @OoBook in https://github.com/unusualify/modularity/commit/52e2102d41071b529e4f128c064523953baab1ee
+- enhance attribute casting logic and introduce matching functions by @OoBook in https://github.com/unusualify/modularity/commit/8513a0745541deb744b298af1fd338bc564521a9
+- streamline attribute casting and matching logic by @OoBook in https://github.com/unusualify/modularity/commit/7593edbf38d7c337e6bbbf8196e84670ca521c8a
+- integrate attribute casting utility and simplify value matching by @OoBook in https://github.com/unusualify/modularity/commit/ab7729b628ff77a0fb780ebd23f65996f215d3dc
+- remove unused formatter and simplify action formatting by @OoBook in https://github.com/unusualify/modularity/commit/f856de9dd37d2d2aea9201322012027e82c62f40
+- remove deprecated casting logic to enhance clarity by @OoBook in https://github.com/unusualify/modularity/commit/dff237d382aa3fbeee856bf49759235efe8f4fd1
+- remove deprecated value matching functions for improved clarity by @OoBook in https://github.com/unusualify/modularity/commit/d9f3810d1b2bf40031982643a64787e07b1d6b61
+- remove fullscreen button from modal and update delete dialog attributes by @OoBook in https://github.com/unusualify/modularity/commit/f9e3864244e88e5e2b4844fe5a32b8bed5582a3c
+- update deletion confirmation messages for improved clarity by @OoBook in https://github.com/unusualify/modularity/commit/2508caa29adb603c995a5b325179cfc3827e38a0
+- update afterNotificationSent method to accept notifiable parameter by @OoBook in https://github.com/unusualify/modularity/commit/61bd5b688f2f2107b824aaa9b975f3d588e59926
+- introduce TaskCreatedNotification and update notification handling by @OoBook in https://github.com/unusualify/modularity/commit/3206d9829dd9876bd413f0183441194f3a336303
+- remove via method from notification classes by @OoBook in https://github.com/unusualify/modularity/commit/084605bb3d46ffc830bdf8954fdd3fc64bcf1de0
+- enhance table row actions with dynamic conditions and form attributes by @OoBook in https://github.com/unusualify/modularity/commit/b8991625c5f54dd137e20c757f694903a6bb6ee3
+- update modal attributes and improve styling by @OoBook in https://github.com/unusualify/modularity/commit/b2f93004bf45c6288c4a2da1fbc505f9249b7a03
+- integrate Vuex store for enhanced condition checks by @OoBook in https://github.com/unusualify/modularity/commit/3efd7de81dac89d1bb6e3ae8bd8523de44e387c9
+
+### :lipstick: Styling
+
+- lint coding styles for v0.44.0 by @invalid-email-address in https://github.com/unusualify/modularity/commit/30957ac09dfe081d981e90e20a8ba9aa6891d2dd
+- improve method formatting for clarity by @OoBook in https://github.com/unusualify/modularity/commit/01b193a0aa1a022a25b82442ba266c4e6b461938
+
+### :white_check_mark: Testing
+
+- add comprehensive unit tests for condition evaluation functions by @OoBook in https://github.com/unusualify/modularity/commit/20291944f980b02a49fa3c2dc1a34ee54eb533d8
+
+### :package: Build
+
+- update build artifacts for v0.44.0 by @invalid-email-address in https://github.com/unusualify/modularity/commit/5d8f4d069d27386149fed081f2f8668635d0507e
+- update build artifacts for v0.45.0 by @OoBook in https://github.com/unusualify/modularity/commit/27aa9a827266804f27cdbfd67ccaf7db52d22222
+
+### :beers: Other Stuff
+
+- update unusualify/payable dependency version to ^0.12 by @OoBook in https://github.com/unusualify/modularity/commit/30ab7659a5d76076650d9da54c254cf8929824aa
+- rename companies table in migration file by @celikerde in https://github.com/unusualify/modularity/commit/00a8c9e4a8996ec01a5c770c596d406f198ac5e4
+
 ## v0.44.0 - 2025-08-26
 
 ### :rocket: Features
