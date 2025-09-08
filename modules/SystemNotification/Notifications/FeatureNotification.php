@@ -179,11 +179,11 @@ abstract class FeatureNotification extends Notification implements ShouldQueue
 
     public function getValidChannels($channels): array
     {
-        if(!is_array($channels)){
+        if (! is_array($channels)) {
             $channels = explode(',', $channels);
         }
 
-        return array_filter($channels, function($channel) {
+        return array_filter($channels, function ($channel) {
             return $this->isValidChannel($channel);
         });
     }
@@ -194,7 +194,7 @@ abstract class FeatureNotification extends Notification implements ShouldQueue
 
         $channels = config("modularity.notifications.{$class}.channels", null);
 
-        if($channels !== null && is_string($channels)){
+        if ($channels !== null && is_string($channels)) {
             return $this->getValidChannels(explode(',', $channels));
         }
 

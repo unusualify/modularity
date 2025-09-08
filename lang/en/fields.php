@@ -14,7 +14,6 @@ return [
     'confirm-soft-deletion-title' => 'Confirm Permanent Delete',
     'confirm-soft-deletion-description' => 'Are you sure to delete {name} {route} permanently?',
 
-
     'confirm-bulk-publish' => 'Are you sure want to publish {count} {route}?',
     'confirm-bulk-delete' => 'Are you sure want to delete {count} {route}?',
     'confirm-bulk-restore' => 'Are you sure want to restore {count} {route}?',

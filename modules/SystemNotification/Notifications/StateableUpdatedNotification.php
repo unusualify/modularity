@@ -15,6 +15,7 @@ class StateableUpdatedNotification extends FeatureNotification implements Should
     {
         parent::__construct($model);
     }
+
     public function toArray($notifiable): array
     {
         return [];

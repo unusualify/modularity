@@ -70,7 +70,7 @@ trait FormActions
 
             if (isset($action['formDraft'])) {
                 $formDraft = $action['formDraft'];
-                if($formDraft === 'company'){
+                if ($formDraft === 'company') {
                     $action['formAttributes'] = array_merge($action['formAttributes'] ?? [], [
                         'modelValue' => $this->user->company,
                     ]);

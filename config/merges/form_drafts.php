@@ -161,7 +161,7 @@ return [
             'label' => 'Tax ID / Personal ID',
             'default' => '',
             'col' => ['sm' => 6],
-            //San Marino and Liechtenstein have a 6 character personal id
+            // San Marino and Liechtenstein have a 6 character personal id
             'rules' => 'min:6|max:30',
             // 'rules' => 'sometimes|min:3',
         ],

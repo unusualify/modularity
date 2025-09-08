@@ -19,7 +19,6 @@ use Unusualify\Modularity\Entities\Enums\PaymentStatus;
 use Unusualify\Modularity\Facades\CurrencyExchange;
 use Unusualify\Modularity\Facades\Filepond;
 use Unusualify\Modularity\Services\MessageStage;
-use Unusualify\Modularity\View\Component;
 use Unusualify\Payable\Payable;
 
 class PriceController extends Controller
@@ -363,7 +362,7 @@ class PriceController extends Controller
 
         $payable = new Payable($paymentService->key);
 
-        if (!$paymentService->serviceClass::hasBuiltInForm()) {
+        if (! $paymentService->serviceClass::hasBuiltInForm()) {
             if ($request->ajax()) {
                 return response()->json([
                     'status' => MessageStage::ERROR,
@@ -452,7 +451,7 @@ class PriceController extends Controller
 
         $resp = $payable->checkout($payload, paymentPayload: $paymentPayload);
 
-        if($request->ajax()) {
+        if ($request->ajax()) {
             return $resp;
         }
 
@@ -463,7 +462,7 @@ class PriceController extends Controller
     {
         $color = 'error';
         $title = __('payment.error-title');
-        $description =  __('payment.failed-description');
+        $description = __('payment.failed-description');
         $icon = 'mdi-alert-circle-outline';
         $modalProps = [];
 
@@ -482,7 +481,7 @@ class PriceController extends Controller
                 'confirmText' => __('Continue'),
             ];
 
-            if($payment->status !== PaymentStatus::COMPLETED) {
+            if ($payment->status !== PaymentStatus::COMPLETED) {
                 $payment->update([
                     'status' => PaymentStatus::COMPLETED,
                 ]);
@@ -510,7 +509,7 @@ class PriceController extends Controller
 
         $modularityPayload = $payment ? $payment->parameters->modularity ?? new \stdClass : new \stdClass;
 
-        if($request->ajax()) {
+        if ($request->ajax()) {
             return response()->json([
                 'variant' => $color,
                 'message' => $description,

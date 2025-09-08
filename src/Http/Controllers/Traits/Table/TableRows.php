@@ -22,7 +22,6 @@ trait TableRows
 
         $noDefaultTableRowActions = $this->getConfigFieldsByRoute('no_default_table_row_actions', false);
 
-
         if (! $noDefaultTableRowActions) {
             $model = $this->repository->getModel();
             // if $this->repository has hasPayment
@@ -228,7 +227,7 @@ trait TableRows
 
             if (isset($action['formDraft'])) {
                 $formDraft = $action['formDraft'];
-                if($formDraft === 'company'){
+                if ($formDraft === 'company') {
                     $action['form']['attributes'] = array_merge($action['form']['attributes'] ?? [], [
                         'modelValue' => $this->user->company,
                     ]);

@@ -76,7 +76,7 @@ class User extends Authenticatable implements MustVerifyEmailContract
     protected $appends = [
         'company_name',
         'name_with_company',
-        'valid_company'
+        'valid_company',
     ];
 
     protected $isCreatingCompany = false;
@@ -171,30 +171,32 @@ class User extends Authenticatable implements MustVerifyEmailContract
             $company = $this->company;
             $companyType = $company->is_personal ? 'personal' : 'company';
 
-            switch($companyType){
+            switch ($companyType) {
                 case 'personal':
-                    if(!$company->address
-                        || !$company->city
-                        || !$company->state
-                        || !$company->zip_code
-                        || !$company->country_id
-                    ){
+                    if (! $company->address
+                        || ! $company->city
+                        || ! $company->state
+                        || ! $company->zip_code
+                        || ! $company->country_id
+                    ) {
                         $valid = false;
                     }
+
                     break;
                 default:
-                    if(!$company->name
-                        || !$company->tax_id
-                        || !$company->phone
-                        || !$company->email
-                        || !$company->address
-                        || !$company->country_id
-                        || !$company->city
-                        || !$company->state
-                        || !$company->zip_code
-                    ){
+                    if (! $company->name
+                        || ! $company->tax_id
+                        || ! $company->phone
+                        || ! $company->email
+                        || ! $company->address
+                        || ! $company->country_id
+                        || ! $company->city
+                        || ! $company->state
+                        || ! $company->zip_code
+                    ) {
                         $valid = false;
                     }
+
                     break;
             }
         }

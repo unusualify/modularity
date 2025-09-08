@@ -32,7 +32,7 @@ trait ChangeRelationships
 
     protected function hasChangedRelationships($changes, $relationships = null)
     {
-        if(empty($relationships)){
+        if (empty($relationships)) {
             return count($changes) > 0;
         }
 

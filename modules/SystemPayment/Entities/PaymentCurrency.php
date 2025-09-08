@@ -31,7 +31,7 @@ class PaymentCurrency extends \Modules\SystemPricing\Entities\Currency
         return $this->belongsTo(\Modules\SystemPayment\Entities\PaymentService::class, 'payment_service_id', 'id');
     }
 
-    protected function hasCreditCardPaymentService() : Attribute
+    protected function hasCreditCardPaymentService(): Attribute
     {
         return Attribute::make(
             get: fn ($value) => $this->relationLoaded('paymentService')

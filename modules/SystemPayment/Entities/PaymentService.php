@@ -69,17 +69,17 @@ class PaymentService extends Model
         try {
             $paymentGateway = $this->key;
         } catch (\Throwable $th) {
-            //throw $th;
+            // throw $th;
         }
 
-        if($paymentGateway){
+        if ($paymentGateway) {
 
             try {
                 $serviceClass = \Unusualify\Payable\Payable::getServiceClass($paymentGateway);
             } catch (\Exception $e) {
 
                 try {
-                    //code...
+                    // code...
                     // Check transferrable status directly from spreadable relationship instead of using the accessor
                     $isTransferrable = $this->spreadable && isset($this->spreadable->content['type']) && $this->spreadable->content['type'] == 2;
 
@@ -104,7 +104,7 @@ class PaymentService extends Model
                     dd($th, $this, $serviceClass, $paymentGateway);
                 }
             }
-        };
+        }
 
         return Attribute::make(
             get: fn ($value) => $serviceClass,
@@ -132,8 +132,9 @@ class PaymentService extends Model
         try {
             $type = $this->spreadable->content['type'] ?? 1;
         } catch (\Throwable $th) {
-            //throw $th;
+            // throw $th;
         }
+
         return Attribute::make(
             get: fn ($value) => $type == 2,
         );

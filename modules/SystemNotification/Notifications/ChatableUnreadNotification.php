@@ -3,15 +3,16 @@
 namespace Modules\SystemNotification\Notifications;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Unusualify\Modularity\Facades\ModularityLog;
 use Modules\SystemNotification\Notifications\Contracts\AfterSendable;
+use Unusualify\Modularity\Facades\ModularityLog;
 
-class ChatableUnreadNotification extends FeatureNotification implements ShouldQueue, AfterSendable
+class ChatableUnreadNotification extends FeatureNotification implements AfterSendable, ShouldQueue
 {
     public function __construct(\Unusualify\Modularity\Entities\Chat $model)
     {
         parent::__construct($model->chatable);
     }
+
     public function shouldSend(object $notifiable, string $channel): bool
     {
         return true;

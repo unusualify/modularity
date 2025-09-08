@@ -31,7 +31,6 @@ class AuthorizableUpdated implements ShouldDispatchAfterCommit
         //
     }
 
-
     public function broadcastOn(): array
     {
         return [
