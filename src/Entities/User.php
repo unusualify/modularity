@@ -186,7 +186,7 @@ class User extends Authenticatable implements MustVerifyEmailContract
                 default:
                     if (! $company->name
                         || ! $company->tax_id
-                        || ! $company->phone
+                        // || ! $company->phone
                         || ! $company->email
                         || ! $company->address
                         || ! $company->country_id
