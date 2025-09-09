@@ -2,6 +2,20 @@
 
 All notable changes to `modularity` will be documented in this file
 
+## v0.45.2 - 2025-09-09
+
+### :wrench: Bug Fixes
+
+- comment out phone validation in validCompany method by @OoBook in https://github.com/unusualify/modularity/commit/47a9a9525a2fa4ead1bdfc0c23552a35ae639f4c
+
+### :recycle: Refactors
+
+- clear default channels for stateable, chatable, assignable, and authorizable notifications by @OoBook in https://github.com/unusualify/modularity/commit/f25abe42ed2f07a543709af9ce0e0bb81db8c747
+
+### :package: Build
+
+- update build artifacts for v0.45.1 by @invalid-email-address in https://github.com/unusualify/modularity/commit/e152e6a47d8a23eef2c1670559ae2ec42ac73ba0
+
 ## v0.45.1 - 2025-09-08
 
 ### :recycle: Refactors
