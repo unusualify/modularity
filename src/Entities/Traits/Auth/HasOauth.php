@@ -1,6 +1,6 @@
 <?php
 
-namespace Unusualify\Modularity\Entities\Traits;
+namespace Unusualify\Modularity\Entities\Traits\Auth;
 
 use Unusualify\Modularity\Entities\UserOauth;
 
