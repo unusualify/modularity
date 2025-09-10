@@ -9,7 +9,7 @@ use Oobook\Priceable\Models\Currency;
 use Unusualify\Modularity\Entities\Traits\HasCreator;
 use Unusualify\Modularity\Entities\Traits\HasFileponds;
 use Unusualify\Modularity\Entities\Traits\HasSpreadable;
-use Unusualify\Modularity\Entities\Traits\ModelHelpers;
+use Unusualify\Modularity\Entities\Traits\Core\ModelHelpers;
 
 class Payment extends \Unusualify\Payable\Models\Payment
 {

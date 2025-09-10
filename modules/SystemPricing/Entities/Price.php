@@ -6,7 +6,7 @@ use Illuminate\Support\Arr;
 use Modules\SystemPayment\Entities\Payment;
 use Modules\SystemPricing\Entities\Mutators\PriceMutators;
 use Unusualify\Modularity\Entities\Enums\PaymentStatus;
-use Unusualify\Modularity\Entities\Traits\ModelHelpers;
+use Unusualify\Modularity\Entities\Traits\Core\ModelHelpers;
 use Unusualify\Modularity\Facades\Filepond;
 
 class Price extends \Oobook\Priceable\Models\Price
