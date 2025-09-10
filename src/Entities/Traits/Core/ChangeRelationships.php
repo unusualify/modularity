@@ -1,6 +1,6 @@
 <?php
 
-namespace Unusualify\Modularity\Entities\Traits\Relationships;
+namespace Unusualify\Modularity\Entities\Traits\Core;
 
 use Illuminate\Support\Arr;
 

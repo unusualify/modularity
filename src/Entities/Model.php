@@ -12,7 +12,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 use Unusualify\Modularity\Entities\Traits\HasPresenter;
 use Unusualify\Modularity\Entities\Traits\IsTranslatable;
-use Unusualify\Modularity\Entities\Traits\ModelHelpers;
+use Unusualify\Modularity\Entities\Traits\Core\ModelHelpers;
 
 abstract class Model extends LaravelModel implements TaggableInterface
 {
