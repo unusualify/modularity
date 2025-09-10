@@ -1,6 +1,6 @@
 <?php
 
-namespace Unusualify\Modularity\Entities\Traits;
+namespace Unusualify\Modularity\Entities\Traits\Secondary;
 
 // use Kalnoy\Nestedset\NodeTrait;
 use Unusualify\Modularity\Entities\NestedsetCollection;

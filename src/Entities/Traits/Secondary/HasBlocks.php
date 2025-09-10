@@ -1,6 +1,6 @@
 <?php
 
-namespace Unusualify\Modularity\Entities\Traits;
+namespace Unusualify\Modularity\Entities\Traits\Secondary;
 
 use Unusualify\Modularity\Entities\Block;
 use Unusualify\Modularity\Services\Blocks\Block as BlockConfig;
