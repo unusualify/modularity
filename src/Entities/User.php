@@ -166,10 +166,14 @@ class User extends Authenticatable implements MustVerifyEmailContract
     {
         $valid = true;
 
-        if ($this->company_id != null) {
+        if ($this->company_id != null && ($company = $this->company)) {
+            $companyType = 'company';
 
-            $company = $this->company;
-            $companyType = $company->is_personal ? 'personal' : 'company';
+            try {
+                $companyType = $company->is_personal ? 'personal' : 'company';
+            } catch (\Exception $e) {
+
+            }
 
             switch ($companyType) {
                 case 'personal':
