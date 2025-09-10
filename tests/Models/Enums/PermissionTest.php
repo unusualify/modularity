@@ -37,11 +37,11 @@ class PermissionTest extends TestCase
         $cases = Permission::cases();
         $this->assertCount(14, $cases);
 
-        $caseValues = array_map(fn($case) => $case->value, $cases);
+        $caseValues = array_map(fn ($case) => $case->value, $cases);
         $expectedValues = [
             'create', 'view', 'edit', 'delete', 'forceDelete', 'restore',
             'duplicate', 'reorder', 'bulk', 'bulkDelete', 'bulkForceDelete',
-            'bulkRestore', 'activity', 'show'
+            'bulkRestore', 'activity', 'show',
         ];
 
         foreach ($expectedValues as $value) {
@@ -73,7 +73,7 @@ class PermissionTest extends TestCase
         $validValues = [
             'create', 'view', 'edit', 'delete', 'forceDelete', 'restore',
             'duplicate', 'reorder', 'bulk', 'bulkDelete', 'bulkForceDelete',
-            'bulkRestore', 'activity', 'show'
+            'bulkRestore', 'activity', 'show',
         ];
 
         foreach ($validValues as $value) {
@@ -92,7 +92,7 @@ class PermissionTest extends TestCase
         $validValues = [
             'create', 'view', 'edit', 'delete', 'forceDelete', 'restore',
             'duplicate', 'reorder', 'bulk', 'bulkDelete', 'bulkForceDelete',
-            'bulkRestore', 'activity', 'show'
+            'bulkRestore', 'activity', 'show',
         ];
 
         foreach ($validValues as $value) {
@@ -121,7 +121,7 @@ class PermissionTest extends TestCase
     {
         $permission = Permission::CREATE;
 
-        $result = match($permission) {
+        $result = match ($permission) {
             Permission::CREATE => 'can_create',
             Permission::VIEW => 'can_view',
             Permission::EDIT => 'can_edit',
@@ -245,7 +245,7 @@ class PermissionTest extends TestCase
         ];
 
         foreach ($deletePermissions as $permission) {
-            $this->assertStringContainsString('delete', strtolower($permission->value));
+            $this->assertStringContainsString('delete', mb_strtolower($permission->value));
         }
     }
 
@@ -257,7 +257,7 @@ class PermissionTest extends TestCase
         ];
 
         foreach ($restorePermissions as $permission) {
-            $this->assertStringContainsString('restore', strtolower($permission->value));
+            $this->assertStringContainsString('restore', mb_strtolower($permission->value));
         }
     }
 
@@ -312,8 +312,8 @@ class PermissionTest extends TestCase
     {
         // Verify that DASHBOARD permission is commented out and not available
         $cases = Permission::cases();
-        $caseNames = array_map(fn($case) => $case->name, $cases);
+        $caseNames = array_map(fn ($case) => $case->name, $cases);
 
-                 $this->assertNotContains('DASHBOARD', $caseNames);
-     }
+        $this->assertNotContains('DASHBOARD', $caseNames);
+    }
 }

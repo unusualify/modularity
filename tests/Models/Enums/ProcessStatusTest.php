@@ -28,7 +28,7 @@ class ProcessStatusTest extends TestCase
         $cases = ProcessStatus::cases();
         $this->assertCount(5, $cases);
 
-        $caseValues = array_map(fn($case) => $case->value, $cases);
+        $caseValues = array_map(fn ($case) => $case->value, $cases);
         $this->assertContains('preparing', $caseValues);
         $this->assertContains('waiting_for_confirmation', $caseValues);
         $this->assertContains('waiting_for_reaction', $caseValues);
@@ -172,7 +172,7 @@ class ProcessStatusTest extends TestCase
     {
         $status = ProcessStatus::CONFIRMED;
 
-        $result = match($status) {
+        $result = match ($status) {
             ProcessStatus::PREPARING => 'prep',
             ProcessStatus::WAITING_FOR_CONFIRMATION => 'wait_conf',
             ProcessStatus::WAITING_FOR_REACTION => 'wait_react',
@@ -263,12 +263,12 @@ class ProcessStatusTest extends TestCase
         $outlinedStates = [
             ProcessStatus::PREPARING,
             ProcessStatus::WAITING_FOR_CONFIRMATION,
-            ProcessStatus::WAITING_FOR_REACTION
+            ProcessStatus::WAITING_FOR_REACTION,
         ];
 
         $tonalStates = [
             ProcessStatus::REJECTED,
-            ProcessStatus::CONFIRMED
+            ProcessStatus::CONFIRMED,
         ];
 
         foreach ($outlinedStates as $state) {

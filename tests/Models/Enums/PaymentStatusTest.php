@@ -28,7 +28,7 @@ class PaymentStatusTest extends TestCase
         $cases = PaymentStatus::cases();
         $this->assertCount(5, $cases);
 
-        $caseValues = array_map(fn($case) => $case->value, $cases);
+        $caseValues = array_map(fn ($case) => $case->value, $cases);
         $this->assertContains('PENDING', $caseValues);
         $this->assertContains('FAILED', $caseValues);
         $this->assertContains('COMPLETED', $caseValues);
@@ -118,7 +118,7 @@ class PaymentStatusTest extends TestCase
     {
         $status = PaymentStatus::COMPLETED;
 
-        $result = match($status) {
+        $result = match ($status) {
             PaymentStatus::PENDING => 'waiting',
             PaymentStatus::FAILED => 'error',
             PaymentStatus::COMPLETED => 'success',
@@ -250,7 +250,7 @@ class PaymentStatusTest extends TestCase
         $cases = PaymentStatus::cases();
 
         foreach ($cases as $case) {
-            $this->assertEquals(strtoupper($case->value), $case->value);
+            $this->assertEquals(mb_strtoupper($case->value), $case->value);
         }
     }
 

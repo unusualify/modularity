@@ -27,7 +27,7 @@ class AssignmentStatusTest extends TestCase
         $cases = AssignmentStatus::cases();
         $this->assertCount(4, $cases);
 
-        $caseValues = array_map(fn($case) => $case->value, $cases);
+        $caseValues = array_map(fn ($case) => $case->value, $cases);
         $this->assertContains('completed', $caseValues);
         $this->assertContains('pending', $caseValues);
         $this->assertContains('rejected', $caseValues);
@@ -125,7 +125,7 @@ class AssignmentStatusTest extends TestCase
     {
         $status = AssignmentStatus::PENDING;
 
-        $result = match($status) {
+        $result = match ($status) {
             AssignmentStatus::COMPLETED => 'done',
             AssignmentStatus::PENDING => 'waiting',
             AssignmentStatus::REJECTED => 'failed',
