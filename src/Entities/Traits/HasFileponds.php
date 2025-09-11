@@ -42,9 +42,7 @@ trait HasFileponds
     public function hasFilepond($role = null)
     {
         return (bool) $role
-            ? $this->fileponds()->filter(function ($filepond) use ($role) {
-                return $filepond->role === $role;
-            })->count()
-            : $this->fileponds()->count();
+            ? $this->fileponds()->where('role', $role)->exists()
+            : $this->fileponds()->exists();
     }
 }
