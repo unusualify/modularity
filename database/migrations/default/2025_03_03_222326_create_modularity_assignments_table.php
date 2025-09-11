@@ -27,7 +27,7 @@ return new class extends Migration
             $table->dateTime('completed_at')->nullable();
 
             // a "published" column, and soft delete and timestamps columns
-            createDefaultExtraTableFields($table, false, false);
+            createDefaultExtraTableFields($table, true, false);
         });
     }
 
