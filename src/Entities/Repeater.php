@@ -18,8 +18,8 @@ class Repeater extends Model
 {
     protected $fillable = [
         'repeatable_id',
-        'content',
         'repeatable_type',
+        'content',
         'role',
         'locale',
     ];
