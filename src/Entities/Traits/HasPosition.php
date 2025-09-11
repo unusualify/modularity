@@ -2,13 +2,24 @@
 
 namespace Unusualify\Modularity\Entities\Traits;
 
+use Illuminate\Support\Facades\DB;
+
 trait HasPosition
 {
     protected static function bootHasPosition()
     {
         static::creating(function ($model) {
-            // dd($model);
-            $model->setToLastPosition();
+            if (! $model->position) {
+                $model->setToLastPosition();
+            } else {
+                $model->position = (int) $model->position;
+
+                if ($model->position > $model->getCurrentLastPosition()) {
+                    $model->setToLastPosition();
+                } else {
+                    static::where('position', '>=', $model->position)->update(['position' => DB::raw('position + 1')]);
+                }
+            }
         });
     }
 
@@ -43,7 +54,7 @@ trait HasPosition
         }
 
         foreach ($ids as $id) {
-            $model = static::find($id);
+            $model = static::findOrFail($id);
             $model->position = $startOrder++;
             $model->save();
         }
