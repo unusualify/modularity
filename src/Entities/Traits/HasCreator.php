@@ -376,6 +376,6 @@ trait HasCreator
      */
     public function scopeAuthorized($query, $guardName = null)
     {
-        return $this->scopeHasAccessTo($query, null, $guardName);
+        return $this->scopeHasAccessToCreation($query, null, $guardName);
     }
 }
