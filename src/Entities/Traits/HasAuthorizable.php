@@ -51,9 +51,9 @@ trait HasAuthorizable
         static::saving(function (Model $model) {
             if ($model->authorized_id) {
                 $authorizedType = $model->authorized_type
-                    ?? $model->authorizationRecord()->exists()
+                    ?? ($model->authorizationRecord()->exists()
                         ? $model->authorizationRecord->authorized_type
-                        : $model->getDefaultAuthorizedModel();
+                        : $model->getDefaultAuthorizedModel());
 
                 if (class_exists($authorizedType)) {
 
@@ -70,7 +70,9 @@ trait HasAuthorizable
             }
 
             foreach (static::$hasAuthorizableFillable as $field) {
-                $model->offsetUnset($field);
+                if(isset($model->$field)) {
+                    $model->offsetUnset($field);
+                }
             }
         });
 
@@ -100,7 +102,9 @@ trait HasAuthorizable
     /**
      * Laravel hook to initialize the trait
      */
-    public function initializeHasAuthorizable(): void {}
+    public function initializeHasAuthorizable(): void {
+        $this->mergeFillable(static::$hasAuthorizableFillable);
+    }
 
     /**
      * Get the authorization record associated with this model
@@ -143,13 +147,9 @@ trait HasAuthorizable
      */
     final public function getAuthorizedModel()
     {
-        try {
-            return $this->authorizationRecord()->exists()
-                ? ($this->authorizationRecord ? $this->authorizationRecord->authorized_type : $this->getDefaultAuthorizedModel())
-                : $this->getDefaultAuthorizedModel();
-        } catch (\Exception $e) {
-            dd($this, $this->authorizationRecord, $e);
-        }
+        return $this->authorizationRecord()->exists()
+            ? ($this->authorizationRecord ? $this->authorizationRecord->authorized_type : $this->getDefaultAuthorizedModel())
+            : $this->getDefaultAuthorizedModel();
     }
 
     /**
@@ -218,11 +218,13 @@ trait HasAuthorizable
      *
      * @return bool
      */
-    public function hasAuthorizationUsage()
+    public function hasAuthorizationUsage($user = null)
     {
-        if (! ($user = $this->getUserForHasAuthorization())) {
+        if (! ($user = $this->getUserForHasAuthorization($user))) {
             return false;
         }
+
+        $this->allowableUser = $user;
 
         return $this->isAllowedItem(
             item: $this,
@@ -231,26 +233,29 @@ trait HasAuthorizable
         );
     }
 
-    public function scopeIsAuthorizedToYou($query)
+    public function scopeIsAuthorizedToYou($query, $user = null)
     {
-        if (! ($user = $this->getUserForHasAuthorization())) {
-            return $query;
+        $authorizedUserId = -1;
+        $authorizedUserType = null;
+        if (($user = $this->getUserForHasAuthorization($user))) {
+            $authorizedUserId = $user->id;
+            $authorizedUserType = get_class($user);
         }
 
-        return $query->whereHas('authorizationRecord', function ($query) use ($user) {
-            $query->where('authorized_id', $user->id)
-                ->where('authorized_type', get_class($user));
+        return $query->whereHas('authorizationRecord', function ($query) use ($authorizedUserId, $authorizedUserType) {
+            $query->where('authorized_id', $authorizedUserId)
+                ->where('authorized_type', $authorizedUserType);
         });
     }
 
-    public function scopeIsAuthorizedToYourRole($query)
+    public function scopeIsAuthorizedToYourRole($query, $user = null)
     {
-        if (! ($user = $this->getUserForAssignable())) {
-            return $query;
+        $userModel = $this->getAuthorizedModel();
+        $userRoles = [];
+        if ($user = $this->getUserForHasAuthorization($user)) {
+            $userModel = get_class($user);
+            $userRoles = $user->roles;
         }
-
-        $userModel = get_class($user);
-        $userRoles = $user->roles;
 
         return $query->whereHas('authorizationRecord', function ($query) use ($userModel, $userRoles) {
             $query->where('authorized_type', $userModel)
