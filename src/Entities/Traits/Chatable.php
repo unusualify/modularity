@@ -217,4 +217,59 @@ trait Chatable
             }
         }
     }
+
+    /**
+     * Get the number of chat messages for this model
+     */
+    public function numberOfChatMessages(): int
+    {
+        return $this->chatMessages()->count();
+    }
+
+    /**
+     * Get the number of unread chat messages for this model
+     */
+    public function numberOfUnreadChatMessages(): int
+    {
+        return $this->unreadChatMessages()->count();
+    }
+
+    /**
+     * Get the number of unread chat messages for you
+     */
+    public function numberOfUnreadChatMessagesForYou(): int
+    {
+        return $this->unreadChatMessagesForYou()->count();
+    }
+
+    /**
+     * Get the number of unread chat messages from creator
+     */
+    public function numberOfUnreadChatMessagesFromCreator(): int
+    {
+        return $this->unreadChatMessagesFromCreator()->count();
+    }
+
+    /**
+     * Get the number of unread chat messages from client
+     */
+    public function numberOfUnreadChatMessagesFromClient(): int
+    {
+        return $this->unreadChatMessagesFromClient()->count();
+    }
+
+    /**
+     * Get the number of unanswered creator chat messages
+     */
+    public function numberOfUnansweredCreatorChatMessages(): int
+    {
+        $latestMessage = $this->latestChatMessage()->first();
+
+        if (!$latestMessage) {
+            return 0;
+        }
+
+        // Check if the latest message is from a creator and is unread
+        return $this->hasUnansweredChatMessageFromCreator()->exists() ? 1 : 0;
+    }
 }
