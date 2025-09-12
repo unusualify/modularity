@@ -16,7 +16,7 @@ trait ChatMessageScopes
 
     public function scopeUnreadForYou(Builder $query, $guardName = null): Builder
     {
-        return $query->where('is_read', false)->whereNot(fn ($query) => $query->authorized($guardName));
+        return $query->where('is_read', false)->whereNot(fn ($query) => $query->hasAccessToCreation(null, $guardName));
     }
 
     public function scopeFromClient(Builder $query): Builder
