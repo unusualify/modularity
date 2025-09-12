@@ -20,8 +20,6 @@ trait Assignable
      */
     public static function bootAssignable(): void
     {
-        static::retrieved(function (Model $model) {});
-
         static::deleting(function (Model $model) {
             $assignmentsRelation = $model->assignments();
             $assignmentModel = $assignmentsRelation->getRelated();
