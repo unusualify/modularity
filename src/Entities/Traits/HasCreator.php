@@ -323,21 +323,15 @@ trait HasCreator
         });
     }
 
-    /**
-     * Scope a query to only include the current user's revisions.
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    public function scopeAuthorized($query, $guardName = null)
+    public function scopeHasAccessToCreation($query, $user = null, $guardName = null)
     {
-        if (! Auth::check()) {
+        if ($user === null && ! Auth::check()) {
             return $query;
         }
 
         $guardName ??= Auth::guard()->name;
 
-        $user = auth($guardName)->user();
+        $user ??= Auth::guard($guardName)->user();
 
         $abortRoleExceptions = static::$abortCreatorRoleExceptions ?? false;
 
@@ -373,5 +367,15 @@ trait HasCreator
                 $query = $this->addAuthorizedUserQueryForCreatorRecord($query, $user);
             });
         });
+    }
+
+    /**
+     * Scope a query to only include the current user's revisions.
+     *
+     * @deprecated use scopeHasAccessToCreation instead
+     */
+    public function scopeAuthorized($query, $guardName = null)
+    {
+        return $this->scopeHasAccessTo($query, null, $guardName);
     }
 }
