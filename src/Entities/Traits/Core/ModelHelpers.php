@@ -19,8 +19,6 @@ trait ModelHelpers
 
     public static $defaultAuthorizedModel = \Unusualify\Modularity\Entities\User::class;
 
-    public static $obligatoryAuthorizationRoles = ['superadmin', 'admin', 'client-manager', 'client-assistant'];
-
     public static $authorizableRolesToCheck = ['manager', 'account-executive'];
 
     public static $assignableRolesToCheck = ['editor', 'reporter'];
