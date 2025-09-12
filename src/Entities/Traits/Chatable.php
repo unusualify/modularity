@@ -4,6 +4,7 @@ namespace Unusualify\Modularity\Entities\Traits;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use Modules\SystemNotification\Events\UnreadChatMessage;
 use Modules\SystemNotification\Notifications\ChatableUnreadNotification;
 use Unusualify\Modularity\Entities\Chat;
@@ -60,13 +61,17 @@ trait Chatable
         return $this->hasManyThrough(ChatMessage::class, Chat::class, 'chatable_id', 'chat_id', 'id', 'id');
     }
 
-    public function creatorChatMessages(): \Illuminate\Database\Eloquent\Relations\HasOneThrough
+    public function creatorChatMessages(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
     {
         $creator = $this->creator;
 
-        return $this->whereHas('chatMessages', function ($query) use ($creator) {
-            $query->isCreator($creator->id, $creator->guard_name);
-        });
+        return $this->hasManyThrough(ChatMessage::class, Chat::class, 'chatable_id', 'chat_id', 'id', 'id')
+            ->whereHas('creatorRecord', function ($query) use ($creator) {
+                if ($creator) {
+                    $query->where('creator_id', $creator->id)
+                          ->where('creator_type', get_class($creator));
+                }
+            });
     }
 
     public function latestChatMessage(): \Illuminate\Database\Eloquent\Relations\HasOneThrough
@@ -105,7 +110,7 @@ trait Chatable
             $chatableTableAlias = 'chatable_creators';
 
             $messageQuery->whereExists(function ($subQuery) use ($creatorRecordTable, $chatMessageTable, $chatTable, $creatableTableAlias, $chatableTableAlias, $currentClass) {
-                $subQuery->select(\DB::raw(1))
+                $subQuery->select(DB::raw(1))
                     ->from($creatorRecordTable . ' as ' . $creatableTableAlias)
                     ->join($creatorRecordTable . ' as ' . $chatableTableAlias, function ($join) use ($creatableTableAlias, $chatableTableAlias) {
                         $join->on($creatableTableAlias . '.creator_id', '=', $chatableTableAlias . '.creator_id')
@@ -117,6 +122,13 @@ trait Chatable
                     ->where($chatableTableAlias . '.creatable_type', ChatMessage::class);
             });
         });
+    }
+
+    public function truncateChat(): void
+    {
+        $this->chat()->delete();
+
+        $this->chat()->create();
     }
 
     protected function chatMessagesCount(): Attribute
