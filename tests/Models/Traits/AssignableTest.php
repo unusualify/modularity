@@ -315,6 +315,159 @@ class AssignableTest extends ModelTestCase
         $this->assertNull($this->model->active_assignee_name);
     }
 
+    public function test_active_assignee_name_returns_name_when_assignment_exists()
+    {
+        $assignee = User::create([
+            'name' => 'Test Assignee',
+            'email' => 'assignee@example.com',
+            'published' => true,
+        ]);
+
+        $assigner = User::create([
+            'name' => 'Test Assigner',
+            'email' => 'assigner@example.com',
+            'published' => true,
+        ]);
+
+        // Create assignment
+        $this->model->assignments()->create([
+            'assignee_id' => $assignee->id,
+            'assignee_type' => get_class($assignee),
+            'assigner_id' => $assigner->id,
+            'assigner_type' => get_class($assigner),
+            'description' => 'Test assignment',
+            'due_at' => now()->addDays(7),
+        ]);
+
+        $this->model->refresh();
+        $this->assertEquals('Test Assignee', $this->model->active_assignee_name);
+    }
+
+    public function test_active_assigner_name_returns_null_when_no_assignment()
+    {
+        $this->assertNull($this->model->active_assigner_name);
+    }
+
+    public function test_active_assigner_name_returns_name_when_assignment_exists()
+    {
+        $assignee = User::create([
+            'name' => 'Test Assignee',
+            'email' => 'assignee@example.com',
+            'published' => true,
+        ]);
+
+        $assigner = User::create([
+            'name' => 'Test Assigner',
+            'email' => 'assigner@example.com',
+            'published' => true,
+        ]);
+
+        // Create assignment
+        $this->model->assignments()->create([
+            'assignee_id' => $assignee->id,
+            'assignee_type' => get_class($assignee),
+            'assigner_id' => $assigner->id,
+            'assigner_type' => get_class($assigner),
+            'description' => 'Test assignment',
+            'due_at' => now()->addDays(7),
+        ]);
+
+        $this->model->refresh();
+        $this->assertEquals('Test Assigner', $this->model->active_assigner_name);
+    }
+
+    public function test_active_assignment_status_returns_null_when_no_assignment()
+    {
+        $this->assertNull($this->model->active_assignment_status);
+    }
+
+    public function test_active_assignment_status_returns_formatted_status_when_assignment_exists()
+    {
+        $assignee = User::create([
+            'name' => 'Test Assignee',
+            'email' => 'assignee@example.com',
+            'published' => true,
+        ]);
+
+        $assigner = User::create([
+            'name' => 'Test Assigner',
+            'email' => 'assigner@example.com',
+            'published' => true,
+        ]);
+
+        // Create assignment with pending status
+        $this->model->assignments()->create([
+            'assignee_id' => $assignee->id,
+            'assignee_type' => get_class($assignee),
+            'assigner_id' => $assigner->id,
+            'assigner_type' => get_class($assigner),
+            'description' => 'Test assignment',
+            'status' => AssignmentStatus::PENDING,
+            'due_at' => now()->addDays(7),
+        ]);
+
+        $this->model->refresh();
+
+        // The active_assignment_status should return a Vue chip component HTML
+        $status = $this->model->active_assignment_status;
+        $this->assertNotNull($status);
+        $this->assertIsString($status);
+        $this->assertStringContainsString('<v-chip', $status);
+        $this->assertStringContainsString('variant=\'text\'', $status);
+    }
+
+    public function test_active_assignment_status_with_different_statuses()
+    {
+        $assignee = User::create([
+            'name' => 'Test Assignee',
+            'email' => 'assignee@example.com',
+            'published' => true,
+        ]);
+
+        $assigner = User::create([
+            'name' => 'Test Assigner',
+            'email' => 'assigner@example.com',
+            'published' => true,
+        ]);
+
+        // Test different assignment statuses
+        $statuses = [
+            AssignmentStatus::PENDING,
+            AssignmentStatus::COMPLETED,
+            AssignmentStatus::CANCELLED,
+        ];
+
+        foreach ($statuses as $status) {
+            // Create a new model for each status test
+            $testModel = new TestAssignableModel(['name' => "Test Model for {$status->value}"]);
+            $testModel->save();
+
+            // Create assignment with specific status
+            $testModel->assignments()->create([
+                'assignee_id' => $assignee->id,
+                'assignee_type' => get_class($assignee),
+                'assigner_id' => $assigner->id,
+                'assigner_type' => get_class($assigner),
+                'description' => "Test assignment with {$status->value} status",
+                'status' => $status,
+                'due_at' => now()->addDays(7),
+            ]);
+
+            $testModel->refresh();
+
+            $assignmentStatus = $testModel->active_assignment_status;
+            $this->assertNotNull($assignmentStatus);
+            $this->assertIsString($assignmentStatus);
+            $this->assertStringContainsString('<v-chip', $assignmentStatus);
+            $this->assertStringContainsString('variant=\'text\'', $assignmentStatus);
+        }
+    }
+
+    public function test_initialize_assignable_appends_active_assigner_name()
+    {
+        $appended = $this->model->getAppends();
+        $this->assertContains('active_assignee_name', $appended);
+    }
     public function test_boot_assignable_adds_retrieved_event()
     {
         // This test verifies that the boot method exists and doesn't throw errors
