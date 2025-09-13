@@ -2,9 +2,12 @@
 
 namespace Unusualify\Modularity\Tests;
 
+use Modules\SystemPayment\Entities\Payment;
 use Nwidart\Modules\LaravelModulesServiceProvider;
 use Spatie\Permission\PermissionServiceProvider;
 use Unusualify\Modularity\Activators\ModularityActivator;
+use Unusualify\Modularity\Entities\Enums\PaymentStatus;
+use Unusualify\Modularity\Entities\Observers\PriceableObserver;
 use Unusualify\Modularity\LaravelServiceProvider;
 use Unusualify\Modularity\Providers\ModularityProvider;
 
@@ -77,6 +80,19 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
         $app['config']->set('modularity.media_library.image_service', "Unusualify\Modularity\Services\MediaLibrary\Local");
         $app['config']->set('modularity.file_library.file_service', "Unusualify\Modularity\Services\FileLibrary\Disk");
+
+        $app['config']->set([
+            'priceable.observers.price' => PriceableObserver::class,
+            'priceable.prices_are_including_vat' => false,
+        ]);
+
+        $app['config']->set([
+            'payable.table' => 'up_payments',
+            'payable.model' => Payment::class,
+            'payable.status_enum' => PaymentStatus::class,
+            'payable.additional_fillable' => ['payment_service_id', 'price_id', 'currency_id'],
+            // 'payable.middleware' => ['web.auth', 'modularity.panel'],
+        ]);
     }
 
     /**
