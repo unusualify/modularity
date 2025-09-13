@@ -12,18 +12,6 @@ trait HasPriceable
     use TraitsHasPriceable,
         HasPriceableMutators;
 
-    /**
-     * Boot the trait.
-     *
-     * Sets up event listeners for model creation, updating, retrieval, and deletion.
-     *
-     * @return void
-     */
-    public static function bootHasPriceable()
-    {
-        // parent::bootHasPriceable();
-    }
-
     public function prices(): \Illuminate\Database\Eloquent\Relations\MorphMany
     {
         return $this->morphMany(Price::class, 'priceable');
