@@ -29,7 +29,7 @@ trait HasCreator
      */
     protected $customHasCreatorFields = [];
 
-    protected $creatableClass;
+    // protected $creatableClass;
 
     protected static function bootHasCreator()
     {
@@ -92,11 +92,11 @@ trait HasCreator
     public function getCreatableClass()
     {
         // if $this is a table row, fill attributes and relations new class
-        if (! $this->creatableClass) {
+        if (! isset(static::$creatableClass) || ! static::$creatableClass || ! class_exists(static::$creatableClass)) {
             return $this;
         }
 
-        $class = new $this->creatableClass;
+        $class = new static::$creatableClass;
 
         $class->setAttribute($this->getKeyName(), $this->getKey());
         $class->fill($this->getAttributes());
@@ -216,11 +216,7 @@ trait HasCreator
     {
         $key = $this->getKey();
 
-        try {
-            return (! is_null($key) && $this->creatorRecord()->exists()) ? $this->creatorRecord->creator_type : static::getDefaultCreatorModel();
-        } catch (\Exception $e) {
-            dd($this, $this->creatorRecord);
-        }
+        return (! is_null($key) && $this->creatorRecord()->exists()) ? $this->creatorRecord->creator_type : static::getDefaultCreatorModel();
     }
 
     /**
@@ -262,9 +258,9 @@ trait HasCreator
      *
      * @return array Array of authorized role names
      */
-    protected function getAuthorizedRolesForCreatorRecord()
+    protected function getRolesHasAccessToCreation()
     {
-        return $this->authorizedRolesForCreatorRecord ?? [
+        return ($this->rolesHasAccessToCreation ?? $this->authorizedRolesForCreatorRecord) ?? [
             'admin',
             'manager',
             'editor',
@@ -276,9 +272,9 @@ trait HasCreator
      *
      * @return array Array of authorized user role names
      */
-    protected function getAuthorizedUserRolesForCreatorRecord()
+    protected function getCompanyRolesHasAccessToCreation()
     {
-        return $this->authorizedUserRolesForCreatorRecord ?? [
+        return $this->companyRolesHasAccessToCreation ?? $this->authorizedUserRolesForCreatorRecord ?? [
             'manager',
             'client-manager',
         ];
@@ -307,19 +303,16 @@ trait HasCreator
      * @param \Illuminate\Database\Eloquent\Builder $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeIsMyCreation($query)
+    public function scopeIsMyCreation($query, $user = null, $guardName = null)
     {
-        $guardName = null;
-        $userId = -1;
+        $guardName ??= Auth::check() ? Auth::guard()->name : null;
+        $userId = $user ? $user->id : (Auth::check() ? Auth::id() : -1);
+        $creatorType = $user ? get_class($user) : (Auth::check() ? Auth::guard()->getProvider()->getModel() : null);
 
-        if (Auth::check()) {
-            $guardName = Auth::guard()->name;
-            $userId = Auth::id();
-        }
-
-        return $query->whereHas('creatorRecord', function ($query) use ($userId, $guardName) {
+        return $query->whereHas('creatorRecord', function ($query) use ($userId, $guardName, $creatorType) {
             $query->where('creator_id', $userId)
-                ->where('guard_name', $guardName);
+                ->where('guard_name', $guardName)
+                ->where('creator_type', $creatorType);
         });
     }
 
@@ -342,7 +335,7 @@ trait HasCreator
         if (! $abortRoleExceptions) {
 
             if ($hasSpatiePermission) {
-                $existingRoles = $spatieRoleModel::whereIn('name', $this->getAuthorizedRolesForCreatorRecord())->get();
+                $existingRoles = $spatieRoleModel::whereIn('name', $this->getRolesHasAccessToCreation())->get();
 
                 if ($user->isSuperAdmin() || $user->hasRole($existingRoles->map(fn ($role) => $role->name)->toArray())) {
                     return $query;
@@ -358,7 +351,7 @@ trait HasCreator
                 $query = $query->where('id', $user->id);
 
                 if ($hasSpatiePermission) {
-                    $existingRoles = $spatieRoleModel::whereIn('name', $this->getAuthorizedUserRolesForCreatorRecord())->get();
+                    $existingRoles = $spatieRoleModel::whereIn('name', $this->getCompanyRolesHasAccessToCreation())->get();
                     if ($user->company_id && $user->hasRole($existingRoles->map(fn ($role) => $role->name)->toArray())) {
                         $query = $query->orWhere('company_id', $user->company_id);
                     }
