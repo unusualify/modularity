@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        $creatorRecordsTable = modularityConfig('tables.creator_records', 'modularity_creator_records');
+        $creatorRecordsTable = modularityConfig('tables.creator_records', 'um_creator_records');
 
         if (! Schema::hasTable($creatorRecordsTable)) {
             Schema::create($creatorRecordsTable, function (Blueprint $table) {
