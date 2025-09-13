@@ -26,6 +26,13 @@ class Price extends \Oobook\Priceable\Models\Price
         'total_amount',
     ];
 
+    public static function booted()
+    {
+        static::saving(function ($model) {
+            $model->offsetUnset(static::$priceSavingKey);
+        });
+    }
+
     /**
      * For a price we need to make sure we always have
      * a VAT rate and a Currency. Selecting them everytime
