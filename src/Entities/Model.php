@@ -31,7 +31,7 @@ abstract class Model extends LaravelModel implements TaggableInterface
 
     protected function isTranslationModel(): bool
     {
-        return Str::endsWith(get_class($this), 'Translation');
+        return Str::endsWith(get_class($this), 'Translation') || property_exists($this, 'baseModuleModel');
     }
 
     public function setPublishStartDateAttribute($value): void
