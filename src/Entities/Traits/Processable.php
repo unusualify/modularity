@@ -21,10 +21,6 @@ trait Processable
      */
     public static function bootProcessable(): void
     {
-        static::retrieved(function (Model $model) {});
-
-        static::saving(function (Model $model) {});
-
         static::created(function (Model $model) {
             if (! $model->process()->exists()) {
                 $model->process()->create([
@@ -39,18 +35,7 @@ trait Processable
                 $model->setProcessStatus($model->processable_status, $model->processable_reason);
             }
         });
-
-        // static::saved(function (Model $model) {
-        //     $model->process()->createOrUpdate ([
-        //         'status' => ProcessStatus::PREPARING,
-        //     ]);
-        // });
     }
-
-    /**
-     * Laravel hook to initialize the trait
-     */
-    public function initializeProcessable(): void {}
 
     public function process(): MorphOne
     {
@@ -77,14 +62,6 @@ trait Processable
      */
     public function setProcessStatus(string $status, ?string $reason = null): void
     {
-        // if( !$this->process()->exists()) {
-        //     $this->process()->create([
-        //         'status' => ProcessStatus::PREPARING,
-        //     ]);
-        // } else {
-
-        //     // Update the current status
-        // }
 
         $this->process()->updateOrCreate(
             ['processable_id' => $this->id, 'processable_type' => static::class],
