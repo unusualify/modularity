@@ -85,6 +85,11 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             'priceable.observers.price' => PriceableObserver::class,
             'priceable.prices_are_including_vat' => false,
         ]);
+        $app['config']->set([
+            'translatable.locales' => [
+                'en',
+            ],
+        ]);
 
         $app['config']->set([
             'payable.table' => 'up_payments',
