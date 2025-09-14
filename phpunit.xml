@@ -15,9 +15,25 @@
     <env name="APP_KEY" value="base64:W99w+5JYz8SVGf5sx17gmPR6uoNCtWiEVc+9qu8iGEg="/>
     <ini name="memory_limit" value="512M"/>
   </php>
-  <filter>
-    <whitelist processUncoveredFilesFromWhitelist="true">
-        <directory suffix=".php"></directory>
-    </whitelist>
-  </filter>
+  <source>
+    <include>
+      <directory suffix=".php">src</directory>
+    </include>
+    <exclude>
+      <directory>src/Contracts</directory>
+      <directory>src/Console</directory>
+      <directory>src/Database/migrations</directory>
+      <directory>tests</directory>
+      <directory>vendor</directory>
+      <file>src/bootstrap.php</file>
+    </exclude>
+  </source>
+  <coverage>
+    <report>
+      <html outputDirectory="coverage-html" lowUpperBound="50" highLowerBound="80"/>
+      <text outputFile="coverage.txt" showUncoveredFiles="true" showOnlySummary="false"/>
+      <xml outputDirectory="coverage-xml"/>
+      <clover outputFile="coverage-clover.xml"/>
+    </report>
+  </coverage>
 </phpunit>
