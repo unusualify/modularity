@@ -9,6 +9,7 @@ use Spatie\Activitylog\Facades\LogBatch;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Unusualify\Modularity\Entities\State;
 use Unusualify\Modularity\Traits\ManageModuleRoute;
 
 trait ModelHelpers
@@ -36,9 +37,9 @@ trait ModelHelpers
     {
         if (! auth()->check()) {
             activity()->disableLogging();
+        } else {
+            activity()->enableLogging();
         }
-
-        static::retrieved(function ($model) {});
 
         static::saving(function ($model) {
             if (method_exists($model, 'isTranslatable') && $model->isTranslatable()) {
@@ -60,12 +61,7 @@ trait ModelHelpers
         });
 
         static::saved(function ($model) {
-            // dd($model->oldTranslations);
-            try {
-                // code...
-            } catch (\Throwable $th) {
-                // throw $th;
-            }
+
             if (method_exists($model, 'isTranslatable') && $model->isTranslatable()) {
                 $changes = [];
                 $oldValues = [];
@@ -127,38 +123,7 @@ trait ModelHelpers
         return $this->{$this->getRouteTitleColumnKey()};
     }
 
-    public function setRelationsShowFormat()
-    {
-        foreach ($this->getRelations() as $relationName => $relation) {
-
-            // if ($relation instanceof \Illuminate\Database\Eloquent\Collection) {
-            //     // dd($this, $relationName, $this->getRelations());
-            //     $this->{$relationName} = $relation->map(function ($related) {
-
-            //         if (method_exists($related, 'setRelationsShowFormat')) {
-            //             $related->setRelationsShowFormat();
-            //         }
-
-            //         return $related;
-            //     });
-
-            //     $this["{$relationName}_show"] ??= $this->{$relationName}->map(fn ($model) => modelShowFormat($model))->implode(', ');
-
-            // } elseif ($relation) {
-
-            //     if (method_exists($relation, 'setRelationsShowFormat')) {
-            //         $relation->setRelationsShowFormat();
-            //     }
-
-            //     // $this->{$relationName} = $relation;
-
-            //     $this["{$relationName}_show"] ??= modelShowFormat($relation);
-
-            // }
-        }
-    }
-
-    public function setStateablePreview($state)
+    public function setStateablePreview(State $state)
     {
         return "<v-chip variant='text' color='{$state->color}' prepend-icon='{$state->icon}'>{$state->translatedAttribute('name')[app()->getLocale()]}</v-chip>";
     }
@@ -244,6 +209,7 @@ trait ModelHelpers
 
         // dd($attributesToLog, $this->isDirty(), $this->getDirty());
         return LogOptions::defaults()
+            // ->logUnguarded()
             // ->logAll()
             ->logOnly($attributesToLog)
             // ->logOnly(['preferences->notifications->status', 'preferences->hero_url']) // log json attributes
@@ -289,9 +255,9 @@ trait ModelHelpers
                 $camelCase = Str::camel($matches[1]);
                 $snakeCase = Str::snake($matches[1]);
 
-                if (array_key_exists($camelCase, $relationshipTypes) && in_array($relationshipTypes[$camelCase], ['hasMany', 'belongsToMany', 'HasManyThrough', 'MorphMany', 'MorphToMany'])) {
+                if (array_key_exists($camelCase, $relationshipTypes) && in_array($relationshipTypes[$camelCase], ['HasMany', 'BelongsToMany', 'HasManyThrough', 'MorphMany', 'MorphToMany'])) {
                     return $this->{$camelCase}()->count();
-                } elseif (array_key_exists($snakeCase, $relationshipTypes) && in_array($relationshipTypes[$snakeCase], ['hasMany', 'belongsToMany', 'HasManyThrough', 'MorphMany', 'MorphToMany'])) {
+                } elseif (array_key_exists($snakeCase, $relationshipTypes) && in_array($relationshipTypes[$snakeCase], ['HasMany', 'BelongsToMany', 'HasManyThrough', 'MorphMany', 'MorphToMany'])) {
                     return $this->{$snakeCase}()->count();
                 }
                 // if(is_plural($matches[1])) {
