@@ -2,6 +2,7 @@
 
 namespace Unusualify\Modularity\Entities\Traits\Core;
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use PDO;
@@ -121,7 +122,7 @@ trait HasScopes
         }
 
         if (isset($scopes['exceptIds'])) {
-            $query->whereNotIn(static::getTable() . '.id', $scopes['exceptIds']);
+            $query->whereNotIn((new static)->getTable() . '.id', $scopes['exceptIds']);
             unset($scopes['exceptIds']);
         }
 
