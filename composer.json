@@ -106,9 +106,9 @@
         }
     },
     "scripts": {
-        "test": "vendor/bin/phpunit",
-        "test-coverage": "vendor/bin/phpunit --coverage-html coverage",
-        "test:stop:defect": "vendor/bin/phpunit --stop-on-defect",
+        "test": "vendor/bin/phpunit --no-coverage",
+        "test:coverage": "vendor/bin/phpunit",
+        "test:stop:defect": "vendor/bin/phpunit --stop-on-defect --no-coverage",
         "pint": "vendor/bin/pint",
         "pint:test": "vendor/bin/pint --test",
         "pint:bail": "vendor/bin/pint --bail",
