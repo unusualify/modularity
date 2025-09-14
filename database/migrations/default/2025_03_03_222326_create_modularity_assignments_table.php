@@ -3,12 +3,13 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Unusualify\Modularity\Facades\MigrationBackup;
 
 return new class extends Migration
 {
     public function up()
     {
-        $assignmentTable = config('modularity.tables.assignments', 'm_assignments');
+        $assignmentTable = config('modularity.tables.assignments', 'um_assignments');
 
         Schema::create($assignmentTable, function (Blueprint $table) {
             // this will create an id, name field
@@ -29,11 +30,14 @@ return new class extends Migration
             // a "published" column, and soft delete and timestamps columns
             createDefaultExtraTableFields($table, true, false);
         });
+
+        MigrationBackup::restore();
     }
 
     public function down()
     {
-        $assignmentTable = config('modularity.tables.assignments', 'm_assignments');
+        $assignmentTable = config('modularity.tables.assignments', 'um_assignments');
+        MigrationBackup::backup($assignmentTable);
         Schema::dropIfExists($assignmentTable);
     }
 };

@@ -70,9 +70,7 @@ trait HasAuthorizable
             }
 
             foreach (static::$hasAuthorizableFillable as $field) {
-                if(isset($model->$field)) {
-                    $model->offsetUnset($field);
-                }
+                $model->offsetUnset($field);
             }
         });
 
