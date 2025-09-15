@@ -3,10 +3,11 @@
 namespace Unusualify\Modularity\Entities\Traits;
 
 use Illuminate\Support\Str;
+use Unusualify\Modularity\Entities\Traits\Core\ModelHelpers;
 
 trait IsHostable
 {
-    use HasScopes, HasSlug, ModelHelpers;
+    use HasSlug, ModelHelpers;
 
     protected $hostableColumn = 'url';
 

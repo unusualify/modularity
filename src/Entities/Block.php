@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model as BaseModel;
 use Unusualify\Modularity\Entities\Traits\HasFiles;
 use Unusualify\Modularity\Entities\Traits\HasImages;
 use Unusualify\Modularity\Entities\Traits\HasPresenter;
-use Unusualify\Modularity\Entities\Traits\HasRelated;
+use Unusualify\Modularity\Entities\Traits\Secondary\HasRelated;
 
 class Block extends BaseModel
 {

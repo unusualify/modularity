@@ -31,38 +31,6 @@ class State extends Model
         'active',
     ];
 
-    /**
-     * Returns the fully qualified translation class name for this model.
-     *
-     * @return string|null
-     */
-    public function getTranslationModelNameDefault()
-    {
-        $model = modularityConfig('namespace') . "\Entities\Translations\\" . class_basename($this) . 'Translation';
-
-        if (@class_exists($model)) {
-            return $model;
-        }
-        // TODO: Fix this while creating a package for State
-        $model = class_namespace($this) . "\Translations\\" . class_basename($this) . 'Translation';
-
-        if (@class_exists($model)) {
-            return $model;
-        }
-
-        throw new \Exception('State translation model not found');
-    }
-
-    // public function getTranslation(?string $locale = null, ?bool $withFallback = null): ?Model
-    // {
-    //     // how to know whether the model is coming from a parent relationship or sole record
-    //     dd(
-    //         get_class_methods($this),
-    //     );
-
-    //     return parent::getTranslation($locale, $withFallback);
-    // }
-
     public function getTable()
     {
         return modularityConfig('tables.states', 'um_states');

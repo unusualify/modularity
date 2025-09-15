@@ -320,45 +320,6 @@ trait HasStateable
         }
     }
 
-    /**
-     * Get the default stateables with the number of items in each state.
-     *
-     * @param array $scopes
-     * @return array
-     *
-     * @deprecated Use StateableTrait::getStateableFilterList instead
-     */
-    public static function defaultStateables($scopes = [])
-    {
-        $defaultStates = self::getDefaultStates();
-        $defaultStateCodes = array_column($defaultStates, 'code');
-
-        return State::whereIn('code', $defaultStateCodes)
-            ->get()
-            ->map(function ($state) use ($scopes) {
-                $studlyCode = Str::studly($state->code);
-
-                // dd(static::query()->toRawSql());
-                $number = static::handleScopes(static::query(), $scopes)
-                    ->isStateableCount($state->code);
-
-                return [
-                    'name' => $state->name ?? $state->translations->first()->name,
-                    'code' => $state->code,
-                    'slug' => "isStateable{$studlyCode}",
-                    'number' => $number,
-                ];
-            })
-            ->sortBy(function ($state) use ($defaultStateCodes) {
-                return array_search($state['code'], $defaultStateCodes);
-            })
-            ->filter(function ($state) {
-                return $state['number'] > 0;
-            })
-            ->values()
-            ->toArray();
-    }
-
     protected function clearStateableFillable()
     {
         $this->offsetUnset('_stateable');
@@ -381,34 +342,14 @@ trait HasStateable
         }
     }
 
-    protected function setPreservedStateable()
-    {
-        if (isset($this->_status)) {
-            dd(
-                $this->_status,
-                $this->_preserved_stateable,
-                $this->_stateable,
-            );
-            $this->_preserved_stateable = $this->_stateable;
-        }
-    }
-
     protected function stateableUpdatingCheck()
     {
-        if (isset($this->stateable_id) && $this->stateable->id !== $this->stateable_id) {
+        if (isset($this->stateable_id)
+            && (!$this->stateable || $this->stateable->id !== $this->stateable_id)
+        ) {
             $this->modelStateableIsUpdating = true;
             $this->modelStateableIsUpdatingId = $this->stateable_id;
         }
-    }
-
-    protected function isModelStateableUpdating()
-    {
-        return $this->modelStateableIsUpdating;
-    }
-
-    protected function getModelStateableUpdatingId()
-    {
-        return $this->modelStateableIsUpdatingId;
     }
 
     protected function updateStateable()

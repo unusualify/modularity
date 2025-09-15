@@ -48,7 +48,7 @@ class SchemaParser extends Parser
     protected $traitNamespaces = [
         'soft_delete' => 'Illuminate\Database\Eloquent\SoftDeletes',
         'has_factory' => 'Illuminate\Database\Eloquent\Factories\HasFactory',
-        'model_helpers' => 'Unusualify\Modularity\Entities\Traits\ModelHelpers',
+        'model_helpers' => 'Unusualify\Modularity\Entities\Traits\Core\ModelHelpers',
     ];
 
     protected $traits = [

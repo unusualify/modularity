@@ -3,6 +3,7 @@
 namespace Unusualify\Modularity\Entities\Scopes;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 use Unusualify\Modularity\Entities\ChatMessage;
 
 trait ChatableScopes
@@ -43,7 +44,7 @@ trait ChatableScopes
                 $creatableTableAlias = 'creatable_creators';
                 $chatableTableAlias = 'chatable_creators';
 
-                $subQuery->select(\DB::raw(1))
+                $subQuery->select(DB::raw(1))
                     ->from($creatorRecordTable . ' as ' . $creatableTableAlias)
                     ->join($creatorRecordTable . ' as ' . $chatableTableAlias, function ($join) use ($creatableTableAlias, $chatableTableAlias) {
                         $join->on($creatableTableAlias . '.creator_id', '=', $chatableTableAlias . '.creator_id')

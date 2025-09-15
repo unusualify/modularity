@@ -2,7 +2,7 @@
 
 namespace Modules\SystemPricing\Entities;
 
-use Unusualify\Modularity\Entities\Traits\ModelHelpers;
+use Unusualify\Modularity\Entities\Traits\Core\ModelHelpers;
 
 class Currency extends \Oobook\Priceable\Models\Currency
 {

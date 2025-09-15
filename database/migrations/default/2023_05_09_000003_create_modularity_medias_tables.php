@@ -14,8 +14,8 @@ return new class extends Migration
     public function up()
     {
 
-        $mediasTable = modularityConfig('tables.medias', 'modularity_medias');
-        $mediablesTable = modularityConfig('tables.mediables', 'modularity_mediables');
+        $mediasTable = modularityConfig('tables.medias', 'um_medias');
+        $mediablesTable = modularityConfig('tables.mediables', 'um_mediables');
 
         if (! Schema::hasTable($mediasTable)) {
             Schema::create($mediasTable, function (Blueprint $table) {
@@ -63,8 +63,8 @@ return new class extends Migration
      */
     public function down()
     {
-        $mediasTable = modularityConfig('tables.medias', 'modularity_medias');
-        $mediablesTable = modularityConfig('tables.mediables', 'modularity_mediables');
+        $mediasTable = modularityConfig('tables.medias', 'um_medias');
+        $mediablesTable = modularityConfig('tables.mediables', 'um_mediables');
 
         Schema::dropIfExists($mediablesTable);
         Schema::dropIfExists($mediasTable);

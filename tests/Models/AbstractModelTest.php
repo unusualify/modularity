@@ -90,7 +90,7 @@ class AbstractModelTest extends ModelTestCase
 
         $this->assertContains('Unusualify\Modularity\Entities\Traits\HasPresenter', $traits);
         $this->assertContains('Unusualify\Modularity\Entities\Traits\IsTranslatable', $traits);
-        $this->assertContains('Unusualify\Modularity\Entities\Traits\ModelHelpers', $traits);
+        $this->assertContains('Unusualify\Modularity\Entities\Traits\Core\ModelHelpers', $traits);
         $this->assertContains('Illuminate\Database\Eloquent\SoftDeletes', $traits);
         $this->assertContains('Cartalyst\Tags\TaggableTrait', $traits);
         $this->assertContains('Illuminate\Notifications\Notifiable', $traits);

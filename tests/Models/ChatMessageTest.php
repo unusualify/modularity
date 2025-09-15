@@ -31,6 +31,7 @@ class ChatMessageTest extends ModelTestCase
             'is_sent',
             'is_received',
             'edited_at',
+            'notified_at',
 
             // Creator record
             'custom_creator_id',

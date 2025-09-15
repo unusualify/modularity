@@ -2,8 +2,10 @@
 
 namespace Unusualify\Modularity\Entities\Traits;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Facades\Auth;
 use Unusualify\Modularity\Entities\Enums\ProcessStatus;
@@ -21,10 +23,6 @@ trait Processable
      */
     public static function bootProcessable(): void
     {
-        static::retrieved(function (Model $model) {});
-
-        static::saving(function (Model $model) {});
-
         static::created(function (Model $model) {
             if (! $model->process()->exists()) {
                 $model->process()->create([
@@ -35,22 +33,11 @@ trait Processable
 
         static::saved(function (Model $model) {
             if ($model->processable_status) {
-                dd($model->processable_status, $model->processable_reason);
                 $model->setProcessStatus($model->processable_status, $model->processable_reason);
+                $model->refresh();
             }
         });
-
-        // static::saved(function (Model $model) {
-        //     $model->process()->createOrUpdate ([
-        //         'status' => ProcessStatus::PREPARING,
-        //     ]);
-        // });
     }
-
-    /**
-     * Laravel hook to initialize the trait
-     */
-    public function initializeProcessable(): void {}
 
     public function process(): MorphOne
     {
@@ -69,7 +56,7 @@ trait Processable
             'process_id',     // Foreign key on process_histories table
             'id',             // Local key on the model using this trait
             'id'              // Local key on processes table
-        )->where(modularityConfig('tables.processes', 'm_processes') . '.processable_type', static::class);
+        )->where(modularityConfig('tables.processes', 'um_processes') . '.processable_type', static::class);
     }
 
     /**
@@ -77,14 +64,6 @@ trait Processable
      */
     public function setProcessStatus(string $status, ?string $reason = null): void
     {
-        // if( !$this->process()->exists()) {
-        //     $this->process()->create([
-        //         'status' => ProcessStatus::PREPARING,
-        //     ]);
-        // } else {
-
-        //     // Update the current status
-        // }
 
         $this->process()->updateOrCreate(
             ['processable_id' => $this->id, 'processable_type' => static::class],
@@ -96,6 +75,40 @@ trait Processable
             'reason' => $reason,
             'user_id' => Auth::id(),
         ]);
+    }
+
+    public function processHistory(): HasOneThrough
+    {
+        return $this->hasOneThrough(
+            ProcessHistory::class,
+            Process::class,
+            'processable_id',
+            'process_id',
+            'id',
+            'id'
+        )->where(modularityConfig('tables.processes', 'um_processes') . '.processable_type', static::class)->latest();
+    }
+
+    protected function hasProcessHistory(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->processHistories()->exists(),
+        );
+    }
+
+
+    protected function processHistoryStatus(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->processHistory?->status,
+        );
+    }
+
+    protected function processHistoryReason(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->processHistory?->reason,
+        );
     }
 
     /**
@@ -125,10 +138,8 @@ trait Processable
     /**
      * Check if the process is in a specific status for a country
      */
-    public function hasProcessStatus(string $status): bool
+    public function isProcessStatus(ProcessStatus $status): bool
     {
-        return $this->process()
-            ->where('status', $status)
-            ->exists();
+        return ($this->processHistory?->status ?? $this->process->status) == $status;
     }
 }

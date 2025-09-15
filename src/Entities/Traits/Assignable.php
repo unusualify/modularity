@@ -6,8 +6,10 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Unusualify\Modularity\Entities\Assignment;
 use Unusualify\Modularity\Entities\Scopes\AssignableScopes;
+
 
 trait Assignable
 {
@@ -18,7 +20,24 @@ trait Assignable
      */
     public static function bootAssignable(): void
     {
-        static::retrieved(function (Model $model) {});
+        static::deleting(function (Model $model) {
+            $assignmentsRelation = $model->assignments();
+            $assignmentModel = $assignmentsRelation->getRelated();
+
+            // soft delete
+            if(class_uses_recursive(static::class) && in_array(SoftDeletes::class, class_uses_recursive(static::class))) {
+                $assignmentsRelation->delete();
+            } else {
+                $assignmentsRelation->forceDelete();
+            }
+        });
+
+        if(class_uses_recursive(static::class) && in_array(SoftDeletes::class, class_uses_recursive(static::class))) {
+            static::forceDeleting(function (Model $model) {
+                $assignmentsRelation = $model->assignments();
+                $assignmentsRelation->forceDelete();
+            });
+        };
     }
 
     /**

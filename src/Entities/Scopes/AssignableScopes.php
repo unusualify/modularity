@@ -4,6 +4,7 @@ namespace Unusualify\Modularity\Entities\Scopes;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Unusualify\Modularity\Entities\Assignment;
 use Unusualify\Modularity\Entities\Enums\AssignmentStatus;
 
@@ -101,27 +102,23 @@ trait AssignableScopes
         // }
         $userIds = $users->pluck('id');
 
+        if ($userIds->isEmpty()) {
+            return $query->whereRaw('1 = 0');
+        }
+
         $query->whereExists(function ($subQuery) use ($assignmentTable, $modelTable, $modelClass, $userClass, $userIds) {
-            $userIds->each(function ($userId) use ($subQuery, $assignmentTable, $modelTable, $modelClass, $userClass) {
-                $subQuery = $subQuery->orWhereExists(function ($subQuery) use ($assignmentTable, $modelTable, $modelClass, $userClass, $userId) {
-                    // Create a SQL string for the subquery
-                    $latestAssignmentSql = \DB::table($assignmentTable)
-                        ->select(\DB::raw('MAX(created_at)'))
-                        ->whereColumn("{$assignmentTable}.assignable_id", "{$modelTable}.id")
-                        ->where("{$assignmentTable}.assignable_type", $modelClass)
-                        ->toSql();
-
-                    $subQuery->select(\DB::raw(1))
-                        ->from($assignmentTable)
-                        ->whereColumn("{$assignmentTable}.assignable_id", "{$modelTable}.id")
-                        ->where("{$assignmentTable}.assignable_type", $modelClass)
-                        ->where("{$assignmentTable}.assignee_id", $userId)
-                        ->where("{$assignmentTable}.assignee_type", $userClass)
-                        ->whereRaw("{$assignmentTable}.created_at = ({$latestAssignmentSql})", [$modelClass]);
-                });
-            });
-
-            return $subQuery;
+            $subQuery->select(\DB::raw(1))
+                ->from($assignmentTable)
+                ->whereColumn("{$assignmentTable}.assignable_id", "{$modelTable}.id")
+                ->where("{$assignmentTable}.assignable_type", $modelClass)
+                ->whereIn("{$assignmentTable}.assignee_id", $userIds->toArray())
+                ->where("{$assignmentTable}.assignee_type", $userClass)
+                ->whereRaw("{$assignmentTable}.created_at = (
+                    SELECT MAX(created_at)
+                    FROM {$assignmentTable} AS latest
+                    WHERE latest.assignable_id = {$assignmentTable}.assignable_id
+                    AND latest.assignable_type = ?
+                )", [$modelClass]);
         });
 
         return $query;
