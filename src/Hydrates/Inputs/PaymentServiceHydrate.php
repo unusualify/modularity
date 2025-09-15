@@ -93,7 +93,7 @@ class PaymentServiceHydrate extends InputHydrate
                 'name' => 'bank_receipt',
                 'label' => 'Upload Transfer Receipt',
                 'col' => ['cols' => 12],
-                'acceptedExtensions' => ['pdf'],
+                'acceptedExtensions' => ['pdf','jpg','jpeg','png'],
                 'max-files' => 2,
                 'min' => 1,
                 'default' => [],
