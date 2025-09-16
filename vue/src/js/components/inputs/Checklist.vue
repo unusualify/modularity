@@ -44,7 +44,13 @@
         >
           <v-col v-bind="{...treeviewCols}">
 
-            <v-list v-model:opened="openedGroups">
+            <v-list
+              v-model:opened="openedGroups"
+              :class="[
+                'd-flex flex-column',
+                `ga-${groupExpandGap}`
+              ]"
+            >
 
               <template
                 v-for="(group, key) in groupedItems"
@@ -91,9 +97,9 @@
                         :text="group[`${itemTitle}`]"
                         type="body-1"
                         color="grey-darken-5"
-                        weight="medium"
+                        weight="bold"
                         justify="space-between"
-                        v-bind="props"
+                        v-bind="{...groupExpandTitleProps, ...props}"
                       >
                         <!-- {{ titleSerialized }} -->
                         <template v-slot:right>
@@ -138,7 +144,11 @@
                               :label="item[itemTitle]"
                               :class="getCheckboxClasses(item)"
                               :readonly="isMandatoryItem(item) || isProtected(item[itemValue]) || readonly"
-                            />
+                            >
+                              <template v-slot:label="labelScope">
+                                <span :style="{fontSize: labelFontSize}" v-bind="labelScope.props">{{ labelScope.label }}</span>
+                              </template>
+                            </v-checkbox>
 
                           </div>
                         </v-col>
@@ -160,7 +170,10 @@
                         hide-details
                         density="compact"
                         :readonly="isMandatoryItem(item) || readonly"
-                        >
+                      >
+                        <template v-slot:label="labelScope">
+                          <span :style="{fontSize: labelFontSize}" v-bind="labelScope.props">{{ labelScope.label }}</span>
+                        </template>
                       </v-checkbox>
                     </v-list-item>
 
@@ -181,7 +194,11 @@
                       color="success"
                       hide-details
                       density="compact"
-                    />
+                    >
+                      <template v-slot:label="labelScope">
+                        <span :style="{fontSize: labelFontSize}" v-bind="labelScope.props">{{ labelScope.label }}</span>
+                      </template>
+                    </v-checkbox>
                   </v-list-item>
 
                 </template>
@@ -234,7 +251,11 @@
                     :label="item[itemTitle]"
                     :class="getCheckboxClasses(item)"
                     :readonly="isMandatoryItem(item) || isProtected(item[itemValue]) || readonly"
-                  />
+                  >
+                    <template v-slot:label="labelScope">
+                      <span :style="{fontSize: labelFontSize}" v-bind="labelScope.props">{{ labelScope.label }}</span>
+                    </template>
+                  </v-checkbox>
                 </div>
               </v-col>
               <!-- <v-spacer></v-spacer> -->
@@ -263,6 +284,10 @@
       labelColor: {
         type: String,
         default: 'grey-darken-1'
+      },
+      labelFontSize: {
+        type: String,
+        default: '0.825rem'
       },
       subtitleColor: {
         type: String,
@@ -388,7 +413,15 @@
       cardStats: {
         type: Array,
         default: () => []
-      }
+      },
+      groupExpandTitleProps: {
+        type: Object,
+        default: () => ({})
+      },
+      groupExpandGap: {
+        type: String,
+        default: '4'
+      },
     },
     setup (props, context) {
       const maxSelectable = computed(() => {
