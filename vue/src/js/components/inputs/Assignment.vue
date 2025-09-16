@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, computed, onMounted, watch } from 'vue'
+  import { ref, computed, onMounted, watch, nextTick } from 'vue'
   import { useI18n } from 'vue-i18n'
   import {
     useInput,
@@ -205,7 +205,7 @@
     if (input.value) {
       const valid = await createForm.value.validate()
 
-      if (!valid) {
+      if (!valid || !valid.valid) {
         return
       }
 
@@ -230,12 +230,15 @@
             })
 
             assignments.value.unshift(response.data)
-            createFormModel.value = {
-              assignee_id: null,
-              due_at: null,
-              description: null,
-            }
             createFormModalActive.value = false
+
+            nextTick(() => {
+              createFormModel.value = {
+                assignee_id: null,
+                due_at: null,
+                description: null,
+              }
+            })
           }
         }, (error) => {
           __log(error)
@@ -535,6 +538,7 @@
 
             persistent
             transition="scale-transition"
+            validate-on="submit lazy"
           >
             <v-card>
               <v-card-text >
@@ -613,7 +617,7 @@
                         minRule(10, 'Description must be at least 10 characters')
                       ]"
 
-                      :validate-on="`input blur`"
+                      validate-on="input lazy"
 
                     />
                   </div>
@@ -635,7 +639,7 @@
                       density="comfortable"
                       type="submit"
                       :loading="updating"
-                      :disabled="!input || updating || (createForm && !createForm.isValid)"
+                      :disabled="!input || updating"
                     >
                       {{ $t('Assign') }}
                     </v-btn>
