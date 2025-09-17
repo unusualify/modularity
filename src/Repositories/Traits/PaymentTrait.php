@@ -260,6 +260,8 @@ trait PaymentTrait
                         'type' => 'payment-service',
                         'name' => 'payment_service',
                         'label' => 'Payment',
+                        'transaction_fee_percentage' => 3,
+                        'transaction_fee_description' => __('transaction fee'),
                         'price_object' => '${payment_price}$',
                     ],
                 ]),

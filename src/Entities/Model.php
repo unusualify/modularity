@@ -12,7 +12,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 use Unusualify\Modularity\Entities\Traits\HasPresenter;
 use Unusualify\Modularity\Entities\Traits\IsTranslatable;
-use Unusualify\Modularity\Entities\Traits\ModelHelpers;
+use Unusualify\Modularity\Entities\Traits\Core\ModelHelpers;
 
 abstract class Model extends LaravelModel implements TaggableInterface
 {
@@ -31,7 +31,7 @@ abstract class Model extends LaravelModel implements TaggableInterface
 
     protected function isTranslationModel(): bool
     {
-        return Str::endsWith(get_class($this), 'Translation');
+        return Str::endsWith(get_class($this), 'Translation') || property_exists($this, 'baseModuleModel');
     }
 
     public function setPublishStartDateAttribute($value): void
@@ -63,10 +63,6 @@ abstract class Model extends LaravelModel implements TaggableInterface
                 $fillable[] = 'active';
             }
         }
-
-        // if (in_array('Unusualify\Modularity\Entities\Traits\HasCreator', class_uses_recursive(static::class))) {
-        //     $fillable = array_merge($fillable, static::$hasCreatorFillable ?? []);
-        // }
 
         if (in_array('Unusualify\Modularity\Entities\Traits\HasAuthorizable', class_uses_recursive(static::class))) {
             $fillable = array_merge($fillable, static::$hasAuthorizableFillable ?? []);

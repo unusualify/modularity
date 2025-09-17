@@ -6,7 +6,7 @@ use Illuminate\Support\Arr;
 use Modules\SystemPayment\Entities\Payment;
 use Modules\SystemPricing\Entities\Mutators\PriceMutators;
 use Unusualify\Modularity\Entities\Enums\PaymentStatus;
-use Unusualify\Modularity\Entities\Traits\ModelHelpers;
+use Unusualify\Modularity\Entities\Traits\Core\ModelHelpers;
 use Unusualify\Modularity\Facades\Filepond;
 
 class Price extends \Oobook\Priceable\Models\Price
@@ -25,6 +25,13 @@ class Price extends \Oobook\Priceable\Models\Price
     protected $appends = [
         'total_amount',
     ];
+
+    public static function booted()
+    {
+        static::saving(function ($model) {
+            $model->offsetUnset(static::$priceSavingKey);
+        });
+    }
 
     /**
      * For a price we need to make sure we always have

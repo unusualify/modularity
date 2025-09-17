@@ -40,16 +40,28 @@
   }
 
   const substractTimezone = (date) => {
+    if (!date || date === 'null' || date === '') return null
+
     const timezone = findActiveTimezone()
     const newDate = new Date(date)
+
+    // Check if date is valid
+    if (isNaN(newDate.getTime())) return null
+
     const timezoneOffset = newDate.getTimezoneOffset()
     const substractedDate = new Date(newDate.getTime() - timezoneOffset * 60000)
     return substractedDate
   }
 
   const addTimezone = (date) => {
+    if (!date || date === 'null' || date === '') return null
+
     const timezone = findActiveTimezone()
     const newDate = new Date(date)
+
+    // Check if date is valid
+    if (isNaN(newDate.getTime())) return null
+
     const timezoneOffset = newDate.getTimezoneOffset()
     const addedDate = new Date(newDate.getTime() + timezoneOffset * 60000)
     return addedDate
@@ -58,14 +70,22 @@
   const { input, id , boundProps } = useInput(props, {
     emit,
     initializeInput: (val) => {
+      if (!val) return null
+
       if (!props.useTimezone) {
         return addTimezone(val)
       }
       return val
     },
     updateModelValue: (val, old) => {
+      if (!val) {
+        emit('update:modelValue', null)
+        return
+      }
+
       if (!props.useTimezone) {
-        emit('update:modelValue', substractTimezone(val))
+        const adjustedDate = substractTimezone(val)
+        emit('update:modelValue', adjustedDate)
       } else {
         emit('update:modelValue', val)
       }

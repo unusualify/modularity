@@ -170,15 +170,18 @@ describe('VInputAssignment', () => {
 
       const newAssignment = {
         assignee_id: 1,
-        due_at: '2024-04-01',
-        description: 'New task',
+        due_at: new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString(),
+        description: 'New task Description',
         assignee_avatar: 'avatar.jpg',
       }
 
       wrapper.vm.createFormModel = newAssignment
-      // wrapper.vm.$refs.createForm = {
-      //   validate: vi.fn().mockResolvedValueOnce(true)
-      // }
+
+      // Mock the form validation to return successful validation
+      wrapper.vm.createForm = {
+        validate: vi.fn().mockResolvedValue({ valid: true })
+      }
+
       axios.post.mockResolvedValueOnce({
         status: 200,
         data: { ...mockAssignment, ...newAssignment }
@@ -295,7 +298,7 @@ describe('VInputAssignment', () => {
 
       const newAssignment = {
         assignee_id: 1,
-        due_at: new Date('2024-05-12').toISOString(),
+        due_at: new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString(),
         description: 'New task',
       }
 
@@ -303,9 +306,9 @@ describe('VInputAssignment', () => {
 
       expect(wrapper.vm.$refs.createFormModal.dialog).toBe(true)
 
-      const mockValidate = vi.fn().mockResolvedValue(true)
-
-      wrapper.vm.$refs.createForm.validate = mockValidate
+      wrapper.vm.createForm = {
+        validate: vi.fn().mockResolvedValue({ valid: true })
+      }
 
       axios.post.mockResolvedValueOnce({
         status: 200,
@@ -314,7 +317,7 @@ describe('VInputAssignment', () => {
 
       await wrapper.vm.createAssignment()
 
-      expect(mockValidate).toHaveBeenCalled()
+      expect(wrapper.vm.createForm.validate).toHaveBeenCalled()
 
       expect(axios.post).toHaveBeenCalledWith(
         '/api/assignments/123/create',

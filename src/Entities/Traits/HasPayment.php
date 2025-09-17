@@ -47,12 +47,10 @@ trait HasPayment
         });
 
         self::saving(static function (Model $model) {
-            if (isset($model->_price)) {
-                $model->offsetUnset('_price');
-                $model->offsetUnset('priceExcludingVatFormatted');
-                $model->offsetUnset('paymentStatus');
-                $model->offsetUnset('paymentStatusTranslated');
-            }
+            $model->offsetUnset('_price');
+            $model->offsetUnset('priceExcludingVatFormatted');
+            $model->offsetUnset('paymentStatus');
+            $model->offsetUnset('paymentStatusTranslated');
         });
 
     }
@@ -70,8 +68,22 @@ trait HasPayment
 
     public function paymentPrice(): \Illuminate\Database\Eloquent\Relations\MorphOne
     {
+        return $this->morphOne(Price::class, 'priceable')
+            ->where('role', 'payment')
+            ->latest('created_at');
+
         $priceTable = (new Price)->getTable();
         $morphClass = addslashes($this->getMorphClass());
+
+        return $this->morphOne(Price::class, 'priceable')
+            ->where('role', 'payment')
+            ->whereRaw("created_at = (
+                SELECT MAX(p2.created_at)
+                FROM {$priceTable} p2
+                WHERE p2.priceable_id = {$priceTable}.priceable_id
+                AND p2.priceable_type = {$priceTable}.priceable_type
+                AND p2.role = ?
+            )", ['payment']);
 
         return $this->morphOne(Price::class, 'priceable')
             ->whereRaw("{$priceTable}.created_at = (select max(created_at) from {$priceTable} where {$priceTable}.priceable_id = '{$this->id}' and {$priceTable}.priceable_type = '{$morphClass}' and {$priceTable}.role = 'payment')");
@@ -83,6 +95,10 @@ trait HasPayment
 
     public function initialPayablePrice(): \Illuminate\Database\Eloquent\Relations\MorphOne
     {
+        return $this->morphOne(Price::class, 'priceable')
+            ->where('role', 'payment')
+            ->oldest('created_at');
+
         $priceTable = (new Price)->getTable();
         $morphClass = addslashes($this->getMorphClass());
 
@@ -93,6 +109,11 @@ trait HasPayment
 
     public function payablePrice(): \Illuminate\Database\Eloquent\Relations\MorphOne
     {
+        return $this->morphOne(Price::class, 'priceable')
+            ->where('role', 'payment')
+            ->whereDoesntHave('payments', fn($q) => $q->where('status', 'COMPLETED'))
+            ->latest('created_at');
+
         $priceTable = (new Price)->getTable();
         $morphClass = addslashes($this->getMorphClass());
 
@@ -180,29 +201,8 @@ trait HasPayment
     {
         $price = 0;
 
-        foreach ($this->getPaymentRelations() as $relation) {
-            $relation = $this->$relation;
-
-            if ($relation instanceof Collection) {
-                $relation = $relation->each(function ($item) use (&$price) {
-                    $basePrice = $item->basePrice ?? $item->base_price;
-
-                    if ($basePrice) {
-                        try {
-                            $price += $basePrice instanceof Model
-                                ? $basePrice->raw_amount
-                                : $basePrice['raw_amount'];
-                        } catch (\Exception $e) {
-                            dd($e, $item);
-                        }
-                    }
-                });
-            } elseif ($relation instanceof Model) {
-                $basePrice = $relation->basePrice;
-                $price += $basePrice instanceof Model
-                    ? $basePrice->raw_amount
-                    : $basePrice['raw_amount'];
-            }
+        if ($this->initialPayablePrice) {
+            $price = $this->initialPayablePrice->raw_amount;
         }
 
         return Attribute::make(
@@ -220,7 +220,7 @@ trait HasPayment
     protected function payablePriceExcludingVat(): Attribute
     {
         return Attribute::make(
-            get: fn ($value) => $this->payablePrice ? $this->payablePrice->raw_amount : null,
+            get: fn ($value) => $this->payablePrice ? $this->payablePrice->price_excluding_vat : null,
         );
     }
 

@@ -21,8 +21,8 @@ class RepeaterTest extends ModelTestCase
     {
         $expectedFillable = [
             'repeatable_id',
-            'content',
             'repeatable_type',
+            'content',
             'role',
             'locale',
         ];

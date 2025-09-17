@@ -23,3 +23,9 @@ vue/src/sass/themes/customs/**
 **/.DS_Store
 **/test.*
 .secrets
+
+# Code Coverage Reports
+/coverage-html/
+/coverage-xml/
+coverage.txt
+coverage-clover.xml

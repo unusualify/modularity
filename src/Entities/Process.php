@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+// use Illuminate\Support\Facades\DB;
 use Unusualify\Modularity\Entities\Enums\ProcessStatus;
 use Unusualify\Modularity\Entities\Scopes\ProcessScopes;
 
@@ -43,6 +44,16 @@ class Process extends Model
     protected $casts = [
         'status' => ProcessStatus::class,
     ];
+
+    // public static function booted(): void
+    // {
+    //     static::creating(function (Process $process) {
+    //         $table = $process->getTable();
+    //         if (DB::table($table)->where('processable_id', $process->processable_id)->where('processable_type', $process->processable_type)->exists()) {
+    //             throw new \Exception('Processable model already exists');
+    //         }
+    //     });
+    // }
 
     /**
      * Get the parent processable model

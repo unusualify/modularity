@@ -74,7 +74,7 @@ trait IsSingular
 
     public function isPublished()
     {
-        return (bool) ($this->content['published'] ?? true);
+        return (bool) ($this->published ?? $this->content['published'] ?? true);
     }
 
     final public function getTable()

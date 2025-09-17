@@ -5,16 +5,18 @@ namespace Unusualify\Modularity\Entities;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 use Modules\SystemNotification\Events\AssignmentCreated;
 use Modules\SystemNotification\Events\AssignmentUpdated;
 use Unusualify\Modularity\Entities\Enums\AssignmentStatus;
 use Unusualify\Modularity\Entities\Scopes\AssignmentScopes;
+use Unusualify\Modularity\Entities\Traits\Core\ModelHelpers;
 use Unusualify\Modularity\Entities\Traits\HasFileponds;
 
 class Assignment extends Model
 {
-    use AssignmentScopes, HasFileponds;
+    use SoftDeletes, AssignmentScopes, HasFileponds;
 
     /**
      * The attributes that are mass assignable.

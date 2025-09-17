@@ -14,7 +14,7 @@ return new class extends Migration
             Schema::create($filepondsTable, function (Blueprint $table) {
                 $table->{modularityIncrementsMethod()}('id');
                 $table->uuidMorphs('filepondable');
-                $table->text('uuid');
+                $table->text('uuid')->unique();
                 $table->text('file_name');
                 $table->string('role');
                 $table->string('locale');

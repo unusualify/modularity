@@ -34,7 +34,7 @@ class PaymentCurrency extends \Modules\SystemPricing\Entities\Currency
     protected function hasCreditCardPaymentService(): Attribute
     {
         return Attribute::make(
-            get: fn ($value) => $this->relationLoaded('paymentService')
+            get: fn ($value) => $this->relationLoaded('paymentService') && $this->paymentService
                 ? $this->paymentService->published && $this->paymentService->is_internal
                 : $this->paymentService()->published()->isInternal()->count() > 0,
         );

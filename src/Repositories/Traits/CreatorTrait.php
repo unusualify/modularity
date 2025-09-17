@@ -12,6 +12,6 @@ trait CreatorTrait
      */
     public function filterCreatorTrait($query, &$scopes)
     {
-        $scopes['authorized'] = true;
+        $scopes['hasAccessToCreation'] = true;
     }
 }

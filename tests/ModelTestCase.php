@@ -39,7 +39,7 @@ abstract class ModelTestCase extends TestCase
             'default_auth_driver' => null,
             'subject_returns_soft_deleted_models' => false,
             'activity_model' => Activity::class,
-            'table_name' => 'sp_activity_log',
+            'table_name' => 'sp_activity_logs',
             'database_connection' => 'testdb',
         ]);
 

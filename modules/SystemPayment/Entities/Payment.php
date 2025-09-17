@@ -9,7 +9,7 @@ use Oobook\Priceable\Models\Currency;
 use Unusualify\Modularity\Entities\Traits\HasCreator;
 use Unusualify\Modularity\Entities\Traits\HasFileponds;
 use Unusualify\Modularity\Entities\Traits\HasSpreadable;
-use Unusualify\Modularity\Entities\Traits\ModelHelpers;
+use Unusualify\Modularity\Entities\Traits\Core\ModelHelpers;
 
 class Payment extends \Unusualify\Payable\Models\Payment
 {
@@ -98,8 +98,9 @@ class Payment extends \Unusualify\Payable\Models\Payment
     protected function serviceClass(): Attribute
     {
         $serviceClass = null;
-        $paymentGateway = $this->paymentService->key;
+        $paymentGateway = null;
         try {
+            $paymentGateway = $this->paymentService->key;
             $serviceClass = \Unusualify\Payable\Payable::getServiceClass($paymentGateway);
         } catch (\Exception $e) {
             if ($e->getMessage() == 'Service class not found for slug: ' . $paymentGateway && $this->paymentService->transferrable) {

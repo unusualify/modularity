@@ -14,6 +14,6 @@ class StateTranslation extends Model
 
     public function getTable()
     {
-        return modularityConfig('tables.state_translations', 'modularity_state_translations');
+        return modularityConfig('tables.state_translations', 'um_state_translations');
     }
 }

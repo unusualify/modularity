@@ -29,6 +29,7 @@ class ChatMessage extends Model
         'is_sent',
         'is_received',
         'edited_at',
+        'notified_at',
     ];
 
     /**
