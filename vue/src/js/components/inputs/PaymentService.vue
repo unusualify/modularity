@@ -598,9 +598,6 @@ export default {
     }
 
     .service-icon-container {
-      width: fit-content;
-      position:absolute;
-      top: 5px;
 
       .v-img__img--relative {
         background: rgba(211, 216, 221, 0.30);
@@ -608,13 +605,6 @@ export default {
         border-radius: 4px;
       }
     }
-  }
-
-  .d-flex{
-    display: flex;
-  }
-  .justify-content-end{
-    justify-content:flex-end;
   }
 </style>
 
