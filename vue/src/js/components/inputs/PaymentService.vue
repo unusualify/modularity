@@ -4,7 +4,7 @@
       <v-col class="d-flex flex-column justify-center px-0">
         <v-card class="pa-4 payment-container" elevation="0">
           <v-card-text class="pa-0">
-            <p class="select-title">{{ $t('How would you like to pay?') }}</p>
+            <p class="text-h5 text-center ma-6">{{ $t('How would you like to pay?') }}</p>
           </v-card-text>
 
           <!-- Currency Selector -->
@@ -21,28 +21,29 @@
           />
 
           <!-- Payment Methods -->
-          <v-radio-group v-model="localPaymentMethod" column>
+          <v-radio-group v-model="localPaymentMethod" column >
             <!-- Credit Card Option -->
             <div
               class="service-container px-3 py-cs-1 credit-card-service"
               :class="{ 'selected-service--focus': localPaymentMethod === localDefaultPaymentMethod }"
             >
               <v-radio
-                :label="$t('Credit Card')"
+                :label="$t('Credit Card') + ' *' "
                 :value="localDefaultPaymentMethod"
-                class="service-label"
+                class="service-label flex-md-1-1-0 flex-1-1-100"
               />
-              <v-row align="center">
-                <v-col class="d-flex justify-content-end">
-                  <v-img-icon
-                    v-for="(currencyCardType, key) in currencyCardTypes[selectedCurrency.iso_4217]"
+              <div class="flex-md-1-1-0 flex-1-1-100">
+                <div class="d-flex justify-md-end ga-1">
+                  <v-img-icon v-for="(currencyCardType, key) in currencyCardTypes[selectedCurrency.iso_4217]"
                     :key="`type-${key}`"
                     :src="currencyCardType.logo"
                     style="max-width: 64px;"
+                    class="v-img__img--relative"
                   />
-                </v-col>
-              </v-row>
+                </div>
+              </div>
             </div>
+
 
             <!-- Other Payment Services -->
             <div
@@ -52,21 +53,30 @@
               :class="{ 'selected-service--focus': localPaymentMethod === service[itemValue] }"
             >
               <v-radio
-                :label="service.name"
-                :value="service[itemValue]"
-                class="service-label"
+                 :labelX="!service.name.includes('Bank Transfer') ? service.name + '*' : service.name"
+                 :label="`${service.name} ${service.is_external ? '*' : ''}`"
+                 :value="service[itemValue]"
+                 class="service-label flex-md-1-1-0 flex-1-1-100"
               />
-              <v-row align="center">
+              <div class="flex-md-0-1 flex-1-1-100">
+                <div class="service-icon-container">
+                  <v-img-icon
+                    :Xsrc="'/storage/uploads/' + service?.medias.find(item => item?.pivot?.role === 'logo')?.uuid"
+                    :src="service.button_logo_url"
+                    class="v-img__img--relative"
+                  />
+                </div>
+
+              </div>
+              <!-- <v-row align="center">
                 <v-col class="d-flex justify-content-end">
-                  <div class="service-icon-container">
-                    <v-img-icon
-                      :Xsrc="'/storage/uploads/' + service?.medias.find(item => item?.pivot?.role === 'logo')?.uuid"
-                      :src="service.button_logo_url"
-                      class="v-img__img--relative"
-                    />
-                  </div>
                 </v-col>
-              </v-row>
+              </v-row> -->
+            </div>
+            <div v-if="currencyHasExternalService" class="service-container" style="border: none;">
+              <div class="text-body-1">
+                {{ '* ' + '+' + transactionFeePercentage + '% ' + transactionFeeDescription }}
+              </div>
             </div>
           </v-radio-group>
         </v-card>
@@ -92,27 +102,26 @@
               :complete-url="completeUrl"
             >
               <template #button="{ pay }">
-                <v-btn
-                  :style="selectedCurrency?.payment_service?.button_style"
-                  block
-                  density="comfortable"
-                  max-width="300px"
-                  max-height=""
-                  min-width="80%"
-                  class="d-flex align-center justify-center py-8"
-                  @click="pay"
-                >
-                  <v-img v-if="selectedCurrency?.payment_service?.button_logo_url"
-                    contain
-                    :width="100"
-                    style="max-height: 36px; max-width: 100px;"
-                    aspect-ratio="16/9"
-                    :src="selectedCurrency?.payment_service?.button_logo_url"
-                  />
-                  <span class="ml-2 font-weight-bold text-body-2 text-align-center" >
-                    {{ displayPrice }}
-                  </span>
-                </v-btn>
+                <div class="d-flex flex-column align-center" style="width: 100%;">
+                  <p class="text-h5 text-center ma-4">{{ $t('Click below to pay securely') }}</p>
+                  <v-btn
+                    :style="selectedCurrency?.payment_service?.button_style"
+                    density="comfortable"
+                    max-height=""
+                    max-width="300px"
+                    min-width="80%"
+                    class="d-flex align-center justify-center py-6"
+                    @click="pay"
+                  >
+                    <v-img v-if="selectedCurrency?.payment_service?.button_logo_url"
+                      contain
+                      :width="100"
+                      style="max-height: 36px; max-width: 100px;"
+                      aspect-ratio="16/9"
+                      :src="selectedCurrency?.payment_service?.button_logo_url"
+                    />
+                  </v-btn>
+                </div>
               </template>
             </ue-revolut-checkout-modal>
           </template>
@@ -150,26 +159,27 @@
             </ue-form>
           </div>
         </template>
-        <v-btn v-else
-          :style="selectedService?.button_style"
-          @click="submitForm"
-          density="comfortable"
-          max-width="300px"
-          min-width="80%"
-          class="d-flex align-center justify-center"
-        >
-          <v-img
-            contain
-            width="100px"
-            height="36px"
-            style="max-width: 100px; max-height: 36px;"
-            :src="selectedService?.button_logo_url"
-          />
-          <span class="ml-2 font-weight-bold text-body-2 text-align-center" >
-            {{ displayPrice }}
-          </span>
+        <div v-else class="d-flex flex-column align-center" style="width: 100%;">
+          <p class="text-h5 text-center ma-4">{{ $t('Click below to pay securely') }}</p>
+          <v-btn
+            :style="selectedService?.button_style"
+            @click="submitForm"
+            density="comfortable"
+            max-height=""
+            max-width="300px"
+            min-width="80%"
+            class="d-flex align-center justify-center py-6"
+          >
+            <v-img
+              contain
+              width="100px"
+              height="36px"
+              style="max-width: 100px; max-height: 36px;"
+              :src="selectedService?.button_logo_url"
+            />
+          </v-btn>
+        </div>
           <!-- {{ selectedService?.name }} -->
-        </v-btn>
       </v-col>
     </v-row>
   </v-input>
@@ -245,7 +255,16 @@ export default {
     completeUrl: {
       type: String,
       default: null
-    }
+    },
+
+    transactionFeePercentage: {
+      type: Number,
+      default: 3
+    },
+    transactionFeeDescription: {
+      type: String,
+      default: 'transaction fee'
+    },
   },
 
   setup(props, { emit }) {
@@ -288,6 +307,10 @@ export default {
       return props.items.filter(service => {
         return service.payment_currencies?.some(currency => currency.id === currencyModel.value)
       });
+    });
+
+    const currencyHasExternalService = computed(() => {
+      return filteredServiceItems.value.some(service => service.is_external);
     });
 
     const selectedService = computed(() => {
@@ -461,6 +484,7 @@ export default {
       selectedCurrency,
       formattedCurrencies,
       filteredServiceItems,
+      currencyHasExternalService,
 
       transferSchema,
       transferFormModel,
@@ -535,7 +559,8 @@ export default {
   }
   .service-container{
     display:flex;
-    flex-flow: row;
+    // flex-flow: row;
+    flex-wrap: wrap;
     border: 1px solid #CACBCB;
     border-radius: 4px;
     margin: 0.5rem 1.5rem;
@@ -553,10 +578,12 @@ export default {
           top: 50%;
           transform: translateY(-50%);
         }
-        .v-img__img--relative{
-          width:min-content;
-          padding: 4px;
-        }
+      }
+      .v-img__img--relative{
+        background: rgba(211, 216, 221, 0.30);
+        width:min-content;
+        padding: 8px 28px;
+        border-radius: 4px;
       }
 
     }

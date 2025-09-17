@@ -1,12 +1,7 @@
 <template>
-  <v-container class="d-flex flex-column justify-center align-center w-100">
-    <!-- <div>Revolut Checkout Modal</div> -->
-    <div style="margin-top:12px">
-      <slot name="button" v-bind="{ pay }">
-        <v-btn id="pay-button" @click="pay">Pay</v-btn>
-      </slot>
-    </div>
-  </v-container>
+  <slot name="button" v-bind="{ pay }">
+    <v-btn id="pay-button" @click="pay">Pay</v-btn>
+  </slot>
 </template>
 
 <script>
