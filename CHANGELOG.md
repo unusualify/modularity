@@ -2,6 +2,17 @@
 
 All notable changes to `modularity` will be documented in this file
 
+## v0.46.1 - 2025-09-17
+
+### :wrench: Bug Fixes
+
+- clean up unused styles and improve component structure by @OoBook in https://github.com/unusualify/modularity/commit/d10c448f39308123c1172f4ae0302753fd956950
+
+### :package: Build
+
+- update build artifacts for v0.46.0 by @invalid-email-address in https://github.com/unusualify/modularity/commit/5926e060a571a02ba17dea92aed2e2e71784ea4f
+- update build artifacts for v0.46.1 by @OoBook in https://github.com/unusualify/modularity/commit/b519e935fa578139ef3a92ef3b588588d3029800
+
 ## v0.46.0 - 2025-09-17
 
 ### :rocket: Features
