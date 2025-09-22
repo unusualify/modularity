@@ -19,6 +19,8 @@ use Laravel\Socialite\Facades\Socialite;
 use Modules\SystemUser\Repositories\UserRepository;
 use PragmaRX\Google2FA\Google2FA;
 use Unusualify\Modularity\Entities\User;
+use Unusualify\Modularity\Events\ModularityUserRegistered;
+use Unusualify\Modularity\Events\ModularityUserRegistering;
 use Unusualify\Modularity\Facades\Modularity;
 use Unusualify\Modularity\Http\Controllers\Traits\ManageUtilities;
 use Unusualify\Modularity\Http\Requests\OauthRequest;
@@ -375,7 +377,9 @@ class LoginController extends Controller
             }
         } else {
             // If the user doesn't exist, create it
+            event(new ModularityUserRegistering($request));
             $user = $repository->oauthCreateUser($oauthUser);
+            event(new ModularityUserRegistered($user, $request));
             $user->linkProvider($oauthUser, $provider);
 
             // Login and redirect
