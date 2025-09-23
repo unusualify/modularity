@@ -4,6 +4,8 @@ import { CACHE } from '@/store/mutations'
 import store from '@/store'
 
 export default function useCache() {
+  const store = useStore()
+
   const get = (key, defaultValue = null) => {
     return store.getters[CACHE.GET_CACHE](key) ?? defaultValue
   }
@@ -24,11 +26,17 @@ export default function useCache() {
     store.commit(CACHE.FORGET_CACHE, key)
   }
 
+  const has = (key) => {
+    return store.getters[CACHE.HAS_CACHE](key)
+  }
+
   return {
     get,
     put,
     push,
     last,
-    forget
+    forget,
+
+    states: computed(() => store.state.cache),
   }
 }
