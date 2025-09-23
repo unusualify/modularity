@@ -397,6 +397,7 @@ class Modularity extends FileRepository
     public function isPanelUrl($url = null)
     {
         $host = request()->getHost();
+
         if ($this->hasAdminAppUrl()) {
 
             if ($url) {
@@ -423,6 +424,19 @@ class Modularity extends FileRepository
         }
 
         return $segment === $this->getAdminUrlPrefix() && $host === $this->getAppHost();
+    }
+
+    /**
+     * Check if a route is a modularity route via admin route name prefix.
+     *
+     * @param string $routeName
+     * @return bool
+     */
+    public function isModularityRoute(string $routeName): bool
+    {
+        $segments = explode('.', $routeName);
+
+        return $segments[0] === $this->getAdminRouteNamePrefix();
     }
 
     /**
