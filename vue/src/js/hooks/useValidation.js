@@ -112,7 +112,8 @@ export default function useValidation (props) {
           return !!v || msg || 'Required';
         case 'array':
         case 'object':
-          max = (max == undefined) ? -1 : max;
+          max = _.toNumber(max)
+          max = _.isNaN(max) ? -1 : max;
           let $msg = ((minOrExact == max || max < 0) ? `Requires exactly ${minOrExact} items` : `Requires at least ${minOrExact}${((max != Infinity  && max != undefined) ? ', and maximum of:' + max : '')}) elements`);
           // let $msg = ((max != Infinity) ? ', maximum:' + max : '');
           if(Array.isArray(v)) {
