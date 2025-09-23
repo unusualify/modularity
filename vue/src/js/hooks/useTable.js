@@ -274,8 +274,7 @@ export default function useTable (props, context) {
 
   const updateResponseFields = (response, queryParameters = {}) => {
     totalNumberOfElements.value = response.resource.total
-    tableFilters.setMainFilters(response.mainFilters)
-    // tableFilters.advancedFilters.value = resource.advancedFilters
+    TableFilters.setMainFilters(response.mainFilters)
 
     if(state.options.page !== response.resource.current_page){
       updatingOptions.value = true
@@ -306,21 +305,21 @@ export default function useTable (props, context) {
       ...{ replaceUrl: false }
     }
 
-    if(tableFilters.search.value !== ''){
-      payload.search = tableFilters.search.value
+    if(TableFilters.search.value !== ''){
+      payload.search = TableFilters.search.value
     }
 
-    if(tableFilters.activeFilterSlug.value !== 'all'){
+    if(TableFilters.activeFilterSlug.value !== 'all'){
       payload.filter = {
         ...(payload.filter ?? {}),
-        status: tableFilters.activeFilterSlug.value,
+        status: TableFilters.activeFilterSlug.value,
       }
     }
 
-    if(!_.isEmpty(tableFilters.activeAdvancedFilters.value)){
+    if(!_.isEmpty(TableFilters.activeAdvancedFilters.value)){
       payload.filter = {
         ...(payload.filter ?? {}),
-        ...tableFilters.activeAdvancedFilters.value,
+        ...TableFilters.activeAdvancedFilters.value,
       }
     }
 
@@ -349,24 +348,31 @@ export default function useTable (props, context) {
     // state.isLoading = false
   }
 
-  const tableItem = useTableItem()
-  const tableNames = useTableNames(props, {
-    editedIndex: editedIndex
-  })
-  const tableFilters = useTableFilters(props)
-  const tableHeaders = useTableHeaders(props)
-  const tableForms = useTableForms(props, {
+  const TableItem = useTableItem(props)
+  const TableNames = useTableNames(props, {
     ...context,
-    ...tableNames,
+    TableItem,
+    ...{
+      editedIndex: editedIndex
+    }
+  })
+  const TableFilters = useTableFilters(props)
+  const TableHeaders = useTableHeaders(props)
+  const TableForms = useTableForms(props, {
+    ...context,
+    ...TableNames,
+    TableItem,
     ...{
       loadItems
     }
   })
-  const tableModals = useTableModals(props)
-  const tableItemActions = useTableItemActions(props, {
+  const TableModals = useTableModals(props, {...context, TableItem, TableNames})
+  const TableItemActions = useTableItemActions(props, {
     ...context,
+    TableItem,
+    TableNames,
+    TableForms,
     ...{
-      tableForms,
       loadItems
     }
   })
@@ -374,7 +380,7 @@ export default function useTable (props, context) {
   const openItemForm = (id) => {
     const item = state.elements.find(element => element.id == id)
     if(item){
-      tableItemActions.itemAction(item, 'edit')
+      TableItemActions.itemAction(item, 'edit')
     }
   }
 
@@ -420,6 +426,7 @@ export default function useTable (props, context) {
     options,
     elements,
 
+    editedItem: TableItem.editedItem,
 
     // datatable store
     editedIndex: editedIndex,
@@ -436,7 +443,7 @@ export default function useTable (props, context) {
           "value": curr.id, // Todo datatable ref item-key prop instead of static.id
           "index" : currentIndex,
           "selectable": props.showSelect,
-          "columns": tableHeaders.headers.value.reduce((headersPrev, header) => {
+          "columns": TableHeaders.headers.value.reduce((headersPrev, header) => {
             headersPrev[header.key] = curr[header.key]
 
             return headersPrev
@@ -450,7 +457,6 @@ export default function useTable (props, context) {
 
       return items;
     }),
-
   })
 
   const methods = reactive({
@@ -485,8 +491,8 @@ export default function useTable (props, context) {
       }
     },
 
-    setEditedItem: tableItem.setEditedItem,
-    resetEditedItem: tableItem.resetEditedItem,
+    setEditedItem: TableItem.setEditedItem,
+    resetEditedItem: TableItem.resetEditedItem,
     sortElements(list){
       // state.elements = list;
 
@@ -536,12 +542,12 @@ export default function useTable (props, context) {
     },
     // filter
     searchItems(newSearchValue){
-      if(!tableFilters.setSearchValue()) return
+      if(!TableFilters.setSearchValue()) return
 
       loadItems()
     },
     changeFilter(slug){
-      if(!tableFilters.setFilterSlug(slug)) return
+      if(!TableFilters.setFilterSlug(slug)) return
 
       options.value.page = 1
       loadItems()
@@ -551,7 +557,7 @@ export default function useTable (props, context) {
       loadItems()
     },
     resetAdvancedFilter(){
-      tableFilters.clearAdvancedFilter()
+      TableFilters.clearAdvancedFilter()
       options.value.page = 1
       loadItems()
     },
@@ -572,7 +578,7 @@ export default function useTable (props, context) {
     }
   })
 
-  watch(() => tableItem.editedItem.value, (newValue, oldValue) => {
+  watch(() => TableItem.editedItem.value, (newValue, oldValue) => {
     state.editedIndex = state.elements.findIndex(o => { return o.id === newValue.id })
   })
   watch(() => state.activeTableItem, (newValue, oldValue) => {
@@ -598,14 +604,14 @@ export default function useTable (props, context) {
     // Refresh edited item
     if(state.editedIndex > -1) {
       let refreshItem = newValue[state.editedIndex]
-      tableItem.setEditedItem(refreshItem)
+      TableItem.setEditedItem(refreshItem)
     }
   }, { deep: true })
 
   // Set up watchers to handle action events
-  watch(() => tableItemActions.actionEvents.event, (event) => {
+  watch(() => TableItemActions.actionEvents.event, (event) => {
     if (event) {
-      const payload = tableItemActions.actionEvents.payload
+      const payload = TableItemActions.actionEvents.payload
 
       let callbackParameters = []
       let hasCallback = false
@@ -619,7 +625,7 @@ export default function useTable (props, context) {
       switch (event) {
         case 'dialog':
           if(payload.callback && typeof payload.callback === 'function') {
-            hasCallback = tableModals.modals.value.dialog
+            hasCallback = TableModals.modals.value.dialog
 
             const attributes = {
               confirmClosing: false,
@@ -628,8 +634,8 @@ export default function useTable (props, context) {
             switch(payload.type){
               case 'delete':
               case 'forceDelete':
-                attributes.description = tableNames.deleteDialogDescription.value
-                attributes.title = tableNames.deleteDialogTitle.value
+                attributes.description = TableNames.deleteDialogDescription.value
+                attributes.title = TableNames.deleteDialogTitle.value
                 attributes.titleJustify = 'center'
                 break
               case 'bulkPublish':
@@ -642,7 +648,7 @@ export default function useTable (props, context) {
                 const langKey = `fields.confirm-${kebabCase}`
                 attributes.description = t(langKey, {
                   count: state.selectedItems.length,
-                  route: tableNames.transNamePlural.value
+                  route: TableNames.transNamePlural.value
                 })
                 break
               default:
@@ -651,9 +657,9 @@ export default function useTable (props, context) {
             }
 
             // callbackParameters.push(successCallback)
-            // tableModals.modals.value.dialog.setConfirmCallback(() => payload.callback(...callbackParameters))
-            tableModals.modals.value.dialog.set(attributes)
-            // tableModals.modals.value.dialog.open()
+            // TableModals.modals.value.dialog.setConfirmCallback(() => payload.callback(...callbackParameters))
+            TableModals.modals.value.dialog.set(attributes)
+            // TableModals.modals.value.dialog.open()
           }
           break
         case 'process':
@@ -671,13 +677,13 @@ export default function useTable (props, context) {
           break
 
         case 'showCustomForm':
-          tableForms.customFormModalActive.value = true
+          TableForms.customFormModalActive.value = true
           break
 
         case 'showData':
-          tableModals.modals.value.show.loadData(payload.data)
-          tableModals.modals.value.show.set(payload.action)
-          tableModals.modals.value.show.open()
+          TableModals.modals.value.show.loadData(payload.data)
+          TableModals.modals.value.show.set(payload.action)
+          TableModals.modals.value.show.open()
           break
       }
 
@@ -701,16 +707,16 @@ export default function useTable (props, context) {
             }
           }
 
-          // tableModals.modals.value.dialog.close()
-          // tableModals.modals.value.dialog.reset()
+          // TableModals.modals.value.dialog.close()
+          // TableModals.modals.value.dialog.reset()
 
           if(resetItem) {
-            tableItem.resetEditedItem()
+            TableItem.resetEditedItem()
             state.selectedItems = []
           }
 
           if(updateItem && payload.item) {
-            tableItem.setEditedItem(payload.item)
+            TableItem.setEditedItem(payload.item)
           }
 
         }
@@ -727,24 +733,24 @@ export default function useTable (props, context) {
         hasCallback.open()
       }
 
-      tableItemActions.actionEvents.reset()
+      TableItemActions.actionEvents.reset()
       // Reset the event after handling it
     }
   }, { immediate: true })
 
-  const formatter = useFormatter(props, context, tableHeaders.selectedHeaders)
+  const formatter = useFormatter(props, context, TableHeaders.selectedHeaders)
 
   return {
     form,
     ...useTableActions(props, context),
     ...toRefs(state),
     ...toRefs(methods),
-    ...tableNames,
-    ...tableFilters,
-    ...tableHeaders,
-    ...tableForms,
-    ...tableItemActions,
-    ...tableModals,
+    ...TableNames,
+    ...TableFilters,
+    ...TableHeaders,
+    ...TableForms,
+    ...TableItemActions,
+    ...TableModals,
     ...formatter,
   }
 }

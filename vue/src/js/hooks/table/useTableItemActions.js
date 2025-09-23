@@ -39,10 +39,8 @@ export const makeTableItemActionsProps = propsFactory({
   }
 })
 
-export default function useTableItemActions(props, { tableForms, loadItems }) {
+export default function useTableItemActions(props, { TableForms, loadItems, TableItem, TableNames }) {
   const store = useStore()
-  const tableItem = useTableItem()
-  const tableNames = useTableNames(props)
   const { can } = useAuthorization()
   const DynamicModal = useDynamicModal()
   const { castObjectAttributes } = useCastAttributes()
@@ -71,11 +69,11 @@ export default function useTableItemActions(props, { tableForms, loadItems }) {
       case 'switch':
       case 'duplicate':
       case 'activate':
-        hasAction = !tableItem.isDeleted(item) && can(action.name, tableNames.permissionName.value)
+        hasAction = !TableItem.isDeleted(item) && can(action.name, TableNames.permissionName.value)
         break
       case 'forceDelete':
       case 'restore':
-        hasAction = tableItem.isDeleted(item) && can(action.name, tableNames.permissionName.value)
+        hasAction = TableItem.isDeleted(item) && can(action.name, TableNames.permissionName.value)
         break
       default:
         break
@@ -116,8 +114,8 @@ export default function useTableItemActions(props, { tableForms, loadItems }) {
 
   const handleEditAction = (item) => {
     if (props.editOnModal || props.embeddedForm) {
-      tableItem.setEditedItem(item)
-      tableForms.openForm()
+      TableItem.setEditedItem(item)
+      TableForms.openForm()
     } else {
 
       if(_.isObject(props.endpoints) && props.endpoints.edit) {
@@ -131,7 +129,7 @@ export default function useTableItemActions(props, { tableForms, loadItems }) {
   }
 
   const handleRestoreAction = (item) => {
-    tableItem.setEditedItem(item)
+    TableItem.setEditedItem(item)
 
     const type = 'restore'
     const callback = async (callback, errorCallback) => {
@@ -144,8 +142,8 @@ export default function useTableItemActions(props, { tableForms, loadItems }) {
   }
 
   const handleDuplicateAction = (item) => {
-    tableItem.setEditedItem(_.omit(item, 'id'))
-    tableForms.openForm()
+    TableItem.setEditedItem(_.omit(item, 'id'))
+    TableForms.openForm()
   }
 
   const handleSwitchAction = (item, value, key) => {
@@ -167,10 +165,10 @@ export default function useTableItemActions(props, { tableForms, loadItems }) {
   }
 
   const handleDeleteAction = (item) => {
-    tableItem.setEditedItem(item)
+    TableItem.setEditedItem(item)
 
-    let id = tableItem.editedItem.value.id
-    let type = tableItem.isSoftDeletableItem.value ? 'forceDelete' : 'delete'
+    let id = TableItem.editedItem.value.id
+    let type = TableItem.isSoftDeletableItem.value ? 'forceDelete' : 'delete'
 
     const callback = async (callback, errorCallback) => {
       if (type === 'forceDelete') {
@@ -197,30 +195,30 @@ export default function useTableItemActions(props, { tableForms, loadItems }) {
   }
 
   const handleCustomFormAction = (action, item) => {
-    tableForms.customFormSchema.value = _.cloneDeep(action.form.attributes.schema)
-    tableForms.customFormAttributes.value = _.cloneDeep(action.form.attributes)
+    TableForms.customFormSchema.value = _.cloneDeep(action.form.attributes.schema)
+    TableForms.customFormAttributes.value = _.cloneDeep(action.form.attributes)
 
     if (action.form.hasOwnProperty('model_formatter')) {
       for (let key in action.form.model_formatter) {
         let attr = _.get(item, action.form.model_formatter[key], '')
-        _.set(tableForms.customFormModel.value, key, attr)
+        _.set(TableForms.customFormModel.value, key, attr)
       }
     }
 
     if (action.form.hasOwnProperty('schema_formatter')) {
       for (let key in action.form.schema_formatter) {
         let attr = _.get(item, action.form.schema_formatter[key], '')
-        _.set(tableForms.customFormAttributes.value.schema, key, attr)
+        _.set(TableForms.customFormAttributes.value.schema, key, attr)
       }
     }
 
     if(action.hasOwnProperty('modalAttributes')){
-      tableForms.customFormModalAttributes.value = _.cloneDeep(action.modalAttributes)
+      TableForms.customFormModalAttributes.value = _.cloneDeep(action.modalAttributes)
     } else {
-      tableForms.customFormModalAttributes.value = {}
+      TableForms.customFormModalAttributes.value = {}
     }
 
-    tableForms.customFormModalActive.value = true
+    TableForms.customFormModalActive.value = true
     actionEvents.event = 'showCustomForm'
     actionEvents.payload = { action, item }
   }

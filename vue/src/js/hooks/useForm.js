@@ -6,7 +6,7 @@ import { cloneDeep, isEqual, find, reduce, set, get } from 'lodash-es'
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
 
 import { useInputHandlers, useValidation, useLocale, useItemActions, useAuthorization } from '@/hooks'
-import { FORM, ALERT } from '@/store/mutations/index'
+import { ALERT } from '@/store/mutations/index'
 import ACTIONS from '@/store/actions'
 import api from '@/store/api/form'
 import { getModel, getSubmitFormData, getSchema, getFormEventSchema, } from '@/utils/getFormData.js'
@@ -18,6 +18,7 @@ import { redirector } from '@/utils/response'
 export const makeFormProps = propsFactory({
   modelValue: {
     type: Object,
+    required: true,
     // default () {
     //   return {}
     // }
@@ -41,6 +42,7 @@ export const makeFormProps = propsFactory({
   },
   schema: {
     type: Object,
+    required: true,
     // default () {
     //   return {}
     // }
@@ -180,27 +182,22 @@ export default function useForm(props, context) {
   const issetSchema = ref(props.schema ? true : false)
 
   const formLoading = ref(false)
+  const serverValid = ref(true)
   const formErrors = ref({})
 
-  const rawSchema = ref(issetSchema.value
-    ? props.schema
-    : store.state.form.inputs)
+  const rawSchema = ref(props.schema)
 
   const chunkedRawSchema = computed(() => processInputs(rawSchema.value))
 
-  const defaultItem = ref(issetSchema.value
-    ? getModel(rawSchema.value)
-    : store.getters.defaultItem)
-
-  const storeEditedItem = computed(() => store.state.form.editedItem)
+  const defaultItem = ref(getModel(rawSchema.value))
 
   const model = ref(getModel(
     rawSchema.value,
-    issetModel.value ? props.modelValue : storeEditedItem.value,
-    store.state,
+    props.modelValue,
   ))
 
-  const formItem = computed(() => issetModel.value ? props.modelValue : storeEditedItem.value)
+  // const formItem = computed(() => issetModel.value ? props.modelValue : store.state.form.editedItem)
+  const formItem = computed(() => props.modelValue)
 
   const inputSchema = ref(validations.invokeRuleGenerator(getSchema(rawSchema.value, { ...model.value, ...formItem.value }, props.isEditing)))
   const formEventSchema = ref(getFormEventSchema(rawSchema.value, { ...model.value, ...formItem.value }, props.isEditing))
@@ -254,6 +251,7 @@ export default function useForm(props, context) {
 
   const states = reactive({
     id,
+    reference: computed(() => 'ref-' + states.id),
     formBaseId,
     VForm,
 
@@ -261,7 +259,6 @@ export default function useForm(props, context) {
     issetSchema,
 
     model,
-    // storeEditedItem,
     formItem,
 
     chunkedRawSchema,
@@ -277,15 +274,13 @@ export default function useForm(props, context) {
     buttonDefaultText: computed(() =>
       props.buttonText ? (te(props.buttonText) ? t(props.buttonText) : props.buttonText) : t('submit')
     ),
-    // editedItem: computed(() => store.state.form.editedItem),
-    serverValid: computed(() => store.state.form.serverValid ?? true),
-    loading: computed(() =>
-      props.actionUrl ? formLoading.value : store.state.form.loading
-    ),
-    errors: computed(() =>
-      props.actionUrl ? formErrors.value : store.state.form.errors
-    ),
-    reference: computed(() => 'ref-' + states.id),
+
+    serverValid,
+    loading: formLoading,
+    // errors: computed(() =>
+    //   props.actionUrl ? formErrors.value : store.state.form.errors
+    // ),
+    errors: formErrors,
     hasTraslationInputs: computed(() => getTranslationInputsCount(inputSchema.value) > 0),
 
     hasAdditionalSection,
@@ -316,10 +311,10 @@ export default function useForm(props, context) {
         (response) => {
           formLoading.value = false
           if (Object.prototype.hasOwnProperty.call(response.data, 'errors')) {
-            store.commit(FORM.SET_SERVER_VALID, false)
+            serverValid.value = false
             formErrors.value = response.data.errors
           } else if (Object.prototype.hasOwnProperty.call(response.data, 'variant')) {
-            store.commit(FORM.SET_SERVER_VALID, false)
+            serverValid.value = false
             store.commit(ALERT.SET_ALERT, { message: response.data.message, variant: response.data.variant })
           }
 
@@ -351,7 +346,6 @@ export default function useForm(props, context) {
           if (Object.prototype.hasOwnProperty.call(response.data, 'exception')) {
             store.commit(ALERT.SET_ALERT, { message: 'Your submission could not be processed.', variant: 'error' })
           } else {
-            store.dispatch(ACTIONS.HANDLE_ERRORS, response.data)
             store.commit(ALERT.SET_ALERT, { message: 'Your submission could not be validated, please fix and retry', variant: 'error' })
           }
 
@@ -384,7 +378,7 @@ export default function useForm(props, context) {
           }
         }
 
-        store.dispatch(ACTIONS.SAVE_FORM, { item: null, callback: callbackFunction, errorCallback })
+        // store.dispatch(ACTIONS.SAVE_FORM, { item: null, callback: callbackFunction, errorCallback })
 
         // if(props.refreshOnSaved) {
         //   window.location.reload()
@@ -596,7 +590,8 @@ export default function useForm(props, context) {
         if (props.async) {
           e && e.preventDefault()
           if (!props.actionUrl) {
-            store.commit(FORM.SET_EDITED_ITEM, states.model)
+            // store.commit(FORM.SET_EDITED_ITEM, states.model)
+
             nextTick(() => {
               saveForm(callback, errorCallback)
             })
@@ -635,14 +630,6 @@ export default function useForm(props, context) {
     }
   })
 
-  // Watch editedItem
-  watch(() => storeEditedItem.value, (newVal, oldVal) => {
-    if (!issetModel.value) {
-      // methods.regenerateInputSchema(newValue)
-      // model.value = getModel(rawSchema.value, newValue, store.state)
-    }
-  })
-
   watch(() => model.value, (newVal, oldVal) => { // ✅ Proper ref watching
     if (issetModel.value) {
 
@@ -669,12 +656,6 @@ export default function useForm(props, context) {
     if (!isEqual(newValue, oldValue) && issetSchema.value && !isEqual(newValue, inputSchema.value)) {
       rawSchema.value = newValue
       defaultItem.value = getModel(rawSchema.value)
-
-      // model.value = getModel(
-      //   rawSchema.value,
-      //   issetModel.value ? props.modelValue : storeEditedItem.value,
-      //   store.state,
-      // )
 
       inputSchema.value = validations.invokeRuleGenerator(getSchema(rawSchema.value, model.value, props.isEditing))
       formEventSchema.value = getFormEventSchema(rawSchema.value, formItem.value, props.isEditing)

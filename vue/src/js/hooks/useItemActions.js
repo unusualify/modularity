@@ -5,7 +5,7 @@ import _ from 'lodash-es'
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
 
 import ACTIONS from '@/store/actions'
-import { FORM, ALERT } from '@/store/mutations/index'
+import { ALERT } from '@/store/mutations/index'
 import api from '@/store/api/form'
 
 import { useCastAttributes, useDynamicModal } from '@/hooks'

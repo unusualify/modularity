@@ -1,15 +1,6 @@
 import * as exports from '@/imports'
 
-// Component Imports
-
-// Store modules
-import form from '@/store/modules/form'
-// styles
-
 const store = exports.store
-
-// Stores
-store.registerModule('form', form)
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to

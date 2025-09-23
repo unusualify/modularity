@@ -292,22 +292,24 @@
               <v-card class="fill-height d-flex flex-column py-4">
                 <ue-form
                   ref="UeForm"
-
                   form-class="px-4"
                   fill-height
                   scrollable
                   has-divider
                   no-default-form-padding
-                  v-bind="formAttributes"
 
+                  :modelValue="editedItem"
+                  v-bind="formAttributes"
                   :title="{
                     ...formAttributes.title ?? {},
                     text: formTitle,
                   }"
+                  :schema="formSchema"
                   :subtitle="formSubtitle"
                   :isEditing="editedIndex > -1"
                   :style="formModalBodyScope.isFullActive ? 'height: 95vh !important;' : 'height: 70vh !important;'"
                   :actions="formActions"
+                  :actionUrl="editedIndex > -1 ? endpoints.update.replace(':id', editedItem.id) : endpoints.store"
                   has-submit
                   :button-text="editedIndex > -1 ? $t('fields.update') : $t('fields.create')"
                   @action-complete="handleFormActionComplete"
