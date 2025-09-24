@@ -200,6 +200,10 @@ export default function useTableItemActions(props, { tableForms, loadItems }) {
     tableForms.customFormSchema.value = _.cloneDeep(action.form.attributes.schema)
     tableForms.customFormAttributes.value = _.cloneDeep(action.form.attributes)
 
+    if(action.form.attributes && action.form.attributes.modelValue){
+      tableForms.customFormModel.value = _.cloneDeep(action.form.attributes.modelValue)
+    }
+
     if (action.form.hasOwnProperty('model_formatter')) {
       for (let key in action.form.model_formatter) {
         let attr = _.get(item, action.form.model_formatter[key], '')
