@@ -364,6 +364,8 @@ class ModelHelpersTest extends ModelTestCase
 
     public function test_activity_logging_with_authenticated_user()
     {
+        $this->app['config']->set('activitylog.enabled', true);
+
         Auth::login($this->user);
 
         $model = $this->testModel::create([
@@ -381,6 +383,8 @@ class ModelHelpersTest extends ModelTestCase
 
     public function test_activity_logging_without_authenticated_user()
     {
+        $this->app['config']->set('activitylog.enabled', true);
+
         Auth::logout();
 
         $model = $this->testModel::create([
