@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         $adminUserTable = modularityConfig('tables.users', 'um_users');
-        $companyTable = modularityConfig('tables.companies', 'modularity_companies');
+        $companyTable = modularityConfig('tables.companies', 'um_companies');
 
         if (! Schema::hasTable($adminUserTable)) {
             Schema::create(modularityConfig('tables.users', 'um_users'), function (Blueprint $table) use ($companyTable) {
