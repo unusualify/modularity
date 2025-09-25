@@ -62,7 +62,11 @@ class HasCreatorTest extends ModelTestCase
     {
         // Create a user and creator record
         $user = User::create(['name' => 'Creator User', 'email' => 'creator@example.com', 'published' => true]);
-        $user->company()->create(['name' => 'Creator Company']);
+
+        $user = User::find($user->id);
+        $company = Company::create(['name' => 'Creator Company']);
+        $user->company_id = $company->id;
+        $user->save();
 
         // Create creator record manually for testing
         $this->model->creatorRecord()->create([
@@ -80,6 +84,17 @@ class HasCreatorTest extends ModelTestCase
         $this->assertInstanceOf(User::class, $creator);
         $this->assertEquals($user->id, $creator->id);
         $this->assertEquals($user->name, $creator->name);
+        $this->assertEquals($company->id, $creator->company_id);
+        $this->assertEquals($company->name, $creator->company->name);
+        $this->assertEquals($company->id, $this->model->creatorCompany->id);
+
+        $this->assertEquals($company->id, TestCreatorModel::whereHas('creatorCompany', function ($query) use ($company) {
+            $query->where($company->getTable() . '.name', 'LIKE', '%' . 'Creator' . '%');
+        })->first()->creatorCompany->id);
+
+        $this->assertEquals(0, TestCreatorModel::whereHas('creatorCompany', function ($query) use ($company) {
+            $query->where($company->getTable() . '.name', 'LIKE', '%' . 'Non-Existing' . '%');
+        })->count());
     }
 
     public function test_company_relationship()
