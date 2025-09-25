@@ -10,6 +10,7 @@ use Unusualify\Modularity\Entities\Traits\HasCreator;
 use Unusualify\Modularity\Entities\Traits\HasFileponds;
 use Unusualify\Modularity\Entities\Traits\HasSpreadable;
 use Unusualify\Modularity\Entities\Traits\Core\ModelHelpers;
+use Unusualify\Modularity\Relations\PaymentableRelation;
 
 class Payment extends \Unusualify\Payable\Models\Payment
 {
@@ -94,6 +95,13 @@ class Payment extends \Unusualify\Payable\Models\Payment
     {
         return $this->morphTo('paymentable');
     }
+    // /**
+    //  * Behaves like a real morphTo by providing the morph keys via subselects.
+    //  */
+    // public function paymentable(): \Illuminate\Database\Eloquent\Relations\MorphTo
+    // {
+    //     return new PaymentableRelation($this);
+    // }
 
     protected function serviceClass(): Attribute
     {
