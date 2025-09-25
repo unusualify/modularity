@@ -2,6 +2,37 @@
 
 All notable changes to `modularity` will be documented in this file
 
+## v0.47.0 - 2025-09-25
+
+### :rocket: Features
+
+- add creatorCompany relationship and update table name configuration by @OoBook in https://github.com/unusualify/modularity/commit/614925b1be7e894ce683fc52e8deae20781310f3
+- introduce PaymentableRelation for enhanced morphTo functionality by @OoBook in https://github.com/unusualify/modularity/commit/6594e06a02b410052b2d618eee57e4732718c399
+
+### :wrench: Bug Fixes
+
+- add user registration events for OAuth login flow by @celikerde in https://github.com/unusualify/modularity/commit/0d4db8ebf123dd4138059b202cf09c9387621708
+- enable logging conditionally based on activitylog configuration by @OoBook in https://github.com/unusualify/modularity/commit/3ee5184469b5748ca6e5372469be9c0c1543de28
+- resolve actionUrl in form attributes for table row actions by @OoBook in https://github.com/unusualify/modularity/commit/8e96ced3f35f1e85917683214fbcf770190523cd
+- clone modelValue from form attributes for custom forms by @OoBook in https://github.com/unusualify/modularity/commit/426c08e76174997fb2d3db254c5376c9203a2abd
+- handle max value conversion for array and object validation by @OoBook in https://github.com/unusualify/modularity/commit/c91838d2b1cc47f9d0aa52043a7b45c9674d2276
+- update default company table name in user migration by @OoBook in https://github.com/unusualify/modularity/commit/db6d50ec8a33c5609b7efb4453f57b1370ae7cc0
+- handle exceptions during OAuth user retrieval by @OoBook in https://github.com/unusualify/modularity/commit/c79618fa7beb665af541bdedc72e524a4eac68b7
+
+### :recycle: Refactors
+
+- simplify click handler and introduce computed property for next action status by @OoBook in https://github.com/unusualify/modularity/commit/3198d38cdab82120e929b003450bd35f3471895b
+- comment out validation logic in initializeHasUuid method and related tests by @OoBook in https://github.com/unusualify/modularity/commit/018b51d3e826f7edc0f5ee63a6252a914b5c394b
+
+### :white_check_mark: Testing
+
+- enable activity logging for authenticated and unauthenticated users by @OoBook in https://github.com/unusualify/modularity/commit/85c087be24c3741ec5e680a66681821b1476bc7a
+
+### :package: Build
+
+- update build artifacts for v0.46.1 by @invalid-email-address in https://github.com/unusualify/modularity/commit/979cb7b60ba87ea801b4430d4209a1e88c8e24e1
+- update build artifacts for v0.47.0 by @OoBook in https://github.com/unusualify/modularity/commit/a8781a21a3dc3abe149ef9e4901918e0ba8b9ad6
+
 ## v0.46.1 - 2025-09-17
 
 ### :wrench: Bug Fixes
