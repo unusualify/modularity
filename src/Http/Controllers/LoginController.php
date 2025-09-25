@@ -342,8 +342,13 @@ class LoginController extends Controller
      */
     public function handleProviderCallback($provider, OauthRequest $request)
     {
+        $oauthUser = null;
+        try {
+            $oauthUser = Socialite::driver($provider)->user();
+        } catch (\Exception $e) {
+            return redirect()->route(Route::hasAdmin('login.form'));
+        }
 
-        $oauthUser = Socialite::driver($provider)->user();
         $repository = App::make(UserRepository::class);
 
         // If the user with that email exists
