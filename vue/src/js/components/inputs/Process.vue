@@ -97,7 +97,7 @@
                 :elevation="bothFormAndProcessableValid ? null : 10"
                 :color="bothFormAndProcessableValid ? 'success' : onlyOneValid ? 'warning' : 'secondary'"
                 :prepend-icon="bothFormAndProcessableValid ? 'mdi-check-circle-outline' :  (onlyOneValid ? 'mdi-progress-question' : 'mdi-gesture-tap')"
-                @click="$log('edit', $refs.formModal.open())"
+                @click="$refs.formModal.open()"
                 class="mb-4"
               >
                 {{ bothFormAndProcessableValid ? $t('Edit') : onlyOneValid ? $t('Complete') : $t('Fill') }}
@@ -259,7 +259,7 @@
                   :loading="updating"
                   :disabled="processModel.status === 'preparing' && !bothFormAndProcessableValid"
                   @click="confirmUpdateProcess(
-                    processModel.status === 'preparing' ? 'waiting_for_confirmation' : 'waiting_for_reaction'
+                    nextActionStatus
                   )"
                 >
                   {{ status.next_action_label }}
@@ -749,6 +749,17 @@ export default {
         status.response_message = props.statusConfiguration?.[process.status]?.response_message
 
         return status
+      }),
+
+      nextActionStatus: computed(() => {
+        switch(processModel.value?.status){
+          case 'preparing':
+            return 'waiting_for_confirmation'
+          case 'confirmed':
+            return 'preparing'
+          default:
+            return 'waiting_for_reaction'
+        }
       }),
     })
 

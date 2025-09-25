@@ -37,7 +37,7 @@ trait ModelHelpers
     {
         if (! auth()->check()) {
             activity()->disableLogging();
-        } else {
+        } elseif (config('activitylog.enabled', true)) {
             activity()->enableLogging();
         }
 

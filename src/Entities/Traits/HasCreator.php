@@ -5,6 +5,7 @@ namespace Unusualify\Modularity\Entities\Traits;
 use Illuminate\Support\Facades\Auth;
 use Unusualify\Modularity\Entities\Company;
 use Unusualify\Modularity\Facades\Modularity;
+use Unusualify\Modularity\Relations\CreatorCompanyRelation;
 
 trait HasCreator
 {
@@ -189,6 +190,42 @@ trait HasCreator
             $this->getCreatableClass(),
             $creatorRecordModel->getTable() . '.creatable_id',
             'id'
+        );
+    }
+
+    public function creatorCompany(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        $creatableClass = $this->getCreatableClass();
+        $creatorRecordModel = new ($this->getCreatorRecordModel());
+        $creatorModel = new ($this->getCreatorModel());
+
+        $companyModel = new Company;
+
+        $relatedQuery = $companyModel->newQuery()
+            ->select($companyModel->getTable() . '.*')
+            ->join(
+                $creatorModel->getTable(),
+                $creatorModel->getTable() . '.company_id',
+                '=',
+                $companyModel->getTable() . '.id'
+            )
+            ->join(
+                $creatorRecordModel->getTable(),
+                function ($join) use ($creatorRecordModel, $creatorModel, $creatableClass) {
+                    $join->on($creatorRecordModel->getTable() . '.creator_id', '=', $creatorModel->getTable() . '.id')
+                        ->where($creatorRecordModel->getTable() . '.creatable_type', '=', get_class($creatableClass));
+                }
+            );
+
+        return new CreatorCompanyRelation(
+            $relatedQuery,
+            $creatableClass,
+            $creatorRecordModel->getTable() . '.creatable_id',
+            $creatableClass->getKeyName(),
+            $creatorRecordModel->getTable(),
+            $creatorModel->getTable(),
+            $companyModel->getTable(),
+            get_class($creatableClass)
         );
     }
 

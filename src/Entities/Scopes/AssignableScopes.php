@@ -4,7 +4,6 @@ namespace Unusualify\Modularity\Entities\Scopes;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Unusualify\Modularity\Entities\Assignment;
 use Unusualify\Modularity\Entities\Enums\AssignmentStatus;
 

@@ -28,7 +28,7 @@ class HasPositionTest extends ModelTestCase
 
     public function test_model_uses_has_position_trait()
     {
-        $model = new TestPositionModel();
+        $model = new TestPositionModel;
         $traits = class_uses_recursive($model);
         $this->assertContains('Unusualify\Modularity\Entities\Traits\HasPosition', $traits);
     }
@@ -111,7 +111,6 @@ class HasPositionTest extends ModelTestCase
         $model2 = new TestPositionModel(['name' => 'Model 2']);
         $model2->position = 2;
         $model2->save();
-
 
         // Query with ordered scope
         $orderedModels = TestPositionModel::ordered()->get();
@@ -244,5 +243,6 @@ class TestPositionModel extends Model
     use HasPosition;
 
     protected $table = 'test_position_models';
+
     protected $fillable = ['name', 'position'];
 }

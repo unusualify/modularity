@@ -69,7 +69,7 @@ trait Chatable
             ->whereHas('creatorRecord', function ($query) use ($creator) {
                 if ($creator) {
                     $query->where('creator_id', $creator->id)
-                          ->where('creator_type', get_class($creator));
+                        ->where('creator_type', get_class($creator));
                 }
             });
     }
@@ -265,7 +265,7 @@ trait Chatable
     {
         $latestMessage = $this->latestChatMessage()->first();
 
-        if (!$latestMessage) {
+        if (! $latestMessage) {
             return 0;
         }
 

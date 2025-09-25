@@ -3,10 +3,7 @@
 namespace Unusualify\Modularity\Tests\Models\Traits;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Query\Expression;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Schema;
 use Unusualify\Modularity\Entities\Scopes\SingularScope;
 use Unusualify\Modularity\Entities\Traits\IsSingular;
 use Unusualify\Modularity\Facades\Modularity;
@@ -23,20 +20,21 @@ class IsSingularTest extends ModelTestCase
 
     public function test_model_uses_is_singular_trait()
     {
-        $model = new TestSingularModel();
+        $model = new TestSingularModel;
         $traits = class_uses_recursive($model);
         $this->assertContains('Unusualify\Modularity\Entities\Traits\IsSingular', $traits);
     }
 
     public function test_boot_is_singular_adds_global_scope()
     {
-        $model = new TestSingularModel();
+        $model = new TestSingularModel;
         $globalScopes = $model->getGlobalScopes();
 
         $hasSingularScope = false;
         foreach ($globalScopes as $scope) {
             if ($scope instanceof SingularScope) {
                 $hasSingularScope = true;
+
                 break;
             }
         }
@@ -46,7 +44,7 @@ class IsSingularTest extends ModelTestCase
 
     public function test_initialize_is_singular_merges_fillable_attributes()
     {
-        $model = new TestSingularModel();
+        $model = new TestSingularModel;
 
         $fillable = $model->getFillable();
 
@@ -58,7 +56,7 @@ class IsSingularTest extends ModelTestCase
 
     public function test_initialize_is_singular_sets_content_cast()
     {
-        $model = new TestSingularModel();
+        $model = new TestSingularModel;
 
         $casts = $model->getCasts();
 
@@ -219,7 +217,7 @@ class IsSingularTest extends ModelTestCase
 
     public function test_get_table_returns_configured_table_name()
     {
-        $model = new TestSingularModel();
+        $model = new TestSingularModel;
 
         $expectedTable = Modularity::config('tables.singletons', 'modularity_singletons');
         $this->assertEquals($expectedTable, $model->getTable());
@@ -248,7 +246,7 @@ class IsSingularTest extends ModelTestCase
         $this->assertEquals(TestSingularModel::class, $fresh->getRawOriginal('singleton_type'));
     }
 
-        public function test_only_fillable_attributes_are_stored_in_content()
+    public function test_only_fillable_attributes_are_stored_in_content()
     {
         $model = new TestSingularModel([
             'name' => 'Test Name',
@@ -269,7 +267,7 @@ class IsSingularTest extends ModelTestCase
         $expectedKeys = ['name', 'description', 'published'];
         foreach ($expectedKeys as $key) {
             if (isset($content[$key])) {
-                $this->assertContains($key, (new TestSingularModel())->getFillable());
+                $this->assertContains($key, (new TestSingularModel)->getFillable());
             }
         }
     }
@@ -311,7 +309,7 @@ class IsSingularTest extends ModelTestCase
 
     public function test_content_includes_all_fillable_attributes_with_null_values()
     {
-        $model = new TestSingularModel();
+        $model = new TestSingularModel;
         $model->save();
 
         $fresh = TestSingularModel::withoutGlobalScopes()->find($model->id);
@@ -334,7 +332,7 @@ class IsSingularTest extends ModelTestCase
     public function test_retrieved_event_handles_null_content_gracefully()
     {
         // Create model without setting any fillable attributes
-        $model = new TestSingularModel();
+        $model = new TestSingularModel;
         $model->save();
 
         // Retrieve should not fail even with empty content

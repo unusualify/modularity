@@ -299,6 +299,7 @@ class TestFilepondsModel extends Model
     use HasFileponds;
 
     protected $table = 'test_fileponds_models';
+
     protected $fillable = ['name'];
 }
 
@@ -308,5 +309,6 @@ class TestCustomFilepondsModel extends Model
     use HasFileponds;
 
     protected $table = 'test_fileponds_models';
+
     protected $fillable = ['name'];
 }

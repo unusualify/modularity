@@ -12,7 +12,6 @@ use Modules\SystemUser\Entities\Company;
 use Spatie\Permission\Models\Role;
 use Unusualify\Modularity\Entities\CreatorRecord;
 use Unusualify\Modularity\Entities\Traits\HasCreator;
-use Unusualify\Modularity\Entities\Traits\HasUuid;
 use Unusualify\Modularity\Entities\User;
 use Unusualify\Modularity\Tests\ModelTestCase;
 
@@ -41,7 +40,7 @@ class HasCreatorTest extends ModelTestCase
     public function test_trait_initialization()
     {
         // Test that the trait properly initializes fillable attributes
-        $model = new TestCreatorModel();
+        $model = new TestCreatorModel;
         $fillable = $model->getFillable();
 
         $this->assertContains('custom_creator_id', $fillable);
@@ -62,7 +61,11 @@ class HasCreatorTest extends ModelTestCase
     {
         // Create a user and creator record
         $user = User::create(['name' => 'Creator User', 'email' => 'creator@example.com', 'published' => true]);
-        $user->company()->create(['name' => 'Creator Company']);
+
+        $user = User::find($user->id);
+        $company = Company::create(['name' => 'Creator Company']);
+        $user->company_id = $company->id;
+        $user->save();
 
         // Create creator record manually for testing
         $this->model->creatorRecord()->create([
@@ -80,6 +83,17 @@ class HasCreatorTest extends ModelTestCase
         $this->assertInstanceOf(User::class, $creator);
         $this->assertEquals($user->id, $creator->id);
         $this->assertEquals($user->name, $creator->name);
+        $this->assertEquals($company->id, $creator->company_id);
+        $this->assertEquals($company->name, $creator->company->name);
+        $this->assertEquals($company->id, $this->model->creatorCompany->id);
+
+        $this->assertEquals($company->id, TestCreatorModel::whereHas('creatorCompany', function ($query) use ($company) {
+            $query->where($company->getTable() . '.name', 'LIKE', '%' . 'Creator' . '%');
+        })->first()->creatorCompany->id);
+
+        $this->assertEquals(0, TestCreatorModel::whereHas('creatorCompany', function ($query) use ($company) {
+            $query->where($company->getTable() . '.name', 'LIKE', '%' . 'Non-Existing' . '%');
+        })->count());
     }
 
     public function test_company_relationship()
@@ -94,7 +108,7 @@ class HasCreatorTest extends ModelTestCase
         // Mock authentication
         $user = User::create(['name' => 'Auth User', 'email' => 'auth@example.com', 'published' => true]);
 
-                        // Create a proper mock for the guard
+        // Create a proper mock for the guard
         $guardMock = Mockery::mock();
         $guardMock->shouldReceive('id')->andReturn($user->id);
         $guardMock->name = 'modularity'; // Set as property, not method
@@ -250,6 +264,7 @@ class HasCreatorTest extends ModelTestCase
             use HasCreator;
 
             protected $table = 'test_creator_models';
+
             protected $fillable = ['name'];
 
             public static $defaultHasCreatorModel = User::class;
@@ -334,6 +349,7 @@ class HasCreatorTest extends ModelTestCase
             use HasCreator;
 
             protected $table = 'test_creator_models';
+
             protected $fillable = ['name'];
 
             public static $defaultHasCreatorModel = User::class;
@@ -400,9 +416,11 @@ class HasCreatorTest extends ModelTestCase
             use HasCreator;
 
             protected $table = 'test_creator_models';
+
             protected $fillable = ['name'];
 
             public static $defaultHasCreatorModel = User::class;
+
             protected static $abortCreatorRoleExceptions = true;
         };
 
@@ -446,7 +464,9 @@ class HasCreatorTest extends ModelTestCase
             use HasCreator;
 
             protected $table = 'test_creator_models';
+
             protected $fillable = ['name'];
+
             public static $creatableClass = TestCreatorModel::class;
 
             public static $defaultHasCreatorModel = User::class;
@@ -472,6 +492,7 @@ class HasCreatorTest extends ModelTestCase
             use HasCreator;
 
             protected $table = 'test_creator_models';
+
             protected $fillable = ['name'];
 
             public static $defaultHasCreatorModel = User::class;
@@ -522,6 +543,7 @@ class TestCreatorModel extends Model
     use HasCreator;
 
     protected $table = 'test_creator_models';
+
     protected $fillable = ['name', 'description'];
 
     public static $defaultHasCreatorModel = User::class;

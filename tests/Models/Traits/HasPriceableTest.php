@@ -21,8 +21,11 @@ class HasPriceableTest extends ModelTestCase
     use RefreshDatabase;
 
     protected $model;
+
     protected $currency;
+
     protected $vatRate;
+
     protected $priceType;
 
     protected function setUp(): void
@@ -592,6 +595,7 @@ class TestPriceableModel extends Model
     use HasPriceable;
 
     protected $table = 'test_priceable_models';
+
     protected $fillable = ['name'];
 
     public static $priceSavingKey = 'price_value';

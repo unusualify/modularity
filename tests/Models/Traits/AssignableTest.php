@@ -48,7 +48,8 @@ class AssignableTest extends ModelTestCase
 
         $this->model->save();
 
-        $softDeletesModelClass = new class extends Model {
+        $softDeletesModelClass = new class extends Model
+        {
             use SoftDeletes, Assignable;
 
             protected $table = 'test_assignable_soft_deletes_models';
@@ -201,6 +202,7 @@ class AssignableTest extends ModelTestCase
             'id' => $assignmentId,
         ]);
     }
+
     public function test_assignments_are_deleted_when_soft_deletes_model_is_deleted()
     {
         // Create a test user for assignee
@@ -258,7 +260,7 @@ class AssignableTest extends ModelTestCase
         $this->assertEquals(Assignment::class, $relation->getRelated()::class);
     }
 
-        public function test_last_assignment_returns_most_recent()
+    public function test_last_assignment_returns_most_recent()
     {
         // Create users for assignee and assigner
         $assignee = User::create([
@@ -468,6 +470,7 @@ class AssignableTest extends ModelTestCase
         $appended = $this->model->getAppends();
         $this->assertContains('active_assignee_name', $appended);
     }
+
     public function test_boot_assignable_adds_retrieved_event()
     {
         // This test verifies that the boot method exists and doesn't throw errors
@@ -1193,5 +1196,3 @@ class TestAssignableModel extends Model
 
     protected $fillable = ['name'];
 }
-
-

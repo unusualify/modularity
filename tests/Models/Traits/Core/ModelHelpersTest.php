@@ -7,7 +7,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
-use Spatie\Activitylog\Facades\LogBatch;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Unusualify\Modularity\Entities\Model;
@@ -22,7 +21,9 @@ class ModelHelpersTest extends ModelTestCase
     use RefreshDatabase;
 
     protected $model;
+
     protected $testModel;
+
     protected $user;
 
     protected function setUp(): void
@@ -221,7 +222,7 @@ class ModelHelpersTest extends ModelTestCase
             'en' => [
                 'name' => 'Translatable Model Name',
                 'description' => 'Translatable Model Description',
-                'active' => 0
+                'active' => 0,
             ],
         ]);
 
@@ -285,7 +286,6 @@ class ModelHelpersTest extends ModelTestCase
         $numberOfTags = $model->numberOfTags();
         $this->assertEquals(0, $numberOfTags);
     }
-
 
     public function test_magic_call_spreadable_mutator_methods()
     {
@@ -364,6 +364,8 @@ class ModelHelpersTest extends ModelTestCase
 
     public function test_activity_logging_with_authenticated_user()
     {
+        $this->app['config']->set('activitylog.enabled', true);
+
         Auth::login($this->user);
 
         $model = $this->testModel::create([
@@ -381,6 +383,8 @@ class ModelHelpersTest extends ModelTestCase
 
     public function test_activity_logging_without_authenticated_user()
     {
+        $this->app['config']->set('activitylog.enabled', true);
+
         Auth::logout();
 
         $model = $this->testModel::create([
@@ -401,13 +405,15 @@ class ModelHelpersTest extends ModelTestCase
     public function test_number_of_method_with_snake_case_relationships()
     {
         // Create a model with snake_case relationship methods
-        $modelWithSnakeCase = new class extends Model {
+        $modelWithSnakeCase = new class extends Model
+        {
             use ModelHelpers;
 
             protected $table = 'test_model_helpers_models';
+
             protected $fillable = ['name'];
 
-            public function user_posts() : \Illuminate\Database\Eloquent\Relations\HasMany
+            public function user_posts(): \Illuminate\Database\Eloquent\Relations\HasMany
             {
                 return $this->hasMany(self::class, 'parent_id');
             }
@@ -429,11 +435,14 @@ class ModelHelpersTest extends ModelTestCase
     public function test_complex_spreadable_attributes_and_methods()
     {
         // Create a model with more complex spreadable configurations
-        $complexModel = new class extends Model {
+        $complexModel = new class extends Model
+        {
             use ModelHelpers;
 
             protected $table = 'test_model_helpers_models';
+
             protected $fillable = ['name', 'preferences'];
+
             protected $casts = ['preferences' => 'array'];
 
             protected $spreadableMutatorAttributes = [
@@ -491,7 +500,9 @@ class ModelHelpersTest extends ModelTestCase
 class ModelHelperModel extends Model
 {
     protected $table = 'test_model_helpers_models';
+
     protected $fillable = ['name', 'title', 'description', 'slug', 'preferences'];
+
     protected $casts = ['preferences' => 'array'];
 
     public function getRouteTitleColumnKey(): string
@@ -500,12 +511,12 @@ class ModelHelperModel extends Model
     }
 
     // Define some relationships for testing
-    public function posts() : \Illuminate\Database\Eloquent\Relations\HasMany
+    public function posts(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(self::class, 'parent_id');
     }
 
-    public function comments() : \Illuminate\Database\Eloquent\Relations\MorphMany
+    public function comments(): \Illuminate\Database\Eloquent\Relations\MorphMany
     {
         return $this->morphMany(self::class, 'commentable');
     }
@@ -520,7 +531,7 @@ class ModelHelperModel extends Model
         'getComputedValue' => 'method_computed_value',
         'getDynamicMethod' => 'method_dynamic_value',
     ];
-};
+}
 
 class TranslatableModel extends Model
 {
@@ -538,10 +549,9 @@ class TranslatableModel extends Model
     {
         return 'title';
     }
-};
+}
 class TranslatableModelTranslation extends Model
 {
-
     protected $baseModuleModel = TranslatableModel::class;
     // protected $fillable = [
     //     'name',
@@ -550,5 +560,4 @@ class TranslatableModelTranslation extends Model
     // ];
 
     protected $table = 'translatable_model_translations';
-
-};
+}

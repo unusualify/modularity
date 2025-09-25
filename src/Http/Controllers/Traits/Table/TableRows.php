@@ -247,6 +247,10 @@ trait TableRows
                 $action['url'] = resolve_route($action['url']);
             }
 
+            if (isset($action['form']) && isset($action['form']['attributes']) && isset($action['form']['attributes']['actionUrl'])) {
+                $action['form']['attributes']['actionUrl'] = resolve_route($action['form']['attributes']['actionUrl']);
+            }
+
             if (isset($action['responsive'])) {
                 $action = $this->applyResponsiveClasses(
                     item: $action,

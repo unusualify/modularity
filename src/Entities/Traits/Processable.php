@@ -96,7 +96,6 @@ trait Processable
         );
     }
 
-
     protected function processHistoryStatus(): Attribute
     {
         return Attribute::make(

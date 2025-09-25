@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Schema;
 use Spatie\Permission\Models\Role;
 use Unusualify\Modularity\Entities\Authorization;
 use Unusualify\Modularity\Entities\Traits\HasAuthorizable;
-use Unusualify\Modularity\Entities\Traits\HasUuid;
 use Unusualify\Modularity\Entities\User;
 use Unusualify\Modularity\Tests\ModelTestCase;
 
@@ -21,6 +20,7 @@ class HasAuthorizableTest extends ModelTestCase
     use RefreshDatabase;
 
     protected TestAuthorizableModel $model;
+
     protected $softDeletesModel;
 
     protected function setUp(): void
@@ -46,10 +46,12 @@ class HasAuthorizableTest extends ModelTestCase
         ]);
         $this->model->save();
 
-        $softDeletesModelClass = new class extends Model {
+        $softDeletesModelClass = new class extends Model
+        {
             use SoftDeletes, HasAuthorizable;
 
             protected $table = 'test_authorizable_soft_deletes_models';
+
             protected $fillable = ['name'];
         };
 
@@ -351,6 +353,7 @@ class HasAuthorizableTest extends ModelTestCase
             use HasAuthorizable;
 
             protected $table = 'test_authorizable_models';
+
             protected $fillable = ['name'];
 
             public static $defaultAuthorizedModel = User::class;
@@ -482,6 +485,7 @@ class HasAuthorizableTest extends ModelTestCase
         $this->assertCount(1, $modelsForManagerRole);
         $this->assertEquals($this->model->id, $modelsForManagerRole->first()->id);
     }
+
     public function test_scope_has_any_authorization()
     {
         $user = User::create(['name' => 'User', 'email' => 'user@example.com', 'published' => true]);
@@ -527,6 +531,7 @@ class HasAuthorizableTest extends ModelTestCase
             use HasAuthorizable;
 
             protected $table = 'test_authorizable_models';
+
             protected $fillable = ['name'];
 
             public static $defaultAuthorizedModel = User::class;
@@ -535,7 +540,7 @@ class HasAuthorizableTest extends ModelTestCase
             protected $allowedRolesForAuthorizationManagement = [
                 'superadmin',
                 'admin',
-                'manager'
+                'manager',
             ];
 
             public static $authorizableRolesToCheck = ['manager'];
@@ -592,6 +597,7 @@ class HasAuthorizableTest extends ModelTestCase
             use HasAuthorizable;
 
             protected $table = 'test_authorizable_models';
+
             protected $fillable = ['name'];
 
             public static $defaultAuthorizedModel = User::class;
@@ -668,6 +674,7 @@ class TestAuthorizableModel extends Model
     use HasAuthorizable;
 
     protected $table = 'test_authorizable_models';
+
     protected $fillable = ['name'];
 
     public static $defaultAuthorizedModel = User::class;

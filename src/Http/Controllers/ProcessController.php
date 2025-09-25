@@ -77,7 +77,7 @@ class ProcessController extends Controller
 
         if (count($processFields) > 0) {
             $process->processable->setProcessStatus($request->get('status'), $request->get('reason') ?? null);
-        }else if (method_exists($processableModel, 'moduleName') && method_exists($processableModel, 'routeName')) {
+        } elseif (method_exists($processableModel, 'moduleName') && method_exists($processableModel, 'routeName')) {
             $module = Modularity::find($processableModel->moduleName());
             $schema = $module->getRouteInputs($processableModel->routeName());
             $repository = App::make($module->getRouteClass($processableModel->routeName(), 'repository'));
@@ -94,7 +94,6 @@ class ProcessController extends Controller
 
             $repository->update($process->processable_id, $request->all(), $schema);
         }
-
 
         $process->refresh();
 

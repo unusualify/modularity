@@ -17,6 +17,7 @@ class HasScopesTest extends ModelTestCase
     use RefreshDatabase;
 
     protected $model;
+
     protected $testModel;
 
     protected function setUp(): void
@@ -37,13 +38,15 @@ class HasScopesTest extends ModelTestCase
         });
 
         // Create anonymous test model class
-        $this->testModel = new class extends Model {
+        $this->testModel = new class extends Model
+        {
             use HasScopes;
 
             protected $table = 'test_has_scopes_models';
+
             protected $fillable = [
                 'name', 'published', 'public', 'publish_start_date',
-                'publish_end_date', 'category', 'priority'
+                'publish_end_date', 'category', 'priority',
             ];
 
             protected $casts = [
@@ -580,10 +583,12 @@ class HasScopesTest extends ModelTestCase
     public function test_scope_edge_cases()
     {
         // Test with model that doesn't have public column
-        $modelWithoutPublic = new class extends Model {
+        $modelWithoutPublic = new class extends Model
+        {
             use HasScopes;
 
             protected $table = 'test_has_scopes_models';
+
             protected $fillable = ['name', 'published'];
 
             protected $casts = [

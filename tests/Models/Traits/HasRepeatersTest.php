@@ -131,7 +131,7 @@ class HasRepeatersTest extends ModelTestCase
         $contentData = [
             'title' => 'Test Title',
             'description' => 'Test Description',
-            'settings' => ['option1' => true, 'option2' => false]
+            'settings' => ['option1' => true, 'option2' => false],
         ];
 
         $repeater = new Repeater([
@@ -151,7 +151,6 @@ class HasRepeatersTest extends ModelTestCase
         $this->assertTrue($savedRepeater->content['settings']['option1']);
         $this->assertFalse($savedRepeater->content['settings']['option2']);
     }
-
 
     public function test_repeaters_can_have_empty_content()
     {
@@ -247,5 +246,6 @@ class TestRepeatableModel extends Model
     use ModelHelpers, HasRepeaters;
 
     protected $table = 'test_repeaters_models';
+
     protected $fillable = ['name'];
 }

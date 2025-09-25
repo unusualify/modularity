@@ -10,7 +10,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Unusualify\Modularity\Entities\Assignment;
 use Unusualify\Modularity\Entities\Scopes\AssignableScopes;
 
-
 trait Assignable
 {
     use AssignableScopes;
@@ -25,19 +24,19 @@ trait Assignable
             $assignmentModel = $assignmentsRelation->getRelated();
 
             // soft delete
-            if(class_uses_recursive(static::class) && in_array(SoftDeletes::class, class_uses_recursive(static::class))) {
+            if (class_uses_recursive(static::class) && in_array(SoftDeletes::class, class_uses_recursive(static::class))) {
                 $assignmentsRelation->delete();
             } else {
                 $assignmentsRelation->forceDelete();
             }
         });
 
-        if(class_uses_recursive(static::class) && in_array(SoftDeletes::class, class_uses_recursive(static::class))) {
+        if (class_uses_recursive(static::class) && in_array(SoftDeletes::class, class_uses_recursive(static::class))) {
             static::forceDeleting(function (Model $model) {
                 $assignmentsRelation = $model->assignments();
                 $assignmentsRelation->forceDelete();
             });
-        };
+        }
     }
 
     /**

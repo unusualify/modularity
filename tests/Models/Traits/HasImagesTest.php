@@ -5,9 +5,7 @@ namespace Unusualify\Modularity\Tests\Models\Traits;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Unusualify\Modularity\Entities\Media;
 use Unusualify\Modularity\Entities\Traits\Core\ModelHelpers;
@@ -20,8 +18,11 @@ class HasImagesTest extends ModelTestCase
     use RefreshDatabase;
 
     protected $model;
+
     protected $media1;
+
     protected $media2;
+
     protected $media3;
 
     protected function setUp(): void
@@ -234,10 +235,10 @@ class HasImagesTest extends ModelTestCase
         $this->assertCount(2, $imagesList);
 
         $expectedUrl1 = ImageService::getUrlWithCrop($this->media1->uuid, [
-            'crop_x' => 0, 'crop_y' => 0, 'crop_w' => 1920, 'crop_h' => 1080
+            'crop_x' => 0, 'crop_y' => 0, 'crop_w' => 1920, 'crop_h' => 1080,
         ], []);
         $expectedUrl2 = ImageService::getUrlWithCrop($this->media2->uuid, [
-            'crop_x' => 0, 'crop_y' => 0, 'crop_w' => 1280, 'crop_h' => 720
+            'crop_x' => 0, 'crop_y' => 0, 'crop_w' => 1280, 'crop_h' => 720,
         ], []);
 
         $this->assertContains($expectedUrl1, $imagesList);
@@ -292,7 +293,7 @@ class HasImagesTest extends ModelTestCase
             'metadatas' => json_encode([
                 'altText' => ['en' => 'Custom alt text'],
                 'caption' => ['en' => 'Custom caption'],
-                'video' => ['en' => 'https://example.com/video.mp4']
+                'video' => ['en' => 'https://example.com/video.mp4'],
             ]),
         ]);
 
@@ -323,7 +324,7 @@ class HasImagesTest extends ModelTestCase
             'metadatas' => json_encode([
                 'altText' => ['en' => 'Custom alt text'],
                 'caption' => ['en' => 'Custom caption'],
-                'video' => ['en' => 'https://example.com/video.mp4']
+                'video' => ['en' => 'https://example.com/video.mp4'],
             ]),
         ]);
 
@@ -338,7 +339,7 @@ class HasImagesTest extends ModelTestCase
             'metadatas' => json_encode([
                 'altText' => ['en' => 'Custom alt text'],
                 'caption' => ['en' => 'Custom caption'],
-                'video' => ['en' => 'https://example.com/video.mp4']
+                'video' => ['en' => 'https://example.com/video.mp4'],
             ]),
         ]);
 
@@ -362,7 +363,7 @@ class HasImagesTest extends ModelTestCase
             'metadatas' => json_encode([
                 'altText' => ['en' => 'Custom alt text'],
                 'caption' => ['en' => 'Custom caption'],
-                'video' => ['en' => 'https://example.com/video.mp4']
+                'video' => ['en' => 'https://example.com/video.mp4'],
             ]),
         ]);
 
@@ -377,7 +378,7 @@ class HasImagesTest extends ModelTestCase
             'metadatas' => json_encode([
                 'altText' => ['en' => 'Custom alt text'],
                 'caption' => ['en' => 'Custom caption'],
-                'video' => ['en' => 'https://example.com/video.mp4']
+                'video' => ['en' => 'https://example.com/video.mp4'],
             ]),
         ]);
 
@@ -400,7 +401,7 @@ class HasImagesTest extends ModelTestCase
             'crop_w' => 1920,
             'crop_h' => 1080,
             'metadatas' => json_encode([
-                'altText' => ['en' => 'Custom alt text from metadata']
+                'altText' => ['en' => 'Custom alt text from metadata'],
             ]),
         ]);
 
@@ -419,7 +420,7 @@ class HasImagesTest extends ModelTestCase
             'metadatas' => json_encode([
                 'altText' => ['en' => 'Custom alt text'],
                 'caption' => ['en' => 'Custom caption'],
-                'video' => ['en' => 'https://example.com/video.mp4']
+                'video' => ['en' => 'https://example.com/video.mp4'],
             ]),
         ]);
 
@@ -441,7 +442,7 @@ class HasImagesTest extends ModelTestCase
             'crop_w' => 1920,
             'crop_h' => 1080,
             'metadatas' => json_encode([
-                'caption' => ['en' => 'Custom caption from metadata']
+                'caption' => ['en' => 'Custom caption from metadata'],
             ]),
         ]);
 
@@ -480,7 +481,7 @@ class HasImagesTest extends ModelTestCase
             'crop_w' => 1920,
             'crop_h' => 1080,
             'metadatas' => json_encode([
-                'video' => ['en' => 'https://example.com/video.mp4']
+                'video' => ['en' => 'https://example.com/video.mp4'],
             ]),
         ]);
 
@@ -497,7 +498,7 @@ class HasImagesTest extends ModelTestCase
             'crop_w' => 1280,
             'crop_h' => 720,
             'metadatas' => json_encode([
-                'video' => 'https://example.com/legacy-video.mp4'
+                'video' => 'https://example.com/legacy-video.mp4',
             ]),
         ]);
 
@@ -688,6 +689,7 @@ class HasImagesTest extends ModelTestCase
             use ModelHelpers, HasImages;
 
             protected $table = 'test_mediable_models';
+
             protected $fillable = ['name'];
         };
 
@@ -733,6 +735,7 @@ class HasImagesTest extends ModelTestCase
             use ModelHelpers, HasImages;
 
             protected $table = 'test_mediable_models';
+
             protected $fillable = ['name'];
 
             // Make findMedia public for testing
@@ -830,6 +833,7 @@ class HasImagesTest extends ModelTestCase
             use HasImages;
 
             protected $table = 'test_mediable_models';
+
             protected $fillable = ['name'];
 
             // Mock getRouteInputs to simulate icon input
@@ -839,8 +843,8 @@ class HasImagesTest extends ModelTestCase
                     [
                         'type' => 'image',
                         'isIcon' => true,
-                        'name' => 'icon'
-                    ]
+                        'name' => 'icon',
+                    ],
                 ];
             }
         };
@@ -879,6 +883,7 @@ class TestMediableModel extends Model
     use HasImages;
 
     protected $table = 'test_mediable_models';
+
     protected $fillable = ['name'];
 
     // Mock getRouteInputs for basic functionality

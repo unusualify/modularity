@@ -32,6 +32,6 @@ class CreatorRecord extends Model
 
     public function getTable()
     {
-        return modularityConfig('tables.creator_records', 'modularity_creator_records');
+        return modularityConfig('tables.creator_records', 'um_creator_records');
     }
 }
