@@ -6,10 +6,10 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Modules\SystemPricing\Entities\Price;
 use Oobook\Priceable\Models\Currency;
+use Unusualify\Modularity\Entities\Traits\Core\ModelHelpers;
 use Unusualify\Modularity\Entities\Traits\HasCreator;
 use Unusualify\Modularity\Entities\Traits\HasFileponds;
 use Unusualify\Modularity\Entities\Traits\HasSpreadable;
-use Unusualify\Modularity\Entities\Traits\Core\ModelHelpers;
 use Unusualify\Modularity\Relations\PaymentableRelation;
 
 class Payment extends \Unusualify\Payable\Models\Payment

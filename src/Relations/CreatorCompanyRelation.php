@@ -10,8 +10,11 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 class CreatorCompanyRelation extends HasOne
 {
     protected string $creatorRecordTable;
+
     protected string $userTable;
+
     protected string $companyTable;
+
     protected string $creatableType;
 
     public function __construct(

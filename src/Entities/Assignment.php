@@ -11,7 +11,6 @@ use Modules\SystemNotification\Events\AssignmentCreated;
 use Modules\SystemNotification\Events\AssignmentUpdated;
 use Unusualify\Modularity\Entities\Enums\AssignmentStatus;
 use Unusualify\Modularity\Entities\Scopes\AssignmentScopes;
-use Unusualify\Modularity\Entities\Traits\Core\ModelHelpers;
 use Unusualify\Modularity\Entities\Traits\HasFileponds;
 
 class Assignment extends Model

@@ -24,10 +24,12 @@ class ChangeRelationshipsTest extends ModelTestCase
         });
 
         // Create test model instance
-        $this->model = new class extends Model {
+        $this->model = new class extends Model
+        {
             use ChangeRelationships;
 
             protected $table = 'test_change_relationships_models';
+
             protected $fillable = ['name'];
         };
 
@@ -52,7 +54,7 @@ class ChangeRelationshipsTest extends ModelTestCase
         $relationships = [
             'users' => ['user1', 'user2'],
             'posts' => ['post1'],
-            'tags' => ['tag1', 'tag2', 'tag3']
+            'tags' => ['tag1', 'tag2', 'tag3'],
         ];
 
         $this->model->setChangedRelationships($relationships);
@@ -125,7 +127,7 @@ class ChangeRelationshipsTest extends ModelTestCase
         $relationships = [
             'users' => ['user1', 'user2'],
             'posts' => ['post1'],
-            'comments' => []
+            'comments' => [],
         ];
 
         $this->model->setChangedRelationships($relationships);
@@ -152,7 +154,7 @@ class ChangeRelationshipsTest extends ModelTestCase
     {
         $this->model->setChangedRelationships([
             'users' => ['user1'],
-            'posts' => ['post1']
+            'posts' => ['post1'],
         ]);
 
         // Test existing relationships
@@ -168,7 +170,7 @@ class ChangeRelationshipsTest extends ModelTestCase
     {
         $this->model->setChangedRelationships([
             'users' => ['user1'],
-            'posts' => ['post1']
+            'posts' => ['post1'],
         ]);
 
         // Test with array of relationships - should return true if ANY exist
@@ -184,7 +186,7 @@ class ChangeRelationshipsTest extends ModelTestCase
     {
         $this->model->setChangedRelationships([
             'users' => ['user1'],
-            'posts' => ['post1']
+            'posts' => ['post1'],
         ]);
 
         // Test with multiple arguments - should return true if ANY exist
@@ -200,7 +202,7 @@ class ChangeRelationshipsTest extends ModelTestCase
     {
         $this->model->setChangedRelationships([
             'users' => ['user1'],
-            'posts' => ['post1']
+            'posts' => ['post1'],
         ]);
 
         // Test with empty array should return true (has changes)
@@ -211,7 +213,7 @@ class ChangeRelationshipsTest extends ModelTestCase
     {
         $this->model->setChangedRelationships([
             'users' => ['user1'],
-            'posts' => ['post1']
+            'posts' => ['post1'],
         ]);
 
         // Test with null should return false (null is not a valid relationship key)
@@ -228,21 +230,21 @@ class ChangeRelationshipsTest extends ModelTestCase
         $complexRelationships = [
             'users' => [
                 ['id' => 1, 'name' => 'John'],
-                ['id' => 2, 'name' => 'Jane']
+                ['id' => 2, 'name' => 'Jane'],
             ],
             'posts' => [
                 'created' => ['post1', 'post2'],
                 'updated' => ['post3'],
-                'deleted' => []
+                'deleted' => [],
             ],
             'tags' => 'single_tag',
             'metadata' => [
                 'count' => 5,
                 'last_updated' => '2023-01-01',
                 'nested' => [
-                    'deep' => ['very_deep' => 'value']
-                ]
-            ]
+                    'deep' => ['very_deep' => 'value'],
+                ],
+            ],
         ];
 
         $this->model->setChangedRelationships($complexRelationships);
@@ -286,7 +288,7 @@ class ChangeRelationshipsTest extends ModelTestCase
         $expected = [
             'users' => ['user3', 'user4', 'user5'],
             'posts' => ['post1'],
-            'tags' => ['tag1', 'tag2']
+            'tags' => ['tag1', 'tag2'],
         ];
         $this->assertEquals($expected, $this->model->getChangedRelationships());
 
@@ -306,7 +308,7 @@ class ChangeRelationshipsTest extends ModelTestCase
         $this->model->addChangedRelationships('bool_key', true);
         $this->model->addChangedRelationships('null_key', null);
         $this->model->addChangedRelationships('array_key', ['a', 'b', 'c']);
-        $this->model->addChangedRelationships('object_key', (object)['prop' => 'value']);
+        $this->model->addChangedRelationships('object_key', (object) ['prop' => 'value']);
 
         $changes = $this->model->getChangedRelationships();
 
@@ -316,7 +318,7 @@ class ChangeRelationshipsTest extends ModelTestCase
         $this->assertTrue($changes['bool_key']);
         $this->assertNull($changes['null_key']);
         $this->assertEquals(['a', 'b', 'c'], $changes['array_key']);
-        $this->assertEquals((object)['prop' => 'value'], $changes['object_key']);
+        $this->assertEquals((object) ['prop' => 'value'], $changes['object_key']);
 
         // Test that all keys are detected as changed
         $this->assertTrue($this->model->wasChangedRelationships('string_key'));
@@ -331,10 +333,12 @@ class ChangeRelationshipsTest extends ModelTestCase
     public function test_multiple_model_instances_independence()
     {
         // Create another model instance
-        $model2 = new class extends Model {
+        $model2 = new class extends Model
+        {
             use ChangeRelationships;
 
             protected $table = 'test_change_relationships_models';
+
             protected $fillable = ['name'];
         };
         $model2->fill(['name' => 'Test Model 2']);

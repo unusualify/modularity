@@ -4,7 +4,6 @@ namespace Unusualify\Modularity\Entities\Traits;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
 use Modules\SystemPayment\Entities\Payment;
 use Modules\SystemPricing\Entities\Price;
 use Money\Currency;
@@ -111,7 +110,7 @@ trait HasPayment
     {
         return $this->morphOne(Price::class, 'priceable')
             ->where('role', 'payment')
-            ->whereDoesntHave('payments', fn($q) => $q->where('status', 'COMPLETED'))
+            ->whereDoesntHave('payments', fn ($q) => $q->where('status', 'COMPLETED'))
             ->latest('created_at');
 
         $priceTable = (new Price)->getTable();

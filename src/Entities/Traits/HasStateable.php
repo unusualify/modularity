@@ -345,7 +345,7 @@ trait HasStateable
     protected function stateableUpdatingCheck()
     {
         if (isset($this->stateable_id)
-            && (!$this->stateable || $this->stateable->id !== $this->stateable_id)
+            && (! $this->stateable || $this->stateable->id !== $this->stateable_id)
         ) {
             $this->modelStateableIsUpdating = true;
             $this->modelStateableIsUpdatingId = $this->stateable_id;

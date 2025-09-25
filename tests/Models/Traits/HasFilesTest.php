@@ -7,7 +7,6 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Unusualify\Modularity\Entities\File;
 use Unusualify\Modularity\Entities\Traits\HasFiles;
@@ -19,8 +18,11 @@ class HasFilesTest extends ModelTestCase
     use RefreshDatabase;
 
     protected $model;
+
     protected $file1;
+
     protected $file2;
+
     protected $file3;
 
     protected function setUp(): void
@@ -192,6 +194,7 @@ class HasFilesTest extends ModelTestCase
             use HasFiles;
 
             protected $table = 'test_fileable_models';
+
             protected $fillable = ['name'];
         };
 
@@ -355,6 +358,7 @@ class HasFilesTest extends ModelTestCase
             use HasFiles;
 
             protected $table = 'test_fileable_models';
+
             protected $fillable = ['name'];
 
             // Make findFile public for testing
@@ -460,5 +464,6 @@ class TestFileableModel extends Model
     use HasFiles;
 
     protected $table = 'test_fileable_models';
+
     protected $fillable = ['name'];
 }

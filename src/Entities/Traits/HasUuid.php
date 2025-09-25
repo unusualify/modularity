@@ -8,6 +8,7 @@ use Oobook\Database\Eloquent\Concerns\ManageEloquent;
 trait HasUuid
 {
     use ManageEloquent;
+
     public static function bootHasUuid()
     {
         static::creating(function ($model) {

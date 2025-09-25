@@ -5,8 +5,6 @@ namespace Unusualify\Modularity\Entities\Traits;
 use Illuminate\Support\Facades\Auth;
 use Unusualify\Modularity\Entities\Company;
 use Unusualify\Modularity\Facades\Modularity;
-use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Unusualify\Modularity\Relations\CreatorCompanyRelation;
 
 trait HasCreator

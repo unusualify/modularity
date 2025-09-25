@@ -100,7 +100,8 @@ trait HasAuthorizable
     /**
      * Laravel hook to initialize the trait
      */
-    public function initializeHasAuthorizable(): void {
+    public function initializeHasAuthorizable(): void
+    {
         $this->mergeFillable(static::$hasAuthorizableFillable);
     }
 

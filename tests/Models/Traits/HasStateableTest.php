@@ -11,8 +11,6 @@ use Unusualify\Modularity\Entities\Model;
 use Unusualify\Modularity\Entities\State;
 use Unusualify\Modularity\Entities\Stateable;
 use Unusualify\Modularity\Entities\Traits\HasStateable;
-use Unusualify\Modularity\Entities\Traits\HasTranslation;
-use Unusualify\Modularity\Entities\Translations\StateTranslation;
 use Unusualify\Modularity\Tests\ModelTestCase;
 
 class HasStateableTest extends ModelTestCase
@@ -20,6 +18,7 @@ class HasStateableTest extends ModelTestCase
     use RefreshDatabase;
 
     protected $testModel;
+
     protected $stateModel;
 
     protected function setUp(): void
@@ -479,7 +478,7 @@ class HasStateableTest extends ModelTestCase
         $this->assertContains(app()->getLocale(), $languages);
     }
 
-        public function test_get_state_model()
+    public function test_get_state_model()
     {
         $stateModel = $this->testModel::getStateModel();
 
@@ -489,10 +488,12 @@ class HasStateableTest extends ModelTestCase
     public function test_get_default_state_with_invalid_default_state_property()
     {
         // Create a model with invalid $default_state property
-        $invalidModel = new class extends Model {
+        $invalidModel = new class extends Model
+        {
             use HasStateable;
 
             protected $table = 'test_stateable_models';
+
             protected $fillable = ['name', 'title', 'initial_stateable', 'stateable_id'];
 
             // Invalid: not an array
@@ -517,10 +518,12 @@ class HasStateableTest extends ModelTestCase
     public function test_get_default_state_with_integer_default_state_property()
     {
         // Create a model with integer $default_state property
-        $intModel = new class extends Model {
+        $intModel = new class extends Model
+        {
             use HasStateable;
 
             protected $table = 'test_stateable_models';
+
             protected $fillable = ['name', 'title', 'initial_stateable', 'stateable_id'];
 
             // Invalid: integer value
@@ -545,10 +548,12 @@ class HasStateableTest extends ModelTestCase
     public function test_get_default_state_with_object_default_state_property()
     {
         // Create a model with object $default_state property
-        $objModel = new class extends Model {
+        $objModel = new class extends Model
+        {
             use HasStateable;
 
             protected $table = 'test_stateable_models';
+
             protected $fillable = ['name', 'title', 'initial_stateable', 'stateable_id'];
 
             // Invalid: object value
@@ -566,7 +571,7 @@ class HasStateableTest extends ModelTestCase
             public function __construct(array $attributes = [])
             {
                 parent::__construct($attributes);
-                static::$default_state = new \stdClass();
+                self::$default_state = new \stdClass;
             }
         };
 
@@ -579,17 +584,19 @@ class HasStateableTest extends ModelTestCase
     public function test_get_default_state_with_valid_default_state_property()
     {
         // Create a model with valid $default_state property
-        $validModel = new class extends Model {
+        $validModel = new class extends Model
+        {
             use HasStateable;
 
             protected $table = 'test_stateable_models';
+
             protected $fillable = ['name', 'title', 'initial_stateable', 'stateable_id'];
 
             // Valid: array value
             protected static $default_state = [
                 'icon' => '$custom',
                 'color' => 'custom',
-                'extra_field' => 'should_be_filtered_out'
+                'extra_field' => 'should_be_filtered_out',
             ];
 
             protected static $default_states = [
@@ -629,6 +636,7 @@ class TestStateableModel extends Model
     use HasStateable;
 
     protected $table = 'test_stateable_models';
+
     protected $fillable = ['name', 'title', 'initial_stateable', 'stateable_id'];
 
     protected static $default_states = [

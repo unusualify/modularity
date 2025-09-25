@@ -23,6 +23,7 @@ class ProcessableTest extends ModelTestCase
     use RefreshDatabase;
 
     protected $model;
+
     protected $user;
 
     protected function setUp(): void
@@ -142,7 +143,6 @@ class ProcessableTest extends ModelTestCase
         // Create a process manually first
         $existingProcess = $this->model->process;
 
-
         // Create another model to trigger the boot method
         $newModel = new TestProcessableModel(['name' => 'Another Test Model']);
         $newModel->save();
@@ -179,7 +179,6 @@ class ProcessableTest extends ModelTestCase
         $this->model->processable_status = ProcessStatus::WAITING_FOR_CONFIRMATION->value;
         $this->model->processable_reason = 'Test reason';
         $this->model->save();
-
 
         $this->assertEquals(ProcessStatus::WAITING_FOR_CONFIRMATION, $this->model->process->status);
         $this->assertEquals('Test reason', $this->model->process->histories->first()->reason);
@@ -697,5 +696,6 @@ class TestProcessableModel extends Model
     use Processable;
 
     protected $table = 'test_processable_models';
+
     protected $fillable = ['name', 'processable_status', 'processable_reason'];
 }

@@ -13,9 +13,10 @@ use Unusualify\Modularity\Entities\Traits\Core\ModelHelpers as CoreModelHelpers;
  *
  * OLD: use Unusualify\Modularity\Entities\Traits\ModelHelpers;
  * NEW: use Unusualify\Modularity\Entities\Traits\Core\ModelHelpers;
- *
  * @see Unusualify\Modularity\Entities\Traits\Core\ModelHelpers
+ *
  * @psalm-suppress DeprecatedTrait
+ *
  * @phpstan-ignore-next-line
  */
 trait ModelHelpers

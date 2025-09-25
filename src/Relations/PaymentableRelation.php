@@ -16,7 +16,7 @@ class PaymentableRelation extends MorphTo
 
     public function __construct(Model $parent)
     {
-        $this->priceModel = new Price();
+        $this->priceModel = new Price;
 
         // Set up the relation as paymentable_type/paymentable_id from the global scope subselects
         $relation = 'priceable';
@@ -138,7 +138,7 @@ class PaymentableRelation extends MorphTo
         $type = $this->parent->getAttribute($this->morphType);
         $id = $this->parent->getAttribute($this->foreignKey);
 
-        if (!$type || !$id) {
+        if (! $type || ! $id) {
             return null;
         }
 

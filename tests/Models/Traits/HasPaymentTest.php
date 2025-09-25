@@ -11,8 +11,8 @@ use Modules\SystemPayment\Entities\Payment;
 use Modules\SystemPayment\Entities\PaymentService;
 use Modules\SystemPricing\Entities\Price;
 use Oobook\Priceable\Models\Currency as PriceableCurrency;
-use Oobook\Priceable\Models\VatRate;
 use Oobook\Priceable\Models\PriceType;
+use Oobook\Priceable\Models\VatRate;
 use Unusualify\Modularity\Entities\Enums\PaymentStatus;
 use Unusualify\Modularity\Entities\Traits\HasPayment;
 use Unusualify\Modularity\Tests\ModelTestCase;
@@ -22,13 +22,19 @@ class HasPaymentTest extends ModelTestCase
     use RefreshDatabase;
 
     protected $model;
+
     protected $currency;
+
     protected $vatRate;
+
     protected $priceType;
 
     protected $iyzicoPaymentService;
+
     protected $paypalPaymentService;
+
     protected $revolutPaymentService;
+
     protected $bankTransferPaymentService;
 
     protected function setUp(): void
@@ -117,14 +123,14 @@ class HasPaymentTest extends ModelTestCase
                 'spread_payload' => [
                     'type' => 1,
                     'transfer_details' => [
-                    'account_holder' => '',
-                    'iban' => '',
-                    'swift_code' => '',
-                    'description' => '',
-                    'address' => '',
+                        'account_holder' => '',
+                        'iban' => '',
+                        'swift_code' => '',
+                        'description' => '',
+                        'address' => '',
+                    ],
                 ],
-            ],
-        ]);
+            ]);
 
         $this->revolutPaymentService = PaymentService::firstOrCreate(
             [
@@ -293,7 +299,7 @@ class HasPaymentTest extends ModelTestCase
         // Test that we can find unpaid prices (prices without completed payments)
         $unpaidPrices = $this->model->prices()
             ->where('role', 'payment')
-            ->whereDoesntHave('payments', fn($q) => $q->where('status', 'COMPLETED'))
+            ->whereDoesntHave('payments', fn ($q) => $q->where('status', 'COMPLETED'))
             ->get();
 
         $this->assertCount(1, $unpaidPrices);
@@ -690,7 +696,9 @@ class HasPaymentTest extends ModelTestCase
             use HasPayment;
 
             protected $table = 'test_payable_models';
+
             protected $fillable = ['name'];
+
             protected $hasPaymentRelations = 'items';
         };
 
@@ -703,7 +711,9 @@ class HasPaymentTest extends ModelTestCase
             use HasPayment;
 
             protected $table = 'test_payable_models';
+
             protected $fillable = ['name'];
+
             protected $hasPaymentRelations = ['items', 'services'];
         };
 
@@ -772,7 +782,7 @@ class HasPaymentTest extends ModelTestCase
 
         $unpaidPrices = $this->model->prices()
             ->where('role', 'payment')
-            ->whereDoesntHave('payments', fn($q) => $q->where('status', 'COMPLETED'))
+            ->whereDoesntHave('payments', fn ($q) => $q->where('status', 'COMPLETED'))
             ->get();
         $this->assertEquals($price2->id, $unpaidPrices->first()->id); // Unpaid price
 
@@ -793,6 +803,7 @@ class TestPayableModel extends Model
     use HasPayment;
 
     protected $table = 'test_payable_models';
+
     protected $fillable = ['name'];
 
     public static $priceSavingKey = 'price_value';
@@ -804,6 +815,7 @@ class TestPayableModelWithEvents extends Model
     use HasPayment;
 
     protected $table = 'test_payable_models';
+
     protected $fillable = ['name'];
 
     public static $priceSavingKey = 'price_value';

@@ -11,7 +11,6 @@ use Modules\SystemNotification\Events\UnreadChatMessage;
 use Spatie\Permission\Models\Role;
 use Unusualify\Modularity\Entities\Chat;
 use Unusualify\Modularity\Entities\ChatMessage;
-use Unusualify\Modularity\Entities\CreatorRecord;
 use Unusualify\Modularity\Entities\Traits\Chatable;
 use Unusualify\Modularity\Entities\Traits\Core\ModelHelpers;
 use Unusualify\Modularity\Entities\Traits\HasCreator;
@@ -46,14 +45,14 @@ class ChatableTest extends ModelTestCase
 
     public function test_model_uses_chatable_trait()
     {
-        $model = new TestChatableModel();
+        $model = new TestChatableModel;
         $traits = class_uses_recursive($model);
         $this->assertContains('Unusualify\Modularity\Entities\Traits\Chatable', $traits);
     }
 
     public function test_initialize_chatable_appends_count_attributes()
     {
-        $model = new TestChatableModel();
+        $model = new TestChatableModel;
         $appends = $model->getAppends();
 
         $this->assertContains('chat_messages_count', $appends);
@@ -63,7 +62,7 @@ class ChatableTest extends ModelTestCase
 
     public function test_initialize_chatable_respects_no_appends_flag()
     {
-        $model = new TestChatableModelNoAppends();
+        $model = new TestChatableModelNoAppends;
         $appends = $model->getAppends();
 
         $this->assertNotContains('chat_messages_count', $appends);
@@ -506,7 +505,7 @@ class ChatableTest extends ModelTestCase
 
     public function test_chatable_scopes_trait_is_used()
     {
-        $model = new TestChatableModel();
+        $model = new TestChatableModel;
         $traits = class_uses_recursive($model);
         $this->assertContains('Unusualify\Modularity\Entities\Scopes\ChatableScopes', $traits);
     }
@@ -703,6 +702,7 @@ class TestChatableModel extends Model
     use Chatable, ModelHelpers;
 
     protected $table = 'test_chatable_models';
+
     protected $fillable = ['name'];
 }
 
@@ -712,7 +712,9 @@ class TestChatableModelNoAppends extends Model
     use Chatable, ModelHelpers;
 
     protected $table = 'test_chatable_models';
+
     protected $fillable = ['name'];
+
     protected static $noChatableAppends = true;
 }
 
@@ -722,7 +724,9 @@ class TestChatableModelCustomInterval extends Model
     use Chatable, ModelHelpers;
 
     protected $table = 'test_chatable_models';
+
     protected $fillable = ['name'];
+
     protected static $chatableNotificationInterval = 30;
 }
 
@@ -732,5 +736,6 @@ class TestChatableModelWithCreator extends Model
     use Chatable, ModelHelpers, HasCreator;
 
     protected $table = 'test_chatable_models';
+
     protected $fillable = ['name'];
 }

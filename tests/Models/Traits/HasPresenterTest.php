@@ -14,7 +14,7 @@ class HasPresenterTest extends ModelTestCase
     {
         parent::setUp();
 
-        $this->model = new TestPresenterModel();
+        $this->model = new TestPresenterModel;
     }
 
     public function test_model_uses_has_presenter_trait()
@@ -150,7 +150,9 @@ class TestPresenterModel extends Model
     use HasPresenter;
 
     public $presenter;
+
     public $presenterAdmin;
+
     public $customPresenter;
 }
 

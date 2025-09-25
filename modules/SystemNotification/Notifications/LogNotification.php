@@ -45,6 +45,7 @@ class LogNotification extends Notification implements ShouldQueue
                     return get_class($value) . ' object';
                 }
             }
+
             return $value;
         }, $context);
     }
