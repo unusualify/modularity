@@ -492,7 +492,7 @@ return [
             'label' => 'Name',
             'default' => '',
             'col' => ['cols' => 12, 'lg' => 12],
-            'rules' => 'min:2',
+            'rules' => 'min:2|alpha',
             'validateOn' => 'input',
         ],
         'surname' => [
@@ -501,7 +501,7 @@ return [
             'label' => 'Surname',
             'default' => '',
             'col' => ['cols' => 12, 'lg' => 12],
-            'rules' => 'min:2',
+            'rules' => 'min:2|alpha',
             'validateOn' => 'input',
         ],
         'company' => [
