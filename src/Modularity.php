@@ -315,6 +315,16 @@ class Modularity extends FileRepository
         return app('config')->get('app.name');
     }
 
+    /**
+     * Get the path to the modules directory.
+     *
+     * @return string
+     */
+    final public function getModulesPath($path = '')
+    {
+        return concatenate_path($this->config('paths.modules'), $path);
+    }
+
     public function setSystemModulesPath()
     {
         if ($this->isProduction()) {
