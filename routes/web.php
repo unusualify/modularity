@@ -51,7 +51,7 @@ Route::get('users/impersonate/{id}', 'ImpersonateController@impersonate')->name(
 
 // system internal api routes (for ajax web routes)
 Route::prefix('api')->group(function () {
-    Route::get('modal-service/{key}', function (Request $request, string $key) {
+    Route::withoutMiddleware(['modularity.panel', 'web.auth', 'modularity.core'])->get('modal-service/{key}', function (Request $request, string $key) {
         $modalService = Session::get($key);
 
         if (! $modalService) {
