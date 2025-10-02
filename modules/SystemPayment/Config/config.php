@@ -286,6 +286,7 @@ return [
                     'title' => 'Company',
                     'key' => 'company',
                     'itemTitle' => 'name',
+                    'minWidth' => 150,
                 ],
                 [
                     'title' => 'Service',
@@ -331,7 +332,7 @@ return [
                     'key' => 'updated_at',
                     'formatter' => [
                         'date',
-                        'numeric',
+                        'long',
                     ],
                     'searchable' => false,
                     'sortable' => true,
