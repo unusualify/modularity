@@ -1,5 +1,6 @@
 // hooks/useItemActions.js
 import { toRefs, computed, reactive, ref } from 'vue'
+import { router } from '@inertiajs/vue3'
 import { useStore } from 'vuex'
 import _ from 'lodash-es'
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
@@ -8,7 +9,7 @@ import ACTIONS from '@/store/actions'
 import { ALERT } from '@/store/mutations/index'
 import api from '@/store/api/form'
 
-import { useCastAttributes, useDynamicModal } from '@/hooks'
+import { useConfig, useCastAttributes, useDynamicModal } from '@/hooks'
 import { checkItemConditions } from '@/utils/itemConditions';
 
 export const makeItemActionsProps = propsFactory({
@@ -24,6 +25,7 @@ export const makeItemActionsProps = propsFactory({
 
 export default function useItemActions(props, context) {
   const store = useStore()
+  const { shouldUseInertia } = useConfig()
   const { castObjectAttributes } = useCastAttributes()
   const dynamicModal = useDynamicModal()
 
@@ -107,9 +109,14 @@ export default function useItemActions(props, context) {
 
         // Reload the page after successful operation
         if (action.reloadOnSuccess === true) {
-          setTimeout(() => {
-            window.location.reload();
-          }, action.reloadDelay || 1000); // 1 second delay to show the success message
+          const forceRefresh = action.forceRefresh || false
+          if(shouldUseInertia.value && !forceRefresh) {
+            router.reload({ only: ['formAttributes', ...(action.reloadOnly || [])] })
+          } else {
+            setTimeout(() => {
+              window.location.reload()
+            }, action.reloadDelay || 1000); // 1 second delay to show the success message
+          }
         }
       },
       (error) => {
