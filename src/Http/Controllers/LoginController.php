@@ -429,6 +429,7 @@ class LoginController extends Controller
                             ['email'],
                         ],
                         'readonly' => true,
+                        'clearable' => false,
                     ],
                     'password' => [
                         'type' => 'password',
