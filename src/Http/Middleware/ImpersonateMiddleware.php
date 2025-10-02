@@ -33,24 +33,7 @@ class ImpersonateMiddleware
         }
 
         view()->composer(modularityBaseKey() . '::layouts.master', function ($view) {
-            $userRepository = app()->make(\Modules\SystemUser\Repositories\UserRepository::class);
-            $activeUser = null;
-            $canFetchUsers = false;
-
-            if (Auth::check()) {
-                $activeUser = Auth::user();
-                $canFetchUsers = $activeUser->isSuperAdmin() || $activeUser->isImpersonating();
-            }
-
-            $impersonation = [
-                'active' => $activeUser ? $activeUser->isSuperAdmin() || $activeUser->isImpersonating() : false,
-                'users' => $canFetchUsers ? $userRepository->whereNot(fn ($query) => $query->role(['superadmin']))->get(['id', 'name', 'email', 'company_id'])->toArray() : [],
-                'impersonated' => $activeUser ? $activeUser->isImpersonating() : false,
-                'stopRoute' => route(Route::hasAdmin('impersonate.stop')),
-                'route' => route(Route::hasAdmin('impersonate'), ['id' => ':id']),
-            ];
-            // setActiveMenuItem($configuration['sidebar'], $configuration['current_url']);
-            $view->with('impersonation', $impersonation);
+            $view->with('impersonation', get_modularity_impersonation_config());
         });
 
         return $next($request);
