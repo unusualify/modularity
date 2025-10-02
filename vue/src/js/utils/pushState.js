@@ -156,4 +156,6 @@ export function isSameUrl(url1, url2) {
   return getURLWithoutQuery(url1) === getURLWithoutQuery(url2)
 }
 
-
+export function isSamePath(path1, path2) {
+  return path1 === path2
+}
