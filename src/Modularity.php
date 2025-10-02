@@ -291,6 +291,16 @@ class Modularity extends FileRepository
     }
 
     /**
+     * Check if inertia should be used.
+     *
+     * @return bool
+     */
+    final public function shouldUseInertia()
+    {
+        return $this->config('use_inertia', false);
+    }
+
+    /**
      * Create a page title callback.
      *
      * @param \Closure $callback
@@ -313,6 +323,16 @@ class Modularity extends FileRepository
         }
 
         return app('config')->get('app.name');
+    }
+
+    /**
+     * Get the path to the modules directory.
+     *
+     * @return string
+     */
+    final public function getModulesPath($path = '')
+    {
+        return concatenate_path($this->config('paths.modules'), $path);
     }
 
     public function setSystemModulesPath()
@@ -397,6 +417,7 @@ class Modularity extends FileRepository
     public function isPanelUrl($url = null)
     {
         $host = request()->getHost();
+
         if ($this->hasAdminAppUrl()) {
 
             if ($url) {
@@ -423,6 +444,19 @@ class Modularity extends FileRepository
         }
 
         return $segment === $this->getAdminUrlPrefix() && $host === $this->getAppHost();
+    }
+
+    /**
+     * Check if a route is a modularity route via admin route name prefix.
+     *
+     * @param string $routeName
+     * @return bool
+     */
+    public function isModularityRoute(string $routeName): bool
+    {
+        $segments = explode('.', $routeName);
+
+        return $segments[0] === $this->getAdminRouteNamePrefix();
     }
 
     /**

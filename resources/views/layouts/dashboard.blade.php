@@ -15,11 +15,6 @@
 
 @section('content')
     <div class="dashboard pa-3 h-100">
-        <ue-dashboard :blocks='@json($blocks ?? [])'>
+        <ue-blocks :items='@json($blockItems ?? [])'>
     </div>
 @stop
-
-@section('STORE')
-
-@stop
-

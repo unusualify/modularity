@@ -20,7 +20,6 @@ export default createStore({
     browser,
     cache
   }
-
 })
 // export default new Vuex.Store({
 //     modules

@@ -22,11 +22,11 @@ export function globalError (component = null, error = { message: '', value: nul
     //   message: 'Your session has expired, please <a href="' + document.location + '" target="_blank">login in another tab</a>. You can then continue working here.',
     //   variant: 'warning'
     // })
-    window.vm.config.globalProperties.$dialog({
-      message: 'Your session has expired, please <a class="v-btn v-btn--slim text-primary v-btn--density-default v-btn--size-default mr-12" href="'
-        + document.location
-        + '" target="_blank">login in another tab</a>',
-    })
+    // window.vm.config.globalProperties.$dialog({
+    //   message: 'Your session has expired, please <a class="v-btn v-btn--slim text-primary v-btn--density-default v-btn--size-default mr-12" href="'
+    //     + document.location
+    //     + '" target="_blank">login in another tab</a>',
+    // })
   } else if(error?.value && error.value?.response && error.value.response?.data) {
     window.vm.config.globalProperties.$notif({
       message: error.value.response.data.message ?? 'An error occurred',

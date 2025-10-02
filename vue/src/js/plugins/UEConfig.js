@@ -34,15 +34,7 @@ import FitGrid from '@/directives/fit-grid'
 import Scrollable from '@/directives/scrollable'
 import Transition from '@/directives/transition'
 import commonMethods from '@/utils/commonMethods'
-import { ALERT } from '../store/mutations'
-
-// const includeGlobalComponents = require.context('__components', false, /[A-Za-z]*(?<!_)\.vue$/i)
-
-
-// const includeLabComponents = require.context('__components/labs', false, /[A-Za-z]*(?<!_)\.vue$/i)
-// const includeLayouts = require.context('__components/layouts/', false, /[A-Za-z]*(?<!_)\.vue$/i)
-// const includeFormInputs = require.context('__components/inputs', true, /\.vue$/i)
-// const includeCustomFormInputs = require.context('__components/inputs', true, /\.vue$/i)
+import { ALERT } from '@/store/mutations'
 
 const includeGlobalComponents = import.meta.glob('__components/*.vue', {eager: true})
 const includeIteratorComponents = import.meta.glob('__components/data_iterators/*.vue', {eager: true})
@@ -81,49 +73,45 @@ export default {
     // i18n.global.setDateTimeFormat('tr', 'Europe/Istanbul')
 
     // add Global methods to all components
-    app.config.globalProperties = {
-      ...app.config.globalProperties,
-      $getLocale: i18n.global.locale.value,
-      $numberFormats: i18n.global.numberFormats.value,
-      $te: function (key, locale) {
-        const func = i18n.global.te
-        return func(key, locale) ?? false
-      },
-      $tc: function (key, locale) {
-        const func = i18n.global.tc
-        return func(key, locale) ?? false
-      },
-      $plural: function (str) {
-        return pluralize.plural(str)
-      },
-      registerComponentsV1: function (components, folder = '', prefix = 'ue') {
-        folder = folder !== '' ? folder + '/' : ''
-        components.keys().forEach((path) => {
-          const fileName = path.split('/').pop().split('.')[0]
-          const componentName = prefix + fileName.replace(/[A-Z]/g, m => '-' + m.toLowerCase())
-          app.component(componentName, require(`__components/${folder}${fileName}.vue`).default)
-        })
-      },
-      registerComponents: function (components, folder = '', prefix = 'Ue') {
-        folder = folder !== '' ? folder + '/' : ''
-        Object.keys(components).forEach(path => {
-          const extFile = path.split('/').pop()
-          const fileName = path.split('/').pop().split('.')[0]
-          const module = components[path]
-          // const componentName = prefix + fileName.replace(/[A-Z]/g, m => '-' + m.toLowerCase())
-          const componentName = prefix + upperFirst(fileName)
-          app.component(componentName, module.default)
-        })
-        // components.keys().forEach((path) => {
-        //   const fileName = path.split('/').pop().split('.')[0]
-        //   const componentName = prefix + fileName.replace(/[A-Z]/g, m => '-' + m.toLowerCase())
-        //   app.component(componentName, require(`__components/${folder}${fileName}.vue`).default)
-        // })
-      },
+    app.config.globalProperties.$getLocale = i18n.global.locale.value
+    app.config.globalProperties.$numberFormats = i18n.global.numberFormats.value
+    app.config.globalProperties.$te = function (key, locale) {
+      const func = i18n.global.te
+      return func(key, locale) ?? false
+    }
 
-      $call: function (functionName, ...args) {
-        return this[functionName](...args)
-      },
+    app.config.globalProperties.$tc = function (key, locale) {
+      const func = i18n.global.tc
+      return func(key, locale) ?? false
+    }
+
+    app.config.globalProperties.$plural = function (str) {
+      return pluralize.plural(str)
+    }
+
+    app.config.globalProperties.registerComponentsV1 = function (components, folder = '', prefix = 'ue') {
+      folder = folder !== '' ? folder + '/' : ''
+      components.keys().forEach((path) => {
+        const fileName = path.split('/').pop().split('.')[0]
+        const componentName = prefix + fileName.replace(/[A-Z]/g, m => '-' + m.toLowerCase())
+        app.component(componentName, require(`__components/${folder}${fileName}.vue`).default)
+      })
+    }
+
+    app.config.globalProperties.registerComponents = function (components, folder = '', prefix = 'Ue') {
+      folder = folder !== '' ? folder + '/' : ''
+      Object.keys(components).forEach(path => {
+        const extFile = path.split('/').pop()
+        const fileName = path.split('/').pop().split('.')[0]
+        const module = components[path]
+        // const componentName = prefix + fileName.replace(/[A-Z]/g, m => '-' + m.toLowerCase())
+        const componentName = prefix + upperFirst(fileName)
+        app.component(componentName, module.default)
+      })
+    }
+
+    app.config.globalProperties.$call = function (functionName, ...args) {
+      return this[functionName](...args)
     }
 
     Object.keys(commonMethods).forEach(key => {
@@ -148,23 +136,16 @@ export default {
           this.$store.commit(MEDIA_LIBRARY.UPDATE_MEDIA_HEIGHT_MIN, 0) // set height min to 0
           this.$store.commit(MEDIA_LIBRARY.UPDATE_MEDIA_MODE, false) // set the strict to false (you can change the active type)
 
-          if (this.$root.$refs.main && this.$root.$refs.main.$refs.mediaLibrary) {
-            this.$root.$refs.main.$refs.mediaLibrary.openModal()
-          }
-          // if (this.$root.$refs.mediaLibrary) this.$root.$refs.mediaLibrary.open()
+          this.$store.commit(MEDIA_LIBRARY.OPEN_MODAL)
         }
       }
 
     })
     // all components
-
-    // app.component('v-form-base', VFormBase);
     app.component('VCustomFormBase', VCustomFormBase)
     app.component('UeDynamicModal', DynamicModal)
     app.component('UeModal', UEModal)
-    // app.component('ue-modal-dialog', UEModalDialog)
     app.component('UeModalMedia', UEModalMedia)
-    // Vue.component('ue-medialibrary', UEMediaLibrary)
 
     // crm base package components
     app.config.globalProperties.registerComponents(includeGlobalComponents)
@@ -173,27 +154,6 @@ export default {
     app.config.globalProperties.registerComponents(includeLayouts, 'layouts')
     app.config.globalProperties.registerComponents(includeFormInputs, 'inputs', 'VInput')
     app.config.globalProperties.registerComponents(includeCustomComponents, 'customs', 'UeCustom')
-
-    // app.config.globalProperties.registerComponents(includeCustomFormInputs, 'customs/inputs', 'v-input')
-    // // Configurations
-    // Vue.config.productionTip = isProd
-    // Vue.config.devtools = true
-    // app.config.globalProperties.$http = axios
-
-    // axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
-
-    // axios.interceptors.response.use((response) => response, (error) => {
-    //     globalError('CONTENT', error)
-
-    //     return Promise.reject(error)
-    // })
-
-    // // Plugins
-    // Vue.use(VueTimeago, {
-    //     name: 'timeago', // component name
-    //     locale: window[import.meta.env.VUE_APP_NAME].twillLocalization.locale,
-    //     locales: mapValues(locales, 'date-fns')
-    // })
 
     // Directives
     app.directive('mask', VueMaskDirective)

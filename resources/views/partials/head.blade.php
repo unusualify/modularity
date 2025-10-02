@@ -4,10 +4,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=Edge">
     <meta name="robots" content="noindex,nofollow" />
 
-    {{-- <title>{{ config('app.name') }} {{ modularityConfig('admin_app_title_suffix') }}</title> --}}
     <title> {{ $pageTitle ?? \Unusualify\Modularity\Facades\Modularity::pageTitle() }}</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <!-- Fonts -->
 
     @stack('head_css')
     @stack('head_js')

@@ -1,8 +1,9 @@
 import { CONFIG } from '../mutations'
 
-
 const state = {
   test: window[import.meta.env.VUE_APP_NAME]?.STORE.config.test ?? false,
+  isInertia: window[import.meta.env.VUE_APP_NAME]?.STORE.config.isInertia ?? false,
+
   profileMenu: window[import.meta.env.VUE_APP_NAME]?.STORE.config.profileMenu ?? [],
   sidebarStatus: true,
   sidebarOptions: window[import.meta.env.VUE_APP_NAME]?.STORE.config.sidebarOptions ?? false,

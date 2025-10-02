@@ -271,6 +271,7 @@ trait PaymentTrait
                     'hasDivider' => false,
                     'refreshOnSaved' => true,
                     'async' => false,
+                    'noSchemaUpdatingProgressBar' => true,
                 ],
                 'creatable' => false,
                 'isEditing' => false,

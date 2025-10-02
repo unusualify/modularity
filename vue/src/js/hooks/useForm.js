@@ -1,12 +1,13 @@
 // hooks/useForm.js
-import { ref, computed, watch, toRefs, reactive, nextTick } from 'vue'
+import { ref, computed, watch, toRefs, reactive, nextTick, onMounted } from 'vue'
+import { router } from '@inertiajs/vue3'
 import { useStore } from 'vuex'
 import { useI18n } from 'vue-i18n'
 import { cloneDeep, isEqual, find, reduce, set, get } from 'lodash-es'
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
 
-import { useInputHandlers, useValidation, useLocale, useItemActions, useAuthorization } from '@/hooks'
-import { FORM, ALERT } from '@/store/mutations/index'
+import { useConfig, useInputHandlers, useValidation, useLocale, useItemActions, useAuthorization } from '@/hooks'
+import { ALERT } from '@/store/mutations/index'
 import ACTIONS from '@/store/actions'
 import api from '@/store/api/form'
 import { getModel, getSubmitFormData, getSchema, getFormEventSchema, } from '@/utils/getFormData.js'
@@ -18,6 +19,7 @@ import { redirector } from '@/utils/response'
 export const makeFormProps = propsFactory({
   modelValue: {
     type: Object,
+    required: true,
     // default () {
     //   return {}
     // }
@@ -41,6 +43,7 @@ export const makeFormProps = propsFactory({
   },
   schema: {
     type: Object,
+    required: true,
     // default () {
     //   return {}
     // }
@@ -144,7 +147,6 @@ export const makeFormProps = propsFactory({
     type: String,
     default: 'Additional Options'
   },
-
   clearOnSaved: {
     type: Boolean,
     default: false
@@ -153,15 +155,28 @@ export const makeFormProps = propsFactory({
     type: Boolean,
     default: false
   },
+  forceRefresh: {
+    type: Boolean,
+    default: false
+  },
   noWaitSourceLoading: {
     type: Boolean,
     default: false
+  },
+  noSchemaUpdatingProgressBar: {
+    type: Boolean,
+    default: false
+  },
+  reloadOnly: {
+    type: Array,
+    default: () => []
   }
 })
 
 export default function useForm(props, context) {
   const store = useStore()
   const { t, te } = useI18n({ useScope: 'global' })
+  const { shouldUseInertia } = useConfig()
 
   // Composables
   const inputHandlers = useInputHandlers()
@@ -180,29 +195,36 @@ export default function useForm(props, context) {
   const issetSchema = ref(props.schema ? true : false)
 
   const formLoading = ref(false)
+  const serverValid = ref(true)
   const formErrors = ref({})
 
-  const rawSchema = ref(issetSchema.value
-    ? props.schema
-    : store.state.form.inputs)
-
+  const rawSchema = ref(props.schema)
   const chunkedRawSchema = computed(() => processInputs(rawSchema.value))
 
-  const defaultItem = ref(issetSchema.value
-    ? getModel(rawSchema.value)
-    : store.getters.defaultItem)
-
-  const storeEditedItem = computed(() => store.state.form.editedItem)
+  const defaultItem = ref(getModel(rawSchema.value))
 
   const model = ref(getModel(
     rawSchema.value,
-    issetModel.value ? props.modelValue : storeEditedItem.value,
-    store.state,
+    props.modelValue,
   ))
 
-  const formItem = computed(() => issetModel.value ? props.modelValue : storeEditedItem.value)
+  const schemaUpdating = ref(false)
+
+  const setSchemaUpdating = (value) => {
+    if(value && props.noSchemaUpdatingProgressBar) {
+      schemaUpdating.value = false
+      return
+    }
+
+    schemaUpdating.value = value
+  }
+
+  // const formItem = computed(() => issetModel.value ? props.modelValue : store.state.form.editedItem)
+  const formItem = computed(() => props.modelValue)
 
   const inputSchema = ref(validations.invokeRuleGenerator(getSchema(rawSchema.value, { ...model.value, ...formItem.value }, props.isEditing)))
+  // const inputSchema = ref(getSchema(rawSchema.value, { ...model.value, ...formItem.value }, props.isEditing))
+
   const formEventSchema = ref(getFormEventSchema(rawSchema.value, { ...model.value, ...formItem.value }, props.isEditing))
   const extraValids = ref(props.actions.length ? props.actions.map(() => true) : [])
 
@@ -254,6 +276,7 @@ export default function useForm(props, context) {
 
   const states = reactive({
     id,
+    reference: computed(() => 'ref-' + states.id),
     formBaseId,
     VForm,
 
@@ -261,9 +284,10 @@ export default function useForm(props, context) {
     issetSchema,
 
     model,
-    // storeEditedItem,
     formItem,
 
+    schemaUpdating,
+    formActionsActive: computed(() => !schemaUpdating.value && props.isEditing),
     chunkedRawSchema,
     inputSchema,
     formEventSchema,
@@ -277,15 +301,13 @@ export default function useForm(props, context) {
     buttonDefaultText: computed(() =>
       props.buttonText ? (te(props.buttonText) ? t(props.buttonText) : props.buttonText) : t('submit')
     ),
-    // editedItem: computed(() => store.state.form.editedItem),
-    serverValid: computed(() => store.state.form.serverValid ?? true),
-    loading: computed(() =>
-      props.actionUrl ? formLoading.value : store.state.form.loading
-    ),
-    errors: computed(() =>
-      props.actionUrl ? formErrors.value : store.state.form.errors
-    ),
-    reference: computed(() => 'ref-' + states.id),
+
+    serverValid,
+    loading: formLoading,
+    // errors: computed(() =>
+    //   props.actionUrl ? formErrors.value : store.state.form.errors
+    // ),
+    errors: formErrors,
     hasTraslationInputs: computed(() => getTranslationInputsCount(inputSchema.value) > 0),
 
     hasAdditionalSection,
@@ -316,10 +338,10 @@ export default function useForm(props, context) {
         (response) => {
           formLoading.value = false
           if (Object.prototype.hasOwnProperty.call(response.data, 'errors')) {
-            store.commit(FORM.SET_SERVER_VALID, false)
+            serverValid.value = false
             formErrors.value = response.data.errors
           } else if (Object.prototype.hasOwnProperty.call(response.data, 'variant')) {
-            store.commit(FORM.SET_SERVER_VALID, false)
+            serverValid.value = false
             store.commit(ALERT.SET_ALERT, { message: response.data.message, variant: response.data.variant })
           }
 
@@ -337,7 +359,11 @@ export default function useForm(props, context) {
             redirector(response.data)
           } else {
             let __reload = () => {
-              window.location.reload(true)
+              if(shouldUseInertia.value && !props.forceRefresh) {
+                router.reload({ only: ['formAttributes', ...(props.reloadOnly || [])] })
+              } else {
+                window.location.reload(true)
+              }
             }
             callbackFunction = (data) => {
               if(callback && typeof callback === 'function') callback(data)
@@ -351,45 +377,12 @@ export default function useForm(props, context) {
           if (Object.prototype.hasOwnProperty.call(response.data, 'exception')) {
             store.commit(ALERT.SET_ALERT, { message: 'Your submission could not be processed.', variant: 'error' })
           } else {
-            store.dispatch(ACTIONS.HANDLE_ERRORS, response.data)
             store.commit(ALERT.SET_ALERT, { message: 'Your submission could not be validated, please fix and retry', variant: 'error' })
           }
 
           if (errorCallback && typeof errorCallback === 'function') errorCallback(response.data)
         }
       )
-    } else {
-      nextTick(() => {
-        let __reload = () => {
-          window.location.reload(true)
-        }
-
-        let callbackFunction = callback
-
-        if(props.refreshOnSaved) {
-          callbackFunction = (data) => {
-            context.emit('submitted', data)
-            if(callback && typeof callback === 'function') callback(data)
-            if(Object.prototype.hasOwnProperty.call(data, 'forceRedirect') && data.forceRedirect) {
-              redirector(data)
-            }else{
-              __reload()
-            }
-          }
-        } else {
-          callbackFunction = (data) => {
-            context.emit('submitted', data)
-            redirector(data)
-            if(callback && typeof callback === 'function') callback(data)
-          }
-        }
-
-        store.dispatch(ACTIONS.SAVE_FORM, { item: null, callback: callbackFunction, errorCallback })
-
-        // if(props.refreshOnSaved) {
-        //   window.location.reload()
-        // }
-      })
     }
   }
 
@@ -596,7 +589,8 @@ export default function useForm(props, context) {
         if (props.async) {
           e && e.preventDefault()
           if (!props.actionUrl) {
-            store.commit(FORM.SET_EDITED_ITEM, states.model)
+            // store.commit(FORM.SET_EDITED_ITEM, states.model)
+
             nextTick(() => {
               saveForm(callback, errorCallback)
             })
@@ -623,23 +617,16 @@ export default function useForm(props, context) {
     },
   })
 
+
   // Add watch to sync with modelValue when it exists
   watch(() => props.modelValue, (newVal, oldVal) => {
-
     if(oldVal === undefined) return
 
     if (issetModel.value) {
-      if(isEqual(newVal, oldVal) && isEqual(newVal, model.value)) return
+      let newModelValue = getModel(rawSchema.value, newVal, store.state)
+      if(isEqual(newVal, oldVal) && isEqual(newModelValue, model.value)) return
 
       model.value = getModel(rawSchema.value, newVal, store.state)
-    }
-  })
-
-  // Watch editedItem
-  watch(() => storeEditedItem.value, (newVal, oldVal) => {
-    if (!issetModel.value) {
-      // methods.regenerateInputSchema(newValue)
-      // model.value = getModel(rawSchema.value, newValue, store.state)
     }
   })
 
@@ -667,26 +654,25 @@ export default function useForm(props, context) {
   // Watch schema
   watch(() => props.schema, (newValue, oldValue) => {
     if (!isEqual(newValue, oldValue) && issetSchema.value && !isEqual(newValue, inputSchema.value)) {
+      setSchemaUpdating(true)
+
       rawSchema.value = newValue
       defaultItem.value = getModel(rawSchema.value)
 
-      // model.value = getModel(
-      //   rawSchema.value,
-      //   issetModel.value ? props.modelValue : storeEditedItem.value,
-      //   store.state,
-      // )
-
-      inputSchema.value = validations.invokeRuleGenerator(getSchema(rawSchema.value, model.value, props.isEditing))
-      formEventSchema.value = getFormEventSchema(rawSchema.value, formItem.value, props.isEditing)
+      inputSchema.value = validations.invokeRuleGenerator(getSchema(rawSchema.value, { ...model.value, ...formItem.value }, props.isEditing))
+      formEventSchema.value = getFormEventSchema(rawSchema.value, { ...model.value, ...formItem.value }, props.isEditing)
       // states.extraValids = props.actions.length ? props.actions.map(() => true) : []
       initialize()
       // context.emit('update:schema' )
+
+      setTimeout(() => {
+        setSchemaUpdating(false)
+      }, 500)
     }
   }, { deep: true })
 
   // Watch inputSchema
   watch(() => inputSchema.value, (newValue, oldValue) => {
-
     // if(isEqual(newValue, oldValue) && isEqual(newValue, rawSchema.value)) return
 
     // if(issetSchema.value) {
@@ -704,12 +690,12 @@ export default function useForm(props, context) {
     if( !isEqual(value, oldValue)) {
       const oldModel = cloneDeep(model.value)
       // Changed variable name to avoid conflict
-      const newModel = getModel(value, model.value, store.state)
+      const newModel = getModel(value, props.modelValue, store.state)
 
       if (!isEqual(newModel, oldModel)) {
         model.value = newModel
         inputSchema.value = validations.invokeRuleGenerator(
-          getSchema(value, model.value, props.isEditing)
+          getSchema(value, props.modelValue, props.isEditing)
         )
       }
     }

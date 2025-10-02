@@ -525,7 +525,7 @@ trait FormSchema
                 input: $input,
                 module: $this->module ?? null,
                 routeName: $this->routeName ?? null,
-                skipQueries: Request::ajax() || App::runningInConsole() || false,
+                skipQueries: (Request::ajax() && ! Request::inertia()) || App::runningInConsole() || false,
             );
 
             if (in_array($input['type'], ['input-repeater']) && isset($input['schema'])) {

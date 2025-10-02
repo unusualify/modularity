@@ -11,6 +11,7 @@ import Modularity, {isCustomTheme} from './vite-plugin-modularity'
 import { defineConfig, loadEnv, splitVendorChunkPlugin } from 'vite'
 import { fileURLToPath, URL } from 'node:url'
 import path from 'path'
+import fs from 'fs'
 import { globSync } from 'glob'
 
 import dotenv from 'dotenv'
@@ -79,6 +80,7 @@ export default defineConfig(({ command, mode }) => {
   const outDir = 'dist/modularity'
   // const outDir = fileURLToPath(new URL(`${LARAVEL_ROOT_LEVEL}/public${base}`, import.meta.url))
   const targetDir = fileURLToPath(new URL(`${LARAVEL_ROOT_LEVEL}/public`, import.meta.url))
+  const appDir = fileURLToPath(new URL(`${LARAVEL_ROOT_LEVEL}`, import.meta.url))
   const publicDir = 'public'
 
   const server = {
@@ -113,8 +115,14 @@ export default defineConfig(({ command, mode }) => {
     // },
   }
 
+  const ziggyPath = path.resolve(appDir, 'vendor/tightenco/ziggy')
+  const hasZiggy = fs.existsSync(ziggyPath)
+
   return {
     // envDir: path.resolve(__dirname, '../../../.env'),
+    // define: {
+    //   __HAS_ZIGGY__: JSON.stringify(hasZiggy),
+    // },
     envPrefix,
     base,
     publicDir,
@@ -170,7 +178,8 @@ export default defineConfig(({ command, mode }) => {
         __hooks: fileURLToPath(new URL(`${srcDir}/js/hooks`, import.meta.url)),
         __layouts: fileURLToPath(new URL(`${srcDir}/js/layouts`, import.meta.url)),
         __setup: fileURLToPath(new URL(`${srcDir}/js/setup`, import.meta.url)),
-        '~': fileURLToPath(new URL('./node_modules', import.meta.url))
+        '~': fileURLToPath(new URL('./node_modules', import.meta.url)),
+        '#': fileURLToPath(new URL(`${appDir}`, import.meta.url)),
       }
     },
     build: {

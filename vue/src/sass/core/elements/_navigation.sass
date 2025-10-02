@@ -24,6 +24,10 @@
               width: $sidebar-info-logo-width
               height: $sidebar-info-logo-height
 
+    .ue-inertia-anchor
+      text-decoration: none !important
+      color: inherit
+
   .v-list-group__items
     .v-list-item
       &--nav
@@ -34,7 +38,7 @@
     margin-bottom: calc($spacer * 3)
     &--active
       background: rgba(var(--v-theme-primary), 1)
-      color: rgba(var(--v-theme-on-primary), 1)
+      color: rgba(var(--v-theme-on-primary), 1) !important
       > .v-list-item__overlay
         opacity: 0
 
@@ -53,40 +57,40 @@
     .v-list
       margin-left: unset !important
 
-    .v-list-item
-      display: flex
-      flex-flow: column
-      align-items: center
-      justify-content: center
-      margin: unset !important
-      padding-inline: unset !important
+      .v-list-item
+        display: flex
+        flex-flow: column
+        align-items: center
+        justify-content: center
+        margin: unset !important
+        padding-inline: unset !important
 
-      &:not(.v-list-item--link, .ue-sidebar__info-item)
-        display: none
+        &:not(.ue-navigation-link-item[data-level="0"], .v-list-group .v-list-item.v-list-group__header, .ue-sidebar__info-item)
+          display: none
 
-      .v-avatar
-        --v-avatar-height: 24px
+        .v-avatar
+          --v-avatar-height: 24px
 
-      &--active, > .v-list-item__overlay
-        // width: calc(100% - 4rem)
-        width: calc(50%)
-        min-width: calc( $sidebar-icon-size * 2)
-        max-width: calc( $sidebar-icon-size * 3)
-        left: 50%
-        transform: translateX(-50%)
-        border-radius: 12px
+        &--active, > .v-list-item__overlay
+          // width: calc(100% - 4rem)
+          width: calc(50%)
+          min-width: calc( $sidebar-icon-size * 2)
+          max-width: calc( $sidebar-icon-size * 3)
+          left: 50%
+          transform: translateX(-50%)
+          border-radius: 12px
 
-      > *:not(.v-list-item__prepend, .v-list-item__overlay, .v-list-item__underlay),
-      > .v-list-item__prepend .v-list-item__spacer
-        display: none
+        > *:not(.v-list-item__prepend, .v-list-item__overlay, .v-list-item__underlay),
+        > .v-list-item__prepend .v-list-item__spacer
+          display: none
 
-      .ue-sidebar__avatar
-        width: $sidebar-info-mini-avatar-size
-        height: $sidebar-info-mini-avatar-size
-        .ue-sidebar__logo
-          > span.icon
-            svg
-              width: $sidebar-info-mini-logo-width
-              height: $sidebar-info-mini-logo-height
+        .ue-sidebar__avatar
+          width: $sidebar-info-mini-avatar-size
+          height: $sidebar-info-mini-avatar-size
+          .ue-sidebar__logo
+            > span.icon
+              svg
+                width: $sidebar-info-mini-logo-width
+                height: $sidebar-info-mini-logo-height
 
 
