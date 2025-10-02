@@ -196,8 +196,18 @@ class Module extends NwidartModule
 
     /**
      * Get all routes of the module.
+     *
+     * @deprecated Use getRouteNames() instead
      */
     public function getRoutes(): array
+    {
+        return $this->getRouteNames();
+    }
+
+    /**
+     * Get all routes of the module.
+     */
+    public function getRouteNames(): array
     {
         return $this->moduleActivator->getRoutes();
     }
