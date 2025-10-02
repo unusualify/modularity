@@ -896,7 +896,6 @@
                   :class="action.class ?? ''"
                   >
                   <template v-slot:activator="{ props }">
-                    {{ $log(action) }}
                     <component :is="action.is"
                       @click="itemAction(item, action)"
                       v-bind="{
