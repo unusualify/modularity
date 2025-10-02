@@ -120,9 +120,9 @@ export default defineConfig(({ command, mode }) => {
 
   return {
     // envDir: path.resolve(__dirname, '../../../.env'),
-    define: {
-      __HAS_ZIGGY__: JSON.stringify(hasZiggy),
-    },
+    // define: {
+    //   __HAS_ZIGGY__: JSON.stringify(hasZiggy),
+    // },
     envPrefix,
     base,
     publicDir,
