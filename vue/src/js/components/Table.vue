@@ -742,27 +742,30 @@
           v-slot:[`item.${col.key}`]="{ item }"
         >
           <template v-if="col.formatterName == 'edit' || col.formatterName == 'activate'">
-            <v-tooltip :text="item[col.key]" :key="i" :disabled="col.isFormatting">
+            <v-tooltip :text="item[col.key]" :key="i" :disabled="col.isFormatting" maxWidth="300">
               <template v-slot:activator="{ props }">
-                <span
-                  :key="i"
-                  v-bind="props"
-                  class="pa-0 justify-start text-none text-wrap text-primary darken-1 cursor-pointer"
-                  @click="itemAction(item, col.formatterName)"
-                >
-                  <template v-if="col.isFormatting">
-                    <ue-recursive-stuff
-                      v-bind="handleFormatter(col.formatter, window.__shorten(item[col.key] ?? '', cellOptions.maxChars))"
-                    />
+                <div class="d-flex">
+                  <template v-if="(col.hasCopy ?? false) || col.key.match(/^id|uuid$/)">
+                    <ue-copy-text :text="item[col.key]" class="mr-2"/>
                   </template>
-                  <template v-else>
-                    {{ window.__isset(item[col.key]) ? window.__shorten(item[col.key], col?.textLength ?? 8) : '' }}
-                  </template>
-                </span>
+                  <div
+                    :key="i"
+                    v-bind="props"
+                    class="justify-start text-none text-wrap text-primary darken-1 cursor-pointer text-truncate"
+                    @click="itemAction(item, col.formatterName)"
+                  >
+                    <template v-if="col.isFormatting">
+                      <ue-recursive-stuff
+                        v-bind="handleFormatter(col.formatter, item[col.key])"
+                      />
+                    </template>
+                    <template v-else>
+                      {{ item[col.key] }}
+                    </template>
+                  </div>
+                </div>
 
-                <template v-if="(col.hasCopy ?? false) || col.key.match(/^id|uuid$/)">
-                  <ue-copy-text :text="item[col.key]" />
-                </template>
+
               </template>
             </v-tooltip>
           </template>
