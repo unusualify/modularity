@@ -133,6 +133,7 @@ class LoginController extends Controller
                 'formClass' => 'py-6',
                 'no-default-form-padding' => true,
                 'hasSubmit' => true,
+                'noSchemaUpdatingProgressBar' => true,
             ],
             'formSlots' => [
                 'options' => [
@@ -448,6 +449,7 @@ class LoginController extends Controller
                 'buttonText' => __('authentication.sign-in'),
                 'formClass' => 'py-6',
                 'no-default-form-padding' => true,
+                'noSchemaUpdatingProgressBar' => true,
             ],
             'attributes' => [
                 'noDivider' => true,
@@ -567,7 +569,7 @@ class LoginController extends Controller
                 'buttonText' => __('authentication.complete-registration'),
                 'formClass' => 'py-6',
                 'no-default-form-padding' => true,
-
+                'noSchemaUpdatingProgressBar' => true,
             ],
             'attributes' => [
                 'noDivider' => true,
