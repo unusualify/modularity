@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
 use Unusualify\Modularity\Facades\ModularityLog;
 use Unusualify\Modularity\Http\Controllers\Traits\ManageEvents;
+use Unusualify\Modularity\Http\Controllers\Traits\ManageInertia;
 use Unusualify\Modularity\Http\Controllers\Traits\ManagePrevious;
 use Unusualify\Modularity\Http\Controllers\Traits\ManageSingleton;
 use Unusualify\Modularity\Http\Controllers\Traits\ManageUtilities;
@@ -22,7 +23,7 @@ use Unusualify\Modularity\Services\MessageStage;
 
 abstract class BaseController extends PanelController
 {
-    use ManagePrevious, ManageUtilities, ManageEvents, ManageSingleton;
+    use ManagePrevious, ManageUtilities, ManageEvents, ManageSingleton, ManageInertia;
 
     /**
      * @var string
@@ -64,7 +65,8 @@ abstract class BaseController extends PanelController
 
         $this->addIndexWiths();
 
-        if ($this->request->ajax()) {
+
+        if ($this->request->ajax() && (method_exists($this, 'isInertiaRequest') ? !$this->isInertiaRequest() : true)) {
             if ($this->request->has('ids')) {
                 $ids = $this->request->get('ids');
 
@@ -114,16 +116,7 @@ abstract class BaseController extends PanelController
             $indexData += ['openCreate' => true];
         }
 
-        $view = Collection::make([
-            "$this->viewPrefix.index",
-            "$this->baseKey::" . $this->getSnakeCase($this->routeName) . '.index',
-            "$this->baseKey::layouts.index",
-            "$this->baseKey::layouts.index",
-        ])->first(function ($view) {
-            return View::exists($view);
-        });
-
-        return View::make($view, $indexData);
+        return $this->renderIndex($indexData);
     }
 
     /**
@@ -152,15 +145,7 @@ abstract class BaseController extends PanelController
         // $this->submodule = isset($parentModuleId);
         // $this->submoduleParentId = $parentModuleId;
 
-        $view = Collection::make([
-            "$this->viewPrefix.form",
-            "$this->baseKey::$this->routeName.form",
-            "$this->baseKey::layouts.form",
-        ])->first(function ($view) {
-            return View::exists($view);
-        });
-
-        return View::make($view, $this->getFormData(null));
+        return $this->renderForm($this->getFormData(null));
     }
 
     /**
@@ -331,15 +316,7 @@ abstract class BaseController extends PanelController
 
         $this->setBackLink();
 
-        $view = Collection::make([
-            "$this->viewPrefix.form",
-            "$this->baseKey::$this->routeName.form",
-            "$this->baseKey::layouts.form",
-        ])->first(function ($view) {
-            return View::exists($view);
-        });
-
-        return View::make($view, $this->getFormData($id));
+        return $this->renderForm($this->getFormData($id));
     }
 
     /**

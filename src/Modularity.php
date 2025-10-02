@@ -291,6 +291,16 @@ class Modularity extends FileRepository
     }
 
     /**
+     * Check if inertia should be used.
+     *
+     * @return bool
+     */
+    final public function shouldUseInertia()
+    {
+        return $this->config('use_inertia', false);
+    }
+
+    /**
      * Create a page title callback.
      *
      * @param \Closure $callback

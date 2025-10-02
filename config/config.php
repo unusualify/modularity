@@ -30,6 +30,7 @@ return [
     'js_namespace' => env('VUE_APP_NAME', 'MODULARITY'),
     'build_timeout' => 300,
     'use_big_integers_on_migrations' => true,
+    'use_inertia' => env('MODULARITY_USE_INERTIA', false),
 
     'locale' => 'en',
     'fallback_locale' => 'en',

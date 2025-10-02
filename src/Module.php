@@ -771,6 +771,38 @@ class Module extends NwidartModule
     }
 
     /**
+     * getInertiaPagesPath
+     *
+     * @param string $routeName
+     */
+    public function getInertiaPagesPath($routeName): string
+    {
+        return $this->getDirectoryPath('Resources/assets/Pages/' . $routeName);
+    }
+
+    /**
+     * hasInertiaPagesType
+     *
+     * @param string $routeName
+     * @param string $type
+     */
+    public function hasInertiaPagesType($routeName, $type): bool
+    {
+        return file_exists($this->getInertiaPagesPath($routeName) . '/' . $type . '.vue');
+    }
+
+    /**
+     * getInertiaPagesTypeName
+     *
+     * @param string $routeName
+     * @param string $type
+     */
+    public function getInertiaPagesTypeName($routeName, $type): string
+    {
+        return $this->getName() . '/' . $routeName . '/' . $type;
+    }
+
+    /**
      * getRouteClass
      */
     public function getRouteClass(string $routeName, string $target, bool $asClass = false): string

@@ -15,6 +15,7 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+vue/src/js/Pages/customs
 vue/src/js/components/customs
 vue/src/js/config/themes/customs/**
 !vue/src/js/config/themes/customs/**/.gitkeep
