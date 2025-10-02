@@ -345,8 +345,65 @@ class LoginController extends Controller
         $oauthUser = null;
         try {
             $oauthUser = Socialite::driver($provider)->user();
-        } catch (\Exception $e) {
-            return redirect()->route(Route::hasAdmin('login.form'));
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            $modalService = modularity_modal_service(
+                'error',
+                'mdi-alert-circle-outline',
+                'Authentication Cancelled',
+                'Google authentication was cancelled. Please try again or use alternative login methods.',
+                [
+                    'noCancelButton' => true,
+                    'confirmText' => 'Return to Login',
+                    'confirmButtonAttributes' => [
+                        'color' => 'primary',
+                        'variant' => 'elevated',
+                    ],
+                ]
+            );
+
+            return redirect(merge_url_query(route('admin.login.form'), [
+                'modalService' => $modalService,
+            ]));
+        }
+        catch (\Laravel\Socialite\Two\InvalidStateException $e) {
+            $modalService = modularity_modal_service(
+                'error',
+                'mdi-alert-circle-outline',
+                'Invalid State',
+                'Google authentication was invalid. Please try again or use alternative login methods.',
+                [
+                    'noCancelButton' => true,
+                    'confirmText' => 'Return to Login',
+                    'confirmButtonAttributes' => [
+                        'color' => 'primary',
+                        'variant' => 'elevated',
+                    ],
+                ]
+            );
+
+            return redirect(merge_url_query(route('admin.login.form'), [
+                'modalService' => $modalService,
+            ]));
+        }
+        catch (\Exception $e) {
+            $modalService = modularity_modal_service(
+                'error',
+                'mdi-alert-circle-outline',
+                'General Error',
+                'An error occurred during authentication. Please try again or use alternative login methods.',
+                [
+                    'noCancelButton' => true,
+                    'confirmText' => 'Return to Login',
+                    'confirmButtonAttributes' => [
+                        'color' => 'primary',
+                        'variant' => 'elevated',
+                    ],
+                ]
+            );
+
+            return redirect(merge_url_query(route('admin.login.form'), [
+                'modalService' => $modalService,
+            ]));
         }
 
         $repository = App::make(UserRepository::class);
