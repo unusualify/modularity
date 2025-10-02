@@ -94,6 +94,7 @@ class ModularityNavigation
             $routeName = Route::hasAdmin($array['route_name']);
             if ($routeName) {
                 $array['route'] = route($routeName);
+                $array['is_modularity_route'] = Modularity::isModularityRoute($routeName);
                 if ($array['route'] == $this->request->url()) {
                     $is_active = 1;
                 }
