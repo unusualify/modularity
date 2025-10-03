@@ -1,5 +1,5 @@
 // useConfig.js
-import { computed, toRefs } from 'vue'
+import { computed, toRefs, reactive } from 'vue'
 import { useStore } from 'vuex'
 import store from '@/store'
 import { CONFIG } from '@/store/mutations'
@@ -22,16 +22,19 @@ export default function useConfig() {
     store.commit(CONFIG.DECREASE_AXIOS_REQUEST)
   }
 
-  return {
-    ...toRefs({
-      shouldUseInertia,
-      isRequestInProgress,
-    }),
+  const states = reactive({
+    shouldUseInertia,
+    isRequestInProgress,
+  })
 
-    ...toRefs({
-      setRequestInProgress,
-      increaseAxiosRequest,
-      decreaseAxiosRequest,
-    })
+  const methods = reactive({
+    setRequestInProgress,
+    increaseAxiosRequest,
+    decreaseAxiosRequest,
+  })
+
+  return {
+    ...toRefs(states),
+    ...toRefs(methods),
   }
 }
