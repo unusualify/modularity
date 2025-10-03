@@ -137,8 +137,8 @@ trait CreateVerifiedEmailAccount
     public function setUserRegister(array $credentials)
     {
         $user = User::create([
-            'name' => $credentials['name'],
-            'surname' => $credentials['surname'],
+            'name' => $this->normalizeName($credentials['name']),
+            'surname' => $this->normalizeName($credentials['surname']),
             'email' => $credentials['email'],
             'email_verified_at' => now(),
             'password' => Hash::make($credentials['password']),
@@ -149,5 +149,18 @@ trait CreateVerifiedEmailAccount
         $user->assignRole('client-manager');
 
         return $user;
+    }
+
+    /**
+     * Normalize name by trimming and replacing multiple spaces with single spaces
+     * This matches the frontend nameRule validation logic
+     */
+    protected function normalizeName(?string $name): ?string
+    {
+        if (empty($name)) {
+            return $name;
+        }
+
+        return trim(preg_replace('/\s+/', ' ', $name));
     }
 }
