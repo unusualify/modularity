@@ -5,14 +5,19 @@
     </ue-title>
 
     <v-row>
-      <!-- Preview cards -->
-      <template v-for="(context, index) in formattedPreview" :key="`summary-${index}`">
+      <!-- Country cards (sorted alphabetically) -->
+      <template v-for="(context, index) in sortedCountryCards" :key="`country-${index}`">
         <v-col cols="12" :md="context.col || 6" class="d-flex">
           <ue-configurable-card v-bind="context" elevation="2" title-color="primary" class="my-2 w-100 h-100" col-padding-x="4"/>
         </v-col>
       </template>
 
-      <!-- Final form data -->
+      <!-- Press Release Content card (if exists) -->
+      <v-col v-if="pressReleaseContentCard" cols="12" :md="pressReleaseContentCard.col || 12" class="d-flex">
+        <ue-configurable-card v-bind="pressReleaseContentCard" elevation="2" title-color="primary" class="my-2 w-100 h-100" col-padding-x="4"/>
+      </v-col>
+
+      <!-- Final form data (Add-ons) -->
       <v-col cols="12" v-if="previewFormData.length > 0" v-fit-grid>
         <v-sheet class="px-0">
           <div class="d-flex flex-column ga-2 my-4">
@@ -36,7 +41,7 @@
           </div>
           <!-- Preview form items -->
           <template
-            v-for="(data, index) in previewFormData"
+            v-for="(data, index) in sortedPreviewFormData"
             :key="`final-form-data-${index}`"
           >
             <ue-configurable-card
@@ -111,6 +116,7 @@
                     :color="getFieldColor(data)"
                     @click="$emit('final-form-action', {
                       index: index,
+                      data: data,
                       event: !fieldSelected(data)
                     })"
                     :readonly="isReadOnly(data)"
@@ -157,6 +163,32 @@ export default {
       default: () => {}
     }
   },
+  computed: {
+    sortedCountryCards() {
+      // Filter and sort only country cards (exclude Press Release Content)
+      return [...this.formattedPreview]
+        .filter(card => card.title && !card.title.toLowerCase().includes('press release'))
+        .sort((a, b) => {
+          const titleA = a.title || ''
+          const titleB = b.title || ''
+          return titleA.localeCompare(titleB)
+        })
+    },
+    pressReleaseContentCard() {
+      // Find the Press Release Content card
+      return this.formattedPreview.find(card =>
+        card.title && card.title.toLowerCase().includes('press release')
+      )
+    },
+    sortedPreviewFormData() {
+      // Sort add-ons alphabetically by name
+      return [...this.previewFormData].sort((a, b) => {
+        const nameA = a.name || ''
+        const nameB = b.name || ''
+        return nameA.localeCompare(nameB)
+      })
+    }
+  },
   methods: {
     fieldSelected(data) {
       const fieldName = data.fieldName
@@ -167,7 +199,7 @@ export default {
 
       let selected = false
       if(isString(fieldFormat)){
-        result = includes(values, data[fieldFormat])
+        selected = includes(values, data[fieldFormat])
       }else if(isObject(fieldFormat)){
         let item = values.find(item => item[fieldFormatUniqueKey] === data[fieldFormatSourceKey])
         selected = item !== undefined && item !== null

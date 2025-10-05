@@ -26,7 +26,7 @@
       :key="`stepper-preview-item-subtitle-${inputName}`"
     >
       <template
-        v-for="(context, key) in model[inputName]"
+        v-for="(context, key) in sortedModelData(inputName)"
         :key="`stepper-preview-item-subtitle-${inputName}-${index}`"
       >
         <!-- Array context -->
@@ -79,6 +79,37 @@ export default {
     model: {
       type: Object,
       required: true
+    }
+  },
+  methods: {
+    sortedModelData(inputName) {
+      const data = this.model[inputName]
+
+      if (!data) return {}
+
+      // If it's an array, sort it
+      if (Array.isArray(data)) {
+        return data.sort((a, b) => {
+          // If array elements are strings, sort alphabetically
+          if (typeof a === 'string' && typeof b === 'string') {
+            return a.localeCompare(b)
+          }
+          // If array elements are arrays (like ['Country', 'Package']), sort by first element
+          if (Array.isArray(a) && Array.isArray(b) && a[0] && b[0]) {
+            return a[0].localeCompare(b[0])
+          }
+          return 0
+        })
+      }
+
+      // If it's an object, convert to array of entries and sort by key
+      if (typeof data === 'object') {
+        return Object.entries(data).sort(([keyA], [keyB]) => {
+          return keyA.localeCompare(keyB)
+        })
+      }
+
+      return data
     }
   },
   created() {
