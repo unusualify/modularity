@@ -145,7 +145,9 @@ class BuildCommand extends BaseCommand
 
             $this->runVueProcess(['npm', 'run', 'watch'], true);
         } else {
-            $this->runVueProcess(['npm', 'run', 'build']);
+            $this->runVueProcess(['npm', 'run', 'build'], env: [
+                'VUE_IS_CUSTOM_BUILD' => 'true',
+            ]);
 
             $this->info('');
             $progressBar->setMessage("Publishing assets...\n\n");
@@ -226,17 +228,19 @@ class BuildCommand extends BaseCommand
     /**
      * @return void
      */
-    private function runVueProcess(array $command, $disableTimeout = false)
+    private function runVueProcess(array $command, $disableTimeout = false, $env = [])
     {
-        $process = new Process($command, get_modularity_vendor_path('vue'));
+        $process = new Process($command, get_modularity_vendor_path('vue'), [
+            ...$env,
+        ]);
         $process->setTty(Process::isTtySupported());
 
-        // Add environment variables
-        $process->setEnv([
-            'BASE_PATH' => base_path(),
-            // 'VENDOR_DIR' => modularityConfig('vendor_dir'),
-            'VENDOR_DIR' => Modularity::getVendorDir(),
-        ]);
+        // // Add environment variables
+        // $process->setEnv([
+        //     'BASE_PATH' => base_path(),
+        //     'VENDOR_DIR' => Modularity::getVendorDir(),
+        //     ...$env,
+        // ]);
 
         if ($disableTimeout) {
             $process->setTimeout(null);
@@ -298,7 +302,7 @@ class BuildCommand extends BaseCommand
         $vuePagesPath = Modularity::getVendorPath('vue/src/js/Pages/customs');
 
         // Create customs directory if it doesn't exist
-        if (!is_dir($vuePagesPath)) {
+        if (! is_dir($vuePagesPath)) {
             mkdir($vuePagesPath, 0755, true);
         }
 
@@ -324,11 +328,11 @@ class BuildCommand extends BaseCommand
         $modulesPath = base_path('modules');
         $vuePagesPath = get_modularity_vendor_path('vue/src/js/Pages');
 
-        if (!is_dir($modulesPath)) {
+        if (! is_dir($modulesPath)) {
             $this->warn('Modules directory not found: ' . $modulesPath);
+
             return 0;
         }
-
 
         foreach (Modularity::all() as $module) {
             $moduleName = $module->getName();
@@ -338,7 +342,7 @@ class BuildCommand extends BaseCommand
 
                 $moduleRouteFiles = glob($moduleRoutePath . '/*.vue');
 
-                if(count($moduleRouteFiles) > 0){
+                if (count($moduleRouteFiles) > 0) {
                     // dd($moduleRoutePath, "{$vuePagesPath}/customs/{$moduleName}/{$moduleRouteName}");
                     $this->copyDirectory($moduleRoutePath, "{$vuePagesPath}/customs/{$moduleName}/{$moduleRouteName}", clean: false);
 
