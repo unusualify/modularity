@@ -24,8 +24,7 @@
         :custom-filter="filter"
       >
         <template v-slot:selection="{ item, index }">
-          <v-chip
-            v-if="item === Object(item)"
+          <v-chip v-if="item === Object(item)"
             :color="`${item.raw.color}-lighten-3`"
             :text="item.title"
             size="small"
