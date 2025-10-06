@@ -93,6 +93,8 @@
     </v-layout>
     <ue-alert ref='alert'></ue-alert>
   </v-app>
+
+  <ue-dynamic-modal></ue-dynamic-modal>
 </template>
 <script>
 import { computed } from 'vue'

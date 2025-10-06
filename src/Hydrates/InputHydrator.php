@@ -19,7 +19,7 @@ class InputHydrator
         $input = $this->input;
         if (isset($input['type'])) {
             $hydrateClass = "Unusualify\Modularity\Hydrates\Inputs\\" . studlyName($input['type']) . 'Hydrate';
-            $skipQueries = $this->skipQueries ?? Request::ajax();
+            $skipQueries = $this->skipQueries ?? (Request::ajax() && ! Request::inertia());
 
             if (@class_exists($hydrateClass)) {
                 $input = App::make($hydrateClass, [

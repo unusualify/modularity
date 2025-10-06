@@ -1,10 +1,13 @@
 // hooks/utils/useGenerate.js
 import { computed } from 'vue'
+import { router } from '@inertiajs/vue3'
 import { useDisplay } from 'vuetify'
+import { useConfig } from '@/hooks'
+import { isSameUrl } from '@/utils/pushState'
 
 export default function useGenerate(props, context) {
-
   const { smAndUp } = useDisplay()
+  const { shouldUseInertia } = useConfig()
 
   const generatedButtonProps = computed(() => {
 
@@ -38,7 +41,15 @@ export default function useGenerate(props, context) {
     if(action.href){
       extraProps['onClick'] = (e) => {
         e.preventDefault()
-        window.open(action.href, action.target ?? '_blank')
+        const target = action.target ?? '_blank'
+
+        if(shouldUseInertia.value && isSameUrl(action.href, window.location.href)) {
+          router.visit(action.href)
+        } else if (target !== '_blank') {
+          router.visit(action.href, { target })
+        } else {
+          window.open(action.href, target)
+        }
       }
     }
 

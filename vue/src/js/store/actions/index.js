@@ -43,11 +43,7 @@ export const GET_PREVIEW = 'getPreview'
 export const GET_REVISION = 'getRevisionContent'
 export const GET_CURRENT = 'getCurrentContent'
 
-/* Errors */
-export const HANDLE_ERRORS = 'handleErrors'
-
 export default {
-  HANDLE_ERRORS,
   GET_BUCKETS,
   SAVE_BUCKETS,
   GET_DATATABLE,

@@ -185,6 +185,9 @@ class BaseServiceProvider extends ServiceProvider
 
         $this->app->alias(\Torann\GeoIP\Facades\GeoIP::class, 'GeoIP');
 
+        // Register Inertia middleware
+        $this->app->singleton('inertia.middleware', \Unusualify\Modularity\Http\Middleware\HandleInertiaRequests::class);
+
         $this->app->register(TelescopeServiceProvider::class);
 
         $this->registerTranslationService();
@@ -431,11 +434,11 @@ class BaseServiceProvider extends ServiceProvider
         }
 
         if (config($this->baseKey . '.enabled.media-library')) {
-            View::composer("$this->baseKey::layouts.master", MediasUploaderConfig::class);
+            View::composer(["$this->baseKey::layouts.master", "$this->baseKey::layouts.app-inertia"], MediasUploaderConfig::class);
         }
 
         if (config($this->baseKey . '.enabled.file-library')) {
-            View::composer("$this->baseKey::layouts.master", FilesUploaderConfig::class);
+            View::composer(["$this->baseKey::layouts.master", "$this->baseKey::layouts.app-inertia"], FilesUploaderConfig::class);
         }
 
         // View::composer("$this->baseKey::partials.navigation.*", ActiveNavigation::class);
@@ -449,7 +452,7 @@ class BaseServiceProvider extends ServiceProvider
             return $view->with($with);
         });
 
-        View::composer(["$this->baseKey::layouts.master", "$this->baseKey::auth.layout"], Localization::class);
+        View::composer(["$this->baseKey::layouts.master", "$this->baseKey::auth.layout", "$this->baseKey::layouts.app-inertia"], Localization::class);
     }
 
     /**

@@ -7,7 +7,7 @@ import _ from 'lodash-es'
 import datatableApi from '@/store/api/datatable'
 
 import ACTIONS from '@/store/actions'
-import { useTableItem, useTableNames } from '@/hooks/table'
+import { useTableNames } from '@/hooks/table'
 
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
 
@@ -21,12 +21,11 @@ export const makeTableModalsProps = propsFactory({
 export default function useTableModals(props, context) {
   const store = useStore()
   const { t } = useI18n({ useScope: 'global' })
-  const tableItem = useTableItem()
-  const tableNames = useTableNames(props)
+  const { editedItem } = context.TableItem
+  const TableNames = context.TableNames
 
   // Modal States
   const deleteModalActive = ref(false)
-  // const customModalActive = ref(!(_.isEmpty(store._state.data.datatable.customModal)))
   const customModalActive = ref(props.openCustomModal)
   const actionModalActive = ref(false)
 
@@ -47,9 +46,9 @@ export default function useTableModals(props, context) {
     customModalActive.value = false
   }
   const cleanupModals = () => {
-    if (store._state.data.datatable.customModal) {
-      __removeQueryParams(['customModal[description]', 'customModal[color]', 'customModal[icon]', 'customModal[hideModalCancel]'])
-    }
+    // if (store._state.data.datatable.customModal) {
+    //   __removeQueryParams(['customModal[description]', 'customModal[color]', 'customModal[icon]', 'customModal[hideModalCancel]'])
+    // }
   }
   const setModalType = (type) => {
     activeModalType.value = type
@@ -83,7 +82,7 @@ export default function useTableModals(props, context) {
   // Computed Properties
   const actionDialogQuestion = computed(() => {
     return t('confirm-action', {
-      route: tableNames.transNameSingular.value,
+      route: TableNames.transNameSingular.value,
       action: t(selectedAction.value?.name ?? ''),
     })
   })

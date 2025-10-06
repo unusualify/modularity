@@ -74,6 +74,7 @@ class User extends Authenticatable implements MustVerifyEmailContract
     protected $appends = [
         'company_name',
         'name_with_company',
+        'email_with_company',
         'valid_company',
     ];
 
@@ -219,6 +220,13 @@ class User extends Authenticatable implements MustVerifyEmailContract
     {
         return Attribute::make(
             get: fn () => $this->name . ' (' . ($this->company_name ? $this->company_name : __('System User')) . ')',
+        );
+    }
+
+    protected function emailWithCompany(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->email . ' (' . ($this->company_name ? $this->company_name : __('System User')) . ')',
         );
     }
 

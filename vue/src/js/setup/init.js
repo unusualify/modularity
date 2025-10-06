@@ -693,7 +693,7 @@ export default function init(){
 
     // Check for 401 Unauthenticated error
     if (error.response?.status === 401) {
-      // store.commit(USER.OPEN_LOGIN_MODAL)
+      store.commit(USER.OPEN_LOGIN_MODAL)
     }
     // Do something with response error
     return Promise.reject(error);

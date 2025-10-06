@@ -1,5 +1,3 @@
-/* Datatable */
-export { default as DATATABLE } from './datatable'
 /* Form */
 export { default as FORM } from './form'
 

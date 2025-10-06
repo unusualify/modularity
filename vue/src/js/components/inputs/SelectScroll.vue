@@ -14,9 +14,9 @@
     :item-value="itemValue"
     :item-title="itemTitle"
 
-    :loading="loading"
+    :loading="itemsLoading"
     :readonly="$attrs.readonly || readonly || elements.length === 0"
-    :hide-no-data="loading"
+    :hide-no-data="itemsLoading"
     :no-filter="noFilter"
 
     :rules="rules"
@@ -53,15 +53,15 @@ export default {
     },
   },
   setup (props, context) {
-    const inputHook = useInput(props, context)
-    const inputFetchHook = useInputFetch(props, {
+    const Input = useInput(props, context)
+    const InputFetch = useInputFetch(props, {
       ...context,
-      input: inputHook.input
+      input: Input.input
     })
 
     return {
-      ...inputHook,
-      ...inputFetchHook
+      ...Input,
+      ...InputFetch
     }
   },
   data () {

@@ -157,6 +157,17 @@ export default {
       globalError(component, error)
     })
   },
+  bulkForceDelete (url, ids, callback) {
+    axios.post(url, { ids }).then(function (resp) {
+      if (callback && typeof callback === 'function') callback(resp)
+    }, function (resp) {
+      const error = {
+        message: 'Bulk force delete request error.',
+        value: resp
+      }
+      globalError(component, error)
+    })
+  },
   bulkRestore (url, ids, callback) {
     // axios.post(window[import.meta.env.VUE_APP_NAME].ENDPOINTS.bulkRestore, { ids }).then(function (resp) {
     axios.post(url, { ids }).then(function (resp) {

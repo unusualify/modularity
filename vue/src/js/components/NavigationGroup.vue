@@ -53,6 +53,7 @@
           density="compact"
           :id="item.menuActivator"
           :slim="true"
+          :data-level="level"
 
           @click="$emit('activateMenu', item.menuActivator)"
           >
@@ -77,10 +78,27 @@
       <!-- Handle other components -->
       <v-tooltip v-else bottom :disabled="!showTooltip">
         <template v-slot:activator="{ props }">
-          <div v-bind="props">
+          <component
+            :is="isInertiaLink(item) ? 'ue-link' : 'div'"
+            v-bind="{
+              ...props,
+              ...(isInertiaLink(item)
+                ? {
+                  href: item.route || item.href,
+                  class: 'ue-inertia-anchor'
+                }
+                : {}
+              ),
+            }"
+            :class="[
+              !isInertiaLink(item) ? 'ue-inertia-anchor' : '',
+            ]"
+            >
             <component
               :is="getComponentType(item)"
               v-bind="getComponentProps(item, i)"
+              :data-level="level"
+              class="ue-navigation-link-item"
             >
               <template v-if="item.badge" v-slot:prepend="prependScope">
                 <v-badge color="warning" v-bind="item.badgeProps ?? {}" :content="formatBadgeContent(item.badge)">
@@ -88,7 +106,7 @@
                 </v-badge>
               </template>
             </component>
-          </div>
+          </component>
         </template>
         <span>{{ item.name }}</span>
       </v-tooltip>
@@ -97,7 +115,7 @@
 </template>
 
 <script>
-import { inject } from "vue";
+import { isSamePath, getPath } from '@/utils/pushState'
 
 export default {
   name: "ue-navigation-group",
@@ -169,18 +187,20 @@ export default {
 
   created() {
     this.opened = this.getListGroupOpens([], this.items);
+
   },
   watch: {},
   methods: {
     getComponentType(item) {
       if (this.isSubgroup(item)) return 'v-list-group';
       if (this.isMenu(item)) return 'v-menu-wrapper';
+      // if (this.isInApp(item)) return 'ue-link';
       return 'v-list-item';
+      // return 'ue-link';
     },
     getComponentProps(item, index) {
       const baseProps = {
         index,
-
         // 'active-class': `sidebar-item-active sidebar-item-active-${this.level}`,
       };
 
@@ -210,9 +230,13 @@ export default {
       };
     },
     getListItemProps(item, index) {
+      const isActive = this.isInertiaLink(item)
+        ? isSamePath(this.$page.url, getPath(item.route || item.href))
+        : this.activeIndex === index
+
       const props = {
         nav: true,
-        active: this.activeIndex === index,
+        active: isActive,
         ripple: false,
         append: false,
         title: item.name,
@@ -220,10 +244,16 @@ export default {
       };
 
       if (this.isRoute(item)) {
-        props.href = item.route || item.href;
+        if (!this.isInertiaLink(item)) {
+          props.href = item.route || item.href;
+        }else{
+          props.class = 'ue-inertia-link';
+        }
         Object.assign(props, this.$bindAttributes(item));
       } else if (this.isEvent(item)) {
-        props.onClick = () => this.$call(item.event);
+        props.onClick = () => {
+          this.$call(item.event);
+        }
       } else if (this.isMenuRoute(item)) {
         props.density = 'compact';
         props.href = item.route || item.href;
@@ -255,6 +285,8 @@ export default {
     isHeader: (item) => !item.href && !item.route && !item.items && !!item.name,
     isMenu: (item) => !!item.menuItems,
     isMenuRoute(item){ return !item.menuItems && this.profileMenu && (!!item.route || !!item.href)},
+    isInApp(item){ return item.is_modularity_route ?? false},
+    isInertiaLink(item){ return this.isInApp(item) && this.$shouldUseInertia()},
 
     formatBadgeContent(badge) {
       let value = parseInt(badge);

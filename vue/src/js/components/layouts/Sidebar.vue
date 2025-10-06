@@ -20,9 +20,10 @@
 
     <!-- <ue-svg-icon class="ue-sidebar__logo" symbol="main-logo-light"></ue-svg-icon> -->
     <template v-slot:prepend>
+
       <v-list class="ue-sidebar__info">
+
         <v-list-item
-          v-if="!$store.getters.isSuperAdmin"
           prepend-avatar="https://randomuser.me/api/portraits/women/85.jpg"
           :subtitle="$store.getters.appEmail"
           :title="$store.getters.appName"
@@ -34,17 +35,9 @@
             </v-avatar>
           </template>
         </v-list-item>
-        <div v-else class="mx-3 text-subtitle-2">
-          <div v-for="(version, key) in $store.getters.versions" :key="key" class="d-flex align-center my-1">
-            <div class="flex-grow-1">{{ $headline(key) }}:</div>
-            <div class="flex-grow-0 ml-1 font-weight-bold">{{ version }}</div>
-          </div>
-          <div v-if="$store.getters.isSuperAdmin" v-for="key in ['appName', 'appEnv', 'appDebug']" :key="key" class="d-flex align-center my-1">
-            <div class="flex-grow-1">{{ key === 'appDebug' ? 'Debug Mode' : $headline(key) }}:</div>
-            <div class="flex-grow-0 ml-1 font-weight-bold">{{ key === 'appDebug' ? $store.getters[key] ? 'Active' : 'Inactive' : $store.getters[key] }}</div>
-          </div>
-        </div>
+
       </v-list>
+
       <div class="d-flex align-center position-relatie" style="">
         <v-divider class="flex-grow-1"></v-divider>
         <v-btn
@@ -123,7 +116,7 @@
           </ue-logout-modal>
 
           <!-- About Dialog -->
-          <v-dialog ref="aboutDialog" max-width="500" v-if="$store.getters.versions && !$store.getters.isGuest && !$store.getters.isClient && !$store.getters.isSuperAdmin">
+          <v-dialog ref="aboutDialog" max-width="500" v-if="$store.getters.versions && !$store.getters.isGuest && !$store.getters.isClient">
             <template v-slot:activator="{ props: activatorProps }">
               <v-list-item prepend-icon="mdi-information" v-bind="activatorProps">
                 {{ $t("About") }}

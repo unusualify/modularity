@@ -4,6 +4,7 @@ namespace Unusualify\Modularity\Repositories\Logic;
 
 use Illuminate\Support\Arr;
 use Unusualify\Modularity\Entities\Interfaces\Sortable;
+use Unusualify\Modularity\Facades\ModularityLog;
 
 trait QueryBuilder
 {
@@ -18,7 +19,7 @@ trait QueryBuilder
      * @param int|string|null $id
      * @return \Illuminate\Support\Collection|\Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public function get($with = [], $scopes = [], $orders = [], $perPage = 20, $appends = [], $forcePagination = false, $id = null)
+    public function get($with = [], $scopes = [], $orders = [], $perPage = 20, $appends = [], $forcePagination = false, $id = null, $exceptIds = [])
     {
         $query = $this->model->query();
 
@@ -74,6 +75,10 @@ trait QueryBuilder
 
         $page = request()->get('page') ?? null;
 
+        if ($exceptIds) {
+            $query = $query->whereNotIn('id', $exceptIds);
+        }
+
         if ($id) {
             $totalRows = $query->count();
             // $totalPages = ceil($totalRows / $perPage);
@@ -101,7 +106,32 @@ trait QueryBuilder
 
         try {
 
-            return $query->paginate($perPage, page: $page);
+            $results = $query->paginate($perPage, page: $page);
+
+            try {
+                // Apply appends/mutators
+                if (! empty($appends)) {
+                    $results->getCollection()->transform(function ($item) use ($appends) {
+                        // If $appends is a string, convert to array
+                        $appendArray = is_string($appends) ? explode(',', $appends) : $appends;
+
+                        foreach ($appendArray as $append) {
+                            $item->{$append} = $item->{$append};
+                        }
+
+                        return $item;
+                    });
+                }
+            } catch (\Throwable $th) {
+                ModularityLog::alert('Error applying appends/mutators: ' . $th->getMessage(), [
+                    'appends' => $appends,
+                    'results' => $results->getCollection()->toArray(),
+                    'th' => $th,
+                ]);
+
+            }
+
+            return $results;
 
         } catch (\Throwable $th) {
             dd(
@@ -175,7 +205,7 @@ trait QueryBuilder
      * @param array $schema
      * @return \Illuminate\Support\Collection
      */
-    public function getByIds(array $ids, $with = [], $scopes = [], $orders = [], $isFormatted = false, $schema = null, $lazy = [])
+    public function getByIds(array $ids, $appends = [], $with = [], $scopes = [], $orders = [], $isFormatted = false, $schema = null, $lazy = [])
     {
         $query = $this->model->whereIn('id', $ids);
 
@@ -186,7 +216,7 @@ trait QueryBuilder
         $query = $this->order($query, $orders);
 
         if ($isFormatted) {
-            return $query->get()->map(function ($item) use ($lazy) {
+            return $query->get()->map(function ($item) use ($lazy, $appends) {
 
                 if ($lazy && count($lazy) > 0 && $item instanceof \Illuminate\Database\Eloquent\Model) {
                     foreach ($lazy as $relation) {
@@ -212,6 +242,10 @@ trait QueryBuilder
                             $item->load($relation);
                         }
                     }
+                }
+
+                foreach ($appends as $append) {
+                    $item->{$append} = $item->{$append};
                 }
 
                 return array_merge(
@@ -251,6 +285,16 @@ trait QueryBuilder
                                 $item->load($relation);
                             }
                         }
+                    }
+
+                    return $item;
+                });
+            }
+
+            if ($appends && count($appends) > 0) {
+                $result = $result->map(function ($item) use ($appends) {
+                    foreach ($appends as $append) {
+                        $item->{$append} = $item->{$append};
                     }
 
                     return $item;

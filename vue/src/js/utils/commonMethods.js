@@ -1,7 +1,7 @@
 import { useI18n } from 'vue-i18n'
 import _ from 'lodash-es'
 import pluralize from 'pluralize'
-import { useAuthorization, useCache, useCastAttributes } from '@/hooks'
+import { useAuthorization, useCache, useCastAttributes, useConfig } from '@/hooks'
 
 import { ALERT, CONFIG, USER, CACHE } from '../store/mutations'
 
@@ -34,6 +34,11 @@ export default {
   $main: function () {
 
     return this.$app._instance.refs.main
+  },
+  $shouldUseInertia: function () {
+    const { shouldUseInertia } = useConfig()
+
+    return shouldUseInertia.value
   },
   $profileDialog: function () {
     return this.$root.$refs.sidebar.$refs.profileDialog
@@ -81,7 +86,9 @@ export default {
     this.$store.commit(ALERT.SET_DIALOG, payload)
   },
   $hasRequestInProgress: function () {
-    return this.$store.getters.isRequestInProgress
+    const { isRequestInProgress } = useConfig()
+
+    return isRequestInProgress.value
   },
   $trans: function (key, defaultValue) {
     return this.$lodash.get(window[import.meta.env.VUE_APP_NAME]?.modularityLocalization.lang, key, defaultValue)

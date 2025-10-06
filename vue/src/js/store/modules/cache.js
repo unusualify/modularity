@@ -14,6 +14,9 @@ const getters = {
     const value = state[key] ? (Array.isArray(state[key]) ? _.last(state[key]) : state[key]) : null
 
     return value
+  },
+  [CACHE.HAS_CACHE]: (state) => (key) => {
+    return state[key] !== undefined
   }
 }
 

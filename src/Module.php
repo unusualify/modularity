@@ -196,8 +196,18 @@ class Module extends NwidartModule
 
     /**
      * Get all routes of the module.
+     *
+     * @deprecated Use getRouteNames() instead
      */
     public function getRoutes(): array
+    {
+        return $this->getRouteNames();
+    }
+
+    /**
+     * Get all routes of the module.
+     */
+    public function getRouteNames(): array
     {
         return $this->moduleActivator->getRoutes();
     }
@@ -758,6 +768,38 @@ class Module extends NwidartModule
     public function getTargetClassPath(string $target, $className = null): string
     {
         return $this->getDirectoryPath(GenerateConfigReader::read(kebabCase($target))->getPath()) . ($className ? '/' . $className : '');
+    }
+
+    /**
+     * getInertiaPagesPath
+     *
+     * @param string $routeName
+     */
+    public function getInertiaPagesPath($routeName): string
+    {
+        return $this->getDirectoryPath('Resources/assets/Pages/' . $routeName);
+    }
+
+    /**
+     * hasInertiaPagesType
+     *
+     * @param string $routeName
+     * @param string $type
+     */
+    public function hasInertiaPagesType($routeName, $type): bool
+    {
+        return file_exists($this->getInertiaPagesPath($routeName) . '/' . $type . '.vue');
+    }
+
+    /**
+     * getInertiaPagesTypeName
+     *
+     * @param string $routeName
+     * @param string $type
+     */
+    public function getInertiaPagesTypeName($routeName, $type): string
+    {
+        return $this->getName() . '/' . $routeName . '/' . $type;
     }
 
     /**

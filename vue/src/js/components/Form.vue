@@ -47,7 +47,7 @@
           <template v-slot:right>
             <div class="d-flex mt-2 mt-md-0 gc-2">
               <!-- Title Center Form Actions -->
-              <FormActions v-if="actionsPosition == 'title-center' && isEditing"
+              <FormActions v-if="actionsPosition == 'title-center' && formActionsActive"
                 :modelValue="formItem"
                 :actions="actions"
                 :is-editing="isEditing"
@@ -67,7 +67,7 @@
               </slot>
 
               <!-- Title Right Form Actions -->
-              <FormActions v-if="actionsPosition == 'title-right' && isEditing"
+              <FormActions v-if="actionsPosition == 'title-right' && formActionsActive"
                 :modelValue="formItem"
                 :actions="actions"
                 :is-editing="isEditing"
@@ -137,7 +137,7 @@
         >
           <div class="flex-grow-1 px-1">
             <!-- Top Form Actions -->
-            <FormActions v-if="actionsPosition == 'top' && isEditing"
+            <FormActions v-if="actionsPosition == 'top' && formActionsActive"
               :modelValue="formItem"
               :actions="actions"
               :is-editing="isEditing"
@@ -154,7 +154,7 @@
             <slot name="top" v-bind="{item: formItem, schema}"></slot>
 
             <!-- Middle Form Actions -->
-            <FormActions v-if="actionsPosition == 'middle' && isEditing"
+            <FormActions v-if="actionsPosition == 'middle' && formActionsActive"
               :modelValue="formItem"
               :actions="actions"
               :is-editing="isEditing"
@@ -178,7 +178,7 @@
               />
             </div>
 
-            <v-custom-form-base
+            <v-custom-form-base v-if="!schemaUpdating"
               :class="hasSchemaInputSourceLoading && !noWaitSourceLoading ? 'd-none' : ''"
               :id="formBaseId"
 
@@ -229,8 +229,18 @@
               </template> -->
             </v-custom-form-base>
 
+            <div v-else class="d-flex justify-center align-center h-100 pa-16">
+              <v-progress-circular
+                indeterminate
+                bg-color="primary-lighten-3"
+                color="primary"
+                :size="60"
+                :width="6"
+              />
+            </div>
+
             <!-- Bottom Form Actions -->
-            <FormActions v-if="actionsPosition == 'bottom' && isEditing"
+            <FormActions v-if="actionsPosition == 'bottom' && formActionsActive"
               :modelValue="formItem"
               :actions="actions"
               :is-editing="isEditing"
@@ -264,9 +274,9 @@
               <slot name="right" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema}">
                 <AdditionalSectionContent
                   :actions-position="actionsPosition"
-                  :is-editing="isEditing"
                   :form-item="formItem"
                   :actions="actions"
+                  :form-actions-active="formActionsActive"
                   @action-complete="$emit('actionComplete', $event)"
                 >
                   <template #right-top>
@@ -389,15 +399,15 @@ import FormEvents from './form/FormEvents.vue'
 const AdditionalSectionContent = {
   props: {
     actionsPosition: String,
-    isEditing: Boolean,
     formItem: Object,
-    actions: [Array, Object]
+    actions: [Array, Object],
+    formActionsActive: Boolean
   },
   emits: ['action-complete'],
   template: `
     <div class="mb-2">
       <!-- Right Top Form Actions -->
-      <FormActions v-if="actionsPosition == 'right-top' && isEditing"
+      <FormActions v-if="actionsPosition == 'right-top' && formActionsActive"
         :modelValue="formItem"
         :actions="actions"
         :is-editing="isEditing"
@@ -414,7 +424,7 @@ const AdditionalSectionContent = {
       <slot name="right-top"></slot>
 
       <!-- Right Middle Form Actions -->
-      <FormActions v-if="actionsPosition == 'right-middle' && isEditing"
+      <FormActions v-if="actionsPosition == 'right-middle' && formActionsActive"
         :modelValue="formItem"
         :actions="actions"
         :is-editing="isEditing"
@@ -431,7 +441,7 @@ const AdditionalSectionContent = {
       <slot name="right-middle"></slot>
 
       <!-- Right Bottom Form Actions -->
-      <FormActions v-if="actionsPosition == 'right-bottom' && isEditing"
+      <FormActions v-if="actionsPosition == 'right-bottom' && formActionsActive"
         :modelValue="formItem"
         :actions="actions"
         :is-editing="isEditing"

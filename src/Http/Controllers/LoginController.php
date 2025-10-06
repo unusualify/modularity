@@ -135,6 +135,7 @@ class LoginController extends Controller
                 'formClass' => 'py-6',
                 'no-default-form-padding' => true,
                 'hasSubmit' => true,
+                'noSchemaUpdatingProgressBar' => true,
             ],
             'formSlots' => [
                 'options' => [
@@ -345,8 +346,63 @@ class LoginController extends Controller
         $oauthUser = null;
         try {
             $oauthUser = Socialite::driver($provider)->user();
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            $modalService = modularity_modal_service(
+                'error',
+                'mdi-alert-circle-outline',
+                'Authentication Cancelled',
+                'Google authentication was cancelled. Please try again or use alternative login methods.',
+                [
+                    'noCancelButton' => true,
+                    'confirmText' => 'Return to Login',
+                    'confirmButtonAttributes' => [
+                        'color' => 'primary',
+                        'variant' => 'elevated',
+                    ],
+                ]
+            );
+
+            return redirect(merge_url_query(route('admin.login.form'), [
+                'modalService' => $modalService,
+            ]));
+        } catch (\Laravel\Socialite\Two\InvalidStateException $e) {
+            $modalService = modularity_modal_service(
+                'error',
+                'mdi-alert-circle-outline',
+                'Invalid State',
+                'Google authentication was invalid. Please try again or use alternative login methods.',
+                [
+                    'noCancelButton' => true,
+                    'confirmText' => 'Return to Login',
+                    'confirmButtonAttributes' => [
+                        'color' => 'primary',
+                        'variant' => 'elevated',
+                    ],
+                ]
+            );
+
+            return redirect(merge_url_query(route('admin.login.form'), [
+                'modalService' => $modalService,
+            ]));
         } catch (\Exception $e) {
-            return redirect()->route(Route::hasAdmin('login.form'));
+            $modalService = modularity_modal_service(
+                'error',
+                'mdi-alert-circle-outline',
+                'General Error',
+                'An error occurred during authentication. Please try again or use alternative login methods.',
+                [
+                    'noCancelButton' => true,
+                    'confirmText' => 'Return to Login',
+                    'confirmButtonAttributes' => [
+                        'color' => 'primary',
+                        'variant' => 'elevated',
+                    ],
+                ]
+            );
+
+            return redirect(merge_url_query(route('admin.login.form'), [
+                'modalService' => $modalService,
+            ]));
         }
 
         $repository = App::make(UserRepository::class);
@@ -429,6 +485,7 @@ class LoginController extends Controller
                             ['email'],
                         ],
                         'readonly' => true,
+                        'clearable' => false,
                     ],
                     'password' => [
                         'type' => 'password',
@@ -457,6 +514,7 @@ class LoginController extends Controller
                 'buttonText' => __('authentication.sign-in'),
                 'formClass' => 'py-6',
                 'no-default-form-padding' => true,
+                'noSchemaUpdatingProgressBar' => true,
             ],
             'attributes' => [
                 'noDivider' => true,
@@ -576,7 +634,7 @@ class LoginController extends Controller
                 'buttonText' => __('authentication.complete-registration'),
                 'formClass' => 'py-6',
                 'no-default-form-padding' => true,
-
+                'noSchemaUpdatingProgressBar' => true,
             ],
             'attributes' => [
                 'noDivider' => true,

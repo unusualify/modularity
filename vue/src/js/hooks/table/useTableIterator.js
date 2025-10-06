@@ -3,7 +3,7 @@ import { watch, computed, nextTick, reactive, toRefs, ref, watchEffect } from 'v
 import { propsFactory } from "vuetify/lib/util/propsFactory.mjs";
 import { useFormatter, useRoot } from '@/hooks'
 
-import { useTableItemActions } from '@/hooks/table'
+import { useTableItemActions, useTableItem, useTableNames, useTableForms } from '@/hooks/table'
 
 export const makeTableIteratorProps = propsFactory({
   name: {
@@ -42,7 +42,10 @@ export const tableIterableEmits = [
 ]
 
 export default function useTableIterator(props, context){
-  const { itemHasAction } = useTableItemActions(props, context)
+  const TableItem = useTableItem(props)
+  const TableNames = useTableNames(props, {...context, TableItem})
+  const TableForms = useTableForms(props, {...context, ...TableNames, TableItem})
+  const { itemHasAction } = useTableItemActions(props, {...context, TableNames, TableItem, TableForms})
 
   const state = reactive({
     id: Math.ceil(Math.random() * 1000000 ) + ' -iterator',
