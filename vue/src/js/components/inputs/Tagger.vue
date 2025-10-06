@@ -239,12 +239,6 @@ export default {
 }
 </script>
 
-<style lang="sass">
-  .v-input-tagger
-
-
-</style>
-
 <style lang="scss">
 
 </style>
