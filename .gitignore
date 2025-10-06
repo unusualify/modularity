@@ -1,4 +1,5 @@
 composer.lock
+modularity.hot
 /.phpunit.cache
 /node_modules
 /vendor
@@ -6,6 +7,8 @@ composer.lock
 .env.backup
 .env.production
 .env.development
+.env.staging
+.env.local
 .phpunit.result.cache
 Homestead.json
 Homestead.yaml
