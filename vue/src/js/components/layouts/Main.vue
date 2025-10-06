@@ -362,7 +362,7 @@
           Store.commit(ALERT.SET_ALERT, {...res})
           if(res.timeout) {
             setTimeout(() => {
-              if(shouldUseInertia.value) {
+              if(shouldUseInertia.value && false) {
                 router.reload()
                 Store.commit(USER.CLOSE_LOGIN_MODAL)
               } else {
@@ -370,7 +370,7 @@
               }
             }, res.timeout)
           }else{
-            if(shouldUseInertia.value) {
+            if(shouldUseInertia.value && false) {
               router.reload()
               Store.commit(USER.CLOSE_LOGIN_MODAL)
             } else {
