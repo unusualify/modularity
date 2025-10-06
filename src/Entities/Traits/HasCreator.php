@@ -51,7 +51,7 @@ trait HasCreator
         });
 
         static::saved(function ($model) {
-            if($model->wasRecentlyCreated){
+            if ($model->wasRecentlyCreated) {
                 if ($model->isCustomCreatorSaving) {
                     $guard = Auth::guard();
                     $model->creatorRecord()->create([

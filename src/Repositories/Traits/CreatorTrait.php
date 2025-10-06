@@ -26,18 +26,18 @@ trait CreatorTrait
     public function getFormFieldsCreatorTrait($object, $fields, $schema = [])
     {
         // set, cast, unset or manipulate the fields by using object, fields and schema
-        if(isset($schema['custom_creator_id'])){
+        if (isset($schema['custom_creator_id'])) {
             $creatorInput = $schema['custom_creator_id'];
             $isAllowed = true;
 
-            if(isset($creatorInput['allowedRoles'])){
+            if (isset($creatorInput['allowedRoles'])) {
                 $allowedRoles = $creatorInput['allowedRoles'];
-                if(!(Auth::check() && Auth::user()->hasRole($allowedRoles))){
+                if (! (Auth::check() && Auth::user()->hasRole($allowedRoles))) {
                     $isAllowed = false;
                 }
             }
 
-            if($isAllowed && $object->creator()->exists()){
+            if ($isAllowed && $object->creator()->exists()) {
                 $fields['custom_creator_id'] = $object?->creator?->id;
             }
         }
@@ -48,7 +48,7 @@ trait CreatorTrait
     public function prependFormSchemaCreatorTrait($scope = [])
     {
         return [
-            (object)[
+            (object) [
                 'type' => 'creator',
             ],
         ];

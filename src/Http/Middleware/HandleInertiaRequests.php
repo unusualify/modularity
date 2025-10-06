@@ -11,6 +11,7 @@ class HandleInertiaRequests extends Middleware
      * The root template that's loaded on the first page visit.
      *
      * @see https://inertiajs.com/server-side-setup#root-template
+     *
      * @var string
      */
     protected $rootView = 'modularity::layouts.app-inertia';
@@ -19,8 +20,6 @@ class HandleInertiaRequests extends Middleware
      * Determines the current asset version.
      *
      * @see https://inertiajs.com/asset-versioning
-     * @param  \Illuminate\Http\Request  $request
-     * @return string|null
      */
     public function version(Request $request): ?string
     {
@@ -31,8 +30,6 @@ class HandleInertiaRequests extends Middleware
      * Defines the props that are shared by default.
      *
      * @see https://inertiajs.com/shared-data
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
      */
     public function share(Request $request): array
     {
@@ -51,7 +48,7 @@ class HandleInertiaRequests extends Middleware
                 'js_namespace' => modularityConfig('js_namespace'),
                 'timezone' => modularityConfig('timezone'),
             ],
-            'endpoints' => fn () => $request->attributes->get('endpoints', new \StdClass()),
+            'endpoints' => fn () => $request->attributes->get('endpoints', new \StdClass),
 
             'authorization' => fn () => $this->getAuthorizationData($request),
             'storeData' => fn () => $this->getStoreData($request),
@@ -65,7 +62,7 @@ class HandleInertiaRequests extends Middleware
     {
         $user = $request->user();
 
-        if (!$user) {
+        if (! $user) {
             return [];
         }
 
@@ -94,13 +91,13 @@ class HandleInertiaRequests extends Middleware
                 'secondarySidebarOptions' => modularityConfig('ui_settings.secondarySidebar'),
             ],
             'user' => [
-                'isGuest' => !$user,
+                'isGuest' => ! $user,
                 'profile' => $user ? $user->toArray() : [],
                 'profileRoute' => $user ? route('admin.profile.update') : '',
-                'profileShortcutModel' => new \StdClass(),
-                'profileShortcutSchema' => new \StdClass(),
-                'loginShortcutModel' => new \StdClass(),
-                'loginShortcutSchema' => new \StdClass(),
+                'profileShortcutModel' => new \StdClass,
+                'profileShortcutSchema' => new \StdClass,
+                'loginShortcutModel' => new \StdClass,
+                'loginShortcutSchema' => new \StdClass,
                 'loginRoute' => route('admin.login'),
             ],
             'medias' => [
@@ -154,7 +151,7 @@ class HandleInertiaRequests extends Middleware
                 'total' => \Unusualify\Modularity\Entities\Media::query()->authorized()->count(),
                 'endpoint' => route('admin.media-library.media.index'),
                 'tagsEndpoint' => route('admin.media-library.media.tags'),
-                'uploaderConfig' => []
+                'uploaderConfig' => [],
             ];
         }
 
@@ -165,7 +162,7 @@ class HandleInertiaRequests extends Middleware
                 'total' => \Unusualify\Modularity\Entities\File::query()->authorized()->count(),
                 'endpoint' => route('admin.file-library.file.index'),
                 'tagsEndpoint' => route('admin.file-library.file.tags'),
-                'uploaderConfig' => []
+                'uploaderConfig' => [],
             ];
         }
 

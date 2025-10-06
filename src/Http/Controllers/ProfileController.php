@@ -240,7 +240,7 @@ class ProfileController extends BaseController
         $pageTitle = __('Profile Settings') . ' - ' . \Unusualify\Modularity\Facades\Modularity::pageTitle();
         $headerTitle = __('My Profile');
 
-        if($this->shouldUseInertia()) {
+        if ($this->shouldUseInertia()) {
             return $this->renderInertiaProfile(compact('elements', 'endpoints', 'pageTitle', 'headerTitle'));
         }
 
@@ -255,7 +255,7 @@ class ProfileController extends BaseController
 
         return \Inertia\Inertia::render('Profile', [
             'elements' => $data['elements'] ?? [],
-            'endpoints' => $data['endpoints'] ?? new \StdClass(),
+            'endpoints' => $data['endpoints'] ?? new \StdClass,
             'mainConfiguration' => $this->getInertiaMainConfiguration($data),
             'headLayoutData' => $this->getHeadLayoutData($data),
         ]);

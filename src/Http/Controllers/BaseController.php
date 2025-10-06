@@ -65,7 +65,7 @@ abstract class BaseController extends PanelController
 
         $this->addIndexWiths();
 
-        if ($this->request->ajax() && (method_exists($this, 'isInertiaRequest') ? !$this->isInertiaRequest() : true)) {
+        if ($this->request->ajax() && (method_exists($this, 'isInertiaRequest') ? ! $this->isInertiaRequest() : true)) {
             if ($this->request->has('ids')) {
                 $ids = $this->request->get('ids');
 
@@ -111,7 +111,7 @@ abstract class BaseController extends PanelController
                 $with = explode(',', $with);
             }
 
-            if (!is_array($with)) {
+            if (! is_array($with)) {
                 $with = [];
             }
 

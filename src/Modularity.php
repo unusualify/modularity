@@ -448,9 +448,6 @@ class Modularity extends FileRepository
 
     /**
      * Check if a route is a modularity route via admin route name prefix.
-     *
-     * @param string $routeName
-     * @return bool
      */
     public function isModularityRoute(string $routeName): bool
     {

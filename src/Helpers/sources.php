@@ -290,5 +290,3 @@ if (! function_exists('get_modularity_inertia_main_configuration')) {
         ], $data['_mainConfiguration'] ?? []);
     }
 }
-
-

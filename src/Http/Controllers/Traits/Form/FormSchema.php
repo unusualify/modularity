@@ -52,20 +52,18 @@ trait FormSchema
             ? $this->formSchema($inputs)
             : $inputs;
 
-        if($this->repository){
-            if(method_exists($this->repository, 'appendFormSchema')){
+        if ($this->repository) {
+            if (method_exists($this->repository, 'appendFormSchema')) {
                 $inputs = array_merge($inputs, $this->repository->appendFormSchema());
             }
-            if(method_exists($this->repository, 'prependFormSchema')){
+            if (method_exists($this->repository, 'prependFormSchema')) {
                 $inputs = array_merge($this->repository->prependFormSchema($inputs), $inputs);
             }
         }
 
-
         if (isset(static::$formSchemaCallbacks[static::class]) && is_callable(static::$formSchemaCallbacks[static::class])) {
             $inputs = call_user_func(static::$formSchemaCallbacks[static::class], object_to_array($inputs));
         }
-
 
         return $this->createFormSchema($inputs);
     }

@@ -110,7 +110,7 @@ trait QueryBuilder
 
             try {
                 // Apply appends/mutators
-                if (!empty($appends)) {
+                if (! empty($appends)) {
                     $results->getCollection()->transform(function ($item) use ($appends) {
                         // If $appends is a string, convert to array
                         $appendArray = is_string($appends) ? explode(',', $appends) : $appends;
@@ -260,7 +260,7 @@ trait QueryBuilder
             $result = $query->get();
 
             if ($lazy && count($lazy) > 0) {
-                $result = $result->map(function ($item) use ($lazy, $appends) {
+                $result = $result->map(function ($item) use ($lazy) {
                     if ($lazy && count($lazy) > 0 && $item instanceof \Illuminate\Database\Eloquent\Model) {
                         foreach ($lazy as $relation) {
                             $parts = explode('.', $relation);
@@ -291,7 +291,7 @@ trait QueryBuilder
                 });
             }
 
-            if($appends && count($appends) > 0) {
+            if ($appends && count($appends) > 0) {
                 $result = $result->map(function ($item) use ($appends) {
                     foreach ($appends as $append) {
                         $item->{$append} = $item->{$append};

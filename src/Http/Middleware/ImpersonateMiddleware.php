@@ -4,8 +4,6 @@ namespace Unusualify\Modularity\Http\Middleware;
 
 use Closure;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Route;
 use Unusualify\Modularity\Facades\Modularity;
 
 class ImpersonateMiddleware

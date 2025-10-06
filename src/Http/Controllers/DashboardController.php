@@ -48,7 +48,7 @@ class DashboardController extends BaseController
         $pageTitle = __('Dashboard') . ' - ' . \Unusualify\Modularity\Facades\Modularity::pageTitle();
         $headerTitle = __('Dashboard');
 
-        if($this->shouldUseInertia()) {
+        if ($this->shouldUseInertia()) {
             return $this->renderInertiaDashboard(compact('blockItems', 'endpoints', 'pageTitle', 'headerTitle'));
         }
 
@@ -64,7 +64,7 @@ class DashboardController extends BaseController
 
         return \Inertia\Inertia::render('Dashboard', [
             'blockItems' => $data['blockItems'] ?? [],
-            'endpoints' => $data['endpoints'] ?? new \StdClass(),
+            'endpoints' => $data['endpoints'] ?? new \StdClass,
             'mainConfiguration' => $this->getInertiaMainConfiguration($data),
             'headLayoutData' => $this->getHeadLayoutData($data),
         ]);

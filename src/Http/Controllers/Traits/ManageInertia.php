@@ -3,13 +3,11 @@
 namespace Unusualify\Modularity\Http\Controllers\Traits;
 
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\View;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
 use Unusualify\Modularity\Facades\Modularity;
-use Unusualify\Modularity\Facades\Navigation;
 
 trait ManageInertia
 {
@@ -35,6 +33,7 @@ trait ManageInertia
     public function isInertiaRequest(): bool
     {
         return Request::inertia();
+
         return $this->request->header('X-Inertia') === 'true';
     }
 
@@ -75,7 +74,7 @@ trait ManageInertia
             'tableAttributes' => $data['tableAttributes'] ?? [],
             // 'tableStore' => $data['tableStore'] ?? new \StdClass(),
             // 'formStore' => $data['formStore'] ?? new \StdClass(),
-            'endpoints' => $data['endpoints'] ?? new \StdClass(),
+            'endpoints' => $data['endpoints'] ?? new \StdClass,
             'mainConfiguration' => $this->getInertiaMainConfiguration($data),
             'headLayoutData' => $this->getHeadLayoutData($data),
         ]);
@@ -93,7 +92,7 @@ trait ManageInertia
         return Inertia::render($pageComponent, [
             'formAttributes' => $data['formAttributes'] ?? [],
             // 'formStore' => $data['formStore'] ?? new \StdClass(),
-            'endpoints' => $data['endpoints'] ?? new \StdClass(),
+            'endpoints' => $data['endpoints'] ?? new \StdClass,
             'mainConfiguration' => $this->getInertiaMainConfiguration($data),
             'headLayoutData' => $this->getHeadLayoutData($data),
         ]);
@@ -125,6 +124,7 @@ trait ManageInertia
         // This could be implemented to check if the Vue component file exists
         // For now, we rely on the Inertia resolver to handle fallbacks
         $vueFile = resource_path("js/Pages/{$componentPath}.vue");
+
         return file_exists($vueFile);
     }
 

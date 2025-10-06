@@ -3,7 +3,6 @@
 namespace Unusualify\Modularity\Http\ViewComposers;
 
 use Illuminate\Contracts\View\View;
-use Illuminate\Support\Facades\Lang;
 
 class Localization
 {

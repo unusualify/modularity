@@ -3,8 +3,6 @@
 namespace Unusualify\Modularity\Http\Middleware;
 
 use Closure;
-use Illuminate\Support\Facades\Auth;
-use Unusualify\Modularity\Facades\Navigation;
 
 class NavigationMiddleware
 {
@@ -18,7 +16,7 @@ class NavigationMiddleware
     {
         view()->composer([
             modularityBaseKey() . '::layouts.*',
-            'translation::layout'
+            'translation::layout',
         ], function ($view) {
             $view->with('navigation', get_modularity_navigation_config());
         });

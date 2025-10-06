@@ -381,7 +381,6 @@ trait MethodTransformers
         return $formSchema;
     }
 
-
     /**
      * @param array $scope
      * @return array

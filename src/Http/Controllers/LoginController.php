@@ -365,8 +365,7 @@ class LoginController extends Controller
             return redirect(merge_url_query(route('admin.login.form'), [
                 'modalService' => $modalService,
             ]));
-        }
-        catch (\Laravel\Socialite\Two\InvalidStateException $e) {
+        } catch (\Laravel\Socialite\Two\InvalidStateException $e) {
             $modalService = modularity_modal_service(
                 'error',
                 'mdi-alert-circle-outline',
@@ -385,8 +384,7 @@ class LoginController extends Controller
             return redirect(merge_url_query(route('admin.login.form'), [
                 'modalService' => $modalService,
             ]));
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             $modalService = modularity_modal_service(
                 'error',
                 'mdi-alert-circle-outline',
