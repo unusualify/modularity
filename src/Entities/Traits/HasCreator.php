@@ -34,29 +34,14 @@ trait HasCreator
 
     protected static function bootHasCreator()
     {
-        static::created(function ($model) {
-            if ($model->isCustomCreatorSaving) {
-                $model->creatorRecord()->create($model->customHasCreatorFields);
-                $model->isCustomCreatorSaving = false;
-                $model->customHasCreatorFields = [];
-            } elseif (Auth::check()) {
-                $guard = Auth::guard();
-                $model->creatorRecord()->create([
-                    'creator_id' => $guard->id(), // creator user id
-                    'creator_type' => $guard->getProvider()->getModel(), // creator model
-                    'guard_name' => $guard->name,
-                ]);
-            }
-        });
-
         static::saving(function ($model) {
             if ($model->custom_creator_id) {
-                $guard = Auth::guard();
+                // if model is updating,
                 $model->isCustomCreatorSaving = true;
                 $model->customHasCreatorFields = [
                     'creator_id' => $model->custom_creator_id,
-                    'creator_type' => $model->custom_creator_type ?? static::getDefaultCreatorModel(),
-                    'guard_name' => $model->custom_guard_name ?? $guard->name,
+                    ...($model->custom_creator_type ? ['creator_type' => $model->custom_creator_type] : []),
+                    ...($model->custom_guard_name ? ['guard_name' => $model->custom_guard_name] : []),
                 ];
             }
 
@@ -65,8 +50,35 @@ trait HasCreator
             }
         });
 
-        static::creating(function ($model) {
-            // dd($model);
+        static::saved(function ($model) {
+            if($model->wasRecentlyCreated){
+                if ($model->isCustomCreatorSaving) {
+                    $guard = Auth::guard();
+                    $model->creatorRecord()->create([
+                        'creator_type' => $guard->getProvider()->getModel(),
+                        'guard_name' => $guard->name,
+                        ...$model->customHasCreatorFields,
+                    ]);
+                    $model->isCustomCreatorSaving = false;
+                    $model->customHasCreatorFields = [];
+                } elseif (Auth::check()) {
+                    $guard = Auth::guard();
+                    $model->creatorRecord()->create([
+                        'creator_id' => $guard->id(), // creator user id
+                        'creator_type' => $guard->getProvider()->getModel(), // creator model
+                        'guard_name' => $guard->name,
+                    ]);
+                }
+            } else { // updated, so it exists
+                if ($model->isCustomCreatorSaving) {
+                    // dd($model->customHasCreatorFields, $model->isCustomCreatorSaving, $model);
+                    $model->creatorRecord()->updateOrCreate([
+                        'creatable_type' => get_class($model),
+                        'creatable_id' => $model->id,
+                    ], $model->customHasCreatorFields);
+                }
+
+            }
         });
 
         if (in_array('Illuminate\Database\Eloquent\SoftDeletes', class_uses_recursive(static::class))) {
