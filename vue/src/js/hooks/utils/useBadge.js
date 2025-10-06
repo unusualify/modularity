@@ -1,5 +1,6 @@
 // hooks/utils/useBadge.js
 import { computed } from 'vue'
+import { toNumber, isNumber } from 'lodash'
 
 export default function useBadge(props, context) {
 
@@ -11,10 +12,13 @@ export default function useBadge(props, context) {
     let badge = action.badge
 
     if(window.__isString(badge)){
-      badge = parseInt(badge)
+      let badgeNumber = toNumber(badge)
+
+      if(!isNaN(badgeNumber))
+        return badgeNumber > 0
     }
 
-    return badge > 0
+    return badge
   }
 
   const badgeProps = (action) => {
