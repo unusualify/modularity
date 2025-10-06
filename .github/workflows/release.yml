@@ -20,64 +20,64 @@ jobs:
           fetch-depth: 0
       - name: Extract tag name
         run: echo "TAG_NAME=${GITHUB_REF#refs/heads/release/}" >> $GITHUB_ENV
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 8.3
-          extensions: json, dom, curl, libxml, mbstring
-          coverage: none
+      # - name: Setup PHP
+      #   uses: shivammathur/setup-php@v2
+      #   with:
+      #     php-version: 8.3
+      #     extensions: json, dom, curl, libxml, mbstring
+      #     coverage: none
 
-      - name: Install Pint
-        run: composer global require laravel/pint
+      # - name: Install Pint
+      #   run: composer global require laravel/pint
 
-      - name: Run Pint
-        run: pint
+      # - name: Run Pint
+      #   run: pint
 
-      - name: Check for Vue changes
-        id: check-vue-changes
-        run: |
-          # git diff --quiet HEAD^ HEAD vue/src/ vue/public/ || echo "vue_changed=true" >> $GITHUB_OUTPUT
-          git diff --quiet HEAD^ HEAD vue/ || echo "vue_changed=true" >> $GITHUB_OUTPUT
+      # - name: Check for Vue changes
+      #   id: check-vue-changes
+      #   run: |
+      #     # git diff --quiet HEAD^ HEAD vue/src/ vue/public/ || echo "vue_changed=true" >> $GITHUB_OUTPUT
+      #     git diff --quiet HEAD^ HEAD vue/ || echo "vue_changed=true" >> $GITHUB_OUTPUT
 
-      - name: Setup Node.js
-        if: steps.check-vue-changes.outputs.vue_changed == 'true'
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
+      # - name: Setup Node.js
+      #   if: steps.check-vue-changes.outputs.vue_changed == 'true'
+      #   uses: actions/setup-node@v4
+      #   with:
+      #     node-version: '18'
 
-      - name: Install Vue dependencies
-        if: steps.check-vue-changes.outputs.vue_changed == 'true'
-        working-directory: vue
-        run: npm install
+      # - name: Install Vue dependencies
+      #   if: steps.check-vue-changes.outputs.vue_changed == 'true'
+      #   working-directory: vue
+      #   run: npm install
 
-      - name: Build Vue
-        if: steps.check-vue-changes.outputs.vue_changed == 'true'
-        working-directory: vue
-        run: npm run build
+      # - name: Build Vue
+      #   if: steps.check-vue-changes.outputs.vue_changed == 'true'
+      #   working-directory: vue
+      #   run: npm run build
 
-      - name: Stage changes, commit and tag it
-        run: |
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-          # Check if vue/dist has changes and commit if necessary
-          if [ -d "vue/dist" ] && git status vue/dist --porcelain | grep .; then
-            git add vue/dist
-            git commit -m "build(vue): update build artifacts for ${{ env.TAG_NAME }}"
-          fi
-          # Continue with other changes
-          git add .
-          git diff --quiet && git diff --staged --quiet || git commit -m "style(laravel): lint coding styles for ${{ env.TAG_NAME }}"
-          git push
-          git checkout main
-          git merge --no-ff ${{ github.ref }}
-          git tag ${{ env.TAG_NAME }}
+      # - name: Stage changes, commit and tag it
+      #   run: |
+      #     git config user.name github-actions
+      #     git config user.email github-actions@github.com
+      #     # Check if vue/dist has changes and commit if necessary
+      #     if [ -d "vue/dist" ] && git status vue/dist --porcelain | grep .; then
+      #       git add vue/dist
+      #       git commit -m "build(vue): update build artifacts for ${{ env.TAG_NAME }}"
+      #     fi
+      #     # Continue with other changes
+      #     git add .
+      #     git diff --quiet && git diff --staged --quiet || git commit -m "style(laravel): lint coding styles for ${{ env.TAG_NAME }}"
+      #     git push
+      #     git checkout main
+      #     git merge --no-ff ${{ github.ref }}
+      #     git tag ${{ env.TAG_NAME }}
 
-      - name: Push changes
-        uses: ad-m/github-push-action@master
-        with:
-          # branch: ${{ github.event.inputs.major_version }}
-          branch: 'main'
-          force: true
+      # - name: Push changes
+      #   uses: ad-m/github-push-action@master
+      #   with:
+      #     # branch: ${{ github.event.inputs.major_version }}
+      #     branch: 'main'
+      #     force: true
       - uses: oobook/automated-tag@v1
         id: tag-generation
         with:
