@@ -157,7 +157,10 @@ export default {
     // app.config.globalProperties.registerComponents(includeLabComponents, 'labs')
     app.config.globalProperties.registerComponents(includeLayouts, 'layouts')
     app.config.globalProperties.registerComponents(includeFormInputs, 'inputs', 'VInput')
-    app.config.globalProperties.registerComponents(includeCustomComponents, 'customs', 'UeCustom')
+
+    if ( import.meta.env.VUE_IS_CUSTOM_BUILD || false ) {
+      app.config.globalProperties.registerComponents(includeCustomComponents, 'customs', 'UeCustom')
+    }
 
     // Directives
     app.directive('mask', VueMaskDirective)

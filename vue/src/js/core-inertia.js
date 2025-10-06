@@ -30,13 +30,19 @@ createInertiaApp({
       let moduleRouteName = segments.length > 0 ? segments.pop() : null
       let moduleName = null
 
+      const isCustomBuild = import.meta.env.VUE_IS_CUSTOM_BUILD || false
+
       if(segments.length > 0){
         moduleName = segments.pop()
       }
 
-      const customPages = import.meta.glob('./Pages/customs/**/*.vue', { eager: true })
+      let page = null
 
-      let page = customPages[`./Pages/customs/${name}.vue`]
+      if(isCustomBuild){
+        const customPages = import.meta.glob('./Pages/customs/**/*.vue', { eager: true })
+
+        page = customPages[`./Pages/customs/${name}.vue`]
+      }
 
       if(!page){
         const pages = import.meta.glob('./Pages/**/*.vue', { eager: true })
