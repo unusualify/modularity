@@ -65,7 +65,6 @@ abstract class BaseController extends PanelController
 
         $this->addIndexWiths();
 
-
         if ($this->request->ajax() && (method_exists($this, 'isInertiaRequest') ? !$this->isInertiaRequest() : true)) {
             if ($this->request->has('ids')) {
                 $ids = $this->request->get('ids');
@@ -89,9 +88,15 @@ abstract class BaseController extends PanelController
                     $orders = explode(',', $orders);
                 }
 
+                $appends = $this->request->get('appends') ?? [];
+                if (is_string($appends)) {
+                    $appends = explode(',', $appends);
+                }
+
                 return Response::json(
                     $this->repository->getByIds(
                         ids: $ids,
+                        appends: $appends,
                         with: $eagers,
                         scopes: $scopes,
                         orders: $orders,
@@ -101,6 +106,14 @@ abstract class BaseController extends PanelController
             }
 
             $with = $this->request->get('eager', $this->request->get('with', []));
+
+            if (is_string($with)) {
+                $with = explode(',', $with);
+            }
+
+            if (!is_array($with)) {
+                $with = [];
+            }
 
             return Response::json([
                 'resource' => $this->getJSONData(with: $with),
