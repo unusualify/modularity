@@ -48,7 +48,7 @@ export default function useCastAttributes () {
 
       let newValue = __data_get(ownerItem, notation)
 
-      if(newValue){
+      if(!(newValue === undefined && newValue === null)){
         let _value
 
         if(isArray(newValue) && newValue.length > 0 ){
