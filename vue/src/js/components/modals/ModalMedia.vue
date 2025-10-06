@@ -159,6 +159,8 @@ import MediaGrid from './media-library/MediaGrid.vue'
 import ItemList from './media-library/ItemList.vue'
 import MediaSidebar from './media-library/MediaSidebar.vue'
 import { makeModalMediaProps } from '@/hooks/useModal'
+
+import { useUser } from '@/hooks'
 // import a17Checkbox from '@/components/Checkbox.vue'
 
 // TEST END
@@ -172,7 +174,11 @@ export default {
     // 'a17-checkbox': a17Checkbox
   },
   setup (props, { attrs, slots, emit }) {
+    const { isGuest } = useUser()
 
+    return {
+      isGuest
+    }
   },
   props: {
     ...makeModalMediaProps(),
@@ -532,6 +538,9 @@ export default {
       this.mediaItems.splice(0)
     },
     reloadGrid: function () {
+      if(this.isGuest){
+        return
+      }
       const self = this;
       this.loading = true
       // let formdata = null;
