@@ -4,7 +4,6 @@ import { usePage, Head } from '@inertiajs/vue3'
 
 const page = usePage()
 
-console.log('MainLayout', page.props.mainConfiguration.navigation.sidebar)
 const loading = ref(true)
 
 const headData = computed(() => {
@@ -29,8 +28,6 @@ const mainConfiguration = computed(() => {
     ...page.props.mainConfiguration,
   }
 })
-
-// console.log(mainConfiguration.value, page.props.mainConfiguration)
 
 onMounted(() => {
   setTimeout(() => {
@@ -62,6 +59,14 @@ defineOptions({
       <!-- Additional slots -->
       <template #slots>
         <slot name="slots" />
+      </template>
+
+      <template #top>
+        <component v-if="$componentExists('UeCustomMainTopSlot')" is="UeCustomMainTopSlot" />
+      </template>
+
+      <template #bottom>
+        <component v-if="$componentExists('UeCustomMainBottomSlot')" is="UeCustomMainBottomSlot" />
       </template>
     </ue-main>
 
