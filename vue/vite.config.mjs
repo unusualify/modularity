@@ -21,8 +21,8 @@ const laravelRootUpperLevel = (dir) => {
   return Array(dir.split('/').length + 1).fill('..').join('/')
 }
 
-const env = dotenv.config({ path: path.resolve(__dirname, '../../../.env') }).parsed // prevent writing to `process.env`
-dotenvExpand.expand(env)
+// const env = dotenv.config({ path: path.resolve(__dirname, '../../../.env') }).parsed // prevent writing to `process.env`
+// dotenvExpand.expand(env)
 
 const partialsDirectory = path.resolve(__dirname, './views/partials')
 
@@ -58,17 +58,26 @@ const svgConfig = (suffix = null, isProduction = true) => {
 }
 
 export default defineConfig(({ command, mode }) => {
+  const env = dotenv.config({ path: path.resolve(__dirname, '../../../.env') }).parsed // prevent writing to `process.env`
+  dotenvExpand.expand(env)
+
   const ENV = loadEnv(mode, process.cwd(), '')
   const envPrefix = ['VUE', 'VITE']
   const isProduction = mode === 'production'
+  const isStaging = mode === 'staging'
+  const isLocal = mode === 'local'
+  const isDevelopment = mode === 'development'
+
+  const compressMode = ['production', 'staging', 'modularity'].includes(mode) ? 'compressed' : 'expanded'
 
   const vendorDir = ENV.VENDOR_DIR || 'vendor/unusualify/modularity'
-  const LARAVEL_ROOT_LEVEL = laravelRootUpperLevel(vendorDir)
-
   const APP_THEME = ENV.VUE_APP_THEME || 'unusualify'
   const VUE_DEV_PORT = ENV.VUE_DEV_PORT || 5173
   const VUE_DEV_HOST = ENV.VUE_DEV_HOST || 'localhost' // jakomeet.test
   const VUE_DEV_PROXY = ENV.VUE_DEV_PROXY || null
+  const VUE_IS_CUSTOM_BUILD = ENV.VUE_IS_CUSTOM_BUILD || false
+
+  const LARAVEL_ROOT_LEVEL = laravelRootUpperLevel(vendorDir)
 
   const srcDir = fileURLToPath(new URL('src', import.meta.url))
   const inputDir = fileURLToPath(new URL(`${srcDir}/js`, import.meta.url))
@@ -80,7 +89,7 @@ export default defineConfig(({ command, mode }) => {
   const outDir = 'dist/modularity'
   // const outDir = fileURLToPath(new URL(`${LARAVEL_ROOT_LEVEL}/public${base}`, import.meta.url))
   const targetDir = fileURLToPath(new URL(`${LARAVEL_ROOT_LEVEL}/public`, import.meta.url))
-  const appDir = fileURLToPath(new URL(`${LARAVEL_ROOT_LEVEL}`, import.meta.url))
+  let appDir = fileURLToPath(new URL(`${LARAVEL_ROOT_LEVEL}`, import.meta.url))
   const publicDir = 'public'
 
   const server = {
@@ -97,7 +106,7 @@ export default defineConfig(({ command, mode }) => {
 
   const APP_THEME_FOLDER = isCustomTheme(APP_THEME) ? `customs/${APP_THEME}` : `${APP_THEME}`
 
-  if (!isProduction) {
+  if (mode === 'development') {
     server.hmr = {
       protocol: 'ws',
       host: VUE_DEV_HOST
@@ -115,7 +124,13 @@ export default defineConfig(({ command, mode }) => {
     // },
   }
 
-  const ziggyPath = path.resolve(appDir, 'vendor/tightenco/ziggy')
+  let hasAppDir = fs.existsSync(appDir)
+  let ziggyPath = path.resolve(appDir, 'vendor/tightenco/ziggy')
+
+  if ( !fs.existsSync(ziggyPath) ) {
+    ziggyPath = path.resolve(__dirname, '../vendor/tightenco/ziggy')
+    appDir = path.resolve(__dirname, '..')
+  }
   const hasZiggy = fs.existsSync(ziggyPath)
 
   return {
