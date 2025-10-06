@@ -367,6 +367,37 @@ trait MethodTransformers
     }
 
     /**
+     * @param array $scope
+     * @return array
+     */
+    public function appendFormSchema($scope = [])
+    {
+        $formSchema = [];
+
+        foreach ($this->traitsMethods(__FUNCTION__) as $method) {
+            $formSchema = array_merge($formSchema, $this->$method($scope));
+        }
+
+        return $formSchema;
+    }
+
+
+    /**
+     * @param array $scope
+     * @return array
+     */
+    public function prependFormSchema($scope = [])
+    {
+        $formSchema = [];
+
+        foreach ($this->traitsMethods(__FUNCTION__) as $method) {
+            $formSchema = array_merge($formSchema, $this->$method($scope));
+        }
+
+        return $formSchema;
+    }
+
+    /**
      * @param \Illuminate\Database\Query\Builder $query
      * @return \Illuminate\Database\Query\Builder
      */
