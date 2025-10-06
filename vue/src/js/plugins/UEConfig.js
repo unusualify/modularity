@@ -114,6 +114,10 @@ export default {
       return this[functionName](...args)
     }
 
+    app.config.globalProperties.$componentExists = function (componentName) {
+      return Object.keys(app._context.components).includes(componentName)
+    }
+
     Object.keys(commonMethods).forEach(key => {
       app.config.globalProperties[key] = commonMethods[key].bind(app.config.globalProperties)
     })
