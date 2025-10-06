@@ -640,6 +640,7 @@ export default function useTable (props, context) {
                 break
               case 'bulkPublish':
               case 'bulkDelete':
+              case 'bulkForceDelete':
               case 'bulkRestore':
               case 'bulkDestroy':
                 callbackParameters.push(state.selectedItems)
