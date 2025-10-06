@@ -199,7 +199,7 @@ export default function useTableItemActions(props, { TableForms, loadItems, Tabl
     TableForms.customFormAttributes.value = _.cloneDeep(action.form.attributes)
 
     if(action.form.attributes && action.form.attributes.modelValue){
-      tableForms.customFormModel.value = _.cloneDeep(action.form.attributes.modelValue)
+      TableForms.customFormModel.value = _.cloneDeep(action.form.attributes.modelValue)
     }
 
     if (action.form.hasOwnProperty('model_formatter')) {
