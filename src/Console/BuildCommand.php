@@ -97,7 +97,7 @@ class BuildCommand extends BaseCommand
         $progressBar->start();
 
         if ($npmInstall) {
-            $this->runVueProcess(['npm', 'ci']);
+            $this->runVueProcess(['npm', 'ci', '--legacy-peer-deps']);
         } else {
             sleep(1);
         }
@@ -138,7 +138,9 @@ class BuildCommand extends BaseCommand
 
             // $this->runVueProcess(['npm', 'run', 'serve', '--', "--mode={$mode}", "--port={$this->getDevPort()}"], true);
             // $this->runVueProcess(['npm', 'run', 'serve', '--','--source-map', '--inspect-loader ',"--port={$this->getDevPort()}"], true);
-            $this->runVueProcess(['npm', 'run', 'dev'], true);
+            $this->runVueProcess(['npm', 'run', 'dev'], true, env: [
+                'VUE_IS_CUSTOM_BUILD' => 'true',
+            ]);
         } elseif ($this->option('watch')) {
             // $this->startWatcher( $resource_path, 'php artisan modularity:build --copyOnly');
             $this->startWatchers();
