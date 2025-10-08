@@ -237,12 +237,12 @@ class BuildCommand extends BaseCommand
         ]);
         $process->setTty(Process::isTtySupported());
 
-        // // Add environment variables
-        // $process->setEnv([
-        //     'BASE_PATH' => base_path(),
-        //     'VENDOR_DIR' => Modularity::getVendorDir(),
-        //     ...$env,
-        // ]);
+        // Add environment variables
+        $process->setEnv([
+            'BASE_PATH' => base_path(),
+            'VENDOR_DIR' => Modularity::getVendorDir(),
+            ...$env,
+        ]);
 
         if ($disableTimeout) {
             $process->setTimeout(null);
