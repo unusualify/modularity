@@ -2,6 +2,12 @@
 
 All notable changes to `modularity` will be documented in this file
 
+## v0.48.1 - 2025-10-08
+
+### :wrench: Bug Fixes
+
+- update npm install command to include legacy peer dependencies by @OoBook in https://github.com/unusualify/modularity/commit/6642965bb085331b94508c9264574c8af56679fc
+
 ## v0.48.0 - 2025-10-06
 
 ### :rocket: Features
