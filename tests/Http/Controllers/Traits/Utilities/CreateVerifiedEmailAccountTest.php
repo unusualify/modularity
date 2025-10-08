@@ -129,7 +129,7 @@ class CreateVerifiedEmailAccountTest extends ModelTestCase
     public function test_set_user_register()
     {
         $credentials = [
-            'name' => 'Name ',
+            'name' => 'Name',
             'surname' => 'Surname',
             'email' => 'email@email.com',
             'email_verified_at' => now(),
