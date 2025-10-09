@@ -275,6 +275,7 @@ return [
                     ],
                     'hasDialog' => true,
                     'dialogQuestion' => __('Are you sure you want to refund this payment?'),
+                    'allowedRoles' => ['superadmin', 'admin', 'manager'],
                 ],
             ],
             'headers' => [
