@@ -35,8 +35,25 @@ trait CreateVerifiedEmailAccount
         return [
             'token' => 'required',
             'email' => 'required|email',
-            'name' => 'required',
-            'surname' => 'required',
+            // Check for multiple consecutive spaces in between the names and surnames
+            'name' => [
+                'required',
+                function ($_, $value, $fail) {
+                    if (preg_match('/\s{2,}/', $value)) {
+                        $fail('This field cannot contain multiple consecutive spaces in between the names.');
+                        return;
+                    }
+                }
+            ],
+            'surname' => [
+                'required',
+                function ($_, $value, $fail) {
+                    if (preg_match('/\s{2,}/', $value)) {
+                        $fail('This field cannot contain multiple consecutive spaces in between the names.');
+                        return;
+                    }
+                }
+            ],
             'company' => 'required',
             'password' => ['required', 'confirmed'],
         ];
@@ -155,12 +172,12 @@ trait CreateVerifiedEmailAccount
      * Normalize name by trimming and replacing multiple spaces with single spaces
      * This matches the frontend nameRule validation logic
      */
-    protected function normalizeName(?string $name): ?string
+    public function normalizeName(?string $name): ?string
     {
         if (empty($name)) {
             return $name;
         }
 
-        return trim(preg_replace('/\s+/', ' ', $name));
+        return trim($name);
     }
 }
