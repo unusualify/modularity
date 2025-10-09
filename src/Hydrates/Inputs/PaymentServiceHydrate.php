@@ -4,6 +4,7 @@ namespace Unusualify\Modularity\Hydrates\Inputs;
 
 use Modules\SystemPayment\Entities\PaymentCurrency;
 use Modules\SystemPayment\Entities\PaymentService;
+use Unusualify\Modularity\Facades\Modularity;
 
 class PaymentServiceHydrate extends InputHydrate
 {
@@ -43,11 +44,20 @@ class PaymentServiceHydrate extends InputHydrate
             : [];
 
         $input['items'] = ! $this->skipQueries
-            ? PaymentService::published()->isExternal()->orWhere(fn ($query) => $query->published()->isTransfer())->with('paymentCurrencies')->get()->toArray()
+            ? PaymentService::published()
+                ->isExternal()
+                ->orWhere(fn ($query) => $query->published()->isTransfer())
+                ->with('paymentCurrencies')
+                ->get()
+                ->toArray()
             : [];
 
         $paymentServices = ! $this->skipQueries
-            ? PaymentService::published()->where('is_internal', 1)->with(['paymentCurrencies', 'cardTypes'])->get()->all()
+            ? PaymentService::published()
+                ->where('is_internal', 1)
+                ->with(['paymentCurrencies', 'cardTypes'])
+                ->get()
+                ->all()
             : [];
 
         $mappedData = [];
@@ -107,11 +117,11 @@ class PaymentServiceHydrate extends InputHydrate
             ],
         ]);
 
+        $input['includeTransactionFee'] = Modularity::shouldIncludeTransactionFee();
+
         $input['paymentUrl'] = route('admin.system.system_payment.pay');
         $input['checkoutUrl'] = route('admin.system.system_payment.checkout');
         $input['completeUrl'] = route('admin.system.system_payment.payment.response');
-
-        // dd($input['supportedCurrencies']->toArray());
 
         return $input;
     }
