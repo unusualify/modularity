@@ -29,6 +29,7 @@ import sampleSchema from '@/__snapshots/getFormData/schema.json';
 
 
 const isArrayable = 'input-treeview|treeview|input-checklist|input-repeater|input-file|input-image'
+const numberable = 'number-input'
 // const isMediableTypes = 'input-file|input-image'
 // const isMediableFields = 'files|medias'
 
@@ -200,6 +201,11 @@ export const getModel = (inputs, item = null, rootState = null) => {
           fields[name] = value
         }
       }
+    }
+
+    if(numberable.includes(input.type) && __isset(value) && __isString(value)){
+      console.log(name, value)
+      fields[name] = _.toNumber(value)
     }
 
     if(input.type == 'preview' && __isset(input.previewKey) && item && __isset(item[input.previewKey])){
