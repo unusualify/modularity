@@ -26,7 +26,7 @@ export default function useValidation (props) {
     nameRule: (msg) => v => {
       if (!v) return true;
       const trimmed = v.trim().replace(/\s+/g, ' ');
-      return /^[\p{L}'\-\-]+(?: [\p{L}'\-\-]+)*$/u.test(trimmed) || msg || 'Only letters, apostrophes, and hyphens allowed. Spaces only between names.';
+      return /^[\p{L}'\-]+(?: [\p{L}'\-]+)*$/u.test(trimmed) || msg || 'Only letters, apostrophes, and hyphens allowed.';
     },
     // requiredRule: msg => v => !!v || msg || 'Required',
     emailRule: (options = {}, msg) => v => {
