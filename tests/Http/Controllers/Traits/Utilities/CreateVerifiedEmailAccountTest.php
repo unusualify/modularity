@@ -242,4 +242,19 @@ class CreateVerifiedEmailAccountTest extends ModelTestCase
 
         $this->assertEquals('Registration has been completed successfully.', $response->getSession()->get('status'));
     }
+
+    public function test_normalize_name()
+    {
+        $name1 = 'Name  ';
+        $normalizedName = $this->controller->normalizeName($name1);
+        $this->assertEquals('Name', $normalizedName);
+
+        $name2 = '     Name';
+        $normalizedName = $this->controller->normalizeName($name2);
+        $this->assertEquals('Name', $normalizedName);
+
+        $name3 = '    Name  ';
+        $normalizedName = $this->controller->normalizeName($name3);
+        $this->assertEquals('Name', $normalizedName);
+    }
 }
