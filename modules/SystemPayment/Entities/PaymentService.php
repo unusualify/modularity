@@ -20,6 +20,7 @@ class PaymentService extends Model
         'name',
         'key',
         'published',
+        'transaction_fee_percentage',
         'is_external',
         'is_internal',
         'button_style',
@@ -30,7 +31,24 @@ class PaymentService extends Model
         'button_logo_url',
         'transferrable',
         'bank_details',
+        'has_transaction_fee',
     ];
+
+    protected $casts = [
+        'transaction_fee_percentage' => 'float',
+    ];
+
+    protected $with = [
+        'paymentCurrencies',
+    ];
+
+
+    protected function hasTransactionFee(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $this->transaction_fee_percentage > 0.00,
+        );
+    }
 
     /**
      * Get the payments for the PaymentService.

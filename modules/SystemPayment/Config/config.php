@@ -45,6 +45,13 @@ return [
                     'key' => 'paymentCurrencies',
                 ],
                 [
+                    'title' => 'Transaction Fee (%)',
+                    'key' => 'transaction_fee_percentage',
+                    'formatter' => [
+                        'chip',
+                    ],
+                ],
+                [
                     'title' => 'Status',
                     'key' => 'published',
                     'formatter' => [
@@ -92,6 +99,18 @@ return [
                     'type' => 'select',
                     'multiple',
                     'repository' => 'Modules\\SystemPayment\\Repositories\\PaymentCurrencyRepository',
+                    'col' => ['cols' => 12, 'lg' => 6],
+                ],
+                [
+                    'name' => 'transaction_fee_percentage',
+                    'label' => 'Transaction Fee Percentage',
+                    'type' => 'number-input',
+                    'clearable' => false,
+                    'default' => 0.00,
+                    'precision' => 2,
+                    'max' => 100.00,
+                    'min' => 0.00,
+                    'col' => ['cols' => 12, 'lg' => 6],
                 ],
                 [
                     'type' => 'radio-group',
