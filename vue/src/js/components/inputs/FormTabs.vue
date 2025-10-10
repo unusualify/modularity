@@ -60,7 +60,7 @@
 
 <script>
 import { toRefs, reactive, ref, computed, watch } from 'vue';
-import { cloneDeep, each, filter, startCase, snakeCase, isString } from 'lodash-es';
+import { cloneDeep, each, filter, startCase, snakeCase, isString, get } from 'lodash-es';
 import { useI18n } from 'vue-i18n';
 import { useInput,
   makeInputProps,
@@ -106,6 +106,15 @@ export default {
       type: Array,
       default: () => ['*']
     },
+    orderBy: {
+      type: String,
+      default: 'name'
+    },
+    orderByDirection: {
+      type: String,
+      default: 'asc',
+      validator: (value) => ['asc', 'desc'].includes(value)
+    },
     noSchemaUpdatingProgressBar: {
       type: Boolean,
       default: false
@@ -119,7 +128,33 @@ export default {
 
     const { matchStandardAttribute, castStandardAttribute, castEvalAttribute, castAttribute, castObjectAttribute } = useCastAttributes()
 
-    const elements = ref(props.items)
+    // Helper function to sort items based on configurable parameters
+    const sortItems = (items) => {
+      return [...items].sort((a, b) => {
+        const fieldA = a[props.orderBy] || ''
+        const fieldB = b[props.orderBy] || ''
+
+        // Handle different data types
+        let comparison = 0
+        if (typeof fieldA === 'string' && typeof fieldB === 'string') {
+          comparison = fieldA.localeCompare(fieldB)
+        } else if (typeof fieldA === 'number' && typeof fieldB === 'number') {
+          comparison = fieldA - fieldB
+        } else {
+          // Fallback to string comparison
+          comparison = String(fieldA).localeCompare(String(fieldB))
+        }
+
+        return props.orderByDirection === 'desc' ? -comparison : comparison
+      })
+    }
+
+    // Sort items based on configurable orderBy and orderByDirection parameters
+    const sortedItems = computed(() => {
+      return sortItems(props.items)
+    })
+
+    const elements = ref(sortedItems.value)
     const loading = ref(true)
 
     const formRefs = reactive(new Map())
@@ -134,7 +169,7 @@ export default {
 
     const getFormRef = (id) => formRefs.get(id)
 
-    const models = ref(elements.value.reduce((acc, item) => {
+    const models = ref(sortedItems.value.reduce((acc, item) => {
       if(!__isset(acc[item.id])){
         acc[item.id] = {
           ...(getModel(props.schema, {})),
@@ -249,7 +284,7 @@ export default {
       return getSchema(baseSchema, models.value?.[item.id] ?? {})
     }
 
-    const schemas = ref(elements.value.reduce((acc, item, index) => {
+    const schemas = ref(sortedItems.value.reduce((acc, item, index) => {
       if(!__isset(acc[item.id])){
         acc[item.id] = generateSchema(item)
         // Process initial triggers
@@ -259,12 +294,12 @@ export default {
       return acc
     }, {}))
 
-    const valids = ref(elements.value.reduce((acc, item, i) => {
+    const valids = ref(sortedItems.value.reduce((acc, item, i) => {
       acc[i] = null
       return acc
     }, {}))
 
-    if(elements.value.length > 0){
+    if(sortedItems.value.length > 0){
       loading.value = false
     }
 
@@ -272,7 +307,7 @@ export default {
       loading,
       elements,
       formRefs,
-      activeTab: 1,
+      activeTab: 0,
       models,
       schemas,
       valids,
@@ -280,6 +315,9 @@ export default {
 
     watch(() => props.items, (newVal) => {
       loading.value = true
+
+      // Get sorted items for display using configurable parameters
+      const newSortedItems = sortItems(newVal)
 
       let addedItems = newVal.filter(item => !elements.value.find(el => el.id == item.id))
       let removedItems = elements.value.filter(item => !newVal.find(el => el.id == item.id))
@@ -299,7 +337,10 @@ export default {
             schemas.value = updatedSchemas
           }
 
-          valids.value[item.id] = null
+          const itemIndex = newSortedItems.findIndex(el => el.id === item.id)
+          if (itemIndex !== -1) {
+            valids.value[itemIndex] = null
+          }
           // setFormRef(item.id, null)
         })
       }
@@ -308,12 +349,22 @@ export default {
         removedItems.forEach(item => {
           delete models.value[item.id]
           delete schemas.value[item.id]
-          delete valids.value[item.id]
+          const itemIndex = elements.value.findIndex(el => el.id === item.id)
+          if (itemIndex !== -1) {
+            delete valids.value[itemIndex]
+          }
           setFormRef(item.id, null)
         })
       }
 
-      elements.value = newVal
+      // Update elements with sorted items for display
+      elements.value = newSortedItems
+
+      // Reinitialize valids array with correct size
+      valids.value = newSortedItems.reduce((acc, item, i) => {
+        acc[i] = null
+        return acc
+      }, {})
     })
 
     watch(() => elements.value, (newVal) => {

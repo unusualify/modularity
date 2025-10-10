@@ -33,7 +33,7 @@
 
       <!-- Data rows -->
       <div
-        v-for="(item, i) in items"
+        v-for="(item, i) in sortedItems"
         :key="`item-${i}`"
         class="ue-list-section__row ue-list-section__row--data"
         :class="[getRowClass(item, i), {'has-bottom-border': hasRowBottomBorder}]"
@@ -57,7 +57,7 @@
       </div>
 
       <!-- Empty state message -->
-      <div v-if="items.length === 0 && emptyMessage" class="ue-list-section__row ue-list-section__row--empty">
+      <div v-if="sortedItems.length === 0 && emptyMessage" class="ue-list-section__row ue-list-section__row--empty">
         <div class="ue-list-section__row--empty .ue-list-section__cell">{{ emptyMessage }}</div>
       </div>
     </div>
@@ -153,6 +153,22 @@ export default {
           .replace(/([A-Z])/g, ' $1')
           .replace(/^./, str => str.toUpperCase());
       });
+    },
+
+    sortedItems() {
+      // Sort items alphabetically by the first field (usually the name/title)
+      return [...this.items].sort((a, b) => {
+        const fieldA = this.$lodash.get(a, this.itemFields[0], '')
+        const fieldB = this.$lodash.get(b, this.itemFields[0], '')
+
+        // Handle different data types
+        if (typeof fieldA === 'string' && typeof fieldB === 'string') {
+          return fieldA.localeCompare(fieldB)
+        }
+
+        // Fallback to string comparison
+        return String(fieldA).localeCompare(String(fieldB))
+      })
     },
 
     totalRatio() {

@@ -484,9 +484,10 @@
 
         return result
       },
-      handleFinalFormAction({index, event}) {
+      // For Addon conflict.
+      handleFinalFormAction({index, event,data}) {
         // const data = this.previewFormData[index]
-        const data = this.lastFormPreview[index]
+        // const data = this.lastFormPreview[index]
         const fieldName = data.fieldName
         const fieldFormat = data._fieldFormat ?? 'id'
         const lastStepModel = cloneDeep(this.lastStepModel)
