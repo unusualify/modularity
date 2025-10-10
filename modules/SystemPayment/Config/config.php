@@ -365,9 +365,22 @@ return [
             ],
             'inputs' => [
                 [
-                    'type' => 'number',
+                    'type' => 'number-input',
                     'name' => 'amount',
                     'label' => 'Payment Amount',
+                    'controlVariant' => 'stacked',
+                    'col' => ['cols' => 12, 'lg' => 6],
+                    'allowedRoles' => ['superadmin'],
+                ],
+                [
+                    'type' => 'combobox',
+                    'name' => 'currency_id',
+                    'label' => 'Currency',
+                    'itemTitle' => 'name',
+                    'itemValue' => 'id',
+                    'connector' => 'SystemPricing:Currency|repository:list:column=name',
+                    'default' => 1,
+                    'rules' => 'required',
                     'col' => ['cols' => 12, 'lg' => 6],
                     'allowedRoles' => ['superadmin'],
                 ],
