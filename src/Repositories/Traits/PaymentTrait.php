@@ -158,6 +158,16 @@ trait PaymentTrait
             $paymentService = PaymentService::find($fields['payment_service_id']);
             $paymentPrice = $object->paymentPrice()->first();
 
+            $paymentPricePayload = [
+                ...($fields['price_vat_rate_id'] ? ['vat_rate_id' => $fields['price_vat_rate_id']] : []),
+                ...($fields['price_discount_percentage'] ? ['discount_percentage' => $fields['price_discount_percentage']] : []),
+            ];
+
+            if(!empty($paymentPricePayload)){
+                $paymentPrice->update($paymentPricePayload);
+                $paymentPrice->refresh();
+            }
+
             if ($paymentService->transferrable && $paymentPrice) {
                 $paymentPayload = [
                     'payment_service_id' => $paymentService->id,
@@ -182,6 +192,14 @@ trait PaymentTrait
 
                 if (isset($fields['payment_description'])) {
                     $paymentPayload['spread_payload']['description'] = $fields['payment_description'];
+                }
+
+                if (isset($fields['payment_status'])) {
+                    $paymentPayload['status'] = $fields['payment_status'];
+                }
+
+                if (isset($fields['payment_currency_id'])) {
+                    $paymentPayload['currency_id'] = $fields['payment_currency_id'];
                 }
 
                 $paymentPrice->updateOrNewPayment($paymentPayload, $extraPayload);
