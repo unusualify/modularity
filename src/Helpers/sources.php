@@ -1,9 +1,15 @@
 <?php
 
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Lang;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Unusualify\Modularity\Facades\Modularity;
+use Unusualify\Modularity\Facades\Navigation;
 
 if (! function_exists('getLocales')) {
     /**
@@ -152,5 +158,135 @@ if (! function_exists('clear_translations')) {
         $cache_key = 'modularity-languages';
 
         Cache::forget($cache_key);
+    }
+}
+
+if (! function_exists('get_modularity_navigation_config')) {
+    function get_modularity_navigation_config()
+    {
+        $sidebarKey = 'default';
+        $profileMenuKey = 'default';
+        $sidebarBottomKey = 'default';
+
+        if (Auth::guest()) {
+            $sidebarKey = 'guest';
+            $profileMenuKey = 'guest';
+            $sidebarBottomKey = 'guest';
+        } else {
+            $user = Auth::user();
+
+            if ($user->hasRole('superadmin')) {
+                $sidebarKey = 'superadmin';
+                $profileMenuKey = 'superadmin';
+                $sidebarBottomKey = 'superadmin';
+            } elseif (count($user->roles) > 0 && $user->isClient()) {
+                $sidebarKey = 'client';
+                $profileMenuKey = 'client';
+                $sidebarBottomKey = 'client';
+            }
+        }
+
+        $sidebarConfigKey = 'modularity-navigation.sidebar.' . $sidebarKey;
+        $profileMenuConfigKey = 'modularity-navigation.profileMenu.' . $profileMenuKey;
+        $sidebarBottomConfigKey = 'modularity-navigation.sidebarBottom.' . $sidebarBottomKey;
+
+        $navigation = [
+            'current_url' => url()->current(),
+            'sidebar' => array_values(Navigation::formatSidebarMenu(config($sidebarConfigKey, []))),
+            'breadcrumbs' => [],
+            'profileMenu' => array_values(Navigation::formatSidebarMenu(config($profileMenuConfigKey, []))),
+            'sidebarBottom' => array_values(Navigation::formatSidebarMenu(config($sidebarBottomConfigKey, []))),
+        ];
+
+        return $navigation;
+    }
+}
+
+if (! function_exists('get_modularity_authorization_config')) {
+    function get_modularity_authorization_config()
+    {
+        $user = Auth::user();
+
+        $permissions = Arr::mapWithKeys(Gate::abilities(), function ($closure, $key) {
+            return [$key => Gate::allows($key)];
+        });
+
+        $roles = Arr::map($user?->roles?->toArray() ?? [], function ($role) {
+            return $role['name'];
+        });
+
+        return [
+            'isSuperAdmin' => $user?->isSuperAdmin() ?? false,
+            'isClient' => $user?->isClient() ?? false,
+            'roles' => $roles,
+            'permissions' => $permissions,
+        ];
+    }
+}
+
+if (! function_exists('get_modularity_impersonation_config')) {
+    function get_modularity_impersonation_config()
+    {
+        $activeUser = null;
+        $canFetchUsers = false;
+
+        if (Auth::check()) {
+            $activeUser = Auth::user();
+            $canFetchUsers = $activeUser->isSuperAdmin() || $activeUser->isImpersonating();
+        }
+
+        $userRepository = app()->make(\Modules\SystemUser\Repositories\UserRepository::class);
+
+        return [
+            'active' => $activeUser ? $activeUser->isSuperAdmin() || $activeUser->isImpersonating() : false,
+            'users' => $canFetchUsers ? $userRepository->whereNot(fn ($query) => $query->role(['superadmin']))->get(['id', 'name', 'email', 'company_id'])->toArray() : [],
+            'impersonated' => $activeUser ? $activeUser->isImpersonating() : false,
+            'stopRoute' => route(Route::hasAdmin('impersonate.stop')),
+            'route' => route(Route::hasAdmin('impersonate'), ['id' => ':id']),
+        ];
+    }
+}
+
+if (! function_exists('get_modularity_localization_config')) {
+    function get_modularity_localization_config()
+    {
+        // $currentLang = Lang::get("{$name}::lang", [], modularityConfig('locale'));
+        $currentLang = Lang::get('*', [], modularityConfig('locale'));
+
+        // $fallbackLang = Lang::get("{$name}::lang", [], modularityConfig('fallback_locale', 'en'));
+        $fallbackLang = Lang::get('*', [], modularityConfig('fallback_locale', 'en'));
+
+        $lang = array_replace_recursive($fallbackLang, $currentLang);
+
+        return [
+            'locale' => modularityConfig('locale'),
+            'fallback_locale' => modularityConfig('fallback_locale', 'en'),
+            'lang' => $lang,
+        ];
+    }
+}
+
+if (! function_exists('get_modularity_head_layout_config')) {
+    function get_modularity_head_layout_config(array $data)
+    {
+        return array_merge([
+            'pageTitle' => $data['pageTitle'] ?? Modularity::pageTitle(),
+        ], $data['_headLayoutData'] ?? []);
+    }
+}
+
+if (! function_exists('get_modularity_inertia_main_configuration')) {
+    function get_modularity_inertia_main_configuration(array $data)
+    {
+        return array_merge([
+            'headerTitle' => $data['headerTitle'] ?? config('app.name'),
+            'hideDefaultSidebar' => $data['hideDefaultSidebar'] ?? false,
+            'fixedAppBar' => $data['fixedAppBar'] ?? false,
+            'appBarOrder' => $data['appBarOrder'] ?? 0,
+
+            'navigation' => get_modularity_navigation_config(),
+            'impersonation' => get_modularity_impersonation_config(),
+            'authorization' => get_modularity_authorization_config(),
+        ], $data['_mainConfiguration'] ?? []);
     }
 }

@@ -4,16 +4,21 @@ import _ from 'lodash-es'
 import { useStore } from 'vuex'
 import { useI18n } from 'vue-i18n'
 
-import { FORM } from '@/store/mutations'
 import ACTIONS from '@/store/actions'
 
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
-import { useTableItem } from '@/hooks/table'
 
 export const makeTableFormsProps = propsFactory({
   inputFields: {
     type: Array,
     default: () => []
+  },
+  formSchema: {
+    type: Object,
+    required: true,
+    validator(value) {
+      return value && typeof value === 'object'
+    }
   },
   formWidth: {
     type: [String, Number],
@@ -49,7 +54,7 @@ export default function useTableForms(props, context) {
 
   const store = useStore()
   const { t } = useI18n({ useScope: 'global' })
-  const { setEditedItem, resetEditedItem, editedItem } = useTableItem()
+  const { setEditedItem, resetEditedItem, editedItem } = context.TableItem
 
   // Form refs and state
   const UeForm = ref(null)
@@ -74,7 +79,7 @@ export default function useTableForms(props, context) {
   })
 
   // Computed properties
-  const inputs = computed(() => props.inputFields ?? store.state.datatable.inputs ?? [])
+  // const inputs = computed(() => props.inputFields ?? store.state.datatable.inputs ?? [])
 
   const formRef = computed(() =>
     state.id + '-form'
@@ -144,7 +149,7 @@ export default function useTableForms(props, context) {
     ...toRefs(states),
 
     // Computed
-    inputs,
+    // inputs,
     formRef,
     formStyles,
     formLoading,

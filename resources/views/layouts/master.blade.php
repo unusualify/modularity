@@ -93,21 +93,6 @@
             <div id="ue-main-body" class="ue--main-container pa-3 h-100">
 
                 @yield('content')
-
-                <div id="ue-bottom-content">
-                    @if (modularityConfig('enabled.media-library') || modularityConfig('enabled.file-library'))
-                        {{-- <ue-media
-                            ref="mediaLibra"
-                            :authorized="{{ json_encode(auth('twill_users')->user()->can('upload')) }}"
-                            :extra-metadatas="{{ json_encode(array_values(modularityConfig('media_library.extra_metadatas_fields', []))) }}"
-                            :translatable-metadatas="{{ json_encode(array_values(modularityConfig('media_library.translatable_metadatas_fields', []))) }}"
-                        ></ue-media> --}}
-
-                    @endif
-
-                    {{-- <ue-alert ref='alert'></ue-alert> --}}
-                    {{-- <ue-modal-test></ue-modal-test> --}}
-                </div>
             </div>
 
             @yield('slots')
@@ -130,6 +115,7 @@
 
     window['{{ modularityConfig('js_namespace') }}'].ENDPOINTS = {!! json_encode($endpoints ?? new StdClass()) !!}
     window['{{ modularityConfig('js_namespace') }}'].STORE.config = {
+        isInertia: {{ json_encode(false) }},
         test: false,
         profileMenu: {!! json_encode($navigation['profileMenu']) !!},
         sidebarOptions: {!! json_encode(modularityConfig('ui_settings.sidebar')) !!},

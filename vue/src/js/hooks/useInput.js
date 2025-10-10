@@ -3,7 +3,7 @@
 import { reactive, toRefs, computed, ref, inject } from 'vue'
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
 
-import { omit } from 'lodash-es'
+import { omit, isObject } from 'lodash-es'
 
 export const makeInputProps = propsFactory({
   modelValue: {
@@ -70,14 +70,21 @@ export default function useInput (props, context) {
   const { modelValue, obj } = toRefs(props)
   const VInput = ref(null)
 
+  const initialValue = ref(modelValue.value ?? props?.default ?? props?.obj?.schema?.default ?? (Object.prototype.hasOwnProperty.call(props, 'multiple') && props.multiple ? [] : null))
+
   const states = reactive({
     VInput,
     id: Math.ceil(Math.random() * 1000000) + '-input',
     boundProps: omit(obj.value.schema ?? {}, ['offset', 'order', 'col']),
 
+    initialValue,
     input: computed({
       get: () => {
         let _val = modelValue.value ?? props?.default ?? props?.obj?.schema?.default ?? []
+
+        if(props.convertObject && Object.prototype.hasOwnProperty.call(props, 'multiple') && props.multiple){
+          _val = _val.map(item => isObject(item) ? item[props.itemValue] : item)
+        }
 
         if(Array.isArray(_val) && Object.prototype.hasOwnProperty.call(props, 'multiple') && !props.multiple && _val.length === 0){
           _val = !Array.isArray(modelValue.value) ? modelValue.value : null

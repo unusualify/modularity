@@ -29,6 +29,7 @@
           @update:valid="$emit('form-valid', {event: $event, index: i})"
 
           noDefaultFormPadding
+          noSchemaUpdatingProgressBar
         />
       </v-stepper-window-item>
 

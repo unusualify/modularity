@@ -16,12 +16,12 @@
 </template>
 
 <script>
-import { useInput, makeInputProps, makeInputEmits } from '@/hooks'
-import { FORM } from '@/store/mutations'
-import { useStore } from 'vuex'
-import api from '@/store/api/form'
-
 import { ref, computed, toRefs, toRef } from 'vue'
+import { useStore } from 'vuex'
+import { useInput, makeInputProps, makeInputEmits } from '@/hooks'
+import api from '@/store/api/form'
+import { FORM } from '@/store/mutations'
+
 
 export default {
   name: 'v-input-tag',
@@ -60,15 +60,22 @@ export default {
 
   setup(props, context) {
     const store = useStore()
+    const Cache = useCache()
+    const cacheKey = `taggable_items_${props.taggable}`
 
     const loading = ref(false)
 
-    if(!store.state.form.taggableItems[props.taggable]) {
-      store.commit(FORM.SET_TAGGABLE_ITEMS, { taggable_type: props.taggable, items: props.items ?? [] })
+    // if(!store.state.form.taggableItems[props.taggable]) {
+    //   store.commit(FORM.SET_TAGGABLE_ITEMS, { taggable_type: props.taggable, items: props.items ?? [] })
+    // }
+
+    if(!store.getters[CACHE.HAS_CACHE](cacheKey)) {
+      Cache.put(cacheKey, props.items ?? [])
     }
 
     const items = computed(() => {
-      return store.state.form.taggableItems[props.taggable]
+      return Cache.states[cacheKey] ?? []
+      // return store.state.form.taggableItems[props.taggable]
     })
 
     return {

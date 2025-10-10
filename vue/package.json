@@ -17,6 +17,7 @@
     "madge": "madge"
   },
   "dependencies": {
+    "@inertiajs/vue3": "^2.1.6",
     "@kugatsu/vuenotification": "^1.1.4",
     "@revolut/checkout": "^1.1.23",
     "@rollup/plugin-commonjs": "^25.0.7",
@@ -32,6 +33,7 @@
     "fine-uploader-wrappers": "^1.0.1",
     "jquery": "^3.6.3",
     "laravel-echo": "^1.17.1",
+    "laravel-vite-plugin": "^2.0.1",
     "lodash-es": "^4.17.21",
     "madge": "^6.1.0",
     "marked": "^16.1.1",

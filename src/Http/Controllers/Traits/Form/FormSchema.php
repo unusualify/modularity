@@ -52,6 +52,15 @@ trait FormSchema
             ? $this->formSchema($inputs)
             : $inputs;
 
+        if ($this->repository) {
+            if (method_exists($this->repository, 'appendFormSchema')) {
+                $inputs = array_merge($inputs, $this->repository->appendFormSchema());
+            }
+            if (method_exists($this->repository, 'prependFormSchema')) {
+                $inputs = array_merge($this->repository->prependFormSchema($inputs), $inputs);
+            }
+        }
+
         if (isset(static::$formSchemaCallbacks[static::class]) && is_callable(static::$formSchemaCallbacks[static::class])) {
             $inputs = call_user_func(static::$formSchemaCallbacks[static::class], object_to_array($inputs));
         }
@@ -525,7 +534,7 @@ trait FormSchema
                 input: $input,
                 module: $this->module ?? null,
                 routeName: $this->routeName ?? null,
-                skipQueries: Request::ajax() || App::runningInConsole() || false,
+                skipQueries: (Request::ajax() && ! Request::inertia()) || App::runningInConsole() || false,
             );
 
             if (in_array($input['type'], ['input-repeater']) && isset($input['schema'])) {

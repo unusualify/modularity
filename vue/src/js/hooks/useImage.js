@@ -1,4 +1,4 @@
-// hooks/formatter .js
+// hooks/useImage.js
 
 // import { ref, watch, computed, nextTick } from 'vue'
 import { reactive, toRefs, computed, watch } from 'vue'

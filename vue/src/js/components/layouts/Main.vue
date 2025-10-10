@@ -87,7 +87,6 @@
     <!-- MODALS -->
     <!-- Media Library -->
     <ue-modal-media v-if="$store.getters.mediaLibraryAccessible"
-      ref="mediaLibrary"
       v-model="$store.state.mediaLibrary.showModal"
     ></ue-modal-media>
 
@@ -241,8 +240,11 @@
 </template>
 
 <script>
-  import { ALERT, CONFIG, MEDIA_LIBRARY } from '@/store/mutations/index'
-  import { USER } from '@/store/mutations';
+  import { computed } from 'vue'
+  import { router } from '@inertiajs/vue3'
+  import { useStore } from 'vuex'
+  import { useConfig } from '@/hooks'
+  import { ALERT, CONFIG, MEDIA_LIBRARY, USER } from '@/store/mutations'
 
   export default {
     props: {
@@ -350,6 +352,39 @@
         }
       }
     },
+    setup (props, context) {
+      const Store = useStore()
+      const { shouldUseInertia } = useConfig()
+
+      const loginFormSubmitted = (res) => {
+        // this.$store.commit(USER.CLOSE_LOGIN_MODAL)
+        if(res.variant === 'success') {
+          Store.commit(ALERT.SET_ALERT, {...res})
+          if(res.timeout) {
+            setTimeout(() => {
+              if(shouldUseInertia.value && false) {
+                router.reload()
+                Store.commit(USER.CLOSE_LOGIN_MODAL)
+              } else {
+                window.location.reload()
+              }
+            }, res.timeout)
+          }else{
+            if(shouldUseInertia.value && false) {
+              router.reload()
+              Store.commit(USER.CLOSE_LOGIN_MODAL)
+            } else {
+              window.location.reload()
+            }
+          }
+        }
+      }
+
+      return {
+        shouldUseInertia,
+        loginFormSubmitted
+      }
+    },
     data () {
       return {
         loader: null,
@@ -455,10 +490,8 @@
         && !this.authorization.isClient
       )
     },
-
     mounted () {
     },
-
     methods: {
       addSidebarItem: function (event) {
         // drawer = !drawer
@@ -477,34 +510,17 @@
 
         // this.loader = null;
       },
-
-      submit () {
-        alert('Submit Form')
-      },
       closeAlertDialog(){
         this.$store.commit(ALERT.CLEAR_DIALOG)
       },
       profileFormSubmitted(res) {
-
         if (typeof URLS !== 'undefined' && URLS) {
           axios.get(URLS.profileShow).then(res => {
             this.$store.commit(USER.SET_PROFILE_DATA, res.data)
           })
         }
       },
-      loginFormSubmitted(res) {
-        // this.$store.commit(USER.CLOSE_LOGIN_MODAL)
-        if(res.variant === 'success') {
-          this.$store.commit(ALERT.SET_ALERT, {...res})
-          if(res.timeout) {
-            setTimeout(() => {
-              window.location.reload()
-            }, res.timeout)
-          }else{
-            window.location.reload()
-          }
-        }
-      }
+
     }
   }
 </script>

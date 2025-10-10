@@ -56,6 +56,9 @@ trait ManageUtilities
 
                     'isModuleTable' => true,
                     'defaultTableOptions' => $this->getDefaultTableOptions(),
+
+                    'formSchema' => $this->filterSchemaByRoles($this->formSchema),
+                    'endpoints' => $tableEndpoints,
                 ],
                 ($this->isNested ? ['titlePrefix' => $this->nestedParentModel->getTitleValue() . ' \ '] : []),
                 array_merge_recursive_preserve(
@@ -69,8 +72,8 @@ trait ManageUtilities
 
             ),
             'formStore' => [
-                'inputs' => $this->filterSchemaByRoles($this->formSchema),
-                'fields' => [],
+                // 'inputs' => $this->filterSchemaByRoles($this->formSchema),
+                // 'fields' => [],
             ],
             'tableStore' => [],
             '__old' => [
@@ -138,13 +141,16 @@ trait ManageUtilities
                 ),
                 'isEditing' => $itemId ? true : false,
                 'actions' => $this->getFormActions(),
-                ...(($formAttributes['async'] ?? true) ? [] : ['actionUrl' => $this->getFormUrl($itemId)]),
+                // ...(($formAttributes['async'] ?? true) ? [] : ['actionUrl' => $this->getFormUrl($itemId)]),
+                'actionUrl' => $this->getFormUrl($itemId),
+
+                'schema' => $this->filterSchemaByRoles($schema),
             ], $formAttributes),
             'endpoints' => [
                 ((bool) $itemId ? 'update' : 'store') => $this->getFormUrl($itemId),
             ] + $this->getUrls(),
             'formStore' => [
-                'inputs' => $this->filterSchemaByRoles($schema),
+                // 'inputs' => $this->filterSchemaByRoles($schema),
             ],
             '__old' => [
                 // 'editable' => !!$itemId,

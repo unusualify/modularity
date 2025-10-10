@@ -1,9 +1,10 @@
 // hooks/table/useTableItem.js
 import { computed, ref, nextTick, watch } from 'vue'
 import { useStore } from 'vuex'
-import { FORM } from '@/store/mutations'
-
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
+
+import { getSubmitFormData, getModel } from '@/utils/getFormData.js'
+
 
 export const makeTableItemProps = propsFactory({
 
@@ -12,9 +13,11 @@ export const makeTableItemProps = propsFactory({
 export default function useTableItem(props, context) {
   const store = useStore()
 
-  const editedItem = computed(() =>
-    store.state.form.editedItem ?? {}
-  )
+  // const editedItem = computed(() =>
+  //   store.state.form.editedItem ?? {}
+  // )
+
+  const editedItem = ref(props.modelValue ? props.modelValue : getModel(props.formSchema))
 
   // computed
   const isSoftDeletableItem = computed(() =>
@@ -27,12 +30,14 @@ export default function useTableItem(props, context) {
 
   // Methods
   const setEditedItem = (item) => {
-    store.commit(FORM.SET_EDITED_ITEM, item)
+    // store.commit(FORM.SET_EDITED_ITEM, item)
+    editedItem.value = Object.assign({}, item)
   }
 
   const resetEditedItem = () => {
     nextTick(() => {
-      store.commit(FORM.RESET_EDITED_ITEM)
+      editedItem.value = getModel(props.formSchema)
+      // store.commit(FORM.RESET_EDITED_ITEM)
     })
   }
 

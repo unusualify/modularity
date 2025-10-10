@@ -167,6 +167,7 @@ class ResetPasswordController extends Controller
                     'actionUrl' => route(Route::hasAdmin('password.reset.update')),
                     'buttonText' => 'authentication.reset',
                     'formClass' => 'px-5',
+                    'noSchemaUpdatingProgressBar' => true,
                 ],
                 'formSlots' => $formSlots,
             ]);

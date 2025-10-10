@@ -4,11 +4,13 @@ export const PUT_CACHE = 'putCache'
 export const PUSH_CACHE = 'pushCache'
 export const GET_LAST_CACHE = 'getLastCache'
 export const FORGET_CACHE = 'forgetCache'
+export const HAS_CACHE = 'hasCache'
 
 export default {
   GET_CACHE,
   PUT_CACHE,
   GET_LAST_CACHE,
   PUSH_CACHE,
-  FORGET_CACHE
+  FORGET_CACHE,
+  HAS_CACHE
 }

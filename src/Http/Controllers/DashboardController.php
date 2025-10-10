@@ -36,19 +36,37 @@ class DashboardController extends BaseController
 
     public function index($parentId = null)
     {
-        $blocks = $this->app->config->get(modularityBaseKey() . '.ui_settings.dashboard.blocks');
+        $blockItems = $this->app->config->get(modularityBaseKey() . '.ui_settings.dashboard.blocks');
 
-        foreach ($blocks as $index => $block) {
-            if ($this->isAllowedItem($block, 'allowedRoles')) {
-                $blocks[$index] = Component::create($block);
+        foreach ($blockItems as $index => $blockItem) {
+            if ($this->isAllowedItem($blockItem, 'allowedRoles')) {
+                $blockItems[$index] = Component::create($blockItem);
             }
         }
 
         $endpoints = $this->getUrls();
-
         $pageTitle = __('Dashboard') . ' - ' . \Unusualify\Modularity\Facades\Modularity::pageTitle();
         $headerTitle = __('Dashboard');
 
-        return View::make("$this->baseKey::layouts.dashboard", compact('blocks', 'endpoints', 'pageTitle', 'headerTitle'));
+        if ($this->shouldUseInertia()) {
+            return $this->renderInertiaDashboard(compact('blockItems', 'endpoints', 'pageTitle', 'headerTitle'));
+        }
+
+        return View::make("$this->baseKey::layouts.dashboard", compact('blockItems', 'endpoints', 'pageTitle', 'headerTitle'));
+    }
+
+    /**
+     * Render dashboard with Inertia
+     */
+    protected function renderInertiaDashboard(array $data)
+    {
+        $this->shareInertiaStoreVariables();
+
+        return \Inertia\Inertia::render('Dashboard', [
+            'blockItems' => $data['blockItems'] ?? [],
+            'endpoints' => $data['endpoints'] ?? new \StdClass,
+            'mainConfiguration' => $this->getInertiaMainConfiguration($data),
+            'headLayoutData' => $this->getHeadLayoutData($data),
+        ]);
     }
 }

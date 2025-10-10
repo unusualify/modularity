@@ -453,10 +453,15 @@ abstract class PanelController extends CoreController
 
     protected function getJSONData($with = [])
     {
-
         $scopes = $this->filterScope($this->nestedParentScopes());
 
-        $paginator = $this->getIndexItems(with: $with, scopes: $scopes);
+        $appends = $this->request->get('appends', []);
+
+        if (is_string($appends)) {
+            $appends = explode(',', $appends);
+        }
+
+        $paginator = $this->getIndexItems(with: $with, scopes: $scopes, appends: $appends);
 
         $noFormatted = $this->request->get('light', false);
 
@@ -830,6 +835,12 @@ abstract class PanelController extends CoreController
             $perPage = 0;
         }
 
+        $exceptIds = $this->request->get('exceptIds') ?? [];
+
+        if (is_string($exceptIds)) {
+            $exceptIds = explode(',', $exceptIds);
+        }
+
         return $this->transformIndexItems($this->repository->get(
             with: ($this->indexWith ?? []) + $with,
             scopes: $scopes,
@@ -837,7 +848,8 @@ abstract class PanelController extends CoreController
             perPage: $perPage,
             forcePagination: $forcePagination,
             appends: $appends,
-            id: $this->request->get('id') ?? null
+            id: $this->request->get('id') ?? null,
+            exceptIds: $exceptIds
         ));
     }
 

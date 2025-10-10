@@ -71,7 +71,7 @@ class ForgotPasswordController extends Controller
                 'buttonText' => 'authentication.reset-send',
                 'formClass' => 'py-6',
                 'no-default-form-padding' => true,
-
+                'noSchemaUpdatingProgressBar' => true,
             ],
             'formSlots' => [
                 'bottom' => [

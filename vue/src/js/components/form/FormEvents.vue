@@ -1,3 +1,60 @@
+<script setup>
+import { computed } from 'vue'
+import _ from 'lodash-es'
+
+const props = defineProps({
+  events: {
+    type: Array,
+    required: true
+  },
+  modelValue: {
+    type: Object,
+    required: true
+  },
+  formItem: {
+    type: Object,
+    default: () => ({})
+  }
+})
+
+const emit = defineEmits(['update:modelValue'])
+
+const input = computed({
+  get() {
+    return props.modelValue ?? {}
+  },
+  set(value) {
+    emit('update:modelValue', value)
+  }
+})
+
+const updateValue = (key, value) => {
+  input.value = { ...props.modelValue, [key]: value }
+}
+
+const getEventActiveLabel = (event) => {
+  const item = event.items.find(item => item[event.itemValue] === (window.__isset(input.value[event.name]) ? input.value[event.name] : -1))
+
+  return item ? item[event.itemTitle] : event.label
+}
+
+const getEventProps = (event) => {
+  return _.omit(event, [
+    'type',
+    'name',
+    'tooltip',
+    'conditions',
+    'scopeRole',
+    'allowedRoles',
+    'tooltipLocation',
+  ])
+}
+
+defineOptions({
+  name: 'FormEvents'
+})
+</script>
+
 <template>
   <template v-for="event in events" :key="event.name">
     <v-tooltip
@@ -64,56 +121,3 @@
 
   </template>
 </template>
-
-<script>
-export default {
-  name: 'FormEvents',
-  emits: ['update:modelValue'],
-  props: {
-    events: {
-      type: Array,
-      required: true
-    },
-    modelValue: {
-      type: Object,
-      required: true
-    },
-    formItem: {
-      type: Object,
-      default: () => ({})
-    }
-  },
-  computed: {
-    input: {
-      get() {
-        return this.modelValue ?? {}
-      },
-      set(value) {
-        this.$emit('update:modelValue', value)
-      }
-    }
-  },
-  methods: {
-    updateValue(key, value) {
-      this.input = { ...this.modelValue, [key]: value };
-      // this.$emit('update:modelValue', newModel);
-    },
-    getEventActiveLabel(event) {
-      const item = event.items.find(item => item[event.itemValue] ===  (window.__isset(this.input[event.name]) ? this.input[event.name] : -1))
-
-      return item ? item[event.itemTitle] : event.label
-    },
-    getEventProps(event) {
-      return this.$lodash.omit(event, [
-        'type',
-        'name',
-        'tooltip',
-        'conditions',
-        'scopeRole',
-        'allowedRoles',
-        'tooltipLocation',
-      ])
-    }
-  }
-}
-</script>

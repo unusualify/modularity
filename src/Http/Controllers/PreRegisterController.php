@@ -55,6 +55,7 @@ class PreRegisterController extends Controller
                 'formClass' => 'py-6',
                 'no-default-form-padding' => true,
                 'hasSubmit' => true,
+                'noSchemaUpdatingProgressBar' => true,
             ],
             'formSlots' => [
                 'options' => [

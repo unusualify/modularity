@@ -82,19 +82,6 @@ function resolveDevServerUrl (address, config) {
   const configHmrClientPort = typeof config.server.hmr === 'object' ? config.server.hmr.clientPort : null
   const port = configHmrClientPort ?? address.port
 
-  // console.log(
-  //   configHmrProtocol,
-  //   clientProtocol,
-  //   serverProtocol,
-  //   protocol,
-  //   configHmrHost,
-  //   configHost,
-  //   serverAddress,
-  //   host,
-  //   configHmrClientPort,
-  //   port
-
-  // )
   return `${protocol}://${host}:${port}`
 }
 

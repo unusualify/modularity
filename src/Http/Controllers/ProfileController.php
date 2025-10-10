@@ -231,18 +231,34 @@ class ProfileController extends BaseController
 
         // dd($sectionFields);
 
-        $data['elements'] = [
+        $elements = [
             UWrapper::makeGridSection($sectionFields, rowAttributes: ['class' => 'h-100'], colAttributes: ['class' => 'd-flex flex-column ga-6']),
         ];
         // dd($data);
-        $data['endpoints'] = $this->getUrls();
+        $endpoints = $this->getUrls();
 
-        $data['pageTitle'] = __('Profile Settings') . ' - ' . \Unusualify\Modularity\Facades\Modularity::pageTitle();
-        $data['headerTitle'] = __('My Profile');
+        $pageTitle = __('Profile Settings') . ' - ' . \Unusualify\Modularity\Facades\Modularity::pageTitle();
+        $headerTitle = __('My Profile');
+
+        if ($this->shouldUseInertia()) {
+            return $this->renderInertiaProfile(compact('elements', 'endpoints', 'pageTitle', 'headerTitle'));
+        }
 
         $view = "$this->baseKey::layouts.profile";
 
-        return View::make($view, $data);
+        return View::make($view, compact('elements', 'endpoints', 'pageTitle', 'headerTitle'));
+    }
+
+    protected function renderInertiaProfile(array $data)
+    {
+        $this->shareInertiaStoreVariables();
+
+        return \Inertia\Inertia::render('Profile', [
+            'elements' => $data['elements'] ?? [],
+            'endpoints' => $data['endpoints'] ?? new \StdClass,
+            'mainConfiguration' => $this->getInertiaMainConfiguration($data),
+            'headLayoutData' => $this->getHeadLayoutData($data),
+        ]);
     }
 
     /**

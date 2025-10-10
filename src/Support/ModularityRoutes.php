@@ -121,6 +121,7 @@ class ModularityRoutes
             'impersonate',
             'language',
             'navigation',
+            'inertia.middleware',
         ]);
 
         Route::aliasMiddleware('authorization', AuthorizationMiddleware::class);

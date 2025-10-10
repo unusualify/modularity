@@ -26,6 +26,7 @@ export { default as useForm, makeFormProps } from './useForm'
 
 export { default as useAuthorization } from './useAuthorization'
 export { default as useCache } from './useCache'
+export { default as useConfig } from './useConfig'
 
 export { default as useDynamicModal } from './useDynamicModal'
 
@@ -36,3 +37,7 @@ export { default as useInputFetch, makeInputFetchProps } from './useInputFetch'
 export { default as useAlert } from './useAlert'
 
 export { default as useCastAttributes } from './useCastAttributes'
+
+export { default as useInertiaRequests, useInertiaLoading } from './useInertiaRequests'
+
+export { default as useUser } from './useUser'

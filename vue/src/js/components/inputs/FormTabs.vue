@@ -42,6 +42,7 @@
                 @Xupdate:modelValue="$log('update:modelValue', $event, item.id)"
 
                 :schema="schemas[item.id]"
+                :noSchemaUpdatingProgressBar="noSchemaUpdatingProgressBar"
 
                 v-model:valid="valids[i]"
 
@@ -113,6 +114,10 @@ export default {
       type: String,
       default: 'asc',
       validator: (value) => ['asc', 'desc'].includes(value)
+    },
+    noSchemaUpdatingProgressBar: {
+      type: Boolean,
+      default: false
     }
   },
   setup (props, { emit }) {

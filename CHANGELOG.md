@@ -2,6 +2,116 @@
 
 All notable changes to `modularity` will be documented in this file
 
+## v0.48.1 - 2025-10-08
+
+### :wrench: Bug Fixes
+
+- update npm install command to include legacy peer dependencies by @OoBook in https://github.com/unusualify/modularity/commit/6642965bb085331b94508c9264574c8af56679fc
+
+## v0.48.0 - 2025-10-06
+
+### :rocket: Features
+
+- add isModularityRoute method to check route prefixes by @OoBook in https://github.com/unusualify/modularity/commit/6855101483b90ad529739959f1e2e7256d476a9e
+- enhance cache functionality with new hasCache getter and store state access by @OoBook in https://github.com/unusualify/modularity/commit/7b2e04dc70ec89aedc1d94022ccee9b804a015ae
+- add isSameUrl function to compare URLs without query parameters by @OoBook in https://github.com/unusualify/modularity/commit/4c49e0540f98523fcd59cbb5a02a5fde05898701
+- add custom hook for user state management by @OoBook in https://github.com/unusualify/modularity/commit/61ffe75c862f30370a88a9c8a74072feb410f61c
+- add inertiajs and tightenco/ziggy dependencies by @OoBook in https://github.com/unusualify/modularity/commit/20d6e0de16c291bbac5549638b4ba54473973395
+- add Inertia.js and Laravel Vite plugin by @OoBook in https://github.com/unusualify/modularity/commit/39e60795a922e96b1122398a333db16071bc032e
+- add Ziggy support detection and update path resolution by @OoBook in https://github.com/unusualify/modularity/commit/f79de218ed00b22c3b7f1df47219438d769bb935
+- add modularity configuration functions for navigation, authorization, impersonation, and localization by @OoBook in https://github.com/unusualify/modularity/commit/49987bf2502d9f00ca1f6542d79383fe7e30dc76
+- enhance sidebar menu item handling by @OoBook in https://github.com/unusualify/modularity/commit/8bd6b9a759e310b411fea7554ac8dfdb190e313b
+- add function for module path retrieval by @OoBook in https://github.com/unusualify/modularity/commit/7d05123574136adfe72537b8be7af98cb3839ad3
+- add noSchemaUpdatingProgressBar prop by @OoBook in https://github.com/unusualify/modularity/commit/f06d3383109a5f544bab778baa4ca8313ac635a5
+- add noSchemaUpdatingProgressBar prop to StepperContent component by @OoBook in https://github.com/unusualify/modularity/commit/045433634787c09031f0d9759e0f9508f344b4b6
+- add isSamePath function for path comparison by @OoBook in https://github.com/unusualify/modularity/commit/1a0483b04d7f7c1a82e11323261eeda5887a0bda
+- implement Inertia.js support and related components by @OoBook in https://github.com/unusualify/modularity/commit/dab9461b5fb97db588cfffd5f1d931c87584432a
+- add noSchemaUpdatingProgressBar prop to multiple form controllers by @OoBook in https://github.com/unusualify/modularity/commit/157613435993c56d2aecd7fa1239aa20121701b8
+- refactor dashboard layout and controller for Inertia support by @OoBook in https://github.com/unusualify/modularity/commit/c2d5d2a4c69c3f254e384077a5d069b4ab89920a
+- enhance navigation component with Inertia support and data-level attribute by @OoBook in https://github.com/unusualify/modularity/commit/4f0fc612bcd2532a5482c496c4f95392f93185a2
+- update Form component to use formActionsActive for action visibility by @OoBook in https://github.com/unusualify/modularity/commit/c4e79256f498fc2651988569f84fd43fc83cfc9b
+- enhance button click handling with Inertia support by @OoBook in https://github.com/unusualify/modularity/commit/e4206858e5ad7928bfcfbe290ad78a03d964e92d
+- add useConfig and useUser hooks for improved functionality by @OoBook in https://github.com/unusualify/modularity/commit/6fd5800df7b112b5079514cb0563dc0100eb7c20
+- integrate Inertia support in item actions for improved page reload handling by @OoBook in https://github.com/unusualify/modularity/commit/d7b112d480b458c429812e6b33d681f9380bceff
+- refactor login form handling with Inertia support by @OoBook in https://github.com/unusualify/modularity/commit/05e02c29c07a203b450204c580f22ff1bcd7d144
+- update table configuration with minWidth and formatter changes by @OoBook in https://github.com/unusualify/modularity/commit/0c4f77307c9a31fbd9a6e777cef34bcf80b9f565
+- implement select hook with customizable properties by @OoBook in https://github.com/unusualify/modularity/commit/a3dcc52dba62cf4e5e8bb064340b0971b4ceaf23
+- add pagination hook with customizable properties by @OoBook in https://github.com/unusualify/modularity/commit/d98130a1ed96ab5465e164a0399340718e477199
+- enhance input handling with initial value and object conversion support by @OoBook in https://github.com/unusualify/modularity/commit/1c1c6e8d37ab5423ede51ce2c3961fcc9b105b95
+- enhance form schema handling with repository methods by @OoBook in https://github.com/unusualify/modularity/commit/86be99105373f5305762c2ecd5d45698f58dc745
+- enhance data retrieval with appends and exceptIds support by @OoBook in https://github.com/unusualify/modularity/commit/18eb77d6a24e9b2d6244b580b504f614818a7e0d
+- introduce BrowserHydrate and Vue component for enhanced item selection by @OoBook in https://github.com/unusualify/modularity/commit/326c0ba3b50a5925ccf54f9777dde976b4151442
+- add email_with_company attribute for enhanced user information by @OoBook in https://github.com/unusualify/modularity/commit/33a2305262afb59c22b8d8958d33cdf31e3765b7
+- implement CreatorHydrate class for custom input handling by @OoBook in https://github.com/unusualify/modularity/commit/65ac20933aa080fd2e25771bc4b4f59f09958a48
+- integrate CreatorTrait for enhanced payment record management by @OoBook in https://github.com/unusualify/modularity/commit/71cdc0509fc1ac852b3b4a0ee09387a696c08d70
+- add guest user handling to media modal functionality by @OoBook in https://github.com/unusualify/modularity/commit/f5e3d87293a476c183eeb7118b15d468c41ed523
+- add input fields for payment amount and payer email by @OoBook in https://github.com/unusualify/modularity/commit/0b9363a1a99b91dce3ee708dc2ba1ed797ca8219
+- add global method to check component existence by @OoBook in https://github.com/unusualify/modularity/commit/534590b271261c0c2a89227a256cc9a2dfc696ef
+- add top and bottom slot components for enhanced layout flexibility by @OoBook in https://github.com/unusualify/modularity/commit/7f8f99cea57870e3d3288d23498b9bc4f5a4b2e9
+- conditionally register custom components for custom builds by @OoBook in https://github.com/unusualify/modularity/commit/f899e57cf1f1520447d885e34e1e590ae4dd2db9
+- enhance Vue build process with custom environment support by @OoBook in https://github.com/unusualify/modularity/commit/2c8e10d9acaefd5a6ddbd8798bca70e2cb758ca3
+
+### :wrench: Bug Fixes
+
+- disable clearable option for email input in password form by @celikerde in https://github.com/unusualify/modularity/commit/44319e1e34e85cf1c4b211858a60a0b9ff525e2f
+- ensure login modal is triggered on 401 error response by @OoBook in https://github.com/unusualify/modularity/commit/85b5daccc274cd6bc026cf00d842e27472b4d62f
+- update modal-service route to bypass middleware by @celikerde in https://github.com/unusualify/modularity/commit/86fe16325e3060534431da3fd7af64a41efda263
+- enhance error handling for OAuth authentication by @celikerde in https://github.com/unusualify/modularity/commit/9cdfd8002e0209bee1d7fefc1ab53f2b7225cc1f
+- update null and undefined check for newValue assignment by @OoBook in https://github.com/unusualify/modularity/commit/1f3c530b0e5ce89a205e716c37863399b742843d
+- correct reference to TableForms in custom form model assignment by @OoBook in https://github.com/unusualify/modularity/commit/29bf1a48537039aeb5e1a82d3d6a89a15e65d16d
+- improve badge value handling with lodash utilities by @OoBook in https://github.com/unusualify/modularity/commit/806092f25a51f25c7b1972f34eb2ccfbe0f3da56
+- disable router reload for alert timeout handling by @OoBook in https://github.com/unusualify/modularity/commit/7f5f3da088828121cf49676c1aa5c0f319ed63cd
+- readd bulkForceDelete functionality for improved item management by @OoBook in https://github.com/unusualify/modularity/commit/469722e2431d42e48d04aa7938a75256a0c5c347
+
+### :recycle: Refactors
+
+- refactor store initialization into a separate partial by @OoBook in https://github.com/unusualify/modularity/commit/92692add98c3084e443221e81de0dd8992ed4318
+- simplify title handling in head partial by @OoBook in https://github.com/unusualify/modularity/commit/2fd61b5cf5a0082062156eab63a7a0deb2dca70d
+- remove deprecated stepper form component by @OoBook in https://github.com/unusualify/modularity/commit/7c5dc2ea68d3b80d59ac0607ad6ef6ae167b78a9
+- improve caching mechanism for taggable items by @OoBook in https://github.com/unusualify/modularity/commit/b7865004a2883c824f66bc00f8b7dc38704d9935
+- streamline form handling and remove unused store modules by @OoBook in https://github.com/unusualify/modularity/commit/8d6291eaa9bc5dd5da2ea4a4c6a8b71333750fcb
+- comment out session expiration dialog code for future reference by @OoBook in https://github.com/unusualify/modularity/commit/05ff9f19f23017a9cc4f5d5c44da608f00be82e3
+- streamline global properties registration and clean up imports by @OoBook in https://github.com/unusualify/modularity/commit/b26d94bdab42d13bf2e38f2af8f8a937ac7f6288
+- update file name for clarity and consistency by @OoBook in https://github.com/unusualify/modularity/commit/d290d39c743e2794d03b0643498e29a859436344
+- update store access and improve code clarity by @OoBook in https://github.com/unusualify/modularity/commit/38d4bf0c9289b63ec89f08f6344083b83376c478
+- streamline authorization data handling in view composer by @OoBook in https://github.com/unusualify/modularity/commit/0edd70c30b904d954f97fb5ef6a10d2a31354d9c
+- simplify impersonation data handling in view composer by @OoBook in https://github.com/unusualify/modularity/commit/09d6ffdf79fccfe1f85981836d49c7b4dafc6b72
+- simplify navigation data handling in view composer by @OoBook in https://github.com/unusualify/modularity/commit/457b421f7286eb29f073ae94804ce5328fbc68a8
+- simplify localization data handling by @OoBook in https://github.com/unusualify/modularity/commit/c3506739f5b55931fea2ac6ae238e5b2f54feadd
+- deprecate getRoutes by @OoBook in https://github.com/unusualify/modularity/commit/896a4df733b4c1e8a3857ff75a51cd01d868bd54
+- migrate to script setup syntax by @OoBook in https://github.com/unusualify/modularity/commit/200ef42122fd66deaaa819bd4c4cb69144cdd5f0
+- comment out Ziggy definition for clarity by @OoBook in https://github.com/unusualify/modularity/commit/815899121fc42546a14823b7cce571af53fe7a17
+- remove debug log statement from action activator template by @OoBook in https://github.com/unusualify/modularity/commit/2bdf8b94a5d1b7a96477621d746db543cdf77b06
+- clean up master layout by removing unused media library references by @OoBook in https://github.com/unusualify/modularity/commit/d03d344da4ede9fb2f5d82c912759e42cf006958
+- enhance tooltip and item action handling in table component by @OoBook in https://github.com/unusualify/modularity/commit/8c50f79156e9508966e76e79c0bf288fc746217b
+- simplify sidebar information display and update dialog conditions by @OoBook in https://github.com/unusualify/modularity/commit/2d25bd346e5d88a2d46c28e6d54e8416f40ceb3b
+- streamline state and method management with reactive objects by @OoBook in https://github.com/unusualify/modularity/commit/7a7b120272ef4793e6824aa6949515939f170ecf
+- update loading state handling and improve input fetch integration by @OoBook in https://github.com/unusualify/modularity/commit/5a3ffe0205e51a00808f52c6e2a8d9e978f5102c
+- streamline creator record handling during model saving and creation by @OoBook in https://github.com/unusualify/modularity/commit/89fe2071d146e535cb6890b72fe1817a21256d51
+
+### :lipstick: Styling
+
+- lint coding styles for v0.47.0 by @invalid-email-address in https://github.com/unusualify/modularity/commit/88c198086f1fdc350d50dace66954ecbe086f049
+- lint coding styles for v0.48.0 by @OoBook in https://github.com/unusualify/modularity/commit/0a08f6024c6caf057ec0d22f577bf5d0b32f3821
+
+### :package: Build
+
+- update build artifacts for v0.47.0 by @invalid-email-address in https://github.com/unusualify/modularity/commit/3982ca98e5de8430314c1285fe9ca4f9337edf94
+- update build artifacts for v0.48.0 by @OoBook in https://github.com/unusualify/modularity/commit/aa16e991f53b36983c132f4d3b11141c5a483a9f
+- update build artifacts for v0.48.0 by @OoBook in https://github.com/unusualify/modularity/commit/b488e0bef5a4312dec99463c970abd3e0accae2c
+
+### :green_heart: Workflow
+
+- disable pint and vue build operations by @web-flow in https://github.com/unusualify/modularity/commit/d8e2680042ff3ccfa6fdd00e705bf74db0a7c8d2
+
+### :beers: Other Stuff
+
+- add debug logging for inertia setup process by @OoBook in https://github.com/unusualify/modularity/commit/6d8b2c93a4bf564dfe8ec5bb3914ccd937cd100e
+- remove unused SASS styles to streamline component by @OoBook in https://github.com/unusualify/modularity/commit/065b51fef9627d58bc04fb38dc690f9976b62d36
+- remove commented-out console log statements for cleaner code by @OoBook in https://github.com/unusualify/modularity/commit/7e88ac964ad56e96362d869f482732e0ba5f62bd
+- refactor environment variable loading and improve app directory resolution by @OoBook in https://github.com/unusualify/modularity/commit/d96fca80aa9492f0e1ca50946102abc355f2c1a3
+- update ignored files for environment configurations by @OoBook in https://github.com/unusualify/modularity/commit/12a644b43eaf751a92c5da91aa4bd77a72bdd445
+
 ## v0.47.0 - 2025-09-25
 
 ### :rocket: Features

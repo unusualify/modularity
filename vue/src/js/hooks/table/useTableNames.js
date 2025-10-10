@@ -73,7 +73,7 @@ export default function useTableNames(props, context) {
   const store = useStore()
   const { t, te } = useI18n({ useScope: 'global' })
 
-  const { editedItem, isSoftDeletableItem } = useTableItem()
+  const { editedItem, isSoftDeletableItem } = context.TableItem
 
   const Module = useModule(props, context)
 

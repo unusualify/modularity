@@ -286,6 +286,7 @@ return [
                     'title' => 'Company',
                     'key' => 'company',
                     'itemTitle' => 'name',
+                    'minWidth' => 150,
                 ],
                 [
                     'title' => 'Service',
@@ -331,7 +332,7 @@ return [
                     'key' => 'updated_at',
                     'formatter' => [
                         'date',
-                        'numeric',
+                        'long',
                     ],
                     'searchable' => false,
                     'sortable' => true,
@@ -343,6 +344,20 @@ return [
                 ],
             ],
             'inputs' => [
+                [
+                    'type' => 'number',
+                    'name' => 'amount',
+                    'label' => 'Payment Amount',
+                    'col' => ['cols' => 12, 'lg' => 6],
+                    'allowedRoles' => ['superadmin'],
+                ],
+                [
+                    'type' => 'text',
+                    'name' => 'email',
+                    'label' => 'Payer Email',
+                    'col' => ['cols' => 12, 'lg' => 6],
+                    'allowedRoles' => ['superadmin'],
+                ],
                 [
                     'type' => 'preview',
                     'name' => 'description',

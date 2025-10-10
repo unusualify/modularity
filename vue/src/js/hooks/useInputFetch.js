@@ -2,78 +2,35 @@
 import { ref, computed } from 'vue'
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
 
-import { getParameters, getURLWithoutQuery, getOrigin, getPath } from '@/utils/pushState'
+import { makeSelectProps } from '@/hooks/utils/useSelect.js'
+import { usePagination, makePaginationProps } from '@/hooks/utils/usePagination.js'
 
 
 export const makeInputFetchProps = propsFactory({
-  itemValue: {
-    type: String,
-    default: 'id'
-  },
-  itemTitle: {
-    type: String,
-    default: 'name'
-  },
-  multiple: {
-    type: Boolean,
-    default: false
-  },
-  page: {
-    type: Number,
-    default: 1
-  },
-  lastPage: {
-    type: Number,
-    default: -1
-  },
-  itemsPerPage: {
-    type: Number,
-    default: 20
-  },
-  endpoint: {
-    type: String,
-  },
-  items: {
-    type: Array,
-    default: () => []
-  },
-  sourceLoading: {
-    type: Boolean,
-    default: false
-  }
+  ...makeSelectProps(),
+  ...makePaginationProps(),
 })
 
 export default function useInputFetch(props, context) {
-  const loading = ref(false)
+  const {
+    activePage,
+    activeLastPage,
+    nextPage,
+    search,
+    itemsLoading,
+    elements,
+    fullUrl,
 
-  const rawEndpoint = ref(getURLWithoutQuery(props.endpoint))
-  const activePage = ref(props.page || 1)
-  const activeLastPage = ref(props.lastPage || -1)
-  const nextPage = ref(activeLastPage.value > 0 ? activeLastPage.value + 1 : props.page || 1)
-  const search = ref('')
-
-  const elements = ref(props.items || [])
-
-  const defaultQueryParameters = ref(getParameters(props.endpoint))
-  const queryParameters = computed(() => {
-    let query = new URLSearchParams({
-      ...defaultQueryParameters.value,
-      ...(!!nextPage.value ? {page: nextPage.value} : {}),
-      itemsPerPage: props.itemsPerPage,
-      ...(!!search.value ? {search: search.value} : {})
-    })
-
-    return query.toString()
-  })
-
-  const fullUrl = computed(() => {
-    return getURLWithoutQuery(rawEndpoint.value) + '?' + queryParameters.value
-  })
+    setItemsLoading,
+    setElements,
+    appendElements,
+    setActivePage
+  } = usePagination(props, context)
 
   const getItemsFromApi = async () => {
 
     if( !(nextPage.value > activeLastPage.value) || activeLastPage.value < 0){
-      loading.value = true;
+      setItemsLoading(true)
 
       context.emit('update:input', [
         {
@@ -91,14 +48,13 @@ export default function useInputFetch(props, context) {
                 activeLastPage.value = response.data.resource.last_page
 
               if(search.value == ''){
-                elements.value = elements.value.concat(response.data.resource.data ?? []);
+                appendElements(response.data.resource.data ?? []);
               }else{
-                elements.value = response.data.resource.data ?? []
+                setElements(response.data.resource.data ?? [])
               }
               // page.value++;
 
-              activePage.value = response.data.resource.current_page
-              nextPage.value = response.data.resource.current_page + 1
+              setActivePage(response.data.resource.current_page)
 
               if(!!context.input.value){
                 let searchContinue = false;
@@ -120,7 +76,7 @@ export default function useInputFetch(props, context) {
                 if(searchContinue){
                   getItemsFromApi()
                 } else {
-                  loading.value = false;
+                  setItemsLoading(false)
                   context.emit('update:input', [
                     {
                       key: 'sourceLoading',
@@ -141,7 +97,7 @@ export default function useInputFetch(props, context) {
                   ])
                 }
               }else{
-                loading.value = false;
+                setItemsLoading(false)
                 context.emit('update:input', [
                   {
                     key: 'sourceLoading',
@@ -181,7 +137,7 @@ export default function useInputFetch(props, context) {
   }
 
   return {
-    loading,
+    itemsLoading,
     elements,
     getItemsFromApi,
     activePage,
