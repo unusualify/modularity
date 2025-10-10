@@ -17,13 +17,13 @@ export default function useCurrency(props) {
   const { locale } = useI18n({ useScope: 'global' })
 
 
-  const methods = reactive({
-    formatPrice(amount, symbol) {
+  const methods = {
+    formatPrice: (amount, symbol) => {
       return window.__formatCurrencyPrice(amount, symbol, locale.value ?? locale)
     }
-  })
+  }
 
   return {
-    ...toRefs(methods)
+    ...methods
   }
 }

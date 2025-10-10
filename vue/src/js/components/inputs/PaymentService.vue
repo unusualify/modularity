@@ -23,12 +23,12 @@
           <!-- Payment Methods -->
           <v-radio-group v-model="localPaymentMethod" column >
             <!-- Credit Card Option -->
-            <div
+            <div v-if="creditCardService"
               class="service-container px-3 py-cs-1 credit-card-service"
               :class="{ 'selected-service--focus': localPaymentMethod === localDefaultPaymentMethod }"
             >
               <v-radio
-                :label="$t('Credit Card') + ' *' "
+                :label="$t('Credit Card') + ' ' + (creditCardService.has_transaction_fee && includeTransactionFee ? '(+' + creditCardService.transaction_fee_percentage + '%)*' : '')"
                 :value="localDefaultPaymentMethod"
                 class="service-label flex-md-1-1-0 flex-1-1-100"
               />
@@ -53,8 +53,7 @@
               :class="{ 'selected-service--focus': localPaymentMethod === service[itemValue] }"
             >
               <v-radio
-                 :labelX="!service.name.includes('Bank Transfer') ? service.name + '*' : service.name"
-                 :label="`${service.name} ${service.is_external ? '*' : ''}`"
+                 :label="`${service.name} ${service.has_transaction_fee && includeTransactionFee ? '(+' + service.transaction_fee_percentage + '%)*' : ''}`"
                  :value="service[itemValue]"
                  class="service-label flex-md-1-1-0 flex-1-1-100"
               />
@@ -73,9 +72,9 @@
                 </v-col>
               </v-row> -->
             </div>
-            <div v-if="currencyHasExternalService" class="service-container" style="border: none;">
+            <div v-if="currencyHasTransactionFee" class="service-container" style="border: none;">
               <div class="text-body-1">
-                {{ '* ' + '+' + transactionFeePercentage + '% ' + transactionFeeDescription }}
+                {{ '* ' + transactionFeeDescription }}
               </div>
             </div>
           </v-radio-group>
@@ -84,7 +83,7 @@
         <!-- Total Amount Display -->
         <v-card-title class="headline">
           <p class="total mb-2">{{ $t('Total Amount') }}</p>
-          <p class="amount mb-2">{{ displayPrice }}</p>
+          <p class="amount mb-2">{{ displayPriceFormatted }}</p>
           <p class="" v-if="isExchanged">{{ $t('Exchange Rate') }}: ~{{ exchangeRate }}</p>
         </v-card-title>
       </v-col>
@@ -257,13 +256,18 @@ export default {
       default: null
     },
 
+    includeTransactionFee: {
+      type: Boolean,
+      default: false
+    },
+
     transactionFeePercentage: {
       type: Number,
       default: 3
     },
     transactionFeeDescription: {
       type: String,
-      default: 'transaction fee'
+      default: 'Transaction fee for the payment service'
     },
   },
 
@@ -273,9 +277,45 @@ export default {
 
     // Refs
     const localPaymentMethod = ref('');
-    const localDefaultPaymentMethod = ref("-1");
+    const localDefaultPaymentMethod = ref(-1);
     const currencyModel = ref(props.price_object.currency_id || props.supportedCurrencies[0]?.id);
-    const displayPrice = ref(formatPrice.value(props.price_object.total_amount / 100, props.supportedCurrencies[0]?.symbol || ''));
+
+    const selectedCurrency = computed(() =>
+      props.supportedCurrencies.find(curr => curr.id === currencyModel.value)
+    );
+
+    const currencyHasCreditCardService = computed(() => {
+      return !!selectedCurrency.value.payment_service
+    });
+
+    const creditCardService = computed(() => {
+      return selectedCurrency.value.payment_service;
+    });
+
+    const currencyHasTransactionFee = computed(() => {
+      return props.includeTransactionFee && (selectedCurrency.value.payment_service?.has_transaction_fee || selectedCurrency.value.payment_services.some(service => service.has_transaction_fee));
+    });
+
+    const selectedPaymentService = computed(() => {
+      return localPaymentMethod.value == -1
+        ? selectedCurrency.value.payment_service
+        : selectedCurrency.value.payment_services.find(service => service.id === localPaymentMethod.value);
+    });
+
+    const calculatePrice = (amount) => {
+      let transactionFee = props.includeTransactionFee ? selectedPaymentService.value?.transaction_fee_percentage ?? 0 : 0;
+
+      return amount + ( transactionFee * amount / 100);
+    }
+
+    const priceAmount = ref(props.price_object.total_amount);
+    const calculatedPriceAmount = computed(() => {
+      return calculatePrice(priceAmount.value / 100);
+    });
+
+    const displayPriceFormatted = computed(() => {
+      return formatPrice(calculatedPriceAmount.value, selectedCurrency.value?.symbol || '');
+    });
 
     const builtInFormLoading = ref(true);
     const builtInFormAttributes = ref({});
@@ -289,11 +329,6 @@ export default {
       card_cvv: ''
     });
 
-    // Computed
-    const selectedCurrency = computed(() =>
-      props.supportedCurrencies.find(curr => curr.id === currencyModel.value)
-    );
-
     const formattedCurrencies = computed(() =>
       props.supportedCurrencies.map(currency => ({
         id: currency.id,
@@ -305,7 +340,7 @@ export default {
       if (!currencyModel.value) return [];
 
       return props.items.filter(service => {
-        return service.payment_currencies?.some(currency => currency.id === currencyModel.value)
+        return service.payment_currencies?.some(currency => currency.id === currencyModel.value && (service.is_external || service.transferrable))
       });
     });
 
@@ -320,7 +355,7 @@ export default {
 
       if (methodValue == null || methodValue === '') return null;
 
-      return items.find(service => service[props.itemValue] === methodValue) || null;
+      return items.find(service => service[props.itemValue] === methodValue) || selectedCurrency.value.payment_service || null;
     });
 
     const transferFormModel = ref({
@@ -341,7 +376,7 @@ export default {
     };
 
     const serviceHasCreditCard = (service) => {
-      if (!service) return true;
+      if (!service) return false;
 
       return service.is_internal && !serviceIsTransferrable(service)
     };
@@ -358,6 +393,24 @@ export default {
       get: () => props.modelValue,
       set: (newValue) => emit('update:modelValue', newValue)
     });
+
+    if(!currencyHasCreditCardService.value){
+      localPaymentMethod.value = filteredServiceItems.value[0].id;
+
+      input.value = {
+        payment_method: localPaymentMethod.value,
+        credit_card: { ...localCreditCard },
+        currency: selectedCurrency.value,
+      };
+    } else {
+      localPaymentMethod.value = localDefaultPaymentMethod.value;
+
+      input.value = {
+        payment_method: localPaymentMethod.value,
+        credit_card: { ...localCreditCard },
+        currency: selectedCurrency.value,
+      };
+    }
 
     const isExchanged = computed(() =>
       selectedCurrency.value?.iso_4217 !== props.baseCurrency
@@ -412,12 +465,13 @@ export default {
       currencyModel.value = newCurrencyId;
       localPaymentMethod.value = localDefaultPaymentMethod.value;
 
-      const selectedCurrencyObject = props.supportedCurrencies.find(curr => curr.id === newCurrencyId);
-      if (!selectedCurrencyObject || !props.currencyConversionEndpoint) return;
+      // const selectedCurrencyObject = props.supportedCurrencies.find(curr => curr.id === newCurrencyId);
+      const selectedCurrencyObject = _.cloneDeep(selectedCurrency.value);
+      if (!selectedCurrency.value || !props.currencyConversionEndpoint) return;
 
       try {
         const response = await axios.post(props.currencyConversionEndpoint, {
-          currency: selectedCurrencyObject.iso_4217,
+          currency: selectedCurrency.value.iso_4217,
           amount: props.price_object.discounted_raw_amount / 100
         });
 
@@ -425,23 +479,25 @@ export default {
 
         const calculatedAmount = response.data.converted_amount * ( 1 + props.price_object.vat_multiplier);
 
-        displayPrice.value = formatPrice.value(
-          calculatedAmount,
-          selectedCurrencyObject.symbol
-        );
+        priceAmount.value = calculatedAmount * 100;
 
-        emit('update:price', displayPrice.value);
-        emit('currency-converted', displayPrice.value);
+        emit('update:price', displayPriceFormatted.value);
+        emit('currency-converted', displayPriceFormatted.value);
       } catch (error) {
         console.error('Currency conversion error:', error);
       }
     };
 
     // Watchers
+    watch(currencyModel, (newValue) => {
+      localPaymentMethod.value = currencyHasCreditCardService.value ? localDefaultPaymentMethod.value : filteredServiceItems.value[0]?.id ?? -1;
+    });
+
     watch(() => props.modelValue, (newValue) => {
       if (newValue && typeof newValue === 'object') {
-        localPaymentMethod.value = newValue.payment_method || localDefaultPaymentMethod.value;
-        Object.assign(localCreditCard, newValue.credit_card || {});
+        // console.log('watch props.modelValue', newValue.payment_method || localDefaultPaymentMethod.value, newValue);
+        // localPaymentMethod.value = newValue.payment_method || localPaymentMethod.value || localDefaultPaymentMethod.value;
+        // Object.assign(localCreditCard, newValue.credit_card || {});
       }
     }, { immediate: true, deep: true });
 
@@ -474,6 +530,10 @@ export default {
       localPaymentMethod,
       localDefaultPaymentMethod,
       localCreditCard,
+      creditCardService,
+
+      selectedPaymentService,
+      currencyHasTransactionFee,
 
       isCreditCardForm,
       isTransferrableForm,
@@ -493,7 +553,7 @@ export default {
       handleTransferSubmit,
 
       handleCurrencyChange,
-      displayPrice,
+      displayPriceFormatted,
       selectedService,
       exchangeRate,
       isExchanged,
