@@ -301,6 +301,16 @@ class Modularity extends FileRepository
     }
 
     /**
+     * Check if transaction fee should be included.
+     *
+     * @return bool
+     */
+    final public function shouldIncludeTransactionFee()
+    {
+        return $this->config('include_transaction_fee', false);
+    }
+
+    /**
      * Create a page title callback.
      *
      * @param \Closure $callback

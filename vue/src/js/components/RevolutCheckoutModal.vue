@@ -22,10 +22,9 @@ export default {
   setup(props) {
     const DynamicModal = useDynamicModal()
 
-    console.log('props', props);
     let payWithPopup = null;
+
     RevolutCheckout(props.token, props.env).then(instance => {
-      console.log('instance', instance);
       payWithPopup = instance.payWithPopup;
     });
 

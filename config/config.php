@@ -31,6 +31,7 @@ return [
     'build_timeout' => 300,
     'use_big_integers_on_migrations' => true,
     'use_inertia' => env('MODULARITY_USE_INERTIA', false),
+    'include_transaction_fee' => env('MODULARITY_INCLUDE_TRANSACTION_FEE', false),
 
     'locale' => 'en',
     'fallback_locale' => 'en',
