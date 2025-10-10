@@ -401,6 +401,7 @@ onMounted(() => {
     :ref="VInputRef"
     v-model="input"
     :class="['v-input-browser']"
+    hide-details="auto"
   >
     <template v-slot:default="defaultSlot">
       <v-combobox
@@ -424,7 +425,6 @@ onMounted(() => {
         @keyup.enter="performSearch"
       >
         <template v-slot:selection="{ item, index }">
-          {{ $log(item, initialValue, modelValue, input, ) }}
           <v-chip v-if="item === Object(item)"
             :color="isInitialItem(item)
               ? 'green-lighten-3'
