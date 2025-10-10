@@ -95,7 +95,7 @@ trait SendsEmailVerificationRegister
                 'status' => 'success',
                 'title' => __('authentication.pre-register-title'),
                 'description' => __('authentication.pre-register-description'),
-                'button_text' => __('authentication.pre-register-button_text'),
+                'button_text' => __('authentication.pre-register-button-text'),
                 'button_url' => route('admin.login'),
             ],
         ]);

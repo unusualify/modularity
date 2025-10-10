@@ -231,7 +231,7 @@ class RegisterController extends Controller
                 'status' => 'success',
                 'title' => __('authentication.register-title'),
                 'description' => __('authentication.register-description'),
-                'button_text' => __('authentication.register-button_text'),
+                'button_text' => __('authentication.register-button-text'),
                 'button_url' => route('admin.login'),
             ],
         ]);
