@@ -26,11 +26,9 @@ class LanguageMiddleware
 
         if (! in_array($locale, $translatableLocales) && $request->user() && $request->user()->language) {
             $locale = $request->user()->language;
-        }
-
-        if (! in_array($locale, $translatableLocales)) {
-            if (env('AUTO_LOCALE_FINDER', false)) {
-                if (mb_strtolower(geoip()->getLocation($request->ip())->iso_code) === 'tr') {
+        } else if (env('MODULARITY_AUTO_LOCALE_FINDER', false)) {
+            if (mb_strtolower(geoip()->getLocation($request->ip())->iso_code) === 'tr') {
+                if (in_array($locale, $translatableLocales)) {
                     $locale = 'tr';
                 }
             }
