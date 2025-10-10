@@ -21,8 +21,13 @@ export default function useValidation (props) {
   })
 
   const ruleMethods = reactive({
-    minRule: (l, msg) => v => (!!v && v.length >= l) || msg || `min. ${l} ${Array.isArray(v) ? 'Selections' : 'Characters'}`,
+    minRule: (l, msg) => v => (!!v && (typeof v === 'string' ? v.trim().length : v.length) >= l) || msg || `min. ${l} ${Array.isArray(v) ? 'Selections' : 'Characters'}`,
     maxRule: (l, msg) => v => (!v || v.length <= l) || msg || `max. ${l} ${Array.isArray(v) ? 'Selections' : 'Characters'}`,
+    nameRule: (msg) => v => {
+      if (!v) return true;
+      const trimmed = v.trim().replace(/\s+/g, ' ');
+      return /^[\p{L}'\-]+(?: [\p{L}'\-]+)*$/u.test(trimmed) || msg || 'Only letters, apostrophes, and hyphens allowed.';
+    },
     // requiredRule: msg => v => !!v || msg || 'Required',
     emailRule: (options = {}, msg) => v => {
         if (!v) return true;

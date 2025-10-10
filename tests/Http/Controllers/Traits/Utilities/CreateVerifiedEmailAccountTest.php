@@ -129,7 +129,7 @@ class CreateVerifiedEmailAccountTest extends ModelTestCase
     public function test_set_user_register()
     {
         $credentials = [
-            'name' => 'Name ',
+            'name' => 'Name',
             'surname' => 'Surname',
             'email' => 'email@email.com',
             'email_verified_at' => now(),
@@ -241,5 +241,20 @@ class CreateVerifiedEmailAccountTest extends ModelTestCase
         $this->assertEquals('http://localhost/home', $response->getTargetUrl());
 
         $this->assertEquals('Registration has been completed successfully.', $response->getSession()->get('status'));
+    }
+
+    public function test_normalize_name()
+    {
+        $name1 = 'Name  ';
+        $normalizedName = $this->controller->normalizeName($name1);
+        $this->assertEquals('Name', $normalizedName);
+
+        $name2 = '     Name';
+        $normalizedName = $this->controller->normalizeName($name2);
+        $this->assertEquals('Name', $normalizedName);
+
+        $name3 = '    Name  ';
+        $normalizedName = $this->controller->normalizeName($name3);
+        $this->assertEquals('Name', $normalizedName);
     }
 }
