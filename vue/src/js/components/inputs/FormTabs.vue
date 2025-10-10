@@ -272,7 +272,7 @@ export default {
       loading,
       elements,
       formRefs,
-      activeTab: 1,
+      activeTab: 0,
       models,
       schemas,
       valids,
