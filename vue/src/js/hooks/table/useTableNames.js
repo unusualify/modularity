@@ -117,15 +117,21 @@ export default function useTableNames(props, context) {
       translationKey = props.editFormTitle
     }
 
-    let interpolation = isEditing ? props.formEditTitleInterpolations : props.formCreateTitleInterpolations
+    // NOTE: Build a fresh object — never mutate `props.form{Edit,Create}TitleInterpolations`.
+    // The source map holds *paths* (e.g. `{ item: 'id' }`); writing the resolved value back into
+    // it would poison the next compute, since the loop would then look up the resolved value
+    // itself (e.g. a UUID) instead of the original path — pinning the modal title to the id of
+    // the first ticket opened in the session.
+    const interpolationSource = isEditing ? props.formEditTitleInterpolations : props.formCreateTitleInterpolations
+    const interpolation = {}
 
-    for(let key in interpolation) {
-      let value = interpolation[key]
-      interpolation[key] = __isset(Module[interpolation[key]])
-        ? Module[interpolation[key]].value
-        : __isset(editedItem.value[interpolation[key]])
-          ? editedItem.value[interpolation[key]]
-          : value
+    for(let key in interpolationSource) {
+      const path = interpolationSource[key]
+      interpolation[key] = __isset(Module[path])
+        ? Module[path].value
+        : __isset(editedItem.value[path])
+          ? editedItem.value[path]
+          : path
     }
 
     return te(translationKey) ? t(translationKey, interpolation) : translationKey
