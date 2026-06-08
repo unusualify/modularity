@@ -2,6 +2,16 @@
 
 All notable changes to `modularous` will be documented in this file
 
+## v0.58.4 - 2026-06-08
+
+### :wrench: Bug Fixes
+
+- update global scope and currency formatting by @celikerde in https://github.com/unusualify/modularous/commit/5475b1bc90794d4f4f70c8af49a3e957c5d0e6a2
+- enhance reason input with overflow handling and submission logic by @celikerde in https://github.com/unusualify/modularous/commit/12f4ac07f78ab148e286cc485079cc510a0e3c1c
+- prevent mutation of title interpolation props by @celikerde in https://github.com/unusualify/modularous/commit/1717a2836cb5135aab5de25cabb4b28405f299d1
+- enhance payment processing experience by @celikerde in https://github.com/unusualify/modularous/commit/23e3f8aa27592047ca7b8320f965c84fbd35ad6a
+- add initial item locking functionality by @celikerde in https://github.com/unusualify/modularous/commit/6bfb162ad7af68279d6772793000679c7132f373
+
 ## v12.0.1 - 2026-05-12
 
 ### :rocket: Features
