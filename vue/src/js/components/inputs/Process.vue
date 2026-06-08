@@ -167,6 +167,59 @@
             :col-classes="['font-weight-bold text-wrap', 'd-flex justify-start']"
             :col-ratios="historyColRatio ?? displayColRatio"
           >
+            <template v-slot:field.1="slotScope">
+              <div class="d-flex align-center w-100" style="min-width: 0;">
+                <div
+                  ref="reasonTextEl"
+                  class="flex-grow-1 text-truncate"
+                  style="min-width: 0;"
+                >
+                  {{ slotScope.value }}
+                </div>
+                <v-menu
+                  v-if="hasReasonOverflow"
+                  v-model="reasonMenuOpen"
+                  :close-on-content-click="false"
+                  location="bottom end"
+                  offset="4"
+                >
+                  <template v-slot:activator="{ props: activatorProps }">
+                    <v-btn
+                      :icon="reasonMenuOpen ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+                      size="x-small"
+                      variant="text"
+                      density="compact"
+                      class="ms-1 flex-shrink-0"
+                      v-bind="activatorProps"
+                    />
+                  </template>
+                  <v-card max-width="360">
+                    <v-card-text
+                      class="text-body-2 text-break"
+                      style="white-space: pre-line;"
+                    >
+                      {{ slotScope.value }}
+                    </v-card-text>
+                    <!--
+                      TODO: copy-to-clipboard icon (disabled in this version, re-enable later)
+                      Requires: position-relative on v-card, pe-10 pb-10 on v-card-text,
+                      and reasonCopied + copyReason from setup().
+                    <v-btn
+                      :icon="reasonCopied ? 'mdi-check' : 'mdi-content-copy'"
+                      :color="reasonCopied ? 'success' : undefined"
+                      size="x-small"
+                      variant="text"
+                      density="compact"
+                      class="position-absolute"
+                      style="bottom: 6px; right: 6px;"
+                      :title="$t('Copy')"
+                      @click.stop="copyReason(slotScope.value)"
+                    />
+                    -->
+                  </v-card>
+                </v-menu>
+              </div>
+            </template>
           </ue-list-section>
 
           <template v-if="!(showProcessableDetails && processableModel)">
@@ -215,7 +268,18 @@
                         <p class="text-subtitle-1 mb-4" v-if="getStatusConfigurationValue('rejected', 'dialog_message')">
                           {{ getStatusConfigurationValue('rejected', 'dialog_message') }}
                         </p>
-                        <v-textarea v-model="reason" variant="outlined" label="Reason" />
+                        <v-textarea
+                          v-model="reason"
+                          variant="outlined"
+                          label="Reason"
+                          counter="500"
+                          maxlength="500"
+                          :rules="[v => !v || v.length <= 500 || $t('Maximum {count} characters allowed', { count: 500 })]"
+                          persistent-counter
+                          :hint="$t('Press Shift+Enter for a new line, Enter to submit.')"
+                          persistent-hint
+                          @keydown.enter.exact.prevent="onReasonEnter"
+                        />
                       </v-card-text>
                       <v-card-actions class="justify-center">
                         <v-btn
@@ -231,7 +295,7 @@
                           color="error"
                           :slim="false"
                           variant="elevated"
-                          :disabled="!reason"
+                          :disabled="!reason || reason.length > 500"
                           :loading="updating"
                           @click="updateProcess('rejected')"
                         >
@@ -278,7 +342,7 @@
 </template>
 
 <script>
-import { ref, reactive, computed, toRefs, nextTick, onMounted } from 'vue'
+import { ref, reactive, computed, toRefs, nextTick, onMounted, onUnmounted, watch } from 'vue'
 import _ from 'lodash-es'
 import { useI18n } from 'vue-i18n'
 import { useStore } from 'vuex'
@@ -451,6 +515,92 @@ export default {
 
     const reason = ref('')
     const promptModalActive = ref(false)
+
+    // Enter alone submits the rejection; Shift+Enter inserts a new line (default textarea behavior).
+    const onReasonEnter = () => {
+      if (!reason.value) return
+      if (reason.value.length > 500) return
+      if (updating.value) return
+      updateProcess('rejected')
+    }
+
+    // History reason truncation + popover-on-chevron (per-card, not inline expansion)
+    const reasonMenuOpen = ref(false)
+    const reasonTextEl = ref(null)
+    const hasReasonOverflow = ref(false)
+    let reasonResizeObserver = null
+
+    /*
+     * Copy-to-clipboard for reason popover — disabled in this version, re-enable later.
+     *
+     * const reasonCopied = ref(false)
+     * let reasonCopyTimer = null
+     *
+     * const copyReason = async (text) => {
+     *   if (!text) return
+     *   try {
+     *     if (window.navigator.clipboard && window.navigator.clipboard.writeText) {
+     *       await window.navigator.clipboard.writeText(text)
+     *     } else {
+     *       // Fallback for non-secure contexts (e.g. http://app.b2press.test)
+     *       const ta = document.createElement('textarea')
+     *       ta.value = text
+     *       ta.setAttribute('readonly', '')
+     *       ta.style.position = 'absolute'
+     *       ta.style.left = '-9999px'
+     *       document.body.appendChild(ta)
+     *       ta.select()
+     *       document.execCommand('copy')
+     *       document.body.removeChild(ta)
+     *     }
+     *     reasonCopied.value = true
+     *     if (reasonCopyTimer) clearTimeout(reasonCopyTimer)
+     *     reasonCopyTimer = setTimeout(() => { reasonCopied.value = false }, 1500)
+     *   } catch (e) {
+     *     // silently ignore — clipboard may be unavailable
+     *   }
+     * }
+     */
+
+    const checkReasonOverflow = () => {
+      if (reasonTextEl.value) {
+        hasReasonOverflow.value = reasonTextEl.value.scrollWidth > reasonTextEl.value.clientWidth
+      }
+    }
+
+    watch(reasonTextEl, (el) => {
+      if (reasonResizeObserver) {
+        reasonResizeObserver.disconnect()
+        reasonResizeObserver = null
+      }
+      if (el && typeof ResizeObserver !== 'undefined') {
+        reasonResizeObserver = new ResizeObserver(checkReasonOverflow)
+        reasonResizeObserver.observe(el)
+      }
+      nextTick(checkReasonOverflow)
+    })
+
+    /*
+     * Reset copy state whenever popover opens/closes — re-enable with copy feature.
+     * watch(reasonMenuOpen, () => {
+     *   reasonCopied.value = false
+     *   if (reasonCopyTimer) {
+     *     clearTimeout(reasonCopyTimer)
+     *     reasonCopyTimer = null
+     *   }
+     * })
+     */
+
+    onUnmounted(() => {
+      if (reasonResizeObserver) {
+        reasonResizeObserver.disconnect()
+        reasonResizeObserver = null
+      }
+      // if (reasonCopyTimer) {
+      //   clearTimeout(reasonCopyTimer)
+      //   reasonCopyTimer = null
+      // }
+    })
 
     const openDialog = (status, callback) => {
       let title = t('Are you sure you want to update the process?')
@@ -772,6 +922,14 @@ export default {
       getStatusConfigurationValue,
     })
 
+    watch(
+      () => processModel.value?.last_history?.reason,
+      () => {
+        reasonMenuOpen.value = false
+        nextTick(checkReasonOverflow)
+      }
+    )
+
     onMounted(() => {
       fetchProcess()
     })
@@ -781,6 +939,12 @@ export default {
       ...toRefs(states),
       formSchema,
       processModel,
+      reasonMenuOpen,
+      reasonTextEl,
+      hasReasonOverflow,
+      onReasonEnter,
+      // reasonCopied,
+      // copyReason,
       ...toRefs(methods),
     }
   },

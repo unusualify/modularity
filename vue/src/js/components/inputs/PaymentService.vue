@@ -1,6 +1,10 @@
 <template>
   <v-input v-model="input">
-    <v-row no-gutters>
+    <v-row
+      no-gutters
+      :inert="paymentProcessing"
+      :aria-busy="paymentProcessing"
+    >
       <v-col class="d-flex flex-column justify-center px-0">
         <v-card class="pa-4 payment-container" elevation="0">
           <v-card-text class="pa-0">
@@ -99,6 +103,7 @@
             /> -->
             <ue-revolut-checkout-modal v-else
               @cancel="runBuiltInForm"
+              @success="handlePaymentSuccess"
               v-bind="builtInFormAttributes"
               :complete-url="completeUrl"
             >
@@ -143,7 +148,7 @@
             <ue-form
               ref="transferForm"
               :schema="transferSchema"
-              :modelValue="createTransferModel()"
+              :modelValue="transferFormModel"
               :action-url="paymentUrl"
 
               noDefaultSurface
@@ -153,7 +158,7 @@
               @submitted="handleTransferSubmit"
             >
               <template #submit="{ validForm, loading, saveForm }">
-                <v-btn color="success" block :disabled="!validForm || transferFormCompleted" :loading="loading"  @click="saveForm">
+                <v-btn color="success" block :disabled="!validForm || transferFormCompleted" :loading="loading"  @click="startTransferSubmission(saveForm)">
                   {{ $t('I Have Completed The Transfer') }}
                 </v-btn>
               </template>
@@ -184,6 +189,13 @@
       </v-col>
     </v-row>
   </v-input>
+
+  <Teleport to="body">
+    <div v-if="paymentProcessing" class="payment-service-overlay">
+      <v-progress-circular indeterminate color="primary" size="64" :width="5" />
+      <p class="mt-4 text-body-1 font-weight-medium">{{ $t('Please wait...') }}</p>
+    </div>
+  </Teleport>
 </template>
 
 <script>
@@ -329,6 +341,14 @@ export default {
 
     const builtInFormLoading = ref(true);
     const builtInFormAttributes = ref({});
+    const paymentProcessing = ref(false);
+
+    // Lock the entire payment form once a built-in gateway (e.g. Revolut) reports
+    // a successful charge. The server-side completion call will redirect the user
+    // shortly after, but this prevents a second payment attempt during that window.
+    const handlePaymentSuccess = () => {
+      paymentProcessing.value = true;
+    };
 
     // Reactive state
     const localCreditCard = reactive({
@@ -442,9 +462,23 @@ export default {
       }
     }
 
+    // Optimistically lock the form the moment the user clicks "I Have Completed
+    // The Transfer" so the "Please wait…" overlay shows immediately, not after
+    // the ~1s network round-trip. If the server replies with a non-success
+    // status the overlay is released again in handleTransferSubmit.
+    const startTransferSubmission = (saveForm) => {
+      handlePaymentSuccess();
+      saveForm();
+    }
+
     const handleTransferSubmit = (data) => {
       if(data.status === 'success'){
         transferFormCompleted.value = true;
+        handlePaymentSuccess();
+      } else {
+        // Server rejected the submission — release the overlay so the user can
+        // see/fix the errors instead of being stuck on "Please wait…".
+        paymentProcessing.value = false;
       }
     }
 
@@ -531,13 +565,12 @@ export default {
       };
     }, { deep: true });
 
-    watch(isTransferrableForm, (newValue) => {
-      if(newValue){
-        let paymentServiceID = localPaymentMethod.value;
-        transferFormModel.value.payment_service_id = paymentServiceID;
-        transferFormModel.value.currency_id = selectedCurrency.value.id;
+    watch([isTransferrableForm, localPaymentMethod, selectedCurrency], () => {
+      if(isTransferrableForm.value){
+        transferFormModel.value.payment_service_id = localPaymentMethod.value;
+        transferFormModel.value.currency_id = selectedCurrency.value?.id ?? null;
       }
-    }, { deep: true });
+    });
 
     if(selectedCurrency.value.has_built_in_form){
       runBuiltInForm();
@@ -581,6 +614,9 @@ export default {
       builtInFormAttributes,
       setBuiltInFormAttributes,
       runBuiltInForm,
+      paymentProcessing,
+      handlePaymentSuccess,
+      startTransferSubmission,
     };
   }
 };
@@ -702,4 +738,20 @@ export default {
     }
   }
 
+  .payment-service-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(2px);
+    color: #20363B;
+    pointer-events: auto;
+    // It's a status indicator, not content — don't let the user highlight it.
+    user-select: none;
+    -webkit-user-select: none;
+  }
 </style>
