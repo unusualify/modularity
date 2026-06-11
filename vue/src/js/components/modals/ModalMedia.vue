@@ -129,7 +129,15 @@
                                 @shiftChange="updateSelectedMedias"/>
                   <MediaGrid v-else :items="renderedMediaItems" :selected-items="selectedMedias" :used-items="usedMedias"
                                 @change="updateSelectedMedias" @shiftChange="updateSelectedMedias"/>
-                  <!-- <a17-spinner v-if="loading" class="medialibrary__spinner">Loading&hellip;</a17-spinner> -->
+                  <div v-if="loading" class="medialibrary__spinner text-center py-4">
+                    <v-progress-circular indeterminate color="primary" size="32" />
+                  </div>
+                  <p
+                    v-else-if="gridLoaded && maxPage > 1 && page >= maxPage"
+                    class="text-center text-medium-emphasis py-3 text-caption"
+                  >
+                    {{ $t('media-library.end-of-list', 'All items loaded') }}
+                  </p>
                 </div>
                 <!-- TEST END -->
               </div>
@@ -210,7 +218,9 @@ export default {
   data: function () {
     return {
       loading: false,
-      maxPage: 20,
+      maxPage: 1,
+      /** Matches MediaLibraryController::$perPage / FileLibraryController::$perPage */
+      itemsPerPage: 40,
       mediaItems: [],
       selectedMedias: [],
       gridHeight: 0,
@@ -218,6 +228,7 @@ export default {
       tags: [],
       lastScrollTop: 0,
       gridLoaded: false,
+      scrollListenerAttached: false,
       full: true,
       sharedFilterState: {
         search: '',
@@ -348,11 +359,51 @@ export default {
     // Re-run it as soon as a real endpoint becomes available.
     endpoint: function (newEndpoint, oldEndpoint) {
       if (newEndpoint && !oldEndpoint && !this.gridLoaded) {
-        this.reloadGrid()
+        this.reloadGrid({ reset: true })
       }
     }
   },
   methods: {
+    getFocusMediaId () {
+      if (!this.connector || this.indexToReplace < 0) {
+        return null
+      }
+
+      const media = this.selected[this.connector]?.[this.indexToReplace]
+
+      return media?.id ?? null
+    },
+    buildGridRequestParams ({ includeFocusId = false } = {}) {
+      const params = {
+        ...this.cleanEmptyFilters(this.sharedFilterState),
+        page: this.page,
+        itemsPerPage: this.itemsPerPage,
+        type: this.type
+      }
+
+      if (includeFocusId) {
+        const focusId = this.getFocusMediaId()
+        if (focusId) {
+          params.id = focusId
+        }
+      }
+
+      return params
+    },
+    resetPagination () {
+      this.page = 1
+      this.sharedFilterState.page = 1
+      this.maxPage = 1
+      this.gridHeight = 0
+      this.lastScrollTop = 0
+    },
+    detachScrollPagination () {
+      const list = this.$refs.list
+      if (list && this.scrollListenerAttached) {
+        list.removeEventListener('scroll', this.scrollToPaginate)
+        this.scrollListenerAttached = false
+      }
+    },
     deleteSelectedMedias: function (mediasIds) {
       let keepSelectedMedias = []
       if (mediasIds && mediasIds.length !== this.selectedMedias.length) {
@@ -423,11 +474,18 @@ export default {
       this.$refs.modal.open()
     },
     opened: function () {
-      if (!this.gridLoaded) {
-        this.reloadGrid()
-      }
+      const focusId = this.getFocusMediaId()
 
-      // this.listenScrollPosition()
+      if (focusId) {
+        this.resetPagination()
+        this.clearMediaItems()
+        this.gridLoaded = false
+        this.reloadGrid({ reset: false, includeFocusId: true })
+      } else if (!this.gridLoaded) {
+        this.reloadGrid({ reset: true })
+      } else {
+        this.listenScrollPosition()
+      }
 
       // empty selected medias (to avoid gs when adding)
       this.selectedMedias = []
@@ -530,7 +588,9 @@ export default {
       const self = this
       const el = this.$refs.list
       // when changing filters, reset the page to 1
-      this.page = 1
+      this.resetPagination()
+      this.gridLoaded = false
+      this.detachScrollPagination()
 
       this.clearMediaItems()
       this.clearSelectedMedias()
@@ -552,8 +612,8 @@ export default {
     clearMediaItems: function () {
       this.mediaItems.splice(0)
     },
-    reloadGrid: function () {
-      if(this.isGuest){
+    reloadGrid: function ({ reset = false, includeFocusId = false } = {}) {
+      if (this.isGuest) {
         return
       }
       // Guard: types may not be hydrated yet on first created() tick. The
@@ -561,37 +621,43 @@ export default {
       if (!this.endpoint) {
         return
       }
-      const self = this;
+
+      if (reset) {
+        this.clearMediaItems()
+      }
+
+      const self = this
       this.loading = true
-      // let formdata = null;
-      const form = this.$refs.form
-      const formdata = self.cleanEmptyFilters(this.sharedFilterState);
+      const formdata = self.buildGridRequestParams({ includeFocusId })
 
       // see api/media-library for actual ajax
       api.get(this.endpoint, formdata, (resp) => {
-        // add medias here
-        resp.data.items.forEach(item => {
+        const items = resp.data?.items ?? []
+
+        items.forEach(item => {
           if (!this.mediaItems.find(media => media.id === item.id)) {
             this.mediaItems.push(item)
           }
         })
 
         this.maxPage = resp.data.maxPage || 1
-        let regularArray = resp.data.tags.map(({label, ...rest}) => ({
+        if (resp.data.page) {
+          this.page = resp.data.page
+          this.sharedFilterState.page = resp.data.page
+        }
+
+        const tagList = resp.data.tags ?? []
+        this.tags = tagList.map(({ label, ...rest }) => ({
           title: label,
           ...rest
-        }));
-        this.tags = regularArray || []
+        }))
 
         this.$store.commit(MEDIA_LIBRARY.UPDATE_MEDIA_TYPE_TOTAL, { type: this.type, total: resp.data.total })
         this.loading = false
-        // this.listenScrollPosition()
         this.gridLoaded = true
-      }, (error) => {
-        // this.$store.commit(NOTIFICATION.SET_NOTIF, {
-        //   message: error.data.message,
-        //   variant: 'error'
-        // })
+        this.listenScrollPosition()
+      }, () => {
+        this.loading = false
       })
     },
     updateType: function (newType) {
@@ -617,27 +683,42 @@ export default {
       return data
     },
     listenScrollPosition: function () {
-      // re-listen for scroll position
-      this.$nextTick(function () {
-        if (!this.gridLoaded) return
+      this.$nextTick(() => {
+        if (!this.gridLoaded || this.loading) {
+          return
+        }
 
         const list = this.$refs.list
+        if (!list) {
+          return
+        }
+
         if (this.gridHeight !== list.scrollHeight) {
-          list.addEventListener('scroll', this.scrollToPaginate)
+          this.detachScrollPagination()
+          list.addEventListener('scroll', this.scrollToPaginate, { passive: true })
+          this.scrollListenerAttached = true
+          this.gridHeight = list.scrollHeight
         }
       })
     },
     scrollToPaginate: function () {
-      if (!this.gridLoaded) return
+      if (!this.gridLoaded || this.loading) {
+        return
+      }
 
       const list = this.$refs.list
-      const offset = 10
+      if (!list) {
+        return
+      }
 
-      if (list.scrollTop > this.lastScrollTop && list.scrollTop + list.offsetHeight > list.scrollHeight - offset) {
-        list.removeEventListener('scroll', this.scrollToPaginate)
+      const offset = 120
+
+      if (list.scrollTop > this.lastScrollTop && list.scrollTop + list.clientHeight >= list.scrollHeight - offset) {
+        this.detachScrollPagination()
 
         if (this.maxPage > this.page) {
           this.page = this.page + 1
+          this.sharedFilterState.page = this.page
           this.reloadGrid()
         } else {
           this.gridHeight = list.scrollHeight
@@ -672,20 +753,10 @@ export default {
   },
 
   created () {
-    if (!this.gridLoaded) {
-      this.reloadGrid()
-    }
-
-    // empty selected medias (to avoid gs when adding)
     this.selectedMedias = []
-
-    // in replace mode : select the media to replace when opening
-    if (this.connector && this.indexToReplace > -1) {
-      const mediaInitSelect = this.selected[this.connector][this.indexToReplace]
-      if (mediaInitSelect) {
-        this.selectedMedias.push(mediaInitSelect)
-      }
-    }
+  },
+  beforeUnmount () {
+    this.detachScrollPagination()
   }
 }
 </script>
