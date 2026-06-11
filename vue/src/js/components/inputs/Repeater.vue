@@ -17,7 +17,7 @@
       </div>
       <ue-collapsible
         v-model="isOpen"
-        :no-collapse="!collapsible"
+        no-collapse
         no-header-background
         :horizontal-padding="0"
         :vertical-padding="0"
@@ -40,13 +40,81 @@
         <template v-slot:default>
           <div class="mt-4">
             <!-- Headers -->
-            <v-row v-if="!noHeaders && hasRepeaterModels" class="mb-4" no-gutters>
+            <v-row v-if="!collapsible && !noHeaders && hasRepeaterModels" class="mb-4" no-gutters>
               <v-col v-for="header in headers" :key="header.title" v-bind="header.col">
                 {{ header.title }}
               </v-col>
             </v-row>
+            <!-- Draggable + Collapsible -->
+            <div v-if="draggable && collapsible" class="v-input-repeater__block v-input-repeater__block--collapsible v-input-repeater__block--draggable-collapsible">
+              <Draggable
+                class="v-input-repeater__content"
+                v-model="repeaterModels"
+                item-key="id"
+                v-bind="collapsibleDragOptions"
+              >
+                <template #item="itemSlot">
+                  <ue-collapsible
+                    class="v-input-repeater__collapsible-item"
+                    bordered
+                    dense
+                    no-header-background
+                    :horizontal-padding="2"
+                    :vertical-padding="2"
+                    :model-value="openedPanels.includes(getPanelValue(itemSlot.element, itemSlot.index))"
+                    @update:model-value="togglePanel(itemSlot.element, itemSlot.index, $event)"
+                  >
+                    <template #title>
+                      <div class="v-input-repeater__collapsible-title d-flex align-center w-100 min-width-0">
+                        <v-icon
+                          class="drag__handle me-2 flex-shrink-0 text-medium-emphasis"
+                          icon="mdi-drag-vertical"
+                          size="small"
+                        />
+                        <span class="text-body-2 text-truncate flex-grow-1 min-width-0">{{ getRepeaterItemTitle(itemSlot.index) }}</span>
+                        <div v-if="!noToolbar" class="d-flex align-center ga-1 ms-2 flex-shrink-0" @click.stop>
+                          <v-btn v-if="isAddible" @click="addRepeaterBlock()" color="success" variant="text" density="compact" icon="">
+                            <v-icon size="x-small" icon="mdi-plus" />
+                          </v-btn>
+                          <v-btn v-if="!isUnique" @click="duplicateRepeaterBlock(itemSlot.index)" variant="text" density="compact" icon="">
+                            <v-icon size="x-small" icon="mdi-content-copy" />
+                          </v-btn>
+                          <v-btn @click="deleteRepeaterBlock(itemSlot.index)" color="red" variant="text" density="compact" icon="">
+                            <v-icon size="x-small" icon="$delete" />
+                          </v-btn>
+                        </div>
+                      </div>
+                    </template>
+                    <div :class="['v-input-repeater__item--body', {gutter: withGutter}]">
+                      <v-custom-form-base
+                        :id="`ue-repeater-form-${itemSlot.index}`"
+                        :modelValue="itemSlot.element"
+                        :schema="repeaterSchemas[itemSlot.index]"
+                        :row="formRowAttribute"
+                        @update:schema="onUpdateRepeaterSchema($event, itemSlot.index)"
+                        @update:modelValue="onUpdateRepeaterModel($event, itemSlot.index)"
+                      >
+                        <template
+                          v-for="(_slot, key) in selectFieldSlots[itemSlot.index]"
+                          :key="key"
+                          v-slot:[`slot-inject-${_slot.name}-key-ue-repeater-form-${itemSlot.index}-${_slot.inputName}`]="_slotData"
+                        >
+                          <ue-recursive-stuff
+                            v-for="(context, i) in _slot.context.elements"
+                            :key="i"
+                            :configuration="context"
+                            :bindData="_slotData">
+                          </ue-recursive-stuff>
+                        </template>
+                      </v-custom-form-base>
+                    </div>
+                  </ue-collapsible>
+                </template>
+              </Draggable>
+            </div>
+
             <!-- Draggable -->
-            <div v-if="draggable" :class="['v-input-repeater__block v-input-repeater__block--draggable']">
+            <div v-else-if="draggable" :class="['v-input-repeater__block v-input-repeater__block--draggable']">
               <Draggable
                 class="v-input-repeater__content"
                 v-model="repeaterModels"
@@ -115,6 +183,63 @@
               </Draggable>
             </div>
 
+            <!-- Collapsible -->
+            <v-expansion-panels
+              v-else-if="collapsible"
+              v-model="openedPanels"
+              multiple
+              variant="accordion"
+              class="v-input-repeater__block v-input-repeater__block--collapsible"
+            >
+              <v-expansion-panel
+                v-for="(item, index) in repeaterModels"
+                :key="item.id"
+                :value="getPanelValue(item, index)"
+                class="v-input-repeater__panel"
+              >
+                <v-expansion-panel-title class="py-2 min-h-auto">
+                  <span class="text-body-2 text-truncate flex-grow-1">{{ getRepeaterItemTitle(index) }}</span>
+                  <div v-if="!noToolbar" class="d-flex align-center ga-1 ms-2 flex-shrink-0" @click.stop>
+                    <v-btn v-if="isAddible" @click="addRepeaterBlock()" color="success" variant="text" density="compact" icon="">
+                      <v-icon size="x-small" icon="mdi-plus" />
+                    </v-btn>
+                    <v-btn v-if="!isUnique" @click="duplicateRepeaterBlock(index)" variant="text" density="compact" icon="">
+                      <v-icon size="x-small" icon="mdi-content-copy" />
+                    </v-btn>
+                    <v-btn @click="deleteRepeaterBlock(index)" color="red" variant="text" density="compact" icon="">
+                      <v-icon size="x-small" icon="$delete" />
+                    </v-btn>
+                  </div>
+                </v-expansion-panel-title>
+                <v-expansion-panel-text class="pa-0">
+                  <div :class="['v-input-repeater__item--body', {gutter: withGutter}]">
+                    <v-custom-form-base
+                      :id="`ue-repeater-form-${index}`"
+                      class="w-100 h-100"
+                      :modelValue="item"
+                      :schema="repeaterSchemas[index]"
+                      :row="formRowAttribute"
+                      @update:modelValue="onUpdateRepeaterModel($event, index)"
+                      @update:schema="onUpdateRepeaterSchema($event, index)"
+                    >
+                      <template
+                        v-for="(_slot, key) in selectFieldSlots[index]"
+                        :key="key"
+                        v-slot:[`slot-inject-${_slot.name}-key-ue-repeater-form-${index}-${_slot.inputName}`]="_slotData"
+                      >
+                        <ue-recursive-stuff
+                          v-for="(context, i) in _slot.context.elements"
+                          :key="i"
+                          :configuration="context"
+                          :bindData="_slotData">
+                        </ue-recursive-stuff>
+                      </template>
+                    </v-custom-form-base>
+                  </div>
+                </v-expansion-panel-text>
+              </v-expansion-panel>
+            </v-expansion-panels>
+
             <!-- Static -->
             <v-row v-else class="v-input-repeater__block" v-bind="rowAttribute">
               <v-col v-for="(item, index) in repeaterModels" :key="item.id" v-bind="$lodash.pick(formCol, ['cols', 'xs', 'sm', 'md', 'lg', 'xl'])">
@@ -178,13 +303,13 @@
 
             <!-- Bottom Actions -->
             <div
-              v-if="!noAddButton || $slots.addButton || $slots.addButtonRight"
+              v-if="(totalRepeats < 1 || !noAddButton) || $slots.addButton || $slots.addButtonRight"
               class="v-input-repeater__bottom mb-12"
             >
               <div class="d-flex">
                 <slot name="addButton" v-bind="{text: addButtonContent, addRepeaterBlock, isActive: addButtonIsActive}">
                   <v-btn
-                    v-if="!noAddButton && (schema.length || Object.keys(schema).length)"
+                    v-if="(totalRepeats < 1 || !noAddButton) && (schema.length || Object.keys(schema).length) "
                     variant="outlined"
                     class=""
                     :disabled="!addButtonIsActive"
@@ -229,10 +354,6 @@
       noToolbar: {
         type: Boolean,
         default: false
-      },
-      collapsible: {
-        type: Boolean,
-        default: false
       }
     },
     setup (props, context) {
@@ -247,7 +368,14 @@
         isOpen: true
       }
     },
-    computed: {},
+    computed: {
+      collapsibleDragOptions () {
+        return {
+          ...this.dragOptions,
+          handle: '.drag__handle'
+        }
+      }
+    },
     methods: {},
     watch: {},
     created () {
@@ -317,9 +445,38 @@
           overflow: hidden
 
       &--draggable
-        margin-left: -1 * 12 * $spacer
-        .v-input-repeater__item
-          padding-left: 12 * $spacer
+        &:not(.v-input-repeater__block--draggable-collapsible)
+          margin-left: -1 * 12 * $spacer
+          .v-input-repeater__item
+            padding-left: 12 * $spacer
+
+      &--draggable-collapsible
+        margin-left: 0
+
+        .v-input-repeater__collapsible-item
+          :deep(.ue-collapsible__header)
+            overflow: hidden
+
+          :deep(.ue-collapsible__title)
+            min-width: 0
+            overflow: hidden
+
+        .v-input-repeater__collapsible-title
+          min-width: 0
+
+          .drag__handle
+            cursor: grab
+
+      &--collapsible
+        .v-input-repeater__collapsible-item
+          margin-bottom: 8px
+
+        .v-input-repeater__panel
+          :deep(.v-expansion-panel-title)
+            min-height: auto
+
+          :deep(.v-expansion-panel-text__wrapper)
+            padding: 12px 16px 16px
 
 
     .v-input-repeater__item--body

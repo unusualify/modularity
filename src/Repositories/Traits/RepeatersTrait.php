@@ -263,7 +263,9 @@ trait RepeatersTrait
 
         return collect($schema)->reduce(function ($acc, $curr) {
             if (isset($curr['name']) && (preg_match('/json-repeater/', $curr['root'] ?? 'default') || preg_match('/json-repeater/', $curr['type']))) {
-                $acc[] = $curr + ['translated' => $curr['translated'] ?? false];
+                $acc[$curr['name']] = $curr + ['translated' => $curr['translated'] ?? false];
+            } else if ($curr['type'] == 'wrap' && isset($curr['schema'])) {
+                $acc = array_merge($acc, $this->getRepeaterInputs($curr['schema']));
             }
 
             return $acc;
@@ -289,7 +291,7 @@ trait RepeatersTrait
 
                 foreach ($object->repeaters->groupBy('locale') as $repeatersByLocale) {
                     foreach ($repeatersByLocale as $repeater) {
-                        if ($schema[$repeater->role]['translated'] ?? false) {
+                        if ($repeaterInputs[$repeater->role]['translated'] ?? false) {
                             $name = $repeater->role . '.' . $repeater->locale;
 
                             foreach (Arr::dot($repeater->content) as $notation => $value) {

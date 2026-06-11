@@ -128,6 +128,18 @@ export const makeRepeaterProps = propsFactory({
   asObject: {
     type: Boolean,
     default: false
+  },
+  collapsible: {
+    type: Boolean,
+    default: false
+  },
+  collapsibleTitleField: {
+    type: String,
+    default: null
+  },
+  collapsibleDefaultOpen: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -385,10 +397,77 @@ export default function useRepeater (props, context) {
   }
 
   const repeaterModels = ref(getInitialRepeaterModels())
+  const openedPanels = ref([])
+
+  function getPanelValue (model, index) {
+    return props.autoIdGenerator ? (model?.id ?? index) : index
+  }
+
+  function syncOpenedPanels (models) {
+    if (!props.collapsible) {
+      return
+    }
+
+    const panelValues = models.map((model, index) => getPanelValue(model, index))
+    openedPanels.value = openedPanels.value.filter(value => panelValues.includes(value))
+
+    if (props.collapsibleDefaultOpen && openedPanels.value.length === 0 && panelValues.length > 0) {
+      openedPanels.value = [...panelValues]
+    }
+  }
+
+  function openPanel (model, index) {
+    const value = getPanelValue(model, index)
+
+    if (!openedPanels.value.includes(value)) {
+      openedPanels.value = [...openedPanels.value, value]
+    }
+  }
+
+  function togglePanel (model, index, open) {
+    const value = getPanelValue(model, index)
+
+    if (open) {
+      openPanel(model, index)
+      return
+    }
+
+    openedPanels.value = openedPanels.value.filter(panelValue => panelValue !== value)
+  }
+
+  function getRepeaterItemTitle (index) {
+    const items = parseRepeaterModels(repeaterModels.value)
+    const item = items[index]
+
+    if (!item) {
+      return ''
+    }
+
+    if (props.collapsibleTitleField && item[props.collapsibleTitleField]) {
+      return String(item[props.collapsibleTitleField])
+    }
+
+    const schemaKeys = Object.keys(rawSchema.value ?? {})
+
+    for (const key of schemaKeys) {
+      const fieldName = rawSchema.value[key]?.name ?? key
+
+      if (item[fieldName]) {
+        return String(item[fieldName])
+      }
+    }
+
+    const label = props.singularLabel || props.label || 'Item'
+
+    return `${label} ${index + 1}`
+  }
+
+  syncOpenedPanels(repeaterModels.value)
 
   watch(() => modelValue.value, (newVal, oldVal) => {
     if(JSON.stringify(newVal) !== JSON.stringify(oldVal)) {
       repeaterModels.value = getInitialRepeaterModels()
+      syncOpenedPanels(repeaterModels.value)
     }
   }, {
     deep: true
@@ -531,6 +610,7 @@ export default function useRepeater (props, context) {
 
         models.push(newModel)
         state.repeaterModels = models
+        openPanel(newModel, state.totalRepeats)
       } else {
         let message = `You cannot add new item, because the number of elements should be at much ${props.max}`
         if (!state.isRemainingAddible) {
@@ -544,6 +624,7 @@ export default function useRepeater (props, context) {
         const newModel = parseRepeaterModels(state.repeaterModels)
         newModel.splice(index, 1)
         state.repeaterModels = hydrateRepeaterModels(newModel)
+        syncOpenedPanels(state.repeaterModels)
       } else {
         store.commit(ALERT.SET_ALERT, { message: `You cannot delete, because the number of elements should be at least ${props.min}`, variant: 'warning', location: 'top' })
       }
@@ -553,6 +634,7 @@ export default function useRepeater (props, context) {
         const newModel = parseRepeaterModels(state.repeaterModels)
         newModel.push(newModel[index])
         state.repeaterModels = hydrateRepeaterModels(newModel)
+        openPanel(state.repeaterModels[state.repeaterModels.length - 1], state.repeaterModels.length - 1)
       } else {
         store.commit(ALERT.SET_ALERT, { message: `You cannot add new item, because the number of elements should be at much ${props.max}`, variant: 'warning', location: 'top' })
       }
@@ -563,6 +645,10 @@ export default function useRepeater (props, context) {
   return {
     ...toRefs(methods),
     ...toRefs(state),
+    openedPanels,
+    getPanelValue,
+    getRepeaterItemTitle,
+    togglePanel,
     invokeRuleGenerator,
     ...inputHook
   }
