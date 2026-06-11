@@ -72,7 +72,7 @@
 </template>
 
 <script>
-import { useSlots, onBeforeMount, watch } from 'vue'
+import { useSlots, onBeforeMount, watch, provide } from 'vue'
 import useFormBaseLogic from '@/hooks/form/useFormBaseLogic'
 import FormBaseField from './FormBaseField.vue'
 
@@ -99,6 +99,8 @@ export default {
   setup (props, { emit }) {
     const slots = useSlots()
     const ctx = useFormBaseLogic(props, { emit }, slots)
+
+    provide('ueFormPayload', ctx.valueIntern)
 
     onBeforeMount(() => {
       ctx.rebuildArrays(ctx.valueIntern.value ?? {}, ctx.formSchema.value ?? {})
