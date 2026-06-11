@@ -249,6 +249,10 @@ trait ImagesTrait
             $fallback_locale = config('app.fallback_locale');
 
             foreach ($this->getColumns(__TRAIT__) as $role) {
+                if (! isset($schema[$role])) {
+                    continue;
+                }
+
                 if (isset($mediasByRole[$role])) {
                     $input = $schema[$role];
                     if ($input['translated'] ?? false) {
