@@ -20,77 +20,72 @@
       <div :class="[
         (hasDivider || title) ? 'px-1' : '',
         scrollable ? 'flex-grow-0' : '',
-        'd-flex flex-row pb-2'
+        'pb-2'
       ]">
-        <div class="d-flex flex-column flex-1-1-100 min-width-0">
-        <ue-title v-if="!noTitle && title"
-          padding="a-0"
-          align="start"
-          justify="start"
-          class="flex-1-1-100"
-          v-bind="titleOptions"
-        >
-          <template v-slot:default>
-            <slot name="header.left" v-bind="{title: titleSerialized, subtitle: subtitle ?? null, model: model, schema: inputSchema, formItem}">
-              <span>
-                {{ titleSerialized }}
-                <ue-title v-if="subtitle"
-                  :text="subtitle"
-                  type="caption"
-                  weight="medium"
-                  color="grey-darken-1"
-                  transform="none"
-                  padding="a-0"
-                />
-              </span>
-              <!-- subtitle -->
-            </slot>
-          </template>
-          <template v-slot:right>
-            <div class="d-flex mt-2 mt-md-0 gc-2">
-              <!-- Title Center Form Actions -->
-              <FormActions v-if="actionsPosition == 'title-center' && formActionsActive"
-                :modelValue="formItem"
-                :actions="actions"
-                :is-editing="isEditing"
-                @action-complete="$emit('actionComplete', $event)"
-              >
-                <template #prepend>
-                  <slot name="actions.prepend"></slot>
-                </template>
-                <template #append>
-                  <slot name="actions.append"></slot>
-                </template>
-              </FormActions>
-
-              <!-- Slot for headerCenter -->
-              <slot name="headerCenter">
-
+        <div class="d-flex flex-column flex-sm-row">
+          <div class="d-flex flex-column flex-1-1-100 min-width-0">
+          <ue-title v-if="!noTitle && title"
+            padding="a-0"
+            align="start"
+            justify="start"
+            class="flex-1-1-100"
+            v-bind="titleOptions"
+          >
+            <template v-slot:default>
+              <slot name="header.left" v-bind="{title: titleSerialized, subtitle: subtitle ?? null, model: model, schema: inputSchema, formItem}">
+                <span>
+                  {{ titleSerialized }}
+                  <ue-title v-if="subtitle"
+                    :text="subtitle"
+                    type="caption"
+                    weight="medium"
+                    color="grey-darken-1"
+                    transform="none"
+                    padding="a-0"
+                  />
+                </span>
+                <!-- subtitle -->
               </slot>
+            </template>
+            <template v-slot:right>
+              <div class="d-flex mt-2 mt-md-0 gc-2">
+                <!-- Title Center Form Actions -->
+                <FormActions v-if="actionsPosition == 'title-center' && formActionsActive"
+                  :modelValue="formItem"
+                  :actions="actions"
+                  :is-editing="isEditing"
+                  @action-complete="$emit('actionComplete', $event)"
+                >
+                  <template #prepend>
+                    <slot name="actions.prepend"></slot>
+                  </template>
+                  <template #append>
+                    <slot name="actions.append"></slot>
+                  </template>
+                </FormActions>
 
-              <!-- Title Right Form Actions -->
-              <FormActions v-if="actionsPosition == 'title-right' && formActionsActive"
-                :modelValue="formItem"
-                :actions="actions"
-                :is-editing="isEditing"
-                @action-complete="$emit('actionComplete', $event)"
-              >
-                <template #prepend="actionsScope">
-                  <slot name="actions.prepend" v-bind="actionsScope"></slot>
-                </template>
-                <template #append="actionsScope">
-                  <slot name="actions.append" v-bind="actionsScope"></slot>
-                </template>
-              </FormActions>
-            </div>
-          </template>
-        </ue-title>
-        <FormPublicLinks
-          :localized-public-permalinks="localizedPublicPermalinks"
-          :languages="languages"
-          :signed-public-preview="signedPublicPreview"
-          :is-editing="isEditing"
-        />
+                <!-- Slot for headerCenter -->
+                <slot name="headerCenter">
+
+                </slot>
+
+                <!-- Title Right Form Actions -->
+                <FormActions v-if="actionsPosition == 'title-right' && formActionsActive"
+                  :modelValue="formItem"
+                  :actions="actions"
+                  :is-editing="isEditing"
+                  @action-complete="$emit('actionComplete', $event)"
+                >
+                  <template #prepend="actionsScope">
+                    <slot name="actions.prepend" v-bind="actionsScope"></slot>
+                  </template>
+                  <template #append="actionsScope">
+                    <slot name="actions.append" v-bind="actionsScope"></slot>
+                  </template>
+                </FormActions>
+              </div>
+            </template>
+          </ue-title>
         </div>
         <div :class="[
           'flex-1-0 d-flex align-start ga-2',
@@ -98,29 +93,14 @@
             || (hasAdditionalSection && $vuetify.display.mdAndDown)
             || (formEventSchema && formEventSchema.length && model)
             || ($slots['header.right'])
-          ) ? 'pl-2' : ''
+          ) ? 'pb-2 pb-md-0 pl-md-2' : ''
         ]">
           <FormEvents v-if="formEventSchema && formEventSchema.length && model"
             :events="formEventSchema"
             v-model="model"
             :form-item="formItem"
           />
-          <!-- Language Selector -->
-          <v-chip-group v-if="hasTraslationInputs && languages && languages.length && languages.length > 1"
-            :modelValue="currentLocale.value"
-            @update:modelValue="updateLocale($event)"
-            selected-class="bg-primary"
-            mandatory
-            class="mt-n2 pt-2"
-          >
-            <v-chip
-              v-for="language in languages"
-              :key="language.value"
-              :text="language.shortlabel"
-              :value="language.value"
-              variant="outlined"
-            ></v-chip>
-          </v-chip-group>
+          <FormLocaleSelector :has-translation-inputs="hasTraslationInputs" />
 
           <!-- Mobile dialog/modal for right section -->
           <v-btn v-if="hasAdditionalSection && $vuetify.display.mdAndDown"
@@ -137,6 +117,13 @@
 
           </slot>
         </div>
+        </div>
+        <FormPublicLinks
+          :localized-public-permalinks="localizedPublicPermalinks"
+          :languages="languages"
+          :signed-public-preview="signedPublicPreview"
+          :is-editing="isEditing"
+        />
       </div>
 
       <v-divider v-if="hasDivider" class="pb-2"></v-divider>
@@ -435,6 +422,7 @@ import { useForm, makeFormProps } from '@/hooks/form'
 import { cloneDeep, omit, isObject } from 'lodash-es'
 import FormActions from './form/FormActions.vue'
 import FormPublicLinks from './form/FormPublicLinks.vue'
+import FormLocaleSelector from './form/FormLocaleSelector.vue'
 import FormEvents from './form/FormEvents.vue'
 import FormSecondaryInputs from './form/FormSecondaryInputs.vue'
 
@@ -513,6 +501,7 @@ export default {
     FormEvents,
     FormSecondaryInputs,
     FormPublicLinks,
+    FormLocaleSelector,
     AdditionalSectionContent,
   },
   emits: [
