@@ -46,4 +46,7 @@ return [
     'cms_parent_segment_bindings' => 'um_cms_parent_segment_bindings',
     'cms_sitemaps' => 'um_cms_sitemaps',
     'cms_sitemapables' => 'um_cms_sitemapables',
+    'cms_style_sheets' => 'um_cms_style_sheets',
+    'cms_layout_builders' => 'um_cms_layout_builders',
+    'cms_page_layouts' => 'um_cms_page_layouts',
 ];

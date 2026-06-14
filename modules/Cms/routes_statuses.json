@@ -4,5 +4,7 @@
     "ParentSegment": true,
     "SiteSetting": true,
     "Sitemap": true,
-    "HomepageTest": true
+    "HomepageTest": true,
+    "StyleSheet": true,
+    "LayoutBuilder": true
 }

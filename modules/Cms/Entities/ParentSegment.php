@@ -2,10 +2,11 @@
 
 namespace Modules\Cms\Entities;
 
-use Illuminate\Database\Eloquent\Model as EloquentModel;
+use Unusualify\Modularous\Entities\Model;
 
 /**
- * One URL prefix row per model class + locale (unique on target_model_class + locale).
+ * One public route binding per model class + locale (unique on target_model_class + locale):
+ * URL path prefix registry only. Presentation shells live in {@see PageLayout}.
  *
  * @property string $target_model_class
  * @property string $locale Empty string = all locales
@@ -14,7 +15,7 @@ use Illuminate\Database\Eloquent\Model as EloquentModel;
  * @property bool $enabled
  * @property int $sort_order
  */
-class ParentSegment extends EloquentModel
+class ParentSegment extends Model
 {
     protected $fillable = [
         'target_model_class',
