@@ -49,6 +49,7 @@ const hydrateTypeMap = {
   'input-filepond-avatar': 'VInputFilepondAvatar',
   'input-form-tabs': 'VInputFormTabs',
   'input-image': 'VInputImage',
+  'input-image-gallery': 'VInputImageGallery',
   'input-payment-service': 'VInputPaymentService',
   'input-price': 'VInputPrice',
   'input-process': 'VInputProcess',
@@ -56,6 +57,8 @@ const hydrateTypeMap = {
   'input-repeater': 'VInputRepeater',
   'input-select-scroll': 'VInputSelectScroll',
   'input-slug': 'VInputSlug',
+  'input-json-field': 'VInputJsonField',
+  'input-layout-blades': 'VInputLayoutBlades',
   'input-spread': 'VInputSpread',
   'input-tag': 'VInputTag',
   'input-tagger': 'VInputTagger'

@@ -19,6 +19,8 @@ describe('input registry', () => {
     expect(mapTypeToComponent('input-checklist')).toBe('VInputChecklist')
     expect(mapTypeToComponent('input-tagger')).toBe('VInputTagger')
     expect(mapTypeToComponent('input-file')).toBe('VInputFile')
+    expect(mapTypeToComponent('input-json-field')).toBe('VInputJsonField')
+    expect(mapTypeToComponent('input-layout-blades')).toBe('VInputLayoutBlades')
   })
   it('returns v-{type} for unknown types', () => {
     expect(mapTypeToComponent('custom-type')).toBe('v-custom-type')
