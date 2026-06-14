@@ -47,7 +47,7 @@ trait TagsTrait
                 $translated = $tagsSchema['translated'] ?? false;
 
                 $values = $fields['tags'] ?? [];
-                if ($translated || Arr::isAssoc($values)) {
+                if ($translated || (is_array($values) && Arr::isAssoc($values))) {
                     foreach ($values as $locale => $value) {
                         $object->setLocaleTags(tags: $value, locale: $locale);
                     }
