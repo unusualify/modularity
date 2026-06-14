@@ -12,35 +12,78 @@ trait IsSingular
 {
     private static $isSingularSelfAttributes = ['singleton_type', 'content'];
 
+    /**
+     * @return list<string>
+     */
+    private static function singularContentAttributeNames(Model $model): array
+    {
+        return array_values(array_filter(
+            $model->getFillable(),
+            fn ($attribute) => ! in_array($attribute, self::$isSingularSelfAttributes, true)
+        ));
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function resolveExistingSingularContent(Model $model): array
+    {
+        $existing = $model->getRawOriginal('content');
+
+        if (is_string($existing)) {
+            $existing = json_decode($existing, true) ?: [];
+        }
+
+        return is_array($existing) ? $existing : [];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function buildSingularContentForUpdate(Model $model): array
+    {
+        $content = self::resolveExistingSingularContent($model);
+        $attributes = $model->getAttributes();
+
+        foreach (self::singularContentAttributeNames($model) as $attribute) {
+            if (array_key_exists($attribute, $attributes) || $model->isDirty($attribute)) {
+                $content[$attribute] = $model->getAttribute($attribute);
+            }
+        }
+
+        return $content;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function buildSingularContent(Model $model): array
+    {
+        return Collection::make(self::singularContentAttributeNames($model))
+            ->mapWithKeys(fn ($attribute) => [$attribute => $model->getAttribute($attribute)])
+            ->toArray();
+    }
+
+    private static function unsetSingularContentAttributes(Model $model): void
+    {
+        foreach (self::singularContentAttributeNames($model) as $attribute) {
+            $model->offsetUnset($attribute);
+        }
+    }
+
     public static function bootIsSingular()
     {
         static::addGlobalScope(new SingularScope);
 
         self::creating(static function (Model $model) {
             $model->setAttribute('singleton_type', static::class);
-            $model->setAttribute('content', Collection::make($model->fillable)
-                ->filter(fn ($attribute) => ! in_array($attribute, self::$isSingularSelfAttributes) && in_array($attribute, $model->getFillable()))
-                ->mapWithKeys(fn ($attribute) => [$attribute => $model->{$attribute}])
-                ->toArray());
-
-            foreach ($model->fillable as $attribute) {
-                if (! in_array($attribute, self::$isSingularSelfAttributes)) {
-                    $model->offsetUnset($attribute);
-                }
-            }
+            $model->setAttribute('content', self::buildSingularContent($model));
+            self::unsetSingularContentAttributes($model);
         });
 
         self::updating(static function (Model $model) {
-            $model->setAttribute('content', Collection::make($model->fillable)
-                ->filter(fn ($attribute) => ! in_array($attribute, self::$isSingularSelfAttributes) && in_array($attribute, $model->getFillable()))
-                ->mapWithKeys(fn ($attribute) => [$attribute => $model->{$attribute}])
-                ->toArray());
-
-            foreach ($model->fillable as $attribute) {
-                if (! in_array($attribute, self::$isSingularSelfAttributes)) {
-                    $model->offsetUnset($attribute);
-                }
-            }
+            $model->setAttribute('content', self::buildSingularContentForUpdate($model));
+            self::unsetSingularContentAttributes($model);
         });
 
         self::retrieved(static function (Model $model) {
@@ -80,16 +123,19 @@ trait IsSingular
 
     public function scopeVisible($query)
     {
+        // zero hour today
         $now = Carbon::now();
+        $startOfDay = $now->startOfDay();
+        $endOfDay = $now->endOfDay();
 
-        $query->where(function ($query) use ($now) {
+        $query->where(function ($query) use ($startOfDay) {
             $query->whereNull("{$this->getTable()}.content->publish_start_date")
-                ->orWhere("{$this->getTable()}.content->publish_start_date", '<=', $now);
+                ->orWhere("{$this->getTable()}.content->publish_start_date", '<=', $startOfDay);
         });
 
-        $query->where(function ($query) use ($now) {
+        $query->where(function ($query) use ($endOfDay) {
             $query->whereNull("{$this->getTable()}.content->publish_end_date")
-                ->orWhere("{$this->getTable()}.content->publish_end_date", '>=', $now);
+                ->orWhere("{$this->getTable()}.content->publish_end_date", '>=', $endOfDay);
         });
 
         return $query;
