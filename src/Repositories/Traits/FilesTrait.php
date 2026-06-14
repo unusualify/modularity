@@ -140,6 +140,7 @@ trait FilesTrait
         $fileInputs = $this->getColumns(__TRAIT__);
         if (! empty($fileInputs) && $object->has('files')) {
             $schema = $schema ?? $this->inputs();
+            $schema = $this->chunkInputs($schema, all: true, noGroupChunk: true);
             $default_locale = config('app.locale');
             $fallback_locale = config('app.fallback_locale');
             $filesByRole = $object->files->groupBy('pivot.role');
