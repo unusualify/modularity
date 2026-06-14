@@ -121,6 +121,7 @@ abstract class InputHydrate
         '.jpeg' => 'image/jpeg',
         '.png' => 'image/png',
         '.gif' => 'image/gif',
+        '.webp' => 'image/webp',
         '.svg' => 'image/svg+xml',
         '.xml' => 'application/xml',
         '.json' => 'application/json',
