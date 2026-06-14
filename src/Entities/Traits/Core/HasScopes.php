@@ -43,6 +43,13 @@ trait HasScopes
 
     public function scopePublished($query)
     {
+        if ($this->publishFieldIsTranslated('published')) {
+            return $query->whereHas('translations', function ($query) {
+                $query->where($this->getLocaleKey(), $this->resolvePublishScopeLocale())
+                    ->where('published', true);
+            });
+        }
+
         return $query->where("{$this->getTable()}.published", true);
     }
 
@@ -58,24 +65,93 @@ trait HasScopes
 
     public function scopeVisible($query)
     {
-        if ($this->isFillable('publish_start_date')) {
-            $query->where(function ($query) {
-                $query->whereNull("{$this->getTable()}.publish_start_date")->orWhere("{$this->getTable()}.publish_start_date", '<=', Carbon::now());
-            });
-
-            if ($this->isFillable('publish_end_date')) {
-                $query->where(function ($query) {
-                    $query->whereNull("{$this->getTable()}.publish_end_date")->orWhere("{$this->getTable()}.publish_end_date", '>=', Carbon::now());
-                });
-            }
-        }
+        $this->applyPublishDateVisibilityScope($query, 'publish_start_date', '<=', Carbon::now());
+        $this->applyPublishDateVisibilityScope($query, 'publish_end_date', '>=', Carbon::now());
 
         return $query;
     }
 
     public function scopeDraft($query)
     {
+        if ($this->publishFieldIsTranslated('published')) {
+            return $query->whereHas('translations', function ($query) {
+                $query->where($this->getLocaleKey(), $this->resolvePublishScopeLocale())
+                    ->where('published', false);
+            });
+        }
+
         return $query->where("{$this->getTable()}.published", false);
+    }
+
+    /**
+     * Whether a publish-related column is stored on the translation row for the active locale.
+     */
+    protected function publishFieldIsTranslated(string $field): bool
+    {
+        return method_exists($this, 'isTranslationAttribute')
+            && $this->isTranslationAttribute($field);
+    }
+
+    /**
+     * Locale used by publish/visibility scopes (current app locale unless the model overrides it).
+     */
+    protected function resolvePublishScopeLocale(): string
+    {
+        if (method_exists($this, 'locale')) {
+            $locale = $this->locale();
+
+            if (is_string($locale) && $locale !== '') {
+                return $locale;
+            }
+        }
+
+        return app()->getLocale();
+    }
+
+    /**
+     * Apply publish window filtering for one date column on the correct table (main vs translation).
+     *
+     * @param Builder $query
+     * @param string $field
+     * @param string $operator
+     * @param \DateTimeInterface|string $value
+     */
+    protected function applyPublishDateVisibilityScope($query, string $field, string $operator, $value): void
+    {
+        if (! $this->publishFieldIsApplicable($field)) {
+            return;
+        }
+
+        if ($this->publishFieldIsTranslated($field)) {
+            $query->whereHas('translations', function ($query) use ($field, $operator, $value) {
+                $query->where($this->getLocaleKey(), $this->resolvePublishScopeLocale())
+                    ->where(function ($query) use ($field, $operator, $value) {
+                        $query->whereNull($field)
+                            ->orWhere($field, $operator, $value);
+                    });
+            });
+
+            return;
+        }
+
+        $table = $this->getTable();
+
+        $query->where(function ($query) use ($table, $field, $operator, $value) {
+            $query->whereNull("{$table}.{$field}")
+                ->orWhere("{$table}.{$field}", $operator, $value);
+        });
+    }
+
+    /**
+     * Whether a publish date column participates in visibility filtering for this model.
+     */
+    protected function publishFieldIsApplicable(string $field): bool
+    {
+        if ($this->publishFieldIsTranslated($field)) {
+            return true;
+        }
+
+        return $this->isFillable($field);
     }
 
     /**
