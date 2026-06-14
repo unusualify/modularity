@@ -127,6 +127,7 @@ class FileLibraryController extends BaseController implements SignUploadListener
                 return $this->buildFile($item);
             })->toArray(),
             'maxPage' => $items->lastPage(),
+            'page' => $items->currentPage(),
             'total' => $items->total(),
             'tags' => $this->repository->getTagsList(),
         ];
