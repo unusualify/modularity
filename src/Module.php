@@ -39,6 +39,9 @@ class Module extends NwidartModule
      */
     private $middlewares = [];
 
+    /** @var array<string, mixed>|null */
+    private ?array $rawConfigCache = null;
+
     private static $routeActionLists = [
         'restore',
         'forceDelete',
@@ -414,15 +417,24 @@ class Module extends NwidartModule
      */
     public function getRawConfig($notation = null, $default = []): mixed
     {
-        $configFolder = GenerateConfigReader::read('config')->getPath();
+        if ($this->rawConfigCache === null) {
+            if ($this->app['config']->has($this->getSnakeName())) {
+                $fromRepository = $this->app['config']->get($this->getSnakeName());
+                $this->rawConfigCache = is_array($fromRepository) ? $fromRepository : [];
+            } else {
+                $configFolder = GenerateConfigReader::read('config')->getPath();
+                $configPath = $this->getDirectoryPath("{$configFolder}/config.php");
 
-        if (file_exists($this->getDirectoryPath("{$configFolder}/config.php"))) {
-            $rawConfig = include $this->getDirectoryPath("{$configFolder}/config.php");
-        } else {
-            $rawConfig = [];
+                $this->rawConfigCache = file_exists($configPath)
+                    ? (include $configPath)
+                    : [];
+                if (! is_array($this->rawConfigCache)) {
+                    $this->rawConfigCache = [];
+                }
+            }
         }
 
-        return $notation ? data_get($rawConfig, $notation, $default) : $rawConfig;
+        return $notation ? data_get($this->rawConfigCache, $notation, $default) : $this->rawConfigCache;
     }
 
     /**
@@ -452,7 +464,8 @@ class Module extends NwidartModule
 
         if (file_exists($configPath)) {
             $config = include $configPath;
-            $this->app['config']->set("{$this->getSnakeName()}", $config);
+            $this->rawConfigCache = is_array($config) ? $config : [];
+            $this->app['config']->set("{$this->getSnakeName()}", $this->rawConfigCache);
         }
     }
 
