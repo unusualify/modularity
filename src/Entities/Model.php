@@ -41,10 +41,10 @@ abstract class Model extends LaravelModel implements CacheableInterface, Modulea
         return Str::endsWith(get_class($this), 'Translation') || property_exists($this, 'baseModuleModel');
     }
 
-    public function setPublishStartDateAttribute($value): void
-    {
-        $this->attributes['publish_start_date'] = $value ?? Carbon::now();
-    }
+    // public function setPublishStartDateAttribute($value): void
+    // {
+    //     $this->attributes['publish_start_date'] = $value ?? Carbon::now();
+    // }
 
     public function getFillable(): array
     {
