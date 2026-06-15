@@ -12,6 +12,7 @@ return [
     'group' => 'system',
     'headline' => 'CMS',
     'url' => 'cms',
+    'icon' => 'mdi-folder-cog-outline',
 
     'promotion' => [
         'enabled' => modularousConfig('cms_promotion.enabled', true),
@@ -25,7 +26,7 @@ return [
             'headline' => 'Style Sheets',
             'url' => 'style-sheets',
             'route_name' => 'style_sheet',
-            'icon' => '$submodule',
+            'icon' => 'mdi-palette-swatch-outline',
             'title_column_key' => 'name',
             'table_options' => [
                 'createOnModal' => true,
@@ -189,7 +190,7 @@ return [
             'headline' => 'Layout Builders',
             'url' => 'layout-builders',
             'route_name' => 'layout_builder',
-            'icon' => '$submodule',
+            'icon' => 'mdi-page-layout-header-footer',
             'title_column_key' => 'name',
             'table_options' => [
                 'createOnModal' => true,
@@ -312,7 +313,7 @@ return [
             'headline' => 'Presentation shells',
             'url' => 'page-layouts',
             'route_name' => 'page_layout',
-            'icon' => 'mdi-page-layout-header',
+            'icon' => 'mdi-page-layout-body',
             'title_column_key' => 'target_model_class',
             'table_options' => [
                 'createOnModal' => true,
@@ -534,7 +535,7 @@ return [
             'headline' => 'Homepage Tests',
             'url' => 'homepage-tests',
             'route_name' => 'homepage_test',
-            'icon' => '$submodule',
+            'icon' => 'mdi-test-tube',
             'title_column_key' => 'name',
             'table_options' => [
                 'createOnModal' => true,
@@ -587,7 +588,7 @@ return [
             'headline' => 'Pages',
             'url' => 'pages',
             'route_name' => 'page',
-            'icon' => '$submodule',
+            'icon' => 'mdi-test-tube',
             'title_column_key' => 'title',
             'table_options' => [
                 'includeScheduledInList' => true,
