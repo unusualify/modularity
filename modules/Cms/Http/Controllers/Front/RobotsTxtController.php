@@ -5,6 +5,7 @@ namespace Modules\Cms\Http\Controllers\Front;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use Modules\Cms\Services\CmsSiteSeoSettingsService;
+use Modules\Cms\Support\CmsPublicSeo;
 
 /**
  * Serves global robots.txt at GET /robots.txt when the route is enabled.
@@ -47,6 +48,10 @@ class RobotsTxtController extends Controller
      */
     public static function resolvedBodyFromConfigOnly(): string
     {
+        if (($staging = CmsPublicSeo::resolvedStagingRobotsTxtBody()) !== null) {
+            return $staging;
+        }
+
         $default = "User-agent: *\nAllow: /";
         $raw = trim((string) modularousConfig('cms_seo.robots.global_robots_txt', $default));
 

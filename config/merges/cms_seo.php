@@ -2,6 +2,16 @@
 
 return [
     /**
+     * Staging / pre-production: force {@code noindex, nofollow} on every public CMS page and serve
+     * {@code Disallow: /} at GET /robots.txt ({@see \Modules\Cms\Support\CmsPublicSeo},
+     * {@see \Modules\Cms\Http\Controllers\Front\CmsController},
+     * {@see \Modules\Cms\Http\Controllers\Front\RobotsTxtController}).
+     */
+    'staging' => [
+        'force_noindex' => env('MODULAROUS_CMS_SEO_STAGING_FORCE_NOINDEX', false),
+    ],
+
+    /**
      * Public URL normalization used by {@see \Modules\Cms\Services\CanonicalUrlResolver}.
      */
     'canonical' => [
