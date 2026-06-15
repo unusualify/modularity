@@ -47,6 +47,7 @@ final class CmsPublicModelResolver
         }
 
         $modelClass = get_class($candidate);
+
         if (! CmsParentSegmentRegistryGate::allowsModelClass($modelClass)) {
             return null;
         }
@@ -160,7 +161,7 @@ final class CmsPublicModelResolver
     /**
      * @param class-string<Model> $modelClass
      */
-    private function applyPublishedVisibilityScopes(Builder $query, string $modelClass): void
+    public static function applyPublishedVisibilityScopes(Builder $query, string $modelClass): void
     {
         $scopes = [];
         foreach (['published', 'visible'] as $name) {
