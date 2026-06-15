@@ -29,7 +29,7 @@ enum Permission: string
     public static function get($caseName)
     {
         foreach (self::cases() as $case) {
-            if ($case->name == $caseName) {
+            if ($case->name == $caseName || $case->value == $caseName) {
                 return $case->value;
             }
         }
