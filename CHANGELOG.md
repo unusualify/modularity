@@ -2,6 +2,14 @@
 
 All notable changes to `modularous` will be documented in this file
 
+## v12.1.1 - 2026-06-15
+
+### :wrench: Bug Fixes
+
+- rename function for clarity in impersonation configuration by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/dbd05ff07617e6c10d9327324cc33f6234bf57b8
+- implement injection markers for modular head and footer content in layout builder by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/84ddaf893468af42aacfc791599fa5384f47501d
+- use dynamic table names for layout builders and style sheets in draft validation by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/0a18f42f4ed7b463c0110a1c20b688d09be9f5c2
+
 ## v12.1.0 - 2026-06-15
 
 ### :rocket: Features
