@@ -971,13 +971,11 @@ class Module extends NwidartModule
      */
     public function getModel($routeName, $asClass = true): Model|string
     {
-        $classNamespace = $this->getTargetClassNamespace('model', Str::studly($routeName));
+        $repository = $this->getRepository($routeName);
 
-        if (! class_exists($classNamespace)) {
-            throw new \Exception('Model not found for ' . $routeName . ' on module ' . $this->getName());
-        }
+        $model = $repository->getModel();
 
-        return $asClass ? App::make($classNamespace) : $classNamespace;
+        return $asClass ? $model : get_class($model);
     }
 
     /**
