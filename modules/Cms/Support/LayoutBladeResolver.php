@@ -13,6 +13,8 @@ use Modules\Cms\Entities\LayoutBuilder;
 /**
  * Renders a {@see LayoutBuilder} as HTML: DB segments use the package shell; filesystem mode delegates to {@code view()}.
  * Optional Blade append fragments extend each shell slot (default: concatenated after that slot's base template).
+ * Filesystem shells embed {@see self::MARKER_HEAD_APPEND} and {@see self::MARKER_BEFORE_FOOTER} at assembly time;
+ * {@see self::injectFilesystemAppendsIntoDocument()} replaces those slots instead of regex-parsing {@code <footer>}.
  *
  * Nested DB body (LayoutBuilder wraps PageLayout body): set {@code LayoutBuilder::$definition['cms_page_layout_body_compose']}
  * to {@code wrap}. The PageLayout {@code body} append is compiled first, then passed as {@code $cmsPageLayoutBodyHtml} while
@@ -25,6 +27,14 @@ use Modules\Cms\Entities\LayoutBuilder;
  */
 final class LayoutBladeResolver
 {
+    /**
+     * Injection-slot markers embedded while assembling filesystem shell HTML.
+     * Unlikely to appear in user content; replaced by {@see self::injectAtInjectionPoint()}.
+     */
+    public const MARKER_HEAD_APPEND = '<!--‹CMS‖MODULAROUS‖HEAD‖APPEND‖7f3a9c2e-4b1d-4e8a-9f2c-1d8e6a4b7c30›-->';
+
+    public const MARKER_BEFORE_FOOTER = '<!--‹CMS‖MODULAROUS‖BEFORE‖FOOTER‖8e4b0d3f-5c2a-4f9b-8a1e-2f9d7c6b8a40›-->';
+
     /**
      * @param array<string, mixed> $mergeViewData
      */
@@ -87,7 +97,6 @@ final class LayoutBladeResolver
         $pageLayoutBladeSource = $pageLayoutBladeSource === 'db' ? 'db' : 'filesystem';
         $allowPageLayoutOverrides = $pageLayoutBladeSource === 'filesystem';
         $moduleRouteContext = self::presentationViewModuleRoute($presentationViewName);
-
         if ($layoutBladeSource === 'filesystem') {
             $slug = self::filesystemOverrideSlug($layout);
 
@@ -104,6 +113,8 @@ final class LayoutBladeResolver
 
             if (self::appendsContainBlade($appends) || $allowPageLayoutOverrides) {
                 $html = self::injectFilesystemAppendsIntoDocument($html, $appends, $data, $moduleRouteContext);
+            } else {
+                $html = self::stripUnusedInjectionMarkers($html);
             }
 
             return view('cms::layout_builder.inline_document', ['document' => $html]);
@@ -240,7 +251,7 @@ final class LayoutBladeResolver
             true
         );
         if ($compiledHead !== '') {
-            $html = self::injectHtmlBeforeClosingTag($html, 'head', $compiledHead);
+            $html = self::injectAtInjectionPoint($html, self::MARKER_HEAD_APPEND, $compiledHead, 'head');
         }
 
         $compiledBody = self::compileSegmentBladeWithOverrides(
@@ -268,10 +279,10 @@ final class LayoutBladeResolver
         $combinedBodyFoot = $compiledBody . $compiledFooter;
 
         if ($combinedBodyFoot !== '') {
-            $html = self::insertAppendsBeforeLayoutBuilderFooter($html, $combinedBodyFoot);
+            $html = self::injectAtInjectionPoint($html, self::MARKER_BEFORE_FOOTER, $combinedBodyFoot, 'body');
         }
 
-        return $html;
+        return self::stripUnusedInjectionMarkers($html);
     }
 
     /**
@@ -280,6 +291,44 @@ final class LayoutBladeResolver
     private static function appendsContainBlade(array $appends): bool
     {
         return $appends['head'] !== '' || $appends['body'] !== '' || $appends['footer'] !== '';
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function layoutMarkerViewData(bool $useInjectionMarkers = true): array
+    {
+        return [
+            'cmsLayoutUseInjectionMarkers' => $useInjectionMarkers,
+            'cmsLayoutMarkerHeadAppend' => self::MARKER_HEAD_APPEND,
+            'cmsLayoutMarkerBeforeFooter' => self::MARKER_BEFORE_FOOTER,
+        ];
+    }
+
+    private static function injectAtInjectionPoint(string $html, string $marker, string $inject, ?string $fallbackClosingTag = null): string
+    {
+        $inject = trim($inject);
+        if ($inject === '') {
+            return $html;
+        }
+
+        if (str_contains($html, $marker)) {
+            return str_replace($marker, $inject, $html);
+        }
+
+        if ($fallbackClosingTag !== null) {
+            return self::injectHtmlBeforeClosingTag($html, $fallbackClosingTag, $inject);
+        }
+
+        return $html . "\n" . $inject . "\n";
+    }
+
+    private static function stripUnusedInjectionMarkers(string $html): string
+    {
+        return str_replace([
+            self::MARKER_HEAD_APPEND,
+            self::MARKER_BEFORE_FOOTER,
+        ], '', $html);
     }
 
     private static function injectHtmlBeforeClosingTag(string $html, string $tagName, string $inject): string
@@ -295,41 +344,6 @@ final class LayoutBladeResolver
         }
 
         return (string) preg_replace($pattern, $inject . '$0', $html, 1);
-    }
-
-    private static function insertAppendsBeforeLayoutBuilderFooter(string $html, string $insert): string
-    {
-        $insert = trim($insert);
-        if ($insert === '') {
-            return $html;
-        }
-
-        $footerBlock = self::extractLastFooterBlock($html);
-        if ($footerBlock !== null) {
-            [$prefix, $footerHtml, $suffix] = $footerBlock;
-
-            return $prefix . $insert . $footerHtml . $suffix;
-        }
-
-        return self::injectHtmlBeforeClosingTag($html, 'body', $insert);
-    }
-
-    private static function extractLastFooterBlock(string $html): ?array
-    {
-        if (preg_match_all('~<footer\b[^>]*>.*?</footer>~is', $html, $matches, PREG_OFFSET_CAPTURE)) {
-            $last = end($matches[0]);
-            $start = $last[1];
-            $footerHtml = $last[0];
-            $end = $start + mb_strlen($footerHtml);
-
-            return [
-                mb_substr($html, 0, $start),
-                $footerHtml,
-                mb_substr($html, $end),
-            ];
-        }
-
-        return null;
     }
 
     /**
@@ -390,15 +404,17 @@ final class LayoutBladeResolver
 
         $shellView = self::firstExistingFilesystemSlugView($slug, 'shell');
 
+        $shellData = array_merge($data, self::layoutMarkerViewData(), [
+            'headHtml' => $headHtml,
+            'bodyHtml' => $bodyHtml,
+            'footerHtml' => $footerHtml,
+        ]);
+
         if ($shellView !== null) {
-            return view($shellView, array_merge($data, [
-                'headHtml' => $headHtml,
-                'bodyHtml' => $bodyHtml,
-                'footerHtml' => $footerHtml,
-            ]))->render();
+            return view($shellView, $shellData)->render();
         }
 
-        return $headHtml . $bodyHtml . $footerHtml;
+        return view('cms::layout_builder.shell', $shellData)->render();
     }
 
     private static function renderFilesystemSlugSegment(string $slug, string $segment, array $data): string
@@ -533,7 +549,7 @@ final class LayoutBladeResolver
         $bodyHtml = self::renderPageLayoutFallbackSegment($moduleRouteContext, 'body', $data);
         $footerHtml = self::renderPageLayoutFallbackSegment($moduleRouteContext, 'footer', $data);
 
-        return view('cms::layout_builder.shell', array_merge($data, [
+        return view('cms::layout_builder.shell', array_merge($data, self::layoutMarkerViewData(), [
             'headHtml' => $headHtml,
             'bodyHtml' => $bodyHtml,
             'footerHtml' => $footerHtml,

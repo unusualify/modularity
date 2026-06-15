@@ -19,9 +19,15 @@
         <link rel="stylesheet" href="{{ $href }}">
     @endforeach
     {!! $headHtml ?? '' !!}
+    @if (! empty($cmsLayoutUseInjectionMarkers))
+        {!! $cmsLayoutMarkerHeadAppend ?? '' !!}
+    @endif
 </head>
 <body>
     {!! $bodyHtml ?? '' !!}
+    @if (! empty($cmsLayoutUseInjectionMarkers))
+        {!! $cmsLayoutMarkerBeforeFooter ?? '' !!}
+    @endif
     {!! $footerHtml ?? '' !!}
     @foreach ($stylesheetScriptSrcs ?? [] as $src)
         <script src="{{ $src }}"></script>
