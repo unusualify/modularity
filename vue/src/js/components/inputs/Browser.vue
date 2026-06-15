@@ -4,7 +4,7 @@
   import { makeSelectProps } from '@/hooks/utils/useSelect'
   import { makePaginationProps, usePagination } from '@/hooks/utils/usePagination'
   import axios from 'axios'
-  import { cloneDeep, pick, omit, isEmpty } from 'lodash-es'
+  import { cloneDeep, pick, omit, isEmpty, isObject } from 'lodash-es'
 
   const searchTextFieldRef = ref(null)
 
@@ -40,6 +40,10 @@
     preserveInitialValues: {
       type: Boolean,
       default: true
+    },
+    lockInitialItems: {
+      type: Boolean,
+      default: false
     }
   })
 
@@ -83,6 +87,35 @@
   const initialObject = ref(null)
 
   const comboboxModel = ref(input.value)
+
+  // Snapshot of the ids that already existed when the form first loaded a value.
+  // Captured directly from modelValue (independent of fetchInitialItems timing) so
+  // that pre-existing items can be locked from removal regardless of fetch order.
+  const lockedIds = ref(null)
+  const lockObjectKey = computed(() => props.objectIdDefiner ?? props.itemValue)
+
+  const captureLockedIds = (val) => {
+    if (!props.lockInitialItems || lockedIds.value !== null) return
+
+    const values = props.multiple ? val : (val != null ? [val] : [])
+    if (!Array.isArray(values) || values.length === 0) return
+
+    // Capture both possible id keys so list items can be matched whichever way they are keyed
+    lockedIds.value = values.map(v => isObject(v)
+      ? (v[lockObjectKey.value] ?? v[props.itemValue])
+      : v
+    )
+  }
+
+  watch(() => props.modelValue, captureLockedIds, { immediate: true, deep: true })
+
+  const isLockedItem = (item) => {
+    if (!props.lockInitialItems || !Array.isArray(lockedIds.value)) return false
+
+    const candidate = item[props.itemValue]
+    // Loose comparison guards against number/string id type mismatches from the API
+    return lockedIds.value.some(lockedId => lockedId == candidate)
+  }
 
   // Fetch initial items if modelValue is provided
   const fetchInitialItems = async () => {
@@ -318,6 +351,9 @@
   }
 
   const isNewSelectedItem = (item) => {
+    if (isLockedItem(item)) {
+      return false
+    }
     if(props.multiple) {
       return selectedItems.value.some(selectedItem => selectedItem[props.objectIdDefiner ?? props.itemValue] === item[props.itemValue]) && !isInitialItem(item)
     } else {
@@ -326,6 +362,10 @@
   }
 
   const itemIsClickable = (item) => {
+    // Locked items cannot be toggled (existing add-ons can't be removed)
+    if (isLockedItem(item)) {
+      return false
+    }
     return canSelectable.value || itemIsSelected(item)
   }
 
@@ -338,6 +378,12 @@
     // if(props.max && selectedItems.value.length >= props.max) {
     //   return
     // }
+
+    // Prevent removing existing add-ons when initial items are locked
+    if (isLockedItem(item)) {
+      return
+    }
+
 
     const objectDefinerKey = props.objectIdDefiner ?? props.itemValue
 
