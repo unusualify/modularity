@@ -244,11 +244,16 @@ trait ImagesTrait
         $imageInputs = $this->getColumns(__TRAIT__);
         if (! empty($imageInputs) && $object->has('medias')) {
             $schema = $schema ?? $this->inputs();
+            $schema = $this->chunkInputs($schema, all: true, noGroupChunk: true);
             $mediasByRole = $object->medias->groupBy('pivot.role');
             $default_locale = config('app.locale');
             $fallback_locale = config('app.fallback_locale');
 
-            foreach ($this->getColumns(__TRAIT__) as $role) {
+            foreach ($imageInputs as $role) {
+                if (! isset($schema[$role])) {
+                    continue;
+                }
+
                 if (isset($mediasByRole[$role])) {
                     $input = $schema[$role];
                     if ($input['translated'] ?? false) {

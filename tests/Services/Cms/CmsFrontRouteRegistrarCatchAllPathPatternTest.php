@@ -36,6 +36,21 @@ final class CmsFrontRouteRegistrarCatchAllPathPatternTest extends TestCase
         $this->assertDoesNotMatchRegularExpression($re, 'internal/widget');
     }
 
+    public function test_stylesheet_public_path_prefix_blocks_when_route_enabled(): void
+    {
+        $this->app['config']->set('modularous.cms_routing.signed_preview.enabled', false);
+        $this->app['config']->set('modularous.cms_stylesheets.public_route.enabled', true);
+        $this->app['config']->set('modularous.cms_stylesheets.public_route.path_prefix', 'cms/stylesheets');
+        $this->app['config']->set('modularous.cms_routing.public_front_catch_all_exclude_path_prefixes', []);
+
+        $pattern = self::reflectCatchAllPattern();
+        $re = '#' . str_replace('#', '\\#', $pattern) . '#';
+
+        $this->assertDoesNotMatchRegularExpression($re, 'cms/stylesheets/demo.css');
+        $this->assertDoesNotMatchRegularExpression($re, 'cms/stylesheets');
+        $this->assertMatchesRegularExpression($re, 'pages/about');
+    }
+
     /** @return non-empty-string */
     private static function reflectCatchAllPattern(): string
     {

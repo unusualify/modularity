@@ -169,102 +169,78 @@ class RouteServiceProvider extends ServiceProvider
         $apiController_namespace = GenerateConfigReader::read('controller')->getNamespace();
         $api_controller_namespace = $apiController_namespace . '\\API';
 
-        foreach (Modularous::allEnabled() as $module) {
-            $_groupOptions = [
-                'prefix' => $module->fullPrefix(),
-                'as' => $module->panelRouteNamePrefix() . '.',
-            ];
-            // $_groupOptions['prefix'] = $module->fullPrefix();
-            ModularousRoutes::registerRoutes(
-                $router,
-                [...$_groupOptions, ...(Arr::only($groupOptions, ['domain']))],
-                ['web'], // $middlewares,
-                $module->getClassNamespace("{$controller_namespace}"),
-                $module->getDirectoryPath("{$routes_folder}/web.php"),
-                true
-            );
-            // ModularousRoutes::registerRoutes(
-            //     $router,
-            //     $_groupOptions,
-            //     ['api'], // $middlewares,
-            //     $module->getClassNamespace("{$controller_namespace}\API"),
-            //     $module->getDirectoryPath("{$routes_folder}/api.php"),
-            //     true
-            // );
-            ModularousRoutes::registerRoutes(
-                $router,
-                [
-                    'domain' => config('app.url'),
-                ],
-                ['web'], // $middlewares,
-                $module->getClassNamespace("{$controller_namespace}\Front"),
-                $module->getDirectoryPath("{$routes_folder}/front.php"),
-                true
-            );
 
-            $router->group([
-                ...$groupOptions,
-                ...[
+        if (modularousConfig('define_panel_routes_on_frontend_requests') || Modularous::isPanelUrl()) {
+            foreach (Modularous::allEnabled() as $module) {
+                $_groupOptions = [
+                    'prefix' => $module->fullPrefix(),
+                    'as' => $module->panelRouteNamePrefix() . '.',
+                ];
+
+                ModularousRoutes::registerRoutes(
+                    $router,
+                    [...$_groupOptions, ...(Arr::only($groupOptions, ['domain']))],
+                    ['web'],
+                    $module->getClassNamespace("{$controller_namespace}"),
+                    $module->getDirectoryPath("{$routes_folder}/web.php"),
+                    true
+                );
+
+                $router->group([
+                    ...$groupOptions,
                     'middleware' => ModularousRoutes::webPanelMiddlewares(),
                     'namespace' => $module->getClassNamespace("{$controller_namespace}"),
-                ],
-            ],
-                function ($router) use ($module) {
+                ], function () use ($module) {
                     Route::moduleRoutes($module);
-                }
-            );
+                });
 
-            $router->group([
-                ...[
+                ModularousRoutes::registerRoutes(
+                    $router,
+                    ['domain' => config('app.url')],
+                    ['web'],
+                    $module->getClassNamespace("{$controller_namespace}\Front"),
+                    $module->getDirectoryPath("{$routes_folder}/front.php"),
+                    true
+                );
+
+                $router->group([
                     'domain' => config('app.url'),
                     'middleware' => ModularousRoutes::webMiddlewares(),
                     'namespace' => $module->getClassNamespace("{$front_controller_namespace}"),
-                ],
-            ],
-                function ($router) use ($module) {
+                ], function () use ($module) {
                     Route::moduleFrontRoutes($module);
+                });
+
+                if (file_exists($module->getDirectoryPath("{$routes_folder}/public-api.php"))) {
+                    ModularousRoutes::registerRoutes(
+                        $router,
+                        ModularousRoutes::getPublicApiGroupOptions(),
+                        [],
+                        $module->getClassNamespace("{$api_controller_namespace}"),
+                        $module->getDirectoryPath("{$routes_folder}/public-api.php"),
+                        true
+                    );
                 }
-            );
 
-            // Public API routes (no authentication)
-            if (file_exists($module->getDirectoryPath("{$routes_folder}/public-api.php"))) {
-                ModularousRoutes::registerRoutes(
-                    $router,
-                    ModularousRoutes::getPublicApiGroupOptions(),
-                    [],
-                    $module->getClassNamespace("{$api_controller_namespace}"),
-                    $module->getDirectoryPath("{$routes_folder}/public-api.php"),
-                    true
-                );
+                if (file_exists($module->getDirectoryPath("{$routes_folder}/api.php"))) {
+                    ModularousRoutes::registerRoutes(
+                        $router,
+                        ModularousRoutes::getAuthApiGroupOptions(),
+                        [],
+                        $module->getClassNamespace("{$api_controller_namespace}"),
+                        $module->getDirectoryPath("{$routes_folder}/api.php"),
+                        true
+                    );
+                }
+
+                $router->group([
+                    'prefix' => ModularousRoutes::getApiPrefix(),
+                    'as' => 'api.',
+                    'namespace' => $module->getClassNamespace("{$api_controller_namespace}"),
+                ], function () use ($module) {
+                    Route::moduleApiRoutes($module);
+                });
             }
-
-            if (file_exists($module->getDirectoryPath("{$routes_folder}/api.php"))) {
-                ModularousRoutes::registerRoutes(
-                    $router,
-                    ModularousRoutes::getAuthApiGroupOptions(),
-                    [],
-                    $module->getClassNamespace("{$api_controller_namespace}"),
-                    $module->getDirectoryPath("{$routes_folder}/api.php"),
-                    true
-                );
-            }
-
-            // API routes
-            $apiGroupOptions = [
-                'prefix' => ModularousRoutes::getApiPrefix(),
-                'as' => 'api.',
-                // 'middleware' => ModularousRoutes::getApiMiddlewares(),
-            ];
-            // $apiGroupOptions = ModularousRoutes::getAuthApiGroupOptions();
-
-            // Module-specific API routes with macro
-            $router->group([
-                ...$apiGroupOptions,
-                'namespace' => $module->getClassNamespace("{$api_controller_namespace}"),
-            ], function ($router) use ($module) {
-                Route::moduleApiRoutes($module);
-            });
-
         }
     }
 
@@ -387,29 +363,31 @@ class RouteServiceProvider extends ServiceProvider
 
             $groupStack = Route::getGroupStack();
             $namespace = $groupStack[count($groupStack) - 1]['namespace'] ?? null;
-            $controllerClass = null;
-            if ($namespace && class_exists("{$namespace}\\{$routeName}Controller")) {
-                $controllerClass = app()->make("{$namespace}\\{$routeName}Controller");
-            }
+            $controllerFqcn = ($namespace && $routeName !== '')
+                ? "{$namespace}\\{$routeName}Controller"
+                : null;
 
+            $controllerResolvable = $controllerFqcn !== null
+                && class_exists($controllerFqcn);
+
+            $bulkSheetController = null;
             $bulkSheetStepUpMiddleware = null;
-            if ($controllerClass instanceof CanBulkSheet) {
+            if ($controllerResolvable && is_subclass_of($controllerFqcn, CanBulkSheet::class)) {
                 try {
-                    if ($controllerClass instanceof CanBulkSheet) {
-                        $customRoutes = array_merge($customRoutes, [
-                            'bulkSheetTool',
-                            'bulkSheetDryRun',
-                            'bulkSheetCommit',
-                            'bulkSheetExport',
-                        ]);
-                        $ability = $controllerClass->bulkSheetStepUpAbility();
-                        if (
-                            $ability !== null && $ability !== ''
-                            && modularousConfig('cms_features.register_middlewares', true)
-                            && modularousConfig('security.enabled', false)
-                        ) {
-                            $bulkSheetStepUpMiddleware = 'modularous.security.step_up:' . $ability;
-                        }
+                    $bulkSheetController = app()->make($controllerFqcn);
+                    $customRoutes = array_merge($customRoutes, [
+                        'bulkSheetTool',
+                        'bulkSheetDryRun',
+                        'bulkSheetCommit',
+                        'bulkSheetExport',
+                    ]);
+                    $ability = $bulkSheetController->bulkSheetStepUpAbility();
+                    if (
+                        $ability !== null && $ability !== ''
+                        && modularousConfig('cms_features.register_middlewares', true)
+                        && modularousConfig('security.enabled', false)
+                    ) {
+                        $bulkSheetStepUpMiddleware = 'modularous.security.step_up:' . $ability;
                     }
                 } catch (\Throwable) {
                     // Submodule may omit this controller; skip bulk sheet routes.
@@ -426,13 +404,13 @@ class RouteServiceProvider extends ServiceProvider
                     'uses' => "{$controllerName}@{$customRoute}",
                 ];
 
-                if ($controllerClass instanceof CanBulkSheet && in_array($customRoute, [
+                if ($bulkSheetController instanceof CanBulkSheet && in_array($customRoute, [
                     'bulkSheetTool',
                     'bulkSheetDryRun',
                     'bulkSheetCommit',
                     'bulkSheetExport',
                 ], true)) {
-                    $names = $controllerClass->bulkSheetWebRouteNames();
+                    $names = $bulkSheetController->bulkSheetWebRouteNames();
                     $asKey = match ($customRoute) {
                         'bulkSheetTool' => $names['tool'],
                         'bulkSheetDryRun' => $names['dryRun'],
@@ -459,7 +437,7 @@ class RouteServiceProvider extends ServiceProvider
                     }
                 }
 
-                if (! $controllerClass || ! method_exists($controllerClass, $customRoute)) {
+                if (! $controllerResolvable || ! method_exists($controllerFqcn, $customRoute)) {
                     continue;
                 }
 
@@ -479,8 +457,13 @@ class RouteServiceProvider extends ServiceProvider
                     Route::get($routeSlug, $mapping);
                 }
 
-                if (in_array($customRoute, ['restoreRevision'])) {
+                if ($customRoute === 'restoreRevision') {
                     Route::get($routeSlug . "/{{$snakeCase}}", $mapping);
+                    $putMapping = $mapping;
+                    unset($putMapping['as']);
+                    Route::put($routeSlug . "/{{$snakeCase}}", $putMapping);
+
+                    continue;
                 }
 
                 if (
@@ -496,7 +479,7 @@ class RouteServiceProvider extends ServiceProvider
                     Route::put($routeSlug, $mapping);
                 }
 
-                if (in_array($customRoute, ['duplicate', 'preview', 'showView', 'restoreRevision', 'approveRevision', 'rejectRevision'])) {
+                if (in_array($customRoute, ['duplicate', 'preview', 'showView', 'approveRevision', 'rejectRevision'])) {
                     Route::put($routeSlug . "/{{$snakeCase}}", $mapping);
                 }
 

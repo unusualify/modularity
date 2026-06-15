@@ -7,6 +7,22 @@ import { useStore } from 'vuex'
 import cloneDeep from 'lodash-es/cloneDeep'
 import isEqual from 'lodash-es/isEqual'
 import { isset } from '@/utils/helpers'
+
+export function normalizeImageModelValue (value) {
+  if (value == null || value === '') {
+    return []
+  }
+
+  if (Array.isArray(value)) {
+    return value.filter(item => item != null && typeof item === 'object')
+  }
+
+  if (typeof value === 'object' && isset(value.id) && isset(value.thumbnail)) {
+    return [value]
+  }
+
+  return []
+}
 import { mapGetters } from '@/utils/mapStore'
 
 import { MEDIA_LIBRARY } from '@/store/mutations/index'
@@ -138,7 +154,7 @@ export default function useImage (props, context) {
     }),
     input_: computed({
       get: () => {
-        return modelValue.value ?? []
+        return normalizeImageModelValue(modelValue.value)
       },
       set: (value, old) => {
         inputHook.updateModelValue.value(value)
@@ -148,7 +164,7 @@ export default function useImage (props, context) {
         // })
       }
     }),
-    input: modelValue.value ?? [],
+    input: normalizeImageModelValue(modelValue.value),
     isDraggable: computed(() => props.draggable && states.input.length > 1),
     remainingItems: computed(() => {
       return props.max - states.input.length
@@ -203,8 +219,7 @@ export default function useImage (props, context) {
     inputHook.updateModelValue.value(value)
   }, { deep: true })
   watch(() => modelValue.value, (value) => {
-    const normalized = value ?? []
-    const next = Array.isArray(normalized) ? normalized : []
+    const next = normalizeImageModelValue(value)
     if (isEqual(states.input, next)) return
     states.input = cloneDeep(next)
   }, { deep: true })

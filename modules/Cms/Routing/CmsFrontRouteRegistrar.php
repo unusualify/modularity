@@ -141,13 +141,8 @@ final class CmsFrontRouteRegistrar
                 continue;
             }
 
-            try {
-                $model = $module->getModel($routeName, true);
-            } catch (\Throwable) {
-                continue;
-            }
-
-            if (! classHasTrait($model, HasParentSegment::class)) {
+            $modelClass = self::resolveModelClassForRoute($module, $routeName);
+            if ($modelClass === null || ! class_exists($modelClass) || ! classHasTrait($modelClass, HasParentSegment::class)) {
                 continue;
             }
 
@@ -168,6 +163,21 @@ final class CmsFrontRouteRegistrar
         }
 
         return null;
+    }
+
+    private static function resolveModelClassForRoute(Module $module, string $routeName): ?string
+    {
+        if (! $module->isEnabledRoute($routeName)) {
+            return null;
+        }
+
+        try {
+            $modelClass = $module->getModel($routeName, false);
+
+            return is_string($modelClass) && $modelClass !== '' ? $modelClass : null;
+        } catch (\Throwable) {
+            return null;
+        }
     }
 
     /**
@@ -210,17 +220,12 @@ final class CmsFrontRouteRegistrar
             return null;
         }
 
-        try {
-            $model = $module->getModel($routeName, true);
-        } catch (\Throwable) {
+        $modelClass = self::resolveModelClassForRoute($module, $routeName);
+        if ($modelClass === null || ! classHasTrait($modelClass, HasParentSegment::class)) {
             return null;
         }
 
-        if (! classHasTrait($model, HasParentSegment::class)) {
-            return null;
-        }
-
-        return self::resolveFrontControllerForModelClass(get_class($model));
+        return self::resolveFrontControllerForModelClass($modelClass);
     }
 
     /**
@@ -331,6 +336,13 @@ final class CmsFrontRouteRegistrar
             $p = trim($raw, '/');
             if ($p !== '') {
                 $blocked[] = preg_quote($p, '/');
+            }
+        }
+
+        if ((bool) modularousConfig('cms_stylesheets.public_route.enabled', true)) {
+            $ss = trim((string) modularousConfig('cms_stylesheets.public_route.path_prefix', 'cms/stylesheets'), '/');
+            if ($ss !== '') {
+                $blocked[] = preg_quote($ss, '/');
             }
         }
 
@@ -465,17 +477,12 @@ final class CmsFrontRouteRegistrar
                     continue;
                 }
 
-                try {
-                    $model = $module->getModel($routeName, true);
-                } catch (\Throwable) {
+                $resolvedModelClass = self::resolveModelClassForRoute($module, $routeName);
+                if ($resolvedModelClass === null || $resolvedModelClass !== $modelClass) {
                     continue;
                 }
 
-                if (get_class($model) !== $modelClass) {
-                    continue;
-                }
-
-                if (! classHasTrait($model, HasParentSegment::class)) {
+                if (! classHasTrait($resolvedModelClass, HasParentSegment::class)) {
                     continue;
                 }
 

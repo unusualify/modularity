@@ -2,8 +2,10 @@
 
 use Illuminate\Support\Facades\Route;
 use Modules\Cms\Http\Controllers\API\CmsRoutingMetaController;
+use Modules\Cms\Http\Controllers\API\PageLayoutController;
 use Modules\Cms\Http\Controllers\API\ParentSegmentController;
 use Modules\Cms\Http\Controllers\API\PromotionController;
+use Modules\Cms\Http\Controllers\API\StyleSheetController;
 use Modules\Cms\Http\Controllers\RedirectController;
 
 Route::middleware(['api.auth', ...\Unusualify\Modularous\Facades\ModularousRoutes::defaultMiddlewares()])->group(function () {
@@ -19,6 +21,8 @@ Route::middleware(['api.auth', ...\Unusualify\Modularous\Facades\ModularousRoute
         Route::get('routing-meta', CmsRoutingMetaController::class)->name('routingMeta');
 
         Route::apiResource('parent-segments', ParentSegmentController::class)->only(['index', 'store', 'update', 'destroy']);
+
+        Route::apiResource('page-layouts', PageLayoutController::class)->only(['index', 'store', 'update', 'destroy']);
 
         $dryRunRoute = Route::post('promotion/dry-run', [PromotionController::class, 'dryRun'])
             ->name('promotion.dryRun');
@@ -44,5 +48,9 @@ Route::middleware(['api.auth', ...\Unusualify\Modularous\Facades\ModularousRoute
 
         Route::get('redirects/bulk/export', [RedirectController::class, 'bulkSheetExport'])
             ->name('redirects.bulk.export');
+
+        Route::post('style-sheets/{style_sheet}/recompile', [StyleSheetController::class, 'recompile'])
+            ->whereNumber('style_sheet')
+            ->name('style_sheets.recompile');
     });
 });

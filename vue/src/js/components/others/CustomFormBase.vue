@@ -427,7 +427,7 @@
 
 // Import
 // import Vue from 'vue'
-import { getCurrentInstance } from 'vue'
+import { getCurrentInstance, provide, computed } from 'vue'
 import { get, set, isPlainObject, isFunction, isString, isNumber, isEmpty, orderBy, delay, find, findIndex, omit, cloneDeep } from 'lodash-es'
 
 import formEvents from '@/utils/formEvents'
@@ -523,9 +523,14 @@ const emits = [
   'click'
 ]
 export default {
-  setup () {
+  setup (props) {
     const _instance = getCurrentInstance()
-    const vueInstance = _instance.appContext
+    const vueInstance = _instance?.appContext
+
+    provide(
+      'ueFormPayload',
+      computed(() => props.model ?? props.modelValue ?? null)
+    )
 
     return {
       vueInstance

@@ -25,7 +25,9 @@ export const getTranslationInputsCount = (inputs) => {
 
 export const getTranslationInputs = (inputs, acc = []) => {
   return reduce(inputs, (acc, input) => {
-    if (isset(input) && isset(input?.schema) && ['wrap', 'group', 'repeater', 'input-repeater'].includes(input.type)) {
+    if(Object.prototype.hasOwnProperty.call(input, 'translated') && input.translated)
+      acc.push(input)
+    else if (isset(input) && isset(input?.schema) && ['wrap', 'group', 'repeater', 'input-repeater'].includes(input.type)) {
       acc = getTranslationInputs(input.schema, acc)
     } else if(Object.prototype.hasOwnProperty.call(input, 'translated') && input.translated)
       acc.push(input)

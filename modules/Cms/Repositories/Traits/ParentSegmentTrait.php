@@ -5,7 +5,8 @@ namespace Modules\Cms\Repositories\Traits;
 
 /**
  * CMS: repositories whose {@see \Unusualify\Modularous\Repositories\Repository::getModel()} uses
- * {@see \Unusualify\Modularous\Entities\Traits\IsCmr} (content module route) and thus {@see HasParentSegment}.
+ * {@see \Modules\Cms\Entities\Concerns\IsCmr} (content module route) and thus {@see HasParentSegment}.
+ * Presentation shells ({@see \Modules\Cms\Entities\PageLayout}) are orthogonal; repositories also use {@see PageLayoutTrait} via {@see \Modules\Cms\Repositories\Traits\CmrTrait}.
  *
  * Enables parent-segment-aware tooling (hydrate selects, slug validation hooks) without hard-coding model classes.
  * Optional {@see $cmsAdminWarningsBuffer} / {@see pullCmsAdminWarnings()} support non-blocking panel hints after save

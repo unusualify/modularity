@@ -3,6 +3,7 @@
 namespace Modules\Cms\Services;
 
 use Modules\Cms\Repositories\SiteSettingRepository;
+use Modules\Cms\Support\CmsPublicSeo;
 
 /**
  * Persists site-wide SEO options in {@see \Modules\Cms\Entities\SiteSetting} (key-value rows).
@@ -21,6 +22,10 @@ class CmsSiteSeoSettingsService
      */
     public function resolvedRobotsTxtBody(): string
     {
+        if (($staging = CmsPublicSeo::resolvedStagingRobotsTxtBody()) !== null) {
+            return $staging;
+        }
+
         $default = "User-agent: *\nAllow: /";
         $raw = null;
 
@@ -61,6 +66,10 @@ class CmsSiteSeoSettingsService
      */
     public function globalRobotsTxtForEditor(): string
     {
+        if (($staging = CmsPublicSeo::resolvedStagingRobotsTxtBody()) !== null) {
+            return rtrim($staging, "\r\n");
+        }
+
         $persisted = $this->persistedGlobalRobotsTxt();
         if ($persisted !== null) {
             return rtrim($persisted, "\r\n");

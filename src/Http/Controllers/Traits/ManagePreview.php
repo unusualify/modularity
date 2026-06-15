@@ -2,11 +2,13 @@
 
 namespace Unusualify\Modularous\Http\Controllers\Traits;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
 use Modules\Cms\Http\Controllers\Traits\ResolvesPublicPresentationView;
+use Modules\Cms\Support\CmsPageLayoutPresentationWrapper;
 use Unusualify\Modularous\Services\MessageStage;
 
 trait ManagePreview
@@ -63,14 +65,24 @@ trait ManagePreview
 
         $previewView = $this->presentationViewName();
 
-        return View::exists($previewView) ? View::make(
-            $previewView,
-            array_replace([
-                'item' => $item,
-            ], $this->previewData($item))
-        ) : View::make('twill::errors.preview', [
-            'moduleName' => Str::singular($this->moduleName),
-        ]);
+        if (! View::exists($previewView)) {
+            return View::make('twill::errors.preview', [
+                'moduleName' => Str::singular($this->moduleName),
+            ]);
+        }
+
+        $innerData = array_replace([
+            'item' => $item,
+        ], $this->previewData($item));
+
+        $wrapped = $item instanceof Model
+            ? CmsPageLayoutPresentationWrapper::documentOrNull($item, $previewView, $innerData)
+            : null;
+        if ($wrapped !== null) {
+            return view('cms::layout_builder.inline_document', ['document' => $wrapped]);
+        }
+
+        return View::make($previewView, $innerData);
     }
 
     public function listRevisions($id)

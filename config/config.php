@@ -34,6 +34,7 @@ return [
     'custom_components_resource_path' => 'vendor/modularous/js/components',
     // 'vendor_components_resource_path' => 'assets/vendor/js/components',
     'enabled_currencies' => explode(',', env('MODULAROUS_ACTIVE_CURRENCIES', 'USD,EUR,TRY')),
+    'define_panel_routes_on_frontend_requests' => env('MODULAROUS_DEFINE_PANEL_ROUTES_ON_FRONTEND_REQUESTS', true),
 
     /**
      * Optional custom currency provider class implementing CurrencyProviderInterface.

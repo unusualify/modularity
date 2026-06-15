@@ -18,6 +18,8 @@ class RepeaterHydrate extends InputHydrate
         'autoIdGenerator' => true,
         'itemValue' => 'id',
         'itemTitle' => 'name',
+        'collapsible' => false,
+        'translated' => false
     ];
 
     /**

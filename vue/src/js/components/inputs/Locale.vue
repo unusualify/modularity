@@ -146,7 +146,7 @@ export default {
 
       const localeAttributes = {}
       // const attributes = cloneDeep(this.attributes)
-      const errorMessages = this.attributes.errorMessages
+      const errorMessages = this.attributes.errorMessages ?? {}
 
       this.languages.forEach((language) => {
         let attributes = cloneDeep(omit(this.attributes, ['errorMessages']))

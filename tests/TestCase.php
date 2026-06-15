@@ -7,6 +7,7 @@ use Illuminate\Foundation\Application;
 use JoeDixon\Translation\TranslationServiceProvider;
 use Modules\SystemPayment\Entities\Payment;
 use Nwidart\Modules\LaravelModulesServiceProvider;
+use Oobook\Database\Eloquent\ManageEloquentServiceProvider;
 use Spatie\Permission\PermissionServiceProvider;
 use Unusualify\Modularous\Activators\ModularousActivator;
 use Unusualify\Modularous\Entities\Enums\PaymentStatus;
@@ -44,6 +45,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             LaravelServiceProvider::class,
             ModularousProvider::class,
             PermissionServiceProvider::class,
+            ManageEloquentServiceProvider::class,
             \Oobook\Priceable\LaravelServiceProvider::class,
             TranslationServiceProvider::class,
             TranslatableServiceProvider::class,
@@ -147,6 +149,18 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             'payable.status_enum' => PaymentStatus::class,
             'payable.additional_fillable' => ['payment_service_id', 'price_id', 'currency_id'],
             // 'payable.middleware' => ['web.auth', 'modularous.panel'],
+        ]);
+
+        // ModelHelpers boots activity logging on every Model; CauserResolver requires this config.
+        $app['config']->set('activitylog', [
+            'enabled' => false,
+            'delete_records_older_than_days' => 365,
+            'default_log_name' => 'default',
+            'default_auth_driver' => null,
+            'subject_returns_soft_deleted_models' => false,
+            'activity_model' => \Spatie\Activitylog\Models\Activity::class,
+            'table_name' => 'sp_activity_logs',
+            'database_connection' => 'testdb',
         ]);
     }
 
