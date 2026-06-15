@@ -5,6 +5,7 @@ namespace Modules\Cms\Http\Controllers\API;
 use Illuminate\Http\JsonResponse;
 use Modules\Cms\Contracts\CmsLocalizationContract;
 use Modules\Cms\Entities\Page;
+use Modules\Cms\Routing\CmsFrontRouteLocalizationBinding;
 use Modules\Cms\Services\CmsParentSegmentResolver;
 use Unusualify\Modularous\Http\Controllers\Controller;
 
@@ -24,7 +25,7 @@ class CmsRoutingMetaController extends Controller
             'hide_default_locale_segment' => $localization->hideDefaultLocaleInUrl(),
             'locale_strategy' => (string) modularousConfig('cms_routing.locale_strategy', 'path'),
             'public_front_route_group_mode' => (string) modularousConfig('cms_routing.public_front_route_group_mode', 'catch_all'),
-            'public_front_uses_locale_route_param' => \Modules\Cms\Routing\CmsFrontRouteLocalizationBinding::shouldUseLocalePrefixRouteGroup(),
+            'public_front_uses_locale_route_param' => CmsFrontRouteLocalizationBinding::shouldUseLocalePrefixRouteGroup(),
             'path_segment_locales' => $localization->pathSegmentLocales(),
             'supported_locales' => $localization->supportedLocalesMeta(),
             'admin' => [

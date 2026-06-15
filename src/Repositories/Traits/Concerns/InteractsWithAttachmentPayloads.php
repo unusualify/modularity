@@ -2,15 +2,18 @@
 
 namespace Unusualify\Modularous\Repositories\Traits\Concerns;
 
+use Unusualify\Modularous\Repositories\Repository;
+use Unusualify\Modularous\Repositories\Traits\FilesTrait;
+
 /**
- * Shared helpers for file / image (and similar) payload shapes on {@see \Unusualify\Modularous\Repositories\Repository}.
+ * Shared helpers for file / image (and similar) payload shapes on {@see Repository}.
  *
  * Payloads may be top-level (`photos`) or nested per locale (`en.photos`) after form preparation.
  */
 trait InteractsWithAttachmentPayloads
 {
     /**
-     * @param  callable(string, mixed): bool  $inferRoleFromKeyValue
+     * @param callable(string, mixed): bool $inferRoleFromKeyValue
      * @return list<string>
      */
     protected function resolveAttachmentRoles(string $traitFqcn, string $chunkInputTypeRegex, array $fields, callable $inferRoleFromKeyValue): array
@@ -132,7 +135,7 @@ trait InteractsWithAttachmentPayloads
     /**
      * Translated vs locale-keyed payload when schema is missing (e.g. revision JSON only).
      *
-     * @param  array<string, mixed>  $fields
+     * @param array<string, mixed> $fields
      */
     protected function isAttachmentRoleTranslatedForFields(array $fields, string $role): bool
     {
@@ -323,9 +326,9 @@ trait InteractsWithAttachmentPayloads
     }
 
     /**
-     * Exclude from {@see \Unusualify\Modularous\Repositories\Traits\FilesTrait} so media IDs are not written as {@code file_id}.
+     * Exclude from {@see FilesTrait} so media IDs are not written as {@code file_id}.
      *
-     * @param  array<string, mixed>  $fields
+     * @param array<string, mixed> $fields
      */
     protected function shouldExcludeRoleFromFileTrait(string $role, array $fields): bool
     {

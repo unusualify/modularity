@@ -3,6 +3,7 @@
 namespace Modules\Cms\Entities;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Modules\Cms\Support\StylesheetManager;
 use Unusualify\Modularous\Entities\Model;
 
 /**
@@ -11,7 +12,7 @@ use Unusualify\Modularous\Entities\Model;
  * @property array<string,mixed>|null $definition Arbitrary manifest (e.g. {@code cms_page_layout_body_compose}: {@code append}|{@code wrap} for DB body nesting).
  * @property list<string>|null $style_sheet_slugs Additional stylesheet slugs merged after {@see $style_sheet_id}.
  * @property string|null $blade_view_name Passed to Laravel {@see view()} when {@code filesystem}.
- * @property int|null $style_sheet_id FK to {@see StyleSheet}; primary sheet consumed by {@see \Modules\Cms\Support\StylesheetManager::linkHrefsForLayoutBuilder()}.
+ * @property int|null $style_sheet_id FK to {@see StyleSheet}; primary sheet consumed by {@see StylesheetManager::linkHrefsForLayoutBuilder()}.
  */
 class LayoutBuilder extends Model
 {

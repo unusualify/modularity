@@ -20,7 +20,7 @@ use Illuminate\Http\RedirectResponse;
 trait HandlesUnauthenticatedInertiaAndAjax
 {
     /**
-     * @param  string[]  ...$guards
+     * @param string[] ...$guards
      */
     public function handle($request, Closure $next, ...$guards): mixed
     {
@@ -37,9 +37,9 @@ trait HandlesUnauthenticatedInertiaAndAjax
 
             if ($request->ajax()) {
                 return response()->json([
-                    'message'   => $e->getMessage(),
+                    'message' => $e->getMessage(),
                     'login_url' => $loginUrl ?: null,
-                    'redirect'  => (bool) $loginUrl,
+                    'redirect' => (bool) $loginUrl,
                 ], 401);
             }
 
@@ -57,9 +57,9 @@ trait HandlesUnauthenticatedInertiaAndAjax
 
             if ($request->ajax()) {
                 return response()->json([
-                    'message'   => __('Unauthenticated.'),
+                    'message' => __('Unauthenticated.'),
                     'login_url' => $response->getTargetUrl(),
-                    'redirect'  => true,
+                    'redirect' => true,
                 ], 401);
             }
         }

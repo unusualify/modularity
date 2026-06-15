@@ -16,7 +16,7 @@ declare(strict_types=1);
 // BOOTSTRAP
 // ══════════════════════════════════════════════════════════════════════════════
 
-$scriptDir   = getcwd();
+$scriptDir = getcwd();
 global $projectRoot;
 $projectRoot = $scriptDir;   // put this file in the project root
 
@@ -77,8 +77,8 @@ out("  <cyan>   cd {$projectRoot} && composer install</cyan>");
 out('');
 out('');
 out('  <bold>3) Vendor publish:</bold>');
-out("  <cyan>   php artisan modularous:build</cyan>");
-out("  <cyan>   php artisan vendor:publish --tag=views --force</cyan>");
+out('  <cyan>   php artisan modularous:build</cyan>');
+out('  <cyan>   php artisan vendor:publish --tag=views --force</cyan>');
 out('');
 out('  <yellow>⚠  Bu adımlar tamamlanmadan uygulama çalışmayacaktır.</yellow>');
 out('');
@@ -93,10 +93,10 @@ out('');
 
 function fixNamespacesInFiles(string $root): void
 {
-    $extensions  = ['php', 'json', 'yml', 'yaml', 'xml'];
+    $extensions = ['php', 'json', 'yml', 'yaml', 'xml'];
     $excludeDirs = ['vendor', 'node_modules', '.git', 'storage/logs', 'storage/framework', 'packages'];
 
-    $files   = collectFiles($root, $extensions, $excludeDirs);
+    $files = collectFiles($root, $extensions, $excludeDirs);
     $updated = 0;
 
     foreach ($files as $path) {
@@ -128,7 +128,7 @@ function fixNamespacesInFiles(string $root): void
 
 function collectFiles(string $root, array $extensions, array $excludeDirs): array
 {
-    $result  = [];
+    $result = [];
     $dirIter = new RecursiveDirectoryIterator($root, RecursiveDirectoryIterator::SKIP_DOTS);
 
     $filter = new RecursiveCallbackFilterIterator(
@@ -142,6 +142,7 @@ function collectFiles(string $root, array $extensions, array $excludeDirs): arra
                     }
                 }
             }
+
             return true;
         }
     );
@@ -206,11 +207,13 @@ function renameRootDirectory(string $root): void
 
     if (! is_dir($src)) {
         skip("No 'modularity/' directory at project root — skipped.");
+
         return;
     }
 
     if (is_dir($dst)) {
         warn("'modularous/' already exists at project root — rename skipped.");
+
         return;
     }
 
@@ -241,8 +244,8 @@ function fixEnvFile(string $envPath): void
 
 function fixDatabaseRecords(PDO $pdo, array $env): void
 {
-    $NS_OLD      = 'Unusualify\Modularity';
-    $NS_NEW      = 'Unusualify\Modularous';
+    $NS_OLD = 'Unusualify\Modularity';
+    $NS_NEW = 'Unusualify\Modularous';
     $JSON_NS_OLD = 'Unusualify\\\\Modularity';   // two actual backslashes (JSON-encoded)
     $JSON_NS_NEW = 'Unusualify\\\\Modularous';
 
@@ -253,7 +256,7 @@ function fixDatabaseRecords(PDO $pdo, array $env): void
         if (empty($rows)) {
             skip('No modularity entries in migrations table.');
         } else {
-            $stmt = $pdo->prepare("UPDATE migrations SET migration = ? WHERE migration = ?");
+            $stmt = $pdo->prepare('UPDATE migrations SET migration = ? WHERE migration = ?');
             foreach ($rows as $name) {
                 $newName = str_replace('modularity', 'modularous', $name);
                 $stmt->execute([$newName, $name]);
@@ -322,15 +325,16 @@ function fixDatabaseRecords(PDO $pdo, array $env): void
     // ── 5f. um_* tables ───────────────────────────────────────────────────────
     dbGroup('um_* namespace / type columns');
     $umMap = [
-        'um_authorizations'  => ['authorized_type'],
-        'um_spreads'         => ['spreadable_type'],
-        'um_tagged'          => ['taggable_type'],
-        'um_tags'            => ['namespace'],
+        'um_authorizations' => ['authorized_type'],
+        'um_spreads' => ['spreadable_type'],
+        'um_tagged' => ['taggable_type'],
+        'um_tags' => ['namespace'],
         'um_creator_records' => ['creator_type', 'creatable_type'],
     ];
     foreach ($umMap as $table => $columns) {
         if (! tableExists($pdo, $table)) {
             skip("Table {$table} not found.");
+
             continue;
         }
         foreach ($columns as $col) {
@@ -362,7 +366,7 @@ function dbReplace(PDO $pdo, string $table, string $column, string $from, string
     );
     $stmt->execute([$from, $to, '%' . $from . '%']);
 
-    $display = strlen($from) > 45 ? substr($from, 0, 42) . '…' : $from;
+    $display = mb_strlen($from) > 45 ? mb_substr($from, 0, 42) . '…' : $from;
     ok(sprintf('%s.%s — %d row(s)  [%s → …]', $table, $column, $count, $display));
 }
 
@@ -370,6 +374,7 @@ function tableExists(PDO $pdo, string $table): bool
 {
     try {
         $pdo->query("SELECT 1 FROM `{$table}` LIMIT 1");
+
         return true;
     } catch (Throwable) {
         return false;
@@ -382,28 +387,33 @@ function columnExists(PDO $pdo, string $table, string $column): bool
 
     if ($driver === 'mysql') {
         $rows = $pdo->query("SHOW COLUMNS FROM `{$table}` LIKE " . $pdo->quote($column))->fetchAll();
+
         return ! empty($rows);
     }
 
     if ($driver === 'sqlite') {
         $stmt = $pdo->query("PRAGMA table_info(`{$table}`)");
         foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $col) {
-            if ($col['name'] === $column) return true;
+            if ($col['name'] === $column) {
+                return true;
+            }
         }
+
         return false;
     }
 
     if ($driver === 'pgsql') {
-        $stmt = $pdo->prepare("
+        $stmt = $pdo->prepare('
             SELECT column_name
             FROM information_schema.columns
             WHERE table_name = ? AND column_name = ?
-        ");
+        ');
         $stmt->execute([$table, $column]);
+
         return $stmt->rowCount() > 0;
     }
 
-    throw new \RuntimeException("Desteklenmeyen veritabanı sürücüsü: {$driver}");
+    throw new RuntimeException("Desteklenmeyen veritabanı sürücüsü: {$driver}");
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -412,7 +422,7 @@ function columnExists(PDO $pdo, string $table, string $column): bool
 
 function parseEnv(string $path): array
 {
-    $env   = [];
+    $env = [];
     $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 
     foreach ($lines as $line) {
@@ -424,7 +434,7 @@ function parseEnv(string $path): array
             continue;
         }
         [$key, $value] = explode('=', $line, 2);
-        $key   = trim($key);
+        $key = trim($key);
         $value = trim($value);
 
         // Strip surrounding quotes
@@ -445,11 +455,11 @@ function parseEnv(string $path): array
 function makePdo(array $env, string $projectRoot): PDO
 {
     $connection = $env['DB_CONNECTION'] ?? 'mysql';
-    $host       = $env['DB_HOST']       ?? '127.0.0.1';
-    $port       = $env['DB_PORT']       ?? '3306';
-    $database   = $env['DB_DATABASE']   ?? '';
-    $username   = $env['DB_USERNAME']   ?? '';
-    $password   = $env['DB_PASSWORD']   ?? '';
+    $host = $env['DB_HOST'] ?? '127.0.0.1';
+    $port = $env['DB_PORT'] ?? '3306';
+    $database = $env['DB_DATABASE'] ?? '';
+    $username = $env['DB_USERNAME'] ?? '';
+    $password = $env['DB_PASSWORD'] ?? '';
 
     if ($connection !== 'mysql') {
         // Basic support for pgsql / sqlite — extend as needed
@@ -458,10 +468,12 @@ function makePdo(array $env, string $projectRoot): PDO
             if (! str_starts_with($dbPath, '/')) {
                 $dbPath = $projectRoot . '/database/database.sqlite';
             }
+
             return new PDO("sqlite:{$dbPath}");
         }
         if ($connection === 'pgsql') {
             $dsn = "pgsql:host={$host};port={$port};dbname={$database}";
+
             return new PDO($dsn, $username, $password, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
         }
     }
@@ -470,9 +482,9 @@ function makePdo(array $env, string $projectRoot): PDO
 
     try {
         $pdo = new PDO($dsn, $username, $password, [
-            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ,
-            PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4",
+            PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4',
         ]);
     } catch (Throwable $e) {
         abort('Database connection failed: ' . $e->getMessage());
@@ -505,22 +517,38 @@ function colorize(string $text): string
         return preg_replace('/<[^>]+>/', '', $text);
     }
     $map = [
-        '<green>'   => "\033[32m", '</green>'   => "\033[0m",
-        '<yellow>'  => "\033[33m", '</yellow>'  => "\033[0m",
-        '<cyan>'    => "\033[36m", '</cyan>'    => "\033[0m",
-        '<red>'     => "\033[31m", '</red>'     => "\033[0m",
+        '<green>' => "\033[32m", '</green>' => "\033[0m",
+        '<yellow>' => "\033[33m", '</yellow>' => "\033[0m",
+        '<cyan>' => "\033[36m", '</cyan>' => "\033[0m",
+        '<red>' => "\033[31m", '</red>' => "\033[0m",
         '<magenta>' => "\033[35m", '</magenta>' => "\033[0m",
-        '<bold>'    => "\033[1m",  '</bold>'    => "\033[0m",
-        '<info>'    => "\033[32m", '</info>'    => "\033[0m",
+        '<bold>' => "\033[1m",  '</bold>' => "\033[0m",
+        '<info>' => "\033[32m", '</info>' => "\033[0m",
     ];
+
     return str_replace(array_keys($map), array_values($map), $text);
 }
 
-function out(string $msg = ''): void  { echo colorize($msg) . PHP_EOL; }
-function ok(string $msg): void        { out("    <green>✔</green> {$msg}"); }
-function skip(string $msg): void      { out("    <yellow>–</yellow> {$msg}"); }
-function warn(string $msg): void      { out("    <red>⚠</red>  {$msg}"); }
-function info(string $msg): void      { out("  <info>{$msg}</info>"); }
+function out(string $msg = ''): void
+{
+    echo colorize($msg) . PHP_EOL;
+}
+function ok(string $msg): void
+{
+    out("    <green>✔</green> {$msg}");
+}
+function skip(string $msg): void
+{
+    out("    <yellow>–</yellow> {$msg}");
+}
+function warn(string $msg): void
+{
+    out("    <red>⚠</red>  {$msg}");
+}
+function info(string $msg): void
+{
+    out("  <info>{$msg}</info>");
+}
 
 function banner(): void
 {

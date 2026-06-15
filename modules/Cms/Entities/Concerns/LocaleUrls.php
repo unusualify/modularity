@@ -24,7 +24,7 @@ trait LocaleUrls
      * Limit the query to models that have a synced {@see UrlRoute::KIND_PAGE_PUBLIC} row for the locale
      * (defaults to the active Laravel locale).
      *
-     * @param  Builder<static>  $query
+     * @param Builder<static> $query
      * @return Builder<static>
      */
     public function scopeWithPublicUrlRouteForLocale(Builder $query, ?string $locale = null): Builder
@@ -269,7 +269,7 @@ trait LocaleUrls
     }
 
     /**
-     * @param  array<string, array<string, mixed>>  $supportedMeta
+     * @param array<string, array<string, mixed>> $supportedMeta
      */
     protected function resolveLocaleLabelForUrlAlternates(string $locale, array $supportedMeta): string
     {
@@ -282,7 +282,7 @@ trait LocaleUrls
             }
         }
 
-        return strtoupper($locale);
+        return mb_strtoupper($locale);
     }
 
     protected function cmsPublicUrlsEnabled(): bool

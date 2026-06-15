@@ -42,13 +42,13 @@ final class ParentSegmentBindingValidator
         ?string $normalizedPrefix,
         ?int $exceptId = null,
     ): void {
-        if (! $enabled || ! static::isWhitespaceOnlyEmptyPrefix($normalizedPrefix)) {
+        if (! $enabled || ! self::isWhitespaceOnlyEmptyPrefix($normalizedPrefix)) {
             return;
         }
 
         $localeScope = trim((string) ($localeScope ?? ''));
 
-        $conflicting = static::enabledBindingsWithEffectivelyEmptyPrefix($exceptId)
+        $conflicting = self::enabledBindingsWithEffectivelyEmptyPrefix($exceptId)
             ->first(function (ParentSegment $row) use ($targetModelClass, $localeScope): bool {
                 return (string) $row->target_model_class !== (string) $targetModelClass
                     && static::localeScopesOverlap($localeScope, (string) ($row->locale ?? ''));
@@ -73,7 +73,7 @@ final class ParentSegmentBindingValidator
             ->when($exceptId !== null, fn ($q) => $q->whereKeyNot($exceptId));
 
         return $query->get()->filter(
-            fn (ParentSegment $row): bool => static::isWhitespaceOnlyEmptyPrefix((string) ($row->normalized_prefix ?? ''))
+            fn (ParentSegment $row): bool => self::isWhitespaceOnlyEmptyPrefix((string) ($row->normalized_prefix ?? ''))
         )->values();
     }
 }

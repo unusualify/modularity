@@ -210,7 +210,7 @@ class MigrationHelpersTest extends TestCase
 
         $this->assertContains('product_id_locale_unique', $indexNames);
 
-        $uniqueIndex = array_filter($indexes, fn($i) => $i['name'] === 'product_id_locale_unique');
+        $uniqueIndex = array_filter($indexes, fn ($i) => $i['name'] === 'product_id_locale_unique');
         $uniqueIndex = array_values($uniqueIndex)[0];
 
         $this->assertTrue($uniqueIndex['unique']);
@@ -518,7 +518,7 @@ class MigrationHelpersTest extends TestCase
         $this->assertCount(3, $foreignKeys);
 
         // Sort for consistent testing
-        usort($foreignKeys, fn($a, $b) => strcmp($a['columns'][0], $b['columns'][0]));
+        usort($foreignKeys, fn ($a, $b) => strcmp($a['columns'][0], $b['columns'][0]));
 
         // Check approved_by foreign key
         $this->assertEquals(['approved_by'], $foreignKeys[0]['columns']);

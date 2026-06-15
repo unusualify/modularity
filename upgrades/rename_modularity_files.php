@@ -3,7 +3,6 @@
 /**
  * Dosya İsimleri Değiştirme Scripti - Exclude Destekli
  */
-
 $targetDirectory = __DIR__; // Proje kök dizini
 $dryRun = true;
 
@@ -14,7 +13,7 @@ $excludePaths = [
     'node_modules',
     'vendor',
     '.git',
-    'storage'
+    'storage',
 ];
 
 $replacements = [
@@ -24,11 +23,11 @@ $replacements = [
 
 $rootPath = realpath(getcwd());
 
-if (!is_dir($targetDirectory)) {
-    die("Hata: Hedef dizin bulunamadı.\n");
+if (! is_dir($targetDirectory)) {
+    exit("Hata: Hedef dizin bulunamadı.\n");
 }
 
-echo "--- " . ($dryRun ? "DRY-RUN MODU" : "CANLI MOD") . " ---\n";
+echo '--- ' . ($dryRun ? 'DRY-RUN MODU' : 'CANLI MOD') . " ---\n";
 
 $directory = new RecursiveDirectoryIterator($targetDirectory, RecursiveDirectoryIterator::SKIP_DOTS);
 $iterator = new RecursiveIteratorIterator($directory, RecursiveIteratorIterator::CHILD_FIRST);
@@ -37,20 +36,25 @@ $renameCount = 0;
 
 foreach ($iterator as $fileInfo) {
     $oldPath = $fileInfo->getRealPath();
-    
+
     // Kendi script dosyamızı ve exclude edilen yolları atla
-    if ($oldPath === __FILE__) continue;
-    
+    if ($oldPath === __FILE__) {
+        continue;
+    }
+
     // Exclude kontrolü
     $shouldSkip = false;
     foreach ($excludePaths as $exclude) {
         // Yolun içinde exclude edilen kelime geçiyor mu?
         if (str_contains($oldPath, DIRECTORY_SEPARATOR . str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $exclude))) {
             $shouldSkip = true;
+
             break;
         }
     }
-    if ($shouldSkip) continue;
+    if ($shouldSkip) {
+        continue;
+    }
 
     $oldName = $fileInfo->getFilename();
     $newName = $oldName;

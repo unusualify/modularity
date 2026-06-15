@@ -10,7 +10,7 @@ trait PublishableTrait
 {
     public function prependFormSchemaPublishableTrait($scope = []): array
     {
-        if ( ! classHasTrait($this->getModel(), Publishable::class)) {
+        if (! classHasTrait($this->getModel(), Publishable::class)) {
             return [];
         }
 

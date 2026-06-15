@@ -7,11 +7,15 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Route;
 use Modules\Cms\Entities\Concerns\HasParentSegment;
+use Modules\Cms\Services\CmsSignedPreviewTargetResolver;
+use Modules\Cms\Services\CmsSignedPreviewUrlGenerator;
+use Modules\Cms\Services\CmsUrlRouteRegistry;
+use Modules\Cms\Support\CmsFrontPath;
+use Modules\Cms\Support\CmsPublicSiteUrl;
 use Unusualify\Modularous\Entities\Traits\HasSlug;
 use Unusualify\Modularous\Entities\Traits\IsSingular;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Support\ModularousFlashWarnings;
-
 
 trait ManageCms
 {
@@ -63,7 +67,6 @@ trait ManageCms
         return $response;
     }
 
-
     /**
      * Metadata for minting a signed public preview URL (any submodule with {@see HasParentSegment} + CMS front stack).
      *
@@ -79,7 +82,7 @@ trait ManageCms
             return null;
         }
 
-        if (! class_exists(\Modules\Cms\Services\CmsSignedPreviewTargetResolver::class)) {
+        if (! class_exists(CmsSignedPreviewTargetResolver::class)) {
             return null;
         }
 
@@ -88,7 +91,7 @@ trait ManageCms
             return null;
         }
 
-        $target = app(\Modules\Cms\Services\CmsSignedPreviewTargetResolver::class)
+        $target = app(CmsSignedPreviewTargetResolver::class)
             ->resolve((string) $this->moduleName, (string) $this->routeName);
         if ($target === null) {
             return null;
@@ -112,7 +115,7 @@ trait ManageCms
                 'route' => $this->routeName,
                 'id' => $itemId,
             ], false),
-            'expiresInMinutes' => app(\Modules\Cms\Services\CmsSignedPreviewUrlGenerator::class)->ttlMinutes(),
+            'expiresInMinutes' => app(CmsSignedPreviewUrlGenerator::class)->ttlMinutes(),
         ];
     }
 
@@ -139,11 +142,11 @@ trait ManageCms
             return null;
         }
 
-        if (! class_exists(\Modules\Cms\Services\CmsUrlRouteRegistry::class)) {
+        if (! class_exists(CmsUrlRouteRegistry::class)) {
             return null;
         }
 
-        $registry = app(\Modules\Cms\Services\CmsUrlRouteRegistry::class);
+        $registry = app(CmsUrlRouteRegistry::class);
 
         if (! $registry->tableReady()) {
             return null;
@@ -165,16 +168,15 @@ trait ManageCms
                 continue;
             }
 
-            $browserPath = \Modules\Cms\Support\CmsFrontPath::publicBrowserPathForLocaleAndRegistryPath($locale, $path);
+            $browserPath = CmsFrontPath::publicBrowserPathForLocaleAndRegistryPath($locale, $path);
 
             $out[] = [
                 'locale' => $locale,
                 'path' => $browserPath,
-                'url' => \Modules\Cms\Support\CmsPublicSiteUrl::absoluteUrlForPath($browserPath),
+                'url' => CmsPublicSiteUrl::absoluteUrlForPath($browserPath),
             ];
         }
 
         return $out === [] ? null : $out;
     }
-
 }

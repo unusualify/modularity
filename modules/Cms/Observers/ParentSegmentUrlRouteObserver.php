@@ -4,12 +4,14 @@ namespace Modules\Cms\Observers;
 
 use Modules\Cms\Contracts\PublicUrlRegistryContract;
 use Modules\Cms\Entities\ParentSegment;
+use Modules\Cms\Entities\UrlRoute;
+use Modules\Cms\Services\CmsParentSegmentResolver;
 use WeakMap;
 
 /**
- * Rebuilds {@see \Modules\Cms\Entities\UrlRoute} PAGE_PUBLIC paths for affected models after parent-prefix rows change.
+ * Rebuilds {@see UrlRoute} PAGE_PUBLIC paths for affected models after parent-prefix rows change.
  *
- * @see \Modules\Cms\Services\CmsParentSegmentResolver
+ * @see CmsParentSegmentResolver
  * @see PublicUrlRegistryContract::syncPublicPageRoutesForAllModelsOfClass()
  */
 final class ParentSegmentUrlRouteObserver

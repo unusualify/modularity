@@ -289,7 +289,7 @@ class InputHydrateTest extends TestCase
 
         Modularous::shouldReceive('find')
             ->with('TestModule')
-            ->andReturn(m::mock(\Unusualify\Modularous\Module::class));
+            ->andReturn(m::mock(Module::class));
 
         $reflection = new \ReflectionClass($h);
         $method = $reflection->getMethod('getModule');

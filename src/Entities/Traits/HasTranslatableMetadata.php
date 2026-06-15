@@ -24,9 +24,9 @@ trait HasTranslatableMetadata
 
     public function initializeHasTranslatableMetadata()
     {
-        if( classHasTrait($this, HasTranslation::class)) {
+        if (classHasTrait($this, HasTranslation::class)) {
             $this->translatedAttributes = array_unique(array_merge($this->translatedAttributes, $this->translatableMetadataAttributeNames()));
-        } else if (classHasTrait($this, IsSingular::class)) {
+        } elseif (classHasTrait($this, IsSingular::class)) {
             $this->mergeFillable($this->translatableMetadataAttributeNames());
         }
     }

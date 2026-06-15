@@ -13,7 +13,7 @@ trait TableBulkActions
     {
         $actions = [];
 
-        if($this->module) {            
+        if ($this->module) {
             if ($this->getIndexOption('delete')) {
                 $actions[] = [
                     'name' => 'bulkDelete',
@@ -23,7 +23,7 @@ trait TableBulkActions
                     'color' => 'primary',
                 ];
             }
-    
+
             if ($this->getIndexOption('forceDelete')) {
                 $actions[] = [
                     'name' => 'bulkForceDelete',
@@ -33,7 +33,7 @@ trait TableBulkActions
                     'color' => 'red',
                 ];
             }
-    
+
             if ($this->getIndexOption('restore')) {
                 $actions[] = [
                     'name' => 'bulkRestore',
@@ -44,7 +44,6 @@ trait TableBulkActions
                 ];
             }
         }
-
 
         return $actions;
     }

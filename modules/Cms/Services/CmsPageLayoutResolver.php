@@ -4,13 +4,15 @@ namespace Modules\Cms\Services;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Schema;
+use Modules\Cms\Entities\Concerns\HasPageLayout;
 use Modules\Cms\Entities\LayoutBuilder;
 use Modules\Cms\Entities\PageLayout;
+use Modules\Cms\Entities\ParentSegment;
 
 /**
- * Resolves locale-agnostic {@see PageLayout} rows keyed by routed model FQCN (see {@see \Modules\Cms\Entities\Concerns\HasPageLayout}).
+ * Resolves locale-agnostic {@see PageLayout} rows keyed by routed model FQCN (see {@see HasPageLayout}).
  *
- * Prefer this over tying shells to {@see \Modules\Cms\Entities\ParentSegment} bindings.
+ * Prefer this over tying shells to {@see ParentSegment} bindings.
  */
 final class CmsPageLayoutResolver
 {

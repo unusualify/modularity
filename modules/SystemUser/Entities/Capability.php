@@ -3,8 +3,8 @@
 namespace Modules\SystemUser\Entities;
 
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Unusualify\Modularous\Entities\Model;
 use Modules\SystemUser\Entities\Traits\FlushesSecurityCache;
+use Unusualify\Modularous\Entities\Model;
 
 class Capability extends Model
 {

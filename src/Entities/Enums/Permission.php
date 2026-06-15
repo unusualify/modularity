@@ -39,7 +39,7 @@ enum Permission: string
 
     public static function generatePermissionName($permission, $routeName)
     {
-        return Str::kebab($routeName) . '_' . static::get($permission);
+        return Str::kebab($routeName) . '_' . self::get($permission);
     }
 
     public static function generatePermissionMiddlewareDefinition($permission, $routeName)

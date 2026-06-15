@@ -116,7 +116,7 @@ trait FilesTrait
     }
 
     /**
-     * @param  array<int|string, mixed>  $rows
+     * @param array<int|string, mixed> $rows
      */
     private function attachFileSpecsFromRows($object, array $rows, string $role, string $locale): void
     {
@@ -180,7 +180,7 @@ trait FilesTrait
     /**
      * Preview: merge DB file pivots with payload.
      *
-     * @param  array<string, mixed>  $fields
+     * @param array<string, mixed> $fields
      */
     private function getPreviewFiles($object, array $fields): Collection
     {
@@ -247,7 +247,7 @@ trait FilesTrait
     /**
      * Roles for file pivots only — never image / media-library fields (e.g. {@code photos}).
      *
-     * @param  array<string, mixed>  $fields
+     * @param array<string, mixed> $fields
      * @return list<string>
      */
     private function resolveFileTraitRoles(array $fields): array
@@ -266,7 +266,7 @@ trait FilesTrait
     }
 
     /**
-     * @param  array<int|string, mixed>  $rows
+     * @param array<int|string, mixed> $rows
      */
     private function collectPivotSpecsForFileRows($object, array $rows, string $role, string $locale): Collection
     {

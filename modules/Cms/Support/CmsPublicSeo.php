@@ -5,6 +5,7 @@ namespace Modules\Cms\Support;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Modules\Cms\Contracts\CanonicalUrlResolverInterface;
+use Modules\Cms\Entities\Translations\PageTranslation;
 use Unusualify\Modularous\Entities\Traits\HasTranslation;
 
 /**
@@ -19,7 +20,7 @@ final class CmsPublicSeo
     public const ROBOTS_TXT_STAGING_DISALLOW_ALL = "User-agent: *\nDisallow: /";
 
     /**
-     * @param object|null $translation e.g. {@see \Modules\Cms\Entities\Translations\PageTranslation}
+     * @param object|null $translation e.g. {@see PageTranslation}
      * @return array{title: string, description: ?string, canonicalUrl: string, robotsMeta: string}
      */
     public static function build(Request $request, Model $item, CanonicalUrlResolverInterface $canonical): array
@@ -31,7 +32,7 @@ final class CmsPublicSeo
         // #TODO: add default title and description for the page if not set
         if (is_array($title) && array_key_exists($locale, $title)) {
             $title = (string) $title[$locale] ?? $item->title ?? 'Page';
-        } else if ($title !== null) {
+        } elseif ($title !== null) {
             $title = (string) (optional($item->translate())->title
                 ?? 'Page');
         }

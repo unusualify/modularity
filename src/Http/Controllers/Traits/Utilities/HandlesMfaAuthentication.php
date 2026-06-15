@@ -14,8 +14,8 @@ use Illuminate\Support\Str;
 use PragmaRX\Google2FA\Google2FA;
 use Unusualify\Modularous\Brokers\RegisterBroker;
 use Unusualify\Modularous\Entities\User;
-use Unusualify\Modularous\Facades\Register;
 use Unusualify\Modularous\Facades\Modularous;
+use Unusualify\Modularous\Facades\Register;
 use Unusualify\Modularous\Notifications\LoginMfaCodeNotification;
 use Unusualify\Modularous\Services\MessageStage;
 
@@ -134,7 +134,7 @@ trait HandlesMfaAuthentication
         $length = max(4, min(10, $this->mfaCodeLength()));
         $max = (10 ** $length) - 1;
 
-        return str_pad((string) random_int(0, $max), $length, '0', STR_PAD_LEFT);
+        return mb_str_pad((string) random_int(0, $max), $length, '0', STR_PAD_LEFT);
     }
 
     protected function createEmailOtpChallenge(Request $request, User $user): string

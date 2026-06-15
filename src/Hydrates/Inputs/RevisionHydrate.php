@@ -69,7 +69,7 @@ class RevisionHydrate extends InputHydrate
         $canReject = false;
         $canRestore = false;
 
-        if($this->module && $this->module->getRepository($this->routeName)->hasBehavior('revisions')) {
+        if ($this->module && $this->module->getRepository($this->routeName)->hasBehavior('revisions')) {
             $canApprove = $this->module->getModel($this->routeName)->usesRevisionWorkflow() && $this->module->allowedPermission(Permission::REVISION_APPROVE->value, $this->routeName);
             $canReject = $this->module->getModel($this->routeName)->usesRevisionWorkflow() && $this->module->allowedPermission(Permission::REVISION_REJECT->value, $this->routeName);
             $canRestore = $this->module->allowedPermission(Permission::REVISION_RESTORE->value, $this->routeName);

@@ -2,8 +2,10 @@
 
 namespace Modules\Cms\Http\Controllers\Front;
 
+use Modules\Cms\Entities\Page;
+
 /**
- * Public CMS {@see \Modules\Cms\Entities\Page} renderer (invokable). View: {@code cms::page.custom}.
+ * Public CMS {@see Page} renderer (invokable). View: {@code cms::page.custom}.
  */
 final class PageController extends CmsController
 {

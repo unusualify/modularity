@@ -1,10 +1,29 @@
 <?php
 
+use Modules\Cms\Contracts\CmsLocalizationContract;
+use Modules\Cms\Entities\ParentSegment;
+use Modules\Cms\Http\Controllers\CmsSignedPublicPreviewController;
+use Modules\Cms\Http\Controllers\Front\CmsController;
+use Modules\Cms\Http\Controllers\Front\CmsPublicFrontController;
+use Modules\Cms\Http\Controllers\Front\PageController;
+use Modules\Cms\Http\Middleware\FallbackLocaleSluglessCanonicalMiddleware;
+use Modules\Cms\Http\Middleware\VisitorRedirectMiddleware;
+use Modules\Cms\Providers\CmsRouteServiceProvider;
+use Modules\Cms\Routing\CmsFrontRouteLocalizationBinding;
+use Modules\Cms\Routing\CmsFrontRouteRegistrar;
+use Modules\Cms\Services\CmsPublicModelResolver;
+use Modules\Cms\Services\CmsSignedPreviewUrlGenerator;
+use Modules\Cms\Services\CmsSlugInputValidationService;
+use Modules\Cms\Support\CmsPublicSiteUrl;
+use Modules\Cms\Support\CmsSluglessFallbackLocale;
+use Unusualify\Modularous\Hydrates\Inputs\SlugHydrate;
+use Unusualify\Modularous\Module;
+
 return [
     /**
      * CMS localization bridge: {@code auto} uses mcamara when installed, else translatable.
      *
-     * @see \Modules\Cms\Contracts\CmsLocalizationContract
+     * @see CmsLocalizationContract
      */
     'localization_driver' => env('MODULAROUS_CMS_LOCALIZATION_DRIVER', 'auto'),
 
@@ -12,9 +31,9 @@ return [
      * Public front catch-all shape: {@code catch_all} = single {@code {path}} (locale in first segment, resolved in PHP);
      * {@code locale_param} = {@code {locale}/{path}} route group (mcamara-friendly; requires mcamara stack).
      * Per-locale URL shapes are **not** duplicated via mcamara {@code transRoute('routes.*')} + lang files: they come
-     * from {@see \Modules\Cms\Entities\UrlRoute} + {@see \Modules\Cms\Entities\ParentSegment} at runtime.
+     * from {@see Modules\Cms\Entities\UrlRoute} + {@see ParentSegment} at runtime.
      *
-     * @see \Modules\Cms\Routing\CmsFrontRouteLocalizationBinding
+     * @see CmsFrontRouteLocalizationBinding
      */
     'public_front_route_group_mode' => env('MODULAROUS_CMS_PUBLIC_FRONT_ROUTE_GROUP_MODE', 'catch_all'),
 
@@ -45,8 +64,8 @@ return [
      * as the implicit locale for URLs with no `/locale/` prefix — e.g. {@code /pages/test} resolves like {@code fallback} content —
      * and {@code GET /en/pages/test} redirects to strip {@code /en} when {@see UrlRoute} already serves {@code PAGE_PUBLIC}.
      *
-     * @see \Modules\Cms\Support\CmsSluglessFallbackLocale
-     * @see \Modules\Cms\Http\Middleware\FallbackLocaleSluglessCanonicalMiddleware
+     * @see CmsSluglessFallbackLocale
+     * @see FallbackLocaleSluglessCanonicalMiddleware
      */
     'fallback_locale_optional_path_segment' => env('MODULAROUS_CMS_FALLBACK_LOCALE_OPTIONAL_PATH_SEGMENT', false),
 
@@ -74,8 +93,8 @@ return [
      * When unset, behaviour depends on {@see public_front_routes_allow_any_host}: if false, routes bind to the host
      * parsed from {@code config('app.url')}; if true, routes match any Host header.
      *
-     * @see \Modules\Cms\Routing\CmsFrontRouteRegistrar::resolvePublicFrontRouteDomain
-     * @see \Modules\Cms\Support\CmsPublicSiteUrl
+     * @see CmsFrontRouteRegistrar::resolvePublicFrontRouteDomain
+     * @see CmsPublicSiteUrl
      */
     'public_front_route_domain' => env('MODULAROUS_CMS_PUBLIC_FRONT_ROUTE_DOMAIN'),
 
@@ -105,23 +124,23 @@ return [
     /** First segment of public CMS routes; must match module `url` / Route::prefix (see `modules/Cms/Routes/front.php`). */
     'front_route_prefix' => env('MODULAROUS_CMS_FRONT_ROUTE_PREFIX', ''),
 
-    /** Serve public pages when {@see \Modules\Cms\Routing\CmsFrontRouteRegistrar} resolves a front controller (see {@see \Modules\Cms\Http\Controllers\Front\PageController}). */
+    /** Serve public pages when {@see CmsFrontRouteRegistrar} resolves a front controller (see {@see PageController}). */
     'public_pages_enabled' => env('MODULAROUS_CMS_PUBLIC_PAGES_ENABLED', true),
 
     /**
-     * When true, {@see \Modules\Cms\Providers\CmsRouteServiceProvider} registers public catch-all routes for each
+     * When true, {@see CmsRouteServiceProvider} registers public catch-all routes for each
      * enabled module whose submodule resolves a {@code Http/Controllers/Front/{Route}Controller} extending
-     * {@see \Modules\Cms\Http\Controllers\Front\CmsController} (see {@see \Modules\Cms\Routing\CmsFrontRouteRegistrar::resolveFrontControllerForModule()}).
+     * {@see CmsController} (see {@see CmsFrontRouteRegistrar::resolveFrontControllerForModule()}).
      */
     'auto_register_public_front' => env('MODULAROUS_CMS_AUTO_REGISTER_PUBLIC_FRONT', true),
 
     /**
-     * When true, the Cms public catch-all uses {@see \Modules\Cms\Http\Controllers\Front\CmsPublicFrontController}
-     * and {@see \Modules\Cms\Services\CmsPublicModelResolver::resolveForParentSegmentRegistry()}: any
+     * When true, the Cms public catch-all uses {@see CmsPublicFrontController}
+     * and {@see CmsPublicModelResolver::resolveForParentSegmentRegistry()}: any
      * {@link \Modules\Cms\Entities\UrlRoute} line whose urlable is an enabled {@link \Modules\Cms\Entities\ParentSegment}
      * target with {@link \Unusualify\Modularous\Entities\Traits\HasParentSegment}. When false, the first
      * {@code front-controller/...} per submodule (legacy) is used. {@see public_front_handlers} is then honored
-     * again for {@see \Modules\Cms\Routing\CmsFrontRouteRegistrar::resolveFrontControllerForModelClass()}.
+     * again for {@see CmsFrontRouteRegistrar::resolveFrontControllerForModelClass()}.
      */
     'universal_cms_public_front' => env('MODULAROUS_CMS_UNIVERSAL_PUBLIC_FRONT', true),
 
@@ -138,23 +157,23 @@ return [
     'universal_public_front_fallback_view' => 'cms::page.custom',
 
     /**
-     * Optional override: {@see \Modules\Cms\Entities\ParentSegment} {@code target_model_class} FQCN → invokable front
-     * controller (must extend {@see \Modules\Cms\Http\Controllers\Front\CmsController}). When empty, resolution uses
-     * {@see \Unusualify\Modularous\Module::getTargetClassNamespace()} with {@code front-controller} + {@code {StudlyRoute}Controller}.
+     * Optional override: {@see ParentSegment} {@code target_model_class} FQCN → invokable front
+     * controller (must extend {@see CmsController}). When empty, resolution uses
+     * {@see Module::getTargetClassNamespace()} with {@code front-controller} + {@code {StudlyRoute}Controller}.
      * Ignored for the public catch-all when {@see universal_cms_public_front} is true.
      *
      * @var array<class-string, class-string>
      */
     'public_front_handlers' => [],
 
-    /** Apply {@see \Modules\Cms\Http\Middleware\VisitorRedirectMiddleware} on the CMS front stack. */
+    /** Apply {@see VisitorRedirectMiddleware} on the CMS front stack. */
     'visitor_redirects_enabled' => env('MODULAROUS_CMS_VISITOR_REDIRECTS_ENABLED', true),
 
     /**
      * Admin panel (slug validation, path preview).
      *
-     * @see \Modules\Cms\Services\CmsSlugInputValidationService
-     * @see \Unusualify\Modularous\Hydrates\Inputs\SlugHydrate
+     * @see CmsSlugInputValidationService
+     * @see SlugHydrate
      */
     'admin' => [
         'slug_nested_path_warnings' => env('MODULAROUS_CMS_ADMIN_SLUG_NESTED_WARNINGS', true),
@@ -163,7 +182,7 @@ return [
          * Max number of URL path segments allowed in the slug field (split on `/`), after trimming.
          * `null` = no limit (default). Set to `1` to forbid nested paths such as `parent/child` in admin.
          *
-         * @see \Modules\Cms\Services\CmsSlugInputValidationService
+         * @see CmsSlugInputValidationService
          */
         'slug_max_path_segments' => env('MODULAROUS_CMS_ADMIN_SLUG_MAX_PATH_SEGMENTS') !== null
             && env('MODULAROUS_CMS_ADMIN_SLUG_MAX_PATH_SEGMENTS') !== ''
@@ -172,7 +191,7 @@ return [
     ],
 
     /**
-     * When a {@see \Modules\Cms\Entities\ParentSegment} row is created/updated/deleted, re-sync {@see \Modules\Cms\Entities\UrlRoute}
+     * When a {@see ParentSegment} row is created/updated/deleted, re-sync {@see Modules\Cms\Entities\UrlRoute}
      * for all instances of {@code target_model_class} ({@see CmsUrlRouteRegistry::syncPublicPageRoutesForAllModelsOfClass}).
      */
     'resync_registry_after_parent_segments_change' => env('MODULAROUS_CMS_RESYNC_URL_ROUTES_AFTER_PARENT_SEGMENTS_CHANGE', true),
@@ -188,15 +207,15 @@ return [
      *
      * @var list<string>
      *
-     * @see \Modules\Cms\Routing\CmsFrontRouteRegistrar::catchAllPathParameterPattern()
+     * @see CmsFrontRouteRegistrar::catchAllPathParameterPattern()
      */
     'public_front_catch_all_exclude_path_prefixes' => [],
 
     /**
      * Time-limited signed URLs for sharing CMS page preview without a panel session.
      *
-     * @see \Modules\Cms\Http\Controllers\CmsSignedPublicPreviewController
-     * @see \Modules\Cms\Services\CmsSignedPreviewUrlGenerator
+     * @see CmsSignedPublicPreviewController
+     * @see CmsSignedPreviewUrlGenerator
      */
     'signed_preview' => [
         'enabled' => env('MODULAROUS_CMS_SIGNED_PREVIEW_ENABLED', true),

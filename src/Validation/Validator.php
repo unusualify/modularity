@@ -13,10 +13,10 @@ class Validator extends IlluminateValidator
     /**
      * {@inheritdoc}
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array<int, string>  $parameters
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array<int, string> $parameters
      */
     public function makeReplacements($message, $attribute, $rule, $parameters)
     {
@@ -32,7 +32,7 @@ class Validator extends IlluminateValidator
     {
         return (string) preg_replace_callback(
             '/\{([^}]+)\}/',
-            static fn (array $matches) => ':'.$matches[1],
+            static fn (array $matches) => ':' . $matches[1],
             $message
         );
     }

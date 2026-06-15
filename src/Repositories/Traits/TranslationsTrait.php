@@ -77,7 +77,6 @@ trait TranslationsTrait
 
                     $activeField = $shouldPublishFirstLanguage || (isset($submittedLanguage) ? $submittedLanguage['published'] : false);
 
-
                     $fields[$locale] = $attributes->mapWithKeys(function ($attribute) use (&$fields, $locale, $localesCount, $index, $translationsFields) {
                         $attributeValue = $fields[$attribute] ?? $translationsFields[$attribute] ?? null;
 
@@ -256,6 +255,7 @@ trait TranslationsTrait
 
                 if (! empty($meaningfulChanges)) {
                     $this->letEloquentModelBeTouched(true);
+
                     break;
                 }
             }

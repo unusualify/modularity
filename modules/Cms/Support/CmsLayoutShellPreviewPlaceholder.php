@@ -6,6 +6,7 @@ namespace Modules\Cms\Support;
 
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Blade;
 
 /**
  * Provides a non-persisted {@see Model} (or generic object) so layout shell segments / appends
@@ -14,7 +15,7 @@ use Illuminate\Database\Eloquent\Model;
 final class CmsLayoutShellPreviewPlaceholder
 {
     /**
-     * Data merged into {@see LayoutBladeResolver} preview renders (segment {@see \Illuminate\Support\Facades\Blade::render} + shell view).
+     * Data merged into {@see LayoutBladeResolver} preview renders (segment {@see Blade::render} + shell view).
      *
      * @return array{item: object, seoTitle: string, seoDescription: string, canonicalUrl: string, robotsMeta: string}
      */

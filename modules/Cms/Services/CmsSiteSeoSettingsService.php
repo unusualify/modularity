@@ -2,14 +2,16 @@
 
 namespace Modules\Cms\Services;
 
+use Modules\Cms\Entities\SiteSetting;
+use Modules\Cms\Http\Controllers\Front\RobotsTxtController;
 use Modules\Cms\Repositories\SiteSettingRepository;
 use Modules\Cms\Support\CmsPublicSeo;
 
 /**
- * Persists site-wide SEO options in {@see \Modules\Cms\Entities\SiteSetting} (key-value rows).
+ * Persists site-wide SEO options in {@see SiteSetting} (key-value rows).
  *
  * Global robots.txt body is stored under the configured group/key/locale and read by
- * {@see \Modules\Cms\Http\Controllers\Front\RobotsTxtController} when `cms_seo.robots.use_site_settings` is true.
+ * {@see RobotsTxtController} when `cms_seo.robots.use_site_settings` is true.
  */
 class CmsSiteSeoSettingsService
 {

@@ -2,19 +2,20 @@
 
 namespace Unusualify\Modularous\Entities\Traits;
 
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Schema;
 use RuntimeException;
+use Unusualify\Modularous\Entities\Enums\Permission;
 use Unusualify\Modularous\Entities\Enums\RevisionStatus;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Module;
-use Unusualify\Modularous\Entities\Enums\Permission;
 
 trait HasRevisions
 {
-    
     /**
      * Override and return true together with {@see revisionPermissionPrefix()} to enable approval workflow.
      * This property is used to check if the revision workflow is enabled for the model.
@@ -31,9 +32,9 @@ trait HasRevisions
      */
     protected function revisionPermissionPrefix(): ?string
     {
-        if(method_exists($this, 'getModule') && ($module = $this->getModule()) instanceof Module) {
+        if (method_exists($this, 'getModule') && ($module = $this->getModule()) instanceof Module) {
             $routeName = $this->getRouteName();
-            
+
             return snakeCase($routeName);
         }
 
@@ -43,7 +44,7 @@ trait HasRevisions
     /**
      * Defines the one-to-many relationship for revisions.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function revisions()
     {
@@ -162,8 +163,8 @@ trait HasRevisions
     /**
      * Scope a query to only include the current user's revisions.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param Builder $query
+     * @return Builder
      */
     public function scopeMine($query)
     {
@@ -234,7 +235,7 @@ trait HasRevisions
         $modelClass = get_class($this);
         $candidates = [
             preg_replace('/\\\\Entities\\\\([^\\\\]+)$/', '\\Entities\\Revisions\\$1Revision', $modelClass),
-            modularousConfig('namespace') . "\\Models\\Revisions\\" . class_basename($this) . 'Revision',
+            modularousConfig('namespace') . '\\Models\\Revisions\\' . class_basename($this) . 'Revision',
         ];
 
         foreach ($candidates as $candidate) {

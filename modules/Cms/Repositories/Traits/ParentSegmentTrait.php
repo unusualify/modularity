@@ -2,11 +2,15 @@
 
 namespace Modules\Cms\Repositories\Traits;
 
+use Illuminate\Database\Eloquent\Model;
+use Modules\Cms\Entities\Concerns\IsCmr;
+use Modules\Cms\Entities\PageLayout;
+use Unusualify\Modularous\Repositories\Repository;
 
 /**
- * CMS: repositories whose {@see \Unusualify\Modularous\Repositories\Repository::getModel()} uses
- * {@see \Modules\Cms\Entities\Concerns\IsCmr} (content module route) and thus {@see HasParentSegment}.
- * Presentation shells ({@see \Modules\Cms\Entities\PageLayout}) are orthogonal; repositories also use {@see PageLayoutTrait} via {@see \Modules\Cms\Repositories\Traits\CmrTrait}.
+ * CMS: repositories whose {@see Repository::getModel()} uses
+ * {@see IsCmr} (content module route) and thus {@see HasParentSegment}.
+ * Presentation shells ({@see PageLayout}) are orthogonal; repositories also use {@see PageLayoutTrait} via {@see CmrTrait}.
  *
  * Enables parent-segment-aware tooling (hydrate selects, slug validation hooks) without hard-coding model classes.
  * Optional {@see $cmsAdminWarningsBuffer} / {@see pullCmsAdminWarnings()} support non-blocking panel hints after save
@@ -24,7 +28,7 @@ trait ParentSegmentTrait
     /**
      * Model FQCN managed by this repository.
      *
-     * @return class-string<\Illuminate\Database\Eloquent\Model>
+     * @return class-string<Model>
      */
     public function parentSegmentTargetModelClass(): string
     {

@@ -2,6 +2,7 @@
 
 namespace Modules\Cms\Repositories;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Validation\ValidationException;
 use Modules\Cms\Entities\ParentSegment;
 use Modules\Cms\Support\ParentSegmentBindingValidator;
@@ -18,7 +19,7 @@ class ParentSegmentRepository extends Repository
     /**
      * Ensure {@code target_model_class} is a registered module route model (FQCN from the select).
      *
-     * @param \Illuminate\Database\Eloquent\Model $object
+     * @param Model $object
      * @param array<string, mixed> $fields
      * @return array<string, mixed>
      */

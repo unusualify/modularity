@@ -4,6 +4,8 @@ namespace Modules\Cms\Http\Controllers\Traits;
 
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
+use Unusualify\Modularous\Http\Controllers\BaseController;
+use Unusualify\Modularous\Http\Controllers\PanelController;
 
 /**
  * Single place to resolve the Blade used for admin preview and public front when they must match
@@ -22,7 +24,7 @@ trait ResolvesPublicPresentationView
 
     /**
      * Snake-case module::route namespace (e.g. cms::page), aligned with
-     * {@see \Unusualify\Modularous\Http\Controllers\BaseController::getViewPrefix()}.
+     * {@see BaseController::getViewPrefix()}.
      */
     protected function presentationViewPrefix(): string
     {
@@ -38,7 +40,7 @@ trait ResolvesPublicPresentationView
 
     /**
      * Dot-separated route-name prefix (e.g. cms.page) for public helpers; mirrors admin
-     * {@see \Unusualify\Modularous\Http\Controllers\PanelController::$routePrefix} shape.
+     * {@see PanelController::$routePrefix} shape.
      */
     protected function presentationRoutePrefix(): string
     {

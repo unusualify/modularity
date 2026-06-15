@@ -3,15 +3,18 @@
 namespace Modules\Cms\Entities\Concerns;
 
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Modules\Cms\Entities\ParentSegment;
 use Modules\Cms\Entities\UrlRoute;
+use Modules\Cms\Repositories\Traits\ParentSegmentTrait;
+use Unusualify\Modularous\Modularous;
 
 /**
  * Opt-in marker for Eloquent models that participate in URL parent-segment bindings
  * (shared path prefixes per model class + locale).
  *
- * Used by {@see \Modules\Cms\Repositories\Traits\ParentSegmentTrait},
- * {@see \Unusualify\Modularous\Modularous::getModuleRouteModelSelectItems()},
+ * Used by {@see ParentSegmentTrait},
+ * {@see Modularous::getModuleRouteModelSelectItems()},
  * and CMS slug validation when resolving public paths.
  */
 trait HasParentSegment
@@ -28,7 +31,7 @@ trait HasParentSegment
         return ParentSegment::where('target_model_class', static::class)->get();
     }
 
-    public function urlRoutes() : \Illuminate\Database\Eloquent\Relations\MorphMany
+    public function urlRoutes(): MorphMany
     {
         return $this->morphMany(UrlRoute::class, 'urlable');
     }

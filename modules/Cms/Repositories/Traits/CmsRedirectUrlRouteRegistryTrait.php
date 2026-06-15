@@ -3,11 +3,13 @@
 namespace Modules\Cms\Repositories\Traits;
 
 use Illuminate\Database\Eloquent\Model;
+use Modules\Cms\Entities\UrlRoute;
+use Modules\Cms\Repositories\RedirectRepository;
 use Modules\Cms\Services\CmsUrlRouteRegistry;
 
 /**
- * Registers redirect {@see \Modules\Cms\Entities\UrlRoute} source rows for the repository's own {@see Redirect} model.
- * Use on {@see \Modules\Cms\Repositories\RedirectRepository} only — separate from {@see UrlRouteRegistrySyncTrait}.
+ * Registers redirect {@see UrlRoute} source rows for the repository's own {@see Redirect} model.
+ * Use on {@see RedirectRepository} only — separate from {@see UrlRouteRegistrySyncTrait}.
  */
 trait CmsRedirectUrlRouteRegistryTrait
 {

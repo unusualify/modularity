@@ -24,7 +24,6 @@ class LayoutBuilderHtmlPreviewController
 
         $placeholder = CmsLayoutShellPreviewPlaceholder::mergeDataForShellPreview(null);
 
-
         dd($placeholder);
         $html = LayoutBladeResolver::renderHtml($layoutBuilder, array_merge($placeholder, [
             'previewBodyHtml' => $body,

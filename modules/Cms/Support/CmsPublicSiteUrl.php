@@ -13,7 +13,7 @@ use Modules\Cms\Routing\CmsFrontRouteRegistrar;
 final class CmsPublicSiteUrl
 {
     /**
-     * Hostname for public page links (no scheme, no path). Empty string means caller should fall back to {@see url()}.
+     * Hostname for public page links (no scheme, no path). Empty string means caller should fall back to {@see URL()}.
      */
     public static function resolvePublicSiteHost(): string
     {

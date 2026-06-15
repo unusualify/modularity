@@ -2,6 +2,7 @@
 
 namespace Modules\Cms\Repositories;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Validation\ValidationException;
 use Modules\Cms\Entities\Concerns\HasPageLayout;
 use Modules\Cms\Entities\PageLayout;
@@ -18,8 +19,8 @@ class PageLayoutRepository extends Repository
     }
 
     /**
-     * @param \Illuminate\Database\Eloquent\Model $object
-     * @param array<string, mixed>               $fields
+     * @param Model $object
+     * @param array<string, mixed> $fields
      * @return array<string, mixed>
      */
     public function prepareFieldsBeforeSave($object, $fields)

@@ -6,6 +6,7 @@ use Illuminate\Auth\AuthManager;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Foundation\Auth\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -113,7 +114,7 @@ class LoginController extends Controller
     }
 
     /**
-     * @param \Illuminate\Foundation\Auth\User $user
+     * @param User $user
      * @return RedirectResponse
      */
     protected function authenticated(Request $request, $user)

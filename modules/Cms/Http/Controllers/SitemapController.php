@@ -3,6 +3,7 @@
 namespace Modules\Cms\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Modules\Cms\Http\Requests\SitemapItemUpsertRequest;
 use Modules\Cms\Http\Requests\SitemapRequest;
@@ -19,7 +20,7 @@ class SitemapController extends BaseController
     protected $routeName = 'Sitemap';
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      */
     public function indexData($request): array
     {

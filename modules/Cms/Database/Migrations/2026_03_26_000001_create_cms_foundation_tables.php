@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
@@ -143,7 +144,7 @@ return new class extends Migration
 
         Schema::create($parentSegmentBindingsTable, function (Blueprint $table): void {
             $table->id();
-            /** @var class-string<\Illuminate\Database\Eloquent\Model> */
+            /** @var class-string<Model> */
             $table->string('target_model_class', 512);
             /** Empty string = all locales */
             $table->string('locale', 12)->default('');

@@ -44,11 +44,11 @@ trait RepeatersTrait
     }
 
     /**
-     * Preview / {@see \Unusualify\Modularous\Repositories\Traits\RevisionsTrait::previewForRevision}: populate `repeaters`
+     * Preview / {@see RevisionsTrait::previewForRevision}: populate `repeaters`
      * from the revision payload so presenters and forms see the same shape as after a normal load.
      *
-     * @param  Model  $object
-     * @param  array<string, mixed>  $fields
+     * @param Model $object
+     * @param array<string, mixed> $fields
      * @return Model
      */
     public function hydrateRepeatersTrait($object, $fields)
@@ -70,7 +70,7 @@ trait RepeatersTrait
      * Mirrors {@see afterSaveRepeatersTrait} field resolution so one {@see Repeater} row exists per role/locale
      * with `content` taken from the payload (unsaved models for preview).
      *
-     * @param  array<string, mixed>  $fields
+     * @param array<string, mixed> $fields
      */
     private function buildPreviewRepeatersRelation(Model $object, array $fields): Collection
     {
@@ -124,7 +124,7 @@ trait RepeatersTrait
     }
 
     /**
-     * @param  array<int|string, mixed>  $content
+     * @param array<int|string, mixed> $content
      */
     private function makePreviewRepeaterRow(Model $object, string $role, string $locale, array $content): Repeater
     {
@@ -264,7 +264,7 @@ trait RepeatersTrait
         return collect($schema)->reduce(function ($acc, $curr) {
             if (isset($curr['name']) && (preg_match('/json-repeater/', $curr['root'] ?? 'default') || preg_match('/json-repeater/', $curr['type']))) {
                 $acc[$curr['name']] = $curr + ['translated' => $curr['translated'] ?? false];
-            } else if ($curr['type'] == 'wrap' && isset($curr['schema'])) {
+            } elseif ($curr['type'] == 'wrap' && isset($curr['schema'])) {
                 $acc = array_merge($acc, $this->getRepeaterInputs($curr['schema']));
             }
 

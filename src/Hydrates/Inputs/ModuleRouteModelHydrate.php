@@ -2,6 +2,8 @@
 
 namespace Unusualify\Modularous\Hydrates\Inputs;
 
+use Modules\Cms\Entities\Concerns\HasPageLayout;
+use Modules\Cms\Entities\Concerns\HasParentSegment;
 use Unusualify\Modularous\Facades\Modularous;
 
 /**
@@ -9,8 +11,8 @@ use Unusualify\Modularous\Facades\Modularous;
  *
  * Config type: {@code module-route-model} → hydrated {@code select} with
  * {@code itemValue} {@code value} (model FQCN) and {@code itemTitle} {@code title} ({@code moduleName - routeName}).
- * Set {@code onlyParentSegmentModels} => true to list only models using {@see \Modules\Cms\Entities\Concerns\HasParentSegment}.
- * Set {@code onlyPageLayoutModels} => true to list only models using {@see \Modules\Cms\Entities\Concerns\HasPageLayout}.
+ * Set {@code onlyParentSegmentModels} => true to list only models using {@see HasParentSegment}.
+ * Set {@code onlyPageLayoutModels} => true to list only models using {@see HasPageLayout}.
  */
 class ModuleRouteModelHydrate extends SelectHydrate
 {

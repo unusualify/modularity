@@ -5,10 +5,11 @@ namespace Modules\Cms\Support;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
+use Modules\Cms\Http\Controllers\Front\CmsPublicFrontController;
 use Unusualify\Modularous\Module;
 
 /**
- * Picks the Blade for {@see \Modules\Cms\Http\Controllers\Front\CmsPublicFrontController} from config or by matching
+ * Picks the Blade for {@see CmsPublicFrontController} from config or by matching
  * the resolved model to a CMS submodule (same {@code module::route.custom} as per–route front controllers).
  */
 final class CmsPublicFrontViewName
@@ -74,7 +75,7 @@ final class CmsPublicFrontViewName
     /**
      * Priority: {@code custom} → static {@code page_layout/*} → informational fallback → universal fallback.
      *
-     * @param  array{module: string, route: string, viewPrefix: string}  $moduleRouteContext
+     * @param array{module: string, route: string, viewPrefix: string} $moduleRouteContext
      * @return non-empty-string
      */
     public static function resolveViewNameForModuleRoute(string $viewPrefix, array $moduleRouteContext): string

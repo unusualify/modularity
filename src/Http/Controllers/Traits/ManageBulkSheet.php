@@ -11,18 +11,20 @@ use Inertia\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Unusualify\Modularous\Contracts\CanBulkSheet;
 use Unusualify\Modularous\Facades\Modularous;
+use Unusualify\Modularous\Http\Controllers\CoreController;
+use Unusualify\Modularous\Http\Controllers\Traits\Table\TableActions;
 use Unusualify\Modularous\Services\BulkCsv\BulkImportService;
 
 /**
  * CSV bulk sheet: index toolbar action + panel routes ({@see bulkSheetTool}, dry-run, commit, export).
  *
  * Requires the host controller to implement {@see CanBulkSheet} and define {@see $moduleName} / {@see $routeName}
- * (see {@see \Unusualify\Modularous\Http\Controllers\CoreController}).
+ * (see {@see CoreController}).
  *
  * Optional overrides: protected hooks {@see bulkSheetToolbarIntroFallback}, {@see bulkSheetToolHeadlineFallback},
  * {@see bulkSheetBreadcrumbsItems}, or extend public methods after composing this trait.
  *
- * {@see \Unusualify\Modularous\Http\Controllers\Traits\Table\TableActions::setTableActions()} invokes
+ * {@see TableActions::setTableActions()} invokes
  * {@see setTableActionsManageBulkSheet()} when this trait is used.
  */
 trait ManageBulkSheet

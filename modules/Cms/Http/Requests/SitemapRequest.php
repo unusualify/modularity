@@ -2,10 +2,11 @@
 
 namespace Modules\Cms\Http\Requests;
 
+use Modules\Cms\Http\Controllers\CmsSitemapPanelController;
 use Unusualify\Modularous\Http\Requests\Request;
 
 /**
- * Panel JSON POST for {@see \Modules\Cms\Http\Controllers\CmsSitemapPanelController} (body genelde boş; ileri alanlar için genişletilebilir).
+ * Panel JSON POST for {@see CmsSitemapPanelController} (body genelde boş; ileri alanlar için genişletilebilir).
  */
 class SitemapRequest extends Request
 {

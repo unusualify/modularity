@@ -2,6 +2,8 @@
 
 namespace Modules\Cms\Services\Stylesheet;
 
+use ScssPhp\ScssPhp\Compiler;
+
 /**
  * Optional SCSS → CSS using scssphp when package is installed and {@see modularousConfig('cms_stylesheets.scssphp.enabled')}.
  */
@@ -17,12 +19,12 @@ final class ScssStylesheetCompiler
             return '';
         }
 
-        if (! class_exists(\ScssPhp\ScssPhp\Compiler::class)) {
+        if (! class_exists(Compiler::class)) {
             return '';
         }
 
         try {
-            $compiler = new \ScssPhp\ScssPhp\Compiler;
+            $compiler = new Compiler;
 
             if (method_exists($compiler, 'compileString')) {
                 return (string) $compiler->compileString($scss)->getCss();

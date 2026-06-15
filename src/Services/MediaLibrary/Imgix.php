@@ -13,7 +13,7 @@ class Imgix implements ImageServiceInterface
 
     /**
      * @var UrlBuilder|null Null when `IMGIX_SOURCE_HOST` is missing —
-     * see the constructor for why we don't fatally throw in that case.
+     *                      see the constructor for why we don't fatally throw in that case.
      */
     private $urlBuilder;
 

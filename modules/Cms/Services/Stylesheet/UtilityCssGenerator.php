@@ -104,7 +104,7 @@ final class UtilityCssGenerator
     private string $utilityNamespacePrefix = 'u-';
 
     /**
-     * @param  string  $suffix  Portion after the namespace (e.g. {@code w-} → {@code u-w-} when namespace is {@code u-}).
+     * @param string $suffix Portion after the namespace (e.g. {@code w-} → {@code u-w-} when namespace is {@code u-}).
      */
     private function utilP(string $suffix): string
     {
@@ -117,7 +117,7 @@ final class UtilityCssGenerator
     }
 
     /**
-     * @param  array<string, mixed>  $utilities
+     * @param array<string, mixed> $utilities
      * @return array<string, mixed>
      */
     private function utilitiesWithoutMetaKeys(array $utilities): array
@@ -128,7 +128,7 @@ final class UtilityCssGenerator
     }
 
     /**
-     * @param  array<string, mixed>  $utilities
+     * @param array<string, mixed> $utilities
      */
     private function resolveUtilityNamespacePrefix(array $utilities): string
     {
@@ -170,7 +170,7 @@ final class UtilityCssGenerator
     }
 
     /**
-     * @param  array<string, mixed>  $utilities
+     * @param array<string, mixed> $utilities
      */
     public function generate(array $utilities): string
     {
@@ -360,7 +360,7 @@ final class UtilityCssGenerator
     }
 
     /**
-     * @param  array<string, mixed>  $cfg
+     * @param array<string, mixed> $cfg
      */
     private function spacing(array $cfg): string
     {
@@ -392,7 +392,7 @@ final class UtilityCssGenerator
                 if ($class === null) {
                     continue;
                 }
-                $out[] = sprintf(".%s{%s:%s;}", $class, $prop, $value);
+                $out[] = sprintf('.%s{%s:%s;}', $class, $prop, $value);
             }
         }
 
@@ -414,8 +414,8 @@ final class UtilityCssGenerator
      *
      * {@code presetKey}: config key hosting the map (normally {@code presets}); passed through for callers, unused here.
      *
-     * @param  array<string, string|array<mixed>|object>  $presetsMap
-     * @param  array<string, mixed>  $wholeBlock
+     * @param array<string, string|array<mixed>|object> $presetsMap
+     * @param array<string, mixed> $wholeBlock
      */
     private function declarationPresets(array $presetsMap, array $wholeBlock, string $defaultPrefix, string $_presetKey): string
     {
@@ -454,7 +454,7 @@ final class UtilityCssGenerator
     }
 
     /**
-     * @param  array<string, mixed>  $cfg
+     * @param array<string, mixed> $cfg
      */
     private function fontSizes(array $cfg): string
     {
@@ -488,7 +488,7 @@ final class UtilityCssGenerator
     }
 
     /**
-     * @param  array<string, mixed>  $cfg
+     * @param array<string, mixed> $cfg
      */
     private function scaleCssProperty(array $cfg, string $cssProperty, string $defaultPrefix, bool $allowBasisKeywords): string
     {
@@ -522,7 +522,7 @@ final class UtilityCssGenerator
     }
 
     /**
-     * @param  array<string, mixed>|null  $cfg
+     * @param array<string, mixed>|null $cfg
      */
     private function fontWeight(?array $cfg): string
     {
@@ -545,7 +545,7 @@ final class UtilityCssGenerator
     }
 
     /**
-     * @param  array<string, mixed>|null  $cfg
+     * @param array<string, mixed>|null $cfg
      */
     private function lineHeightScale(?array $cfg): string
     {
@@ -586,7 +586,7 @@ final class UtilityCssGenerator
     }
 
     /**
-     * @param  array<string, mixed>|null  $cfg
+     * @param array<string, mixed>|null $cfg
      */
     private function fontFamilyScale(?array $cfg): string
     {
@@ -616,7 +616,7 @@ final class UtilityCssGenerator
     }
 
     /**
-     * @param  array<string, mixed>|null  $cfg
+     * @param array<string, mixed>|null $cfg
      */
     private function opacityScale(?array $cfg): string
     {
@@ -638,7 +638,7 @@ final class UtilityCssGenerator
             }
 
             $value = null;
-            if ($s[strlen($s) - 1] === '%' && preg_match('/^\d+(?:\.\d+)?%$/', $s)) {
+            if ($s[mb_strlen($s) - 1] === '%' && preg_match('/^\d+(?:\.\d+)?%$/', $s)) {
                 $n = (float) $s;
                 if ($n >= 0 && $n <= 100) {
                     $value = ($n / 100);
@@ -664,7 +664,7 @@ final class UtilityCssGenerator
     }
 
     /**
-     * @param  array<string, mixed>  $cfg
+     * @param array<string, mixed> $cfg
      */
     private function colorScale(array $cfg, string $cssProp, string $defaultPrefix): string
     {
@@ -694,7 +694,7 @@ final class UtilityCssGenerator
     }
 
     /**
-     * @param  array<string, mixed>|null  $cfg
+     * @param array<string, mixed>|null $cfg
      */
     private function aspectRatioScale(?array $cfg): string
     {
@@ -739,7 +739,7 @@ final class UtilityCssGenerator
 
     /** @deprecated */
     /**
-     * @param  array<string, mixed>  $cfg
+     * @param array<string, mixed> $cfg
      */
     private function gapRowColumnLegacy(array $cfg): string
     {
@@ -755,7 +755,7 @@ final class UtilityCssGenerator
     /**
      * Row / column gaps as length scales — separate from unified {@code spacing.gap}.
      *
-     * @param  array<string, mixed>  $cfg
+     * @param array<string, mixed> $cfg
      */
     private function gapAxis(array $cfg, string $prop, string $defaultPrefix, string $debugIgnored): string
     {
@@ -765,7 +765,7 @@ final class UtilityCssGenerator
     }
 
     /**
-     * @param  array<string, mixed>  $cfg
+     * @param array<string, mixed> $cfg
      */
     private function insetUnified(array $cfg): string
     {
@@ -801,7 +801,7 @@ final class UtilityCssGenerator
     /**
      * Unitless ordinal properties (flex-grow/shrink/order/z-index optionally bounded).
      *
-     * @param  array<string, mixed>  $cfg
+     * @param array<string, mixed> $cfg
      */
     private function flexGrowShrink(array $cfg, string $cssProp, string $prefix, int $min, int $max): string
     {
@@ -831,7 +831,7 @@ final class UtilityCssGenerator
     }
 
     /**
-     * @param  array<string, mixed>  $cfg
+     * @param array<string, mixed> $cfg
      */
     private function ordinalScaleUtility(
         array $cfg,
@@ -884,8 +884,8 @@ final class UtilityCssGenerator
     }
 
     /**
-     * @param  array<string, mixed>  $cfg
-     * @param  string[]                $whitelist
+     * @param array<string, mixed> $cfg
+     * @param string[] $whitelist
      */
     private function enumerationFromConfig(array $cfg, string $cssProperty, array $whitelist, string $defaultPrefix): string
     {
@@ -896,8 +896,8 @@ final class UtilityCssGenerator
     }
 
     /**
-     * @param  array<string, mixed>  $cfg
-     * @param  string[]                $whitelist
+     * @param array<string, mixed> $cfg
+     * @param string[] $whitelist
      */
     private function enumerationFromWhitelistScale(array $cfg, array $whitelist, string $cssProperty): string
     {
@@ -963,11 +963,11 @@ final class UtilityCssGenerator
             return null;
         }
         $raw = trim($raw);
-        if ($raw === '' || strlen($raw) > 200) {
+        if ($raw === '' || mb_strlen($raw) > 200) {
             return null;
         }
 
-        $lower = strtolower($raw);
+        $lower = mb_strtolower($raw);
         if (in_array($lower, ['transparent', 'inherit', 'unset', 'initial'], true)) {
             return $lower;
         }
@@ -979,10 +979,10 @@ final class UtilityCssGenerator
             return $raw;
         }
 
-        if (preg_match('/^rgba?\(/i', $raw) && str_ends_with($raw, ')') && strlen($raw) < 160) {
+        if (preg_match('/^rgba?\(/i', $raw) && str_ends_with($raw, ')') && mb_strlen($raw) < 160) {
             return $raw;
         }
-        if (preg_match('/^hsla?\(/i', $raw) && str_ends_with($raw, ')') && strlen($raw) < 200) {
+        if (preg_match('/^hsla?\(/i', $raw) && str_ends_with($raw, ')') && mb_strlen($raw) < 200) {
             return $raw;
         }
         if (preg_match('/^var\(--[a-zA-Z0-9_-]+\)$/', $raw)) {
@@ -998,7 +998,7 @@ final class UtilityCssGenerator
             return null;
         }
         $stack = preg_replace('/\s+/', ' ', trim($raw));
-        if ($stack === '' || strlen($stack) > 320) {
+        if ($stack === '' || mb_strlen($stack) > 320) {
             return null;
         }
         if (preg_match('/[;<>{}\\\]/', $stack)) {
@@ -1022,7 +1022,7 @@ final class UtilityCssGenerator
             return $raw;
         }
 
-        if (preg_match('/^[a-zA-Z][a-zA-Z0-9()%,._\s\-]*$/u', $raw) && strlen($raw) < 200) {
+        if (preg_match('/^[a-zA-Z][a-zA-Z0-9()%,._\s\-]*$/u', $raw) && mb_strlen($raw) < 200) {
             return $raw;
         }
 
@@ -1036,7 +1036,7 @@ final class UtilityCssGenerator
         }
 
         $raw = str_replace(["\n", "\r"], '', $raw);
-        if (strlen($raw) > 4096) {
+        if (mb_strlen($raw) > 4096) {
             return '';
         }
 
@@ -1070,7 +1070,7 @@ final class UtilityCssGenerator
         if ($raw === null) {
             return null;
         }
-        if (strlen($raw) > 191) {
+        if (mb_strlen($raw) > 191) {
             return null;
         }
         if (! preg_match('/^-?[_a-zA-Z][_a-zA-Z0-9-]*$/u', $raw)) {

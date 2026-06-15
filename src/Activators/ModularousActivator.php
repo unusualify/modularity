@@ -2,7 +2,6 @@
 
 namespace Unusualify\Modularous\Activators;
 
-use Illuminate\Cache\CacheManager;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;

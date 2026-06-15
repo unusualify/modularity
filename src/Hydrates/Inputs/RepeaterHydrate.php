@@ -19,7 +19,7 @@ class RepeaterHydrate extends InputHydrate
         'itemValue' => 'id',
         'itemTitle' => 'name',
         'collapsible' => false,
-        'translated' => false
+        'translated' => false,
     ];
 
     /**

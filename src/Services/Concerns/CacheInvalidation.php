@@ -147,6 +147,7 @@ trait CacheInvalidation
     {
         if ($this->usesTags()) {
             logger()->warning('invalidateByPattern() called with tags enabled. This will not work for tagged keys. Use tag-based invalidation instead.');
+
             return 0;
         }
 
@@ -154,6 +155,7 @@ trait CacheInvalidation
         $driver = config('modularous.cache.driver', config('cache.default'));
         if (! in_array($driver, ['redis', 'predis'])) {
             logger()->warning("invalidateByPattern() is only supported with Redis. Current driver: {$driver}");
+
             return 0;
         }
 

@@ -2,6 +2,7 @@
 
 namespace Modules\Cms\Support;
 
+use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 use Modules\Cms\Contracts\CmsLocalizationContract;
 
 /**
@@ -36,9 +37,9 @@ final class CmsPathLocale
 
         $mcamaraKeys = null;
 
-        if (class_exists(\Mcamara\LaravelLocalization\Facades\LaravelLocalization::class)) {
+        if (class_exists(LaravelLocalization::class)) {
             try {
-                $mcamaraKeys = \Mcamara\LaravelLocalization\Facades\LaravelLocalization::getSupportedLanguagesKeys();
+                $mcamaraKeys = LaravelLocalization::getSupportedLanguagesKeys();
                 if ($mcamaraKeys === []) {
                     $mcamaraKeys = null;
                 }

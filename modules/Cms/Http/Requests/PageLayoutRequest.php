@@ -43,7 +43,7 @@ class PageLayoutRequest extends FormRequest
             'admin_label' => 'nullable|string|max:255',
             'enabled' => 'sometimes|boolean',
             'sort_order' => 'sometimes|integer|min:0',
-            'layout_builder_id' => 'nullable|integer|exists:'.$layoutBuildersTable.',id',
+            'layout_builder_id' => 'nullable|integer|exists:' . $layoutBuildersTable . ',id',
             'blade_source' => 'sometimes|string|in:db,filesystem',
             'blade_segments' => 'nullable|array',
             'blade_segments.head' => 'nullable|string',

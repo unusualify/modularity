@@ -8,18 +8,23 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Modules\Cms\Contracts\CanonicalUrlResolverInterface;
 use Modules\Cms\Entities\UrlRoute;
+use Modules\Cms\Http\Controllers\CmsSignedPublicPreviewController;
+use Modules\Cms\Http\Controllers\PageController;
 use Modules\Cms\Http\Controllers\Traits\ResolvesPublicPresentationView;
 use Modules\Cms\Services\CmsPublicModelResolver;
 use Modules\Cms\Support\CmsPageLayoutPresentationWrapper;
 use Modules\Cms\Support\CmsPublicSeo;
+use Unusualify\Modularous\Http\Controllers\BaseController;
 use Unusualify\Modularous\Http\Controllers\CoreController;
+use Unusualify\Modularous\Http\Controllers\PanelController;
+use Unusualify\Modularous\Traits\Moduleable;
 
 /**
- * Public CMS front (non-Inertia) base controller: extends {@see CoreController} so {@see \Unusualify\Modularous\Traits\Moduleable}
- * {@code $moduleName} / {@code $routeName} match admin controllers (e.g. {@see \Modules\Cms\Http\Controllers\PageController}).
+ * Public CMS front (non-Inertia) base controller: extends {@see CoreController} so {@see Moduleable}
+ * {@code $moduleName} / {@code $routeName} match admin controllers (e.g. {@see PageController}).
  *
- * Presentation (aligned with {@see \Unusualify\Modularous\Http\Controllers\BaseController::getViewPrefix()} /
- * {@see \Unusualify\Modularous\Http\Controllers\PanelController::$routePrefix} semantics for the submodule):
+ * Presentation (aligned with {@see BaseController::getViewPrefix()} /
+ * {@see PanelController::$routePrefix} semantics for the submodule):
  * - {@code $viewPrefix}: {@code snake(module)::snake(route)} (e.g. {@code cms::page})
  * - {@code $routePrefix}: {@code snake(module).snake(route)} (e.g. {@code cms.page})
  *
@@ -32,12 +37,12 @@ abstract class CmsController extends CoreController
     use ResolvesPublicPresentationView;
 
     /**
-     * Blade view namespace fragment (e.g. {@code cms::page}), same pattern as admin {@see \Unusualify\Modularous\Http\Controllers\BaseController::$viewPrefix}.
+     * Blade view namespace fragment (e.g. {@code cms::page}), same pattern as admin {@see BaseController::$viewPrefix}.
      */
     protected $viewPrefix;
 
     /**
-     * Dot-separated route-name prefix for this submodule (e.g. {@code cms.page}); mirrors admin {@see \Unusualify\Modularous\Http\Controllers\PanelController::$routePrefix} shape for public helpers.
+     * Dot-separated route-name prefix for this submodule (e.g. {@code cms.page}); mirrors admin {@see PanelController::$routePrefix} shape for public helpers.
      */
     protected $routePrefix;
 
@@ -135,7 +140,7 @@ abstract class CmsController extends CoreController
     }
 
     /**
-     * Entry point for signed public preview URLs (delegated from {@see \Modules\Cms\Http\Controllers\CmsSignedPublicPreviewController}).
+     * Entry point for signed public preview URLs (delegated from {@see CmsSignedPublicPreviewController}).
      */
     public function renderSignedPublicPreview(
         Request $request,
@@ -172,13 +177,12 @@ abstract class CmsController extends CoreController
             return view('cms::layout_builder.inline_document', ['document' => $wrapped]);
         }
 
-
         return view($viewName, $innerData);
     }
 
     /**
      * Blade view for public presentation (default: {@see publicCmsViewName()}). Override when the view depends on the
-     * resolved model (e.g. {@see \Modules\Cms\Http\Controllers\Front\CmsPublicFrontController}).
+     * resolved model (e.g. {@see CmsPublicFrontController}).
      */
     protected function resolvePublicPresentationViewName(Request $request, Model $item): string
     {

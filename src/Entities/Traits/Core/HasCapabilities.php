@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Modules\SystemUser\Entities\Capability;
 
 trait HasCapabilities
 {
@@ -23,7 +24,7 @@ trait HasCapabilities
             $modelHasRolesTable = config('permission.table_names.model_has_roles', 'sp_model_has_roles');
             $modelMorphKey = config('permission.column_names.model_morph_key', 'model_id');
 
-            if (! class_exists(\Modules\SystemUser\Entities\Capability::class)
+            if (! class_exists(Capability::class)
                 || ! Schema::hasTable($capabilitiesTable)
                 || ! Schema::hasTable($roleCapabilityTable)
                 || ! Schema::hasTable($modelHasRolesTable)) {

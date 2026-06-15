@@ -4,10 +4,13 @@ namespace Modules\Cms\Support;
 
 use Illuminate\Http\Request;
 use Modules\Cms\Contracts\CanonicalUrlResolverInterface;
+use Modules\Cms\Entities\UrlRoute;
+use Modules\Cms\Routing\CmsFrontRouteLocalizationBinding;
+use Modules\Cms\Services\CmsVisitorRedirectResolver;
 
 /**
  * Strips the CMS public route prefix (e.g. {@see modularousConfig('cms_routing.front_route_prefix')})
- * so {@see \Modules\Cms\Entities\UrlRoute} rows (stored without that segment) match the request.
+ * so {@see UrlRoute} rows (stored without that segment) match the request.
  */
 final class CmsFrontPath
 {
@@ -15,8 +18,8 @@ final class CmsFrontPath
      * Normalized path after the CMS front prefix, suitable for locale parsing and registry lookup.
      *
      * When the public route is registered with a dedicated `{locale}` parameter (see
-     * {@see \Modules\Cms\Routing\CmsFrontRouteLocalizationBinding}), prefer
-     * {@see \Modules\Cms\Services\CmsVisitorRedirectResolver::resolveLocalePathKeyAndExplicitFlag()} — the `{path}`
+     * {@see CmsFrontRouteLocalizationBinding}), prefer
+     * {@see CmsVisitorRedirectResolver::resolveLocalePathKeyAndExplicitFlag()} — the `{path}`
      * parameter is then the tail after locale (ParentSegment + slug segments), matching UrlRoute storage.
      */
     public static function innerNormalizedPath(Request $request, CanonicalUrlResolverInterface $canonical): string
@@ -44,7 +47,7 @@ final class CmsFrontPath
     }
 
     /**
-     * Inverse of {@see innerNormalizedPath()}: builds the browser path for a {@see \Modules\Cms\Entities\UrlRoute}
+     * Inverse of {@see innerNormalizedPath()}: builds the browser path for a {@see UrlRoute}
      * `normalized_path` + locale (same rules as admin slug preview / public routing).
      *
      * @todo Consolidate CMS URL surface with a shared trait (HasParentSegment + HasSlug + UrlRoute) for non-Page entities.

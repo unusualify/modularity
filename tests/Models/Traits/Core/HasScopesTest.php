@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Schema;
 use Mockery;
 use PDO;
 use Unusualify\Modularous\Entities\Traits\Core\HasScopes;
+use Unusualify\Modularous\Entities\Traits\HasTranslation;
 use Unusualify\Modularous\Tests\ModelTestCase;
 
 class HasScopesTest extends ModelTestCase
@@ -827,7 +828,7 @@ class HasScopesTest extends ModelTestCase
         return new class($translatedAttributes) extends Model
         {
             use HasScopes;
-            use \Unusualify\Modularous\Entities\Traits\HasTranslation;
+            use HasTranslation;
 
             /** @var list<string> */
             private static array $configuredTranslatedAttributes = [];

@@ -4,15 +4,18 @@ namespace Modules\Cms\Http\Controllers\Front;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Modules\Cms\Entities\ParentSegment;
 use Modules\Cms\Entities\UrlRoute;
+use Modules\Cms\Routing\CmsFrontRouteRegistrar;
 use Modules\Cms\Services\CmsPublicModelResolver;
 use Modules\Cms\Support\CmsPublicFrontViewName;
+use Unusualify\Modularous\Entities\Traits\HasParentSegment;
 
 /**
- * Single public catch-all invokable for the CMS module: resolves the entity from {@see \Modules\Cms\Entities\UrlRoute}
- * for any model that is both on the {@see \Modules\Cms\Entities\ParentSegment} registry and uses
- * {@see \Unusualify\Modularous\Entities\Traits\HasParentSegment} — no “first front controller in route order”
- * ambiguity. See {@see \Modules\Cms\Routing\CmsFrontRouteRegistrar::resolveFrontControllerForModule()}.
+ * Single public catch-all invokable for the CMS module: resolves the entity from {@see UrlRoute}
+ * for any model that is both on the {@see ParentSegment} registry and uses
+ * {@see HasParentSegment} — no “first front controller in route order”
+ * ambiguity. See {@see CmsFrontRouteRegistrar::resolveFrontControllerForModule()}.
  */
 final class CmsPublicFrontController extends CmsController
 {

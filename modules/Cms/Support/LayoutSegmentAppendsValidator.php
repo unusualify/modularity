@@ -39,25 +39,25 @@ final class LayoutSegmentAppendsValidator
     }
 
     /**
-     * @param  array{head:string,body:string,footer:string}  $normalized
+     * @param array{head:string,body:string,footer:string} $normalized
      */
     public static function enforceByteLimit(array $normalized): void
     {
         $maxBytes = max(4096, (int) modularousConfig('cms_layout_builder.max_blade_segments_bytes', 512_000));
         if ($maxBytes > 0 && self::combinedBytes($normalized) > $maxBytes) {
-        throw ValidationException::withMessages([
-            'blade_segments' => [__('Combined layout blade segments exceed the configured byte limit.')],
-        ]);
+            throw ValidationException::withMessages([
+                'blade_segments' => [__('Combined layout blade segments exceed the configured byte limit.')],
+            ]);
         }
     }
 
     /**
      * Raw UTF-8 byte length (excluding base layout bytes).
      *
-     * @param  array{head:string,body:string,footer:string}  $normalized
+     * @param array{head:string,body:string,footer:string} $normalized
      */
     public static function combinedBytes(array $normalized): int
     {
-        return strlen($normalized['head'] . $normalized['body'] . $normalized['footer']);
+        return mb_strlen($normalized['head'] . $normalized['body'] . $normalized['footer']);
     }
 }

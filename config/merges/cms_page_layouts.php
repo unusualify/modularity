@@ -1,10 +1,12 @@
 <?php
 
+use Modules\Cms\Services\CmsPageLayoutResolver;
+
 return [
     /**
-     * Presentation shell keyed by routed model FQCN only (locale-agnostic), {@see \Modules\Cms\Entities\PageLayout}.
+     * Presentation shell keyed by routed model FQCN only (locale-agnostic), {@see Modules\Cms\Entities\PageLayout}.
      *
-     * @see \Modules\Cms\Services\CmsPageLayoutResolver
+     * @see CmsPageLayoutResolver
      */
     'enabled' => env('MODULAROUS_CMS_PAGE_LAYOUTS_ENABLED', true),
 

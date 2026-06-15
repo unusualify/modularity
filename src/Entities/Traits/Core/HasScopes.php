@@ -112,8 +112,6 @@ trait HasScopes
      * Apply publish window filtering for one date column on the correct table (main vs translation).
      *
      * @param Builder $query
-     * @param string $field
-     * @param string $operator
      * @param \DateTimeInterface|string $value
      */
     protected function applyPublishDateVisibilityScope($query, string $field, string $operator, $value): void

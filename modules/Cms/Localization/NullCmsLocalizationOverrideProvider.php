@@ -2,10 +2,11 @@
 
 namespace Modules\Cms\Localization;
 
+use Modules\Cms\Contracts\CmsLocalizationContract;
 use Modules\Cms\Contracts\CmsLocalizationOverrideProviderInterface;
 
 /**
- * No DB overrides; inner {@see \Modules\Cms\Contracts\CmsLocalizationContract} values are used as-is.
+ * No DB overrides; inner {@see CmsLocalizationContract} values are used as-is.
  */
 final class NullCmsLocalizationOverrideProvider implements CmsLocalizationOverrideProviderInterface
 {

@@ -19,9 +19,9 @@ class CapabilityRouteRequest extends Request
 
         return [
             'route_name' => [
-                "required",
-                "string",
-                "min:2",
+                'required',
+                'string',
+                'min:2',
                 "unique:{$tableName},route_name",
                 function (string $attribute, mixed $value, Closure $fail) {
                     if (! is_string($value) || ! Route::has($value)) {
@@ -38,9 +38,9 @@ class CapabilityRouteRequest extends Request
 
         return [
             'route_name' => [
-                "required",
-                "string",
-                "min:2",
+                'required',
+                'string',
+                'min:2',
                 "unique:{$tableName},route_name,{$this->id}",
                 function (string $attribute, mixed $value, Closure $fail) {
                     if (! is_string($value) || ! Route::has($value)) {

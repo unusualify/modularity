@@ -5,11 +5,12 @@ namespace Modules\Cms\Services;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Schema;
 use Modules\Cms\Contracts\CanonicalUrlResolverInterface;
+use Modules\Cms\Entities\PageLayout;
 use Modules\Cms\Entities\ParentSegment;
 
 /**
  * Resolves shared bindings keyed by module-route model + locale (see {@see ParentSegment}):
- * parent URL path prefix. Presentation shells are {@see \Modules\Cms\Entities\PageLayout} / {@see CmsPageLayoutResolver}.
+ * parent URL path prefix. Presentation shells are {@see PageLayout} / {@see CmsPageLayoutResolver}.
  *
  * When a locale has no enabled binding (missing row or enabled=0), the prefix falls back to the first
  * enabled binding matching `cms_routing.default_locale`, `translatable.fallback_locale`,

@@ -4,12 +4,13 @@ namespace Modules\Cms\Events;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Events\Dispatchable;
+use Modules\Cms\Jobs\ScanCmsPublishWindowBoundariesJob;
 
 /**
  * Fired when a scheduled scan detects that a row's {@code publish_start_date} or {@code publish_end_date}
  * has just been crossed (within the configured look-back window).
  *
- * @see \Modules\Cms\Jobs\ScanCmsPublishWindowBoundariesJob
+ * @see ScanCmsPublishWindowBoundariesJob
  */
 final class CmsPublishWindowBoundaryReached
 {

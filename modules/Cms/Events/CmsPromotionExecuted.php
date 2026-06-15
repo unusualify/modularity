@@ -5,9 +5,10 @@ namespace Modules\Cms\Events;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Modules\Cms\Services\CmsPromotionService;
 
 /**
- * Fired after a successful {@see \Modules\Cms\Services\CmsPromotionService::promote} when not dry-run.
+ * Fired after a successful {@see CmsPromotionService::promote} when not dry-run.
  * Listeners may trigger pipelines, notifications, or secondary cache invalidation.
  */
 class CmsPromotionExecuted

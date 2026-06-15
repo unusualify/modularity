@@ -2,11 +2,13 @@
 
 namespace Unusualify\Modularous\Contracts;
 
+use Unusualify\Modularous\Http\Controllers\Traits\ManageBulkSheet;
+
 /**
- * Panel controller contract: CSV bulk sheet UI/routes ({@see \Unusualify\Modularous\Http\Controllers\Traits\ManageBulkSheet})
+ * Panel controller contract: CSV bulk sheet UI/routes ({@see ManageBulkSheet})
  * plus import/export column schema, validation, persistence, and streaming export.
  *
- * {@see \Unusualify\Modularous\Http\Controllers\Traits\ManageBulkSheet::bulkSheetToolKey()} defaults from module/route
+ * {@see ManageBulkSheet::bulkSheetToolKey()} defaults from module/route
  * names unless `tool_key` is set in the route `bulk_sheet` config.
  */
 interface CanBulkSheet

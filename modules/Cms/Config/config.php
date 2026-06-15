@@ -1,5 +1,11 @@
 <?php
 
+use Modules\Cms\Entities\PageLayout;
+use Modules\Cms\Http\Controllers\CmsSitemapPanelController;
+use Modules\Cms\Http\Controllers\SitemapController;
+use Modules\Cms\Repositories\SitemapRepository;
+use Modules\Cms\Routes\web;
+
 return [
     'name' => 'Cms',
     'system_prefix' => true,
@@ -178,7 +184,7 @@ return [
                 ['name' => 'scss_source', 'label' => 'SCSS (optional; enable scssphp + install package)', 'type' => 'textarea', 'rules' => 'nullable|string'],
             ],
         ],
-		'layout_builder' => [
+        'layout_builder' => [
             'name' => 'LayoutBuilder',
             'headline' => 'Layout Builders',
             'url' => 'layout-builders',
@@ -257,7 +263,7 @@ return [
                     'name' => 'style_sheet_id',
                     'label' => 'Primary stylesheet',
                     'rules' => 'nullable',
-                    'connector' => 'Cms:StyleSheet|repository'
+                    'connector' => 'Cms:StyleSheet|repository',
                 ],
                 [
                     'type' => 'layout-blades',
@@ -297,7 +303,7 @@ return [
             ],
         ],
         /**
-         * Locale-agnostic presentation shell per module-route model ({@see \Modules\Cms\Entities\PageLayout}).
+         * Locale-agnostic presentation shell per module-route model ({@see PageLayout}).
          * Panel editors now work with a single {@code layout-blades} block that persists into {@code blade_segments}
          * when the Blade source is {@code db}.
          */
@@ -335,7 +341,7 @@ return [
                     'formatter' => [
                         'date',
                         'numeric-full',
-                    ]
+                    ],
                 ],
                 ['title' => 'Actions', 'key' => 'actions', 'sortable' => false],
             ],
@@ -504,8 +510,8 @@ return [
             ],
         ],
         /**
-         * Panel Inertia index ({@code Cms/Sitemap/Index}): item table + dry-run + commit; {@see \Modules\Cms\Repositories\SitemapRepository},
-         * {@see \Modules\Cms\Http\Controllers\SitemapController}, {@see \Modules\Cms\Http\Controllers\CmsSitemapPanelController}, {@see \Modules\Cms\Routes\web}.
+         * Panel Inertia index ({@code Cms/Sitemap/Index}): item table + dry-run + commit; {@see SitemapRepository},
+         * {@see SitemapController}, {@see CmsSitemapPanelController}, {@see web}.
          */
         'sitemap' => [
             'name' => 'Sitemap',
@@ -573,7 +579,7 @@ return [
                     'name' => 'name',
                     'label' => 'Name',
                     'translated' => true,
-                ]
+                ],
             ],
         ],
         'page' => [

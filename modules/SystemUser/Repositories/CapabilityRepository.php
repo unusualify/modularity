@@ -12,4 +12,3 @@ class CapabilityRepository extends Repository
         $this->model = $model;
     }
 }
-

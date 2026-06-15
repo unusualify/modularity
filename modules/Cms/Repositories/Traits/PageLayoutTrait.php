@@ -2,13 +2,17 @@
 
 namespace Modules\Cms\Repositories\Traits;
 
+use Illuminate\Database\Eloquent\Model;
+use Modules\Cms\Entities\Concerns\HasPageLayout;
+use Unusualify\Modularous\Repositories\Repository;
+
 /**
- * CMS: repositories whose {@see \Unusualify\Modularous\Repositories\Repository::getModel()} uses {@see \Modules\Cms\Entities\Concerns\HasPageLayout}.
+ * CMS: repositories whose {@see Repository::getModel()} uses {@see HasPageLayout}.
  */
 trait PageLayoutTrait
 {
     /**
-     * @return class-string<\Illuminate\Database\Eloquent\Model>
+     * @return class-string<Model>
      */
     public function pageLayoutTargetModelClass(): string
     {
@@ -17,6 +21,6 @@ trait PageLayoutTrait
 
     public function usesPageLayoutPresentation(): bool
     {
-        return classHasTrait($this->pageLayoutTargetModelClass(), \Modules\Cms\Entities\Concerns\HasPageLayout::class);
+        return classHasTrait($this->pageLayoutTargetModelClass(), HasPageLayout::class);
     }
 }

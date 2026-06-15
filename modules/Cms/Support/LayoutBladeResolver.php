@@ -20,13 +20,13 @@ use Modules\Cms\Entities\LayoutBuilder;
  *
  * Merge view data commonly includes {@code previewBodyHtml} (injected into the DB shell body slot: compiled into
  * {@code PageLayout} body appends and/or used as fallback when base+append are empty), {@code item}, and SEO keys
- * ({@code seoTitle}, …) for {@see \Illuminate\Support\Facades\Blade::render} on DB segments; panel preview uses
+ * ({@code seoTitle}, …) for {@see Blade::render} on DB segments; panel preview uses
  * {@see CmsLayoutShellPreviewPlaceholder::mergeDataForShellPreview()}.
  */
 final class LayoutBladeResolver
 {
     /**
-     * @param  array<string, mixed>  $mergeViewData
+     * @param array<string, mixed> $mergeViewData
      */
     public static function renderView(LayoutBuilder $layout, array $mergeViewData = [], ?string $presentationViewName = null): View
     {
@@ -34,7 +34,7 @@ final class LayoutBladeResolver
     }
 
     /**
-     * @param  array<string, mixed>  $mergeViewData
+     * @param array<string, mixed> $mergeViewData
      */
     public static function renderHtml(LayoutBuilder $layout, array $mergeViewData = [], ?string $presentationViewName = null): string
     {
@@ -42,8 +42,8 @@ final class LayoutBladeResolver
     }
 
     /**
-     * @param  array{head:string,body:string,footer:string}|null  $fragmentAppends
-     * @param  array<string, mixed>                               $mergeViewData
+     * @param array{head:string,body:string,footer:string}|null $fragmentAppends
+     * @param array<string, mixed> $mergeViewData
      */
     public static function renderHtmlWithShellAppends(LayoutBuilder $layout, ?array $fragmentAppends, array $mergeViewData = [], ?string $presentationViewName = null, ?string $pageLayoutBladeSource = null): string
     {
@@ -55,7 +55,7 @@ final class LayoutBladeResolver
      *
      * @deprecated Use {@see self::renderHtmlWithShellAppends}.
      *
-     * @param  array<string, mixed>  $mergeViewData
+     * @param array<string, mixed> $mergeViewData
      */
     public static function renderHtmlWithParentSegmentAppends(LayoutBuilder $layout, ?array $parentSegmentAppends, array $mergeViewData = [], ?string $pageLayoutBladeSource = null): string
     {
@@ -63,8 +63,8 @@ final class LayoutBladeResolver
     }
 
     /**
-     * @param  array{head:string,body:string,footer:string}|null  $fragmentAppends
-     * @param  array<string, mixed>                               $mergeViewData
+     * @param array{head:string,body:string,footer:string}|null $fragmentAppends
+     * @param array<string, mixed> $mergeViewData
      */
     public static function renderViewWithShellAppends(LayoutBuilder $layout, ?array $fragmentAppends, array $mergeViewData = [], ?string $presentationViewName = null, ?string $pageLayoutBladeSource = null): View
     {
@@ -180,7 +180,7 @@ final class LayoutBladeResolver
                 $trimmedBodyBase = trim($bodyCombined);
                 if ($trimmedBodyBase === '') {
                     $bodyCombined = $compiledAppendBody;
-                } elseif (strpos($bodyCombined, $compiledAppendBody) === false) {
+                } elseif (! str_contains($bodyCombined, $compiledAppendBody)) {
                     $bodyCombined .= $compiledAppendBody;
                 }
             }
@@ -218,7 +218,7 @@ final class LayoutBladeResolver
     /**
      * @deprecated Use {@see self::renderViewWithShellAppends}.
      *
-     * @param  array<string, mixed>  $mergeViewData
+     * @param array<string, mixed> $mergeViewData
      */
     public static function renderViewWithParentSegmentAppends(LayoutBuilder $layout, ?array $parentSegmentAppends, array $mergeViewData = [], ?string $pageLayoutBladeSource = null): View
     {
@@ -226,8 +226,8 @@ final class LayoutBladeResolver
     }
 
     /**
-     * @param  array{head:string,body:string,footer:string}  $appends
-     * @param  array<string, mixed>                          $data
+     * @param array{head:string,body:string,footer:string} $appends
+     * @param array<string, mixed> $data
      */
     private static function injectFilesystemAppendsIntoDocument(string $html, array $appends, array $data, ?array $moduleRouteContext): string
     {
@@ -275,7 +275,7 @@ final class LayoutBladeResolver
     }
 
     /**
-     * @param  array{head:string,body:string,footer:string}  $appends
+     * @param array{head:string,body:string,footer:string} $appends
      */
     private static function appendsContainBlade(array $appends): bool
     {
@@ -320,12 +320,12 @@ final class LayoutBladeResolver
             $last = end($matches[0]);
             $start = $last[1];
             $footerHtml = $last[0];
-            $end = $start + strlen($footerHtml);
+            $end = $start + mb_strlen($footerHtml);
 
             return [
-                substr($html, 0, $start),
+                mb_substr($html, 0, $start),
                 $footerHtml,
-                substr($html, $end),
+                mb_substr($html, $end),
             ];
         }
 
@@ -351,7 +351,7 @@ final class LayoutBladeResolver
     }
 
     /**
-     * @param  array<string, mixed>  $data
+     * @param array<string, mixed> $data
      */
     private static function compileSegmentBlade(string $template, array $data): string
     {
@@ -426,8 +426,6 @@ final class LayoutBladeResolver
     /**
      * Returns the ordered list of view names where a layout builder segment can be resolved.
      *
-     * @param  string  $slug
-     * @param  string  $segment
      * @return list<string>
      */
     private static function filesystemSlugViewCandidates(string $slug, string $segment): array
@@ -621,7 +619,7 @@ final class LayoutBladeResolver
     }
 
     /**
-     * @param  array{module: string, route: string}|null  $moduleRouteContext
+     * @param array{module: string, route: string}|null $moduleRouteContext
      */
     public static function hasFilesystemPageLayoutSegments(?array $moduleRouteContext): bool
     {

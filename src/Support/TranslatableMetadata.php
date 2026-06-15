@@ -3,11 +3,13 @@
 namespace Unusualify\Modularous\Support;
 
 use Illuminate\Database\Schema\Blueprint;
+use Unusualify\Modularous\Entities\Traits\HasTranslatableMetadata;
+use Unusualify\Modularous\Entities\Traits\HasTranslation;
 
 /**
  * Translatable public metadata columns (SEO title/description, canonical, robots, sitemap inclusion) for
- * {@see \Unusualify\Modularous\Entities\Traits\HasTranslation} models that opt in via
- * {@see \Unusualify\Modularous\Entities\Traits\HasTranslatableMetadata}.
+ * {@see HasTranslation} models that opt in via
+ * {@see HasTranslatableMetadata}.
  *
  * Migrations: {@see createTranslatableMetadataFields()}.
  * Repository form inputs: {@see \Unusualify\Modularous\Repositories\Traits\TranslatableMetadataTrait}.

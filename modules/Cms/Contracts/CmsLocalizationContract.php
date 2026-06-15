@@ -2,8 +2,12 @@
 
 namespace Modules\Cms\Contracts;
 
+use Modules\Cms\Entities\UrlRoute;
+use Modules\Cms\Services\CmsPublicModelResolver;
+use Modules\Cms\Support\CmsFrontPath;
+
 /**
- * Bridges CMS URL features ({@see \Modules\Cms\Entities\UrlRoute}, slugs, {@see \Modules\Cms\Services\CmsPublicModelResolver})
+ * Bridges CMS URL features ({@see UrlRoute}, slugs, {@see CmsPublicModelResolver})
  * with a concrete localization stack (typically {@code mcamara/laravel-localization}) or translatable fallbacks.
  *
  * Implementations are resolved from the container as a singleton; higher layers (e.g. SiteSetting) can decorate via
@@ -17,7 +21,7 @@ interface CmsLocalizationContract
     public function driver(): string;
 
     /**
-     * Locale codes allowed as the first path segment after {@see \Modules\Cms\Support\CmsFrontPath::innerNormalizedPath()}.
+     * Locale codes allowed as the first path segment after {@see CmsFrontPath::innerNormalizedPath()}.
      * Sorted longest-first (e.g. {@code en-gb} before {@code en}).
      *
      * @return list<string>

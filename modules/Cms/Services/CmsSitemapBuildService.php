@@ -130,9 +130,8 @@ final class CmsSitemapBuildService
         $overrides = $this->loadOverrides();
         $grouped = $routes->groupBy(fn (UrlRoute $r) => $r->urlable_type . ':' . $r->urlable_id);
 
-
         foreach ($grouped as $groupKey => $group) {
-            /** @var \Illuminate\Support\Collection<int, UrlRoute> $group */
+            /** @var Collection<int, UrlRoute> $group */
             $first = $group->first();
             if ($first === null) {
                 continue;
@@ -269,7 +268,7 @@ final class CmsSitemapBuildService
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Collection<int|string, \Illuminate\Database\Eloquent\Model>
+     * @return \Illuminate\Database\Eloquent\Collection<int|string, Model>
      */
     private function loadValidModels(string $class, Collection $ids): Collection
     {
@@ -288,7 +287,7 @@ final class CmsSitemapBuildService
     private function shouldIncludeInSitemapForLocale(Model $model, string $locale): bool
     {
 
-        if ( classHasTrait($model, HasTranslation::class)) {
+        if (classHasTrait($model, HasTranslation::class)) {
             $t = $model->translate($locale);
             if ($t === null) {
                 return false;
@@ -297,9 +296,9 @@ final class CmsSitemapBuildService
             if (property_exists($t, 'sitemap_include') || isset($t->sitemap_include)) {
                 return (bool) $t->sitemap_include;
             }
-        } else if ( classHasTrait($model, HasTranslatableMetadata::class) && classHasTrait($model, IsSingular::class)) {
+        } elseif (classHasTrait($model, HasTranslatableMetadata::class) && classHasTrait($model, IsSingular::class)) {
 
-            if((property_exists($model, 'sitemap_include') || isset($model->sitemap_include)) && is_array($model->sitemap_include) && Arr::isAssoc($model->sitemap_include)) {
+            if ((property_exists($model, 'sitemap_include') || isset($model->sitemap_include)) && is_array($model->sitemap_include) && Arr::isAssoc($model->sitemap_include)) {
                 return (bool) $model->sitemap_include[$locale] ?? true;
             }
         }

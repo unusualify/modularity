@@ -11,7 +11,7 @@ use Unusualify\Modularous\Repositories\Repository;
 
 /**
  * CMS sitemap: panel dry-run / commit, backed by {@see CmsSitemapBuildService} + {@see CmsSitemapCacheService}.
- * {@see Sitemap} row(s) in DB hold optional per-urlable override rows ({@see \Modules\Cms\Entities\CmsSitemapableItem}).
+ * {@see Sitemap} row(s) in DB hold optional per-urlable override rows ({@see CmsSitemapableItem}).
  */
 class SitemapRepository extends Repository
 {

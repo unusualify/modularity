@@ -3,13 +3,14 @@
 namespace Modules\Cms\Entities\Concerns;
 
 use Illuminate\Database\Eloquent\Builder;
+use Modules\Cms\Repositories\Traits\CmrTrait;
 use Modules\Cms\Services\CmsPublicModelResolver;
 
 /**
  * Content module route (CMR): CMS panel routes that participate in parent-segment URL bindings and UrlRoute syncing.
  *
  * Composes {@see HasParentSegment} (URL prefix per locale) and {@see HasPageLayout} (locale-agnostic shell defaults).
- * Pair repositories with {@see \Modules\Cms\Repositories\Traits\CmrTrait}.
+ * Pair repositories with {@see CmrTrait}.
  */
 trait IsCmr
 {

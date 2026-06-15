@@ -1,5 +1,7 @@
 <?php
 
+use Modules\Cms\Http\Middleware\LayoutBuilderMiddleware;
+
 return [
     /**
      * Default when a row omits {@code blade_source}: {@code db} stores segments in DB; {@code filesystem} uses {@code blade_view_name}.
@@ -17,7 +19,7 @@ return [
     'preview_enabled' => (bool) env('MODULAROUS_CMS_LAYOUT_PREVIEW_ENABLED', true),
 
     /**
-     * When true, {@see \Modules\Cms\Http\Middleware\LayoutBuilderMiddleware} runs (opt-in; register on route groups in the host app).
+     * When true, {@see LayoutBuilderMiddleware} runs (opt-in; register on route groups in the host app).
      */
     'middleware_enabled' => (bool) env('MODULAROUS_CMS_LAYOUT_MIDDLEWARE_ENABLED', false),
 

@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Schema;
 use Modules\Cms\Contracts\CanonicalUrlResolverInterface;
 use Modules\Cms\Contracts\PublicUrlRegistryContract;
 use Modules\Cms\Entities\UrlRoute;
+use Modules\Cms\Providers\CmsServiceProvider;
+use Modules\Cms\Support\CmsParentSegmentRegistryGate;
 use Modules\Cms\Support\CmsPublicPathHierarchy;
 use Unusualify\Modularous\Entities\Traits\HasSlug;
 use Unusualify\Modularous\Entities\Traits\IsSingular;
@@ -14,12 +16,12 @@ use Unusualify\Modularous\Entities\Traits\IsSingular;
 /**
  * Syncs {@see UrlRoute} rows from page-like models (slugs + parent segments) and redirect sources.
  * Uses each model instance's morph class / class name — no hard-coded entity types.
- * {@see \Unusualify\Modularous\Entities\Traits\IsSingular} models share the singletons table but still sync routes from
+ * {@see IsSingular} models share the singletons table but still sync routes from
  * {@see desiredPublicPathsByLocale()} via {@see ParentSegment} bindings per locale (no per-model slug table).
- * Public requests are gated by {@see \Modules\Cms\Support\CmsParentSegmentRegistryGate} together with
- * {@see \Modules\Cms\Services\CmsPublicModelResolver::resolveForParentSegmentRegistry()}.
+ * Public requests are gated by {@see CmsParentSegmentRegistryGate} together with
+ * {@see CmsPublicModelResolver::resolveForParentSegmentRegistry()}.
  *
- * Application binding: {@see \Modules\Cms\Contracts\PublicUrlRegistryContract} → this class (see {@see \Modules\Cms\Providers\CmsServiceProvider}).
+ * Application binding: {@see PublicUrlRegistryContract} → this class (see {@see CmsServiceProvider}).
  */
 final class CmsUrlRouteRegistry implements PublicUrlRegistryContract
 {
@@ -191,7 +193,7 @@ final class CmsUrlRouteRegistry implements PublicUrlRegistryContract
      * registry ({@see HasSlug} or {@see IsSingular}). Invoked when {@see \Modules\Cms\Entities\ParentSegment} rows
      * change so URL prefixes stay aligned without per-model saves.
      *
-     * @param  class-string<\Illuminate\Database\Eloquent\Model>  $modelClass
+     * @param class-string<Model> $modelClass
      */
     public function syncPublicPageRoutesForAllModelsOfClass(string $modelClass): void
     {

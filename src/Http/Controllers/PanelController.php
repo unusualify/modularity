@@ -276,16 +276,16 @@ abstract class PanelController extends CoreController implements CacheableInterf
     {
         if ($this->isGateable() && $this->setDefaultPermissions) {
 
-            if($this->module) {
+            if ($this->module) {
                 $permissions = [
-                    'VIEW' => [ 'only' => ['index', 'show']],
-                    'CREATE' => [ 'only' => ['create', 'store']],
-                    'EDIT' => [ 'only' => ['edit', 'update']],
-                    'DELETE' => [ 'only' => ['delete']],
-                    'FORCEDELETE' => [ 'only' => ['forceDelete']],
-                    'RESTORE' => [ 'only' => ['restore']],
-                    'DUPLICATE' => [ 'only' => ['duplicate']],
-                    'REORDER' => [ 'only' => ['reorder']],
+                    'VIEW' => ['only' => ['index', 'show']],
+                    'CREATE' => ['only' => ['create', 'store']],
+                    'EDIT' => ['only' => ['edit', 'update']],
+                    'DELETE' => ['only' => ['delete']],
+                    'FORCEDELETE' => ['only' => ['forceDelete']],
+                    'RESTORE' => ['only' => ['restore']],
+                    'DUPLICATE' => ['only' => ['duplicate']],
+                    'REORDER' => ['only' => ['reorder']],
 
                     // 'LIST' => [ 'only' => ['index', 'show']],
                     // 'EDIT' => [ 'only' => ['edit', 'update']],

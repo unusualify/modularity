@@ -23,7 +23,6 @@ if (modularousConfig('enabled.users-management')) {
         ? ['throttle:' . modularousConfig('security.mfa.throttle', modularousConfig('security.throttle.login_2fa', '6,1'))]
         : [];
 
-
     Route::get('register', 'RegisterController@showForm')->name('register.form');
     Route::post('register', 'RegisterController@register')->name('register');
 

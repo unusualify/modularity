@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\App;
 use Mockery as m;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Hydrates\Inputs\StateableHydrate;
+use Unusualify\Modularous\Module;
 use Unusualify\Modularous\Tests\TestCase;
 
 class StateableHydrateTest extends TestCase
@@ -26,7 +27,7 @@ class StateableHydrateTest extends TestCase
         ]);
 
         // Mock module
-        $moduleMock = m::mock(\Unusualify\Modularous\Module::class);
+        $moduleMock = m::mock(Module::class);
         $moduleMock->shouldReceive('getRouteClass')->with('testRoute', 'repository')->andReturn(get_class($repositoryMock));
 
         Modularous::shouldReceive('find')

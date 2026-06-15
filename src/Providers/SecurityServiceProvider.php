@@ -9,7 +9,6 @@ use Unusualify\Modularous\Http\Middleware\SessionSecurityMiddleware;
 use Unusualify\Modularous\Http\Middleware\StepUpMiddleware;
 use Unusualify\Modularous\Services\Security\SecurityService;
 
-
 class SecurityServiceProvider extends ServiceProvider
 {
     public function register(): void

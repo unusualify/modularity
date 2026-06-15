@@ -2,6 +2,7 @@
 
 namespace Unusualify\Modularous\Services;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Unusualify\Modularous\Entities\Traits\HasSlug;
@@ -33,7 +34,7 @@ class SlugInputValidationService
     /**
      * Validate slug for a concrete model class (used by HTTP layer and tests).
      *
-     * @param class-string<\Illuminate\Database\Eloquent\Model> $modelClass
+     * @param class-string<Model> $modelClass
      * @return array{valid: bool, message: ?string, normalized: string}
      */
     public function validateModelSlug(
@@ -128,7 +129,7 @@ class SlugInputValidationService
     }
 
     /**
-     * @param class-string<\Illuminate\Database\Eloquent\Model> $modelClass
+     * @param class-string<Model> $modelClass
      * @return array{slug: string, normalized: string, suffixed: bool}
      */
     public function proposeUniqueSlugForModel(
@@ -142,7 +143,7 @@ class SlugInputValidationService
             throw new InvalidArgumentException(__('This entity does not support slug validation.'));
         }
 
-        /** @var \Illuminate\Database\Eloquent\Model $model */
+        /** @var Model $model */
         $model = new $modelClass;
         $locale = $locale ?? app()->getLocale();
         $trimmedSource = trim($source);

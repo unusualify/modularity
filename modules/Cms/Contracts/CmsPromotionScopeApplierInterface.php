@@ -2,8 +2,10 @@
 
 namespace Modules\Cms\Contracts;
 
+use Modules\Cms\Services\CmsPromotionService;
+
 /**
- * Runs post-promotion work for enabled scope flags (cache is handled in {@see \Modules\Cms\Services\CmsPromotionService}).
+ * Runs post-promotion work for enabled scope flags (cache is handled in {@see CmsPromotionService}).
  * Swap or extend the binding to plug in search reindex, webhooks, or cross-service sync.
  */
 interface CmsPromotionScopeApplierInterface

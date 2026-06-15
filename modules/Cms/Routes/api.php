@@ -7,8 +7,9 @@ use Modules\Cms\Http\Controllers\API\ParentSegmentController;
 use Modules\Cms\Http\Controllers\API\PromotionController;
 use Modules\Cms\Http\Controllers\API\StyleSheetController;
 use Modules\Cms\Http\Controllers\RedirectController;
+use Unusualify\Modularous\Facades\ModularousRoutes;
 
-Route::middleware(['api.auth', ...\Unusualify\Modularous\Facades\ModularousRoutes::defaultMiddlewares()])->group(function () {
+Route::middleware(['api.auth', ...ModularousRoutes::defaultMiddlewares()])->group(function () {
     $promotionStepUpMiddleware = (modularousConfig('cms_features.register_middlewares', true) && modularousConfig('security.enabled', false))
         ? 'modularous.security.step_up:promotion.execute'
         : null;

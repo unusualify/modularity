@@ -10,7 +10,7 @@ namespace Modules\Cms\Support;
 final class LayoutSegmentAppends
 {
     /**
-     * @param  mixed  $raw  Request / JSON payloads.
+     * @param mixed $raw Request / JSON payloads.
      * @return array{head:string,body:string,footer:string}
      */
     public static function normalize(mixed $raw): array

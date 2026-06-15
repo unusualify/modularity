@@ -1,6 +1,9 @@
 <?php
 
+use Illuminate\Database\Eloquent\Model;
 use Modules\Cms\Entities\Page;
+use Modules\Cms\Jobs\ScanCmsPublishWindowBoundariesJob;
+use Modules\Cms\Providers\CmsServiceProvider;
 
 return [
     /**
@@ -12,8 +15,8 @@ return [
     'enabled' => env('MODULAROUS_CMS_SCHEDULE_ENABLED', true),
 
     /**
-     * When true, {@see \Modules\Cms\Providers\CmsServiceProvider} registers
-     * {@see \Modules\Cms\Jobs\ScanCmsPublishWindowBoundariesJob} with Laravel's schedule (opt-in to avoid surprise cron work).
+     * When true, {@see CmsServiceProvider} registers
+     * {@see ScanCmsPublishWindowBoundariesJob} with Laravel's schedule (opt-in to avoid surprise cron work).
      */
     'register_with_laravel_schedule' => env('MODULAROUS_CMS_SCHEDULE_REGISTER', false),
 
@@ -30,7 +33,7 @@ return [
      * Eloquent models scanned for {@code publish_start_date} / {@code publish_end_date} (columns optional per table).
      * Override in host config; default is CMS {@see Page} only.
      *
-     * @var list<class-string<\Illuminate\Database\Eloquent\Model>>
+     * @var list<class-string<Model>>
      */
     'publish_window_models' => (static function (): array {
         $raw = env('MODULAROUS_CMS_PUBLISH_WINDOW_MODELS');

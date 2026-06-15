@@ -6,6 +6,9 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\Auth;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Facades\ModularousCache;
+use Unusualify\Modularous\Http\Controllers\BaseController;
+use Unusualify\Modularous\Module;
+use Unusualify\Modularous\Repositories\Repository;
 use Unusualify\Modularous\Tests\TestCase;
 use Unusualify\Modularous\Traits\Cache\Cacheable;
 use Unusualify\Modularous\Traits\Cache\CacheKeyGenerators;
@@ -329,14 +332,14 @@ class CacheTraitsTest extends TestCase
             use WarmupCache;
         };
 
-        $mockController = \Mockery::mock(\Unusualify\Modularous\Http\Controllers\BaseController::class);
-        $mockRepo = \Mockery::mock(\Unusualify\Modularous\Repositories\Repository::class);
+        $mockController = \Mockery::mock(BaseController::class);
+        $mockRepo = \Mockery::mock(Repository::class);
         $mockRepo->shouldReceive('shouldUseUserAwareCache')->andReturn(false);
         $mockController->shouldReceive('getRepository')->andReturn($mockRepo);
         $mockController->shouldReceive('preload')->once();
         $mockController->shouldReceive('getMainCountsList')->andReturn([]);
 
-        $mockModule = \Mockery::mock(\Unusualify\Modularous\Module::class);
+        $mockModule = \Mockery::mock(Module::class);
         $mockModule->shouldReceive('getRoute')->with('Post')->andReturn(true);
         $mockModule->shouldReceive('getController')->with('Post')->andReturn($mockController);
 
@@ -354,8 +357,8 @@ class CacheTraitsTest extends TestCase
             use WarmupCache;
         };
 
-        $mockController = \Mockery::mock(\Unusualify\Modularous\Http\Controllers\BaseController::class);
-        $mockRepo = \Mockery::mock(\Unusualify\Modularous\Repositories\Repository::class);
+        $mockController = \Mockery::mock(BaseController::class);
+        $mockRepo = \Mockery::mock(Repository::class);
         $mockRepo->shouldReceive('shouldUseUserAwareCache')->andReturn(false);
         $mockController->shouldReceive('getRepository')->andReturn($mockRepo);
         $mockController->shouldReceive('preload')->once();
@@ -370,7 +373,7 @@ class CacheTraitsTest extends TestCase
         $mockController->shouldReceive('getFormattedIndexItem')->once();
         $mockController->shouldReceive('getFormItem')->once();
 
-        $mockModule = \Mockery::mock(\Unusualify\Modularous\Module::class);
+        $mockModule = \Mockery::mock(Module::class);
         $mockModule->shouldReceive('getRoute')->with('Post')->andReturn(true);
         $mockModule->shouldReceive('getController')->with('Post')->andReturn($mockController);
 

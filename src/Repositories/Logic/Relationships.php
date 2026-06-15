@@ -9,6 +9,7 @@ use Unusualify\Modularous\Entities\Model;
 use Unusualify\Modularous\Facades\ModularousFinder;
 use Unusualify\Modularous\Facades\ModularousLog;
 use Unusualify\Modularous\Repositories\Repository;
+use Unusualify\Modularous\Repositories\Traits\RevisionsTrait;
 use Unusualify\Modularous\Traits\CheckSnapshot;
 use Unusualify\Modularous\Traits\ResolveConnector;
 
@@ -18,7 +19,7 @@ trait Relationships
         ResolveConnector;
 
     /**
-     * When true, {@see \Unusualify\Modularous\Repositories\Traits\RevisionsTrait::bypassAfterSaves} may set
+     * When true, {@see RevisionsTrait::bypassAfterSaves} may set
      * `passAfterSaveRelationships` during pending-only revision saves so {@see afterSaveRelationships} is skipped.
      */
     protected bool $pendingBypassRevisionRelationships = true;

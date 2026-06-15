@@ -141,7 +141,7 @@ final class FrameworkArtifactResolver
     }
 
     /**
-     * @param  array<string, mixed>  $framework  {@code definition.framework}
+     * @param array<string, mixed> $framework {@code definition.framework}
      */
     private function resolveBootstrapVendorHref(array $framework, ?string $version): ?string
     {
@@ -169,7 +169,7 @@ final class FrameworkArtifactResolver
     private function isAllowedHref(string $href): bool
     {
         $href = trim($href);
-        if ($href === '' || strlen($href) > 2048) {
+        if ($href === '' || mb_strlen($href) > 2048) {
             return false;
         }
 

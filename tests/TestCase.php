@@ -8,6 +8,7 @@ use JoeDixon\Translation\TranslationServiceProvider;
 use Modules\SystemPayment\Entities\Payment;
 use Nwidart\Modules\LaravelModulesServiceProvider;
 use Oobook\Database\Eloquent\ManageEloquentServiceProvider;
+use Spatie\Activitylog\Models\Activity;
 use Spatie\Permission\PermissionServiceProvider;
 use Unusualify\Modularous\Activators\ModularousActivator;
 use Unusualify\Modularous\Entities\Enums\PaymentStatus;
@@ -158,7 +159,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             'default_log_name' => 'default',
             'default_auth_driver' => null,
             'subject_returns_soft_deleted_models' => false,
-            'activity_model' => \Spatie\Activitylog\Models\Activity::class,
+            'activity_model' => Activity::class,
             'table_name' => 'sp_activity_logs',
             'database_connection' => 'testdb',
         ]);

@@ -36,8 +36,8 @@ class GeneratePasswordNotificationTest extends TestCase
     {
         // Set real config values instead of mocking the facade
         config([
-            'app.name'            => 'Test App',
-            'app.locale'          => 'en',
+            'app.name' => 'Test App',
+            'app.locale' => 'en',
             'app.fallback_locale' => 'en',
         ]);
 
@@ -59,8 +59,8 @@ class GeneratePasswordNotificationTest extends TestCase
     {
         // Set real config values instead of mocking the facade
         config([
-            'app.name'            => 'MyApp',
-            'app.locale'          => 'en',
+            'app.name' => 'MyApp',
+            'app.locale' => 'en',
             'app.fallback_locale' => 'en',
         ]);
 

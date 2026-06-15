@@ -2,10 +2,11 @@
 
 namespace Modules\Cms\Http\Requests;
 
+use Modules\Cms\Entities\CmsSitemapableItem;
 use Unusualify\Modularous\Http\Requests\Request;
 
 /**
- * Panel JSON POST to upsert {@see \Modules\Cms\Entities\CmsSitemapableItem} (per public page / urlable).
+ * Panel JSON POST to upsert {@see CmsSitemapableItem} (per public page / urlable).
  */
 class SitemapItemUpsertRequest extends Request
 {

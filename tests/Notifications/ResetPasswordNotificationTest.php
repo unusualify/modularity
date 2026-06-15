@@ -57,8 +57,8 @@ class ResetPasswordNotificationTest extends TestCase
         $property->setValue(null);
 
         config([
-            'app.name'            => 'Test App',
-            'app.locale'          => 'en',
+            'app.name' => 'Test App',
+            'app.locale' => 'en',
             'app.fallback_locale' => 'en',
             'auth.defaults.passwords' => 'users',
             'auth.passwords.users.expire' => 60,
@@ -96,8 +96,8 @@ class ResetPasswordNotificationTest extends TestCase
         $property->setValue(null);
 
         config([
-            'app.name'            => 'Test App',
-            'app.locale'          => 'en',
+            'app.name' => 'Test App',
+            'app.locale' => 'en',
             'app.fallback_locale' => 'en',
         ]);
 
@@ -154,7 +154,7 @@ class ResetPasswordNotificationTest extends TestCase
     //     // App name should be used at least once
     // }
 
-    protected function createMockNotifiable($name = 'Test User', $email = 'test@example.com')
+    protected function create_mock_notifiable($name = 'Test User', $email = 'test@example.com')
     {
         $notifiable = new class($name, $email)
         {

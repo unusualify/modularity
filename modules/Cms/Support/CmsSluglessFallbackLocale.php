@@ -2,11 +2,13 @@
 
 namespace Modules\Cms\Support;
 
+use Modules\Cms\Http\Middleware\FallbackLocaleSluglessCanonicalMiddleware;
+
 /**
  * Optional “slugless” public URLs for a single editorial fallback locale (e.g. {@code /pages/test}
  * mirrors {@code cms_routing.translatable_fallback_locale_then_default_locale} content; {@code /en/pages/test} redirects away).
  *
- * @see \Modules\Cms\Http\Middleware\FallbackLocaleSluglessCanonicalMiddleware
+ * @see FallbackLocaleSluglessCanonicalMiddleware
  */
 final class CmsSluglessFallbackLocale
 {

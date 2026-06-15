@@ -43,7 +43,7 @@ class PageRequest extends Request
     }
 
     /**
-     * @param \Closure(string): void $fail
+     * @param Closure(string): void $fail
      */
     protected function validateSlugSegmentLocaleValue(string $attribute, mixed $value, Closure $fail): void
     {

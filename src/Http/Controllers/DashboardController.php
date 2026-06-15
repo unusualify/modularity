@@ -6,7 +6,6 @@ use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\View;
 use Inertia\Inertia;
-use Unusualify\Modularous\Entities\Enums\Permission;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Http\Controllers\Traits\ManageUtilities;
 use Unusualify\Modularous\Traits\Allowable;

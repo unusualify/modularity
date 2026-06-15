@@ -2,10 +2,12 @@
 
 namespace Modules\Cms\Services\Concerns;
 
+use Illuminate\Database\Eloquent\Model;
 use Modules\Cms\Contracts\PublicUrlRegistryContract;
+use Unusualify\Modularous\Services\SlugInputValidationService;
 
 /**
- * Extends {@see \Unusualify\Modularous\Services\SlugInputValidationService} with optional checks against
+ * Extends {@see SlugInputValidationService} with optional checks against
  * {@see Modules\Cms\Contracts\PublicUrlRegistryContract}: nested path warnings + hard collision on exact locale/path.
  *
  * Subclasses override {@see slugModelsUsingPublicUrlRegistry()}, path building, and message/config hooks.
@@ -160,7 +162,7 @@ trait ExtendsSlugValidationWithPublicUrlRegistry
     }
 
     /**
-     * @return array{0: class-string<\Illuminate\Database\Eloquent\Model>|null, 1: int|null}
+     * @return array{0: class-string<Model>|null, 1: int|null}
      */
     protected function registryUrlableMorphForSlugValidation(string $modelClass, ?int $excludeId): array
     {
@@ -176,7 +178,7 @@ trait ExtendsSlugValidationWithPublicUrlRegistry
     }
 
     /**
-     * @return class-string<\Illuminate\Database\Eloquent\Model>|null
+     * @return class-string<Model>|null
      */
     protected function publicUrlRegistryMorphClassForNestedWarnings(string $modelClass): ?string
     {

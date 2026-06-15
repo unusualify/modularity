@@ -6,6 +6,7 @@ use Modules\Cms\Contracts\CmsLocalizationContract;
 use Modules\Cms\Contracts\CmsLocalizationOverrideProviderInterface;
 use Modules\Cms\Localization\DelegatingCmsLocalizationAdapter;
 use Modules\Cms\Localization\TranslatableCmsLocalizationAdapter;
+use Modules\Cms\Providers\CmsServiceProvider;
 use Modules\Cms\Services\CanonicalUrlResolver;
 use Unusualify\Modularous\Tests\TestCase;
 
@@ -65,7 +66,7 @@ class CmsLocalizationAdapterTest extends TestCase
         $this->app['config']->set('modularous.cms_routing.path_segment_locales', ['en']);
         $this->app['config']->set('modularous.cms_routing.resync_registry_after_parent_segments_change', false);
 
-        $this->app->register(\Modules\Cms\Providers\CmsServiceProvider::class);
+        $this->app->register(CmsServiceProvider::class);
 
         $this->assertInstanceOf(CmsLocalizationContract::class, $this->app->make(CmsLocalizationContract::class));
         $this->assertSame('translatable', $this->app->make(CmsLocalizationContract::class)->driver());

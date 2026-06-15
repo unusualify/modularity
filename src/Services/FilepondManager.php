@@ -82,7 +82,7 @@ class FilepondManager
         }
 
         $fileType = pathinfo($storagePath, PATHINFO_EXTENSION);
-        $fileType = strtolower((string) $fileType);
+        $fileType = mb_strtolower((string) $fileType);
 
         if (in_array($fileType, ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'])) {
             try {
@@ -122,7 +122,7 @@ class FilepondManager
         }
 
         try {
-            $imagick = new $imagickClass();
+            $imagick = new $imagickClass;
             $imagick->readImage($storagePath);
             $imagick->setImageFormat('jpeg');
             $imagick->setImageCompressionQuality(90);

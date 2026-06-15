@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\App;
 use Mockery as m;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Hydrates\Inputs\TagHydrate;
+use Unusualify\Modularous\Module;
 use Unusualify\Modularous\Tests\TestCase;
 
 class TagHydrateTest extends TestCase
@@ -31,7 +32,7 @@ class TagHydrateTest extends TestCase
             }
         });
 
-        $moduleMock = m::mock(\Unusualify\Modularous\Module::class);
+        $moduleMock = m::mock(Module::class);
         $moduleMock->shouldReceive('getRouteClass')->with('testRoute', 'repository')->andReturn(get_class($repositoryMock));
         $moduleMock->shouldReceive('getRouteActionUrl')->andReturn('/tags');
 

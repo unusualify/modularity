@@ -306,10 +306,12 @@ trait MethodTransformers
                     case 'textarea':
                     case 'input-date':
                         $acc[$item['name']] = $object->{$item['name']} ?? null;
+
                         break;
                     default:
 
                 }
+
                 return $acc;
             }, []);
         }

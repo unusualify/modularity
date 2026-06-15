@@ -322,7 +322,7 @@ trait HasSlug
         }
 
         if (is_string($value)) {
-            $v = strtolower(trim($value));
+            $v = mb_strtolower(trim($value));
             if (in_array($v, ['0', 'false', 'off', 'no', 'inactive', 'disabled'], true)) {
                 return false;
             }

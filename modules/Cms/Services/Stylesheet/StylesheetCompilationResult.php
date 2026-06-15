@@ -2,8 +2,10 @@
 
 namespace Modules\Cms\Services\Stylesheet;
 
+use Modules\Cms\Entities\StyleSheet;
+
 /**
- * Result of compiling one {@see \Modules\Cms\Entities\StyleSheet} record.
+ * Result of compiling one {@see StyleSheet} record.
  *
  * - {@see $frameworkLinkHrefs} External stylesheets (Bootstrap/Tailwind CDN, vendor assets, or prelude links from definition).
  * - {@see $frameworkScriptSrcs} Optional framework scripts (e.g. Bootstrap bundle for components / transitions).
@@ -12,8 +14,8 @@ namespace Modules\Cms\Services\Stylesheet;
 final class StylesheetCompilationResult
 {
     /**
-     * @param  list<string>  $frameworkLinkHrefs
-     * @param  list<string>  $frameworkScriptSrcs
+     * @param list<string> $frameworkLinkHrefs
+     * @param list<string> $frameworkScriptSrcs
      */
     public function __construct(
         public array $frameworkLinkHrefs,

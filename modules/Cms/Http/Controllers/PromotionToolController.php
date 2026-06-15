@@ -7,12 +7,15 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Inertia\Response;
+use Modules\Cms\Repositories\PageRepository;
 use Unusualify\Modularous\Facades\Modularous;
+use Unusualify\Modularous\Facades\ModularousRoutes;
 use Unusualify\Modularous\Http\Controllers\BaseController;
+use Unusualify\Modularous\Http\Controllers\Traits\ManageInertia;
 
 /**
  * Inertia shell for CMS promotion dry-run / execute (POST targets session web routes, not api/v1).
- * Extends {@see BaseController} so {@see \Unusualify\Modularous\Http\Controllers\Traits\ManageInertia}
+ * Extends {@see BaseController} so {@see ManageInertia}
  * supplies the same mainConfiguration / headLayoutData as index screens (sidebar, navigation).
  */
 class PromotionToolController extends BaseController
@@ -20,7 +23,7 @@ class PromotionToolController extends BaseController
     protected $moduleName = 'Cms';
 
     /**
-     * Reuse the Page route binding so {@see \Modules\Cms\Repositories\PageRepository} resolves and
+     * Reuse the Page route binding so {@see PageRepository} resolves and
      * BaseController preview/revision middleware checks do not run against a null repository.
      */
     protected $routeName = 'Page';
@@ -58,7 +61,7 @@ class PromotionToolController extends BaseController
     }
 
     /**
-     * URLs for POST actions that run under {@see \Unusualify\Modularous\Facades\ModularousRoutes::webPanelMiddlewares()}
+     * URLs for POST actions that run under {@see ModularousRoutes::webPanelMiddlewares()}
      * so the panel session authenticates the request (see modules/Cms/Routes/web.php).
      *
      * @return array{dryRun: string, execute: string}

@@ -72,7 +72,7 @@ final class StylesheetCompilerService
     private function limitRawCss(string $raw): string
     {
         $max = (int) modularousConfig('cms_stylesheets.max_raw_css_bytes', 512_000);
-        if (strlen($raw) > $max) {
+        if (mb_strlen($raw) > $max) {
             return mb_substr($raw, 0, $max);
         }
 
@@ -84,7 +84,7 @@ final class StylesheetCompilerService
      * stylesheet body to the compiled bundle and remove that href from {@code $links} so the shell emits one CSS link
      * (the public bundle). Local root-relative {@code /} files only unless {@code cms_stylesheets.allow_http_fetch_for_inline_merge}.
      *
-     * @param  list<string>  $links
+     * @param list<string> $links
      * @return array{0: string, 1: list<string>}
      */
     private function maybeInlineVendorBootstrapCssIntoBundle(StyleSheet $sheet, string $css, array $links): array
@@ -109,6 +109,7 @@ final class StylesheetCompilerService
         foreach ($links as $i => $h) {
             if ($h === $href) {
                 $hrefIndex = $i;
+
                 break;
             }
         }
@@ -122,7 +123,7 @@ final class StylesheetCompilerService
         }
 
         $max = max(1024, (int) modularousConfig('cms_stylesheets.max_inline_vendor_css_bytes', 2_000_000));
-        if (strlen($body) > $max) {
+        if (mb_strlen($body) > $max) {
             $body = mb_substr($body, 0, $max);
         }
 

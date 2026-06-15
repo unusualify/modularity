@@ -2,9 +2,12 @@
 
 namespace Modules\Cms\Repositories\Traits;
 
+use Modules\Cms\Contracts\PublicUrlRegistryContract;
+use Modules\Cms\Entities\UrlRoute;
+
 /**
  * Dispatches {@code afterSave} / {@code afterDelete} / {@code afterRestore} to callables keyed by model class.
- * Used by CMS repositories whose entities sync into {@see \Modules\Cms\Contracts\PublicUrlRegistryContract} (typically {@see \Modules\Cms\Entities\UrlRoute} rows).
+ * Used by CMS repositories whose entities sync into {@see PublicUrlRegistryContract} (typically {@see UrlRoute} rows).
  *
  * Implement {@see publicUrlRegistryAfterSaveHandlers()} / {@see publicUrlRegistryAfterDeleteHandlers()} in the repository trait that uses this.
  */

@@ -7,11 +7,11 @@ use Illuminate\Container\Container;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
+use Modules\Cms\Entities\Concerns\HasPageLayout;
+use Modules\Cms\Entities\Concerns\HasParentSegment;
 use Nwidart\Modules\FileRepository;
 use Nwidart\Modules\Json;
 use Unusualify\Modularous\Contracts\CurrencyProviderInterface;
-use Modules\Cms\Entities\Concerns\HasPageLayout;
-use Modules\Cms\Entities\Concerns\HasParentSegment;
 use Unusualify\Modularous\Exceptions\ModularousSystemPathException;
 
 class Modularous extends FileRepository
@@ -146,8 +146,6 @@ class Modularous extends FileRepository
 
     /**
      * Get & scan all modules.
-     *
-     * @return array
      */
     public function scan(): array
     {
@@ -162,7 +160,7 @@ class Modularous extends FileRepository
             foreach ($manifests as $manifest) {
                 $name = Json::make($manifest)->get('name');
 
-                $modules[strtolower($name)] = $this->createModule($this->app, $name, dirname($manifest));
+                $modules[mb_strtolower($name)] = $this->createModule($this->app, $name, dirname($manifest));
             }
         }
 
@@ -263,7 +261,7 @@ class Modularous extends FileRepository
         /** @var Module $module */
         foreach ($this->all() as $name => $module) {
             if ($this->activator->hasStatus($module, $status)) {
-                $modules[strtolower($name)] = $module;
+                $modules[mb_strtolower($name)] = $module;
             }
         }
 
@@ -476,7 +474,6 @@ class Modularous extends FileRepository
             // get the first segment, path can start with /
             $segment = explode('/', trim($path, '/'))[0];
         }
-
 
         return $segment === $this->getAdminUrlPrefix() && $host === $this->getAppHost();
     }

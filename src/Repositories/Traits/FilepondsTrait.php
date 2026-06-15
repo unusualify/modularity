@@ -41,8 +41,8 @@ trait FilepondsTrait
      * Rows whose UUID still exists only in {@see TemporaryFilepond} (pending approval / bypassed afterSave) are
      * surfaced as unsaved {@see FilepondEntity} models with `isTemporaryRevisionPreview` set.
      *
-     * @param  Model  $object
-     * @param  array<string, mixed>  $fields
+     * @param Model $object
+     * @param array<string, mixed> $fields
      * @return Model
      */
     public function hydrateFilepondsTrait($object, $fields)
@@ -60,8 +60,8 @@ trait FilepondsTrait
     }
 
     /**
-     * @param  Model  $object
-     * @param  array<string, mixed>  $fields
+     * @param Model $object
+     * @param array<string, mixed> $fields
      */
     private function getPreviewFileponds($object, array $fields): Collection
     {
@@ -70,7 +70,6 @@ trait FilepondsTrait
         $original = $object->fileponds;
         $out = Collection::make();
         $replacedRoles = [];
-
 
         foreach ($this->getColumns(__TRAIT__) as $column) {
             if (! $this->dataHasFilepondPayloadKey($fields, $column)) {
@@ -132,7 +131,7 @@ trait FilepondsTrait
     }
 
     /**
-     * @param  array<int|string, mixed>  $rows
+     * @param array<int|string, mixed> $rows
      */
     private function mapFilepondRowsToPreviewModels(Model $object, array $rows, string $role, string $locale, Collection $original): Collection
     {
@@ -196,7 +195,7 @@ trait FilepondsTrait
     /**
      * Same presence rules as {@see afterSaveFilepondsTrait}: allow empty list (cleared field); skip only when absent.
      *
-     * @param  array<string, mixed>  $fields
+     * @param array<string, mixed> $fields
      */
     private function dataHasFilepondPayloadKey(array $fields, string $column): bool
     {

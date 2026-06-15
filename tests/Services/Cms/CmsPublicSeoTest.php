@@ -4,6 +4,7 @@ namespace Unusualify\Modularous\Tests\Services\Cms;
 
 use Illuminate\Http\Request;
 use Modules\Cms\Entities\Page;
+use Modules\Cms\Services\CanonicalUrlResolver;
 use Modules\Cms\Support\CmsPublicSeo;
 use Unusualify\Modularous\Tests\TestCase;
 
@@ -28,7 +29,7 @@ class CmsPublicSeoTest extends TestCase
             'robots_follow' => null,
         ]);
 
-        $canonical = new \Modules\Cms\Services\CanonicalUrlResolver;
+        $canonical = new CanonicalUrlResolver;
         $out = CmsPublicSeo::build($request, $page, $canonical);
 
         $this->assertSame('index, follow', $out['robotsMeta']);
@@ -55,7 +56,7 @@ class CmsPublicSeoTest extends TestCase
             'robots_follow' => true,
         ]);
 
-        $canonical = new \Modules\Cms\Services\CanonicalUrlResolver;
+        $canonical = new CanonicalUrlResolver;
         $out = CmsPublicSeo::build($request, $page, $canonical);
 
         $this->assertSame('https://other.example/path', $out['canonicalUrl']);

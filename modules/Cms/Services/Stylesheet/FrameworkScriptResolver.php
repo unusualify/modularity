@@ -76,7 +76,7 @@ final class FrameworkScriptResolver
     }
 
     /**
-     * @param  array<string, mixed>  $framework  {@code definition.framework}
+     * @param array<string, mixed> $framework {@code definition.framework}
      */
     private function resolveBootstrapBundleJsSrc(array $framework, ?string $version): ?string
     {
@@ -104,7 +104,7 @@ final class FrameworkScriptResolver
     private function isAllowedSrc(string $src): bool
     {
         $src = trim($src);
-        if ($src === '' || strlen($src) > 2048) {
+        if ($src === '' || mb_strlen($src) > 2048) {
             return false;
         }
 

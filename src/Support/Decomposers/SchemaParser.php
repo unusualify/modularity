@@ -111,7 +111,7 @@ class SchemaParser extends Parser
             if (@trait_exists($modelTrait)) {
                 $this->traits[$key] = get_class_short_name($modelTrait);
                 $this->traitNamespaces[$key] = $modelTrait;
-            } else if(@trait_exists("{$this->baseNamespace}\\Entities\\Traits\\{$modelTrait}")) {
+            } elseif (@trait_exists("{$this->baseNamespace}\\Entities\\Traits\\{$modelTrait}")) {
                 $this->traits[$key] = $modelTrait;
                 $this->traitNamespaces[$key] = "{$this->baseNamespace}\\Entities\\Traits\\{$modelTrait}";
             }
@@ -119,11 +119,11 @@ class SchemaParser extends Parser
             $repositoryTrait = '';
             $repositoryTraitNamespace = '';
 
-            if(isset($object['repository'])) {
-                if(@trait_exists($object['repository'])) {
+            if (isset($object['repository'])) {
+                if (@trait_exists($object['repository'])) {
                     $repositoryTrait = get_class_short_name($object['repository']);
                     $repositoryTraitNamespace = $object['repository'];
-                } else if(@trait_exists("{$this->baseNamespace}\\Repositories\\Traits\\{$object['repository']}")) {
+                } elseif (@trait_exists("{$this->baseNamespace}\\Repositories\\Traits\\{$object['repository']}")) {
                     $repositoryTrait = $object['repository'];
                     $repositoryTraitNamespace = "{$this->baseNamespace}\\Repositories\\Traits\\{$object['repository']}";
                 }

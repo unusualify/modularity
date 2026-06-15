@@ -49,7 +49,7 @@ trait ImagesTrait
     /**
      * Preview: merge DB medias with payload; omitted roles / locales keep persisted rows.
      *
-     * @param  array<string, mixed>  $fields
+     * @param array<string, mixed> $fields
      */
     private function getPreviewMedias($object, array $fields): Collection
     {
@@ -217,7 +217,7 @@ trait ImagesTrait
     }
 
     /**
-     * @param  array<int|string, mixed>  $rows
+     * @param array<int|string, mixed> $rows
      */
     private function attachImageSpecsFromRows($object, array $rows, string $role, string $locale): void
     {

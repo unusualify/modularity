@@ -8,7 +8,7 @@ namespace Modules\Cms\Services\Stylesheet;
 final class RootVariablesEmitter
 {
     /**
-     * @param  array<string, string|int|float|null>  $root
+     * @param array<string, string|int|float|null> $root
      */
     public function emit(array $root): string
     {

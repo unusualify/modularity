@@ -323,7 +323,7 @@ if (! function_exists('hydrate_input_extension')) {
                             ],
                         ];
                         if ($targetInputName && $targetPropName) {
-                            $events[] = implode(':', [$eventName, $targetInputName, $targetPropName, $setProp, ...($modelNotation ?  [modelNotation] : [])]);
+                            $events[] = implode(':', [$eventName, $targetInputName, $targetPropName, $setProp, ...($modelNotation ? [modelNotation] : [])]);
                         }
 
                         break;

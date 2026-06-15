@@ -19,6 +19,7 @@ class LayoutBuilderRequest extends Request
     {
         $styleSheetsTable = modularousConfig('tables.cms_style_sheets', 'um_cms_style_sheets');
         $layoutBuildersTable = modularousConfig('tables.cms_layout_builders', 'um_cms_layout_builders');
+
         return [
             'name' => 'required|string|max:255',
             'slug' => [
@@ -36,7 +37,7 @@ class LayoutBuilderRequest extends Request
             'definition' => 'nullable|array',
             'style_sheet_slugs' => 'nullable|array',
             'style_sheet_slugs.*' => 'nullable|string',
-            'style_sheet_id' => 'nullable|integer|exists:'.$styleSheetsTable.',id',
+            'style_sheet_id' => 'nullable|integer|exists:' . $styleSheetsTable . ',id',
         ];
     }
 
@@ -74,7 +75,7 @@ class LayoutBuilderRequest extends Request
                     }
                 }
 
-                if ($maxBytes > 0 && strlen($combined) > $maxBytes) {
+                if ($maxBytes > 0 && mb_strlen($combined) > $maxBytes) {
                     $v->errors()->add('blade_segments', 'Combined Blade segments exceed the configured byte limit.');
                 }
             }

@@ -2,11 +2,13 @@
 
 namespace Modules\Cms\Entities;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Str;
+use Modules\Cms\Entities\Concerns\HasPageLayout;
 use Unusualify\Modularous\Entities\Model;
 
 /**
- * Locale-agnostic public presentation shell attached to exactly one CMS module-route model ({@see \Modules\Cms\Entities\Concerns\HasPageLayout}).
+ * Locale-agnostic public presentation shell attached to exactly one CMS module-route model ({@see HasPageLayout}).
  *
  * URLs / parent prefixes remain {@see ParentSegment}.
  *
@@ -44,9 +46,9 @@ class PageLayout extends Model
     ];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<LayoutBuilder, PageLayout>
+     * @return BelongsTo<LayoutBuilder, PageLayout>
      */
-    public function layoutBuilder() : \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function layoutBuilder(): BelongsTo
     {
         return $this->belongsTo(LayoutBuilder::class);
     }

@@ -17,6 +17,7 @@ class DefaultCountrySeeder extends Seeder
 
         if (! Schema::hasTable($table)) {
             $this->command?->warn("Skipping DefaultCountrySeeder — {$table} does not exist.");
+
             return;
         }
         Schema::disableForeignKeyConstraints();

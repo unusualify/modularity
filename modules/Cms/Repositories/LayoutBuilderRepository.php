@@ -4,6 +4,7 @@ namespace Modules\Cms\Repositories;
 
 use Illuminate\Support\Str;
 use Modules\Cms\Entities\LayoutBuilder;
+use Unusualify\Modularous\Models\Model;
 use Unusualify\Modularous\Repositories\Repository;
 
 class LayoutBuilderRepository extends Repository
@@ -33,7 +34,7 @@ class LayoutBuilderRepository extends Repository
     }
 
     /**
-     * @param  \Unusualify\Modularous\Models\Model  $object
+     * @param Model $object
      */
     public function prepareFieldsBeforeSave($object, $fields)
     {
@@ -84,7 +85,7 @@ class LayoutBuilderRepository extends Repository
     /**
      * Strips incompatible payload when admins flip storage mode mid-request.
      *
-     * @param  array<string, mixed>  $fields
+     * @param array<string, mixed> $fields
      * @return array<string, mixed>
      */
     private function enforceExclusiveStorageFields(array $fields): array
@@ -99,7 +100,7 @@ class LayoutBuilderRepository extends Repository
     }
 
     /**
-     * @param  mixed  $raw
+     * @param mixed $raw
      */
     private function normalizeSegments($raw): array
     {

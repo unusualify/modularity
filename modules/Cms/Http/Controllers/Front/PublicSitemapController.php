@@ -3,10 +3,11 @@
 namespace Modules\Cms\Http\Controllers\Front;
 
 use Illuminate\Http\Response;
+use Modules\Cms\Jobs\RebuildCmsSitemapJob;
 use Modules\Cms\Services\CmsSitemapCacheService;
 
 /**
- * Serves the last **committed** sitemap from cache; rebuild via {@see \Modules\Cms\Jobs\RebuildCmsSitemapJob} or
+ * Serves the last **committed** sitemap from cache; rebuild via {@see RebuildCmsSitemapJob} or
  * `cms:sitemap:rebuild` artisan.
  */
 final class PublicSitemapController

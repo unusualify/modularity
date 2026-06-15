@@ -12,7 +12,6 @@ use Inertia\Inertia;
 use Modules\SystemUser\Http\Requests\CompanyRequest;
 use Modules\SystemUser\Repositories\CompanyRepository;
 use Modules\SystemUser\Repositories\UserRepository;
-use Unusualify\Modularous\Entities\Enums\Permission;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Http\Controllers\Traits\ManageUtilities;
 use Unusualify\Modularous\Services\View\UComponent;

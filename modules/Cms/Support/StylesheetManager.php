@@ -22,7 +22,7 @@ final class StylesheetManager
 {
     /**
      * Full ordered list of stylesheet hrefs: framework CDNs / vendor URLs first, then the compiled custom bundle URL
- * when the sheet produces non-empty custom CSS (empty bundles are not linked).
+     * when the sheet produces non-empty custom CSS (empty bundles are not linked).
      *
      * @return list<string>
      */
@@ -159,8 +159,8 @@ final class StylesheetManager
     }
 
     /**
-     * @param  string|null  $inlineCssFingerprint  Hex SHA-256 of {@see StylesheetCompilationResult::$inlineCss} when non-empty;
-     *                                            appended as a query param for CDN cache busting (see {@code cms_stylesheets.public_route.cache_bust_query}).
+     * @param string|null $inlineCssFingerprint Hex SHA-256 of {@see StylesheetCompilationResult::$inlineCss} when non-empty;
+     *                                          appended as a query param for CDN cache busting (see {@code cms_stylesheets.public_route.cache_bust_query}).
      */
     public static function compiledBundleUrl(StyleSheet $sheet, ?string $inlineCssFingerprint = null): ?string
     {

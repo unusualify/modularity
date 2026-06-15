@@ -33,4 +33,3 @@ class LoginMfaCodeNotification extends Notification
             ->line(Lang::get('If you did not attempt to login, you can ignore this email.'));
     }
 }
-

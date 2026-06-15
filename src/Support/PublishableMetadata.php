@@ -3,10 +3,11 @@
 namespace Unusualify\Modularous\Support;
 
 use Illuminate\Database\Schema\Blueprint;
+use Unusualify\Modularous\Entities\Traits\Publishable;
 
 /**
  * Publishable metadata columns (SEO title/description, canonical, robots, sitemap inclusion) for
- * {@see \Unusualify\Modularous\Entities\Traits\Publishable}.
+ * {@see Publishable}.
  *
  * Repository form inputs: {@see \Unusualify\Modularous\Repositories\Traits\PublishableTrait}.
  */
@@ -49,6 +50,7 @@ final class PublishableMetadata
         $translated = self::normalizeTranslatedFields($translatedFields);
         $translatedPublished = in_array('published', $translated, true);
         $publishedExtraConfig = $translatedPublished ? ['isSecondary' => true] : ['isEvent' => true];
+
         return [
             ['type' => 'switch', 'name' => 'published', 'label' => 'Published', 'trueValue' => true, 'falseValue' => false, ...$publishedExtraConfig, 'translated' => $translatedPublished],
             ['name' => 'publish_start_date', 'label' => 'Publish from', 'type' => 'date', 'isSecondary' => true, 'translated' => in_array('publish_start_date', $translated, true)],

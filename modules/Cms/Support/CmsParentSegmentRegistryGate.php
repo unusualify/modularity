@@ -4,7 +4,9 @@ namespace Modules\Cms\Support;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Schema;
+use Modules\Cms\Entities\Concerns\HasParentSegment;
 use Modules\Cms\Entities\ParentSegment;
+use Modules\Cms\Entities\UrlRoute;
 
 /**
  * Data-driven allow-list for public CMS URLs and sitemap lines: an enabled {@see ParentSegment} row whose
@@ -16,7 +18,7 @@ use Modules\Cms\Entities\ParentSegment;
 final class CmsParentSegmentRegistryGate
 {
     /**
-     * Whether this model class may be served publicly / listed when synced {@see \Modules\Cms\Entities\UrlRoute} rows exist.
+     * Whether this model class may be served publicly / listed when synced {@see UrlRoute} rows exist.
      *
      * @param class-string<Model> $modelClass
      */
@@ -26,7 +28,7 @@ final class CmsParentSegmentRegistryGate
             return false;
         }
 
-        if (! classHasTrait($modelClass, \Modules\Cms\Entities\Concerns\HasParentSegment::class)
+        if (! classHasTrait($modelClass, HasParentSegment::class)
         && ! classHasTrait($modelClass, \Unusualify\Modularous\Entities\Traits\IsSingular::class)) {
             return false;
         }

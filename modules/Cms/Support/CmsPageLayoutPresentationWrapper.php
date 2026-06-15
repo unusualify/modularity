@@ -7,21 +7,23 @@ namespace Modules\Cms\Support;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\View;
 use Modules\Cms\Entities\LayoutBuilder;
-use Modules\Cms\Services\CmsPageLayoutResolver;
 use Modules\Cms\Entities\PageLayout;
+use Modules\Cms\Http\Controllers\Front\CmsController;
+use Modules\Cms\Services\CmsPageLayoutResolver;
+use Unusualify\Modularous\Http\Controllers\Traits\ManagePreview;
 
 /**
  * Wraps submodule {@code *.custom} (or mapped) presentation HTML in a {@see PageLayout} {@see LayoutBladeResolver} shell
- * when a binding exists for the model class — shared by panel preview ({@see \Unusualify\Modularous\Http\Controllers\Traits\ManagePreview})
- * and public CMS ({@see \Modules\Cms\Http\Controllers\Front\CmsController}).
+ * when a binding exists for the model class — shared by panel preview ({@see ManagePreview})
+ * and public CMS ({@see CmsController}).
  */
 final class CmsPageLayoutPresentationWrapper
 {
     /**
      * Full HTML document string, or {@code null} to fall back to rendering {@code $viewName} alone.
      *
-     * @param  array<string, mixed>  $innerData  Passed to the inner view and merged into {@see LayoutBladeResolver} data
-     *                                            (e.g. {@code item}, {@code seoTitle}, …).
+     * @param array<string, mixed> $innerData Passed to the inner view and merged into {@see LayoutBladeResolver} data
+     *                                        (e.g. {@code item}, {@code seoTitle}, …).
      */
     public static function documentOrNull(Model $item, string $viewName, array $innerData): ?string
     {
@@ -138,7 +140,7 @@ final class CmsPageLayoutPresentationWrapper
     /**
      * Prefer {@code module::route.custom} for inner HTML; skip when static page_layout segments own the body slot.
      *
-     * @param  array{module: string, route: string, viewPrefix?: string}|null  $moduleRouteContext
+     * @param array{module: string, route: string, viewPrefix?: string}|null $moduleRouteContext
      */
     private static function innerPresentationViewName(
         string $viewName,
@@ -204,7 +206,7 @@ final class CmsPageLayoutPresentationWrapper
     /**
      * Ensure {@see LayoutBladeResolver} receives a {@code module::route.*} name for filesystem segment resolution.
      *
-     * @param  array{module: string, route: string, viewPrefix?: string}|null  $moduleRouteContext
+     * @param array{module: string, route: string, viewPrefix?: string}|null $moduleRouteContext
      */
     private static function presentationViewNameForContext(string $viewName, ?array $moduleRouteContext): string
     {
@@ -223,7 +225,7 @@ final class CmsPageLayoutPresentationWrapper
     {
         $source = self::normalizePageLayoutBladeSource($pageLayout);
 
-        $layout = new LayoutBuilder();
+        $layout = new LayoutBuilder;
         $layout->blade_source = $source;
         $layout->definition = null;
         $layout->style_sheet_id = null;

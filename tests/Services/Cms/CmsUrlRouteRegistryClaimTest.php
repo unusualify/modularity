@@ -155,8 +155,9 @@ class CmsUrlRouteRegistryClaimTest extends TestCase
         $canonical = app(CanonicalUrlResolverInterface::class);
         $registry = new CmsUrlRouteRegistry($canonical, new CmsParentSegmentResolver($canonical));
 
-        $plain = new class extends Model {
-            /** @inheritdoc */
+        $plain = new class extends Model
+        {
+            /** {@inheritdoc} */
             protected $table = 'stub_plain_sync_all';
         };
 

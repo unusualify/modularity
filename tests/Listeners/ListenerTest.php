@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Notification;
 use Mockery;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Listeners\Listener;
+use Unusualify\Modularous\Module;
 use Unusualify\Modularous\Tests\TestCase;
 
 class ListenerTest extends TestCase
@@ -23,7 +24,7 @@ class ListenerTest extends TestCase
     {
         config(['modularous.mail.enabled' => true]);
 
-        $module = Mockery::mock(\Unusualify\Modularous\Module::class);
+        $module = Mockery::mock(Module::class);
         $module->shouldReceive('getDirectoryPath')
             ->with('Notifications')
             ->andReturn('/path/to/notifications');
@@ -48,7 +49,7 @@ class ListenerTest extends TestCase
     {
         config(['modularous.mail.enabled' => false]);
 
-        $module = Mockery::mock(\Unusualify\Modularous\Module::class);
+        $module = Mockery::mock(Module::class);
         $module->shouldReceive('getDirectoryPath')
             ->with('Notifications')
             ->andReturn('/path/to/notifications');
@@ -73,7 +74,7 @@ class ListenerTest extends TestCase
     {
         config(['modularous.mail.enabled' => false]);
 
-        $module = Mockery::mock(\Unusualify\Modularous\Module::class);
+        $module = Mockery::mock(Module::class);
         $module->shouldReceive('getDirectoryPath')
             ->with('Notifications')
             ->andReturn('/initial/path');
@@ -100,7 +101,7 @@ class ListenerTest extends TestCase
     {
         config(['modularous.mail.enabled' => false]);
 
-        $module = Mockery::mock(\Unusualify\Modularous\Module::class);
+        $module = Mockery::mock(Module::class);
         $module->shouldReceive('getDirectoryPath')
             ->with('Notifications')
             ->andReturn('/initial/path');
@@ -128,7 +129,7 @@ class ListenerTest extends TestCase
     {
         config(['modularous.mail.enabled' => false]);
 
-        $module = Mockery::mock(\Unusualify\Modularous\Module::class);
+        $module = Mockery::mock(Module::class);
         $module->shouldReceive('getDirectoryPath')
             ->with('Notifications')
             ->andReturn('/non/existent/path');
@@ -152,7 +153,7 @@ class ListenerTest extends TestCase
     {
         config(['modularous.mail.enabled' => false]);
 
-        $module = Mockery::mock(\Unusualify\Modularous\Module::class);
+        $module = Mockery::mock(Module::class);
         $module->shouldReceive('getDirectoryPath')
             ->with('Notifications')
             ->andReturn('/path/to/notifications');
@@ -182,7 +183,7 @@ class ListenerTest extends TestCase
     {
         config(['modularous.mail.enabled' => true]);
 
-        $module = Mockery::mock(\Unusualify\Modularous\Module::class);
+        $module = Mockery::mock(Module::class);
         $module->shouldReceive('getDirectoryPath')
             ->with('Notifications')
             ->andReturn('/non/existent/path');

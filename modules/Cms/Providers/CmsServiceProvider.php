@@ -5,9 +5,9 @@ namespace Modules\Cms\Providers;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 use Modules\Cms\Console\PublishLayoutBuilderBladeCommand;
 use Modules\Cms\Console\RebuildCmsSitemapCommand;
-use Modules\Cms\Observers\ParentSegmentUrlRouteObserver;
 use Modules\Cms\Contracts\CanonicalUrlResolverInterface;
 use Modules\Cms\Contracts\CmsLocalizationContract;
 use Modules\Cms\Contracts\CmsLocalizationOverrideProviderInterface;
@@ -22,14 +22,15 @@ use Modules\Cms\Http\Controllers\Front\PublicSitemapController;
 use Modules\Cms\Http\Controllers\Front\RobotsTxtController;
 use Modules\Cms\Http\Controllers\PublicStyleSheetAssetController;
 use Modules\Cms\Http\Middleware\CanonicalLocaleMiddleware;
-use Modules\Cms\Http\Middleware\LayoutBuilderMiddleware;
 use Modules\Cms\Http\Middleware\FallbackLocaleSluglessCanonicalMiddleware;
+use Modules\Cms\Http\Middleware\LayoutBuilderMiddleware;
 use Modules\Cms\Http\Middleware\VisitorRedirectMiddleware;
 use Modules\Cms\Jobs\ScanCmsPublishWindowBoundariesJob;
 use Modules\Cms\Localization\DelegatingCmsLocalizationAdapter;
 use Modules\Cms\Localization\McamaraCmsLocalizationAdapter;
 use Modules\Cms\Localization\NullCmsLocalizationOverrideProvider;
 use Modules\Cms\Localization\TranslatableCmsLocalizationAdapter;
+use Modules\Cms\Observers\ParentSegmentUrlRouteObserver;
 use Modules\Cms\Routing\CmsFrontRouteRegistrar;
 use Modules\Cms\Services\CanonicalUrlResolver;
 use Modules\Cms\Services\CmsAdminWarnings;
@@ -78,7 +79,7 @@ class CmsServiceProvider extends ServiceProvider
             $inner = match (true) {
                 $driver === 'mcamara' => new McamaraCmsLocalizationAdapter($canonical),
                 $driver === 'translatable' => new TranslatableCmsLocalizationAdapter($canonical),
-                $driver === 'auto' && class_exists(\Mcamara\LaravelLocalization\Facades\LaravelLocalization::class) => new McamaraCmsLocalizationAdapter($canonical),
+                $driver === 'auto' && class_exists(LaravelLocalization::class) => new McamaraCmsLocalizationAdapter($canonical),
                 default => new TranslatableCmsLocalizationAdapter($canonical),
             };
 

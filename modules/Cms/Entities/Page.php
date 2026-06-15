@@ -94,7 +94,7 @@ class Page extends Model
     // }
 
     /**
-     * Base {@see \Unusualify\Modularous\Entities\Model} maps null publish_start to "now"; CMS pages use null to clear the schedule.
+     * Base {@see Model} maps null publish_start to "now"; CMS pages use null to clear the schedule.
      */
     public function setPublishStartDateAttribute(mixed $value): void
     {

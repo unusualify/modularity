@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Str;
+use Unusualify\Modularous\Entities\Traits\HasTranslatableMetadata;
 use Unusualify\Modularous\Support\PublishableMetadata;
 use Unusualify\Modularous\Support\TranslatableMetadata;
 
@@ -263,7 +264,7 @@ if (! function_exists('createTranslatableMetadataFields')) {
     /**
      * Translatable metadata (SEO, canonical, robots, sitemap flag) columns for {@code *_translations} tables.
      *
-     * Mirrors {@see TranslatableMetadata::TRANSLATED_ATTRIBUTES}; use with {@see \Unusualify\Modularous\Entities\Traits\HasTranslatableMetadata}.
+     * Mirrors {@see TranslatableMetadata::TRANSLATED_ATTRIBUTES}; use with {@see HasTranslatableMetadata}.
      *
      * @param bool $withSitemapInclude When false, omits sitemap_include (not recommended for new modules).
      */

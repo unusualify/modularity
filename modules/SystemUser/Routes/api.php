@@ -14,5 +14,4 @@ use Unusualify\Modularous\Facades\ModularousRoutes;
 |
 */
 
-Route::middleware(['api.auth', ...ModularousRoutes::defaultMiddlewares()])->group(function () {
-});
+Route::middleware(['api.auth', ...ModularousRoutes::defaultMiddlewares()])->group(function () {});

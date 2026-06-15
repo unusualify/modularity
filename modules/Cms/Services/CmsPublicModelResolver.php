@@ -10,12 +10,14 @@ use Illuminate\Support\Str;
 use Modules\Cms\Contracts\CanonicalUrlResolverInterface;
 use Modules\Cms\Contracts\CmsLocalizationContract;
 use Modules\Cms\Entities\UrlRoute;
+use Modules\Cms\Http\Controllers\Front\CmsController;
+use Modules\Cms\Http\Controllers\Front\CmsPublicFrontController;
 use Modules\Cms\Support\CmsParentSegmentRegistryGate;
 use Modules\Cms\Support\CmsSluglessFallbackLocale;
 
 /**
  * Resolves a published CMS entity for the public front using {@see UrlRoute} rows.
- * Per–submodule {@see \Modules\Cms\Http\Controllers\Front\CmsController} fixes a {@code $modelClass}; the universal
+ * Per–submodule {@see CmsController} fixes a {@code $modelClass}; the universal
  * front uses {@see resolveForParentSegmentRegistry()}.
  */
 final class CmsPublicModelResolver
@@ -28,9 +30,9 @@ final class CmsPublicModelResolver
 
     /**
      * Resolves a published model of any class that appears in {@see UrlRoute} and passes
-     * {@see \Modules\Cms\Support\CmsParentSegmentRegistryGate} ({@code ParentSegment} row + {@link HasParentSegment}
+     * {@see CmsParentSegmentRegistryGate} ({@code ParentSegment} row + {@link HasParentSegment}
      * or {@link \Unusualify\Modularous\Entities\Traits\IsSingular}). Singleton entities still use the concrete class as
-     * {@code urlable_type} while rows live on the singletons table. Powers {@see \Modules\Cms\Http\Controllers\Front\CmsPublicFrontController}.
+     * {@code urlable_type} while rows live on the singletons table. Powers {@see CmsPublicFrontController}.
      */
     public function resolveForParentSegmentRegistry(Request $request, ?string $urlRouteKind = null): ?Model
     {

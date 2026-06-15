@@ -1,8 +1,13 @@
 <?php
 
+use Modules\Cms\Entities\Sitemap;
+use Modules\Cms\Http\Controllers\SitemapToolController;
+use Modules\Cms\Services\CmsSitemapBuildService;
+use Modules\Cms\Services\CmsSitemapCacheService;
+
 return [
     /**
-     * GET /sitemap.xml serves committed XML from cache ({@see \Modules\Cms\Services\CmsSitemapCacheService}).
+     * GET /sitemap.xml serves committed XML from cache ({@see CmsSitemapCacheService}).
      */
     'route_enabled' => env('MODULAROUS_CMS_SITEMAP_ROUTE_ENABLED', true),
 
@@ -18,13 +23,13 @@ return [
     'build_on_cache_miss' => env('MODULAROUS_CMS_SITEMAP_BUILD_ON_MISS', false),
 
     /**
-     * Default {@see \Modules\Cms\Entities\Sitemap} row (migration seeds id = 1, slug = default).
+     * Default {@see Sitemap} row (migration seeds id = 1, slug = default).
      */
     'default_sitemap_id' => (int) env('MODULAROUS_CMS_SITEMAP_DEFAULT_ID', 1),
 
     /**
      * Default XML sitemap `changefreq` / `priority` when no per-model row in `cms_sitemapables`.
-     * {@see \Modules\Cms\Services\CmsSitemapBuildService}
+     * {@see CmsSitemapBuildService}
      */
     'defaults' => [
         'changefreq' => env('MODULAROUS_CMS_SITEMAP_DEFAULT_CHANGEFREQ', 'weekly'),
@@ -40,7 +45,7 @@ return [
     ],
 
     /**
-     * Panel tool ({@see \Modules\Cms\Http\Controllers\SitemapToolController}): step-up ability for **commit** (dry-run is read-only).
+     * Panel tool ({@see SitemapToolController}): step-up ability for **commit** (dry-run is read-only).
      */
     'panel' => [
         'step_up_ability' => [

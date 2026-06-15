@@ -27,7 +27,7 @@ trait SlugsTrait
     }
 
     /**
-     * @param  array<string, mixed>  $fields  Raw request fields (before {@see prepareFieldsBeforeSave} transforms).
+     * @param array<string, mixed> $fields Raw request fields (before {@see prepareFieldsBeforeSave} transforms).
      */
     protected function shouldSkipAutomaticSlugSyncOnSave(Model $object, array $fields): bool
     {
@@ -52,9 +52,6 @@ trait SlugsTrait
         return true;
     }
 
-    /**
-     * @param  mixed  $slugByLocale
-     */
     protected function requestArrayContainsEditorSlugPayload(mixed $slugByLocale): bool
     {
         if (! is_array($slugByLocale)) {
@@ -158,8 +155,6 @@ trait SlugsTrait
 
     /**
      * Used when merging alternate request shapes into `$fields['slugs']` (slug text must be non-empty).
-     *
-     * @param mixed $payload
      */
     protected function slugInputPayloadIsPresent(mixed $payload): bool
     {

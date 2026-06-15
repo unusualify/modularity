@@ -12,4 +12,3 @@ class CapabilityRouteRepository extends Repository
         $this->model = $model;
     }
 }
-

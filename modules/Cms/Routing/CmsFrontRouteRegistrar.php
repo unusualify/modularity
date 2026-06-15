@@ -5,10 +5,16 @@ namespace Modules\Cms\Routing;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
+use Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRoutes;
+use Modules\Cms\Entities\Concerns\HasParentSegment;
 use Modules\Cms\Entities\ParentSegment;
+use Modules\Cms\Entities\UrlRoute;
+use Modules\Cms\Http\Controllers\CmsSignedPublicPreviewController;
 use Modules\Cms\Http\Controllers\Front\CmsController;
 use Modules\Cms\Http\Controllers\Front\CmsPublicFrontController;
-use Modules\Cms\Entities\Concerns\HasParentSegment;
+use Modules\Cms\Providers\CmsRouteServiceProvider;
+use Modules\Cms\Services\CmsPublicModelResolver;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Module;
 
@@ -25,11 +31,11 @@ use Unusualify\Modularous\Module;
  * Here we register GET catch-all(s); with {@see CmsFrontRouteLocalizationBinding} the route may use a real
  * locale segment plus path. The `{path}` wildcard intentionally **does not** match {@see modularousConfig('cms_routing.signed_preview.path_prefix')}
  * (and optional {@see modularousConfig('cms_routing.public_front_catch_all_exclude_path_prefixes')}) so signed preview URLs resolve to
- * {@see \Modules\Cms\Http\Controllers\CmsSignedPublicPreviewController} instead of being eaten by the CMS page resolver. Resolution runs in {@see \Modules\Cms\Services\CmsPublicModelResolver} against
- * {@see \Modules\Cms\Entities\UrlRoute} (per-locale normalized_path) and optional {@see \Modules\Cms\Entities\ParentSegment}
+ * {@see CmsSignedPublicPreviewController} instead of being eaten by the CMS page resolver. Resolution runs in {@see CmsPublicModelResolver} against
+ * {@see UrlRoute} (per-locale normalized_path) and optional {@see ParentSegment}
  * prefixes. Translated segments and slug binding live in the CMS data model, not duplicated Route definitions or lang route files.
  *
- * Auto-registration: {@see registerAutoForQualifiedModules()} — {@see \Modules\Cms\Providers\CmsRouteServiceProvider}.
+ * Auto-registration: {@see registerAutoForQualifiedModules()} — {@see CmsRouteServiceProvider}.
  * Legacy macro: {@see Route::cmsPublicFrontRoutes()} — inner group only; wrap with {@code Route::prefix(...)} if needed.
  *
  * When {@see modularousConfig('cms_routing.universal_cms_public_front')} is true and the {@link ParentSegment} table
@@ -377,7 +383,7 @@ final class CmsFrontRouteRegistrar
         return array_values(array_filter([
             'web',
             $useFallbackSluglessCanonicalMiddleware ? 'modules.cms.fallback.slugless.canonical' : null,
-            $useMcamaraRoutesMiddleware ? \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRoutes::class : null,
+            $useMcamaraRoutesMiddleware ? LaravelLocalizationRoutes::class : null,
             $useCanonicalLocaleMiddleware ? 'modules.cms.canonical.locale' : null,
             $useVisitorRedirect ? 'modules.cms.visitor.redirect' : null,
         ]));
@@ -385,7 +391,7 @@ final class CmsFrontRouteRegistrar
 
     private static function shouldAppendMcamaraRoutesMiddleware(): bool
     {
-        if (! class_exists(\Mcamara\LaravelLocalization\Facades\LaravelLocalization::class)) {
+        if (! class_exists(LaravelLocalization::class)) {
             return false;
         }
 

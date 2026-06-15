@@ -83,7 +83,6 @@ class SetupModularousDevelopmentCommand extends BaseCommand
             $this->laravel['files']->makeDirectory($packagesFolder);
         }
 
-
         if ($this->laravel['files']->isDirectory(base_path('packages/' . $folderName))) {
             $this->alert("Repository cannot be cloned! '" . base_path('packages/modularous') . "' folder already exists.");
 
@@ -103,6 +102,7 @@ class SetupModularousDevelopmentCommand extends BaseCommand
 
         if ($result->failed()) {
             $this->alert("Repository couldn't be cloned! Try Later again.");
+
             return 0;
         }
 

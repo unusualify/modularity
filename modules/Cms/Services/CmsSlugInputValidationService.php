@@ -2,16 +2,17 @@
 
 namespace Modules\Cms\Services;
 
+use Modules\Cms\Contracts\PublicUrlRegistryContract;
 use Modules\Cms\Entities\UrlRoute;
-use Unusualify\Modularous\Entities\Traits\HasParentSegment;
 use Modules\Cms\Services\Concerns\ExtendsSlugValidationWithPublicUrlRegistry;
+use Unusualify\Modularous\Entities\Traits\HasParentSegment;
 use Unusualify\Modularous\Services\SlugInputValidationService;
 
 /**
- * CMS slug validation: core uniqueness + {@see \Modules\Cms\Contracts\PublicUrlRegistryContract} (path collision + nested path hints).
+ * CMS slug validation: core uniqueness + {@see PublicUrlRegistryContract} (path collision + nested path hints).
  *
  * Other modules: extend {@see SlugInputValidationService} and use {@see ExtendsSlugValidationWithPublicUrlRegistry},
- * binding their own {@see \Modules\Cms\Contracts\PublicUrlRegistryContract} implementation.
+ * binding their own {@see PublicUrlRegistryContract} implementation.
  */
 class CmsSlugInputValidationService extends SlugInputValidationService
 {

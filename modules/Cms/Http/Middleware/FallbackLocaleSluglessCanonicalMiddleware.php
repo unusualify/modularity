@@ -5,15 +5,17 @@ namespace Modules\Cms\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Modules\Cms\Contracts\CanonicalUrlResolverInterface;
+use Modules\Cms\Entities\UrlRoute;
+use Modules\Cms\Routing\CmsFrontRouteRegistrar;
 use Modules\Cms\Services\CmsVisitorRedirectResolver;
 use Modules\Cms\Support\CmsSluglessFallbackLocale;
 
 /**
  * When {@see CmsSluglessFallbackLocale::enabled()}, redirects {@code GET /{sluglessLocale}/{rest}} to {@code GET /{rest}}
- * whenever {@see \Modules\Cms\Entities\UrlRoute} already serves {@code PAGE_PUBLIC} for that locale + inner path.
+ * whenever {@see UrlRoute} already serves {@code PAGE_PUBLIC} for that locale + inner path.
  *
- * @see \Modules\Cms\Support\CmsSluglessFallbackLocale
- * @see \Modules\Cms\Routing\CmsFrontRouteRegistrar::resolveMiddlewareStack
+ * @see CmsSluglessFallbackLocale
+ * @see CmsFrontRouteRegistrar::resolveMiddlewareStack
  */
 final class FallbackLocaleSluglessCanonicalMiddleware
 {

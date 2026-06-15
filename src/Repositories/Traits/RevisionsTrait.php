@@ -6,8 +6,9 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 use Unusualify\Modularous\Entities\Enums\RevisionStatus;
-use Unusualify\Modularous\Facades\ValidationException;
 use Unusualify\Modularous\Facades\Modularous;
+use Unusualify\Modularous\Facades\ValidationException;
+use Unusualify\Modularous\Models\Model;
 
 trait RevisionsTrait
 {
@@ -93,7 +94,7 @@ trait RevisionsTrait
     }
 
     /**
-     * @param \Unusualify\Modularous\Models\Model $object
+     * @param Model $object
      * @return array
      */
     public function getFormFieldsRevisionsTrait($object, $fields, $schema = [])
@@ -219,7 +220,7 @@ trait RevisionsTrait
     /**
      * Workflow on + user lacks {@code *_revision_approve}: restore only queues a pending snapshot (subject row unchanged), like a normal edit.
      *
-     * @param \Unusualify\Modularous\Models\Model $object
+     * @param Model $object
      */
     protected function shouldRestoreAsPendingOnly($object): bool
     {
@@ -237,7 +238,7 @@ trait RevisionsTrait
     /**
      * Record a proposed restore as the latest pending revision without persisting payload to the subject.
      *
-     * @param \Unusualify\Modularous\Models\Model $object
+     * @param Model $object
      */
     protected function restoreRevisionAsPendingOnly($object, array $fields, int $sourceRevisionId): mixed
     {
@@ -317,7 +318,7 @@ trait RevisionsTrait
     }
 
     /**
-     * @param  array<string, mixed>  $attributes
+     * @param array<string, mixed> $attributes
      */
     protected function applyApprovedRevisionAttributes(array &$attributes, $userId): void
     {
@@ -477,7 +478,7 @@ trait RevisionsTrait
     }
 
     /**
-     * @param \Unusualify\Modularous\Models\Model $object
+     * @param Model $object
      * @return bool false when merged payload matches last approved (nothing new to queue)
      */
     protected function processPendingRevisionSubmission($object, array $fields): bool
@@ -566,7 +567,7 @@ trait RevisionsTrait
     }
 
     /**
-     * @param \Unusualify\Modularous\Models\Model $object
+     * @param Model $object
      */
     protected function revisionTableHasStatusColumn($object): bool
     {
@@ -579,7 +580,7 @@ trait RevisionsTrait
     /**
      * Payload merged from the latest approved (or legacy unmarked) revision.
      *
-     * @param \Unusualify\Modularous\Models\Model $object
+     * @param Model $object
      * @return array<string, mixed>
      */
     public function getLastApprovedRevisionPayload($object): array

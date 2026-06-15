@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use PragmaRX\Google2FA\Google2FA;
 use Unusualify\Modularous\Entities\User;
+use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Notifications\StepUpCodeNotification;
 use Unusualify\Modularous\Services\MessageStage;
 
@@ -83,7 +84,6 @@ class StepUpService
 
         $resolvedUser = User::find($user->getAuthIdentifier());
         abort_unless($resolvedUser instanceof User, 403);
-
 
         $this->storePendingRequest($request, $capability);
         $this->createChallenge($request, $resolvedUser, $capability);
@@ -161,7 +161,7 @@ class StepUpService
 
         return response()->view(modularousBaseKey() . '::auth.step-up-replay', [
             'pendingRequest' => $pending,
-            'pageTitle' => __('Continuing your action') . ' | ' . \Unusualify\Modularous\Facades\Modularous::pageTitle(),
+            'pageTitle' => __('Continuing your action') . ' | ' . Modularous::pageTitle(),
             'otpField' => $this->otpField(),
         ]);
     }
@@ -242,7 +242,7 @@ class StepUpService
         $length = max(4, min(10, $this->codeLength()));
         $max = (10 ** $length) - 1;
 
-        return str_pad((string) random_int(0, $max), $length, '0', STR_PAD_LEFT);
+        return mb_str_pad((string) random_int(0, $max), $length, '0', STR_PAD_LEFT);
     }
 
     private function createChallenge(Request $request, User $user, ?string $capability = null): void
@@ -280,7 +280,7 @@ class StepUpService
         $request->session()->put($this->pendingRequestSessionKey(), [
             'url' => $request->url(),
             'full_url' => $request->fullUrl(),
-            'method' => strtoupper($request->method()),
+            'method' => mb_strtoupper($request->method()),
             'payload' => collect($request->request->all())
                 ->except(['_token', '_method'])
                 ->toArray(),

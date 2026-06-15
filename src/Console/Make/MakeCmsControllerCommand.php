@@ -4,13 +4,14 @@ namespace Unusualify\Modularous\Console\Make;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
+use Modules\Cms\Http\Controllers\Front\CmsController;
 use Nwidart\Modules\Exceptions\FileAlreadyExistException;
 use Nwidart\Modules\Generators\FileGenerator;
 use Nwidart\Modules\Support\Stub;
 use Unusualify\Modularous\Facades\Modularous;
 
 /**
- * Scaffolds an invokable CMS public controller extending {@see \Modules\Cms\Http\Controllers\Front\CmsController}.
+ * Scaffolds an invokable CMS public controller extending {@see CmsController}.
  *
  * Intended for use when adding CMS submodules / routes and for future {@code HasCms}-style integration.
  */
@@ -29,7 +30,7 @@ class MakeCmsControllerCommand extends Command
 
     public function handle(): int
     {
-        if (!modularousConfig('cms_features.enabled')) {
+        if (! modularousConfig('cms_features.enabled')) {
             $this->error('CMS features are not enabled.');
 
             return self::FAILURE;

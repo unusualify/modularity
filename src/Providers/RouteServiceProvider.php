@@ -13,7 +13,6 @@ use Unusualify\Modularous\Facades\HostRoutingRegistrar;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Facades\ModularousRoutes;
 use Unusualify\Modularous\Http\Controllers\GlideController;
-use Unusualify\Modularous\Module;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -168,7 +167,6 @@ class RouteServiceProvider extends ServiceProvider
         $apiGroupOptions = ModularousRoutes::getApiGroupOptions();
         $apiController_namespace = GenerateConfigReader::read('controller')->getNamespace();
         $api_controller_namespace = $apiController_namespace . '\\API';
-
 
         if (modularousConfig('define_panel_routes_on_frontend_requests') || Modularous::isPanelUrl()) {
             foreach (Modularous::allEnabled() as $module) {

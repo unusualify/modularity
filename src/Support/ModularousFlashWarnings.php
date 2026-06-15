@@ -15,7 +15,7 @@ final class ModularousFlashWarnings
     public const SESSION_KEY = 'modularous.flash_warnings';
 
     /**
-     * @param  list<string>|string  $messages
+     * @param list<string>|string $messages
      */
     public static function merge(array|string $messages): void
     {
@@ -31,7 +31,7 @@ final class ModularousFlashWarnings
     }
 
     /**
-     * @param  mixed  $messages
+     * @param mixed $messages
      * @return list<string>
      */
     private static function normalizeIncoming(array|string $messages): array

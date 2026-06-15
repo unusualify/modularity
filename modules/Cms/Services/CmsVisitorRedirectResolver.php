@@ -8,9 +8,10 @@ use Illuminate\Support\Facades\Schema;
 use Modules\Cms\Contracts\CanonicalUrlResolverInterface;
 use Modules\Cms\Contracts\CmsLocalizationContract;
 use Modules\Cms\Entities\Redirect;
-use Modules\Cms\Support\CmsSluglessFallbackLocale;
 use Modules\Cms\Entities\UrlRoute;
+use Modules\Cms\Routing\CmsFrontRouteLocalizationBinding;
 use Modules\Cms\Support\CmsFrontPath;
+use Modules\Cms\Support\CmsSluglessFallbackLocale;
 use Unusualify\Modularous\Facades\Modularous;
 
 /**
@@ -96,9 +97,9 @@ final class CmsVisitorRedirectResolver
      * Resolves locale + registry path for public CMS URLs.
      *
      * When the matched route uses a dedicated locale route parameter plus a wildcard path (see
-     * {@see \Modules\Cms\Routing\CmsFrontRouteLocalizationBinding}), the path parameter is the full remainder after
+     * {@see CmsFrontRouteLocalizationBinding}), the path parameter is the full remainder after
      * the locale — including ParentSegment prefixes and the slug, aligned with mcamara-style translated URL segments
-     * but driven by {@see \Modules\Cms\Entities\UrlRoute} and {@see \Modules\Cms\Services\CmsParentSegmentResolver}
+     * but driven by {@see UrlRoute} and {@see CmsParentSegmentResolver}
      * instead of static lang route files.
      *
      * @return array{0: string, 1: string, 2: bool} [locale, normalized inner path for UrlRoute / from_path match, had explicit locale segment]
@@ -152,8 +153,8 @@ final class CmsVisitorRedirectResolver
 
     /**
      * @param bool $innerHadExplicitLocale From {@see resolveLocaleAndInnerPath} — {@code false} means no {@code /{locale}/}
-     *        prefix; then only an {@see UrlRoute} for the implicit editorial locale counts as an active page (consistent
-     *        with {@see \Modules\Cms\Services\CmsPublicModelResolver}).
+     *                                     prefix; then only an {@see UrlRoute} for the implicit editorial locale counts as an active page (consistent
+     *                                     with {@see CmsPublicModelResolver}).
      */
     public function isActivePagePath(string $locale, string $pathKey, bool $innerHadExplicitLocale): bool
     {

@@ -19,8 +19,8 @@ trait TableRows
     protected function getTableRowActions()
     {
         $tableActions = [];
-        
-        if($this->module) {
+
+        if ($this->module) {
             $noDefaultTableRowActions = $this->getConfigFieldsByRoute('no_default_table_row_actions', false);
 
             if (! $noDefaultTableRowActions) {
@@ -65,11 +65,11 @@ trait TableRows
                         //  admin.crm.template/system/system-payments/pay/{price}
                         ...(method_exists($model, 'getTableRowPropsForPayment')
                             ? $model->getTableRowPropsForPayment() : []),
-    
+
                     ];
                     // dd($actions);
                 }
-    
+
                 // duplicate action
                 if ($this->getIndexOption('duplicate')) {
                     $tableActions[] = [
@@ -78,7 +78,7 @@ trait TableRows
                         'color' => 'primary darken-2',
                     ];
                 }
-    
+
                 // edit action
                 if ($this->getIndexOption('edit')) {
                     $tableActions[] = [
@@ -88,7 +88,7 @@ trait TableRows
                         // 'color' => 'green darken-2',
                     ];
                 }
-    
+
                 // delete action
                 if ($this->getIndexOption('delete')) {
                     $tableActions[] = [
@@ -99,7 +99,7 @@ trait TableRows
                         'color' => 'error',
                     ];
                 }
-    
+
                 // restore action
                 if ($this->getIndexOption('restore')) {
                     $tableActions[] = [
@@ -110,7 +110,7 @@ trait TableRows
                         'color' => 'green',
                     ];
                 }
-    
+
                 // force delete action
                 if ($this->getIndexOption('forceDelete')) {
                     $tableActions[] = [
@@ -121,7 +121,7 @@ trait TableRows
                         'color' => 'red',
                     ];
                 }
-    
+
                 // show action
                 if ($this->getIndexOption('show')) {
                     $tableActions[] = [
@@ -141,7 +141,7 @@ trait TableRows
                         'fullscreen' => true,
                     ];
                 }
-    
+
                 // activity action
                 if ($this->getIndexOption('activity')) {
                     $tableActions[] = [
@@ -169,13 +169,13 @@ trait TableRows
                     ];
                 }
             }
-    
+
             $tableNavigationActions = Modularous::find($this->moduleName)->getNavigationActions($this->routeName);
             $tableActionsCollection = collect($tableActions);
-    
+
             foreach ($tableNavigationActions as $key => $navigationAction) {
                 $mergeable = isset($navigationAction['merge']) ? (bool) $navigationAction['merge'] : false;
-    
+
                 if (isset($navigationAction['name']) && $mergeable) {
                     $isFound = false;
                     $tableActionsCollection = $tableActionsCollection->reduce(function ($acc, $action) use ($navigationAction, &$isFound) {
@@ -185,47 +185,47 @@ trait TableRows
                         } else {
                             $acc->push($action);
                         }
-    
+
                         return $acc;
                     }, collect([]));
-    
+
                     if ($isFound) {
                         unset($tableNavigationActions[$key]);
                     }
                 }
             }
-    
+
             $tableActions = $tableActionsCollection->toArray();
-    
+
             // navigation actions
             $tableActions = array_merge(
                 $tableActions,
                 $tableNavigationActions
             );
-    
+
             $tableActions = Collection::make($tableActions)->reduce(function ($acc, $action, $key) {
                 $noSuperAdmin = $action['noSuperAdmin'] ?? false;
-    
+
                 // $action['is'] = true;
                 // if(isset($action['connector'])){
                 //     $connector = new Connector($action['connector']);
-    
+
                 //     $connector->run($action, 'is');
                 // }
                 // if(!$action['is']){
                 //     return $acc;
                 // }
-    
+
                 $isAllowed = $this->isAllowedItem(
                     $action,
                     searchKey: 'allowedRoles',
                     orClosure: fn ($item) => ! $noSuperAdmin && $this->user->isSuperAdmin(),
                 );
-    
+
                 if (! $isAllowed) {
                     return $acc;
                 }
-    
+
                 if (isset($action['formDraft'])) {
                     $formDraft = $action['formDraft'];
                     if ($formDraft === 'company') {
@@ -235,23 +235,23 @@ trait TableRows
                     }
                     $action['form']['attributes']['schema'] = $this->createFormSchema(getFormDraft($formDraft));
                 }
-    
+
                 if (isset($action['href'])) {
                     $action['href'] = resolve_route($action['href']);
                 }
-    
+
                 if (isset($action['endpoint'])) {
                     $action['endpoint'] = resolve_route($action['endpoint']);
                 }
-    
+
                 if (isset($action['url'])) {
                     $action['url'] = resolve_route($action['url']);
                 }
-    
+
                 if (isset($action['form']) && isset($action['form']['attributes']) && isset($action['form']['attributes']['actionUrl'])) {
                     $action['form']['attributes']['actionUrl'] = resolve_route($action['form']['attributes']['actionUrl']);
                 }
-    
+
                 if (isset($action['responsive'])) {
                     $action = $this->applyResponsiveClasses(
                         item: $action,
@@ -260,12 +260,12 @@ trait TableRows
                         classNotation: 'class'
                     );
                 }
-    
+
                 $acc[] = $action;
-    
+
                 return $acc;
             }, []);
-    
+
             // dropdown actions
             if (count($tableActions) > 3) {
                 $this->tableAttributes['rowActionsType'] = 'dropdown';

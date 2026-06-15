@@ -4,6 +4,10 @@ namespace Unusualify\Modularous\Hydrates\Inputs;
 
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
+use Modules\Cms\Repositories\Traits\CMRTrait;
+use Modules\Cms\Repositories\Traits\ParentSegmentTrait;
+use Modules\Cms\Services\CmsParentSegmentResolver;
+use Unusualify\Modularous\Entities\Traits\IsCmr;
 use Unusualify\Modularous\Facades\Modularous;
 
 class SlugHydrate extends InputHydrate
@@ -61,16 +65,16 @@ class SlugHydrate extends InputHydrate
     }
 
     /**
-     * When the submodule repository uses {@see \Modules\Cms\Repositories\Traits\ParentSegmentTrait}
-     * (via {@see \Modules\Cms\Repositories\Traits\CMRTrait}), or the route model uses
-     * {@see HasParentSegment} / {@see \Unusualify\Modularous\Entities\Traits\IsCmr}, pass locale → normalized prefix map for the slug field prefix.
+     * When the submodule repository uses {@see ParentSegmentTrait}
+     * (via {@see CMRTrait}), or the route model uses
+     * {@see HasParentSegment} / {@see IsCmr}, pass locale → normalized prefix map for the slug field prefix.
      *
      * @param array<string, mixed> $input
      * @return array<string, mixed>
      */
     protected function appendParentSegmentPrefixSchema(array $input): array
     {
-        if (! class_exists(\Modules\Cms\Services\CmsParentSegmentResolver::class)) {
+        if (! class_exists(CmsParentSegmentResolver::class)) {
             return $input;
         }
 
@@ -89,7 +93,7 @@ class SlugHydrate extends InputHydrate
             return $input;
         }
 
-        $resolver = App::make(\Modules\Cms\Services\CmsParentSegmentResolver::class);
+        $resolver = App::make(CmsParentSegmentResolver::class);
         if (! $resolver->enabled() || ! $resolver->tablesReady()) {
             return $input;
         }
@@ -123,7 +127,6 @@ class SlugHydrate extends InputHydrate
         } catch (\Throwable) {
             $repoClass = null;
         }
-
 
         if (is_string($repoClass) && $repoClass !== '' && class_exists($repoClass)) {
             $repo = App::make($repoClass);
