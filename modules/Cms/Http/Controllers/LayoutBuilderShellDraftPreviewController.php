@@ -44,11 +44,13 @@ final class LayoutBuilderShellDraftPreviewController
     private function layoutBuilderDraft(Request $request): Response
     {
         /** @var array<string, mixed> $validated */
+        $layoutBuildersTable = modularousConfig('tables.cms_layout_builders', 'um_cms_layout_builders');
+        $styleSheetsTable = modularousConfig('tables.cms_style_sheets', 'um_cms_style_sheets');
         $validated = $request->validate([
             'draft' => 'required|in:layout_builder',
             'layout_builder_id' => [
                 'nullable',
-                Rule::exists('layout_builders', 'id'),
+                Rule::exists($layoutBuildersTable, 'id'),
             ],
             'blade_segments' => 'nullable|array',
             'blade_segments.head' => 'nullable|string',
@@ -56,7 +58,7 @@ final class LayoutBuilderShellDraftPreviewController
             'blade_segments.footer' => 'nullable|string',
             'blade_source' => 'nullable|string|in:db,filesystem',
             'blade_view_name' => 'nullable|string|max:512',
-            'style_sheet_id' => 'nullable|integer|exists:style_sheets,id',
+            'style_sheet_id' => 'nullable|integer|exists:'.$styleSheetsTable.',id',
             'style_sheet_slugs' => 'nullable|array',
             'style_sheet_slugs.*' => 'nullable|string',
             'target_model_class' => 'nullable|string|max:512',
