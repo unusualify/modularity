@@ -19,7 +19,7 @@ use Unusualify\Modularous\Traits\ManageNames;
  * Output types: input-assignment, input-browser, input-chat, input-checklist, input-checklist-group,
  * input-comparison-table, input-date, input-file, input-filepond, input-filepond-avatar, input-form-tabs,
  * input-image, input-payment-service, input-price, input-process, input-radio-group, input-repeater,
- * input-select-scroll, input-spread, input-tag, input-tagger. Also: select, group (JsonHydrate),
+ * input-select-scroll, input-json-field, input-layout-blades, input-spread, input-tag, input-tagger. Also: select, group (JsonHydrate),
  * module-route-model (ModuleRouteModelHydrate → select of module routes / model FQCNs).
  */
 abstract class InputHydrate
@@ -185,7 +185,7 @@ abstract class InputHydrate
 
         $this->input = $this->hydrateRules();
 
-        $this->input = Arr::except($this->input, ['route', 'model', 'repository', 'cascades', 'connector', 'onlyParentSegmentModels']);
+        $this->input = Arr::except($this->input, ['route', 'model', 'repository', 'cascades', 'connector', 'onlyParentSegmentModels', 'onlyPageLayoutModels']);
 
         return $this->input;
     }
