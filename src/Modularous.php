@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 use Nwidart\Modules\FileRepository;
 use Nwidart\Modules\Json;
 use Unusualify\Modularous\Contracts\CurrencyProviderInterface;
+use Modules\Cms\Entities\Concerns\HasPageLayout;
 use Modules\Cms\Entities\Concerns\HasParentSegment;
 use Unusualify\Modularous\Exceptions\ModularousSystemPathException;
 
@@ -476,6 +477,7 @@ class Modularous extends FileRepository
             $segment = explode('/', trim($path, '/'))[0];
         }
 
+
         return $segment === $this->getAdminUrlPrefix() && $host === $this->getAppHost();
     }
 
@@ -754,10 +756,11 @@ class Modularous extends FileRepository
      * Value is the model FQCN; title is "{moduleName} - {routeName}" (display only).
      *
      * When {@code $onlyParentSegmentModels} is true, only routes whose model uses {@see HasParentSegment} are listed.
+     * When {@code $onlyPageLayoutModels} is true, only routes whose model uses {@see HasPageLayout} are listed.
      *
      * @return list<array{value: string, title: string}>
      */
-    public function getModuleRouteModelSelectItems(bool $onlyParentSegmentModels = false): array
+    public function getModuleRouteModelSelectItems(bool $onlyParentSegmentModels = false, bool $onlyPageLayoutModels = false): array
     {
         $out = [];
         foreach ($this->all() as $module) {
@@ -776,6 +779,9 @@ class Modularous extends FileRepository
                     continue;
                 }
                 if ($onlyParentSegmentModels && ! classHasTrait($fqcn, HasParentSegment::class)) {
+                    continue;
+                }
+                if ($onlyPageLayoutModels && ! classHasTrait($fqcn, HasPageLayout::class)) {
                     continue;
                 }
                 $out[] = [
