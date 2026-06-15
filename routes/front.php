@@ -46,8 +46,7 @@ Route::group(['prefix' => 'api'], function () {
         Route::apiResource('languages', LanguageController::class, ['only' => 'index']);
     });
 });
-
-if (!modularousConfig('cms.enabled')) {
+if (!modularousConfig('cms_features.enabled')) {
     Route::get('/', function (Request $request) {
         return redirect()->route(Route::hasAdmin('login.form'));
     })->name('modularous.home');
