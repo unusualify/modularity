@@ -60,10 +60,12 @@ class CmsLocalizationAdapterTest extends TestCase
 
     public function test_cms_localization_contract_is_registered_when_cms_enabled(): void
     {
-        $this->app->register(\Modules\Cms\Providers\CmsServiceProvider::class);
         $this->app['config']->set('modularous.cms_features.enabled', true);
         $this->app['config']->set('modularous.cms_routing.localization_driver', 'translatable');
         $this->app['config']->set('modularous.cms_routing.path_segment_locales', ['en']);
+        $this->app['config']->set('modularous.cms_routing.resync_registry_after_parent_segments_change', false);
+
+        $this->app->register(\Modules\Cms\Providers\CmsServiceProvider::class);
 
         $this->assertInstanceOf(CmsLocalizationContract::class, $this->app->make(CmsLocalizationContract::class));
         $this->assertSame('translatable', $this->app->make(CmsLocalizationContract::class)->driver());

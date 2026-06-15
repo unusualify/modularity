@@ -28,6 +28,7 @@ class CmsParentSegmentResolverFallbackTest extends TestCase
             $table->boolean('enabled')->default(true);
             $table->unsignedInteger('sort_order')->default(0);
             $table->timestamps();
+            $table->softDeletes();
         });
 
         $this->app['config']->set('modularous.cms_parent_segments.enabled', true);

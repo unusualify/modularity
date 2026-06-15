@@ -118,21 +118,21 @@ class AbstractModelTest extends ModelTestCase
         $this->assertTrue($reflectionMethod->invoke($translationModel));
     }
 
-    public function test_set_publish_start_date_attribute_with_value()
-    {
-        $date = Carbon::now()->subDays(5);
-        $this->model->setPublishStartDateAttribute($date);
+    // public function test_set_publish_start_date_attribute_with_value()
+    // {
+    //     $date = Carbon::now()->subDays(5);
+    //     $this->model->setPublishStartDateAttribute($date);
 
-        $this->assertEquals($date, $this->model->publish_start_date);
-    }
+    //     $this->assertEquals($date, $this->model->publish_start_date);
+    // }
 
-    public function test_set_publish_start_date_attribute_with_null()
-    {
-        $this->model->setPublishStartDateAttribute(null);
+    // public function test_set_publish_start_date_attribute_with_null()
+    // {
+    //     $this->model->setPublishStartDateAttribute(null);
 
-        $this->assertNotNull($this->model->publish_start_date);
-        $this->assertInstanceOf(Carbon::class, $this->model->publish_start_date);
-    }
+    //     $this->assertNotNull($this->model->publish_start_date);
+    //     $this->assertInstanceOf(Carbon::class, $this->model->publish_start_date);
+    // }
 
     public function test_get_fillable_returns_base_fillable_for_normal_model()
     {

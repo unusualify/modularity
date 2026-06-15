@@ -375,10 +375,10 @@ final class UtilityCssGenerator
 
         $out = [];
         foreach ($scale as $token => $raw) {
-            if (! is_string($token) || ! is_string($raw)) {
+            if ((! is_string($token) && ! is_int($token)) || ! is_string($raw)) {
                 continue;
             }
-            $token = preg_replace('/[^a-zA-Z0-9_-]/', '', $token) ?? '';
+            $token = preg_replace('/[^a-zA-Z0-9_-]/', '', (string) $token) ?? '';
             if ($token === '') {
                 continue;
             }
