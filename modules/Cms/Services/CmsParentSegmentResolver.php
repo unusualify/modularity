@@ -8,7 +8,8 @@ use Modules\Cms\Contracts\CanonicalUrlResolverInterface;
 use Modules\Cms\Entities\ParentSegment;
 
 /**
- * Resolves shared parent path prefixes keyed by module route + locale (see {@see ParentSegment}).
+ * Resolves shared bindings keyed by module-route model + locale (see {@see ParentSegment}):
+ * parent URL path prefix. Presentation shells are {@see \Modules\Cms\Entities\PageLayout} / {@see CmsPageLayoutResolver}.
  *
  * When a locale has no enabled binding (missing row or enabled=0), the prefix falls back to the first
  * enabled binding matching `cms_routing.default_locale`, `translatable.fallback_locale`,
@@ -32,16 +33,24 @@ final class CmsParentSegmentResolver
     }
 
     /**
-     * Normalized path prefix for this model class + locale (e.g. `/blog`), {@code '/'} when the binding stores a deliberate
-     * blank prefix (locale-root homepage), or null when no applicable enabled binding remains.
+     * The enabled binding row for this model class + locale (same choice rules as prefix resolution), or null.
      */
-    public function normalizedPrefixForTargetLocale(string $targetClass, string $locale): ?string
+    public function parentSegmentBindingFor(string $targetClass, string $locale): ?ParentSegment
     {
         if (! $this->enabled() || ! $this->tablesReady()) {
             return null;
         }
 
-        $binding = $this->resolvePreferredEnabledBindingOrFallbackLocale($targetClass, (string) $locale);
+        return $this->resolvePreferredEnabledBindingOrFallbackLocale($targetClass, (string) $locale);
+    }
+
+    /**
+     * Normalized path prefix for this model class + locale (e.g. `/blog`), {@code '/'} when the binding stores a deliberate
+     * blank prefix (locale-root homepage), or null when no applicable enabled binding remains.
+     */
+    public function normalizedPrefixForTargetLocale(string $targetClass, string $locale): ?string
+    {
+        $binding = $this->parentSegmentBindingFor($targetClass, $locale);
 
         return $this->normalizedPathFromBinding($binding);
     }
