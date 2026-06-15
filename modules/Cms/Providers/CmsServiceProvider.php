@@ -5,6 +5,7 @@ namespace Modules\Cms\Providers;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Modules\Cms\Console\PublishLayoutBuilderBladeCommand;
 use Modules\Cms\Console\RebuildCmsSitemapCommand;
 use Modules\Cms\Observers\ParentSegmentUrlRouteObserver;
 use Modules\Cms\Contracts\CanonicalUrlResolverInterface;
@@ -19,7 +20,9 @@ use Modules\Cms\Entities\ParentSegment;
 use Modules\Cms\Http\Controllers\CmsSignedPublicPreviewController;
 use Modules\Cms\Http\Controllers\Front\PublicSitemapController;
 use Modules\Cms\Http\Controllers\Front\RobotsTxtController;
+use Modules\Cms\Http\Controllers\PublicStyleSheetAssetController;
 use Modules\Cms\Http\Middleware\CanonicalLocaleMiddleware;
+use Modules\Cms\Http\Middleware\LayoutBuilderMiddleware;
 use Modules\Cms\Http\Middleware\FallbackLocaleSluglessCanonicalMiddleware;
 use Modules\Cms\Http\Middleware\VisitorRedirectMiddleware;
 use Modules\Cms\Jobs\ScanCmsPublishWindowBoundariesJob;
@@ -30,6 +33,7 @@ use Modules\Cms\Localization\TranslatableCmsLocalizationAdapter;
 use Modules\Cms\Routing\CmsFrontRouteRegistrar;
 use Modules\Cms\Services\CanonicalUrlResolver;
 use Modules\Cms\Services\CmsAdminWarnings;
+use Modules\Cms\Services\CmsPageLayoutResolver;
 use Modules\Cms\Services\CmsParentSegmentResolver;
 use Modules\Cms\Services\CmsPromotionService;
 use Modules\Cms\Services\CmsPublicModelResolver;
@@ -45,6 +49,12 @@ use Modules\Cms\Services\DbFullTextSearchDriver;
 use Modules\Cms\Services\DefaultCmsPromotionScopeApplier;
 use Modules\Cms\Services\NullLeadDelivery;
 use Modules\Cms\Services\RedirectValidationService;
+use Modules\Cms\Services\Stylesheet\FrameworkArtifactResolver;
+use Modules\Cms\Services\Stylesheet\FrameworkScriptResolver;
+use Modules\Cms\Services\Stylesheet\RootVariablesEmitter;
+use Modules\Cms\Services\Stylesheet\ScssStylesheetCompiler;
+use Modules\Cms\Services\Stylesheet\StylesheetCompilerService;
+use Modules\Cms\Services\Stylesheet\UtilityCssGenerator;
 use Unusualify\Modularous\Services\Security\SecurityService;
 use Unusualify\Modularous\Services\SlugInputValidationService;
 
@@ -76,6 +86,7 @@ class CmsServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(CmsParentSegmentResolver::class);
+        $this->app->singleton(CmsPageLayoutResolver::class);
         $this->app->singleton(CmsVisitorRedirectResolver::class);
         $this->app->singleton(CmsPublicModelResolver::class);
 
@@ -88,6 +99,13 @@ class CmsServiceProvider extends ServiceProvider
         $this->app->singleton(SlugInputValidationService::class, CmsSlugInputValidationService::class);
         $this->app->singleton(CmsSignedPreviewUrlGenerator::class);
         $this->app->singleton(CmsSignedPreviewTargetResolver::class);
+
+        $this->app->singleton(RootVariablesEmitter::class);
+        $this->app->singleton(UtilityCssGenerator::class);
+        $this->app->singleton(FrameworkArtifactResolver::class);
+        $this->app->singleton(FrameworkScriptResolver::class);
+        $this->app->singleton(ScssStylesheetCompiler::class);
+        $this->app->singleton(StylesheetCompilerService::class);
 
         $this->app->singleton(RedirectValidationServiceInterface::class, RedirectValidationService::class);
 
@@ -113,7 +131,10 @@ class CmsServiceProvider extends ServiceProvider
 
         if (modularousConfig('cms_features.register_commands', true)) {
             if ($this->app->runningInConsole()) {
-                $this->commands([RebuildCmsSitemapCommand::class]);
+                $this->commands([
+                    RebuildCmsSitemapCommand::class,
+                    PublishLayoutBuilderBladeCommand::class,
+                ]);
             }
         }
 
@@ -121,6 +142,7 @@ class CmsServiceProvider extends ServiceProvider
             Route::aliasMiddleware('modules.cms.canonical.locale', CanonicalLocaleMiddleware::class);
             Route::aliasMiddleware('modules.cms.fallback.slugless.canonical', FallbackLocaleSluglessCanonicalMiddleware::class);
             Route::aliasMiddleware('modules.cms.visitor.redirect', VisitorRedirectMiddleware::class);
+            Route::aliasMiddleware('modules.cms.layout_builder', LayoutBuilderMiddleware::class);
         }
 
         if (modularousConfig('cms_seo.robots.route_enabled', true)) {
@@ -136,6 +158,7 @@ class CmsServiceProvider extends ServiceProvider
         }
 
         $this->registerCmsSignedPreviewRoutes();
+        $this->registerCmsPublicStylesheetRoutes();
         $this->registerCmsPublishSchedule();
     }
 
@@ -163,6 +186,32 @@ class CmsServiceProvider extends ServiceProvider
                     'id' => '[0-9]+',
                 ])
                 ->name('cms.signed_preview.show');
+        };
+
+        $domain = CmsFrontRouteRegistrar::resolvePublicFrontRouteDomain();
+        if ($domain !== null && $domain !== '') {
+            Route::domain($domain)->group($definition);
+        } else {
+            $definition();
+        }
+    }
+
+    private function registerCmsPublicStylesheetRoutes(): void
+    {
+        if (! (bool) modularousConfig('cms_stylesheets.public_route.enabled', true)) {
+            return;
+        }
+
+        $prefix = trim((string) modularousConfig('cms_stylesheets.public_route.path_prefix', 'cms/stylesheets'), '/');
+        if ($prefix === '') {
+            return;
+        }
+
+        $definition = static function () use ($prefix): void {
+            Route::middleware('web')
+                ->get($prefix . '/{slug}.css', [PublicStyleSheetAssetController::class, 'show'])
+                ->where('slug', '[A-Za-z0-9_-]+')
+                ->name('cms.public.stylesheet');
         };
 
         $domain = CmsFrontRouteRegistrar::resolvePublicFrontRouteDomain();

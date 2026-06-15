@@ -9,6 +9,7 @@ namespace Modules\Cms\Repositories\Traits;
  */
 trait CmrTrait
 {
-    use ParentSegmentTrait,
+    use PageLayoutTrait,
+        ParentSegmentTrait,
         UrlRouteRegistrySyncTrait;
 }
