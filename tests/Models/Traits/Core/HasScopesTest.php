@@ -75,6 +75,8 @@ class HasScopesTest extends ModelTestCase
 
     protected function tearDown(): void
     {
+        Schema::dropIfExists('test_translated_publish_translations');
+        Schema::dropIfExists('test_translated_publish_models');
         Schema::dropIfExists('test_has_scopes_models');
         parent::tearDown();
     }
@@ -677,4 +679,219 @@ class HasScopesTest extends ModelTestCase
         $result = $modelWithoutPublic::publishedInListings()->get();
         $this->assertCount(1, $result);
     }
+
+    public function test_scope_published_uses_translation_when_field_is_translated(): void
+    {
+        $this->createTranslatedPublishScopeTables();
+
+        $translatedModel = $this->makeTranslatedPublishScopeModel([
+            'published',
+        ]);
+
+        $publishedMain = $translatedModel::create(['name' => 'Published Main']);
+        $publishedMain->translations()->create([
+            'locale' => 'en',
+            'active' => true,
+            'published' => false,
+        ]);
+
+        $publishedTranslation = $translatedModel::create(['name' => 'Published Translation']);
+        $publishedTranslation->translations()->create([
+            'locale' => 'en',
+            'active' => true,
+            'published' => true,
+        ]);
+
+        app()->setLocale('en');
+
+        $results = $translatedModel::published()->get();
+
+        $this->assertCount(1, $results);
+        $this->assertTrue($results->contains('id', $publishedTranslation->id));
+        $this->assertFalse($results->contains('id', $publishedMain->id));
+    }
+
+    public function test_scope_visible_uses_translation_dates_when_fields_are_translated(): void
+    {
+        $this->createTranslatedPublishScopeTables();
+
+        $translatedModel = $this->makeTranslatedPublishScopeModel([
+            'publish_start_date',
+            'publish_end_date',
+        ]);
+
+        $now = Carbon::now();
+        $past = $now->copy()->subDays(5);
+        $future = $now->copy()->addDays(5);
+
+        $visible = $translatedModel::create(['name' => 'Visible Translation']);
+        $visible->translations()->create([
+            'locale' => 'en',
+            'active' => true,
+            'publish_start_date' => $past,
+            'publish_end_date' => $future,
+        ]);
+
+        $hiddenByMainDates = $translatedModel::create([
+            'name' => 'Hidden By Translation Dates',
+        ]);
+        $hiddenByMainDates->translations()->create([
+            'locale' => 'en',
+            'active' => true,
+            'publish_start_date' => $future,
+            'publish_end_date' => $future->copy()->addDays(5),
+        ]);
+
+        app()->setLocale('en');
+
+        $results = $translatedModel::visible()->get();
+
+        $this->assertTrue($results->contains('id', $visible->id));
+        $this->assertFalse($results->contains('id', $hiddenByMainDates->id));
+    }
+
+    public function test_scope_visible_checks_main_and_translation_dates_separately(): void
+    {
+        $this->createTranslatedPublishScopeTables();
+
+        $mixedModel = $this->makeTranslatedPublishScopeModel([
+            'publish_start_date',
+        ]);
+
+        $now = Carbon::now();
+        $past = $now->copy()->subDays(5);
+        $future = $now->copy()->addDays(5);
+
+        $visible = $mixedModel::create([
+            'name' => 'Mixed Visible',
+            'publish_end_date' => $future,
+        ]);
+        $visible->translations()->create([
+            'locale' => 'en',
+            'active' => true,
+            'publish_start_date' => $past,
+        ]);
+
+        $hidden = $mixedModel::create([
+            'name' => 'Mixed Hidden',
+            'publish_end_date' => $past,
+        ]);
+        $hidden->translations()->create([
+            'locale' => 'en',
+            'active' => true,
+            'publish_start_date' => $past,
+        ]);
+
+        app()->setLocale('en');
+
+        $results = $mixedModel::visible()->get();
+
+        $this->assertTrue($results->contains('id', $visible->id));
+        $this->assertFalse($results->contains('id', $hidden->id));
+    }
+
+    protected function createTranslatedPublishScopeTables(): void
+    {
+        if (! Schema::hasTable('test_translated_publish_models')) {
+            Schema::create('test_translated_publish_models', function (Blueprint $table) {
+                $table->id();
+                $table->string('name');
+                $table->boolean('published')->default(false);
+                $table->datetime('publish_start_date')->nullable();
+                $table->datetime('publish_end_date')->nullable();
+                $table->timestamps();
+            });
+        }
+
+        if (! Schema::hasTable('test_translated_publish_translations')) {
+            Schema::create('test_translated_publish_translations', function (Blueprint $table) {
+                $table->id();
+                $table->unsignedBigInteger('test_translated_publish_model_id');
+                $table->string('locale', 7)->index();
+                $table->boolean('active')->default(true);
+                $table->boolean('published')->default(false);
+                $table->datetime('publish_start_date')->nullable();
+                $table->datetime('publish_end_date')->nullable();
+                $table->timestamps();
+
+                $table->unique(['test_translated_publish_model_id', 'locale'], 'test_translated_publish_model_locale_unique');
+            });
+        }
+    }
+
+    /**
+     * @param list<string> $translatedAttributes
+     */
+    protected function makeTranslatedPublishScopeModel(array $translatedAttributes)
+    {
+        return new class($translatedAttributes) extends Model
+        {
+            use HasScopes;
+            use \Unusualify\Modularous\Entities\Traits\HasTranslation;
+
+            /** @var list<string> */
+            private static array $configuredTranslatedAttributes = [];
+
+            protected $table = 'test_translated_publish_models';
+
+            protected $translationModel = TranslatedPublishScopeTranslation::class;
+
+            public $translationForeignKey = 'test_translated_publish_model_id';
+
+            /** @var list<string> */
+            public $translatedAttributes = [];
+
+            protected $fillable = [
+                'name',
+                'published',
+                'publish_start_date',
+                'publish_end_date',
+            ];
+
+            protected $casts = [
+                'published' => 'boolean',
+                'publish_start_date' => 'datetime',
+                'publish_end_date' => 'datetime',
+            ];
+
+            /**
+             * @param list<string> $translatedAttributes
+             */
+            public function __construct(array $translatedAttributes = [])
+            {
+                parent::__construct();
+
+                if ($translatedAttributes !== []) {
+                    self::$configuredTranslatedAttributes = $translatedAttributes;
+                }
+
+                $this->translatedAttributes = self::$configuredTranslatedAttributes;
+            }
+        };
+    }
+}
+
+namespace Unusualify\Modularous\Tests\Models\Traits\Core;
+
+use Illuminate\Database\Eloquent\Model;
+
+class TranslatedPublishScopeTranslation extends Model
+{
+    protected $table = 'test_translated_publish_translations';
+
+    protected $fillable = [
+        'test_translated_publish_model_id',
+        'locale',
+        'active',
+        'published',
+        'publish_start_date',
+        'publish_end_date',
+    ];
+
+    protected $casts = [
+        'active' => 'boolean',
+        'published' => 'boolean',
+        'publish_start_date' => 'datetime',
+        'publish_end_date' => 'datetime',
+    ];
 }

@@ -367,6 +367,57 @@ export default {
     }
   },
   methods: {
+    mediaThumbnailSrc () {
+      const thumbnail = this.media?.thumbnail
+      if (typeof thumbnail !== 'string' || thumbnail.length === 0) {
+        return null
+      }
+
+      let append = '?'
+      if (thumbnail.indexOf('?') > -1) {
+        append = '&'
+      }
+
+      return thumbnail + append + 'no-cache'
+    },
+    logImageLoadFailure (src, error) {
+      if (process.env.NODE_ENV === 'production') {
+        return
+      }
+
+      const message = error instanceof Error
+        ? error.message
+        : (typeof error?.type === 'string' ? `Image ${error.type} event` : 'Image failed to load')
+
+      console.warn(`[v-input-image] ${message}`, src)
+    },
+    resolveMediaImgElement () {
+      const ref = this.$refs.mediaImg
+      if (!ref) {
+        return null
+      }
+
+      if (ref instanceof HTMLImageElement) {
+        return ref
+      }
+
+      const component = Array.isArray(ref) ? ref[0] : ref
+      if (!component) {
+        return null
+      }
+
+      const el = component.$el ?? component
+
+      if (el instanceof HTMLImageElement) {
+        return el
+      }
+
+      if (el && typeof el.querySelector === 'function') {
+        return el.querySelector('img')
+      }
+
+      return null
+    },
     // crop
     canvasCrop () {
       const data = this.media.crops[Object.keys(this.media.crops)[0]]
@@ -526,17 +577,29 @@ export default {
       if (this.hasMedia) {
         this.cropSrc = this.media.thumbnail
 
+        if (!this.activeCrop) {
+          this.showDefaultThumbnail()
+          this.hasMediaChanged = false
+          return
+        }
+
+        const thumbnailSrc = this.mediaThumbnailSrc()
+        if (!thumbnailSrc) {
+          this.logImageLoadFailure(null, new Error('Missing media thumbnail'))
+          this.showDefaultThumbnail()
+          this.hasMediaChanged = false
+          return
+        }
+
         this.initImg().then(() => {
           imgLoaded()
         }, (error) => {
-          console.error(error)
           this.showDefaultThumbnail()
 
           // lets try to load to image tag now
           this.$nextTick(() => {
-            // the image tag
-            const imgTag = this.$refs.mediaImg
-            if (imgTag) {
+            const imgTag = this.resolveMediaImgElement()
+            if (imgTag && typeof imgTag.addEventListener === 'function') {
               imgTag.addEventListener('load', () => {
                 this.img = imgTag
                 imgLoaded()
@@ -547,10 +610,15 @@ export default {
               })
 
               imgTag.addEventListener('error', (e) => {
-                console.error(e)
+                this.logImageLoadFailure(thumbnailSrc, e)
                 this.showDefaultThumbnail()
+              }, {
+                once: true,
+                passive: true,
+                capture: true
               })
             } else {
+              this.logImageLoadFailure(thumbnailSrc, error)
               this.showImg = false
               this.cropSrc = this.media.thumbnail
             }
@@ -559,10 +627,15 @@ export default {
         this.hasMediaChanged = false
       }
     },
-    initImg: function () {
+    initImg: function (useCrossOrigin = true) {
+      const thumbnailSrc = this.mediaThumbnailSrc()
+      if (!thumbnailSrc) {
+        return Promise.reject(new Error('Missing media thumbnail'))
+      }
+
       return new Promise((resolve, reject) => {
         this.img = new Image()
-        if (!IS_SAFARI) {
+        if (useCrossOrigin && !IS_SAFARI) {
           this.img.crossOrigin = 'Anonymous'
         }
         this.canvas = document.createElement('canvas')
@@ -577,16 +650,20 @@ export default {
         })
 
         // in case of CORS issue or anything else
-        this.img.addEventListener('error', (e) => {
-          reject(e)
+        this.img.addEventListener('error', () => {
+          if (useCrossOrigin && !IS_SAFARI) {
+            this.initImg(false).then(resolve, reject)
+            return
+          }
+
+          reject(new Error(`Failed to load media thumbnail: ${thumbnailSrc}`))
+        }, {
+          once: true,
+          passive: true,
+          capture: true
         })
 
-        // try to load the media thumbnail
-        let append = '?'
-        if (this.media.thumbnail.indexOf('?') > -1) {
-          append = '&'
-        }
-        this.img.src = this.media.thumbnail + append + 'no-cache'
+        this.img.src = thumbnailSrc
       })
     },
     showDefaultThumbnail: function () {

@@ -29,6 +29,7 @@ class ParentSegmentBindingValidatorTest extends TestCase
             $table->boolean('enabled')->default(true);
             $table->unsignedInteger('sort_order')->default(0);
             $table->timestamps();
+            $table->softDeletes();
 
             $table->unique(['target_model_class', 'locale'], 'cms_psb_model_locale_unq_test');
             $table->index(['target_model_class', 'locale', 'enabled'], 'cms_psb_model_loc_en_idx_test');

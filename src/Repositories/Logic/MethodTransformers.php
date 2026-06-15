@@ -300,7 +300,18 @@ trait MethodTransformers
         if (! $noSerialization) {
             $fields = $object->attributesToArray();
         } else {
-            $fields = [];
+            $fields = array_reduce($chunkedInputs, function ($acc, $item) use ($object) {
+                switch ($item['type']) {
+                    case 'text':
+                    case 'textarea':
+                    case 'input-date':
+                        $acc[$item['name']] = $object->{$item['name']} ?? null;
+                        break;
+                    default:
+
+                }
+                return $acc;
+            }, []);
         }
 
         foreach ($this->traitsMethods(__FUNCTION__) as $method) {

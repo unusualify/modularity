@@ -120,6 +120,7 @@ class MediaLibraryController extends BaseController implements SignUploadListene
                 return $item->mediableFormat();
             })->toArray(),
             'maxPage' => $items->lastPage(),
+            'page' => $items->currentPage(),
             'total' => $items->total(),
             'tags' => $this->repository->getTagsList(),
         ];

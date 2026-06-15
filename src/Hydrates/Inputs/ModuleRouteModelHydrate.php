@@ -10,6 +10,7 @@ use Unusualify\Modularous\Facades\Modularous;
  * Config type: {@code module-route-model} → hydrated {@code select} with
  * {@code itemValue} {@code value} (model FQCN) and {@code itemTitle} {@code title} ({@code moduleName - routeName}).
  * Set {@code onlyParentSegmentModels} => true to list only models using {@see \Modules\Cms\Entities\Concerns\HasParentSegment}.
+ * Set {@code onlyPageLayoutModels} => true to list only models using {@see \Modules\Cms\Entities\Concerns\HasPageLayout}.
  */
 class ModuleRouteModelHydrate extends SelectHydrate
 {
@@ -33,7 +34,8 @@ class ModuleRouteModelHydrate extends SelectHydrate
         $this->input['itemTitle'] = 'title';
 
         $onlyParentSegmentModels = (bool) ($this->input['onlyParentSegmentModels'] ?? false);
-        $this->input['items'] = Modularous::getModuleRouteModelSelectItems($onlyParentSegmentModels);
+        $onlyPageLayoutModels = (bool) ($this->input['onlyPageLayoutModels'] ?? false);
+        $this->input['items'] = Modularous::getModuleRouteModelSelectItems($onlyParentSegmentModels, $onlyPageLayoutModels);
 
         return parent::hydrate();
     }

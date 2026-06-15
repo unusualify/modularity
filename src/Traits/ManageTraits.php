@@ -47,6 +47,8 @@ trait ManageTraits
     {
         return Arr::mapWithKeys($schema ?? $this->inputs(), function ($input, $key) use ($all, $noGroupChunk) {
             if (isset($input['type'])) {
+                $input = hydrate_input_type($input);
+
                 switch ($input['type']) {
                     case 'group':
 

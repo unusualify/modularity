@@ -26,7 +26,7 @@ return [
     'image_service' => env('MEDIA_LIBRARY_IMAGE_SERVICE', 'Unusualify\Modularous\Services\MediaLibrary\Imgix'),
     'acl' => env('MEDIA_LIBRARY_ACL', 'private'),
     'filesize_limit' => env('MEDIA_LIBRARY_FILESIZE_LIMIT', 50),
-    'allowed_extensions' => ['svg', 'jpg', 'gif', 'png', 'jpeg'],
+    'allowed_extensions' => ['svg', 'jpg', 'gif', 'png', 'jpeg', 'webp'],
     'init_alt_text_from_filename' => true,
     'prefix_uuid_with_local_path' => modularousConfig('file_library.prefix_uuid_with_local_path', false),
     'translated_form_fields' => true,

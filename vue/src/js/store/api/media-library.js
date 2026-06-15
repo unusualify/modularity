@@ -11,7 +11,10 @@ export default {
     // Form datas : query, page
 
     // Set endpoint in global config
-    axios.get(endpoint, { params: params }).then(function (resp) {
+    axios.get(endpoint, {
+      params: params,
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    }).then(function (resp) {
       if (callback && typeof callback === 'function') callback(resp)
     }, function (resp) {
       // error callback

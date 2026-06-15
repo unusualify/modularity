@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static string getModulePath(string $moduleName)
  * @method static string assetPath(string $module)
  * @method static string moduleAsset(string $module, string $asset)
- * @method static array getModuleRouteModelSelectItems(bool $onlyParentSegmentModels = false)
+ * @method static array getModuleRouteModelSelectItems(bool $onlyParentSegmentModels = false, bool $onlyPageLayoutModels = false)
  * @method static string|null resolveTargetModuleRouteForModelClass(string $modelClass)
  * @method static void enableModule(string $moduleName)
  * @method static void disableModule(string $moduleName)

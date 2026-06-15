@@ -1,6 +1,39 @@
 <?php
 
 return [
+    'cms' => [
+        'style_sheet' => [
+            'name' => 'Stil Sayfası | Stil Sayfaları | {n} Stil Sayfası',
+        ],
+        'layout_builder' => [
+            'name' => 'Şablon Oluşturucu | Şablon Oluşturucular | {n} Şablon Oluşturucu',
+        ],
+        'page_layout' => [
+            'name' => 'Sayfa Şablonu | Sayfa Şablonları | {n} Sayfa Şablonu',
+        ],
+        'parent_segment' => [
+            'name' => 'Ana Bölüm | Ana Bölümler | {n} Ana Bölüm',
+        ],
+        'redirect' => [
+            'name' => 'Yönlendirme | Yönlendirmeler | {n} Yönlendirme',
+
+            'intro' => 'Required: locale, from path, to path. Optional: status code (301–308), active (0/1).',
+            'headline' => 'Yönlendirme içe/dışa aktarma',
+            'browser_title' => 'Yönlendirme içe/dışa aktarma',
+        ],
+        'sitemap' => [
+            'name' => 'Site Haritası | Site Haritaları | {n} Site Haritası',
+        ],
+        'homepage_test' => [
+            'name' => 'Anasayfa Testi | Anasayfa Testleri | {n} Anasayfa Testi',
+        ],
+        'page' => [
+            'name' => 'Sayfa | Sayfalar | {n} Sayfa',
+        ],
+        'site_setting' => [
+            'name' => 'Site Ayarı | Site Ayarları | {n} Site Ayarı',
+        ],
+    ],
     'system_notification' => [
         'my_notification' => [
             'name' => 'Bildirimim | Bildirimlerim | {n} Bildirimim',

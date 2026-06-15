@@ -204,6 +204,9 @@ class ModularousNavigation
                 }
 
                 $route_name = $route_prefix . $route_name;
+                $headline = $item['headline'] ?? ($isSingular
+                    ? singularize(headline($item['name']))
+                    : (pluralize(headline($item['name']))));
 
                 if (isset($item['parent']) && $item['parent']) {
                     // only one link for module
@@ -212,14 +215,14 @@ class ModularousNavigation
                     } else {
 
                         $array['items'][$this->getSnakeCase($item['name'])] = [
-                            'name' => $item['headline'] ?? pluralize(headline($item['name'])),
+                            'name' => $headline,
                             'icon' => $item['icon'] ?? '$submodule',
                             'route_name' => $route_name,
                         ];
                     }
                 } else {
                     $array['items'][$this->getSnakeCase($item['name'])] = [
-                        'name' => $item['headline'] ?? pluralize($item['name']),
+                        'name' => $headline,
                         'icon' => $item['icon'] ?? '$submodule',
                         'route_name' => $route_name,
                     ];

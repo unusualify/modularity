@@ -4,7 +4,9 @@ const _EXTENSIONS =
       extensions: [
         'gif',
         'png',
-        'jpg'
+        'jpg',
+        'jpeg',
+        'webp'
       ],
       icon: 'img',
       display: 'Image File',

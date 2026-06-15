@@ -156,6 +156,8 @@ return new class extends Migration
             // Short names: MySQL identifier limit is 64 chars.
             $table->unique(['target_model_class', 'locale'], 'cms_psb_model_locale_unq');
             $table->index(['target_model_class', 'locale', 'enabled'], 'cms_psb_model_loc_en_idx');
+
+            createDefaultExtraTableFields($table, true, false);
         });
     }
 

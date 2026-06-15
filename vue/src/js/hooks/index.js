@@ -45,6 +45,14 @@ export {
   jsonDiffPartClass,
 } from './useJsonDiff'
 
+export {
+  resolveNativeTextareaFromVuetifyHost,
+  textareaLineBlockSlice,
+  applyTabOrShiftTabInText,
+  createCodeTextareaKeydownHandler,
+  useCodeTextareaShortcuts,
+} from './useCodeTextareaShortcuts'
+
 export { default as useCastAttributes } from './useCastAttributes'
 
 export { default as useInertiaRequests, useInertiaLoading } from './useInertiaRequests'
