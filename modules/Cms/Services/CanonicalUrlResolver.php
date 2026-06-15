@@ -27,8 +27,7 @@ class CanonicalUrlResolver implements CanonicalUrlResolverInterface
         );
         $canonicalPath = rtrim($localePrefix . '/' . ltrim($withoutLocale, '/'), '/');
         $canonicalPath = $canonicalPath === '' ? '/' : $canonicalPath;
-
-        $canonicalUrl = 'https://' . $canonicalHost . $canonicalPath;
+        $canonicalUrl = 'https://' . $canonicalHost . $normalizedPath;
 
         $effectiveHost = $host ?: request()->getHost();
         $incomingUrl = 'https://' . $effectiveHost . $normalizedPath;
