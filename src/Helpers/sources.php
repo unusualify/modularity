@@ -243,9 +243,12 @@ if (! function_exists('get_modularous_impersonation_config')) {
 
         $defaultInput = modularousConfig('default_input');
 
+        $isActive = $activeUser ? $activeUser->is_superadmin || $activeUser->isImpersonating() : false;
+        $isImpersonating = $activeUser ? $activeUser->isImpersonating() : false;
+
         return [
-            'active' => $activeUser ? $activeUser->is_superadmin || $activeUser->isImpersonating() : false,
-            'impersonated' => $activeUser ? $activeUser->isImpersonating() : false,
+            'active' => $isActive,
+            'impersonated' => $isImpersonating,
             'stopRoute' => route(Route::hasAdmin('impersonate.stop')),
             'route' => route(Route::hasAdmin('impersonate'), ['id' => ':id']),
 
@@ -258,7 +261,44 @@ if (! function_exists('get_modularous_impersonation_config')) {
             'variant' => $defaultInput['variant'] ?? 'outlined',
             'itemTitle' => 'email_with_company',
             'searchKeys' => ['name', 'email', 'company.name'],
+            'recent' => ($isActive && ! $isImpersonating)
+                ? get_modularous_recent_impersonations($userRepository)
+                : [],
         ];
+    }
+}
+
+if (! function_exists('get_modularous_recent_impersonations')) {
+    /**
+     * Hydrate the recently impersonated user ids stored in the session into a
+     * lightweight collection matching the shape returned by the impersonate
+     * search endpoint, preserving the stack order (newest first).
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    function get_modularity_recent_impersonations(UserRepository $userRepository): array
+    {
+        $ids = \array_values(\array_filter(
+            (array) session('impersonate_recent', []),
+            fn ($value) => \is_numeric($value)
+        ));
+
+        if (empty($ids)) {
+            return [];
+        }
+
+        $users = $userRepository->getModel()
+            ->whereIn('id', $ids)
+            ->select(['id', 'name', 'email', 'company_id'])
+            ->get()
+            ->keyBy('id');
+
+        return \array_values(\array_filter(\array_map(
+            fn ($id) => $users->get((int) $id)?->only([
+                'id', 'name', 'email', 'company_id', 'company_name', 'email_with_company',
+            ]),
+            $ids
+        )));
     }
 }
 

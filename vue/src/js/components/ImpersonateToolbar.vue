@@ -32,6 +32,12 @@
       type: String,
       default: null
     },
+    recent: {
+      type: Array,
+      default () {
+        return []
+      }
+    },
     itemTitle: {
       type: String,
       default: 'name'
@@ -96,6 +102,7 @@
     :density="density"
     :item-title="itemTitle"
     :item-value="itemValue"
+    :recent-items="recent"
     >
     <template v-slot:activator="{ props }">
       <v-list-item
