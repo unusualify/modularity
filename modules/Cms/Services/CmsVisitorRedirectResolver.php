@@ -61,6 +61,13 @@ final class CmsVisitorRedirectResolver
             return true;
         }
 
+        $stylesheetPrefix = '/' . trim((string) modularousConfig('cms_stylesheets.public_route.path_prefix', 'cms/stylesheets'), '/');
+        if ((bool) modularousConfig('cms_stylesheets.public_route.enabled', true)
+            && $stylesheetPrefix !== '/'
+            && ($normalized === $stylesheetPrefix || str_starts_with($normalized, $stylesheetPrefix . '/'))) {
+            return true;
+        }
+
         $first = explode('/', trim($normalized, '/'))[0] ?? '';
 
         $extra = (array) modularousConfig('cms_routing.visitor_redirect_exclude_prefixes', ['api', 'sanctum', 'livewire']);
