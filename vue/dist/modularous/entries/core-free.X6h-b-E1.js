@@ -1,2 +1,0 @@
-import{al as t}from"../js/vendor.B2nSWMRi.js";import{s,U as e}from"../js/UEConfig.CqHs9vc6.js";import"../js/fine-uploader.BwvI3_t9.js";import"../js/vuetify.oRP6HbQw.js";import"../js/awesome-phonenumber.6EcdwO3D.js";const n=s,o=t({store:n});o.use(e);const r=Object.assign({});o.config.globalProperties.registerComponents(r,"customs","ue-custom");o.mount("#admin");
-//# sourceMappingURL=core-free.X6h-b-E1.js.map
