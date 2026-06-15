@@ -4,11 +4,9 @@ namespace Modules\Cms\Http\Controllers\Front;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-use Modules\Cms\Contracts\CanonicalUrlResolverInterface;
 use Modules\Cms\Entities\UrlRoute;
 use Modules\Cms\Services\CmsPublicModelResolver;
 use Modules\Cms\Support\CmsPublicFrontViewName;
-use Modules\Cms\Support\CmsPublicSeo;
 
 /**
  * Single public catch-all invokable for the CMS module: resolves the entity from {@see \Modules\Cms\Entities\UrlRoute}
@@ -49,31 +47,11 @@ final class CmsPublicFrontController extends CmsController
     }
 
     /**
-     * Renders the same SEO/view payload as {@see CmsController} but the Blade is chosen from the resolved
-     * model type (submodule) instead of a fixed per-controller {@code module::route.custom}.
+     * Blade is chosen from the resolved model type (submodule) instead of a fixed per-controller
+     * {@code module::route.custom}. PageLayout wrapping is handled by {@see CmsController::renderPublicCmsPresentation()}.
      */
-    protected function renderPublicCmsPresentation(
-        Request $request,
-        Model $item,
-        CanonicalUrlResolverInterface $canonical,
-        bool $forcePreviewRobotsNoIndex = false
-    ) {
-        $locale = app()->getLocale();
-        $translation = method_exists($item, 'translate') ? $item->translate($locale) : null;
-
-        $seo = CmsPublicSeo::build($request, $translation, $canonical);
-        if ($forcePreviewRobotsNoIndex) {
-            $seo['robotsMeta'] = 'noindex, nofollow';
-        }
-
-        $viewName = CmsPublicFrontViewName::forModel($item);
-
-        return view($viewName, [
-            'item' => $item,
-            'seoTitle' => $seo['title'],
-            'seoDescription' => $seo['description'],
-            'canonicalUrl' => $seo['canonicalUrl'],
-            'robotsMeta' => $seo['robotsMeta'],
-        ]);
+    protected function resolvePublicPresentationViewName(Request $request, Model $item): string
+    {
+        return CmsPublicFrontViewName::forModel($item);
     }
 }

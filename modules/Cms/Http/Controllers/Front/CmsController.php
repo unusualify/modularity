@@ -10,6 +10,7 @@ use Modules\Cms\Contracts\CanonicalUrlResolverInterface;
 use Modules\Cms\Entities\UrlRoute;
 use Modules\Cms\Http\Controllers\Traits\ResolvesPublicPresentationView;
 use Modules\Cms\Services\CmsPublicModelResolver;
+use Modules\Cms\Support\CmsPageLayoutPresentationWrapper;
 use Modules\Cms\Support\CmsPublicSeo;
 use Unusualify\Modularous\Http\Controllers\CoreController;
 
@@ -153,20 +154,34 @@ abstract class CmsController extends CoreController
         CanonicalUrlResolverInterface $canonical,
         bool $forcePreviewRobotsNoIndex = false,
     ) {
-        $locale = app()->getLocale();
-        $translation = method_exists($item, 'translate') ? $item->translate($locale) : null;
+        $seo = CmsPublicSeo::build($request, $item, $canonical);
+        $seo['robotsMeta'] = CmsPublicSeo::resolveRobotsMeta($seo['robotsMeta'], $forcePreviewRobotsNoIndex);
 
-        $seo = CmsPublicSeo::build($request, $translation, $canonical);
-        if ($forcePreviewRobotsNoIndex) {
-            $seo['robotsMeta'] = 'noindex, nofollow';
-        }
+        $viewName = $this->resolvePublicPresentationViewName($request, $item);
 
-        return view($this->publicCmsViewName(), [
+        $innerData = [
             'item' => $item,
             'seoTitle' => $seo['title'],
             'seoDescription' => $seo['description'],
             'canonicalUrl' => $seo['canonicalUrl'],
             'robotsMeta' => $seo['robotsMeta'],
-        ]);
+        ];
+
+        $wrapped = CmsPageLayoutPresentationWrapper::documentOrNull($item, $viewName, $innerData);
+        if ($wrapped !== null) {
+            return view('cms::layout_builder.inline_document', ['document' => $wrapped]);
+        }
+
+
+        return view($viewName, $innerData);
+    }
+
+    /**
+     * Blade view for public presentation (default: {@see publicCmsViewName()}). Override when the view depends on the
+     * resolved model (e.g. {@see \Modules\Cms\Http\Controllers\Front\CmsPublicFrontController}).
+     */
+    protected function resolvePublicPresentationViewName(Request $request, Model $item): string
+    {
+        return $this->publicCmsViewName();
     }
 }
