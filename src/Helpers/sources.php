@@ -276,7 +276,7 @@ if (! function_exists('get_modularous_recent_impersonations')) {
      *
      * @return array<int, array<string, mixed>>
      */
-    function get_modularity_recent_impersonations(UserRepository $userRepository): array
+    function get_modularous_recent_impersonations(UserRepository $userRepository): array
     {
         $ids = \array_values(\array_filter(
             (array) session('impersonate_recent', []),
