@@ -21,6 +21,20 @@ use Unusualify\Modularous\Facades\ModularousRoutes;
 */
 
 Route::middleware(ModularousRoutes::webPanelMiddlewares())->group(function () {
+    if (modularousConfig('cms_layout_builder.preview_enabled', true)) {
+        Route::get('layout-builders/{layout_builder}/preview-html', LayoutBuilderHtmlPreviewController::class)
+            ->whereNumber('layout_builder')
+            ->name('layout_builder.preview_html');
+    }
+
+    if (
+        (bool) modularousConfig('cms_layout_builder.preview_enabled', true)
+        || (bool) modularousConfig('cms_page_layouts.layout_appends_modal_preview_enabled', true)
+    ) {
+        Route::post('layout-builders/shell-draft-preview', LayoutBuilderShellDraftPreviewController::class)
+            ->name('layout_builder.shell_draft_preview');
+    }
+
     if (modularousConfig('cms_routing.signed_preview.enabled', true)) {
         Route::get('signed-public-preview/{module}/{route}/{id}', SignedPublicPreviewMintController::class)
             ->where([
