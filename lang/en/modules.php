@@ -2,8 +2,17 @@
 
 return [
     'cms' => [
-        'page' => [
-            'name' => 'Page | Pages | {n} Page',
+        'style_sheet' => [
+            'name' => 'Style Sheet | Style Sheets | {n} Style Sheet',
+        ],
+        'layout_builder' => [
+            'name' => 'Layout Builder | Layout Builders | {n} Layout Builder',
+        ],
+        'page_layout' => [
+            'name' => 'Page Layout | Page Layouts | {n} Page Layout',
+        ],
+        'parent_segment' => [
+            'name' => 'Parent Segment | Parent Segments | {n} Parent Segment',
         ],
         'redirect' => [
             'name' => 'Redirect | Redirects | {n} Redirect',
@@ -12,11 +21,14 @@ return [
             'headline' => 'Redirect import / export',
             'browser_title' => 'Redirect import / export',
         ],
-        'parent_segment' => [
-            'name' => 'Parent Segment | Parent Segments | {n} Parent Segment',
-        ],
         'sitemap' => [
             'name' => 'Sitemap | Sitemap | {n} Sitemap',
+        ],
+        'homepage_test' => [
+            'name' => 'Homepage Test | Homepage Tests | {n} Homepage Test',
+        ],
+        'page' => [
+            'name' => 'Page | Pages | {n} Page',
         ],
         'site_setting' => [
             'name' => 'Site Setting | Site Settings | {n} Site Setting',
