@@ -16,35 +16,35 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 </head>
 <body class="bg-light">
-@php
-    $locale = app()->getLocale();
-    $item->loadMissing(['files', 'medias', 'fileponds']);
+    @php
+        $locale = app()->getLocale();
+        $item->loadMissing(['files', 'medias', 'fileponds']);
 
-    $translatedMedias = modularousConfig('media_library.translated_form_fields', false);
+        $translatedMedias = modularousConfig('media_library.translated_form_fields', false);
 
-    $documentFiles = $item->files->filter(function ($file) use ($locale) {
-        return $file->pivot->role === 'documents' && $file->pivot->locale === $locale;
-    });
+        $documentFiles = $item->files->filter(function ($file) use ($locale) {
+            return $file->pivot->role === 'documents' && $file->pivot->locale === $locale;
+        });
 
-    $photoMedias = $item->medias->filter(function ($media) use ($locale, $translatedMedias) {
-        if ($media->pivot->role !== 'photos' || $media->pivot->crop !== 'default') {
-            return false;
-        }
-        if ($translatedMedias) {
-            return $media->pivot->locale === $locale;
-        }
+        $photoMedias = $item->medias->filter(function ($media) use ($locale, $translatedMedias) {
+            if ($media->pivot->role !== 'photos' || $media->pivot->crop !== 'default') {
+                return false;
+            }
+            if ($translatedMedias) {
+                return $media->pivot->locale === $locale;
+            }
 
-        return true;
-    });
+            return true;
+        });
 
-    $attachmentFileponds = $item->fileponds->filter(function ($fp) use ($locale) {
-        return $fp->role === 'attachments' && $fp->locale === $locale;
-    });
+        $attachmentFileponds = $item->fileponds->filter(function ($fp) use ($locale) {
+            return $fp->role === 'attachments' && $fp->locale === $locale;
+        });
 
-    $filepondPreviewRoute = \Illuminate\Support\Facades\Route::has('filepond.preview');
+        $filepondPreviewRoute = \Illuminate\Support\Facades\Route::has('filepond.preview');
 
-    $sessions = $item->repeaters->where('role', 'sessions')->first()?->content ?? [];
-@endphp
+        $sessions = $item->repeaters->where('role', 'sessions')->first()?->content ?? [];
+    @endphp
     <div class="container py-4">
         @include('cms::components.responsive-title', ['title' => $item->title ?? null])
 

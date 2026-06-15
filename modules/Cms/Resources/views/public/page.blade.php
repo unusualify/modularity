@@ -17,14 +17,14 @@
     @endif
 </head>
 <body>
-<main>
-    <h1>{{ optional($translation)->title ?? '' }}</h1>
-    @if(!empty(optional($translation)->excerpt))
-        <p class="excerpt">{{ $translation->excerpt }}</p>
-    @endif
-    <div class="content">
-        {!! optional($translation)->content ?? '' !!}
-    </div>
-</main>
+    <main>
+        <h1>{{ optional($translation)->title ?? '' }}</h1>
+        @if(!empty(optional($translation)->excerpt))
+            <p class="excerpt">{{ $translation->excerpt }}</p>
+        @endif
+        <div class="content">
+            {!! optional($translation)->content ?? '' !!}
+        </div>
+    </main>
 </body>
 </html>
