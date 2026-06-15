@@ -2,6 +2,17 @@
 
 All notable changes to `modularous` will be documented in this file
 
+## v12.1.2 - 2026-06-15
+
+### :wrench: Bug Fixes
+
+- update icons for CMS modules to improve visual consistency by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/29c4e298c95d6a105c9b49236b4846df0faf6cd5
+- enhance get method to support case value retrieval by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/269dd88eace5b560e05a86bd30b2cf8c755d0938
+
+### :recycle: Refactors
+
+- simplify getModel method by utilizing repository to retrieve model instance by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/d2ee4b93ad704238177e796230e4f5119f0ea022
+
 ## v12.1.1 - 2026-06-15
 
 ### :wrench: Bug Fixes
