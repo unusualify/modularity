@@ -32,14 +32,9 @@
               </v-btn>
             </v-toolbar-items>
           </v-toolbar>
-          <div class="medialibrary__header" ref="form">
-            <ue-filter
-              @submit="submitFilter"
-              :clearOption="true"
-              @clear="clearFilters"
-              v-model:filterState="sharedFilterState"
-              >
-              <ul class="secondarynav secondarynav--desktop py" slot="navigation" v-if="types.length">
+          <div class="medialibrary__header pa-4" ref="form">
+            <div class="medialibrary__header-inner">
+              <ul class="secondarynav secondarynav--desktop py medialibrary__nav" v-if="types.length">
                 <v-chip
                   v-for="navType in types"
                   :key="navType.value"
@@ -55,43 +50,101 @@
                 </v-chip>
               </ul>
 
-              <!-- <div class="secondarynav secondarynav--mobile secondarynav--dropdown" slot="navigation">
-                <a17-dropdown ref="secondaryNavDropdown" position="bottom-left" width="full" :offset="0">
-                  <a17-button class="secondarynav__button" variant="dropdown-transparent" size="small"
-                              @click="$refs.secondaryNavDropdown.toggle()" v-if="selectedType">
-                    <span class="secondarynav__link">{{ selectedType.text }}</span><span class="secondarynav__number">{{ selectedType.total }}</span>
-                  </a17-button>
-                  <div slot="dropdown__content">
-                    <ul>
-                      <li v-for="navType in types" :key="navType.value" class="secondarynav__item">
-                        <a href="#" v-on:click.prevent="updateType(navType.value)"><span class="secondarynav__link">{{ navType.text }}</span><span
-                          class="secondarynav__number">{{ navType.total }}</span></a>
-                      </li>
-                    </ul>
-                  </div>
-                </a17-dropdown>
-              </div> -->
-
-              <div slot="hidden-filters">
-
-                <!-- <a17-vselect class="medialibrary__filter-item" ref="filter" name="tag" :options="tags"
-                            :placeholder="$trans('media-library.filter-select-label', 'Filter by tag')" :searchable="true" maxHeight="175px"
-                      />
-                <a17-checkbox class="medialibrary__filter-item" ref="unused" name="unused" :initial-value="0" :value="1" :label="$trans('media-library.unused-filter-label', 'Show unused only')"/> -->
+              <div class="medialibrary__filters medialibrary__filters--desktop">
+                <v-text-field
+                  v-model="sharedFilterState.search"
+                  type="search"
+                  class="medialibrary__search"
+                  :placeholder="$trans('filter.search-placeholder', 'Search')"
+                  variant="outlined"
+                  density="compact"
+                  hide-details="auto"
+                  clearable
+                  @keyup.enter="submitFilter"
+                />
+                <v-autocomplete
+                  v-model="sharedFilterState.tag"
+                  :items="normalizedTags"
+                  item-title="title"
+                  item-value="value"
+                  class="medialibrary__tag-filter"
+                  :label="$trans('media-library.filter-select-label', 'Filter by tag')"
+                  variant="outlined"
+                  density="compact"
+                  hide-details="auto"
+                  clearable
+                />
+                <v-btn
+                  color="primary"
+                  variant="flat"
+                  :loading="loading"
+                  @click="submitFilter"
+                >
+                  {{ $trans('filter.apply-btn', 'Apply Filters') }}
+                </v-btn>
+                <v-btn
+                  color="secondary"
+                  variant="outlined"
+                  :loading="loading"
+                  @click="clearDropdownFilters"
+                >
+                  {{ $trans('filter.clear-btn', 'Clear Filters') }}
+                </v-btn>
               </div>
 
-            </ue-filter>
-            <ue-dropdown-filter
-              @submit="submitFilter"
-              @clear="clearDropdownFilters"
-              :loading="loading"
-              :filter-ref="$refs.filter"
-
-              v-model:filterState="sharedFilterState"
-              :schema="filterSchema"
-            >
-
-            </ue-dropdown-filter>
+              <div class="medialibrary__filters medialibrary__filters--mobile">
+                <v-menu v-model="mobileFiltersOpen" :close-on-content-click="false" location="bottom end">
+                  <template #activator="{ props }">
+                    <v-btn v-bind="props" variant="outlined" append-icon="mdi-chevron-down">
+                      {{ $trans('filter.toggle-label', 'Filters') }}
+                    </v-btn>
+                  </template>
+                  <v-card min-width="320" class="medialibrary__filters-card">
+                    <v-card-text class="d-flex flex-column ga-3">
+                      <v-text-field
+                        v-model="sharedFilterState.search"
+                        type="search"
+                        :placeholder="$trans('filter.search-placeholder', 'Search')"
+                        variant="outlined"
+                        density="compact"
+                        hide-details="auto"
+                        clearable
+                        @keyup.enter="applyMobileFilters"
+                      />
+                      <v-autocomplete
+                        v-model="sharedFilterState.tag"
+                        :items="normalizedTags"
+                        item-title="title"
+                        item-value="value"
+                        :label="$trans('media-library.filter-select-label', 'Filter by tag')"
+                        variant="outlined"
+                        density="compact"
+                        hide-details="auto"
+                        clearable
+                      />
+                      <div class="d-flex flex-wrap ga-2">
+                        <v-btn
+                          color="primary"
+                          variant="flat"
+                          :loading="loading"
+                          @click="applyMobileFilters"
+                        >
+                          {{ $trans('filter.apply-btn', 'Apply Filters') }}
+                        </v-btn>
+                        <v-btn
+                          color="secondary"
+                          variant="outlined"
+                          :loading="loading"
+                          @click="clearMobileFilters"
+                        >
+                          {{ $trans('filter.clear-btn', 'Clear Filters') }}
+                        </v-btn>
+                      </div>
+                    </v-card-text>
+                  </v-card>
+                </v-menu>
+              </div>
+            </div>
           </div>
 
           <div class="medialibrary__inner">
@@ -236,7 +289,7 @@ export default {
         type: this.type ?? "image",
         page: this.page ?? this.initialPage
       },
-
+      mobileFiltersOpen: false,
 
 
       //   show: false
@@ -296,6 +349,12 @@ export default {
     canInsert: function () {
       return !this.selectedMedias.some(sMedia => !!this.usedMedias.find(uMedia => uMedia.id === sMedia.id))
     },
+    normalizedTags: function () {
+      return (this.tags || []).map(({ label, title, value }) => ({
+        title: title || label,
+        value
+      }))
+    },
     ...mapState({
       connector: state => state.mediaLibrary.connector,
       max: state => state.mediaLibrary.max,
@@ -312,39 +371,6 @@ export default {
 
       // show: state => state.mediaLibrary.showModal,
     }),
-    filterSchema: function(){
-      return {
-        tag: {
-          type: "select",
-          name: "tag",
-          label: "Filter by tags",
-          items: this.tags,
-          variant: "outlined",
-          // These were string literals ("true", "12") which Vuetify and
-          // VFormBase reject — booleans expect Boolean, and `col` must be
-          // an object/number (string '12' broke getFormData when it tried
-          // to set col.class on a primitive).
-          clearable: true,
-          chips: true,
-          col: { cols: 12 },
-        },
-        // clearBtn: {
-        //   type: "btn",
-        //   label: "Clear Filters",
-        //   loading: this.loading,
-        //   click: "handleClear"
-        // }
-      }
-    }
-
-    // show: {
-    //     get () {
-    //         return this.$store.state.mediaLibrary.showModal;
-    //     },
-    //     set (value) {
-    //         // this.$store.dispatch(ACTIONS.TOGGLE_MEDIA_MODAL, value)
-    //     }
-    // },
   },
   watch: {
     type: function () {
@@ -573,16 +599,24 @@ export default {
       })
     },
     clearDropdownFilters: function () {
-      const self = this
-      // reset tags
       this.sharedFilterState = {
-        tag: null, // Set tag to null when clearing
+        search: '',
+        tag: null,
         type: this.type,
-        page: this.page
-      };
-      this.$nextTick(function () {
-        self.submitFilter()
+        page: 1
+      }
+
+      this.$nextTick(() => {
+        this.submitFilter()
       })
+    },
+    applyMobileFilters: function () {
+      this.mobileFiltersOpen = false
+      this.submitFilter()
+    },
+    clearMobileFilters: function () {
+      this.mobileFiltersOpen = false
+      this.clearDropdownFilters()
     },
     submitFilter: function (formData) {
       const self = this
@@ -736,7 +770,10 @@ export default {
     },
 
     reloadTags: function (tags = []) {
-      this.tags = tags
+      this.tags = (tags || []).map(({ label, title, ...rest }) => ({
+        title: title || label,
+        ...rest
+      }))
     },
     cleanEmptyFilters: function(obj) {
       return Object.entries(obj).reduce((acc, [key, value]) => {
@@ -777,16 +814,58 @@ export default {
     background: $color__border--light;
     border-bottom: 1px solid $color__border;
     padding: 0 20px;
-    display:flex;
-    flex-flow:row;
+  }
+
+  .medialibrary__header-inner {
+    display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .medialibrary__nav {
+    flex: 1 1 auto;
+    margin: 0;
+    padding-left: 0;
+  }
+
+  .medialibrary__filters {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .medialibrary__filters--desktop {
+    @include breakpoint(small-) {
+      display: none;
+    }
+  }
+
+  .medialibrary__filters--mobile {
+    display: none;
 
     @include breakpoint(small-) {
-      .secondarynav {
-        padding-bottom: 10px;
-      }
+      display: flex;
+      width: 100%;
+      justify-content: flex-end;
     }
+  }
+
+  .medialibrary__search {
+    min-width: 180px;
+    max-width: 260px;
+  }
+
+  .medialibrary__tag-filter {
+    min-width: 200px;
+    max-width: 260px;
+  }
+
+  .medialibrary__filters-card {
+    padding-top: 4px;
   }
 
   .medialibrary__frame {
@@ -899,30 +978,10 @@ export default {
 
 <style lang="scss">
 
-  .medialibrary__filter-item {
-    .vselect {
-      min-width: 200px;
-    }
-  }
-
-  .medialibrary__filter-item.checkbox {
-    margin-top: 8px;
-    margin-right: 45px !important;
-  }
-
   .medialibrary__header {
     @include breakpoint(small-) {
-      .filter__inner {
-        flex-direction: column;
-      }
-
-      .filter__search, .filter__navigation {
-        padding-top: 10px;
-        display: flex;
-      }
-
-      .filter__search input {
-        flex-grow: 1;
+      .secondarynav {
+        padding-bottom: 10px;
       }
     }
   }
