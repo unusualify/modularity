@@ -278,6 +278,7 @@ export default {
       selectedMedias: [],
       gridHeight: 0,
       page: this.initialPage,
+      minPage: this.initialPage,
       tags: [],
       lastScrollTop: 0,
       gridLoaded: false,
@@ -399,10 +400,10 @@ export default {
 
       return media?.id ?? null
     },
-    buildGridRequestParams ({ includeFocusId = false } = {}) {
+    buildGridRequestParams ({ includeFocusId = false, page = null } = {}) {
       const params = {
         ...this.cleanEmptyFilters(this.sharedFilterState),
-        page: this.page,
+        page: page ?? this.page,
         itemsPerPage: this.itemsPerPage,
         type: this.type
       }
@@ -418,6 +419,7 @@ export default {
     },
     resetPagination () {
       this.page = 1
+      this.minPage = 1
       this.sharedFilterState.page = 1
       this.maxPage = 1
       this.gridHeight = 0
@@ -646,7 +648,7 @@ export default {
     clearMediaItems: function () {
       this.mediaItems.splice(0)
     },
-    reloadGrid: function ({ reset = false, includeFocusId = false } = {}) {
+    reloadGrid: function ({ reset = false, includeFocusId = false, direction = 'initial' } = {}) {
       if (this.isGuest) {
         return
       }
@@ -660,25 +662,56 @@ export default {
         this.clearMediaItems()
       }
 
+      if (direction === 'next' && this.page >= this.maxPage) {
+        return
+      }
+
+      if (direction === 'prev' && this.minPage <= 1) {
+        return
+      }
+
+      const list = this.$refs.list
+      const previousScrollHeight = list?.scrollHeight ?? 0
+      const previousScrollTop = list?.scrollTop ?? 0
+
+      let requestPage = this.page
+      if (direction === 'next') {
+        requestPage = this.page + 1
+      } else if (direction === 'prev') {
+        requestPage = this.minPage - 1
+      }
+
       const self = this
       this.loading = true
-      const formdata = self.buildGridRequestParams({ includeFocusId })
+      const formdata = self.buildGridRequestParams({
+        includeFocusId: includeFocusId && direction === 'initial',
+        page: requestPage
+      })
 
       // see api/media-library for actual ajax
       api.get(this.endpoint, formdata, (resp) => {
         const items = resp.data?.items ?? []
+        const loadedPage = resp.data.page || requestPage
 
-        items.forEach(item => {
-          if (!this.mediaItems.find(media => media.id === item.id)) {
-            this.mediaItems.push(item)
+        if (direction === 'prev') {
+          const newItems = items.filter(item => !this.mediaItems.find(media => media.id === item.id))
+          this.mediaItems = [...newItems, ...this.mediaItems]
+          this.minPage = loadedPage
+        } else {
+          items.forEach(item => {
+            if (!this.mediaItems.find(media => media.id === item.id)) {
+              this.mediaItems.push(item)
+            }
+          })
+          this.page = loadedPage
+          this.sharedFilterState.page = loadedPage
+
+          if (direction === 'initial') {
+            this.minPage = loadedPage
           }
-        })
+        }
 
         this.maxPage = resp.data.maxPage || 1
-        if (resp.data.page) {
-          this.page = resp.data.page
-          this.sharedFilterState.page = resp.data.page
-        }
 
         const tagList = resp.data.tags ?? []
         this.tags = tagList.map(({ label, ...rest }) => ({
@@ -689,7 +722,17 @@ export default {
         this.$store.commit(MEDIA_LIBRARY.UPDATE_MEDIA_TYPE_TOTAL, { type: this.type, total: resp.data.total })
         this.loading = false
         this.gridLoaded = true
-        this.listenScrollPosition()
+
+        if (direction === 'prev') {
+          self.$nextTick(() => {
+            if (list) {
+              list.scrollTop = previousScrollTop + (list.scrollHeight - previousScrollHeight)
+            }
+            self.listenScrollPosition()
+          })
+        } else {
+          self.listenScrollPosition()
+        }
       }, () => {
         this.loading = false
       })
@@ -746,17 +789,20 @@ export default {
       }
 
       const offset = 120
+      const scrollingDown = list.scrollTop > this.lastScrollTop
+      const scrollingUp = list.scrollTop < this.lastScrollTop
 
-      if (list.scrollTop > this.lastScrollTop && list.scrollTop + list.clientHeight >= list.scrollHeight - offset) {
+      if (scrollingDown && list.scrollTop + list.clientHeight >= list.scrollHeight - offset) {
         this.detachScrollPagination()
 
         if (this.maxPage > this.page) {
-          this.page = this.page + 1
-          this.sharedFilterState.page = this.page
-          this.reloadGrid()
+          this.reloadGrid({ direction: 'next' })
         } else {
           this.gridHeight = list.scrollHeight
         }
+      } else if (scrollingUp && list.scrollTop <= offset && this.minPage > 1) {
+        this.detachScrollPagination()
+        this.reloadGrid({ direction: 'prev' })
       }
 
       this.lastScrollTop = list.scrollTop
