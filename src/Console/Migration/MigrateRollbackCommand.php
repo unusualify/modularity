@@ -15,7 +15,9 @@ class MigrateRollbackCommand extends Command
      *
      * @var string
      */
-    protected $name = 'modularous:migrate:rollback';
+    protected $signature = 'modularous:migrate:rollback
+                            {module : The name of the module to rollback}
+                            {--pretend : Dump the SQL queries that would be run.}';
 
     /**
      * The console command description.
@@ -74,31 +76,25 @@ class MigrateRollbackCommand extends Command
 
         try {
             foreach ($batches as $batch) {
-                $this->call('migrate:rollback', [
-                    '--path' => $relativeDir,
+                $params = [
+                    '--path'  => $relativeDir,
                     '--batch' => $batch,
-                ]);
+                ];
+
+                if ($this->option('pretend')) {
+                    $params['--pretend'] = true;
+                }
+
+                $this->call('migrate:rollback', $params);
             }
 
-            $this->comment(" {$module->getStudlyName()} Module was rollbacked.");
+            $label = $this->option('pretend') ? 'rollback (pretend)' : 'rollbacked';
+            $this->comment(" {$module->getStudlyName()} Module was {$label}.");
 
         } catch (\Throwable $th) {
             $this->comment(" {$module->getStudlyName()} Module cannot be rollbacked.");
-
         }
 
         return 0;
-    }
-
-    /**
-     * Get the console command arguments.
-     *
-     * @return array
-     */
-    protected function getArguments()
-    {
-        return [
-            ['module', InputArgument::REQUIRED, 'Module name.'],
-        ];
     }
 }
