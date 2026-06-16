@@ -144,7 +144,7 @@ class FileLibraryController extends BaseController implements SignUploadListener
         return $item->mediableFormat() + [
             'tags' => $item->tags->map(function ($tag) {
                 return $tag->name;
-            }),
+            })->values()->all(),
             'deleteUrl' => $item->canDeleteSafely() ? moduleRoute($this->moduleName, $routeNamePrefix . $this->routePrefix, 'destroy', ['file' => $item->id]) : null,
             'updateUrl' => $this->urlGenerator->route(Route::hasAdmin('file-library.file.single-update')),
             'updateBulkUrl' => $this->urlGenerator->route(Route::hasAdmin('file-library.file.bulk-update')),
