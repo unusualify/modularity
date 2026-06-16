@@ -35,31 +35,23 @@
 
       <form v-if="hasMedia" ref="form" class="mediasidebar__inner mediasidebar__form" @submit="submit">
         <span class="mediasidebar__loader" v-if="loading"><span class="loader loader--small"><span></span></span></span>
-        <!-- <a17-vselect v-if="!fieldsRemovedFromBulkEditing.includes('tags')" :label="$trans('media-library.sidebar.tags')"
-          :key="firstMedia.id + '-' + medias.length" name="tags" :multiple="true"
-          :selected="hasMultipleMedias ? sharedTags : firstMedia.tags" :searchable="true"
-          :emptyText="$trans('media-library.no-tags-found', 'Sorry, no tags found.')" :taggable="true" :pushTags="true"
-          size="small" :endpoint="type.tagsEndpoint" @change="save" maxHeight="175px" /> -->
-          <template
-            v-if="!hasMultipleMedias"
-          >
-            <SelectTag
-              :label="$trans('media-library.sidebar.tags')"
-              :key="firstMedia.id + '-' + medias.length"
-              name=""
-              :v-model="hasMultipleMedias ? sharedTags : firstMedia.tags"
-              :options="tags"
-              :selected="hasMultipleMedias ? sharedTags : firstMedia.tags"
-              :searchable="true"
-              :multiple="true"
-              :emptyText="$trans('media-library.no-tags-found', 'Sorry, no tags found.')"
-              :taggable="true"
-              :pushTags="true"
-              size="small"
-              :endpoint="type.tagsEndpoint"
-              @change="save"
-            >
-            </SelectTag>
+        <v-combobox
+          v-if="!fieldsRemovedFromBulkEditing.includes('tags')"
+          v-model="mediaTags"
+          :items="tagComboboxItems"
+          :label="$trans('media-library.sidebar.tags', 'Tags')"
+          :no-data-text="$trans('media-library.no-tags-found', 'Sorry, no tags found.')"
+          multiple
+          chips
+          closable-chips
+          clearable
+          variant="outlined"
+          density="compact"
+          hide-details="auto"
+          class="mb-4"
+          @update:model-value="onTagsChange"
+        />
+        <template v-if="!hasMultipleMedias">
             <v-text-field
               :label="$trans('media-library.sidebar.alt-text')"
               variant="outlined"
@@ -202,16 +194,13 @@ import FormDataAsObj from '@/utils/formDataAsObj.js'
 import a17VueFilters from '@/utils/filters.js'
 import UeMediaSidebarUpload from './MediaSidebarUpload.vue'
 import { ALERT } from '@/store/mutations'
-import SelectTag from '@/components/inputs/SelectTag';
-import formDataAsObj from '../../../utils/formDataAsObj'
 
 // import a17Langswitcher from '@/components/LangSwitcher'
 
 export default {
   name: 'A17MediaSidebar',
   components: {
-    'ue-mediasidebar-upload': UeMediaSidebarUpload,
-    SelectTag
+    'ue-mediasidebar-upload': UeMediaSidebarUpload
 
     // 'a17-langswitcher': a17Langswitcher
   },
@@ -251,14 +240,30 @@ export default {
       focused: false,
       previousSavedData: {},
       fieldsRemovedFromBulkEditing: [],
+      mediaTags: [],
+      tagSuggestions: [],
+      skipTagsSave: false,
 
       deleteModalActive: false
     }
   },
   filters: a17VueFilters,
   watch: {
-    medias: function () {
-      this.fieldsRemovedFromBulkEditing = []
+    medias: {
+      handler: function () {
+        this.fieldsRemovedFromBulkEditing = []
+        this.syncMediaTags()
+      },
+      immediate: true,
+      deep: true
+    },
+    'firstMedia.tags': {
+      handler: function () {
+        if (this.hasSingleMedia && !this.skipTagsSave) {
+          this.syncMediaTags()
+        }
+      },
+      deep: true
     }
   },
   computed: {
@@ -278,9 +283,25 @@ export default {
       return this.type.value === 'image'
     },
     sharedTags: function () {
-      return this.medias.map((media) => {
-        return media.tags
-      }).reduce((allTags, currentTags) => allTags.filter(tag => currentTags.includes(tag)))
+      if (!this.medias.length) {
+        return []
+      }
+
+      return this.medias.reduce((common, media, index) => {
+        const tags = this.normalizeMediaTags(media.tags)
+
+        if (index === 0) {
+          return tags
+        }
+
+        return common.filter(tag => tags.includes(tag))
+      }, [])
+    },
+    tagComboboxItems: function () {
+      return [...new Set([
+        ...(this.tagSuggestions || []),
+        ...(this.mediaTags || [])
+      ])]
     },
     sharedMetadata () {
       return (name, type) => {
@@ -350,6 +371,76 @@ export default {
     })
   },
   methods: {
+    normalizeMediaTags: function (tags) {
+      if (!tags) {
+        return []
+      }
+
+      if (typeof tags === 'string') {
+        return tags.split(',').map(tag => tag.trim()).filter(Boolean)
+      }
+
+      if (Array.isArray(tags)) {
+        return tags.map((tag) => {
+          if (typeof tag === 'string') {
+            return tag
+          }
+
+          if (tag && typeof tag === 'object') {
+            return tag.name || tag.title || tag.label || tag.value || ''
+          }
+
+          return String(tag)
+        }).filter(Boolean)
+      }
+
+      if (typeof tags === 'object') {
+        return this.normalizeMediaTags(Object.values(tags))
+      }
+
+      return []
+    },
+    syncMediaTags: function () {
+      this.skipTagsSave = true
+
+      if (this.hasMultipleMedias) {
+        this.mediaTags = [...this.sharedTags]
+      } else if (this.hasSingleMedia) {
+        this.mediaTags = this.normalizeMediaTags(this.firstMedia.tags)
+      } else {
+        this.mediaTags = []
+      }
+
+      this.$nextTick(() => {
+        this.skipTagsSave = false
+
+        const form = this.$refs.form
+        if (form) {
+          this.previousSavedData = this.buildSavePayload(form)
+        }
+      })
+    },
+    loadTagSuggestions: function () {
+      if (!this.type?.tagsEndpoint) {
+        return
+      }
+
+      this.$axios.get(this.type.tagsEndpoint)
+        .then((response) => {
+          this.tagSuggestions = response.data?.resource?.data ?? []
+        })
+        .catch(() => {
+          this.tagSuggestions = []
+        })
+    },
+    onTagsChange: function (value) {
+      if (this.skipTagsSave) {
+        return
+      }
+
+      this.mediaTags = this.normalizeMediaTags(value)
+      this.save()
+    },
     replaceMedia: function () {
       // Open confirm dialog if any
       if (this.$root.$refs.replaceWarningMediaLibrary) {
@@ -419,6 +510,17 @@ export default {
     getFormData: function (form) {
       return FormDataAsObj(form)
     },
+    buildSavePayload: function (form) {
+      const data = this.getFormData(form) || {}
+
+      if (!this.fieldsRemovedFromBulkEditing.includes('tags')) {
+        data.tags = this.hasMultipleMedias
+          ? this.mediaTags.join(',')
+          : [...this.mediaTags]
+      }
+
+      return data
+    },
     getMediaToReplaceId: function () {
       return this.firstMedia.id
     },
@@ -463,7 +565,7 @@ export default {
       const form = this.$refs.form
       if (!form) return
 
-      const formData = this.getFormData(form)
+      const formData = this.buildSavePayload(form)
       if (!isEqual(formData, this.previousSavedData) && !this.loading) {
         this.previousSavedData = formData
         this.update(form)
@@ -478,7 +580,7 @@ export default {
 
       this.loading = true
 
-      const data = this.getFormData(form)
+      const data = this.buildSavePayload(form)
       data.fieldsRemovedFromBulkEditing = this.fieldsRemovedFromBulkEditing
 
       const url = this.hasMultipleMedias ? this.firstMedia.updateBulkUrl : this.firstMedia.updateUrl // single or multi updates
@@ -498,7 +600,11 @@ export default {
               return mediaFromResp.id === media.id
             })
           })
+        } else if (this.hasSingleMedia) {
+          this.firstMedia.tags = [...this.mediaTags]
         }
+
+        this.syncMediaTags()
       }, (error) => {
         this.loading = false
 
@@ -510,6 +616,9 @@ export default {
         }
       })
     }
+  },
+  mounted: function () {
+    this.loadTagSuggestions()
   }
 }
 </script>
