@@ -164,6 +164,20 @@ class ModuleActivator extends FileActivator
     }
 
     /**
+     * Ensure the routes statuses file exists as an empty object.
+     */
+    public function ensureFileExists(): void
+    {
+        if ($this->files->exists($this->statusesFile)) {
+            return;
+        }
+
+        $this->routesStatuses = [];
+        $this->files->put($this->statusesFile, json_encode(new \stdClass(), JSON_PRETTY_PRINT));
+        $this->flushCache();
+    }
+
+    /**
      * Reads the json file that contains the activation statuses.
      *
      * @throws FileNotFoundException

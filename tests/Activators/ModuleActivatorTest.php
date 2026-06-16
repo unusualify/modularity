@@ -423,18 +423,38 @@ class ModuleActivatorTest extends TestCase
     }
 
     /** @test */
+    public function it_creates_empty_routes_statuses_file_when_missing()
+    {
+        $this->assertFalse($this->files->exists($this->statusFile));
+
+        $this->activator->ensureFileExists();
+
+        $this->assertTrue($this->files->exists($this->statusFile));
+        $this->assertEquals([], $this->activator->readJson());
+        $this->assertEquals([], $this->activator->getRoutes());
+    }
+
+    /** @test */
+    public function it_does_not_overwrite_existing_routes_statuses_file()
+    {
+        $data = ['items' => true];
+
+        $this->files->put($this->statusFile, json_encode($data, JSON_PRETTY_PRINT));
+
+        $this->activator->ensureFileExists();
+
+        $this->assertEquals($data, $this->activator->readJson());
+    }
+
+    /** @test */
     public function it_can_work_with_empty_routes_list()
     {
-        // When no routes have been enabled yet, getRoutes might throw an exception
-        // because the file doesn't exist. This is expected behavior.
-        try {
-            $routes = $this->activator->getRoutes();
-            $this->assertIsArray($routes);
-            $this->assertEmpty($routes);
-        } catch (\Exception $e) {
-            // File not found is expected when no routes exist yet
-            $this->assertStringContainsString('File does not exist', $e->getMessage());
-        }
+        $this->activator->ensureFileExists();
+
+        $routes = $this->activator->getRoutes();
+
+        $this->assertIsArray($routes);
+        $this->assertEmpty($routes);
     }
 
     /** @test */

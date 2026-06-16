@@ -190,6 +190,14 @@ class Module extends NwidartModule
     }
 
     /**
+     * Ensure the routes statuses file exists as an empty object.
+     */
+    public function ensureRoutesStatusesFile(): void
+    {
+        $this->moduleActivator->ensureFileExists();
+    }
+
+    /**
      * Enable the current module route.
      */
     public function enableRoute($route): void
