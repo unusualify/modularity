@@ -2,6 +2,33 @@
 
 All notable changes to `modularous` will be documented in this file
 
+## v12.1.3 - 2026-06-16
+
+### :rocket: Features
+
+- add FlushLibraryUploadsCommand and OrphanUploadCleanup service for managing orphan upload folders by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/e2d9ad1058d722d1da15106f8b794ecf5101a204
+- implement pagination controls for media grid with next and previous navigation by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/7be53a3dd699bebc5a80be798daec44f3a74de13
+
+### :wrench: Bug Fixes
+
+- correct tags mapping to ensure proper array formatting in mediableFormat method by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/81ae5798d1b1100c0170089e778b5c638906c965
+
+### :recycle: Refactors
+
+- enhance media filtering UI with improved tag selection and mobile responsiveness by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/a45537eb72f46444ba2f0357099b57020c1004d4
+
+### :lipstick: Styling
+
+- lint coding styles for v12.1.3 by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/b884cf703a0a8a1220b233ce028470f2c75c9a4a
+
+### :white_check_mark: Testing
+
+- add OrphanUploadCleanupTest to verify orphan folder deletion functionality by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/d1b92a79d52e79e3c6ac9cb653fb82f652820041
+
+### :package: Build
+
+- update build artifacts for v12.1.3 by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/933363dc2bcf5a9110466baeda41b284ec3dbe94
+
 ## v12.1.2 - 2026-06-15
 
 ### :wrench: Bug Fixes
