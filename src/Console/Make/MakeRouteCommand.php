@@ -126,12 +126,6 @@ class MakeRouteCommand extends BaseCommand
 
     private function checkOption($option)
     {
-        // dd(
-        //     $this->options(),
-        //     $option,
-        //     $this->hasOption($option),
-        //     // $this->option($option)
-        // );
         if (! $this->hasOption($option)) {
             return false;
         }
@@ -154,9 +148,6 @@ class MakeRouteCommand extends BaseCommand
 
         $currentDefaultAnswer = $this->defaultReject ? 0 : ($defaultAnswers[$option] ?? 1);
 
-        // dd(
-        //     $this->choice($questions[$option], ['no', 'yes'], $currentDefaultAnswer)
-        // );
         return $this->choice($questions[$option], ['no', 'yes'], $currentDefaultAnswer) === 'yes';
     }
 }
