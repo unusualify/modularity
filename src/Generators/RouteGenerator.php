@@ -656,7 +656,6 @@ class RouteGenerator extends Generator
             return 0;
         } else {
             if ($this->module->getRawRouteConfig($name)) {
-                // dd($this->force);
                 if ($this->force) {
                     // $this->module->delete($name);
                 } elseif (! $this->fix) {
@@ -702,16 +701,6 @@ class RouteGenerator extends Generator
             }
 
         }
-
-        // $this->generateRouteJsonFile();
-        // if ($this->type !== 'plain') {
-        //     $this->generateFiles();
-        //     $this->generateResources();
-        // }
-        // if ($this->type === 'plain') {
-        //     $this->cleanModuleJsonFile();
-        // }
-        // $this->activator->setActiveByName($name, $this->isActive);
 
         $this->console->info("Route [{$name}] " . ($this->fix ? 'fixed' : 'created') . ' successfully.');
 
@@ -879,12 +868,10 @@ class RouteGenerator extends Generator
 
         // add repository
         if ($this->generatorConfig('repository')->generate()) {
-            // $this->console->call('module:make-repository', [
             $this->console->call('modularous:make:repository', [
                 'module' => $this->module->getStudlyName(),
                 'repository' => $this->getName(),
             ]
-                // + ($hasCustomModel ? [ '--custom-model' => $this->customModel] : [])
                 + $console_traits
                 + ['--notAsk' => true]
             );
@@ -1056,23 +1043,6 @@ class RouteGenerator extends Generator
     {
         $headline = $this->getHeadline($this->getName());
         $plural = pluralize($headline);
-        $langDir = $this->module->getDirectoryPath(GenerateConfigReader::read('lang')->getPath());
-
-        // dd(
-        //     // $langDir,
-        //     // getLocales(),
-        //     // $this->translation->allLanguages(),
-        //     // $this->translation->getSourceLanguageTranslationsWith('en'),
-        //      // $this->translation->getGroupsFor('en'),
-        //      // $this->translation->filterTranslationsFor('en', 'announcement'),
-
-        //     // $this->translation->addGroupTranslation('en', 'modules', 'announcement.ab.name', 'Blah | Blabs | {n} Blabs'),
-        //     // $this->translation->addGroupTranslation('tr', 'modules', 'announcement.ab.name', 'Blah | Blabs | {n} Blabs'),
-
-        //     // $this->translation->addGroupTranslation('en', 'announcement_module::test', 'name', 'Test | Tests | {n} Tests'),
-        //     // $this->translation->addGroupTranslation('tr', 'announcement_module::test', 'name', 'Deneme | Denemeler | {n} Denemeler'),
-        //     // Arr::sortRecursive($lang),
-        // );
 
         $languageKey = "{$this->module->getSnakeName()}.{$this->getSnakeCase($this->name)}.name";
         $languageValue = "{$headline} | {$plural} | {n} {$plural}";
@@ -1136,7 +1106,6 @@ class RouteGenerator extends Generator
 
                 foreach ($parser->getColumnTypes() as $column => $type) {
                     if (in_array($type, ['belongsToMany'])) {
-                        // dd(explode('|', $this->relationships), $parser->getColumnTypes());
                         $route_name = $column;
                         sleep(1);
 
@@ -1157,7 +1126,6 @@ class RouteGenerator extends Generator
                     }
 
                     if (in_array($type, ['morphedByMany']) || in_array($column, ['morphedByMany'])) {
-                        // $migratable = true;
                         $route_name = in_array($column, ['morphedByMany']) ? $this->name : $column;
 
                         sleep(1);
@@ -1402,8 +1370,6 @@ class RouteGenerator extends Generator
 
             $this->updateConfigFile();
 
-            // $this->generateFolders();
-
             $console_traits = $this->traits->mapWithKeys(function ($item, $key) {
                 return ["--{$key}" => $item];
             })->toArray();
@@ -1455,9 +1421,6 @@ class RouteGenerator extends Generator
                     );
                 }
             }
-            // dd( 'end of test');
-
-            // $this->generateFiles();
         }
 
         $this->console->info('Route generator test is completed successfully!');
