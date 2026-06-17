@@ -250,6 +250,28 @@ class RegisterBrokerTest extends ModelTestCase
         Notification::assertSentTimes(EmailVerification::class, 1);
     }
 
+    public function test_send_verification_link_is_throttled()
+    {
+        Notification::fake();
+
+        $email = 'throttled@example.com';
+
+        // Insert a recently created token for an UNregistered email so that
+        // recentlyCreatedToken() returns true and the broker throttles.
+        DB::table('um_email_verification_tokens')->insert([
+            'email' => $email,
+            'token' => $this->app['hash']->make('12345678'),
+            'created_at' => now(),
+        ]);
+
+        $this->assertEquals(
+            RegisterBroker::RESET_THROTTLED,
+            $this->broker->sendVerificationLink(['email' => $email]),
+        );
+
+        Notification::assertNothingSent();
+    }
+
     public function test_send_verification_link_with_callback()
     {
         Notification::fake();
