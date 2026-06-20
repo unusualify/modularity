@@ -33,12 +33,12 @@ export default function useDraggable (props, context) {
     dragOptions: computed(() => {
       return {
         disabled: !props.draggable,
-        animation: state.animation
-        // handle: state.handle
-        // ghostClass: state.ghostClass,
-        // chosenClass: state.chosenClass,
-        // dragClass: state.dragClass,
-        // scrollSensitivity: state.scrollSensitivity,
+        animation: state.animation,
+        handle: props.draggable ? state.handle : undefined,
+        ghostClass: state.ghostClass,
+        chosenClass: state.chosenClass,
+        dragClass: state.dragClass,
+        scrollSensitivity: state.scrollSensitivity,
       }
     })
   })

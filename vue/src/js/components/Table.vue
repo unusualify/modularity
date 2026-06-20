@@ -31,7 +31,8 @@
           roundedRows ? 'ue-datatable--rounded-row' : '',
           hideBorderRow ? 'ue-datatable--no-border-row' : '',
           controlsPosition === 'bottom' || $vuetify.display.smAndDown ? 'ue-datatable--bottom-controls' : '',
-          fixedLastColumn ? 'ue-datatable--fixed-last-column' : ''
+          fixedLastColumn ? 'ue-datatable--fixed-last-column' : '',
+          isDraggableActive ? 'ue-table--draggable' : '',
         ]"
         id="ue-table"
 
@@ -51,9 +52,11 @@
         :item-title="titleKey"
         ref="datatable"
 
-        :height="windowSize.y - 64 - 24 - 59 - (hideFooter ? 0 : 76) - ($vuetify.display.mdAndDown ? 80 : 0)"
+        :height="windowSize.y - 64 - 24 - 59 - (hideTableFooter ? 0 : 76) - ($vuetify.display.mdAndDown ? 80 : 0)"
 
         :hide-default-header="hideHeaders || ($vuetify.display.smAndDown && !showMobileHeaders)"
+        :hide-default-body="isDraggableActive"
+        :hide-default-footer="hideTableFooter"
         :multi-sort="multiSort"
         :must-sort="mustSort"
         :group-by="options.groupBy"
@@ -677,7 +680,7 @@
         </template>
 
         <!-- MARK PAGINATION BUTTONS -->
-        <template v-if="hideFooter" v-slot:bottom="{page, pageCount}">
+        <template v-if="hideTableFooter" v-slot:bottom="{page, pageCount}">
         </template>
         <template v-else-if="enableCustomFooter || $vuetify.display.smAndDown" v-slot:bottom="{page, pageCount}">
           <div class="d-flex justify-end py-4">
@@ -860,6 +863,33 @@
 
         </template>
 
+        <template v-if="isDraggableActive" v-slot:header.data-table-drag-handle>
+          <v-tooltip :text="$t('fields.medias.reorder', 'Reorder')" location="top">
+            <template v-slot:activator="{ props: dragHeaderProps }">
+              <v-icon
+                v-bind="dragHeaderProps"
+                size="small"
+                color="medium-emphasis"
+                icon="mdi-drag-vertical"
+              />
+            </template>
+          </v-tooltip>
+        </template>
+
+        <template v-if="isDraggableActive" v-slot:item.data-table-drag-handle>
+          <v-tooltip :text="$t('fields.medias.reorder', 'Reorder')" location="top">
+            <template v-slot:activator="{ props: dragHandleProps }">
+              <v-icon
+                v-bind="dragHandleProps"
+                class="drag__handle ue-table__drag-handle"
+                size="small"
+                color="medium-emphasis"
+                icon="mdi-drag-vertical"
+              />
+            </template>
+          </v-tooltip>
+        </template>
+
         <template v-slot:header.data-table-group>
           <div class="d-inline-flex align-center ga-1 flex-nowrap">
             <span>{{ $t('Group') }}</span>
@@ -985,45 +1015,34 @@
             <v-progress-circular :indeterminate="loading" v-if="enableInfiniteScroll && loading"></v-progress-circular>
         </template>
 
-        <template v-slot:default v-if="draggable">
-          <thead>
-            <slot :name="headers">
-              <VDataTableHeaders :mobile="this.datatable.mobile" :color="this.headerOptions.color">
-                <template v-for="(_, name) in this.datatable.$slots" v-slot:[name]="slotData">
-                  <slot :name="name" v-bind="slotData">
-                    <component
-                      :is="this.datatable.$slots[name]"
-                      v-bind="slotData"
-                    />
-                  </slot>
-
-                </template>
-              </VDataTableHeaders>
-            </slot>
-          </thead>
-
+        <template v-if="isDraggableActive" v-slot:tbody>
           <Draggable
-            :model-value="elements"
-            item-key="position"
+            v-model="elements"
+            item-key="id"
             v-bind="dragOptions"
             tag="tbody"
             class="v-data-table__tbody"
+            role="rowgroup"
             @update:modelValue="sortElements"
           >
             <template #item="itemSlot">
-              <VDataTableRow :item="draggableItems[itemSlot.index]" :mobile="this.datatable.mobile">
-                <template v-for="(_, name) in this.datatable.$slots" v-slot:[name]="slotData">
-                  <slot :name="name" v-bind="slotData">
-                    <component
-                      :is="this.datatable.$slots[name]",
-                      v-bind="{
-                        ...slotData,
-                        ...{
-                          item: elements[itemSlot.index]
-                        }
-                      }"
-                    />
-                  </slot>
+              <VDataTableRow
+                :index="itemSlot.index"
+                :item="draggableItems[itemSlot.index]"
+                :mobile="datatable?.mobile ?? isDataTableMobile"
+              >
+                <template
+                  v-for="(_, name) in datatable?.$slots ?? {}"
+                  :key="name"
+                  v-slot:[name]="slotData"
+                >
+                  <component
+                    :is="datatable.$slots[name]"
+                    v-bind="{
+                      ...slotData,
+                      item: elements[itemSlot.index],
+                    }"
+                  />
                 </template>
               </VDataTableRow>
             </template>
@@ -1145,6 +1164,21 @@ export default {
         width: 100px !important
         min-width: 100px !important
         max-width: 100px !important
+
+  #ue-table.ue-table--draggable
+    .ue-table__drag-handle
+      cursor: grab
+      opacity: 0.45
+      transition: opacity 0.15s ease, color 0.15s ease
+
+    tr:hover .ue-table__drag-handle
+      opacity: 1
+      color: rgb(var(--v-theme-primary)) !important
+
+    .sortable-chosen .ue-table__drag-handle,
+    .sortable-drag .ue-table__drag-handle
+      cursor: grabbing
+      opacity: 1
 
   #ue-table
     .v-data-table-group-header-row

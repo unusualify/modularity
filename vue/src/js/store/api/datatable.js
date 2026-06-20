@@ -106,7 +106,7 @@ export default {
       globalError(component, error)
     })
   },
-  reorder (url = null ,ids, callback) {
+  reorder (url = null ,ids, callback, errorCallback = null) {
     const requestUrl = url ?? window[import.meta.env.VUE_APP_NAME].ENDPOINTS.reorder;
     axios.post(requestUrl, {
       ids: ids
@@ -118,6 +118,7 @@ export default {
         value: resp
       }
       globalError(component, error)
+      if (errorCallback && typeof errorCallback === 'function') errorCallback(error)
     })
   },
 

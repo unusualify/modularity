@@ -259,8 +259,17 @@ export default function useTable (props, context) {
     ...(isStoreTable.value ? lastParameters : {})
   }, ['itemsPerPage', 'page', 'sortBy', 'groupBy', 'search']))
 
+  const resolvePaginatedItemsPerPage = () => {
+    const fromDefaults = props.defaultTableOptions?.itemsPerPage
+    if (fromDefaults && fromDefaults !== -1) {
+      return fromDefaults
+    }
+
+    return 10
+  }
+
   watch(() => smAndDown.value, (newValue, oldValue) => {
-    if(newValue){
+    if(newValue && options.value.itemsPerPage !== -1){
       options.value.itemsPerPage = Math.min(...props.itemsPerPageOptions.map(option => option.value))
     }
   })
@@ -354,6 +363,15 @@ export default function useTable (props, context) {
       }
     }
 
+    if (props.draggable) {
+      if (isDraggableActive.value) {
+        payload.itemsPerPage = -1
+        payload.page = 1
+      } else {
+        payload.itemsPerPage = resolvePaginatedItemsPerPage()
+      }
+    }
+
     if(_.isObject(props.endpoints) && props.endpoints.index) {
       const queryParameters = getQueryParameters()
       await api.get( props.endpoints.index, payload,
@@ -388,6 +406,61 @@ export default function useTable (props, context) {
     }
   })
   const TableFilters = useTableFilters(props)
+
+  const isDraggableActive = computed(() => {
+    if (!props.draggable) {
+      return false
+    }
+
+    if (TableFilters.search.value !== '') {
+      return false
+    }
+
+    if (TableFilters.activeFilterSlug.value !== 'all') {
+      return false
+    }
+
+    if (!_.isEmpty(TableFilters.activeAdvancedFilters.value)) {
+      return false
+    }
+
+    if (options.value.groupBy?.length) {
+      return false
+    }
+
+    return true
+  })
+
+  if (props.draggable) {
+    if (isDraggableActive.value) {
+      options.value.itemsPerPage = -1
+      options.value.page = 1
+    } else {
+      options.value.itemsPerPage = resolvePaginatedItemsPerPage()
+    }
+  }
+
+  watch(isDraggableActive, (active) => {
+    if (!props.draggable) {
+      return
+    }
+
+    if (active) {
+      options.value.itemsPerPage = -1
+      options.value.page = 1
+    } else {
+      options.value.itemsPerPage = resolvePaginatedItemsPerPage()
+    }
+  })
+
+  const hideTableFooter = computed(() => {
+    if (props.draggable) {
+      return isDraggableActive.value
+    }
+
+    return props.hideFooter
+  })
+
   const TableHeaders = useTableHeaders(props)
   const TableGroup = useTableGroup(props, options)
   const state = reactive({ id: Math.ceil(Math.random() * 1000000) + '-table' })
@@ -410,6 +483,21 @@ export default function useTable (props, context) {
       loadItems
     }
   })
+
+  /** Vuetify group-by column (`data-table-group`); fixed width so it does not grow/shrink on UI interaction. */
+  const DATA_TABLE_GROUP_COLUMN_WIDTH = 100
+  const DATA_TABLE_DRAG_HANDLE_COLUMN_WIDTH = 44
+  const DATA_TABLE_DRAG_HANDLE_COLUMN_KEY = 'data-table-drag-handle'
+
+  const dragHandleColumn = {
+    key: DATA_TABLE_DRAG_HANDLE_COLUMN_KEY,
+    title: '\u00A0',
+    width: DATA_TABLE_DRAG_HANDLE_COLUMN_WIDTH,
+    minWidth: DATA_TABLE_DRAG_HANDLE_COLUMN_WIDTH,
+    maxWidth: DATA_TABLE_DRAG_HANDLE_COLUMN_WIDTH,
+    sortable: false,
+    align: 'center',
+  }
 
   const openItemForm = (id) => {
     const item = state.elements.find(element => element.id == id)
@@ -469,26 +557,29 @@ export default function useTable (props, context) {
     activeItemConfiguration: null,
     enableInfiniteScroll: computed(() => props.paginationOptions.footerComponent === 'infiniteScroll' && totalNumberOfElements.value > elements.value.length),
     draggableItems: computed(() => {
-      const items = state.elements.reduce((prev, curr, currentIndex) => {
-        const newItem = {
-          "type": "item",
-          "key": currentIndex+1,
-          "value": curr.id, // Todo datatable ref item-key prop instead of static.id
-          "index" : currentIndex,
-          "selectable": props.showSelect,
-          "columns": TableHeaders.headers.value.reduce((headersPrev, header) => {
-            headersPrev[header.key] = curr[header.key]
+      const rows = Array.isArray(state.elements) ? state.elements : (state.elements?.value ?? [])
 
-            return headersPrev
-          }, {})
-        };
+      return rows.map((curr, currentIndex) => {
+        const columns = TableHeaders.selectedHeaders.value.reduce((headersPrev, header) => {
+          headersPrev[header.key] = curr[header.key] ?? curr[header.value] ?? curr[header.sourceKey]
 
-        // prev.push(newItem);
-        prev[currentIndex] = newItem
-        return prev;
-      }, []); // Array of Objects
+          return headersPrev
+        }, {})
 
-      return items;
+        if (isDraggableActive.value) {
+          columns[DATA_TABLE_DRAG_HANDLE_COLUMN_KEY] = null
+        }
+
+        return {
+          type: 'item',
+          key: curr.id,
+          value: curr.id,
+          index: currentIndex,
+          selectable: props.showSelect,
+          raw: curr,
+          columns,
+        }
+      })
     }),
   })
 
@@ -527,24 +618,38 @@ export default function useTable (props, context) {
     setEditedItem: TableItem.setEditedItem,
     resetEditedItem: TableItem.resetEditedItem,
     sortElements(list){
-      // state.elements = list;
-
-      if(_.isObject(props.endpoints) && props.endpoints.reorder) {
-        api.reorder(
-          props.endpoints.reorder,
-          // For Optimistic UI approach, did not query for new list,
-          // used response.status and new modelValue
-          list.map((element) => element.id), function(response){
-            if(response.status === 200){
-              list.forEach((element, index) => element.position = index+1)
-              state.elements = list
-            }
-          }
-        )
-      } else {
-        console.error(`No reorder endpoint found in endpoints of props`)
+      if (!isDraggableActive.value) {
+        return
       }
 
+      const orderKey = props.orderKey || 'position'
+      const previousElements = _.cloneDeep(elements.value)
+
+      const reordered = list.map((element, index) => ({
+        ...element,
+        [orderKey]: index + 1,
+      }))
+
+      setElements(reordered)
+
+      if(!(_.isObject(props.endpoints) && props.endpoints.reorder)) {
+        setElements(previousElements)
+        console.error(`No reorder endpoint found in endpoints of props`)
+        return
+      }
+
+      api.reorder(
+        props.endpoints.reorder,
+        reordered.map((element) => element.id),
+        function(response){
+          if(response.status !== 200){
+            setElements(previousElements)
+          }
+        },
+        function(){
+          setElements(previousElements)
+        }
+      )
     },
     hydrateNestedData: function (item, data) {
       const valuePattern = /\$([A-Za-z]+)/
@@ -794,7 +899,7 @@ export default function useTable (props, context) {
    * slot forwarding and breaks item.actions and other item.* slots on VDataTableRow).
    */
   const dataTableRowProps = computed(() => {
-    if (!props.isClickableRows || TableHeaders.hasCustomRow.value || props.draggable) {
+    if (!props.isClickableRows || TableHeaders.hasCustomRow.value || isDraggableActive.value) {
       return undefined
     }
     return ({ item }) => {
@@ -812,11 +917,14 @@ export default function useTable (props, context) {
     }
   })
 
-  /** Vuetify group-by column (`data-table-group`); fixed width so it does not grow/shrink on UI interaction. */
-  const DATA_TABLE_GROUP_COLUMN_WIDTH = 100
-
   const headersForDataTable = computed(() => {
-    const headers = TableHeaders.selectedHeaders.value.map((h) => ({ ...h }))
+    let headers = TableHeaders.selectedHeaders.value.map((h) => ({ ...h }))
+
+    if (isDraggableActive.value) {
+      headers = headers.filter((h) => h.key !== DATA_TABLE_DRAG_HANDLE_COLUMN_KEY)
+      headers.unshift({ ...dragHandleColumn })
+    }
+
     if (!options.groupBy?.length) {
       return headers
     }
@@ -854,6 +962,8 @@ export default function useTable (props, context) {
     dataTableRowProps,
     headersForDataTable,
     isDataTableMobile,
+    isDraggableActive,
+    hideTableFooter,
     ...formatter,
   }
 }

@@ -771,11 +771,11 @@ abstract class PanelController extends CoreController implements CacheableInterf
      */
     protected function getIndexItems($with = [], $scopes = [], $appends = [], $forcePagination = false)
     {
-        $perPage = $this->request->get('itemsPerPage') ?? $this->getTableAttribute('itemsPerPage') ?? $this->perPage ?? 10;
-
-        if (! $this->request->ajax()) {
-            $perPage = 0;
-        }
+        $perPage = method_exists($this, 'resolveIndexQueryPerPage')
+            ? $this->resolveIndexQueryPerPage()
+            : ($this->request->ajax()
+                ? (int) ($this->request->get('itemsPerPage') ?? $this->perPage ?? 10)
+                : 0);
 
         $exceptIds = $this->request->get('exceptIds') ?? [];
 

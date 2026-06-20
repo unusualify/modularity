@@ -43,6 +43,7 @@ return [
     ],
     'addPosition' => [
         'model' => 'HasPosition',
+        'repository' => 'PositionTrait',
         'question' => 'Do you need to manage the position of records on this module?',
         'command_option' => [
             'shortcut' => '--P',
