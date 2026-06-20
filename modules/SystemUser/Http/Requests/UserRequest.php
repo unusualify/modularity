@@ -2,6 +2,8 @@
 
 namespace Modules\SystemUser\Http\Requests;
 
+use Illuminate\Support\Facades\Auth;
+use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Http\Requests\Request;
 
 class UserRequest extends Request
@@ -20,25 +22,30 @@ class UserRequest extends Request
                 function ($attribute, $value, $fail) {
                     $rolesTable = config('permission.table_names.roles', 'sp_roles');
                     // Get superadmin role ID
-                    $superadminRole = \DB::table($rolesTable)
-                        ->where('name', 'superadmin')
-                        ->first();
+                    $authorizedUser = Auth::guard(Modularous::getAuthGuardName())->user();
 
-                    if ($superadminRole) {
-                        $superadminId = $superadminRole->id;
+                    if (!$authorizedUser->hasRole('superadmin')) {
+                        $superadminRole = \DB::table($rolesTable)
+                            ->where('name', 'superadmin')
+                            ->first();
 
-                        // Check if roles is an array
-                        if (is_array($value)) {
-                            if (in_array($superadminId, $value)) {
-                                $fail('The roles field cannot contain the superadmin role.');
-                            }
-                        } else {
-                            // Check if roles is a single integer ID
-                            if ((int) $value === $superadminId) {
-                                $fail('The roles field cannot be the superadmin role.');
+                        if ($superadminRole) {
+                            $superadminId = $superadminRole->id;
+
+                            // Check if roles is an array
+                            if (is_array($value)) {
+                                if (in_array($superadminId, $value)) {
+                                    $fail('The roles field cannot contain the superadmin role.');
+                                }
+                            } else {
+                                // Check if roles is a single integer ID
+                                if ((int) $value === $superadminId) {
+                                    $fail('The roles field cannot be the superadmin role.');
+                                }
                             }
                         }
                     }
+
                 },
             ],
         ];
