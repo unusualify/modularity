@@ -44,6 +44,7 @@ const hydrateTypeMap = {
   'input-checklist-group': 'VInputChecklistGroup',
   'input-comparison-table': 'VInputComparisonTable',
   'input-date': 'VInputDate',
+  'input-editor': 'VInputEditor',
   'input-file': 'VInputFile',
   'input-filepond': 'VInputFilepond',
   'input-filepond-avatar': 'VInputFilepondAvatar',

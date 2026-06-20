@@ -187,7 +187,14 @@ export default defineConfig(({ command, mode }) => {
       }),
       Components(),
       splitVendorChunkPlugin(),
-      viteCommonjs(),
+      // Only transform legacy CJS packages that need it. Default (no include) transforms
+      // all of node_modules and breaks ESM packages (e.g. lodash-es).
+      viteCommonjs({
+        include: [
+          '/node_modules/fine-uploader/',
+          '/node_modules/fine-uploader-wrappers/',
+        ],
+      }),
 
       VitePluginSvgSpritemap([
         `./src/sass/themes/${APP_THEME_FOLDER}/icons/**/*.svg`,
@@ -210,10 +217,6 @@ export default defineConfig(({ command, mode }) => {
       alias: {
         vue: 'vue/dist/vue.esm-bundler.js',
         'vue-template-compiler$': '~/vue-template-compiler/build.js',
-        'prosemirror-tables': `${path.join(__dirname, 'node_modules/prosemirror-tables/src/index.js')}`,
-        'prosemirror-state': `${path.join(__dirname, 'node_modules/prosemirror-state/src/index.js')}`,
-        'prosemirror-view': `${path.join(__dirname, 'node_modules/prosemirror-view/src/index.js')}`,
-        'prosemirror-transform': `${path.join(__dirname, 'node_modules/prosemirror-transform/src/index.js')}`,
 
         '@': fileURLToPath(new URL(`${srcDir}/js`, import.meta.url)),
         styles: fileURLToPath(new URL(`${srcDir}/sass`, import.meta.url)),
@@ -265,6 +268,10 @@ export default defineConfig(({ command, mode }) => {
           manualChunks: function manualChunks (id) {
             if (id.match(/node_modules\/(vuetify|fine-uploader\/|awesome-phonenumber)/)) {
               return id.toString().split('node_modules/')[1].split('/')[0].toString()
+            }
+
+            if (id.includes('node_modules/@tiptap/')) {
+              return 'tiptap'
             }
           },
           assetFileNames: (assetInfo) => {
@@ -345,6 +352,17 @@ export default defineConfig(({ command, mode }) => {
         }
       }
     },
-    server
+    server,
+    optimizeDeps: {
+      holdUntilCrawlEnd: true,
+      include: [
+        'vue',
+        'vuex',
+        'vue-i18n',
+      ],
+      esbuildOptions: {
+        target: 'esnext',
+      },
+    },
   }
 })
