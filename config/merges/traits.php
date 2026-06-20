@@ -1,14 +1,8 @@
 <?php
 
-use Modules\Cms\Entities\Concerns\HasParentSegment;
-use Modules\Cms\Entities\Concerns\IsCmr;
-use Modules\Cms\Repositories\Traits\CmrTrait;
-use Modules\Cms\Repositories\Traits\ParentSegmentTrait;
 use Oobook\Snapshot\Traits\HasSnapshot;
 use Symfony\Component\Console\Input\InputOption;
 use Unusualify\Modularous\Entities\Interfaces\Sortable;
-use Unusualify\Modularous\Entities\Traits\Publishable;
-use Unusualify\Modularous\Repositories\Traits\PublishableTrait;
 
 return [
     'addTranslation' => [
@@ -135,8 +129,8 @@ return [
         ],
     ],
     'addCmr' => [
-        'model' => IsCmr::class,
-        'repository' => CmrTrait::class,
+        'model' =>\Modules\Cms\Entities\Concerns\IsCmr::class,
+        'repository' => \Modules\Cms\Repositories\Traits\CmrTrait::class,
         'question' => 'Do you need to add content module route (CMR) feature on this module route?',
         'command_option' => [
             'shortcut' => null,
@@ -145,8 +139,8 @@ return [
         ],
     ],
     'addParentSegment' => [
-        'model' => HasParentSegment::class,
-        'repository' => ParentSegmentTrait::class,
+        'model' => \Modules\Cms\Entities\Concerns\HasParentSegment::class,
+        'repository' => \Modules\Cms\Repositories\Traits\ParentSegmentTrait::class,
         'question' => 'Do you need to add parent segment feature on this module route?',
         'command_option' => [
             'shortcut' => null,
@@ -155,13 +149,23 @@ return [
         ],
     ],
     'addPublishable' => [
-        'model' => Publishable::class,
-        'repository' => PublishableTrait::class,
+        'model' => 'Publishable',
+        'repository' => 'PublishableTrait',
         'question' => 'Do you need to add publishable feature on this module route?',
         'command_option' => [
             'shortcut' => null,
             'input_type' => InputOption::VALUE_NONE,
             'description' => 'Do you need to add publishable feature on this module route?',
+        ],
+    ],
+    'addRepeater' => [
+        'model' => 'HasRepeaters',
+        'repository' => 'RepeatersTrait',
+        'question' => 'Do you need to add repeater feature on this module route?',
+        'command_option' => [
+            'shortcut' => null,
+            'input_type' => InputOption::VALUE_NONE,
+            'description' => 'Do you need to add repeater feature on this module route?',
         ],
     ],
 ];
