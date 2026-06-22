@@ -610,4 +610,56 @@ class ModuleActivatorTest extends TestCase
         $this->assertNotNull($decoded);
         $this->assertIsArray($decoded);
     }
+
+    /** @test */
+    public function it_deletes_statuses_file_on_reset()
+    {
+        $this->activator->enable('items');
+        $this->activator->enable('categories');
+
+        $this->assertTrue($this->files->exists($this->statusFile));
+
+        $this->activator->reset();
+
+        $this->assertFalse($this->files->exists($this->statusFile));
+    }
+
+    /** @test */
+    public function it_clears_route_statuses_on_reset()
+    {
+        $this->activator->enable('items');
+        $this->activator->disable('categories');
+
+        $this->assertCount(2, $this->activator->getRoutesStatuses());
+
+        $this->activator->reset();
+
+        $statuses = $this->activator->getRoutesStatuses();
+        $this->assertIsArray($statuses);
+        $this->assertEmpty($statuses);
+    }
+
+    /** @test */
+    public function it_treats_all_routes_as_inactive_after_reset()
+    {
+        $this->activator->enable('items');
+        $this->assertTrue($this->activator->hasStatus('items', true));
+
+        $this->activator->reset();
+
+        // Once reset, the previously enabled route should be treated as inactive
+        $this->assertFalse($this->activator->hasStatus('items', true));
+        $this->assertTrue($this->activator->hasStatus('items', false));
+    }
+
+    /** @test */
+    public function it_does_not_fail_when_resetting_without_existing_file()
+    {
+        $this->assertFalse($this->files->exists($this->statusFile));
+
+        $this->activator->reset();
+
+        $this->assertFalse($this->files->exists($this->statusFile));
+        $this->assertEmpty($this->activator->getRoutesStatuses());
+    }
 }
