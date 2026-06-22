@@ -5,6 +5,7 @@ namespace Unusualify\Modularous\Tests\Exceptions;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\View;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Unusualify\Modularous\Entities\User;
@@ -135,6 +136,82 @@ class HandlerTest extends ModelTestCase
         // Note: attemptModularousAuthentication returns true if cookie exists,
         // even if it doesn't log in the user (per implementation logic)
         $this->assertTrue(modularousBaseKey() . '::errors.404' === $result || true);
+    }
+
+    public function test_it_returns_true_when_guard_already_authenticated()
+    {
+        // Covers the early "return true;" branch (Handler line 54):
+        // when the modularous guard already reports an authenticated user.
+        $user = User::factory()->create();
+
+        $this->actingAs($user, 'modularous');
+
+        $this->assertTrue(Auth::guard('modularous')->check());
+        $this->assertTrue($this->handler->exposeAttemptModularousAuthentication());
+    }
+
+    public function test_it_returns_false_when_authentication_throws()
+    {
+        // Covers the catch block (Handler lines 100-103): force an exception
+        // inside the try by making the guard resolution throw.
+        Auth::shouldReceive('guard')
+            ->andThrow(new \Exception('boom'));
+
+        Log::shouldReceive('error')
+            ->once()
+            ->with(\Mockery::pattern('/Error in attemptModularousAuthentication: boom/'));
+
+        $this->assertFalse($this->handler->exposeAttemptModularousAuthentication());
+    }
+
+    public function test_it_logs_and_returns_null_when_session_lookup_throws()
+    {
+        // Covers the catch block (Handler line 185): write a session file with
+        // valid login data, then drop the users table so the User::find()
+        // lookup throws a QueryException inside the try.
+        $sessionDir = storage_path('framework/sessions');
+        if (! is_dir($sessionDir)) {
+            mkdir($sessionDir, 0777, true);
+        }
+
+        $loginKey = 'login_modularous_' . sha1(User::class);
+        $sessionData = serialize([$loginKey => 1]);
+        $sessionFile = 'test_session_throws';
+        file_put_contents($sessionDir . '/' . $sessionFile, $sessionData);
+
+        Schema::drop((new User)->getTable());
+
+        Log::shouldReceive('error')
+            ->once()
+            ->with(\Mockery::pattern('/Error getting user data from session:/'));
+
+        try {
+            $result = $this->handler->exposeGetUserDataFromSession($sessionFile);
+
+            $this->assertNull($result);
+        } finally {
+            unlink($sessionDir . '/' . $sessionFile);
+        }
+    }
+
+    public function test_it_runs_middleware_pipeline_to_completion()
+    {
+        // Covers the pipeline "then" closure (Handler line 125: return $request),
+        // which only executes when every middleware calls $next() and the
+        // pipeline finishes without throwing. LanguageMiddleware reads the
+        // authenticated user, so we authenticate one first.
+        $user = User::factory()->create();
+        $this->actingAs($user, 'modularous');
+
+        Log::spy();
+
+        $this->handler->exposeRunModularousMiddleware();
+
+        // If the pipeline reached its closure without an exception, the catch
+        // block's error log is never emitted...
+        Log::shouldNotHaveReceived('error');
+        // ...and LanguageMiddleware ran, setting the locale config.
+        $this->assertNotNull(config(modularousBaseKey() . '.locale'));
     }
 
     public function test_it_handles_missing_user_in_session()
