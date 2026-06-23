@@ -156,6 +156,13 @@ export const getModel = (inputs, item = null, rootState = null) => {
     let accessName = name.replace(/->/g, '.')
     let value = editing ? (__isset(fields[name]) ? fields[name] : (__data_get(item, accessName, _default) ?? _default)) : _default
 
+    if (isTranslated && _.isObject(value)) {
+      value = {
+        ..._default,
+        ...value
+      }
+    }
+
     if(editing){
       if(input.type == 'group' && __isset(item[name])){
         let defaultGroupKeys = Object.keys(_.omit(__dot(_default), ['id']));
