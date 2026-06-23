@@ -2,6 +2,12 @@
 
 All notable changes to `modularous` will be documented in this file
 
+## v12.1.5 - 2026-06-23
+
+### :wrench: Bug Fixes
+
+- enhance value handling for translated objects in getModel function by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/db9e08b59c5d832119d5a0080a6152c7210d4ab2
+
 ## v11.1.1 - 2026-06-23
 
 ### :wrench: Bug Fixes
