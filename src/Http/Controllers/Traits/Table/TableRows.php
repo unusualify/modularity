@@ -219,7 +219,7 @@ trait TableRows
                 $isAllowed = $this->isAllowedItem(
                     $action,
                     searchKey: 'allowedRoles',
-                    orClosure: fn ($item) => ! $noSuperAdmin && $this->user->isSuperAdmin(),
+                    orClosure: fn ($item) => ! $noSuperAdmin && $this->user->is_superadmin,
                 );
 
                 if (! $isAllowed) {
