@@ -494,7 +494,7 @@ abstract class PanelController extends CoreController implements CacheableInterf
         $this->addFormAppends();
         $paginator = $this->getIndexItems(with: $with, scopes: $scopes, appends: $appends);
 
-        return $paginator;
+        return $this->getFormattedIndexItems($paginator);
         return $this->getTransformer($this->getFormattedIndexItems($paginator));
     }
 
