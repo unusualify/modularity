@@ -300,6 +300,8 @@ abstract class ApiController extends CoreController
             $collection = new $this->apiResourceCollectionClass($collection);
         } elseif ($this->apiResourceClass) {
             $collection = $this->apiResourceClass::collection($collection);
+        }  else {
+            $collection = $this->getTransformer($collection);
         }
 
         return $this->respondWithData($collection, $status);
