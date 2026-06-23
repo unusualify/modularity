@@ -2,6 +2,19 @@
 
 All notable changes to `modularous` will be documented in this file
 
+## v12.1.4 - 2026-06-23
+
+### :rocket: Features
+
+- include favicons in app layout and head partials by @celikerde in https://github.com/unusualify/modularous/commit/4ece28d10708bcf7c0d37cf2e6d3e9d7a137e7cb
+- add dynamic favicon links with cache-busting for improved asset management by @celikerde in https://github.com/unusualify/modularous/commit/67fac06e56d48115a0ac81fdd607b3aba92d7630
+
+### :wrench: Bug Fixes
+
+- update isSuperAdmin check to use camelCase property by @celikerde in https://github.com/unusualify/modularous/commit/24a2a627225e0c64ae30ade7d08ae12744451085
+- implement transformer logic for data handling by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/dddd0b682024f0539cbf824a3f9dd775ec3f94c9
+- introduce base Resource class and corresponding tests for data transformation by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/54306eccf55f9b54f7cbbe7cd9f1fd020253a15c
+
 ## v11.1.0 - 2026-06-23
 
 ### :rocket: Features
