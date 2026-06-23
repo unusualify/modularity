@@ -2,6 +2,21 @@
 
 All notable changes to `modularous` will be documented in this file
 
+## v0.58.5 - 2026-06-23
+
+### :rocket: Features
+
+- introduce base resource transformer with merge functionality by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/a9840679ece59ecc6dbe994be9819299e041c4fa
+
+### :wrench: Bug Fixes
+
+- update super admin check to use consistent naming convention by @celikerde in https://github.com/unusualify/modularous/commit/f346696d945bf5f6bd57689e19f496ee8961c126
+- implement transformer logic for data handling by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/748da610e27161b8a886a39cf249f6e27d4cbde5
+
+### :recycle: Refactors
+
+- streamline data transformation in getJSONData method by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/0debba906cd77c7d41411caba3fe8c50c91b1619
+
 ## v12.1.3 - 2026-06-16
 
 ### :rocket: Features
