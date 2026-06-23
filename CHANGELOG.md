@@ -2,6 +2,12 @@
 
 All notable changes to `modularous` will be documented in this file
 
+## v11.1.1 - 2026-06-23
+
+### :wrench: Bug Fixes
+
+- merge default values into translated objects for improved data handling by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/d9b33e1d1899b8beb16c4a32b169e46b8a6dbdd7
+
 ## v0.58.6 - 2026-06-23
 
 ### :wrench: Bug Fixes
