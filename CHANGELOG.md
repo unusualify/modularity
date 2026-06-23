@@ -2,6 +2,17 @@
 
 All notable changes to `modularous` will be documented in this file
 
+## v0.58.6 - 2026-06-23
+
+### :wrench: Bug Fixes
+
+- enhance response handling for API resources by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/0c9317f66d3b260ee30fa2dd1375034911fdcdbb
+- improve translation handling and default value assignment by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/9d77eedaa764c81378e55063dedf0a9c0c6ab957
+
+### :white_check_mark: Testing
+
+- add unit test for collection response with flat pagination by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/ac8b7013f41f512c1ca5a8194491bd6143b6adf3
+
 ## v12.1.4 - 2026-06-23
 
 ### :rocket: Features
