@@ -474,8 +474,14 @@ abstract class PanelController extends CoreController implements CacheableInterf
             $orders = $this->request->get('orders', []);
             $perPage = $this->request->get('itemsPerPage', $this->perPage);
 
-            return $this->getTransformer(
-                $this->repository->list(column: $column, with: $with, scopes: $scopes, orders: $orders, perPage: $perPage, appends: $appends, forcePagination: true)
+            return $this->repository->list(
+                column: $column,
+                with: $with,
+                scopes: $scopes,
+                orders: $orders,
+                perPage: $perPage,
+                appends: $appends,
+                forcePagination: true
             );
         }
 
@@ -483,7 +489,7 @@ abstract class PanelController extends CoreController implements CacheableInterf
         $this->addFormAppends();
         $paginator = $this->getIndexItems(with: $with, scopes: $scopes, appends: $appends);
 
-        return $this->getTransformer($this->getFormattedIndexItems($paginator));
+        return $this->getFormattedIndexItems($paginator);
     }
 
     /**
