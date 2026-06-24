@@ -3,9 +3,14 @@
 namespace Unusualify\Modularous\Http\Controllers;
 
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Pagination\AbstractCursorPaginator;
+use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Facades\Response;
 use Unusualify\Modularous\Http\Controllers\Traits\API\ApiAuthentication;
 use Unusualify\Modularous\Http\Controllers\Traits\API\ApiFiltering;
@@ -300,7 +305,7 @@ abstract class ApiController extends CoreController
             $collection = new $this->apiResourceCollectionClass($collection);
         } elseif ($this->apiResourceClass) {
             $collection = $this->apiResourceClass::collection($collection);
-        }  else {
+        } else {
             $collection = $this->getTransformer($collection);
         }
 
@@ -314,6 +319,24 @@ abstract class ApiController extends CoreController
      */
     protected function respondWithData($data, int $status = 200): JsonResponse
     {
+        if ($data instanceof Responsable) {
+            $payload = $this->resolveApiResourcePayload($data);
+
+            $response = $this->wrapResponses ? ['data' => $payload] : $payload;
+
+            if (! empty($this->responseMetadata)) {
+                $response['meta'] = $this->responseMetadata;
+            }
+
+            $jsonResponse = Response::json($response, $status);
+
+            foreach ($this->getRateLimitHeaders() as $header => $value) {
+                $jsonResponse->header($header, $value);
+            }
+
+            return $jsonResponse;
+        }
+
         $response = $this->wrapResponses ? ['data' => $data] : $data;
 
         if (! empty($this->responseMetadata)) {
@@ -328,6 +351,38 @@ abstract class ApiController extends CoreController
         }
 
         return $jsonResponse;
+    }
+
+    /**
+     * Resolve API resources using Laravel paginator shape (flat pagination keys).
+     *
+     * @param  \Illuminate\Contracts\Support\Responsable  $data
+     * @return array<string, mixed>|mixed
+     */
+    protected function resolveApiResourcePayload($data): mixed
+    {
+        if ($data instanceof ResourceCollection) {
+            $resource = $data->resource;
+
+            if ($resource instanceof AbstractPaginator || $resource instanceof AbstractCursorPaginator) {
+                $payload = $resource->toArray();
+                $payload['data'] = $data->collection->map(
+                    fn ($item) => $item instanceof JsonResource
+                        ? $item->resolve($this->request)
+                        : $item
+                )->all();
+
+                return $payload;
+            }
+
+            return $data->resolve($this->request);
+        }
+
+        if ($data instanceof JsonResource) {
+            return $data->resolve($this->request);
+        }
+
+        return $data->toResponse($this->request)->getData(true);
     }
 
     /**
