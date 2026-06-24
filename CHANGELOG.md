@@ -2,6 +2,12 @@
 
 All notable changes to `modularous` will be documented in this file
 
+## v11.1.2 - 2026-06-24
+
+### :wrench: Bug Fixes
+
+- enhance data response handling with new resource resolution logic by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/61212a230223671b5895a6d4f932c494f68a1f33
+
 ## v12.1.5 - 2026-06-23
 
 ### :wrench: Bug Fixes
