@@ -90,8 +90,9 @@ trait TranslationsTrait
 
                         return [
                             // $attribute => ($attributeValue[$locale] ?? null),
-                            $attribute => array_key_exists($locale, $attributeValue) ? $attributeValue[$locale] : ($attributeValue ?? null),
-                        ];
+                            $attribute => is_array($attributeValue)
+                              ? array_key_exists($locale, $attributeValue) ? $attributeValue[$locale] : ($attributeValue ?? null)
+                              : $attributeValue,                        ];
                     })->toArray();
                 }
             }
