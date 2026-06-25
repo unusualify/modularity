@@ -2,6 +2,12 @@
 
 All notable changes to `modularous` will be documented in this file
 
+## v0.58.7 - 2026-06-25
+
+### :wrench: Bug Fixes
+
+- add model unauthorization handling by @celikerde in https://github.com/unusualify/modularous/commit/1daa04d8b6eb3d1d3f1ab72103cc4ab2c27b58bc
+
 ## v12.1.6 - 2026-06-24
 
 ### :wrench: Bug Fixes
