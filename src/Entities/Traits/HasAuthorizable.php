@@ -21,6 +21,8 @@ trait HasAuthorizable
 
     protected $modelIsAuthorizing = false;
 
+    protected $modelIsUnauthorizing = false;
+
     protected $hasAuthorizableFields = [];
 
     /**
@@ -29,6 +31,11 @@ trait HasAuthorizable
     public static function bootHasAuthorizable(): void
     {
         static::saving(function (Model $model) {
+            // Whether the authorized_id field was explicitly provided in this save (e.g. form submission).
+            // This lets us tell an intentional "clear" (empty value submitted) apart from saves
+            // that don't touch authorization at all (key absent).
+            $authorizedIdProvided = array_key_exists('authorized_id', $model->getAttributes());
+
             if ($model->authorized_id) {
                 $authorizedType = $model->authorized_type
                     ?? ($model->hasAuthorizationRecord()
@@ -49,6 +56,9 @@ trait HasAuthorizable
                         ];
                     }
                 }
+            } elseif ($authorizedIdProvided) {
+                // authorized_id was submitted but is empty/null => the user cleared the authorization.
+                $model->modelIsUnauthorizing = true;
             }
 
             foreach (static::$hasAuthorizableFillable as $field) {
@@ -64,6 +74,12 @@ trait HasAuthorizable
                 );
                 $model->modelIsAuthorizing = false;
                 $model->hasAuthorizableFields = [];
+                if (! $model->wasRecentlyCreated && ! $model->isDirty()) {
+                    $model->touch();
+                }
+            } elseif ($model->modelIsUnauthorizing) {
+                $model->authorizationRecord()->delete();
+                $model->modelIsUnauthorizing = false;
                 if (! $model->wasRecentlyCreated && ! $model->isDirty()) {
                     $model->touch();
                 }
