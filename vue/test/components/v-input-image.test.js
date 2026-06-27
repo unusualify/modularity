@@ -1,11 +1,9 @@
 // test/components/v-input-image.test.js
 import { describe, expect, test, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
-import { createVuetify } from 'vuetify'
-import * as components from 'vuetify/components'
-import * as directives from 'vuetify/directives'
 
 import Image from '../../src/js/components/inputs/Image.vue'
+import createModularousVuetify from '../../src/js/plugins/vuetify'
 import i18n from '../../src/js/config/i18n'
 import store from '../../src/js/store'
 import fitGrid from '../../src/js/directives/fit-grid'
@@ -16,7 +14,7 @@ global.ResizeObserver = class ResizeObserver {
   disconnect() {}
 }
 
-const vuetify = createVuetify({ components, directives })
+const vuetify = createModularousVuetify()
 
 let getModel = () => [
   {

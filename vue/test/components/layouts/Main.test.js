@@ -1,12 +1,31 @@
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { createStore } from 'vuex'
+import { CONFIG } from '@/store/mutations'
 import Main from '@/components/layouts/Main.vue'
 import createModularousVuetify from '@/plugins/vuetify'
 import mediaLibraryModule from '@/store/modules/media-library'
 import i18n from '@/config/i18n'
 
 const vuetify = createModularousVuetify()
+
+const defaultNavigation = {
+  sidebar: [],
+  profileMenu: [],
+  sidebarBottom: [],
+}
+
+const mainStubs = {
+  'ue-sidebar': { name: 'UeSidebar', template: '<div><slot /><slot name="bottom" /></div>' },
+  'ue-modal': { template: '<div />' },
+  'ue-modal-media': true,
+  'ue-alert': true,
+  'ue-dynamic-modal': true,
+  'ue-impersonate-toolbar': true,
+  'ue-navigation-group': true,
+  'ue-title': true,
+  'ue-form': true,
+}
 
 function createTestStore() {
   return createStore({
@@ -21,6 +40,14 @@ function createTestStore() {
           uiPreferences: {},
           profileMenu: [],
         },
+        mutations: {
+          [CONFIG.SET_SIDEBAR](state, status = true) {
+            state.sidebarStatus = status
+          },
+          [CONFIG.SIDEBAR_TOGGLE](state) {
+            state.sidebarStatus = !state.sidebarStatus
+          },
+        },
       },
       alert: {
         namespaced: false,
@@ -28,7 +55,18 @@ function createTestStore() {
       },
       user: {
         namespaced: false,
-        state: { profileDialog: false, showLoginModal: false },
+        state: {
+          profileDialog: false,
+          showLoginModal: false,
+          profile: { avatar_url: '', name: '', email: '' },
+          profileShortcutSchema: {},
+          profileShortcutModel: {},
+          profileRoute: '',
+          loginShortcutSchema: {},
+          loginShortcutModel: {},
+          loginRoute: '',
+          isGuest: false,
+        },
       },
       mediaLibrary: mediaLibraryModule,
       ambient: {
@@ -39,38 +77,37 @@ function createTestStore() {
     getters: {
       sidebarStatus: (state) => state.config?.sidebarStatus ?? true,
       isHot: () => false,
-      userProfile: () => ({ avatar_url: '', name: '', email: '' }),
+      userProfile: (state) => state.user?.profile ?? { avatar_url: '', name: '', email: '' },
       appName: () => 'Test App',
       appEmail: () => 'test@example.com',
       isGuest: () => false,
-      mediaLibraryAccessible: () => false,
+    },
+  })
+}
+
+function mountMain(mountOptions = {}) {
+  const store = mountOptions.store ?? createTestStore()
+
+  return mount(Main, {
+    ...mountOptions,
+    global: {
+      plugins: [store, vuetify, i18n],
+      stubs: mainStubs,
+      mocks: {
+        $openProfileDialog: vi.fn(),
+        $toggleSidebar: vi.fn(),
+      },
+      ...mountOptions.global,
     },
   })
 }
 
 describe('Main', () => {
   test('renders v-app with id inspire', () => {
-    const store = createTestStore()
-    const wrapper = mount(Main, {
-      global: {
-        plugins: [store, vuetify, i18n],
-        stubs: {
-          'ue-sidebar': true,
-          'ue-modal-media': true,
-          'ue-modal': true,
-          'ue-alert': true,
-          'ue-dynamic-modal': true,
-          'ue-impersonate-toolbar': true,
-          'ue-navigation-group': true,
-        },
-      },
+    const wrapper = mountMain({
       props: {
         headerTitle: 'Test App',
-        navigation: {
-          sidebar: [],
-          profileMenu: [],
-          sidebarBottom: [],
-        },
+        navigation: defaultNavigation,
       },
     })
 
@@ -78,20 +115,7 @@ describe('Main', () => {
   })
 
   test('renders sidebar when hideDefaultSidebar is false', () => {
-    const store = createTestStore()
-    const wrapper = mount(Main, {
-      global: {
-        plugins: [store, vuetify, i18n],
-        stubs: {
-          'ue-sidebar': true,
-          'ue-modal-media': true,
-          'ue-modal': true,
-          'ue-alert': true,
-          'ue-dynamic-modal': true,
-          'ue-impersonate-toolbar': true,
-          'ue-navigation-group': true,
-        },
-      },
+    const wrapper = mountMain({
       props: {
         headerTitle: 'Test',
         hideDefaultSidebar: false,
@@ -107,21 +131,11 @@ describe('Main', () => {
   })
 
   test('hides sidebar when hideDefaultSidebar is true', () => {
-    const store = createTestStore()
-    const wrapper = mount(Main, {
-      global: {
-        plugins: [store, vuetify, i18n],
-        stubs: {
-          'ue-modal-media': true,
-          'ue-modal': true,
-          'ue-alert': true,
-          'ue-dynamic-modal': true,
-        },
-      },
+    const wrapper = mountMain({
       props: {
         headerTitle: 'Test',
         hideDefaultSidebar: true,
-        navigation: { sidebar: [], profileMenu: [], sidebarBottom: [] },
+        navigation: defaultNavigation,
       },
     })
 
@@ -129,21 +143,10 @@ describe('Main', () => {
   })
 
   test('renders v-main with default slot', () => {
-    const store = createTestStore()
-    const wrapper = mount(Main, {
-      global: {
-        plugins: [store, vuetify, i18n],
-        stubs: {
-          'ue-sidebar': true,
-          'ue-modal-media': true,
-          'ue-modal': true,
-          'ue-alert': true,
-          'ue-dynamic-modal': true,
-        },
-      },
+    const wrapper = mountMain({
       props: {
         headerTitle: 'Test',
-        navigation: { sidebar: [], profileMenu: [], sidebarBottom: [] },
+        navigation: defaultNavigation,
       },
       slots: {
         default: '<div data-testid="main-content">Main content</div>',

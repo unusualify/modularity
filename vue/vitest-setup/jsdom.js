@@ -29,6 +29,19 @@ class ResizeObserverMock {
 }
 window.ResizeObserver = ResizeObserverMock
 
+// visualViewport for Vuetify VOverlay/dialog positioning (jsdom does not provide it)
+if (!window.visualViewport) {
+  window.visualViewport = {
+    width: window.innerWidth,
+    height: window.innerHeight,
+    offsetLeft: 0,
+    offsetTop: 0,
+    scale: 1,
+    addEventListener: () => {},
+    removeEventListener: () => {},
+  }
+}
+
 // window.$ for Sidebar onMounted (querySelector fallback)
 window.$ = window.$ || ((sel) => document.querySelectorAll(sel))
 

@@ -6,7 +6,7 @@ import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 import i18n from '../../src/js/config/i18n'
-import useForm, { makeFormProps } from '../../src/js/hooks/useForm.js'
+import useForm, { makeFormProps } from '../../src/js/hooks/form/useForm.js'
 
 const vuetify = createVuetify({ components, directives })
 
@@ -14,6 +14,7 @@ const mockGetModel = vi.fn((schema, model) => ({ name: '', email: '', ...model }
 const mockGetSchema = vi.fn((schema) => schema)
 const mockGetFormEventSchema = vi.fn(() => ({}))
 const mockGetSubmitFormData = vi.fn((schema, model) => ({ ...model }))
+const mockGetSecondaryInputs = vi.fn(() => [])
 const mockInvokeRuleGenerator = vi.fn((schema) => schema)
 const mockValidModel = { value: true }
 const mockShouldUseInertia = { value: false }
@@ -23,7 +24,8 @@ vi.mock('@/utils/getFormData.js', () => ({
   getModel: (...args) => mockGetModel(...args),
   getSchema: (...args) => mockGetSchema(...args),
   getFormEventSchema: (...args) => mockGetFormEventSchema(...args),
-  getSubmitFormData: (...args) => mockGetSubmitFormData(...args)
+  getSubmitFormData: (...args) => mockGetSubmitFormData(...args),
+  getSecondaryInputs: (...args) => mockGetSecondaryInputs(...args)
 }))
 
 vi.mock('@/utils/schema.js', () => ({
@@ -125,6 +127,7 @@ beforeEach(() => {
     const m = model?.value ?? model ?? {}
     return { ...m }
   })
+  mockGetSecondaryInputs.mockReturnValue([])
   formApiPost.mockImplementation((url, data, success) => success?.({ data: {} }))
   formApiPut.mockImplementation((url, data, success) => success?.({ data: {} }))
 })

@@ -380,6 +380,7 @@ describe('useTableItemActions', () => {
     const wrapper = await factory(store, {
       rowActions: [{ name: 'edit', href: '/invalid' }]
     })
+    expect(wrapper.vm.visibleRowActions).toEqual([])
     expect(consoleSpy).toHaveBeenCalledWith('href is not supported in row actions', expect.any(Object))
     consoleSpy.mockRestore()
   })

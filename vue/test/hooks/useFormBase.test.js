@@ -4,7 +4,7 @@ import { mount } from '@vue/test-utils'
 import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
-import useFormBase from '../../src/js/hooks/useFormBase.js'
+import useFormBase from '../../src/js/hooks/form/useFormBase.js'
 
 const vuetify = createVuetify({ components, directives })
 

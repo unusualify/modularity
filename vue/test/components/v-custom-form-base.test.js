@@ -20,6 +20,10 @@ import CustomFormBase from '../../src/js/components/others/CustomFormBase.vue'
 
 const vuetify = createVuetify({ components, directives })
 
+// Minimal non-empty model/schema so rebuildArrays does not warn on mount.
+const fixtureModel = { _fixture: null }
+const fixtureSchema = { _fixture: { type: 'hidden', hidden: true } }
+
 async function factory(props = {}, options = {}) {
   return mount(CustomFormBase, {
     global: {
@@ -28,20 +32,22 @@ async function factory(props = {}, options = {}) {
         'ue-recursive-stuff': true,
         'ue-dynamic-component-renderer': true,
         'v-custom-form-base': CustomFormBase,
+        'v-input-locale': true,
         'ue-title': { template: '<span />' }
       },
       directives: {
         resize: { mounted: () => {}, unmounted: () => {} },
         intersect: { mounted: () => {}, unmounted: () => {} },
         touch: { mounted: () => {}, unmounted: () => {} },
-        'click-outside': { mounted: () => {}, unmounted: () => {} }
+        'click-outside': { mounted: () => {}, unmounted: () => {} },
+        mask: { mounted: () => {}, unmounted: () => {} }
       }
     },
     attachTo: document.body,
     ...options,
     props: {
-      modelValue: {},
-      schema: {},
+      modelValue: fixtureModel,
+      schema: fixtureSchema,
       ...props
     }
   })
@@ -59,29 +65,29 @@ describe('VCustomFormBase tests', () => {
     })
 
     test('maps radio to InputRadio', async () => {
-      const wrapper = await factory({ id: 'test', schema: {}, modelValue: {} })
+      const wrapper = await factory({ id: 'test' })
       expect(wrapper.vm.mapTypeToComponent('radio')).toBe('InputRadio')
     })
 
     test('maps text to v-text-field', async () => {
-      const wrapper = await factory({ id: 'test', schema: {}, modelValue: {} })
+      const wrapper = await factory({ id: 'test' })
       expect(wrapper.vm.mapTypeToComponent('text')).toBe('v-text-field')
     })
 
     test('maps unknown type to v-{type}', async () => {
-      const wrapper = await factory({ id: 'test', schema: {}, modelValue: {} })
+      const wrapper = await factory({ id: 'test' })
       expect(wrapper.vm.mapTypeToComponent('custom-type')).toBe('v-custom-type')
     })
   })
 
   describe('bindOptions', () => {
     test('converts string to { value, label }', async () => {
-      const wrapper = await factory({ id: 'test', schema: {}, modelValue: {} })
+      const wrapper = await factory({ id: 'test' })
       expect(wrapper.vm.bindOptions('foo')).toEqual({ value: 'foo', label: 'foo' })
     })
 
     test('returns object as-is', async () => {
-      const wrapper = await factory({ id: 'test', schema: {}, modelValue: {} })
+      const wrapper = await factory({ id: 'test' })
       const opt = { value: 1, label: 'One' }
       expect(wrapper.vm.bindOptions(opt)).toBe(opt)
     })
@@ -89,7 +95,7 @@ describe('VCustomFormBase tests', () => {
 
   describe('bindSchema', () => {
     test('omits type, col, order, offset, ext, event from schema', async () => {
-      const wrapper = await factory({ id: 'test', schema: {}, modelValue: {} })
+      const wrapper = await factory({ id: 'test' })
       const obj = {
         key: 'name',
         schema: {
@@ -107,7 +113,7 @@ describe('VCustomFormBase tests', () => {
     })
 
     test('converts falseValue 0 to string "0"', async () => {
-      const wrapper = await factory({ id: 'test', schema: {}, modelValue: {} })
+      const wrapper = await factory({ id: 'test' })
       const obj = {
         key: 'flag',
         schema: { type: 'checkbox', falseValue: 0, label: 'Flag' }
@@ -119,14 +125,14 @@ describe('VCustomFormBase tests', () => {
 
   describe('isDateTimeColorTypeAndExtensionText', () => {
     test('returns true for date type with ext text', async () => {
-      const wrapper = await factory({ id: 'test', schema: {}, modelValue: {} })
+      const wrapper = await factory({ id: 'test' })
       expect(wrapper.vm.isDateTimeColorTypeAndExtensionText({
         schema: { type: 'date', ext: 'text' }
       })).toBe(true)
     })
 
     test('returns false for date without ext', async () => {
-      const wrapper = await factory({ id: 'test', schema: {}, modelValue: {} })
+      const wrapper = await factory({ id: 'test' })
       expect(wrapper.vm.isDateTimeColorTypeAndExtensionText({
         schema: { type: 'date' }
       })).toBe(false)
@@ -135,14 +141,14 @@ describe('VCustomFormBase tests', () => {
 
   describe('getKeyForArray', () => {
     test('uses key property when schema has key', async () => {
-      const wrapper = await factory({ id: 'test', schema: {}, modelValue: {} })
+      const wrapper = await factory({ id: 'test' })
       const obj = { key: 'items', schema: { key: 'id' } }
       const item = { id: 42, name: 'Item' }
       expect(wrapper.vm.getKeyForArray('form-1', obj, item, 0)).toBe(42)
     })
 
     test('uses index when no key in schema', async () => {
-      const wrapper = await factory({ id: 'test', schema: {}, modelValue: {} })
+      const wrapper = await factory({ id: 'test' })
       const obj = { key: 'items', schema: {} }
       const item = { name: 'Item' }
       expect(wrapper.vm.getKeyForArray('form-1', obj, item, 2)).toBe('form-1-items-2')
@@ -151,7 +157,7 @@ describe('VCustomFormBase tests', () => {
 
   describe('getShorthandTooltip', () => {
     test('converts string to { location: "top", text }', async () => {
-      const wrapper = await factory({ id: 'test', schema: {}, modelValue: {} })
+      const wrapper = await factory({ id: 'test' })
       expect(wrapper.vm.getShorthandTooltip('My tooltip')).toEqual({
         location: 'top',
         text: 'My tooltip'
@@ -159,7 +165,7 @@ describe('VCustomFormBase tests', () => {
     })
 
     test('returns object as-is', async () => {
-      const wrapper = await factory({ id: 'test', schema: {}, modelValue: {} })
+      const wrapper = await factory({ id: 'test' })
       const tooltip = { location: 'bottom', text: 'Custom' }
       expect(wrapper.vm.getShorthandTooltip(tooltip)).toBe(tooltip)
     })
@@ -167,19 +173,19 @@ describe('VCustomFormBase tests', () => {
 
   describe('checkInternGroupType', () => {
     test('returns v-card by default for wrap/group', async () => {
-      const wrapper = await factory({ id: 'test', schema: {}, modelValue: {} })
+      const wrapper = await factory({ id: 'test' })
       const obj = { schema: { type: 'wrap' } }
       expect(wrapper.vm.checkInternGroupType(obj)).toBe('v-card')
     })
 
     test('prepends v- when typeInt does not start with v- or ue-', async () => {
-      const wrapper = await factory({ id: 'test', schema: {}, modelValue: {} })
+      const wrapper = await factory({ id: 'test' })
       const obj = { schema: { type: 'wrap', typeInt: 'card' } }
       expect(wrapper.vm.checkInternGroupType(obj)).toBe('v-card')
     })
 
     test('returns typeInt as-is when it starts with v-', async () => {
-      const wrapper = await factory({ id: 'test', schema: {}, modelValue: {} })
+      const wrapper = await factory({ id: 'test' })
       const obj = { schema: { type: 'wrap', typeInt: 'v-sheet' } }
       expect(wrapper.vm.checkInternGroupType(obj)).toBe('v-sheet')
     })
@@ -187,12 +193,12 @@ describe('VCustomFormBase tests', () => {
 
   describe('slot name helpers', () => {
     test('getFormTopSlot returns slot-top-{id}', async () => {
-      const wrapper = await factory({ id: 'my-form', schema: {}, modelValue: {} })
+      const wrapper = await factory({ id: 'my-form' })
       expect(wrapper.vm.getFormTopSlot()).toBe('slot-top-my-form')
     })
 
     test('getKeyInjectSlot returns correct format', async () => {
-      const wrapper = await factory({ id: 'form-1', schema: {}, modelValue: {} })
+      const wrapper = await factory({ id: 'form-1' })
       const obj = { key: 'address.city' }
       expect(wrapper.vm.getKeyInjectSlot(obj, 'label')).toContain('slot-inject')
       expect(wrapper.vm.getKeyInjectSlot(obj, 'label')).toContain('form-1')
