@@ -2,12 +2,6 @@
 
 All notable changes to `modularous` will be documented in this file
 
-## v12.1.7 - 2026-06-27
-
-### :wrench: Bug Fixes
-
-- add authorization handling in HasAuthorizable trait by @celikerde in https://github.com/unusualify/modularous/commit/c4c37ae3e11bf10614ee367c98e8a03d16944b03
-
 ## v11.1.3 - 2026-06-27
 
 ### :wrench: Bug Fixes
