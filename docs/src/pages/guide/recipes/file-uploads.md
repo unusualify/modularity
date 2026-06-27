@@ -162,4 +162,4 @@ See [flush:filepond](/guide/console/flush/flush-filepond).
 
 - [File Storage with Filepond](/guide/generics/file-storage-with-filepond) — storage mechanics and database layout
 - [Files and Media](/guide/module-features/files-and-media) — the full triple pattern
-- [Uploader component](/guide/components/uploader) — the Vue upload widget
+- [Uploader component](/guide/components/media/uploader) — the Vue upload widget

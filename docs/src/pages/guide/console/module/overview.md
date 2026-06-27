@@ -50,5 +50,5 @@ php artisan modularous:remove:module Blog
 ## Related
 
 - [Generators](../generators/overview) — scaffold modules, models, routes, and traits
-- [Database commands](../database/overview) — migrate / rollback used by `remove-module`
+- [Database commands](../migration/overview) — migrate / rollback used by `remove-module`
 - [System Reference → Modules](/system-reference/modules) — module system internals

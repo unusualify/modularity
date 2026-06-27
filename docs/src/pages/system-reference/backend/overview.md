@@ -79,7 +79,7 @@ A normal admin CRUD request walks through most of these layers in order:
 | Multi-tenant routing | [Providers](#providers) (`RouteServiceProvider`) → [Support](#support) (`HostRouting`) → [Middleware](#middleware) (`Hostable`) → [Facades](#facades) (`HostRouting`) |
 | Real-time / chat | [Events & Listeners](#events-listeners) → [Notifications](#notifications) → [Services](#services) (BroadcastManager) → [Scheduled Jobs](#scheduled-jobs) (ChatableScheduler) |
 
-→ Architecture deep-dives also live under the [guides](/guide/architecture/overview) — cache, broadcasting, host routing, and module conventions are documented there.
+→ Architecture deep-dives also live under the [system reference](/system-reference/architecture) — cache, broadcasting, host routing, and module conventions are documented there.
 
 ---
 
@@ -530,7 +530,7 @@ Modularous ships a versioned, tag-aware cache built on top of Laravel's cache. I
 | Day-to-day API | [`ModularousCache`](/system-reference/backend/facades/modularous-cache) facade, [`CacheRelationshipGraph`](/system-reference/backend/services/cache-relationship-graph) |
 | Repository hooks | [Repository Traits → Logic](/system-reference/backend/repository-traits/logic/overview) (`afterSave{Trait}`, `afterDelete{Trait}`) |
 
-→ Full deep-dive: [Caching guide](/guide/caching/overview).
+→ Full deep-dive: [ModularousCacheService](/system-reference/backend/services/modularous-cache-service).
 
 ### File & media uploads
 
@@ -553,7 +553,7 @@ Build-time only — these run from the CLI to produce or regenerate code.
 | Generators | [`Generator`, `LaravelTestGenerator`, `RouteGenerator`, `StubsGenerator`, `VueTestGenerator`](#generators) |
 | Support | [`Decomposers`](/system-reference/backend/support/decomposers), [`Migrations\SchemaParser`](/system-reference/backend/support/migrations-schema-parser), [`RegexReplacement`](/system-reference/backend/support/regex-replacement) |
 
-→ End-to-end walkthrough: [Module creation guide](/guide/modules/overview).
+→ End-to-end walkthrough: [Modules reference](/system-reference/modules).
 
 ### Multi-tenant / host-based routing
 

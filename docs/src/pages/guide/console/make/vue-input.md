@@ -72,4 +72,4 @@ php artisan modularous:make:vue:input RichText
 - [make:input:hydrate](./input-hydrate) — create the matching PHP hydrate class
 - [make:vue:test](./vue-test) — create a test for this component
 - [make:feature](./feature) — end-to-end wizard
-- [System Reference](/system-reference/backend/console/make#makevueinputcommand)
+- [System Reference](/guide/console/make/overview)

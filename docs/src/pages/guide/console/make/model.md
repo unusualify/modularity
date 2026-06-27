@@ -119,4 +119,4 @@ php artisan modularous:make:model Post Blog --test
 - [make:migration](./migration) — create the matching migration
 - [make:repository](./repository) — create the matching repository
 - [make:model:trait](./model-trait) — create a reusable entity trait
-- [System Reference](/system-reference/backend/console/make#makemodelcommand)
+- [System Reference](/guide/console/make/overview)

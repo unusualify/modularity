@@ -67,4 +67,4 @@ php artisan modularous:make:laravel:test Blog PostRepositoryTest --unit
 ## See also
 
 - [make:vue:test](./vue-test) — create a Vitest test for Vue
-- [System Reference](/system-reference/backend/console/make#makelaraveltestcommand)
+- [System Reference](/guide/console/make/overview)

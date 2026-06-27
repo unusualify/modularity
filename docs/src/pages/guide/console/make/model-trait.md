@@ -68,4 +68,4 @@ php artisan modularous:make:model:trait PriceRange
 
 - [make:repository:trait](./repository-trait) — create a repository trait
 - [make:feature](./feature) — wizard that can call this command as part of a bundle
-- [System Reference](/system-reference/backend/console/make#makemodeltraitcommand)
+- [System Reference](/guide/console/make/overview)

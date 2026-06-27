@@ -132,5 +132,5 @@ See [State Machine recipe](./state-machine).
 ## Next Steps
 
 - [Module Features](/guide/module-features/overview) — stack traits for richer behaviour
-- [Data Tables](/guide/components/data-tables) — customise the list view
+- [Data Tables](/guide/components/shared/data-tables) — customise the list view
 - [Repositories](/system-reference/repositories) — lifecycle hooks (`hydrate`, `afterSave`)

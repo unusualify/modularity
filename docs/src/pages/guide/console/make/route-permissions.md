@@ -57,4 +57,4 @@ php artisan modularous:make:route:permissions ProductCategory
 ## See also
 
 - [make:route](./route) — automatically runs permission creation during scaffold
-- [System Reference](/system-reference/backend/console/make#makeroutepermissionscommand)
+- [System Reference](/guide/console/make/overview)

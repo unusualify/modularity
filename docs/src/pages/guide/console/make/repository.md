@@ -76,4 +76,4 @@ php artisan modularous:make:repository Post Blog --all --notAsk
 
 - [make:model](./model) — create the matching model
 - [make:repository:trait](./repository-trait) — create a standalone repository trait
-- [System Reference](/system-reference/backend/console/make#makerepositoryrcommand)
+- [System Reference](/guide/console/make/overview)

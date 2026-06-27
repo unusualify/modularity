@@ -79,4 +79,4 @@ Extends `makeModelValueProps` plus:
 ## See Also
 
 - [useModelValue](/system-reference/frontend/composables/use-model-value) — `makeModelValueProps` is used here
-- [Data Tables](/guide/components/data-tables)
+- [Data Tables](/guide/components/shared/data-tables)

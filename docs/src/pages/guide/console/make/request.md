@@ -69,4 +69,4 @@ php artisan modularous:make:request Blog Post \
 ## See also
 
 - [make:route](./route) — generates the request as part of a full scaffold
-- [System Reference](/system-reference/backend/console/make#makerequestcommand)
+- [System Reference](/guide/console/make/overview)

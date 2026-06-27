@@ -45,4 +45,4 @@ echo app(Assets::class)->vite(['resources/js/app.js']);
 ## Related
 
 - [Assets service](/system-reference/backend/services/assets) — higher-level facade over `ModularousVite`
-- [Assets commands](/guide/console/assets/overview) — `modularous:assets:build` / `modularous:assets:dev`
+- [Assets commands](/guide/console/build) — `modularous:build` / `modularous:dev`

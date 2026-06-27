@@ -69,4 +69,4 @@ php artisan modularous:make:input:hydrate rich-text
 
 - [make:vue:input](./vue-input) — create the Vue input component
 - [make:feature](./feature) — wizard that can create both together
-- [System Reference](/system-reference/backend/console/make#makeinputhydratecommand)
+- [System Reference](/guide/console/make/overview)

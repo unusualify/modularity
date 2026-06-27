@@ -69,4 +69,4 @@ Run [`make:theme:folder`](./theme-folder) first to create and customize the them
 ## See also
 
 - [make:theme:folder](./theme-folder) — create the theme working folder
-- [System Reference](/system-reference/backend/console/make#makethemecommand)
+- [System Reference](/guide/console/make/overview)

@@ -15,7 +15,7 @@ hero:
       link: get-started/installation-guide
     - theme: alt
       text: Components
-      link: guide/components/data-tables
+      link: guide/components/shared/data-tables
     - theme: alt
       text: GitHub
       link: https://www.github.com/unusualify/modularous

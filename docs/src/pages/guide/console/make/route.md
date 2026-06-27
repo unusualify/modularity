@@ -103,4 +103,4 @@ php artisan modularous:make:route Blog Post --test
 - [make:module](./module) — create the parent module first
 - [make:model](./model) — generate only the model
 - [make:migration](./migration) — generate only the migration
-- [System Reference](/system-reference/backend/console/make#makeroutecommand) — class internals
+- [System Reference](/guide/console/make/overview) — class internals

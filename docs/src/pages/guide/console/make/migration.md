@@ -118,4 +118,4 @@ php artisan modularous:make:migration add_indexes_to_posts_table Blog --plain
 
 - [make:model](./model) — generate the matching model
 - [make:route](./route) — generates model + migration together
-- [System Reference](/system-reference/backend/console/make#makemigrationcommand)
+- [System Reference](/guide/console/make/overview)

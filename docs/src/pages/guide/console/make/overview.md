@@ -103,4 +103,4 @@ php artisan modularous:make:feature
 # Responds to all prompts interactively
 ```
 
-> For the class internals of these commands see [System Reference → Console → Make](/system-reference/backend/console/make).
+> For the class internals of these commands see [System Reference → Console → Make](/guide/console/make/overview).
