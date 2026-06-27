@@ -4,12 +4,12 @@
  */
 import { computed, ref, } from 'vue'
 import { useStore } from 'vuex'
-import store from '@/store'
 import { LANGUAGE } from '@/store/mutations'
 
 const RTL_LOCALES = ['ar', 'arc', 'dv', 'fa', 'ha', 'he', 'khw', 'ks', 'ku', 'ps', 'ur', 'yi']
 
 export default function useLocale (props = {}) {
+  const store = useStore()
   const _locale = ref(props.locale ?? null)
 
   const currentLocale = computed(() => store.state.language?.active ?? null)
