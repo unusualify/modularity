@@ -22,17 +22,31 @@ final class IsolatedTestModules
 
     public static function path(): string
     {
-        if (self::$path !== null) {
-            return self::$path;
+        self::sync();
+
+        return self::$path ?? throw new \RuntimeException('Isolated test modules path was not initialized.');
+    }
+
+    public static function sync(): void
+    {
+        $destination = sys_get_temp_dir() . '/modularous_test_modules_' . self::testTokenSuffix();
+        $marker = $destination . '/.source-fingerprint';
+        $fingerprint = self::sourceFingerprint();
+
+        if (
+            is_dir($destination . '/TestModule')
+            && is_file($marker)
+            && hash_equals($fingerprint, (string) file_get_contents($marker))
+        ) {
+            self::$path = $destination;
+
+            return;
         }
 
-        self::$path = sys_get_temp_dir() . '/modularous_test_modules_' . self::testTokenSuffix();
-
-        if (! is_dir(self::$path)) {
-            self::copyDirectory(self::sourcePath(), self::$path);
-        }
-
-        return self::$path;
+        self::removeDirectory($destination);
+        self::copyDirectory(self::sourcePath(), $destination);
+        file_put_contents($marker, $fingerprint);
+        self::$path = $destination;
     }
 
     /**
@@ -47,6 +61,34 @@ final class IsolatedTestModules
             $file = self::path() . '/' . $module . '/routes_statuses.json';
             file_put_contents($file, json_encode($routes, JSON_PRETTY_PRINT));
         }
+    }
+
+    private static function sourceFingerprint(): string
+    {
+        $source = self::sourcePath();
+
+        if (! is_dir($source)) {
+            throw new \RuntimeException("Test modules source directory not found: {$source}");
+        }
+
+        $parts = [];
+
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($source, \RecursiveDirectoryIterator::SKIP_DOTS)
+        );
+
+        foreach ($iterator as $item) {
+            if (! $item->isFile()) {
+                continue;
+            }
+
+            $relativePath = $iterator->getSubPathName();
+            $parts[] = $relativePath . ':' . $item->getSize() . ':' . $item->getMTime();
+        }
+
+        sort($parts);
+
+        return hash('sha256', implode("\n", $parts));
     }
 
     private static function copyDirectory(string $source, string $destination): void
@@ -77,5 +119,29 @@ final class IsolatedTestModules
 
             copy($item->getPathname(), $target);
         }
+    }
+
+    private static function removeDirectory(string $directory): void
+    {
+        if (! is_dir($directory)) {
+            return;
+        }
+
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($directory, \RecursiveDirectoryIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::CHILD_FIRST
+        );
+
+        foreach ($iterator as $item) {
+            if ($item->isDir()) {
+                rmdir($item->getPathname());
+
+                continue;
+            }
+
+            unlink($item->getPathname());
+        }
+
+        rmdir($directory);
     }
 }
