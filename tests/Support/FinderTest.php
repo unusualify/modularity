@@ -20,7 +20,7 @@ class FinderTest extends TestModulesCase
         MockModuleManager::initialize();
 
         // Only enable TestModule so getRouteModel/getRouteRepository return TestModule's Item (not SystemModule's)
-        $this->writeModuleActivationStatuses(['TestModule' => true]);
+        $this->enableOnlyModules('TestModule');
 
         IsolatedTestModules::seedRoutesStatuses(['TestModule' => ['Item' => true]]);
 

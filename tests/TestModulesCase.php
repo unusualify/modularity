@@ -33,7 +33,6 @@ abstract class TestModulesCase extends TestCase
         $app['config']->set('modules.cache.enabled', false);
         $app['config']->set('modules.namespace', 'TestModules');
         $app['config']->set('modules.scan.paths', [
-            base_path('vendor/*/*'),
             $fixturesPath,
         ]);
 
@@ -62,7 +61,48 @@ abstract class TestModulesCase extends TestCase
 
     protected function writeModuleActivationStatuses(array $statuses): void
     {
-        $this->app['files']->put($this->statusesFilePath, json_encode($statuses, JSON_PRETTY_PRINT));
+        $this->app['files']->put(
+            $this->statusesFilePath,
+            json_encode($statuses, JSON_PRETTY_PRINT)
+        );
+
+        $this->resetScannedModulesCache();
+
+        $activator = $this->app->make(\Nwidart\Modules\Contracts\ActivatorInterface::class);
+
+        foreach (Modularous::all() as $module) {
+            $enabled = (bool) ($statuses[$module->getName()] ?? false);
+
+            if ($enabled) {
+                $activator->enable($module);
+            } else {
+                $activator->disable($module);
+            }
+        }
+    }
+
+    /**
+     * @param  list<string>  $moduleNames
+     */
+    protected function enableOnlyModules(string ...$moduleNames): void
+    {
+        $statuses = [];
+
+        foreach (Modularous::all() as $module) {
+            $statuses[$module->getName()] = in_array($module->getName(), $moduleNames, true);
+        }
+
+        foreach ($moduleNames as $moduleName) {
+            $statuses[$moduleName] = true;
+        }
+
+        $this->writeModuleActivationStatuses($statuses);
+    }
+
+    protected function resetScannedModulesCache(): void
+    {
+        $property = new \ReflectionProperty(\Nwidart\Modules\FileRepository::class, 'modules');
+        $property->setValue(null, null);
     }
 
     protected function ensureModulePanelRoutesRegistered(): void
