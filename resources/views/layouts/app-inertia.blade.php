@@ -9,7 +9,7 @@
         {{-- <title> {{ $pageTitle ?? \Unusualify\Modularous\Facades\Modularous::pageTitle() }}</title> --}}
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        @include("{$MODULARITY_VIEW_NAMESPACE}::partials.favicons")
+        @include("{$MODULAROUS_VIEW_NAMESPACE}::partials.favicons")
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
