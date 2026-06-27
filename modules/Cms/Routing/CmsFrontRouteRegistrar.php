@@ -3,18 +3,15 @@
 namespace Modules\Cms\Routing;
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Str;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 use Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRoutes;
 use Modules\Cms\Entities\Concerns\HasParentSegment;
-use Modules\Cms\Entities\ParentSegment;
-use Modules\Cms\Entities\UrlRoute;
 use Modules\Cms\Http\Controllers\CmsSignedPublicPreviewController;
 use Modules\Cms\Http\Controllers\Front\CmsController;
 use Modules\Cms\Http\Controllers\Front\CmsPublicFrontController;
 use Modules\Cms\Providers\CmsRouteServiceProvider;
 use Modules\Cms\Services\CmsPublicModelResolver;
+use Modules\Cms\Support\CmsFrontRouteRegistrationCache;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Module;
 
@@ -36,11 +33,9 @@ use Unusualify\Modularous\Module;
  * prefixes. Translated segments and slug binding live in the CMS data model, not duplicated Route definitions or lang route files.
  *
  * Auto-registration: {@see registerAutoForQualifiedModules()} — {@see CmsRouteServiceProvider}.
- * Legacy macro: {@see Route::cmsPublicFrontRoutes()} — inner group only; wrap with {@code Route::prefix(...)} if needed.
- *
- * When {@see modularousConfig('cms_routing.universal_cms_public_front')} is true and the {@link ParentSegment} table
- * has enabled rows, the Cms module uses {@see CmsPublicFrontController} (one invokable for all {@link UrlRoute} lines
- * whose {@code urlable} is on the registry) instead of the first {@code front-controller/...} match.
+ * With {@see modularousConfig('cms_routing.universal_cms_public_front')} (default), one host-level catch-all
+ * ({@see CmsPublicFrontController}) resolves all {@see UrlRoute} lines via {@see CmsPublicModelResolver}.
+ * Legacy mode registers per-module catch-alls when {@code universal_cms_public_front} is false.
  */
 final class CmsFrontRouteRegistrar
 {
@@ -97,7 +92,10 @@ final class CmsFrontRouteRegistrar
     }
 
     /**
-     * Registers catch-all routes under each qualifying module's URL prefix (see {@see Module::prefix()}).
+     * Registers the CMS public catch-all when the ParentSegment registry has enabled rows.
+     *
+     * Universal (default): one {@see CmsPublicFrontController} on the public host — paths come from {@see UrlRoute}.
+     * Legacy: one catch-all per qualifying module ({@see registerLegacyModuleCatchAlls()}).
      */
     public static function registerAutoForQualifiedModules(): void
     {
@@ -105,20 +103,70 @@ final class CmsFrontRouteRegistrar
             return;
         }
 
-        if (self::resolveControllerClassOrNull() === null) {
+        if (Modularous::isPanelUrl()) {
             return;
         }
 
-        foreach (Modularous::allEnabled() as $module) {
+        $controller = self::resolveControllerClassOrNull();
+        if ($controller === null) {
+            return;
+        }
+
+        if (CmsFrontRouteRegistrationCache::usesUniversalPublicFront()) {
+            self::registerPublicFrontCatchAll($controller, self::cmsRouteNamePrefix());
+
+            return;
+        }
+
+        self::registerLegacyModuleCatchAlls();
+    }
+
+    /**
+     * @return non-empty-string
+     */
+    private static function cmsRouteNamePrefix(): string
+    {
+        $cmsModule = Modularous::find('Cms') ?? Modularous::find('cms');
+
+        if ($cmsModule instanceof Module) {
+            return $cmsModule->routeNamePrefix() . '.';
+        }
+
+        return 'cms.';
+    }
+
+    /**
+     * Single host-level catch-all used in universal mode.
+     *
+     * @param class-string $controller
+     * @param non-empty-string $routeNamePrefix
+     */
+    private static function registerPublicFrontCatchAll(string $controller, string $routeNamePrefix): void
+    {
+        $group = ['as' => $routeNamePrefix];
+
+        $domain = self::resolvePublicFrontRouteDomain();
+        if ($domain !== null) {
+            $group['domain'] = $domain;
+        }
+
+        Route::group($group, static function () use ($controller): void {
+            self::registerInnerCatchAll($controller);
+        });
+    }
+
+    /**
+     * Legacy: register a catch-all per module whose front controller resolves (see {@see registerUnderModulePrefix()}).
+     */
+    private static function registerLegacyModuleCatchAlls(): void
+    {
+        foreach (CmsFrontRouteRegistrationCache::legacyQualifiedModules() as $moduleName => $controller) {
+            $module = Modularous::find($moduleName);
             if (! $module instanceof Module) {
                 continue;
             }
 
-            if (! self::moduleQualifiesForAutoPublicFront($module)) {
-                continue;
-            }
-
-            self::registerUnderModulePrefix($module);
+            self::registerUnderModulePrefix($module, $controller);
         }
     }
 
@@ -128,7 +176,12 @@ final class CmsFrontRouteRegistrar
      */
     public static function moduleQualifiesForAutoPublicFront(Module $module): bool
     {
-        return self::resolveFrontControllerForModule($module) !== null;
+        if (CmsFrontRouteRegistrationCache::usesUniversalPublicFront()) {
+            return strtolower($module->getName()) === 'cms'
+                && self::resolveControllerClassOrNull() !== null;
+        }
+
+        return CmsFrontRouteRegistrationCache::frontControllerForModule($module) !== null;
     }
 
     /**
@@ -138,37 +191,7 @@ final class CmsFrontRouteRegistrar
      */
     public static function resolveFrontControllerForModule(Module $module): ?string
     {
-        if (self::shouldUseUniversalCmsPublicFrontForModule($module)) {
-            return CmsPublicFrontController::class;
-        }
-
-        foreach ($module->getRouteNames() as $routeName) {
-            if (! $module->isEnabledRoute($routeName)) {
-                continue;
-            }
-
-            $modelClass = self::resolveModelClassForRoute($module, $routeName);
-            if ($modelClass === null || ! class_exists($modelClass) || ! classHasTrait($modelClass, HasParentSegment::class)) {
-                continue;
-            }
-
-            $controllerFqcn = $module->getTargetClassNamespace(
-                'front-controller',
-                Str::studly($routeName) . 'Controller'
-            );
-
-            if (! class_exists($controllerFqcn)) {
-                continue;
-            }
-
-            if (! is_subclass_of($controllerFqcn, CmsController::class, true)) {
-                continue;
-            }
-
-            return $controllerFqcn;
-        }
-
-        return null;
+        return CmsFrontRouteRegistrationCache::frontControllerForModule($module);
     }
 
     private static function resolveModelClassForRoute(Module $module, string $routeName): ?string
@@ -187,41 +210,12 @@ final class CmsFrontRouteRegistrar
     }
 
     /**
-     * Use {@see CmsPublicFrontController} for the Cms module when config is on and there is at least one enabled
-     * {@link ParentSegment} row (registry), so the catch-all is not tied to route iteration order.
-     */
-    private static function shouldUseUniversalCmsPublicFrontForModule(Module $module): bool
-    {
-        if (! (bool) modularousConfig('cms_routing.universal_cms_public_front', true)) {
-            return false;
-        }
-
-        if ($module->getName() !== 'Cms') {
-            return false;
-        }
-
-        if (! class_exists(CmsPublicFrontController::class)) {
-            return false;
-        }
-
-        if (! Schema::hasTable((new ParentSegment)->getTable())) {
-            return false;
-        }
-
-        return ParentSegment::query()->where('enabled', true)->exists();
-    }
-
-    /**
-     * Invokable {@see CmsController} for a specific enabled submodule, when its model uses {@see HasParentSegment}.
+     * Invokable {@see CmsController} for a specific enabled submodule (signed preview, legacy per-route).
      *
      * @return class-string<CmsController>|null
      */
     public static function resolveFrontControllerForModuleRoute(Module $module, string $routeName): ?string
     {
-        if (self::shouldUseUniversalCmsPublicFrontForModule($module)) {
-            return CmsPublicFrontController::class;
-        }
-
         if (! $module->isEnabledRoute($routeName)) {
             return null;
         }
@@ -236,10 +230,12 @@ final class CmsFrontRouteRegistrar
 
     /**
      * {@code GET {modulePrefix}/{path?}} with CMS middleware stack.
+     *
+     * @param class-string|null $controller Pre-resolved invokable controller (skips another qualification scan).
      */
-    public static function registerUnderModulePrefix(Module $module): void
+    public static function registerUnderModulePrefix(Module $module, ?string $controller = null): void
     {
-        $controller = self::resolveFrontControllerForModule($module);
+        $controller ??= self::resolveFrontControllerForModule($module);
         if ($controller === null) {
             return;
         }
@@ -417,41 +413,15 @@ final class CmsFrontRouteRegistrar
             return null;
         }
 
-        if (! Schema::hasTable((new ParentSegment)->getTable())) {
+        if (! CmsFrontRouteRegistrationCache::parentSegmentTableReady()) {
             return null;
         }
 
-        if (! ParentSegment::query()->where('enabled', true)->exists()) {
+        if (! CmsFrontRouteRegistrationCache::hasEnabledParentSegments()) {
             return null;
         }
 
-        if ((bool) modularousConfig('cms_routing.universal_cms_public_front', true) && class_exists(CmsPublicFrontController::class)) {
-            return CmsPublicFrontController::class;
-        }
-
-        $targets = ParentSegment::query()
-            ->where('enabled', true)
-            ->select('target_model_class')
-            ->groupBy('target_model_class')
-            ->orderBy('target_model_class')
-            ->pluck('target_model_class');
-
-        foreach ($targets as $modelClass) {
-            if (! is_string($modelClass) || $modelClass === '' || ! class_exists($modelClass)) {
-                continue;
-            }
-
-            if (! classHasTrait($modelClass, HasParentSegment::class)) {
-                continue;
-            }
-
-            $resolved = self::resolveFrontControllerForModelClass($modelClass);
-            if ($resolved !== null) {
-                return $resolved;
-            }
-        }
-
-        return null;
+        return CmsFrontRouteRegistrationCache::publicFrontCatchAllControllerOrNull();
     }
 
     /**
@@ -464,47 +434,6 @@ final class CmsFrontRouteRegistrar
      */
     public static function resolveFrontControllerForModelClass(string $modelClass): ?string
     {
-        $configured = modularousConfig('cms_routing.public_front_handlers', []);
-        if (is_array($configured) && isset($configured[$modelClass])) {
-            $override = $configured[$modelClass];
-            if (is_string($override) && $override !== '' && class_exists($override)
-                && is_subclass_of($override, CmsController::class, true)) {
-                return $override;
-            }
-        }
-
-        foreach (Modularous::allEnabled() as $module) {
-            if (! $module instanceof Module) {
-                continue;
-            }
-
-            foreach ($module->getRouteNames() as $routeName) {
-                if (! $module->isEnabledRoute($routeName)) {
-                    continue;
-                }
-
-                $resolvedModelClass = self::resolveModelClassForRoute($module, $routeName);
-                if ($resolvedModelClass === null || $resolvedModelClass !== $modelClass) {
-                    continue;
-                }
-
-                if (! classHasTrait($resolvedModelClass, HasParentSegment::class)) {
-                    continue;
-                }
-
-                $fqcn = $module->getTargetClassNamespace(
-                    'front-controller',
-                    Str::studly($routeName) . 'Controller'
-                );
-
-                if (! class_exists($fqcn) || ! is_subclass_of($fqcn, CmsController::class, true)) {
-                    continue;
-                }
-
-                return $fqcn;
-            }
-        }
-
-        return null;
+        return CmsFrontRouteRegistrationCache::frontControllerForModelClass($modelClass);
     }
 }

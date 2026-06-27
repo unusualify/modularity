@@ -252,6 +252,7 @@ export default function useTable (props, context) {
 
   const form = ref(null)
   const loading = ref(false)
+  const actionsLoading = ref(false)
   const options = ref(_.pick({
     ...DEFAULT_TABLE_OPTIONS,
     ...(props.defaultTableOptions ?? {}),
@@ -539,6 +540,8 @@ export default function useTable (props, context) {
       return smAndDown.value
     }),
     loading,
+    actionsLoading,
+    isTableBusy: computed(() => loading.value || actionsLoading.value),
     totalNumberOfElements,
     totalNumberOfPages,
     availablePages: computed(() => {
@@ -713,6 +716,9 @@ export default function useTable (props, context) {
       if(action.type === 'modal') {
         loadItems()
       }
+    },
+    setActionsLoading(value) {
+      actionsLoading.value = value
     }
   })
 
@@ -903,6 +909,10 @@ export default function useTable (props, context) {
       return undefined
     }
     return ({ item }) => {
+      if (state.isTableBusy) {
+        return {}
+      }
+
       const attr = props.clickableItemAttribute
       const canOpen =
         (attr && isset(item[attr])) ||

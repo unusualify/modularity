@@ -130,12 +130,19 @@ abstract class CmsController extends CoreController
         Request $request,
         CanonicalUrlResolverInterface $canonical,
     ) {
+        /**
+         * #TODO: performance optimization, only resolve the item if it qualifies for auto public front
+         * it takes 50ms to resolve the item in local environment
+         */
         $item = $this->resolvePublicItem($request);
-
         if ($item === null) {
             abort(404);
         }
 
+        /**
+         * #TODO: performance optimization, only render the presentation if it qualifies for auto public front
+         * it takes up to 2500ms to render the presentation in local environment
+         */
         return $this->renderPublicCmsPresentation($request, $item, $canonical);
     }
 

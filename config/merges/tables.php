@@ -21,6 +21,7 @@ return [
     'chats' => 'um_chats',
     'chat_messages' => 'um_chat_messages',
     'spreads' => 'um_spreads',
+    'remote_api_sources' => 'um_remote_api_sources',
     'singletons' => 'um_singletons',
     'authorizations' => 'um_authorizations',
     'processes' => 'um_processes',

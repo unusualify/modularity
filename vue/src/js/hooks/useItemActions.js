@@ -12,6 +12,7 @@ import api from '@/store/api/form'
 import { useConfig, useCastAttributes, useDynamicModal } from '@/hooks'
 import { checkItemConditions } from '@/utils/itemConditions'
 import { isset, isObject } from '@/utils/helpers'
+import { buildRemoteApiResponseDescription } from '@/utils/remoteApiResponseDisplay'
 
 export const makeItemActionsProps = propsFactory({
   isEditing: {
@@ -54,6 +55,52 @@ export default function useItemActions(props, context) {
     return item ? item[config.return] : undefined;
   }
 
+  const resolveActionKey = (action) => action.key ?? action.name ?? action.label ?? action.endpoint
+
+  const loading = ref(false)
+  const loadingActions = reactive({})
+
+  const syncGlobalLoading = () => {
+    loading.value = Object.values(loadingActions).some(Boolean)
+  }
+
+  const setActionLoading = (action, isLoading) => {
+    const key = resolveActionKey(action)
+    if (!key) {
+      return
+    }
+
+    if (isLoading) {
+      loadingActions[key] = true
+    } else {
+      delete loadingActions[key]
+    }
+
+    syncGlobalLoading()
+  }
+
+  const isActionLoading = (action) => {
+    const key = resolveActionKey(action)
+    return key ? !!loadingActions[key] : false
+  }
+
+  const openResponseModal = (action, response) => {
+    if (!action.responseModalAttributes || response.data?.data === undefined) {
+      return
+    }
+
+    const payload = response.data.data
+    const description = buildRemoteApiResponseDescription(payload, action, response)
+
+    dynamicModal.open(null, {
+      modalProps: {
+        ...action.responseModalAttributes,
+        description,
+        confirmCallback: async () => true,
+      }
+    })
+  }
+
   const handleRequestAction = (action, endpoint) => {
     if (!endpoint) {
       console.error('Endpoint not specified for request action');
@@ -70,7 +117,7 @@ export default function useItemActions(props, context) {
     const params = {};
 
     // Process each parameter based on its configuration
-    for (const [key, config] of Object.entries(action.params)) {
+    for (const [key, config] of Object.entries(action.params ?? {})) {
       if (typeof config === 'object' && config !== null) {
         const value = resolveParamValue(config);
         if (value === undefined) {
@@ -83,12 +130,16 @@ export default function useItemActions(props, context) {
       }
     }
 
+    setActionLoading(action, true)
+
     api[method](endpoint, params,
       (response) => {
+        setActionLoading(action, false)
+
         if (response.data.message) {
           let actionResponseMessage = action.responseMessage || {};
-          let message = response.data.message;
-          let variant = response.data.variant;
+          let message = response.data.message ?? 'Action completed successfully';
+          let variant = response.data.variant ?? 'success';
 
           if(_.isString(actionResponseMessage)) {
             actionResponseMessage = {
@@ -101,11 +152,14 @@ export default function useItemActions(props, context) {
             message = actionResponseMessage[variant];
           }
 
+
           store.commit(ALERT.SET_ALERT, {
             message: message,
             variant: variant
           });
         }
+
+        openResponseModal(action, response)
         context.emit('actionComplete', { action, response });
 
         // Reload the page after successful operation
@@ -121,6 +175,8 @@ export default function useItemActions(props, context) {
         }
       },
       (error) => {
+        setActionLoading(action, false)
+
         store.commit(ALERT.SET_ALERT, {
           message: error.data?.message || 'Action failed',
           variant: 'error'
@@ -232,11 +288,13 @@ export default function useItemActions(props, context) {
     hasVisibleActions: computed(() => visibleActions.value.length > 0),
     allActions,
     visibleActions,
+    loading,
   })
 
   const methods = reactive({
     // methods
     shouldShowAction: validateAction,
+    isActionLoading,
     handleAction(action) {
       let needToConfirm = false;
       let confirmCallback = null;
@@ -251,7 +309,9 @@ export default function useItemActions(props, context) {
       }
 
       // Replace any URL parameters
-      const endpoint = action.endpoint?.replace(':id', editingItem.id);
+      const endpoint = action.endpoint?.includes(':id')
+        ? action.endpoint.replace(':id', editingItem?.id ?? '')
+        : action.endpoint;
 
       switch (action.type) {
         case 'request':
@@ -300,7 +360,6 @@ export default function useItemActions(props, context) {
 
   return {
     ...toRefs(states),
-    ...toRefs(methods),
-    // ...toRefs(states)
+    ...methods,
   }
 }

@@ -10,6 +10,7 @@ use Modules\Cms\Entities\Page;
 use Modules\Cms\Entities\ParentSegment;
 use Modules\Cms\Observers\ParentSegmentUrlRouteObserver;
 use Modules\Cms\Services\CanonicalUrlResolver;
+use Modules\Cms\Support\CmsPublicUrlRegistryCacheManager;
 use Unusualify\Modularous\Tests\TestCase;
 
 class ParentSegmentUrlRouteObserverTest extends TestCase
@@ -44,7 +45,7 @@ class ParentSegmentUrlRouteObserverTest extends TestCase
             ->method('syncPublicPageRoutesForAllModelsOfClass')
             ->with(Page::class);
 
-        $observer = new ParentSegmentUrlRouteObserver($registry);
+        $observer = $this->makeObserver($registry);
         $segment = ParentSegment::query()->create([
             'target_model_class' => Page::class,
             'locale' => 'en',
@@ -60,7 +61,7 @@ class ParentSegmentUrlRouteObserverTest extends TestCase
         $registry = $this->createMock(PublicUrlRegistryContract::class);
         $registry->expects($this->never())->method('syncPublicPageRoutesForAllModelsOfClass');
 
-        $observer = new ParentSegmentUrlRouteObserver($registry);
+        $observer = $this->makeObserver($registry);
         $segment = ParentSegment::query()->create([
             'target_model_class' => Page::class,
             'locale' => 'en',
@@ -82,7 +83,7 @@ class ParentSegmentUrlRouteObserverTest extends TestCase
             ->method('syncPublicPageRoutesForAllModelsOfClass')
             ->with(Page::class);
 
-        $observer = new ParentSegmentUrlRouteObserver($registry);
+        $observer = $this->makeObserver($registry);
         $segment = ParentSegment::query()->create([
             'target_model_class' => Page::class,
             'locale' => 'en',
@@ -108,7 +109,7 @@ class ParentSegmentUrlRouteObserverTest extends TestCase
                 $calls[] = $class;
             });
 
-        $observer = new ParentSegmentUrlRouteObserver($registry);
+        $observer = $this->makeObserver($registry);
         $segment = ParentSegment::query()->create([
             'target_model_class' => Page::class,
             'locale' => 'en',
@@ -133,7 +134,7 @@ class ParentSegmentUrlRouteObserverTest extends TestCase
             ->method('syncPublicPageRoutesForAllModelsOfClass')
             ->with(Page::class);
 
-        $observer = new ParentSegmentUrlRouteObserver($registry);
+        $observer = $this->makeObserver($registry);
         $segment = ParentSegment::query()->create([
             'target_model_class' => Page::class,
             'locale' => 'en',
@@ -152,7 +153,7 @@ class ParentSegmentUrlRouteObserverTest extends TestCase
         $registry = $this->createMock(PublicUrlRegistryContract::class);
         $registry->expects($this->never())->method('syncPublicPageRoutesForAllModelsOfClass');
 
-        $observer = new ParentSegmentUrlRouteObserver($registry);
+        $observer = $this->makeObserver($registry);
         $segment = ParentSegment::query()->create([
             'target_model_class' => Page::class,
             'locale' => 'en',
@@ -176,5 +177,13 @@ class ParentSegmentUrlRouteObserverTest extends TestCase
         $observer = $this->app->make(ParentSegmentUrlRouteObserver::class);
 
         $this->assertInstanceOf(ParentSegmentUrlRouteObserver::class, $observer);
+    }
+
+    private function makeObserver(PublicUrlRegistryContract $registry): ParentSegmentUrlRouteObserver
+    {
+        return new ParentSegmentUrlRouteObserver(
+            $registry,
+            $this->app->make(CmsPublicUrlRegistryCacheManager::class),
+        );
     }
 }

@@ -227,6 +227,141 @@ describe('useItemActions', () => {
       expect.any(Function),
       expect.any(Function)
     )
+    expect(wrapper.vm.loading).toBe(false)
+  })
+
+  test('handleAction type request sets loading while request is in flight', async () => {
+    const store = createStoreStub()
+    const wrapper = await factory(store)
+    let resolveRequest
+
+    formApiPost.mockImplementation((url, params, success) => {
+      expect(wrapper.vm.loading).toBe(true)
+      expect(wrapper.vm.isActionLoading({
+        type: 'request',
+        endpoint: '/api/items/1/action',
+      })).toBe(true)
+      resolveRequest = () => success({ data: { message: 'Done', variant: 'success' } })
+    })
+
+    const action = {
+      type: 'request',
+      endpoint: '/api/items/1/action',
+      params: {},
+    }
+
+    wrapper.vm.handleAction(action)
+    resolveRequest()
+
+    expect(wrapper.vm.loading).toBe(false)
+    expect(wrapper.vm.isActionLoading(action)).toBe(false)
+  })
+
+  test('handleAction type request clears loading on error', async () => {
+    const store = createStoreStub()
+    const wrapper = await factory(store)
+    const action = {
+      type: 'request',
+      endpoint: '/api/items/1/action',
+      params: {},
+    }
+
+    formApiPost.mockImplementation((url, params, success, error) => {
+      error({ data: { message: 'Server error' } })
+    })
+
+    wrapper.vm.handleAction(action)
+
+    expect(wrapper.vm.loading).toBe(false)
+    expect(wrapper.vm.isActionLoading(action)).toBe(false)
+  })
+
+  test('handleAction type request opens response modal when configured', async () => {
+    const store = createStoreStub()
+    const wrapper = await factory(store, { isEditing: true, item: { id: 1, remote_id: 42 } })
+    formApiPut.mockImplementation((url, params, success) => {
+      success({ data: { data: { id: 42, name: 'Remote package' } } })
+    })
+
+    wrapper.vm.handleAction({
+      type: 'request',
+      method: 'put',
+      endpoint: '/api/items/1/preview-remote',
+      params: {},
+      responseDisplay: 'fields',
+      responseFields: [
+        { key: 'name', label: 'Name' },
+      ],
+      responseModalAttributes: {
+        title: 'Preview API record',
+        confirmText: 'Close',
+      },
+    })
+
+    expect(mockDynamicModalOpen).toHaveBeenCalledWith(null, expect.objectContaining({
+      modalProps: expect.objectContaining({
+        title: 'Preview API record',
+        description: expect.stringContaining('Name'),
+      })
+    }))
+    expect(mockDynamicModalOpen.mock.calls[0][1].modalProps.description).toContain('Remote package')
+    expect(mockDynamicModalOpen.mock.calls[0][1].modalProps.description).not.toContain('"id": 42')
+  })
+
+  test('handleAction type request opens raw response modal when configured', async () => {
+    const store = createStoreStub()
+    const wrapper = await factory(store, { isEditing: true, item: { id: 1, remote_id: 42 } })
+    formApiPut.mockImplementation((url, params, success) => {
+      success({ data: { data: { id: 42, name: 'Remote package' } } })
+    })
+
+    wrapper.vm.handleAction({
+      type: 'request',
+      method: 'put',
+      endpoint: '/api/items/1/preview-remote',
+      params: {},
+      responseDisplay: 'raw',
+      responseModalAttributes: {
+        title: 'Preview API record',
+        confirmText: 'Close',
+      },
+    })
+
+    expect(mockDynamicModalOpen).toHaveBeenCalledWith(null, expect.objectContaining({
+      modalProps: expect.objectContaining({
+        description: JSON.stringify({ id: 42, name: 'Remote package' }, null, 2),
+      })
+    }))
+  })
+
+  test('handleAction type request prefers server display payload when present', async () => {
+    const store = createStoreStub()
+    const wrapper = await factory(store, { isEditing: true, item: { id: 1, remote_id: 42 } })
+    formApiPut.mockImplementation((url, params, success) => {
+      success({
+        data: {
+          data: { id: 42, name: 'Remote package', description: 'Ignored in display' },
+          display_mode: 'fields',
+          display: [
+            { key: 'name', label: 'Package name', value: 'Custom label from server' },
+          ],
+        }
+      })
+    })
+
+    wrapper.vm.handleAction({
+      type: 'request',
+      method: 'put',
+      endpoint: '/api/items/1/preview-remote',
+      params: {},
+      responseModalAttributes: {
+        title: 'Preview API record',
+        confirmText: 'Close',
+      },
+    })
+
+    expect(mockDynamicModalOpen.mock.calls[0][1].modalProps.description).toContain('Custom label from server')
+    expect(mockDynamicModalOpen.mock.calls[0][1].modalProps.description).toContain('Package name')
   })
 
   test('handleAction type request with reloadOnSuccess calls success callback', async () => {
@@ -378,5 +513,30 @@ describe('useItemActions', () => {
       props: { actions: [{ creatable: false }], isEditing: false }
     })
     expect(w.vm.shouldShowAction({ creatable: false })).toBe(true)
+  })
+
+  test('handleAction type request without editingItem calls api post for table toolbar actions', async () => {
+    const TestNoItem = defineComponent({
+      props: { ...makeItemActionsProps() },
+      emits: ['actionComplete'],
+      setup(props, context) {
+        return useItemActions(props, { ...context, actionItem: null })
+      },
+      template: '<div />'
+    })
+    const store = createStoreStub()
+    const w = mount(TestNoItem, {
+      global: { plugins: [vuetify, i18n, store] },
+      props: { actions: [], isEditing: false }
+    })
+
+    w.vm.handleAction({
+      type: 'request',
+      endpoint: '/admin/packages/sync_remote_all',
+      params: {},
+      hasConfirmation: true,
+    })
+
+    expect(mockDynamicModalOpen).toHaveBeenCalled()
   })
 })

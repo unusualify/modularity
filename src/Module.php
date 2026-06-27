@@ -65,6 +65,11 @@ class Module extends NwidartModule
         'rejectRevision',
         'showView',
         'listRevisions',
+        'syncRemote',
+        'syncRemoteAll',
+        'clearRemoteCache',
+        'previewRemote',
+        'listRemoteCatalog',
     ];
 
     /**
