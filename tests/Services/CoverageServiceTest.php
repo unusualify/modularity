@@ -125,7 +125,7 @@ class CoverageServiceTest extends TestCase
         // Test that different branch formats are handled
         $mock = new class($this->cloverDir, $this->cloverName) extends CoverageService
         {
-            public function test_get_git_changed_files(string $baseBranch): array
+            public function testGetGitChangedFiles(string $baseBranch): array
             {
                 // Call the private method through reflection
                 $method = new \ReflectionMethod(parent::class, 'getGitChangedFiles');

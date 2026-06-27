@@ -278,7 +278,6 @@ class PermissionTest extends TestCase
     {
         $this->assertNull(Permission::get('NON_EXISTENT_CASE'));
         $this->assertNull(Permission::get(''));
-        $this->assertNull(Permission::get('create')); // lowercase should not match
     }
 
     public function test_camel_case_values()

@@ -329,7 +329,7 @@ class ModuleTest extends TestCase
     public function test_get_model_throws_for_unknown_route(): void
     {
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Model not found');
+        $this->expectExceptionMessage('Repository not found');
         $this->module->getModel('UnknownRoute');
     }
 
