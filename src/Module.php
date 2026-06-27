@@ -25,7 +25,6 @@ use Unusualify\Modularous\Entities\Enums\Permission;
 use Unusualify\Modularous\Exceptions\ModularousException;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Repositories\Repository;
-use Unusualify\Modularous\Support\Finder;
 
 class Module extends NwidartModule
 {
@@ -973,7 +972,13 @@ class Module extends NwidartModule
      */
     public function getRepository($routeName, $asClass = true): Repository|string
     {
-        return (new Finder)->getRouteRepository($routeName, $asClass);
+        $classNamespace = $this->getRouteClass($routeName, 'repository');
+
+        if (! class_exists($classNamespace)) {
+            return false;
+        }
+
+        return $asClass ? App::make($classNamespace) : $classNamespace;
     }
 
     /**
@@ -985,6 +990,10 @@ class Module extends NwidartModule
     public function getModel($routeName, $asClass = true): Model|string
     {
         $repository = $this->getRepository($routeName);
+
+        if(is_null($repository) || empty($repository) || !class_exists(get_class($repository))) {
+            throw new \Exception('Repository not found for ' . $routeName . ' on module ' . $this->getName());
+        }
 
         $model = $repository->getModel();
 
