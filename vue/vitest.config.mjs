@@ -4,9 +4,11 @@ import { fileURLToPath, URL } from 'node:url'
 
 import Vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
 import Vue from '@vitejs/plugin-vue'
+import { createSassPreprocessorOptions } from './sass-preprocessor-options.mjs'
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url))
 const srcDir = fileURLToPath(new URL('src', import.meta.url))
+const testThemeFolder = 'unusualify'
 
 export default defineConfig({
   root: path.resolve(__dirname),
@@ -81,6 +83,12 @@ export default defineConfig({
       __setup: fileURLToPath(new URL(`${srcDir}/js/setup`, import.meta.url)),
       '~': fileURLToPath(new URL('./node_modules', import.meta.url))
     }
+  },
+  css: {
+    preprocessorOptions: createSassPreprocessorOptions({
+      themeFolder: testThemeFolder,
+      style: 'expanded',
+    }),
   },
 
 })

@@ -6,6 +6,7 @@ import Inspect from 'vite-plugin-inspect'
 import { viteCommonjs } from '@originjs/vite-plugin-commonjs'
 import VitePluginSvgSpritemap from '@spiriit/vite-plugin-svg-spritemap'
 import Modularous, {isCustomTheme} from './vite-plugin-modularous'
+import { createSassPreprocessorOptions } from './sass-preprocessor-options.mjs'
 
 // Utilities
 import { defineConfig, loadEnv, splitVendorChunkPlugin } from 'vite'
@@ -157,9 +158,9 @@ export default defineConfig(({ command, mode }) => {
   if ( !fs.existsSync(ziggyPath) ) {
     ziggyPath = path.resolve(__dirname, '../../../vendor/tightenco/ziggy/dist/index.esm.js')
   }
-  
-  const hasZiggy = process.env.VUE_HAS_ZIGGY !== undefined 
-      ? process.env.VUE_HAS_ZIGGY === 'true' 
+
+  const hasZiggy = process.env.VUE_HAS_ZIGGY !== undefined
+      ? process.env.VUE_HAS_ZIGGY === 'true'
       : fs.existsSync(ziggyPath)
 
   return {
@@ -302,55 +303,10 @@ export default defineConfig(({ command, mode }) => {
       }
     },
     css: {
-      preprocessorOptions: {
-        // Sass deprecation noise mostly originates from Vuetify's internal
-        // styles (e.g. `if()` legacy syntax, `@import`, `lighten()` etc.),
-        // which we cannot patch from this side. `quietDeps` silences any
-        // deprecation whose call site is inside `node_modules`. The explicit
-        // `silenceDeprecations` list covers warnings that surface from our
-        // own files because of `additionalData` injection or because Vite is
-        // still using the legacy Sass JS API.
-        // Drop entries from `silenceDeprecations` once the underlying issue
-        // is addressed so genuinely actionable warnings can resurface.
-        scss: {
-          additionalData: `
-            @use "styles/themes/${APP_THEME_FOLDER}/_additional.scss" as *;
-          `,
-          quietDeps: true,
-          silenceDeprecations: [
-            'legacy-js-api',
-            'import',
-            'global-builtin',
-            'color-functions',
-            'slash-div',
-            'if-function',
-            'null-alpha',
-            'function-units',
-          ],
-          sassOptions: {
-            outputStyle: isProduction ? 'compressed' : 'expanded'
-          }
-        },
-        sass: {
-          additionalData: `
-            @use "styles/themes/${APP_THEME_FOLDER}/_additional.scss" as *
-          `,
-          quietDeps: true,
-          silenceDeprecations: [
-            'legacy-js-api',
-            'import',
-            'global-builtin',
-            'color-functions',
-            'slash-div',
-            'if-function',
-            'null-alpha',
-            'function-units',
-          ],
-          sassOptions: {
-            outputStyle: isProduction ? 'compressed' : 'expanded'
-          }
-        }
-      }
+      preprocessorOptions: createSassPreprocessorOptions({
+        themeFolder: APP_THEME_FOLDER,
+        style: isProduction ? 'compressed' : 'expanded',
+      }),
     },
     server,
     optimizeDeps: {
