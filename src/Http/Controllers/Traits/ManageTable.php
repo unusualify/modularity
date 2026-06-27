@@ -41,7 +41,6 @@ trait ManageTable
         $this->defaultTableAttributes = (array) Config::get(modularousBaseKey() . '.default_table_attributes');
 
         $this->tableAttributes = array_merge_recursive_preserve($this->getTableAttributes(), $this->tableAttributes ?? []);
-
     }
 
     public function setupDefaultFilters()

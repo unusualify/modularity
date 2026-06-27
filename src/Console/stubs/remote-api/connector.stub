@@ -1,0 +1,49 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Modules\$MODULE$\RemoteApi;
+
+use Unusualify\Modularous\Services\RemoteApi\AbstractRemoteApiConnector;
+
+class $ROUTE$RemoteApiConnector extends AbstractRemoteApiConnector
+{
+    /**
+     * @return array<string, mixed>
+     */
+    public static function remoteApiConfiguration(): array
+    {
+        return [
+            'enabled' => true,
+            'base_url' => null,
+            'endpoint' => '$ENDPOINT$',
+            'show_endpoint' => '$ENDPOINT$/{id}',
+            'remote_id_column' => 'remote_id',
+            'response' => [
+                'list_path' => 'data.data.data',
+                'item_path' => 'data.data',
+            ],
+            'mapping' => [
+                'remote_id' => 'id',
+                'remote_payload' => '@raw',
+                'remote_synced_at' => '@now',
+            ],
+            'actions' => ['sync_record', 'sync_all', 'clear_cache', 'preview'],
+            'classes' => [
+                'connector' => self::class,
+                'adapter' => $ROUTE$RemoteApiAdapter::class,
+                'dto' => $ROUTE$RemoteApiDto::class,
+            ],
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $query
+     *
+     * @return array<string, mixed>
+     */
+    protected function beforeFetch(array $query): array
+    {
+        return parent::beforeFetch($query);
+    }
+}

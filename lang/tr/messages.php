@@ -92,4 +92,29 @@ return [
     'save-success' => 'Kayıt Başarıyla Tamamlandı!',
     'success' => 'Başarıyla Tamamlandı!',
     'warning' => 'Bir Uyarı Var!',
+
+    'remote-api' => [
+        'sync-record' => [
+            'label' => 'API\'den Senkronize Et',
+        ],
+        'sync-all' => [
+            'label' => 'Tüm API\'den Senkronize Et',
+            'confirmation-title' => 'Tüm API\'den Senkronize Et?',
+            'confirmation-description' => 'Bu işlem tüm kayıtları API\'den senkronize edecektir. Emin misiniz?',
+            'confirmation-confirmText' => 'Senkronize Et',
+            'confirmation-cancelText' => 'İptal',
+        ],
+        'clear-cache' => [
+            'label' => 'API Önbelleğini Temizle',
+            'confirmation-title' => 'API Önbelleğini Temizle?',
+            'confirmation-description' => 'Bu işlem API önbelleğini temizleyecektir. Emin misiniz?',
+            'confirmation-confirmText' => 'Temizle',
+            'confirmation-cancelText' => 'İptal',
+        ],
+        'preview' => [
+            'label' => 'API Kaydını Önizle',
+            'close' => 'Kapat',
+            'not-found' => 'Uzak kayıt bulunamadı.',
+        ],
+    ],
 ];

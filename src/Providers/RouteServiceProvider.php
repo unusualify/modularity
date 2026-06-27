@@ -392,6 +392,14 @@ class RouteServiceProvider extends ServiceProvider
                 }
             }
 
+            $customRoutes = array_merge($customRoutes, [
+                'syncRemote',
+                'syncRemoteAll',
+                'clearRemoteCache',
+                'previewRemote',
+                'listRemoteCatalog',
+            ]);
+
             $controllerName = "{$routeName}Controller";
             $snakeCase = snakeCase($routeName);
 
@@ -477,7 +485,7 @@ class RouteServiceProvider extends ServiceProvider
                     Route::put($routeSlug, $mapping);
                 }
 
-                if (in_array($customRoute, ['duplicate', 'preview', 'showView', 'approveRevision', 'rejectRevision'])) {
+                if (in_array($customRoute, ['duplicate', 'preview', 'showView', 'approveRevision', 'rejectRevision', 'syncRemote', 'previewRemote'])) {
                     Route::put($routeSlug . "/{{$snakeCase}}", $mapping);
                 }
 
@@ -489,9 +497,15 @@ class RouteServiceProvider extends ServiceProvider
                         'bulkDelete',
                         'bulkRestore',
                         'bulkForceDelete',
+                        'syncRemoteAll',
+                        'clearRemoteCache',
                     ])
                 ) {
                     Route::post($routeSlug, $mapping);
+                }
+
+                if ($customRoute === 'listRemoteCatalog') {
+                    Route::get($routeSlug, $mapping);
                 }
 
             }

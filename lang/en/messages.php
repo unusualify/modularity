@@ -97,4 +97,30 @@ return [
     'save-success' => 'Content saved. All good!',
     'success' => 'Completed Successfully!',
     'warning' => 'There is a warning!',
+
+    'remote-api' => [
+        'sync-record' => [
+            'label' => 'Sync from API',
+        ],
+        'sync-all' => [
+            'label' => 'Sync all from API',
+            'confirmation-title' => 'Sync all from API?',
+            'confirmation-description' => 'This will sync all records from the API. Are you sure?',
+            'confirmation-confirmText' => 'Sync',
+            'confirmation-cancelText' => 'Cancel',
+        ],
+        'clear-cache' => [
+            'label' => 'Clear API cache',
+            'confirmation-title' => 'Clear API cache?',
+            'confirmation-description' => 'This will clear the API cache. Are you sure?',
+            'confirmation-confirmText' => 'Clear',
+            'confirmation-cancelText' => 'Cancel',
+        ],
+        'preview' => [
+            'label' => 'Preview API record',
+            'close' => 'Close',
+            'not-found' => 'Remote record not found.',
+        ],
+        'rate-limit-exceeded' => 'Remote API rate limit exceeded. Please wait and try again.',
+    ],
 ];

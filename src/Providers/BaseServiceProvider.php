@@ -169,6 +169,11 @@ class BaseServiceProvider extends ServiceProvider
 
         $this->app->singleton('modularous.navigation', ModularousNavigation::class);
 
+        $this->app->singleton(\Unusualify\Modularous\Services\RemoteApi\RemoteApiConnectorResolver::class);
+        $this->app->singleton(\Unusualify\Modularous\Services\RemoteApi\RemoteApiRateLimiter::class);
+        $this->app->singleton(\Unusualify\Modularous\Services\RemoteApi\RemoteApiConnectorFactory::class);
+        $this->app->singleton(\Unusualify\Modularous\Services\RemoteApi\RemoteApiSynchronizer::class);
+
         $this->app->singleton('model.relation.namespace', function () {
             return "Illuminate\Database\Eloquent\Relations";
         });
@@ -643,6 +648,13 @@ class BaseServiceProvider extends ServiceProvider
             'path' => storage_path('logs/modularous-notification-failure.log'),
             'level' => env('MODULAROUS_NOTIFICATION_FAILURE_LOG_LEVEL', 'error'),
             'days' => 14,
+        ]);
+        $this->app['config']->set('logging.channels.modularous-remote-api', [
+            'driver' => 'daily',
+            'path' => storage_path('logs/modularous-remote-api.log'),
+            'level' => env('MODULAROUS_REMOTE_API_LOG_LEVEL', 'info'),
+            'days' => env('LOG_DAILY_DAYS', 14),
+            'replace_placeholders' => true,
         ]);
     }
 }
