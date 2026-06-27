@@ -2,6 +2,12 @@
 
 All notable changes to `modularous` will be documented in this file
 
+## v11.1.3 - 2026-06-27
+
+### :wrench: Bug Fixes
+
+- enhance authorization handling for model saves by @celikerde in https://github.com/unusualify/modularous/commit/cde74e32086198cbbcb02d18e742d7dca75348ba
+
 ## v0.58.8 - 2026-06-26
 
 ### :rocket: Features
