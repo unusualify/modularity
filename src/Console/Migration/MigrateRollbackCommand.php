@@ -5,7 +5,6 @@ namespace Unusualify\Modularous\Console\Migration;
 use Illuminate\Console\Command;
 use Illuminate\Database\Migrations\Migrator;
 use Nwidart\Modules\Module;
-use Symfony\Component\Console\Input\InputArgument;
 use Unusualify\Modularous\Facades\Modularous;
 
 class MigrateRollbackCommand extends Command
@@ -77,7 +76,7 @@ class MigrateRollbackCommand extends Command
         try {
             foreach ($batches as $batch) {
                 $params = [
-                    '--path'  => $relativeDir,
+                    '--path' => $relativeDir,
                     '--batch' => $batch,
                 ];
 

@@ -10,13 +10,11 @@ class RemoteApiFieldMapper
 {
     public function __construct(
         private readonly RemoteApiConfiguration $configuration,
-    ) {
-    }
+    ) {}
 
     /**
      * @param array<string, mixed> $row
      * @param array<string, mixed> $existingAttributes
-     *
      * @return array<string, mixed>
      */
     public function map(array $row, array $existingAttributes = [], ?callable $transformField = null): array
@@ -36,7 +34,6 @@ class RemoteApiFieldMapper
     /**
      * @param array<string, mixed> $attributes
      * @param array<string, mixed> $existingAttributes
-     *
      * @return array<string, mixed>
      */
     public function applyFieldRules(array $attributes, array $existingAttributes = []): array
@@ -81,7 +78,7 @@ class RemoteApiFieldMapper
         }
 
         if (str_starts_with($source, '@json:')) {
-            $path = substr($source, 6);
+            $path = mb_substr($source, 6);
             $value = $path === '' ? $row : data_get($row, $path);
 
             return $value === null ? null : json_encode($value, JSON_THROW_ON_ERROR);

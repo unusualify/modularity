@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Unusualify\Modularous\Tests\Services\RemoteApi;
 
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 use Mockery;
 use Unusualify\Modularous\Module;
 use Unusualify\Modularous\Services\RemoteApi\AbstractRemoteApiAdapter;
@@ -132,9 +131,9 @@ class AbstractRemoteApiConnectorCacheTest extends TestCase
 
 class CatalogTestConnector extends AbstractRemoteApiConnector
 {
-  /**
-   * @return array<string, mixed>
-   */
+    /**
+     * @return array<string, mixed>
+     */
     public static function remoteApiConfiguration(): array
     {
         return ['enabled' => false];
@@ -142,7 +141,6 @@ class CatalogTestConnector extends AbstractRemoteApiConnector
 
     /**
      * @param array<int, array<string, mixed>> $items
-     *
      * @return array<int, array<string, mixed>>
      */
     protected function afterFetch(array $items, array $query): array
@@ -158,6 +156,4 @@ class CatalogTestConnector extends AbstractRemoteApiConnector
     }
 }
 
-class CatalogTestAdapter extends AbstractRemoteApiAdapter
-{
-}
+class CatalogTestAdapter extends AbstractRemoteApiAdapter {}

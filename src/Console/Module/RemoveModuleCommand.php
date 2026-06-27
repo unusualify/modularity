@@ -42,8 +42,9 @@ class RemoveModuleCommand extends BaseCommand
         $dryRun = $this->option('dry-run');
         $moduleName = $this->argument('module');
 
-        if ($isProduction && !$force && !$this->confirm('Are you sure you want to remove the module?')) {
-            $this->info("Module removal cancelled.");
+        if ($isProduction && ! $force && ! $this->confirm('Are you sure you want to remove the module?')) {
+            $this->info('Module removal cancelled.');
+
             return 0;
         }
 
@@ -56,6 +57,7 @@ class RemoveModuleCommand extends BaseCommand
 
         if ($dryRun) {
             $this->info("Module [{$moduleName}] would be removed completely!");
+
             return 0;
         }
 

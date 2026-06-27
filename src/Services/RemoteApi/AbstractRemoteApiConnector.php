@@ -8,7 +8,7 @@ use Unusualify\Modularous\Services\RemoteApi\Contracts\DefinesRemoteApiConfigura
 use Unusualify\Modularous\Services\RemoteApi\Contracts\RemoteApiAdapterInterface;
 use Unusualify\Modularous\Services\RemoteApi\Contracts\RemoteApiConnectorInterface;
 
-abstract class AbstractRemoteApiConnector implements RemoteApiConnectorInterface, DefinesRemoteApiConfiguration
+abstract class AbstractRemoteApiConnector implements DefinesRemoteApiConfiguration, RemoteApiConnectorInterface
 {
     /**
      * @return array<string, mixed>
@@ -20,8 +20,7 @@ abstract class AbstractRemoteApiConnector implements RemoteApiConnectorInterface
         protected readonly RemoteApiClient $client,
         protected readonly RemoteApiCache $cache,
         protected readonly RemoteApiAdapterInterface $adapter,
-    ) {
-    }
+    ) {}
 
     public function configuration(): RemoteApiConfiguration
     {
@@ -129,7 +128,6 @@ abstract class AbstractRemoteApiConnector implements RemoteApiConnectorInterface
 
     /**
      * @param array<string, mixed> $query
-     *
      * @return array<string, mixed>
      */
     protected function beforeCatalogFetch(array $query): array
@@ -143,7 +141,6 @@ abstract class AbstractRemoteApiConnector implements RemoteApiConnectorInterface
 
     /**
      * @param array<string, mixed> $existingAttributes
-     *
      * @return array<string, mixed>
      */
     public function mapRow(array $row, array $existingAttributes = []): array
@@ -171,7 +168,6 @@ abstract class AbstractRemoteApiConnector implements RemoteApiConnectorInterface
 
     /**
      * @param array<string, mixed> $query
-     *
      * @return array<string, mixed>
      */
     protected function beforeFetch(array $query): array
@@ -181,7 +177,6 @@ abstract class AbstractRemoteApiConnector implements RemoteApiConnectorInterface
 
     /**
      * @param array<int, array<string, mixed>> $items
-     *
      * @return array<int, array<string, mixed>>
      */
     protected function afterFetch(array $items, array $query): array
@@ -191,7 +186,6 @@ abstract class AbstractRemoteApiConnector implements RemoteApiConnectorInterface
 
     /**
      * @param array<string, mixed> $item
-     *
      * @return array<string, mixed>
      */
     protected function afterFetchOne(array $item, int|string $remoteId, array $query): array
@@ -214,7 +208,6 @@ abstract class AbstractRemoteApiConnector implements RemoteApiConnectorInterface
 
     /**
      * @param array<string, mixed> $payload
-     *
      * @return list<array{key: string, label: string, value: mixed}>
      */
     public function buildPreviewResponseDisplay(array $payload): array
@@ -241,7 +234,6 @@ abstract class AbstractRemoteApiConnector implements RemoteApiConnectorInterface
     /**
      * @param list<array{key: string, label: string, value: mixed}> $fields
      * @param array<string, mixed> $payload
-     *
      * @return list<array{key: string, label: string, value: mixed}>
      */
     protected function customizePreviewResponseDisplay(array $fields, array $payload): array
@@ -279,7 +271,6 @@ abstract class AbstractRemoteApiConnector implements RemoteApiConnectorInterface
 
     /**
      * @param array<string, mixed> $catalogQuery
-     *
      * @return array<int, array<string, mixed>>|null
      */
     protected function resolveDefaultCatalogItemsFromListCache(array $catalogQuery): ?array

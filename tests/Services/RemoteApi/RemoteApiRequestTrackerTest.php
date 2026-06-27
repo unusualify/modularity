@@ -11,7 +11,7 @@ class RemoteApiRequestTrackerTest extends TestCase
 {
     public function test_tracks_requests_per_url_and_flushes(): void
     {
-        $tracker = new RemoteApiRequestTracker();
+        $tracker = new RemoteApiRequestTracker;
 
         $tracker->record('http://app.b2press.test/api/v1/packages?page=1');
         $tracker->record('http://app.b2press.test/api/v1/packages?page=2');

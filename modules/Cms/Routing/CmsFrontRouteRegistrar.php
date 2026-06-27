@@ -177,7 +177,7 @@ final class CmsFrontRouteRegistrar
     public static function moduleQualifiesForAutoPublicFront(Module $module): bool
     {
         if (CmsFrontRouteRegistrationCache::usesUniversalPublicFront()) {
-            return strtolower($module->getName()) === 'cms'
+            return mb_strtolower($module->getName()) === 'cms'
                 && self::resolveControllerClassOrNull() !== null;
         }
 

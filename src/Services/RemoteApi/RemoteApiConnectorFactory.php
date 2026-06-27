@@ -12,8 +12,7 @@ class RemoteApiConnectorFactory
     public function __construct(
         private readonly RemoteApiConnectorResolver $resolver,
         private readonly RemoteApiRateLimiter $rateLimiter,
-    ) {
-    }
+    ) {}
 
     public function make(string $moduleName, string $routeName): RemoteApiConnectorInterface
     {

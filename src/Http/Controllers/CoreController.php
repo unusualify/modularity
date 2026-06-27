@@ -203,8 +203,10 @@ abstract class CoreController extends LaravelController implements ModuleableInt
         if ($data instanceof AbstractPaginator || $data instanceof Collection) {
             return $concrete::collection($data);
         }
+
         return App::makeWith($concrete, ['resource' => $data]);
     }
+
     /**
      * @return Transformers
      */
@@ -213,6 +215,7 @@ abstract class CoreController extends LaravelController implements ModuleableInt
         if (@class_exists($class = "$this->namespace\Transformers\\" . $this->modelName . 'Resource')) {
             return $class;
         }
+
         return null;
     }
 

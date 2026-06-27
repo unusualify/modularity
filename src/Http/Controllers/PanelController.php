@@ -21,7 +21,6 @@ use Unusualify\Modularous\Http\Controllers\Traits\ManageAppends;
 use Unusualify\Modularous\Http\Controllers\Traits\ManageAuthorization;
 use Unusualify\Modularous\Http\Controllers\Traits\ManageScopes;
 use Unusualify\Modularous\Http\Controllers\Traits\ManageWiths;
-use Unusualify\Modularous\Transformers;
 
 abstract class PanelController extends CoreController implements CacheableInterface
 {

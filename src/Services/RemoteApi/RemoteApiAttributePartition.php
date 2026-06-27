@@ -11,7 +11,6 @@ class RemoteApiAttributePartition
     /**
      * @param array<string, mixed> $mapped
      * @param array<string, mixed> $existingParentAttributes
-     *
      * @return array{local: array<string, mixed>, remote: array<string, mixed>}
      */
     public function partition(

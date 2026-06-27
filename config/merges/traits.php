@@ -1,5 +1,9 @@
 <?php
 
+use Modules\Cms\Entities\Concerns\HasParentSegment;
+use Modules\Cms\Entities\Concerns\IsCmr;
+use Modules\Cms\Repositories\Traits\CmrTrait;
+use Modules\Cms\Repositories\Traits\ParentSegmentTrait;
 use Oobook\Snapshot\Traits\HasSnapshot;
 use Symfony\Component\Console\Input\InputOption;
 use Unusualify\Modularous\Entities\Interfaces\Sortable;
@@ -129,8 +133,8 @@ return [
         ],
     ],
     'addCmr' => [
-        'model' =>\Modules\Cms\Entities\Concerns\IsCmr::class,
-        'repository' => \Modules\Cms\Repositories\Traits\CmrTrait::class,
+        'model' => IsCmr::class,
+        'repository' => CmrTrait::class,
         'question' => 'Do you need to add content module route (CMR) feature on this module route?',
         'command_option' => [
             'shortcut' => null,
@@ -139,8 +143,8 @@ return [
         ],
     ],
     'addParentSegment' => [
-        'model' => \Modules\Cms\Entities\Concerns\HasParentSegment::class,
-        'repository' => \Modules\Cms\Repositories\Traits\ParentSegmentTrait::class,
+        'model' => HasParentSegment::class,
+        'repository' => ParentSegmentTrait::class,
         'question' => 'Do you need to add parent segment feature on this module route?',
         'command_option' => [
             'shortcut' => null,

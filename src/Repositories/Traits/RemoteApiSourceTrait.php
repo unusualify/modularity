@@ -270,7 +270,6 @@ trait RemoteApiSourceTrait
 
     /**
      * @param array<string, mixed> $def
-     *
      * @return array<string, mixed>|null
      */
     protected function mapRemoteApiFormAction(array $def, string $routePrefix): ?array

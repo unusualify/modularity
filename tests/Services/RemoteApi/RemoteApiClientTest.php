@@ -147,7 +147,6 @@ class RemoteApiClientTest extends TestCase
 
     /**
      * @param list<array<string, int>> $records
-     *
      * @return array<string, mixed>
      */
     private function paginatedResponse(

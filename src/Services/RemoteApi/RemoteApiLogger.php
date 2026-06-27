@@ -10,8 +10,7 @@ class RemoteApiLogger
 {
     public function __construct(
         private readonly ?RemoteApiConfiguration $configuration = null,
-    ) {
-    }
+    ) {}
 
     public function logHttpRequest(
         string $url,

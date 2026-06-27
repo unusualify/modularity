@@ -12,13 +12,11 @@ class AbstractRemoteApiAdapter implements RemoteApiAdapterInterface
     public function __construct(
         protected readonly RemoteApiConfiguration $configuration,
         protected readonly RemoteApiFieldMapper $fieldMapper,
-    ) {
-    }
+    ) {}
 
     /**
      * @param array<string, mixed> $row
      * @param array<string, mixed> $existingAttributes
-     *
      * @return array<string, mixed>
      */
     public function mapToAttributes(array $row, array $existingAttributes = []): array
@@ -43,7 +41,6 @@ class AbstractRemoteApiAdapter implements RemoteApiAdapterInterface
     /**
      * @param array<string, mixed> $attributes
      * @param array<string, mixed> $existingAttributes
-     *
      * @return array<string, mixed>
      */
     protected function afterMap(array $attributes, RemoteApiDtoInterface $dto, array $existingAttributes = []): array

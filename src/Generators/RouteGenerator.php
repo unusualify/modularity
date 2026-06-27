@@ -6,7 +6,6 @@ use Illuminate\Config\Repository as Config;
 use Illuminate\Console\Command as Console;
 use Illuminate\Container\Container;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Artisan;

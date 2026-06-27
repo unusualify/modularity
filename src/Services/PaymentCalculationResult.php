@@ -147,6 +147,6 @@ final class PaymentCalculationResult
             return 'NULL';
         }
 
-        return "'" . str_replace(["\\", "'"], ["\\\\", "\\'"], $value) . "'";
+        return "'" . str_replace(['\\', "'"], ['\\\\', "\\'"], $value) . "'";
     }
 }

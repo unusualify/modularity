@@ -13,8 +13,8 @@ class RemoteApiClient
 
     public function __construct(
         private readonly RemoteApiConfiguration $configuration,
-        private readonly RemoteApiRateLimiter $rateLimiter = new RemoteApiRateLimiter(),
-        private readonly RemoteApiRequestTracker $requestTracker = new RemoteApiRequestTracker(),
+        private readonly RemoteApiRateLimiter $rateLimiter = new RemoteApiRateLimiter,
+        private readonly RemoteApiRequestTracker $requestTracker = new RemoteApiRequestTracker,
         ?RemoteApiLogger $logger = null,
     ) {
         $this->logger = $logger ?? new RemoteApiLogger($configuration);
@@ -297,7 +297,6 @@ class RemoteApiClient
 
     /**
      * @param array<string, mixed> $response
-     *
      * @return array<int, array<string, mixed>>
      */
     public function extractList(array $response, string $listPath): array
@@ -370,7 +369,6 @@ class RemoteApiClient
 
     /**
      * @param array<string, mixed> $query
-     *
      * @return array<string, mixed>
      */
     private function sanitizeQuery(array $query): array

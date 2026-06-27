@@ -13,6 +13,7 @@ use Unusualify\Modularous\Module;
 use Unusualify\Modularous\Repositories\Repository;
 use Unusualify\Modularous\Services\RemoteApi\ConfigurableRemoteApiAdapter;
 use Unusualify\Modularous\Services\RemoteApi\Contracts\RemoteApiConnectorInterface;
+use Unusualify\Modularous\Services\RemoteApi\Exceptions\RemoteApiSyncException;
 use Unusualify\Modularous\Services\RemoteApi\RemoteApiAttributePartition;
 use Unusualify\Modularous\Services\RemoteApi\RemoteApiConfiguration;
 use Unusualify\Modularous\Services\RemoteApi\RemoteApiFieldMapper;
@@ -94,7 +95,7 @@ class RemoteApiSynchronizerTest extends TestCase
         $repository->shouldReceive('getModel')->andReturn($model);
         $repository->shouldReceive('update')->once()->with(1, ['is_featured' => true])->andReturn($existing);
 
-        $result = (new RemoteApiSynchronizer(new RemoteApiAttributePartition()))->syncRecord($connector, $repository, 42);
+        $result = (new RemoteApiSynchronizer(new RemoteApiAttributePartition))->syncRecord($connector, $repository, 42);
 
         $this->assertFalse($result['created']);
     }
@@ -142,7 +143,7 @@ class RemoteApiSynchronizerTest extends TestCase
         $repository = Mockery::mock(Repository::class);
         $repository->shouldReceive('getModel')->andReturn($model);
 
-        $preview = (new RemoteApiSynchronizer(new RemoteApiAttributePartition()))->previewSyncAll($connector, $repository);
+        $preview = (new RemoteApiSynchronizer(new RemoteApiAttributePartition))->previewSyncAll($connector, $repository);
 
         $this->assertSame('GET http://app.b2press.test/api/v1/packages (paginated list)', $preview['would_fetch']);
         $this->assertCount(1, $preview['records']);
@@ -182,7 +183,7 @@ class RemoteApiSynchronizerTest extends TestCase
         $repository = Mockery::mock(Repository::class);
         $repository->shouldReceive('getModel')->andReturn($model);
 
-        $preview = (new RemoteApiSynchronizer(new RemoteApiAttributePartition()))->previewSyncRecord($connector, $repository, 99);
+        $preview = (new RemoteApiSynchronizer(new RemoteApiAttributePartition))->previewSyncRecord($connector, $repository, 99);
 
         $this->assertSame('create', $preview['action']);
         $this->assertSame(99, $preview['remote_id']);
@@ -256,7 +257,7 @@ class RemoteApiSynchronizerTest extends TestCase
         $repository = Mockery::mock(Repository::class);
         $repository->shouldReceive('getModel')->andReturn($model);
 
-        $result = (new RemoteApiSynchronizer(new RemoteApiAttributePartition()))->syncAll($connector, $repository);
+        $result = (new RemoteApiSynchronizer(new RemoteApiAttributePartition))->syncAll($connector, $repository);
 
         $this->assertSame(1, $result['total']);
         $this->assertSame(0, $result['created']);
@@ -341,7 +342,7 @@ class RemoteApiSynchronizerTest extends TestCase
         $repository = Mockery::mock(Repository::class);
         $repository->shouldReceive('getModel')->andReturn($model);
 
-        $result = (new RemoteApiSynchronizer(new RemoteApiAttributePartition()))->syncAll($connector, $repository);
+        $result = (new RemoteApiSynchronizer(new RemoteApiAttributePartition))->syncAll($connector, $repository);
 
         $this->assertSame(1, $result['total']);
         $this->assertSame(1, $result['updated']);
@@ -367,10 +368,10 @@ class RemoteApiSynchronizerTest extends TestCase
 
         $repository = Mockery::mock(Repository::class);
 
-        $this->expectException(\Unusualify\Modularous\Services\RemoteApi\Exceptions\RemoteApiSyncException::class);
+        $this->expectException(RemoteApiSyncException::class);
         $this->expectExceptionMessage('Remote API record [274] was not found.');
 
-        (new RemoteApiSynchronizer(new RemoteApiAttributePartition()))->syncRecord($connector, $repository, 274);
+        (new RemoteApiSynchronizer(new RemoteApiAttributePartition))->syncRecord($connector, $repository, 274);
     }
 }
 

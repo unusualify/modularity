@@ -8,6 +8,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Unusualify\Modularous\Http\Controllers\Traits\Table\TableActions;
 use Unusualify\Modularous\Repositories\Traits\RemoteApiSourceTrait;
 use Unusualify\Modularous\Services\RemoteApi\AbstractRemoteApiConnector;
 use Unusualify\Modularous\Services\RemoteApi\Exceptions\RemoteApiConfigurationException;
@@ -16,7 +17,7 @@ use Unusualify\Modularous\Services\RemoteApi\Exceptions\RemoteApiSyncException;
 /**
  * Remote API sync controller endpoints and index table toolbar actions.
  *
- * {@see \Unusualify\Modularous\Http\Controllers\Traits\Table\TableActions::setTableActions()} invokes
+ * {@see TableActions::setTableActions()} invokes
  * {@see setTableActionsManageRemoteApiSync()} when this trait is used.
  */
 trait ManageRemoteApiSync
@@ -78,7 +79,6 @@ trait ManageRemoteApiSync
 
     /**
      * @param array<string, mixed> $def
-     *
      * @return array<string, mixed>|null
      */
     protected function mapRemoteApiTableAction(array $def, string $routePrefix): ?array

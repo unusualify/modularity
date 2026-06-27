@@ -50,7 +50,7 @@ final class IsolatedTestModules
     }
 
     /**
-     * @param  array<string, array<string, bool>>  $routesByModule
+     * @param array<string, array<string, bool>> $routesByModule
      */
     public static function seedRoutesStatuses(array $routesByModule = [
         'TestModule' => ['Item' => true],

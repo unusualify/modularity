@@ -3,6 +3,8 @@
 namespace Unusualify\Modularous\Tests;
 
 use Illuminate\Support\Facades\Route;
+use Nwidart\Modules\Contracts\ActivatorInterface;
+use Nwidart\Modules\FileRepository;
 use Nwidart\Modules\Support\Config\GenerateConfigReader;
 use Unusualify\Modularous\Activators\ModularousActivator;
 use Unusualify\Modularous\Facades\Modularous;
@@ -68,7 +70,7 @@ abstract class TestModulesCase extends TestCase
 
         $this->resetScannedModulesCache();
 
-        $activator = $this->app->make(\Nwidart\Modules\Contracts\ActivatorInterface::class);
+        $activator = $this->app->make(ActivatorInterface::class);
 
         foreach (Modularous::all() as $module) {
             $enabled = (bool) ($statuses[$module->getName()] ?? false);
@@ -82,7 +84,7 @@ abstract class TestModulesCase extends TestCase
     }
 
     /**
-     * @param  list<string>  $moduleNames
+     * @param list<string> $moduleNames
      */
     protected function enableOnlyModules(string ...$moduleNames): void
     {
@@ -101,7 +103,7 @@ abstract class TestModulesCase extends TestCase
 
     protected function resetScannedModulesCache(): void
     {
-        $property = new \ReflectionProperty(\Nwidart\Modules\FileRepository::class, 'modules');
+        $property = new \ReflectionProperty(FileRepository::class, 'modules');
         $property->setValue(null, null);
     }
 

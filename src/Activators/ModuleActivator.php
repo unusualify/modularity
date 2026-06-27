@@ -173,7 +173,7 @@ class ModuleActivator extends FileActivator
         }
 
         $this->routesStatuses = [];
-        $this->files->put($this->statusesFile, json_encode(new \stdClass(), JSON_PRETTY_PRINT));
+        $this->files->put($this->statusesFile, json_encode(new \stdClass, JSON_PRETTY_PRINT));
         $this->flushCache();
     }
 

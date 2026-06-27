@@ -6,7 +6,6 @@ use TestModules\TestModule\Entities\Item;
 use TestModules\TestModule\Repositories\ItemRepository;
 use Unusualify\Modularous\Support\Finder;
 use Unusualify\Modularous\Tests\MockModuleManager;
-use Unusualify\Modularous\Tests\Support\IsolatedTestModules;
 use Unusualify\Modularous\Tests\TestModulesCase;
 
 class FinderTest extends TestModulesCase

@@ -184,9 +184,6 @@ class RemoteApiCache
         return $items;
     }
 
-    /**
-     * @param mixed $cached
-     */
     private function isValidPaginatedCatalogCache(mixed $cached): bool
     {
         if (! is_array($cached) || ! isset($cached['items'], $cached['expected_total'])) {

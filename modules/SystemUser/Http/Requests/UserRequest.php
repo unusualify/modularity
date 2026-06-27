@@ -24,7 +24,7 @@ class UserRequest extends Request
                     // Get superadmin role ID
                     $authorizedUser = Auth::guard(Modularous::getAuthGuardName())->user();
 
-                    if (!$authorizedUser->hasRole('superadmin')) {
+                    if (! $authorizedUser->hasRole('superadmin')) {
                         $superadminRole = \DB::table($rolesTable)
                             ->where('name', 'superadmin')
                             ->first();

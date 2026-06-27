@@ -3,8 +3,6 @@
 namespace Unusualify\Modularous\Repositories\Traits;
 
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Auth;
-use Unusualify\Modularous\Models\Model;
 
 trait PositionTrait
 {

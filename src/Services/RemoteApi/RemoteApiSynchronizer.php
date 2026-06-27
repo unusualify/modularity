@@ -12,9 +12,8 @@ use Unusualify\Modularous\Services\RemoteApi\Exceptions\RemoteApiSyncException;
 class RemoteApiSynchronizer
 {
     public function __construct(
-        private readonly RemoteApiAttributePartition $attributePartition = new RemoteApiAttributePartition(),
-    ) {
-    }
+        private readonly RemoteApiAttributePartition $attributePartition = new RemoteApiAttributePartition,
+    ) {}
 
     /**
      * @return array{
@@ -183,7 +182,6 @@ class RemoteApiSynchronizer
                 ? $record->getRemoteApiId()
                 : ($record->remoteApiSource?->{$remoteIdColumn} ?? null);
 
-
             if ($remoteId === null || $remoteId === '') {
                 continue;
             }
@@ -233,7 +231,6 @@ class RemoteApiSynchronizer
 
     /**
      * @param array<string, mixed> $row
-     *
      * @return array{model: Model, created: bool}
      */
     public function syncRecordFromRow(
@@ -312,7 +309,6 @@ class RemoteApiSynchronizer
     /**
      * @param array<string, mixed> $local
      * @param array<string, mixed> $remote
-     *
      * @return array<string, mixed>
      */
     private function ensureRequiredParentAttributes(Model $model, array $local, array $remote): array
@@ -333,7 +329,6 @@ class RemoteApiSynchronizer
 
     /**
      * @param array<string, mixed> $attributes
-     *
      * @return array<string, mixed>
      */
     private function normalizeAttributes(array $attributes): array

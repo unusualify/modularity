@@ -6,10 +6,14 @@ namespace Unusualify\Modularous\Tests\Repositories\Traits;
 
 use Mockery;
 use Unusualify\Modularous\Entities\Model;
+use Unusualify\Modularous\Module;
 use Unusualify\Modularous\Repositories\Repository;
 use Unusualify\Modularous\Repositories\Traits\RemoteApiSourceTrait;
 use Unusualify\Modularous\Services\RemoteApi\AbstractRemoteApiConnector;
+use Unusualify\Modularous\Services\RemoteApi\Contracts\RemoteApiAdapterInterface;
 use Unusualify\Modularous\Services\RemoteApi\Contracts\RemoteApiConnectorInterface;
+use Unusualify\Modularous\Services\RemoteApi\RemoteApiCache;
+use Unusualify\Modularous\Services\RemoteApi\RemoteApiClient;
 use Unusualify\Modularous\Services\RemoteApi\RemoteApiConfiguration;
 use Unusualify\Modularous\Tests\TestCase;
 
@@ -110,7 +114,7 @@ class RemoteApiSourceTraitTest extends TestCase
             $connector->shouldReceive('configuration')->andReturn($configuration);
         }
 
-        $repository = new RemoteApiSourceTraitTestRepository(new RemoteApiSourceTraitTestModel());
+        $repository = new RemoteApiSourceTraitTestRepository(new RemoteApiSourceTraitTestModel);
         $repository->setModuleName('BusinessPackage');
         $repository->setRouteName('Package');
         $repository->setRemoteApiConnector($connector);
@@ -129,7 +133,7 @@ class RemoteApiSourceTraitPreviewConnector extends AbstractRemoteApiConnector
 {
     public function __construct(string $display, array $fields)
     {
-        $module = Mockery::mock(\Unusualify\Modularous\Module::class);
+        $module = Mockery::mock(Module::class);
         $module->shouldReceive('getName')->andReturn('BusinessPackage');
 
         $configuration = new RemoteApiConfiguration($module, 'package_region', [
@@ -144,9 +148,9 @@ class RemoteApiSourceTraitPreviewConnector extends AbstractRemoteApiConnector
 
         parent::__construct(
             $configuration,
-            Mockery::mock(\Unusualify\Modularous\Services\RemoteApi\RemoteApiClient::class),
-            Mockery::mock(\Unusualify\Modularous\Services\RemoteApi\RemoteApiCache::class),
-            Mockery::mock(\Unusualify\Modularous\Services\RemoteApi\Contracts\RemoteApiAdapterInterface::class),
+            Mockery::mock(RemoteApiClient::class),
+            Mockery::mock(RemoteApiCache::class),
+            Mockery::mock(RemoteApiAdapterInterface::class),
         );
     }
 

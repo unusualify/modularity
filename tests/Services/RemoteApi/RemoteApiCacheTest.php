@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Unusualify\Modularous\Tests\Services\RemoteApi;
 
 use Illuminate\Support\Facades\Cache;
-use Unusualify\Modularous\Services\RemoteApi\RemoteApiLogger;
 use Mockery;
 use Unusualify\Modularous\Module;
 use Unusualify\Modularous\Services\RemoteApi\RemoteApiCache;
 use Unusualify\Modularous\Services\RemoteApi\RemoteApiConfiguration;
+use Unusualify\Modularous\Services\RemoteApi\RemoteApiLogger;
 use Unusualify\Modularous\Tests\TestCase;
 
 class RemoteApiCacheTest extends TestCase

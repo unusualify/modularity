@@ -16,8 +16,7 @@ class RemoteApiConfiguration
         public readonly Module $module,
         public readonly string $routeName,
         public readonly array $config,
-    ) {
-    }
+    ) {}
 
     /**
      * @param class-string<AbstractRemoteApiConnector> $connectorClass

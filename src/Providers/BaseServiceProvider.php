@@ -39,6 +39,10 @@ use Unusualify\Modularous\Services\FilepondManager;
 use Unusualify\Modularous\Services\MigrationBackup;
 use Unusualify\Modularous\Services\ModularousCacheService;
 use Unusualify\Modularous\Services\RedirectService;
+use Unusualify\Modularous\Services\RemoteApi\RemoteApiConnectorFactory;
+use Unusualify\Modularous\Services\RemoteApi\RemoteApiConnectorResolver;
+use Unusualify\Modularous\Services\RemoteApi\RemoteApiRateLimiter;
+use Unusualify\Modularous\Services\RemoteApi\RemoteApiSynchronizer;
 use Unusualify\Modularous\Services\UtmParameters;
 use Unusualify\Modularous\Services\View\ModularousNavigation;
 use Unusualify\Modularous\Support\CommandDiscovery;
@@ -169,10 +173,10 @@ class BaseServiceProvider extends ServiceProvider
 
         $this->app->singleton('modularous.navigation', ModularousNavigation::class);
 
-        $this->app->singleton(\Unusualify\Modularous\Services\RemoteApi\RemoteApiConnectorResolver::class);
-        $this->app->singleton(\Unusualify\Modularous\Services\RemoteApi\RemoteApiRateLimiter::class);
-        $this->app->singleton(\Unusualify\Modularous\Services\RemoteApi\RemoteApiConnectorFactory::class);
-        $this->app->singleton(\Unusualify\Modularous\Services\RemoteApi\RemoteApiSynchronizer::class);
+        $this->app->singleton(RemoteApiConnectorResolver::class);
+        $this->app->singleton(RemoteApiRateLimiter::class);
+        $this->app->singleton(RemoteApiConnectorFactory::class);
+        $this->app->singleton(RemoteApiSynchronizer::class);
 
         $this->app->singleton('model.relation.namespace', function () {
             return "Illuminate\Database\Eloquent\Relations";

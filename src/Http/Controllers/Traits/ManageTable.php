@@ -97,7 +97,7 @@ trait ManageTable
         ]);
     }
 
-        /**
+    /**
      * Resolve itemsPerPage for index JSON + default table options.
      */
     protected function resolveIndexItemsPerPage(): int

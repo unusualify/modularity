@@ -14,8 +14,7 @@ class RemoteApiRateLimiter
      */
     public function __construct(
         private readonly ?array $config = null,
-    ) {
-    }
+    ) {}
 
     public function assertCanRequest(string $url): void
     {

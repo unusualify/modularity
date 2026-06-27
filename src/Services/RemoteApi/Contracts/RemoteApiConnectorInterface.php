@@ -27,7 +27,6 @@ interface RemoteApiConnectorInterface
 
     /**
      * @param array<string, mixed> $existingAttributes
-     *
      * @return array<string, mixed>
      */
     public function mapRow(array $row, array $existingAttributes = []): array;

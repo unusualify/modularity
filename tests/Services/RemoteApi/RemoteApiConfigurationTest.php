@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Unusualify\Modularous\Tests\Services\RemoteApi;
 
-use Unusualify\Modularous\Services\RemoteApi\RemoteApiConfiguration;
-use Unusualify\Modularous\Tests\TestCase;
 use Mockery;
 use Unusualify\Modularous\Module;
+use Unusualify\Modularous\Services\RemoteApi\RemoteApiConfiguration;
+use Unusualify\Modularous\Tests\TestCase;
 
 class RemoteApiConfigurationTest extends TestCase
 {

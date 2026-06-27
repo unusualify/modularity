@@ -9,7 +9,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Schema;
-use Modules\SystemPayment\Entities\Payment;
 use Modules\SystemPayment\Entities\PaymentCurrency;
 use Modules\SystemPayment\Entities\PaymentService;
 use Modules\SystemPricing\Entities\Currency;

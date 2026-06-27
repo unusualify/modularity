@@ -137,7 +137,7 @@ trait InteractsWithRemoteApiSyncPreview
         if ($catalogs !== []) {
             $this->newLine();
             $this->components->info('Available catalog keys');
-            $this->line('  · '.implode("\n  · ", $catalogs));
+            $this->line('  · ' . implode("\n  · ", $catalogs));
         }
 
         $this->newLine();

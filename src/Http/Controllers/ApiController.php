@@ -356,7 +356,7 @@ abstract class ApiController extends CoreController
     /**
      * Resolve API resources using Laravel paginator shape (flat pagination keys).
      *
-     * @param  \Illuminate\Contracts\Support\Responsable  $data
+     * @param Responsable $data
      * @return array<string, mixed>|mixed
      */
     protected function resolveApiResourcePayload($data): mixed

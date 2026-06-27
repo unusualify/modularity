@@ -47,7 +47,7 @@ class RemoteApiAttributePartitionTest extends TestCase
             }
         };
 
-        $partitioner = new RemoteApiAttributePartition();
+        $partitioner = new RemoteApiAttributePartition;
         $result = $partitioner->partition($model, $configuration, [
             'remote_id' => 42,
             'synced_name' => 'Premium API',

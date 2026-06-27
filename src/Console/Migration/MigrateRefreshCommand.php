@@ -4,7 +4,6 @@ namespace Unusualify\Modularous\Console\Migration;
 
 use Illuminate\Console\Command;
 use Nwidart\Modules\Module;
-use Symfony\Component\Console\Input\InputArgument;
 use Unusualify\Modularous\Facades\Modularous;
 
 class MigrateRefreshCommand extends Command
@@ -43,6 +42,7 @@ class MigrateRefreshCommand extends Command
         } catch (\Throwable $th) {
             $this->comment(" {$module->getStudlyName()} Module cannot be refreshed.");
         }
+
         return 0;
     }
 }

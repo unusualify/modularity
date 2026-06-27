@@ -8,7 +8,6 @@ use Modules\Cms\Entities\ParentSegment;
 use Modules\Cms\Entities\UrlRoute;
 use Modules\Cms\Services\CmsPublicModelResolver;
 use Modules\Cms\Support\CmsPublicFrontViewName;
-use Unusualify\Modularous\Entities\Traits\HasParentSegment;
 
 /**
  * Single public catch-all invokable when {@see modularousConfig('cms_routing.universal_cms_public_front')} is on:

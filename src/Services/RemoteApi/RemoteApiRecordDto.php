@@ -14,8 +14,7 @@ class RemoteApiRecordDto implements RemoteApiDtoInterface
     public function __construct(
         public readonly int|string|null $id,
         public readonly array $payload = [],
-    ) {
-    }
+    ) {}
 
     public function getRemoteId(): int|string|null
     {

@@ -9,7 +9,6 @@ interface RemoteApiAdapterInterface
     /**
      * @param array<string, mixed> $row
      * @param array<string, mixed> $existingAttributes
-     *
      * @return array<string, mixed>
      */
     public function mapToAttributes(array $row, array $existingAttributes = []): array;

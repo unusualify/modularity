@@ -26,7 +26,6 @@ final class CmsFrontRouteRegistrationCache
     /** @var array<string, mixed>|null */
     private static ?array $runtimeSnapshot = null;
 
-    /** @var string|null */
     private static ?string $runtimeCacheKey = null;
 
     public static function forgetRuntime(): void

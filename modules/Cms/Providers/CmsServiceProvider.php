@@ -36,8 +36,6 @@ use Modules\Cms\Localization\McamaraCmsLocalizationAdapter;
 use Modules\Cms\Localization\NullCmsLocalizationOverrideProvider;
 use Modules\Cms\Localization\TranslatableCmsLocalizationAdapter;
 use Modules\Cms\Observers\ParentSegmentUrlRouteObserver;
-use Modules\Cms\Support\CmsPublicUrlRegistryAboutReporter;
-use Modules\Cms\Support\CmsPublicUrlRegistryCacheManager;
 use Modules\Cms\Routing\CmsFrontRouteRegistrar;
 use Modules\Cms\Services\CanonicalUrlResolver;
 use Modules\Cms\Services\CmsAdminWarnings;
@@ -63,6 +61,8 @@ use Modules\Cms\Services\Stylesheet\RootVariablesEmitter;
 use Modules\Cms\Services\Stylesheet\ScssStylesheetCompiler;
 use Modules\Cms\Services\Stylesheet\StylesheetCompilerService;
 use Modules\Cms\Services\Stylesheet\UtilityCssGenerator;
+use Modules\Cms\Support\CmsPublicUrlRegistryAboutReporter;
+use Modules\Cms\Support\CmsPublicUrlRegistryCacheManager;
 use Unusualify\Modularous\Services\Security\SecurityService;
 use Unusualify\Modularous\Services\SlugInputValidationService;
 

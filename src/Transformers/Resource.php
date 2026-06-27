@@ -2,12 +2,13 @@
 
 namespace Unusualify\Modularous\Transformers;
 
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource as BaseJsonResource;
 
 abstract class Resource extends BaseJsonResource
 {
     /**
-     * @param  \Illuminate\Http\Request  $request
+     * @param Request $request
      * @return array<string, mixed>
      */
     public function toArray($request): array
@@ -21,7 +22,7 @@ abstract class Resource extends BaseJsonResource
     /**
      * Extra fields merged on top of the underlying payload (model or array).
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param Request $request
      * @return array<string, mixed>
      */
     protected function mergeResource($request): array

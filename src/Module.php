@@ -991,7 +991,7 @@ class Module extends NwidartModule
     {
         $repository = $this->getRepository($routeName);
 
-        if(is_null($repository) || empty($repository) || !class_exists(get_class($repository))) {
+        if (is_null($repository) || empty($repository) || ! class_exists(get_class($repository))) {
             throw new \Exception('Repository not found for ' . $routeName . ' on module ' . $this->getName());
         }
 

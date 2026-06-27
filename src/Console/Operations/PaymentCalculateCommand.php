@@ -262,7 +262,7 @@ class PaymentCalculateCommand extends Command
 
         $currency = is_numeric($currencyOption)
             ? PaymentCurrency::query()->find($currencyOption)
-            : PaymentCurrency::query()->where('iso_4217', strtoupper($currencyOption))->first();
+            : PaymentCurrency::query()->where('iso_4217', mb_strtoupper($currencyOption))->first();
 
         if (! $currency) {
             $this->components->error(sprintf('PaymentCurrency not found for: %s', $currencyOption));

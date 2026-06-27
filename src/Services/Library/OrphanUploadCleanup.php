@@ -83,7 +83,7 @@ class OrphanUploadCleanup
     }
 
     /**
-     * @param  string[]  $libraryTypes
+     * @param string[] $libraryTypes
      */
     private function collectKnownFolders(array $libraryTypes): Collection
     {
@@ -141,7 +141,7 @@ class OrphanUploadCleanup
             $prefix = trim((string) modularousConfig($libraryType . '_library.local_path', 'uploads'), '/ ') . '/';
 
             if (str_starts_with($uuid, $prefix)) {
-                $uuid = substr($uuid, strlen($prefix));
+                $uuid = mb_substr($uuid, mb_strlen($prefix));
             }
         }
 
