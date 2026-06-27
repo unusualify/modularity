@@ -2,7 +2,7 @@ import { describe, expect, test, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { defineComponent, ref } from 'vue'
 import i18n from '../../src/js/config/i18n'
-import TableFormatterCell from '../../src/js/components/TableFormatterCell.vue'
+import TableFormatterCell from '../../src/js/components/table/TableFormatterCell.vue'
 import useFormatter from '../../src/js/hooks/useFormatter.js'
 import { shorten } from '../../src/js/utils/helpers.js'
 
