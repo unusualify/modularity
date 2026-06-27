@@ -2,6 +2,17 @@
 
 All notable changes to `modularous` will be documented in this file
 
+## v12.1.7 - 2026-06-27
+
+### :wrench: Bug Fixes
+
+- add authorization handling in HasAuthorizable trait by @celikerde in https://github.com/unusualify/modularous/commit/c4c37ae3e11bf10614ee367c98e8a03d16944b03
+- correct import statement for AbstractPaginator by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/90d187e0e655e2dc0d21d145afe8d861baed81dc
+
+### :beers: Other Stuff
+
+- remove outdated entry for v12.1.7 by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/ac6219016590076457a3bc156e3e5e249d8a38d7
+
 ## v11.1.3 - 2026-06-27
 
 ### :wrench: Bug Fixes
@@ -11,6 +22,7 @@ All notable changes to `modularous` will be documented in this file
 ## v0.58.8 - 2026-06-27
 
 ### :wrench: Bug Fixes
+
 - enhance locale value retrieval logic by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/333f8313e39d497a087c27d273ad6239a290f479
 
 ## v0.58.7 - 2026-06-25
