@@ -115,5 +115,5 @@ jobs:
             composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
             # composer update --prefer-dist --no-interaction
       - name: Execute Laravel tests
-        run: composer test:fast
+        run: composer test
 
