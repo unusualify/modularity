@@ -7,7 +7,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
-se Illuminate\Pagination\AbstractPaginator;
+use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Routing\Controller as LaravelController;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
