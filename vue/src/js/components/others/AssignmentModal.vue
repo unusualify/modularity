@@ -9,8 +9,8 @@
 
   const props = defineProps({
     modelValue: {
-      type: Object,
-      default: () => ({}),
+      type: Boolean,
+      default: false,
     },
     loading: {
       type: Boolean,
