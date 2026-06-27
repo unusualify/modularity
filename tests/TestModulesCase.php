@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use Nwidart\Modules\Support\Config\GenerateConfigReader;
 use Unusualify\Modularous\Activators\ModularousActivator;
 use Unusualify\Modularous\Facades\Modularous;
+use Unusualify\Modularous\Module;
 use Unusualify\Modularous\Support\ModularousRoutes;
 use Unusualify\Modularous\Tests\Support\IsolatedTestModules;
 
@@ -66,25 +67,68 @@ abstract class TestModulesCase extends TestCase
 
     protected function ensureModulePanelRoutesRegistered(): void
     {
+        foreach (['TestModule', 'SystemModule'] as $moduleName) {
+            $module = Modularous::find($moduleName);
+
+            if (! $module instanceof Module || ! $module->hasRoute('Item')) {
+                continue;
+            }
+
+            if ($this->moduleRouteActionIsAvailable($module, 'Item', 'index')) {
+                continue;
+            }
+
+            $this->registerModulePanelRoutes($module);
+
+            if ($this->moduleRouteActionIsAvailable($module, 'Item', 'index')) {
+                continue;
+            }
+
+            $this->registerStubModuleRouteAction($module, 'Item', 'index');
+        }
+    }
+
+    protected function moduleRouteActionIsAvailable(Module $module, string $routeName, string $action): bool
+    {
+        try {
+            $module->getRouteActionUrl($routeName, $action);
+
+            return true;
+        } catch (\Throwable) {
+            return false;
+        }
+    }
+
+    protected function registerModulePanelRoutes(Module $module): void
+    {
         $modularousRoutes = app(ModularousRoutes::class);
         $groupOptions = $modularousRoutes->groupOptions();
         $controllerNamespace = GenerateConfigReader::read('controller')->getPath();
 
-        foreach (Modularous::allEnabled() as $module) {
-            if (! empty($module->getRouteUrls('Item'))) {
-                continue;
+        Route::group(
+            array_merge($groupOptions, [
+                'middleware' => $modularousRoutes->webPanelMiddlewares(),
+                'namespace' => $module->getClassNamespace($controllerNamespace),
+            ]),
+            function () use ($module) {
+                Route::moduleRoutes($module);
             }
+        );
+    }
 
-            Route::group(
-                array_merge($groupOptions, [
-                    'middleware' => $modularousRoutes->webPanelMiddlewares(),
-                    'namespace' => $module->getClassNamespace($controllerNamespace),
-                ]),
-                function () use ($module) {
-                    Route::moduleRoutes($module);
-                }
-            );
+    protected function registerStubModuleRouteAction(Module $module, string $routeName, string $action): void
+    {
+        $routeFullName = $module->panelRouteNamePrefix() . '.' . snakeCase($routeName) . '.' . $action;
+
+        if (Route::has($routeFullName)) {
+            return;
         }
+
+        $routeConfig = $module->getRawRouteConfig(snakeCase($routeName));
+        $urlSegment = $routeConfig['url'] ?? pluralize(kebabCase($routeName));
+        $uri = trim($module->fullPrefix() . '/' . $urlSegment, '/');
+
+        Route::get($uri, static fn () => '')->name($routeFullName);
     }
 
     private function applyTestFixtureGeneratorPaths($app): void
