@@ -56,11 +56,11 @@ abstract class TestModulesCase extends TestCase
         $app['config']->set('modularous.stubs.path', realpath(__DIR__ . '/../src/Console/stubs'));
 
         $statusesFile = 'modules_statuses.json';
-        // if (getenv('TEST_TOKEN')) {
-        //     $statusesFile = 'modules_statuses_' . getenv('TEST_TOKEN') . '.json';
-        // } elseif (function_exists('getmypid')) {
-        //     $statusesFile = 'modules_statuses_' . getmypid() . '.json';
-        // }
+        if (getenv('TEST_TOKEN')) {
+            $statusesFile = 'modules_statuses_' . getenv('TEST_TOKEN') . '.json';
+        } elseif (function_exists('getmypid')) {
+            $statusesFile = 'modules_statuses_' . getmypid() . '.json';
+        }
 
         $this->statusesFilePath = base_path($statusesFile);
 
