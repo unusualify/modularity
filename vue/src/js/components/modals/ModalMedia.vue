@@ -168,7 +168,7 @@
               </footer>
 
               <div class="medialibrary__list" ref="list">
-                <ue-uploader
+                <Uploader
                   ref="uploader"
                   v-if="authorized"
                   @loaded="addMedia"
@@ -217,6 +217,7 @@ import FormDataAsObj from '@/utils/formDataAsObj.js'
 import MediaGrid from './media-library/MediaGrid.vue'
 import ItemList from './media-library/ItemList.vue'
 import MediaSidebar from './media-library/MediaSidebar.vue'
+import Uploader from '__components/media/Uploader.vue'
 import useModal, { makeModalProps, makeModalMediaProps } from '@/hooks/useModal'
 
 import { useUser } from '@/hooks'
@@ -227,7 +228,8 @@ export default {
   components: {
     MediaGrid,
     ItemList,
-    MediaSidebar
+    MediaSidebar,
+    Uploader
     // 'a17-spinner': a17Spinner
     // 'a17-checkbox': a17Checkbox
   },
@@ -451,7 +453,7 @@ export default {
     replaceMedia: function ({ id }) {
       this.$refs.uploader.replaceMedia(id)
     },
-    // for ue-uploader
+    // for Uploader
     addMedia: function (media) {
       const index = this.mediaItems.findIndex(function (item) {
         return item.id === media.id
@@ -580,7 +582,6 @@ export default {
     clearSelectedMedias: function () {
       this.selectedMedias.splice(0)
     },
-    // for ue-filter
     clearFilters: function () {
       const self = this
       // reset tags

@@ -191,11 +191,11 @@
 
   import NotationUtil from '@/utils/notation';
 
-  import StepperHeader from './stepper/StepperHeader.vue'
-  import StepperContent from './stepper/StepperContent.vue'
-  import StepperSummary from './stepper/StepperSummary.vue'
-  import StepperPreview from './stepper/StepperPreview.vue'
-  import StepperFinalSummary from './stepper/StepperFinalSummary.vue'
+  import StepperHeader from '__components/stepper/StepperHeader.vue'
+  import StepperContent from '__components/stepper/StepperContent.vue'
+  import StepperSummary from '__components/stepper/StepperSummary.vue'
+  import StepperPreview from '__components/stepper/StepperPreview.vue'
+  import StepperFinalSummary from '__components/stepper/StepperFinalSummary.vue'
 
   export default {
     name: 'StepperForm',

@@ -141,7 +141,7 @@
     buildJsonFieldCodemirrorExtensions,
     cancelJsonFieldFoldRetries,
     setCodemirrorDoc,
-  } from './jsonFieldCodemirror.js'
+  } from '@/utils/jsonFieldCodemirror.js'
 
   defineOptions({
     name: 'v-input-json-field'

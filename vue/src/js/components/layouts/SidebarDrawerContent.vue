@@ -95,7 +95,7 @@
             />
           </v-expand-transition>
 
-          <ue-logout-modal :csrf="$csrf()">
+          <LogoutModal :csrf="$csrf()">
             <template v-slot:activator="{ props: activatorProps }">
               <v-tooltip text="Logout" location="top" :disabled="!(rail && !isHoverable)">
                 <template v-slot:activator="tooltipActivator">
@@ -111,7 +111,7 @@
                 </template>
               </v-tooltip>
             </template>
-          </ue-logout-modal>
+          </LogoutModal>
 
           <v-dialog
             ref="aboutDialog"
@@ -182,28 +182,29 @@
 </template>
 
 <script setup>
-import { useStore } from 'vuex'
-import { useDisplay } from 'vuetify'
+  import { useStore } from 'vuex'
+  import { useDisplay } from 'vuetify'
+  import LogoutModal from '__components/others/LogoutModal.vue'
 
-defineProps({
-  items: { type: Array, required: true },
-  profileMenu: { type: Array, default: () => [] },
-  miniSymbol: { type: String, default: 'main-logo-dark' },
-  profileMenuOpen: { type: Boolean, default: false },
-  status: { type: Boolean, required: true },
-  rail: { type: Boolean, required: true },
-  isHoverable: { type: Boolean, required: true },
-  hideIcons: { type: Boolean, required: true },
-  options: { type: Object, required: true },
-  width: { type: [Number, String], required: true },
-  effectivePersistent: { type: Boolean, required: true },
-  effectivePermanent: { type: Boolean, required: true },
-  effectiveTemporary: { type: Boolean, default: false },
-  railManual: { type: Boolean, required: true },
-})
+  defineProps({
+    items: { type: Array, required: true },
+    profileMenu: { type: Array, default: () => [] },
+    miniSymbol: { type: String, default: 'main-logo-dark' },
+    profileMenuOpen: { type: Boolean, default: false },
+    status: { type: Boolean, required: true },
+    rail: { type: Boolean, required: true },
+    isHoverable: { type: Boolean, required: true },
+    hideIcons: { type: Boolean, required: true },
+    options: { type: Object, required: true },
+    width: { type: [Number, String], required: true },
+    effectivePersistent: { type: Boolean, required: true },
+    effectivePermanent: { type: Boolean, required: true },
+    effectiveTemporary: { type: Boolean, default: false },
+    railManual: { type: Boolean, required: true },
+  })
 
-const emit = defineEmits(['update:status', 'update:profileMenuOpen', 'activateMenu', 'rail-toggle'])
+  const emit = defineEmits(['update:status', 'update:profileMenuOpen', 'activateMenu', 'rail-toggle'])
 
-const store = useStore()
-const { lgAndUp } = useDisplay()
+  const store = useStore()
+  const { lgAndUp } = useDisplay()
 </script>

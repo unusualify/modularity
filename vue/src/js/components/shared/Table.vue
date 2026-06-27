@@ -1089,9 +1089,8 @@ import {
 } from '@/hooks/table'
 
 import ActiveTableItem from '__components/labs/ActiveTableItem.vue'
-import PaymentService from './inputs/PaymentService.vue'
-import TableFormatterCell from './TableFormatterCell.vue'
-import TableGroupHeaderRow from './TableGroupHeaderRow.vue'
+import TableFormatterCell from '__components/table/TableFormatterCell.vue'
+import TableGroupHeaderRow from '__components/table/TableGroupHeaderRow.vue'
 
 const { ignoreFormatters } = makeFormatterProps()
 
@@ -1100,7 +1099,6 @@ export default {
     ActiveTableItem,
     Draggable,
     VDataTableRow,
-    PaymentService,
     TableActions,
     TableFormatterCell,
     TableGroupHeaderRow

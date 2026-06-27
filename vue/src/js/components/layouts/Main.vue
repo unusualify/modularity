@@ -50,7 +50,7 @@
     >
       <template v-slot:bottom>
         <ue-navigation-group v-if="sidebarBottom.length > 0" :items="sidebarBottom" />
-        <ue-impersonate-toolbar
+        <ImpersonateToolbar
           v-if="impersonation.active"
           v-model="showImpersonateToolbar"
           v-bind="impersonation"
@@ -242,6 +242,7 @@ import { useStore } from 'vuex'
 import { useDisplay } from 'vuetify'
 import { useConfig, useNavigationLayout, useSidebar } from '@/hooks'
 import { ALERT, CONFIG, MEDIA_LIBRARY, USER } from '@/store/mutations'
+import ImpersonateToolbar from '__components/others/ImpersonateToolbar.vue'
 
 const props = defineProps({
   fixedAppBar: { type: Boolean, default: false },

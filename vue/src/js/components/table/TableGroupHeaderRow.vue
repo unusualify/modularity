@@ -50,7 +50,8 @@ import { VBtn } from 'vuetify/lib/components/VBtn/index.js'
 import { VCheckboxBtn } from 'vuetify/lib/components/VCheckbox/index.js'
 import { useGroupBy } from 'vuetify/lib/components/VDataTable/composables/group.js'
 import { useSelection } from 'vuetify/lib/components/VDataTable/composables/select.js'
-import TableFormatterCell from './TableFormatterCell.vue'
+
+import TableFormatterCell from '__components/table/TableFormatterCell.vue'
 
 export default {
   name: 'TableGroupHeaderRow',

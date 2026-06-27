@@ -420,11 +420,11 @@ import { useStore } from 'vuex'
 import { useI18n } from 'vue-i18n'
 import { useForm, makeFormProps } from '@/hooks/form'
 import { cloneDeep, omit, isObject } from 'lodash-es'
-import FormActions from './form/FormActions.vue'
-import FormPublicLinks from './form/FormPublicLinks.vue'
-import FormLocaleSelector from './form/FormLocaleSelector.vue'
-import FormEvents from './form/FormEvents.vue'
-import FormSecondaryInputs from './form/FormSecondaryInputs.vue'
+import FormActions from '../form/FormActions.vue'
+import FormPublicLinks from '../form/FormPublicLinks.vue'
+import FormLocaleSelector from '../form/FormLocaleSelector.vue'
+import FormEvents from '../form/FormEvents.vue'
+import FormSecondaryInputs from '../form/FormSecondaryInputs.vue'
 
 // Create a new component for the right section content
 const AdditionalSectionContent = {
