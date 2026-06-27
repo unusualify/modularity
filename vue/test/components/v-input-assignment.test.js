@@ -1,5 +1,5 @@
 // test/components/v-input-assignment.test.js
-import { describe, expect, test, vi, beforeEach } from 'vitest'
+import { describe, expect, test, vi, beforeEach, afterEach } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
 import UEConfig from '../../src/js/plugins/UEConfig'
 import VInputAssignment from '../../src/js/components/inputs/Assignment.vue'
@@ -106,6 +106,8 @@ function mountAssignment(props = {}, options = {}) {
         'ue-filepond-preview': true,
         'v-input-date': true,
         'ue-dynamic-component-renderer': true,
+        'v-img': true,
+        VImg: true,
         ...(options.global?.stubs ?? {}),
       },
       ...(options.global ?? {}),
@@ -133,7 +135,14 @@ describe('VInputAssignment', () => {
   beforeEach(async () => {
     vi.clearAllMocks()
     assignmentModalValidateForm.mockResolvedValue({ valid: true })
+    wrapper?.unmount()
+    document.body.innerHTML = ''
     wrapper = mountAssignment()
+  })
+
+  afterEach(() => {
+    wrapper?.unmount()
+    document.body.innerHTML = ''
   })
 
   describe('Unit Tests', () => {
