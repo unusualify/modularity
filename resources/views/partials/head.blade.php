@@ -7,7 +7,7 @@
     <title> {{ $pageTitle ?? \Unusualify\Modularous\Facades\Modularous::pageTitle() }}</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    @include("{$MODULARITY_VIEW_NAMESPACE}::partials.favicons")
+    @include("{$MODULAROUS_VIEW_NAMESPACE}::partials.favicons")
 
     @stack('head_css')
     @stack('head_js')
