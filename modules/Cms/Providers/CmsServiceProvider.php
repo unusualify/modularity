@@ -3,9 +3,14 @@
 namespace Modules\Cms\Providers;
 
 use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
+use Modules\Cms\Console\CacheCmsPublicUrlRegistryCommand;
+use Modules\Cms\Console\ClearCmsPublicUrlRegistryCacheCommand;
+use Modules\Cms\Console\OptimizeClearCmsPublicUrlRegistryCommand;
+use Modules\Cms\Console\OptimizeCmsPublicUrlRegistryCommand;
 use Modules\Cms\Console\PublishLayoutBuilderBladeCommand;
 use Modules\Cms\Console\RebuildCmsSitemapCommand;
 use Modules\Cms\Contracts\CanonicalUrlResolverInterface;
@@ -31,6 +36,8 @@ use Modules\Cms\Localization\McamaraCmsLocalizationAdapter;
 use Modules\Cms\Localization\NullCmsLocalizationOverrideProvider;
 use Modules\Cms\Localization\TranslatableCmsLocalizationAdapter;
 use Modules\Cms\Observers\ParentSegmentUrlRouteObserver;
+use Modules\Cms\Support\CmsPublicUrlRegistryAboutReporter;
+use Modules\Cms\Support\CmsPublicUrlRegistryCacheManager;
 use Modules\Cms\Routing\CmsFrontRouteRegistrar;
 use Modules\Cms\Services\CanonicalUrlResolver;
 use Modules\Cms\Services\CmsAdminWarnings;
@@ -92,6 +99,7 @@ class CmsServiceProvider extends ServiceProvider
         $this->app->singleton(CmsPublicModelResolver::class);
 
         $this->app->singleton(CmsUrlRouteRegistry::class);
+        $this->app->singleton(CmsPublicUrlRegistryCacheManager::class);
         $this->app->bind(PublicUrlRegistryContract::class, fn ($app) => $app->make(CmsUrlRouteRegistry::class));
         $this->app->singleton(CmsSitemapBuildService::class);
         $this->app->singleton(CmsSitemapCacheService::class);
@@ -130,11 +138,22 @@ class CmsServiceProvider extends ServiceProvider
             return;
         }
 
+        if ($this->app->runningInConsole()) {
+            AboutCommand::add(
+                'Modularous:Cms',
+                fn () => $this->app->make(CmsPublicUrlRegistryAboutReporter::class)->report(),
+            );
+        }
+
         if (modularousConfig('cms_features.register_commands', true)) {
             if ($this->app->runningInConsole()) {
                 $this->commands([
                     RebuildCmsSitemapCommand::class,
                     PublishLayoutBuilderBladeCommand::class,
+                    ClearCmsPublicUrlRegistryCacheCommand::class,
+                    CacheCmsPublicUrlRegistryCommand::class,
+                    OptimizeClearCmsPublicUrlRegistryCommand::class,
+                    OptimizeCmsPublicUrlRegistryCommand::class,
                 ]);
             }
         }

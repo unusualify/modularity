@@ -35,6 +35,12 @@ final class CmsSitemapCacheService
         Cache::forever($key, $xml);
     }
 
+    public function forget(): void
+    {
+        $key = (string) modularousConfig('cms_sitemap.cache_key', 'modularous_cms_sitemap.committed_v1');
+        Cache::forget($key);
+    }
+
     public function emptyUrlset(): string
     {
         return <<<'XML'

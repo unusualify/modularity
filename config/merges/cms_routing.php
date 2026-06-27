@@ -128,11 +128,41 @@ return [
     'public_pages_enabled' => env('MODULAROUS_CMS_PUBLIC_PAGES_ENABLED', true),
 
     /**
-     * When true, {@see CmsRouteServiceProvider} registers public catch-all routes for each
-     * enabled module whose submodule resolves a {@code Http/Controllers/Front/{Route}Controller} extending
-     * {@see CmsController} (see {@see CmsFrontRouteRegistrar::resolveFrontControllerForModule()}).
+     * When true, {@see CmsRouteServiceProvider} registers one public catch-all ({@see CmsPublicFrontController}
+     * by default) when the ParentSegment registry has enabled rows. Set {@see universal_cms_public_front} to
+     * {@code false} for legacy per-module catch-alls.
      */
     'auto_register_public_front' => env('MODULAROUS_CMS_AUTO_REGISTER_PUBLIC_FRONT', true),
+
+    /**
+     * Cache {@see CmsFrontRouteRegistrar} module qualification scans across requests ({@see CmsFrontRouteRegistrationCache}).
+     * Keys include {@see CmsPublicUrlRegistryCoordinator::parentSegmentRegistryRevision()} and module route fingerprint.
+     */
+    'front_route_registration_cache_enabled' => env('MODULAROUS_CMS_FRONT_ROUTE_REGISTRATION_CACHE', true),
+
+    /** Laravel cache key prefix for {@see CmsFrontRouteRegistrationCache} (revision + module fingerprint are appended). */
+    'front_route_registration_cache_key' => env(
+        'MODULAROUS_CMS_FRONT_ROUTE_REGISTRATION_CACHE_KEY',
+        'modularous_cms.front_route_registration_v1'
+    ),
+
+    /**
+     * Cache store for ParentSegment / UrlRoute registry revisions and front route registration snapshots.
+     * Default {@code file} so boot-time route registration does not depend on the app default {@code CACHE_STORE}.
+     */
+    'public_url_registry_cache_store' => env('MODULAROUS_CMS_PUBLIC_URL_REGISTRY_CACHE_STORE', 'file'),
+
+    /**
+     * When true, {@see ParentSegmentUrlRouteObserver} rebuilds the registration cache immediately after invalidation
+     * (useful after deploy; default false so admin saves stay fast).
+     */
+    'warm_front_route_registration_cache_on_invalidate' => env('MODULAROUS_CMS_WARM_FRONT_ROUTE_REGISTRATION_CACHE', false),
+
+    /** Forget committed sitemap XML when ParentSegment registry is invalidated (admin prefix edits). */
+    'forget_sitemap_on_parent_segment_registry_invalidate' => env('MODULAROUS_CMS_FORGET_SITEMAP_ON_PARENT_SEGMENT_INVALIDATE', true),
+
+    /** Forget committed sitemap XML when UrlRoute rows are synced from entity saves (default false — use {@code cms:public-url-registry:cache --sitemap}). */
+    'forget_sitemap_on_url_route_registry_touch' => env('MODULAROUS_CMS_FORGET_SITEMAP_ON_URL_ROUTE_TOUCH', false),
 
     /**
      * When true, the Cms public catch-all uses {@see CmsPublicFrontController}

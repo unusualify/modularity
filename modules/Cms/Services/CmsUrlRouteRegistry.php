@@ -10,6 +10,7 @@ use Modules\Cms\Entities\UrlRoute;
 use Modules\Cms\Providers\CmsServiceProvider;
 use Modules\Cms\Support\CmsParentSegmentRegistryGate;
 use Modules\Cms\Support\CmsPublicPathHierarchy;
+use Modules\Cms\Support\CmsPublicUrlRegistryCacheManager;
 use Unusualify\Modularous\Entities\Traits\HasSlug;
 use Unusualify\Modularous\Entities\Traits\IsSingular;
 
@@ -128,9 +129,11 @@ final class CmsUrlRouteRegistry implements PublicUrlRegistryContract
             ->where('urlable_id', $model->getKey())
             ->where('kind', UrlRoute::KIND_PAGE_PUBLIC)
             ->delete();
+
+        app(CmsPublicUrlRegistryCacheManager::class)->touchUrlRouteRegistry();
     }
 
-    public function syncPublicPageRoutesForModel(Model $model): void
+    public function syncPublicPageRoutesForModel(Model $model, bool $touchRegistryCache = true): void
     {
         if (! $this->tableReady()) {
             return;
@@ -186,6 +189,10 @@ final class CmsUrlRouteRegistry implements PublicUrlRegistryContract
                 $row->delete();
             }
         }
+
+        if ($touchRegistryCache) {
+            app(CmsPublicUrlRegistryCacheManager::class)->touchUrlRouteRegistry();
+        }
     }
 
     /**
@@ -214,10 +221,12 @@ final class CmsUrlRouteRegistry implements PublicUrlRegistryContract
         $modelClass::query()->chunkById($chunkSize, function ($models): void {
             foreach ($models as $model) {
                 if ($model instanceof Model) {
-                    $this->syncPublicPageRoutesForModel($model);
+                    $this->syncPublicPageRoutesForModel($model, touchRegistryCache: false);
                 }
             }
         }, $keyName);
+
+        app(CmsPublicUrlRegistryCacheManager::class)->touchUrlRouteRegistry();
     }
 
     public function removeRedirectSourceRoute(Model $redirect): void
