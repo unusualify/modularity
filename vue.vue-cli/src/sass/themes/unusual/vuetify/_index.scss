@@ -1,5 +1,0 @@
-// themes/${theme}/vuetify/_index.scss
-@use '../abstract' as *;
-@use 'vuetify' with (
-  $body-font-family: $body-font-family,
-);
