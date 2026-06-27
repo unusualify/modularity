@@ -62,13 +62,14 @@
         :group-by="options.groupBy"
         :density="tableDensity ?? 'comfortable'"
         :disable-sort="disableSort"
-        :loading="loading"
+        :loading="isTableBusy"
         :loading-text="$t('Loading... Please wait')"
 
         :Xmobile="$vuetify.display.smAndDown"
         :mobile-breakpoint="mobileBreakpoint"
 
         :show-select="$store.getters.isSuperAdmin && showSelect"
+        :item-selectable="() => !isTableBusy"
         item-value="id"
         v-model="selectedItems"
         :row-props="dataTableRowProps"
@@ -132,6 +133,7 @@
                       :prepend-icon="(action.icon ? action.icon : `$${action.name}`)"
                       :text="window.__headline(action.name)"
                       :color="action.color ?? 'primary'"
+                      :disabled="isTableBusy"
                       @click="itemAction(action, action.name)"
                       v-tooltip="$lodash.startCase(action.name)"
                     />
@@ -160,7 +162,7 @@
                       !(controlsPosition === 'bottom' || $vuetify.display.smAndDown) ? 'max-width: 250px' : '',
                     ]"
                     @click:append-inner="searchItems"
-                    :disabled="loading"
+                    :disabled="isTableBusy"
                     @keydown.enter="searchItems"
 
                   >
@@ -175,6 +177,8 @@
                   <TableActions
                     :class="$vuetify.display.mdAndUp ? 'flex-grow-0 flex-shrink-0' : ''"
                     :actions="actions"
+                    @action-complete="handleFormActionComplete"
+                    @update:loading="setActionsLoading"
                   >
                     <template #prepend>
                       <!-- filter menu -->
@@ -184,6 +188,7 @@
                           <v-btn v-if="mainFilters.length > 0 && !hideFilters"
                             id="filter-btn-activator"
                             v-bind="{...filterBtnOptions, ...filterBtnTitle, ...props}"
+                            :disabled="isTableBusy"
                             :icon="$vuetify.display.smAndDown ? filterBtnOptions['prepend-icon'] : null"
                             :Xtext="$vuetify.display.smAndDown ? null : filterBtnTitle['text']"
                             :text="filterBtnTitle['text']"
@@ -213,6 +218,7 @@
                       <!-- create button -->
                       <v-btn v-if="$can('create', permissionName) && !noForm && !someSelected && createOnModal"
                         v-bind="addBtnOptions"
+                        :disabled="isTableBusy"
                         @click="createForm"
                         :icon="$vuetify.display.smAndDown ? addBtnOptions['prepend-icon'] : null"
                         :text="$vuetify.display.smAndDown ? null : addBtnTitle"
@@ -228,7 +234,7 @@
 
           <!-- Loading Progress Bar and Divider -->
           <v-progress-linear
-            v-if="hideHeaders && loading"
+            v-if="hideHeaders && isTableBusy"
             class="w-100 mb-4 mt-2"
             color="success"
             indeterminate
@@ -251,6 +257,7 @@
                   v-if="Object.keys(advancedFilters).length > 0 && !hideAdvancedFilters"
                   id="advanced-filter-btn"
                   v-bind="{...filterBtnOptions, ...filterBtnTitle, ...props}"
+                  :disabled="isTableBusy"
                   :icon="$vuetify.display.smAndDown ? 'mdi-filter-variant' : null"
                   :text="$vuetify.display.smAndDown ? null : $t('Filters')"
                   :prepend-icon="$vuetify.display.smAndDown ? null : 'mdi-filter-variant'"
@@ -657,6 +664,7 @@
                           <template v-slot:activator="{ props }">
                             <v-btn
                               v-bind="props"
+                              :disabled="isTableBusy"
                               :text="action.forceLabel ? $t( action.label ?? $headline(action.name) ) : null"
                               :variant="action.variant ?? 'elevated'"
                               :density="action.density ?? (action.forceLabel ? 'comfortable' : 'compact')"
@@ -685,7 +693,7 @@
         <template v-else-if="enableCustomFooter || $vuetify.display.smAndDown" v-slot:bottom="{page, pageCount}">
           <div class="d-flex justify-end py-4">
             <v-container class="max-width text-center">
-              <v-pagination v-if="!loading"
+              <v-pagination v-if="!isTableBusy"
                 v-model="options.page"
                 :length="totalNumberOfPages"
 
@@ -965,6 +973,7 @@
                 <template v-for="(action, k) in visibleRowActions" :key="k">
                   <v-list-item v-if="itemHasAction(item, action)"
                     :class="action.class ?? ''"
+                    :disabled="isTableBusy"
                     @click="itemAction(item, action)"
                     >
                       <v-icon small :color="action.iconColor" left>
@@ -990,6 +999,7 @@
                       v-bind="{
                         ...(action.hasTooltip ? props : {}),
                         ...(action.componentProps ?? {}),
+                        disabled: isTableBusy || (action.componentProps?.disabled ?? false),
                       }"
                     >
                       <template #prepend>
@@ -1012,7 +1022,7 @@
         <!-- MARK: Infinite Scroll Triggering Component -->
         <template v-slot:body.append>
             <v-card v-intersect="onIntersect" v-if="enableInfiniteScroll"/>
-            <v-progress-circular :indeterminate="loading" v-if="enableInfiniteScroll && loading"></v-progress-circular>
+            <v-progress-circular :indeterminate="isTableBusy" v-if="enableInfiniteScroll && isTableBusy"></v-progress-circular>
         </template>
 
         <template v-if="isDraggableActive" v-slot:tbody>
