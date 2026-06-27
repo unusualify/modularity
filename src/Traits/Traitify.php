@@ -21,9 +21,10 @@ trait Traitify
 
         $methods = array_map(function (string $trait) use ($method) {
             // if $methodName is snake_case, combining it and make it snake_case
-            if(str_contains($method, '_')) {
+            // if _ character is at middle of the method name, combine it with the trait name
+            if(str_contains($method, '_') && strpos($method, '_') !== 0 && strpos($method, '_') !== strlen($method) - 1) {
                 return $method . '_' . snakeCase($trait);
-            } 
+            }
             return $method . $trait;
         }, $uniqueTraits);
 
