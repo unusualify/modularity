@@ -5,6 +5,7 @@ namespace Unusualify\Modularous\Tests;
 use Illuminate\Support\Facades\Config;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Module;
+use Unusualify\Modularous\Tests\Support\IsolatedTestModules;
 
 class ModuleTest extends TestCase
 {
@@ -15,9 +16,8 @@ class ModuleTest extends TestCase
     {
         parent::getEnvironmentSetUp($app);
 
-        $fixturesPath = realpath(__DIR__ . '/../test-modules');
-        // if ($fixturesPath) {
-        // }
+        $fixturesPath = IsolatedTestModules::path();
+        IsolatedTestModules::seedRoutesStatuses();
         $app['config']->set('modules.paths.modules', $fixturesPath);
         $app['config']->set('modules.scan.paths', [$fixturesPath]);
         $app['config']->set('modules.namespace', 'TestModules');
@@ -37,12 +37,7 @@ class ModuleTest extends TestCase
         MockModuleManager::initialize();
         $this->module = MockModuleManager::getTestModule();
 
-        $statusesFile = $this->module->getDirectoryPath('routes_statuses.json');
-        if (! is_file($statusesFile)) {
-            file_put_contents($statusesFile, '{}');
-        }
-        // Seed route 'Item' so getRouteNames() / hasRoute('Item') tests pass
-        file_put_contents($statusesFile, json_encode(['Item' => true], JSON_PRETTY_PRINT));
+        IsolatedTestModules::seedRoutesStatuses(['TestModule' => ['Item' => true]]);
     }
 
     public function test_module_can_be_resolved_from_fixtures(): void

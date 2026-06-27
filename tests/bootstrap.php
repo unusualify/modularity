@@ -1,6 +1,7 @@
 <?php
 
 require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/Support/IsolatedTestModules.php';
 
 // Detect ParaTest token or use PID
 $token = getenv('TEST_TOKEN') ?: getmypid();

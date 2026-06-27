@@ -15,6 +15,7 @@ use Unusualify\Modularous\Entities\Enums\PaymentStatus;
 use Unusualify\Modularous\Entities\Observers\PriceableObserver;
 use Unusualify\Modularous\LaravelServiceProvider;
 use Unusualify\Modularous\Providers\ModularousProvider;
+use Unusualify\Modularous\Tests\Support\IsolatedTestModules;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
@@ -101,12 +102,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         $app['config']->set('modularous.base_key', 'modularous');
         $app['config']->set('modularous.stubs.path', realpath(__DIR__ . '/../src/Console/stubs'));
 
-        $statusesFile = 'modules_statuses.json';
-        if (getenv('TEST_TOKEN')) {
-            $statusesFile = 'modules_statuses_' . getenv('TEST_TOKEN') . '.json';
-        } elseif (function_exists('getmypid')) {
-            $statusesFile = 'modules_statuses_' . getmypid() . '.json';
-        }
+        $statusesFile = 'modules_statuses_' . IsolatedTestModules::testTokenSuffix() . '.json';
         $statusFilePath = base_path($statusesFile);
 
         $app['files']->put($statusFilePath, json_encode([
@@ -120,7 +116,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         $app['config']->set('modules.activators.modularous', [
             'class' => ModularousActivator::class,
             'statuses-file' => $statusFilePath,
-            'cache-key' => 'modularous.activator.installed',
+            'cache-key' => 'modularous.activator.installed.' . IsolatedTestModules::testTokenSuffix(),
             'cache-lifetime' => 604800,
         ]);
 

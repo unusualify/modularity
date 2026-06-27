@@ -4,6 +4,7 @@ namespace Unusualify\Modularous\Tests;
 
 use Illuminate\Support\Facades\Config;
 use Unusualify\Modularous\Facades\Modularous;
+use Unusualify\Modularous\Tests\Support\IsolatedTestModules;
 
 class MockModuleManager
 {
@@ -17,10 +18,10 @@ class MockModuleManager
      */
     public static function initialize()
     {
-        self::$mockModulesPath = realpath(__DIR__ . '/../test-modules');
+        self::$mockModulesPath = IsolatedTestModules::path();
 
         if (! self::$mockModulesPath) {
-            throw new \Exception('Mock modules path not found: ' . __DIR__ . '/../test-modules');
+            throw new \Exception('Mock modules path not found: ' . IsolatedTestModules::sourcePath());
         }
 
         // Set modules path to mock modules

@@ -3,6 +3,7 @@
 namespace Unusualify\Modularous\Tests;
 
 use Unusualify\Modularous\Activators\ModularousActivator;
+use Unusualify\Modularous\Tests\Support\IsolatedTestModules;
 
 abstract class TestModulesCase extends TestCase
 {
@@ -18,15 +19,18 @@ abstract class TestModulesCase extends TestCase
     {
         parent::getEnvironmentSetUp($app);
 
+        $fixturesPath = IsolatedTestModules::path();
+        IsolatedTestModules::seedRoutesStatuses();
+
         $app['config']->set('modules.scan.enabled', true);
         $app['config']->set('modules.cache.enabled', false);
         $app['config']->set('modules.namespace', 'TestModules');
         $app['config']->set('modules.scan.paths', [
             base_path('vendor/*/*'),
-            realpath(__DIR__ . '/../test-modules'),
+            $fixturesPath,
         ]);
 
-        $app['config']->set('modules.paths.modules', realpath(__DIR__ . '/../test-modules') ?: __DIR__ . '/../test-modules');
+        $app['config']->set('modules.paths.modules', $fixturesPath);
 
         $generatorPaths = [
             'config' => ['path' => 'Config', 'generate' => true],
@@ -55,14 +59,7 @@ abstract class TestModulesCase extends TestCase
         $app['config']->set('modularous.base_key', 'modularous');
         $app['config']->set('modularous.stubs.path', realpath(__DIR__ . '/../src/Console/stubs'));
 
-        $statusesFile = 'modules_statuses.json';
-        if (getenv('TEST_TOKEN')) {
-            $statusesFile = 'modules_statuses_' . getenv('TEST_TOKEN') . '.json';
-        } elseif (function_exists('getmypid')) {
-            $statusesFile = 'modules_statuses_' . getmypid() . '.json';
-        }
-
-        $this->statusesFilePath = base_path($statusesFile);
+        $this->statusesFilePath = base_path('modules_statuses_' . IsolatedTestModules::testTokenSuffix() . '.json');
 
         $app['files']->put($this->statusesFilePath, json_encode([
             'TestModule' => true,
@@ -71,9 +68,14 @@ abstract class TestModulesCase extends TestCase
         $app['config']->set('modules.activators.modularous', [
             'class' => ModularousActivator::class,
             'statuses-file' => $this->statusesFilePath,
-            'cache-key' => 'modularous.activator.installed',
+            'cache-key' => 'modularous.activator.installed.' . IsolatedTestModules::testTokenSuffix(),
             'cache-lifetime' => 604800,
         ]);
-        // $app['config']->set('modules.activator', 'modularous');
+        $app['config']->set('modules.activator', 'modularous');
+    }
+
+    protected function writeModuleActivationStatuses(array $statuses): void
+    {
+        $this->app['files']->put($this->statusesFilePath, json_encode($statuses, JSON_PRETTY_PRINT));
     }
 }
