@@ -69,6 +69,10 @@ class Module extends NwidartModule
         'clearRemoteCache',
         'previewRemote',
         'listRemoteCatalog',
+        'cachePurge',
+        'cacheWarm',
+        'cachePurgeAll',
+        'cacheWarmAll',
     ];
 
     /**
@@ -553,6 +557,39 @@ class Module extends NwidartModule
         $repository = $this->getRouteClass($routeName, 'repository', true);
 
         return classHasTrait(App::make($repository)->getModel(), $singularTrait);
+    }
+
+    /**
+     * check if the route has remote api source
+     *
+     * @param string $routeName
+     * @return bool
+     */
+    public function hasRemoteApiSource(string $routeName): bool
+    {
+        $repository = $this->getRepository($routeName, true);
+        $model = $repository->getModel();
+
+        return classHasTrait($repository, \Unusualify\Modularous\Repositories\Traits\RemoteApiSourceTrait::class)
+            && classHasTrait($model, \Unusualify\Modularous\Entities\Traits\HasRemoteApiSource::class);
+    }
+
+    /**
+     * isResourceCacheEnabled
+     */
+    public function isResourceCacheEnabled(string $routeName): bool
+    {
+        $repository = $this->getRepository($routeName, true);
+        $controller = $this->getController($routeName, true);
+
+        if( ! class_uses_recursive($repository) || ! in_array(\Unusualify\Modularous\Repositories\Traits\ResourceCacheActionsTrait::class, class_uses_recursive($repository)) ) {
+            return false;
+        }
+        if( ! class_uses_recursive($controller) || ! in_array(\Unusualify\Modularous\Http\Controllers\Traits\ManageResourceCache::class, class_uses_recursive($controller)) ) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
