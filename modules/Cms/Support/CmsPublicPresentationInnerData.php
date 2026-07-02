@@ -45,7 +45,7 @@ final class CmsPublicPresentationInnerData
     }
 
     /**
-     * @param  array{title: string, description: ?string, canonicalUrl: string, robotsMeta: string}  $seo
+     * @param array{title: string, description: ?string, canonicalUrl: string, robotsMeta: string} $seo
      * @return array{item: Model, seoTitle: string, seoDescription: ?string, canonicalUrl: string, robotsMeta: string}
      */
     private static function fromSeo(Model $item, array $seo): array

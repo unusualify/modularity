@@ -3,7 +3,7 @@
 namespace Unusualify\Modularous\Tests\Entities\Observers;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Config;
 use Unusualify\Modularous\Entities\Observers\CacheObserver;
 use Unusualify\Modularous\Facades\Modularous;
@@ -472,7 +472,7 @@ class PackageRegionStub extends Model
         ];
     }
 
-    public function packageCountries(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function packageCountries(): HasMany
     {
         return $this->hasMany(PackageCountryStub::class);
     }
@@ -498,7 +498,7 @@ class RelationshipSourceModelWithoutMetadata extends Model
         return static::$findResult;
     }
 
-    public function dependentItems(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function dependentItems(): HasMany
     {
         return $this->hasMany(DependentRouteModel::class);
     }
@@ -526,7 +526,7 @@ class RelationshipSourceModelWithMetadata extends Model
         ];
     }
 
-    public function dependentItems(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function dependentItems(): HasMany
     {
         return $this->hasMany(DependentRouteModel::class);
     }

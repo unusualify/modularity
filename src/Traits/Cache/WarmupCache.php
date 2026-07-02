@@ -3,6 +3,13 @@
 namespace Unusualify\Modularous\Traits\Cache;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Schema;
+use Modules\Cms\Contracts\CanonicalUrlResolverInterface;
+use Modules\Cms\Contracts\CmsLocalizationContract;
+use Modules\Cms\Services\CmsUrlRouteRegistry;
+use Modules\Cms\Support\CmsPublicFrontViewName;
+use Modules\Cms\Support\CmsPublicPresentationInnerData;
+use Modules\Cms\Support\CmsPublicPresentationItemCache;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Facades\ModularousCache;
 use Unusualify\Modularous\Http\Controllers\BaseController;
@@ -230,12 +237,12 @@ trait WarmupCache
             return false;
         }
 
-        if (! class_exists(\Modules\Cms\Support\CmsPublicPresentationItemCache::class)) {
+        if (! class_exists(CmsPublicPresentationItemCache::class)) {
             return false;
         }
 
-        $viewName = class_exists(\Modules\Cms\Support\CmsPublicFrontViewName::class)
-            ? \Modules\Cms\Support\CmsPublicFrontViewName::forModel($item)
+        $viewName = class_exists(CmsPublicFrontViewName::class)
+            ? CmsPublicFrontViewName::forModel($item)
             : null;
 
         if ($viewName === null || $viewName === '') {
@@ -286,7 +293,7 @@ trait WarmupCache
                     $warmupItem,
                 );
 
-                $cacheKey = \Modules\Cms\Support\CmsPublicPresentationItemCache::cacheKeyForPublicPresentation(
+                $cacheKey = CmsPublicPresentationItemCache::cacheKeyForPublicPresentation(
                     $moduleName,
                     $routeName,
                     $warmupItem,
@@ -294,7 +301,7 @@ trait WarmupCache
                     (string) $locale,
                 );
 
-                $cachedHtml = \Modules\Cms\Support\CmsPublicPresentationItemCache::rememberPublicPresentation(
+                $cachedHtml = CmsPublicPresentationItemCache::rememberPublicPresentation(
                     $moduleName,
                     $routeName,
                     $warmupItem,
@@ -343,8 +350,8 @@ trait WarmupCache
      */
     protected function resolvePresentationItemWarmupContext(string $moduleName, string $routeName, Model $item): array
     {
-        if (class_exists(\Modules\Cms\Support\CmsPublicFrontViewName::class)) {
-            $context = \Modules\Cms\Support\CmsPublicFrontViewName::presentationItemCacheContextForModel($item);
+        if (class_exists(CmsPublicFrontViewName::class)) {
+            $context = CmsPublicFrontViewName::presentationItemCacheContextForModel($item);
             if ($context !== null) {
                 return [$context['moduleName'], $context['moduleRouteName']];
             }
@@ -389,16 +396,16 @@ trait WarmupCache
 
     protected function buildPresentationWarmupInnerData(string $locale, string $registryPath, Model $item): array
     {
-        if (! class_exists(\Modules\Cms\Support\CmsPublicPresentationInnerData::class)
-            || ! interface_exists(\Modules\Cms\Contracts\CanonicalUrlResolverInterface::class)
+        if (! class_exists(CmsPublicPresentationInnerData::class)
+            || ! interface_exists(CanonicalUrlResolverInterface::class)
         ) {
             return ['item' => $item];
         }
 
         try {
-            $canonical = app(\Modules\Cms\Contracts\CanonicalUrlResolverInterface::class);
+            $canonical = app(CanonicalUrlResolverInterface::class);
 
-            return \Modules\Cms\Support\CmsPublicPresentationInnerData::buildForCache(
+            return CmsPublicPresentationInnerData::buildForCache(
                 $locale,
                 $registryPath,
                 $item,
@@ -419,9 +426,9 @@ trait WarmupCache
             return $fromUrlRoutes;
         }
 
-        if (class_exists(\Modules\Cms\Services\CmsUrlRouteRegistry::class)) {
+        if (class_exists(CmsUrlRouteRegistry::class)) {
             try {
-                $paths = app(\Modules\Cms\Services\CmsUrlRouteRegistry::class)->publicPagePathsByLocale($item);
+                $paths = app(CmsUrlRouteRegistry::class)->publicPagePathsByLocale($item);
             } catch (\Throwable) {
                 $paths = [];
             }
@@ -456,7 +463,7 @@ trait WarmupCache
 
         try {
             $table = (new \Modules\Cms\Entities\UrlRoute)->getTable();
-            if (! \Illuminate\Support\Facades\Schema::hasTable($table)) {
+            if (! Schema::hasTable($table)) {
                 return [];
             }
 
@@ -485,10 +492,10 @@ trait WarmupCache
     protected function applyPresentationWarmupLocale(string $locale): void
     {
         if (
-            interface_exists(\Modules\Cms\Contracts\CmsLocalizationContract::class)
-            && app()->bound(\Modules\Cms\Contracts\CmsLocalizationContract::class)
+            interface_exists(CmsLocalizationContract::class)
+            && app()->bound(CmsLocalizationContract::class)
         ) {
-            app(\Modules\Cms\Contracts\CmsLocalizationContract::class)->applyLocaleToApplication($locale);
+            app(CmsLocalizationContract::class)->applyLocaleToApplication($locale);
 
             return;
         }

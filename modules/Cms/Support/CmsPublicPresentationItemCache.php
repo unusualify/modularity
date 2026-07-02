@@ -24,7 +24,7 @@ final class CmsPublicPresentationItemCache
     /**
      * Full HTML document (inner body + page-layout shell) for public routes wrapped by {@see CmsPageLayoutPresentationWrapper}.
      *
-     * @param  array<string, mixed>  $innerData
+     * @param array<string, mixed> $innerData
      */
     public static function rememberWrappedDocumentHtml(
         string $moduleName,
@@ -87,7 +87,7 @@ final class CmsPublicPresentationItemCache
     /**
      * Inner body fragment only — prefer {@see rememberWrappedDocumentHtml()} for page-layout shell public routes.
      *
-     * @param  array<string, mixed>  $innerData
+     * @param array<string, mixed> $innerData
      */
     public static function rememberInnerHtml(
         string $moduleName,
@@ -116,12 +116,12 @@ final class CmsPublicPresentationItemCache
     }
 
     /**
-     * @param  array<string, mixed>  $innerData
+     * @param array<string, mixed> $innerData
      */
     /**
      * Same cache branch as {@see CmsController::renderPublicCmsPresentation()} (wrapped document vs full view).
      *
-     * @param  array<string, mixed>  $innerData
+     * @param array<string, mixed> $innerData
      */
     public static function rememberPublicPresentation(
         string $moduleName,
@@ -295,10 +295,10 @@ final class CmsPublicPresentationItemCache
      */
     public static function normalizeCacheLocale(?string $locale = null): string
     {
-        $locale = trim(strtolower((string) ($locale ?? app()->getLocale())));
+        $locale = trim(mb_strtolower((string) ($locale ?? app()->getLocale())));
 
         if ($locale === '') {
-            return trim(strtolower((string) config('app.locale', 'en')));
+            return trim(mb_strtolower((string) config('app.locale', 'en')));
         }
 
         if (str_contains($locale, '_')) {

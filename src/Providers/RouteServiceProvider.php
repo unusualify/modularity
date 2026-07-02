@@ -343,7 +343,7 @@ class RouteServiceProvider extends ServiceProvider
             $isSingleton = $module ? $module->isSingleton($routeName) : false;
 
             $customRoutes = [
-                ...(!$isSingleton ? [
+                ...(! $isSingleton ? [
                     'reorder',
                     // 'publish',
                     // 'bulkPublish',
@@ -394,15 +394,15 @@ class RouteServiceProvider extends ServiceProvider
                 }
             }
 
-            if($module && $module->isResourceCacheEnabled($routeName)) {
+            if ($module && $module->isResourceCacheEnabled($routeName)) {
                 $customRoutes = array_merge($customRoutes, [
                     'cachePurge',
                     'cacheWarm',
-                    ...(!$isSingleton ? ['cachePurgeAll', 'cacheWarmAll'] : []),
+                    ...(! $isSingleton ? ['cachePurgeAll', 'cacheWarmAll'] : []),
                 ]);
             }
 
-            if($module && $module->hasRemoteApiSource($routeName)) {
+            if ($module && $module->hasRemoteApiSource($routeName)) {
                 $customRoutes = array_merge($customRoutes, [
                     'syncRemote',
                     'syncRemoteAll',

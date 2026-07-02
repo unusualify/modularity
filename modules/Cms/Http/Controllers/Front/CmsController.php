@@ -14,8 +14,8 @@ use Modules\Cms\Http\Controllers\Traits\ResolvesPublicPresentationView;
 use Modules\Cms\Services\CmsPublicModelResolver;
 use Modules\Cms\Support\CmsPageLayoutPresentationWrapper;
 use Modules\Cms\Support\CmsPublicFrontViewName;
-use Modules\Cms\Support\CmsPublicPresentationItemCache;
 use Modules\Cms\Support\CmsPublicPresentationInnerData;
+use Modules\Cms\Support\CmsPublicPresentationItemCache;
 use Unusualify\Modularous\Http\Controllers\BaseController;
 use Unusualify\Modularous\Http\Controllers\CoreController;
 use Unusualify\Modularous\Http\Controllers\PanelController;
@@ -183,7 +183,6 @@ abstract class CmsController extends CoreController
                 $cacheContext['moduleName'],
                 $cacheContext['moduleRouteName'],
             );
-
 
         if (
             $presentationItemCacheEnabled

@@ -6,9 +6,11 @@ namespace Unusualify\Modularous\Jobs\Cache;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Str;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Facades\ModularousCache;
 use Unusualify\Modularous\Jobs\Cache\Concerns\ModularousCacheJob;
@@ -32,8 +34,8 @@ final class WarmModuleRouteCachesJob implements ShouldQueue
 
     public function handle(): void
     {
-        $moduleName = \Illuminate\Support\Str::studly($this->moduleName);
-        $moduleRouteName = \Illuminate\Support\Str::studly($this->moduleRouteName);
+        $moduleName = Str::studly($this->moduleName);
+        $moduleRouteName = Str::studly($this->moduleRouteName);
 
         ModularousCacheLogger::info('cache.job.warm_module_route.start', [
             'moduleName' => $moduleName,
@@ -80,7 +82,7 @@ final class WarmModuleRouteCachesJob implements ShouldQueue
 
                     if (($types['presentationItem'] ?? false) && $this->shouldDispatchPresentationAsync()) {
                         $item = $modelClass::find($record->getKey());
-                        if ($item instanceof \Illuminate\Database\Eloquent\Model) {
+                        if ($item instanceof Model) {
                             WarmPresentationItemJob::dispatch($item, $moduleName, $moduleRouteName);
                         }
 
@@ -96,8 +98,8 @@ final class WarmModuleRouteCachesJob implements ShouldQueue
     {
         return sprintf(
             'cache:warm-route:%s:%s',
-            \Illuminate\Support\Str::studly($this->moduleName),
-            \Illuminate\Support\Str::studly($this->moduleRouteName),
+            Str::studly($this->moduleName),
+            Str::studly($this->moduleRouteName),
         );
     }
 
@@ -112,7 +114,7 @@ final class WarmModuleRouteCachesJob implements ShouldQueue
         array $types,
     ): void {
         $model = $modelClass::find($id);
-        if (! $model instanceof \Illuminate\Database\Eloquent\Model) {
+        if (! $model instanceof Model) {
             return;
         }
 

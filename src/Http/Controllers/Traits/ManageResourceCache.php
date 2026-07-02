@@ -62,12 +62,10 @@ trait ManageResourceCache
 
     /**
      * Check if the repository uses the ResourceCacheActionsTrait.
-     *
-     * @return bool
      */
     protected function repositoryUsesResourceCacheActions(): bool
     {
-        if(!$this->repository) {
+        if (! $this->repository) {
             return false;
         }
 

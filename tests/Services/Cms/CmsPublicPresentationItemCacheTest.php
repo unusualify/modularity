@@ -4,6 +4,7 @@ namespace Unusualify\Modularous\Tests\Services\Cms;
 
 use Illuminate\Support\Facades\Config;
 use Modules\Cms\Entities\Page;
+use Modules\Cms\Support\CmsPageLayoutPresentationWrapper;
 use Modules\Cms\Support\CmsPublicPresentationItemCache;
 use Unusualify\Modularous\Facades\ModularousCache;
 use Unusualify\Modularous\Services\ModularousCacheService;
@@ -44,7 +45,7 @@ class CmsPublicPresentationItemCacheTest extends TestCase
             'en',
         );
 
-        $usesShell = \Modules\Cms\Support\CmsPageLayoutPresentationWrapper::resolvesWithPageLayoutShell($item, $viewName);
+        $usesShell = CmsPageLayoutPresentationWrapper::resolvesWithPageLayoutShell($item, $viewName);
         $expectedKey = $usesShell
             ? CmsPublicPresentationItemCache::cacheKey('BusinessPackage', 'PackageCountry', 99, 'en')
             : CmsPublicPresentationItemCache::cacheKey('BusinessPackage', 'PackageCountry', 99, 'en', ['full' => true]);

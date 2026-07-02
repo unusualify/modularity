@@ -401,7 +401,6 @@ trait CacheInvalidation
             'types' => $types,
         ]);
 
-        
         if ($this->usesTags() && (
             ($types['counts'] ?? false)
             || ($types['index'] ?? false)

@@ -382,7 +382,7 @@ class WarmupCachePresentationTest extends TestCase
     }
 
     /**
-     * @param  array<string, string>  $pathsByLocale
+     * @param array<string, string> $pathsByLocale
      */
     protected function seedUrlRoutesForCountry(WarmupPresentationCountryStub $country, array $pathsByLocale): void
     {

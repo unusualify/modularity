@@ -129,7 +129,7 @@ trait CacheHelpers
     /**
      * Get a value from cache with relationship tags (must match {@see putWithRelations()} / {@see rememberWithRelations()}).
      *
-     * @param  array<string, int|string|array<int|string>>  $relations
+     * @param array<string, int|string|array<int|string>> $relations
      */
     public function getWithRelations(
         string $key,

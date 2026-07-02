@@ -5,6 +5,7 @@ namespace Unusualify\Modularous\Tests\Services\Concerns;
 use Illuminate\Cache\Repository;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Schema;
@@ -322,7 +323,7 @@ class CacheInvalidationTest extends TestCase
         $model->exists = true;
         $model->wasRecentlyCreated = false;
 
-        $mockController = \Mockery::mock(\Illuminate\Routing\Controller::class);
+        $mockController = \Mockery::mock(Controller::class);
 
         $mockModule = \Mockery::mock(Module::class);
         $mockModule->shouldReceive('hasRoute')->with('ExplicitRoute')->andReturn(true);
@@ -399,7 +400,7 @@ class CacheInvalidationTest extends TestCase
         $mockModule->shouldReceive('hasRoute')->with($routeName)->andReturn(true);
         $mockModule->shouldReceive('isSingleton')->with($routeName)->andReturn($isSingleton);
         $mockModule->shouldReceive('getModel')->with($routeName)->andReturn(new InvalidateAllItemsModel);
-        $mockModule->shouldReceive('getController')->with($routeName)->andReturn(\Mockery::mock(\Illuminate\Routing\Controller::class));
+        $mockModule->shouldReceive('getController')->with($routeName)->andReturn(\Mockery::mock(Controller::class));
 
         return $mockModule;
     }
@@ -479,9 +480,7 @@ class ConcreteCacheInvalidation
         return $model instanceof TestModel ? 'TestRoute' : null;
     }
 
-    protected function warmupByModel(Model $model): void
-    {
-    }
+    protected function warmupByModel(Model $model): void {}
 
     protected function warmupForModel(Model $model, array $types = [], ?string $moduleName = null, ?string $moduleRouteName = null): void
     {

@@ -103,7 +103,7 @@ class CanonicalUrlResolver implements CanonicalUrlResolverInterface
     protected function resolveScheme(array $options): string
     {
         if (isset($options['scheme']) && is_string($options['scheme']) && $options['scheme'] !== '') {
-            return strtolower(rtrim($options['scheme'], ':/'));
+            return mb_strtolower(rtrim($options['scheme'], ':/'));
         }
 
         if (app()->bound('request')) {
@@ -111,7 +111,7 @@ class CanonicalUrlResolver implements CanonicalUrlResolverInterface
             if ($request !== null) {
                 $fromRequest = (string) $request->getScheme();
                 if ($fromRequest !== '') {
-                    return strtolower($fromRequest);
+                    return mb_strtolower($fromRequest);
                 }
             }
         }
@@ -119,7 +119,7 @@ class CanonicalUrlResolver implements CanonicalUrlResolverInterface
         $appUrl = (string) config('app.url', '');
         $fromApp = parse_url($appUrl, PHP_URL_SCHEME);
         if (is_string($fromApp) && $fromApp !== '') {
-            return strtolower($fromApp);
+            return mb_strtolower($fromApp);
         }
 
         return 'https';
