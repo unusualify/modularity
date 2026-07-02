@@ -633,19 +633,20 @@ class ModularousRoutes
                 $resourceOptions,
                 $parameters
             ) {
+                // Add additional routes based on type
+                if ($type === 'admin') {
+                    Route::additionalRoutes($routeUrlSegment, $itemStudlyName, [
+                        'as' => implode('.', $resourceOptionsAs),
+                    ]);
+                } elseif ($type === 'api' && ! $isSingleton) {
+                    Route::apiAdditionalRoutes($routeUrlSegment, $itemStudlyName, [
+                        'as' => implode('.', $resourceOptionsAs),
+                    ]);
+                }
+
                 if ($isSingleton) {
                     Route::singleton($routeUrlSegment, $controllerName, $resourceOptions);
                 } else {
-                    // Add additional routes based on type
-                    if ($type === 'admin') {
-                        Route::additionalRoutes($routeUrlSegment, $itemStudlyName, [
-                            'as' => implode('.', $resourceOptionsAs),
-                        ]);
-                    } elseif ($type === 'api') {
-                        Route::apiAdditionalRoutes($routeUrlSegment, $itemStudlyName, [
-                            'as' => implode('.', $resourceOptionsAs),
-                        ]);
-                    }
 
                     // Configure resource options based on type
                     $finalResourceOptions = match ($type) {
