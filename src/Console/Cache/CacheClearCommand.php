@@ -21,7 +21,8 @@ class CacheClearCommand extends BaseCommand
                             {--index : Clear only index/list caches}
                             {--records : Clear only record caches}
                             {--formattedItems : Clear only formatted item caches}
-                            {--formItems : Clear only form item caches}';
+                            {--formItems : Clear only form item caches}
+                            {--presentationItems : Clear only presentation item caches}';
 
     /**
      * The console command description.
@@ -50,6 +51,7 @@ class CacheClearCommand extends BaseCommand
         $recordsOnly = $this->option('records');
         $formattedItemsOnly = $this->option('formattedItems');
         $formItemsOnly = $this->option('formItems');
+        $presentationItemsOnly = $this->option('presentationItems');
         // Check if caching is enabled
         if (! ModularousCache::isEnabled()) {
             $this->warn('Modularous caching is disabled.');
@@ -58,14 +60,14 @@ class CacheClearCommand extends BaseCommand
         }
 
         // Determine what to clear
-        $clearAll = ! $countsOnly && ! $indexOnly && ! $recordsOnly;
+        $clearAll = ! $countsOnly && ! $indexOnly && ! $recordsOnly && ! $formattedItemsOnly && ! $formItemsOnly && ! $presentationItemsOnly;
 
         if ($module && $routeName) {
-            $this->clearModuleCache(Str::studly($module), Str::studly($routeName), $clearAll, $countsOnly, $indexOnly, $recordsOnly, $formattedItemsOnly, $formItemsOnly);
+            $this->clearModuleCache(Str::studly($module), Str::studly($routeName), $clearAll, $countsOnly, $indexOnly, $recordsOnly, $formattedItemsOnly, $formItemsOnly, $presentationItemsOnly);
         } elseif ($module) {
-            $this->clearModuleCache(Str::studly($module), null, $clearAll, $countsOnly, $indexOnly, $recordsOnly, $formattedItemsOnly, $formItemsOnly);
+            $this->clearModuleCache(Str::studly($module), null, $clearAll, $countsOnly, $indexOnly, $recordsOnly, $formattedItemsOnly, $formItemsOnly, $presentationItemsOnly);
         } else {
-            $this->clearAllModulesCache($clearAll, $countsOnly, $indexOnly, $recordsOnly, $formattedItemsOnly, $formItemsOnly);
+            $this->clearAllModulesCache($clearAll, $countsOnly, $indexOnly, $recordsOnly, $formattedItemsOnly, $formItemsOnly, $presentationItemsOnly);
         }
 
         return 0;
@@ -82,7 +84,8 @@ class CacheClearCommand extends BaseCommand
         bool $indexOnly,
         bool $recordsOnly,
         bool $formattedItemsOnly,
-        bool $formItemsOnly
+        bool $formItemsOnly,
+        bool $presentationItemsOnly = false,
     ): void {
         $this->info("Clearing cache for module: {$module}");
         if ($routeName) {
@@ -127,6 +130,13 @@ class CacheClearCommand extends BaseCommand
             $count = ModularousCache::invalidateByPattern($pattern);
             $this->line("  <fg=green>✓</> {$count} form item caches cleared for {$module}");
         }
+
+        if ($presentationItemsOnly) {
+            $prefix = ModularousCache::getPrefix();
+            $pattern = "{$prefix}:{$module}:" . ($routeName ?: '*') . ':presentationItem:*';
+            $count = ModularousCache::invalidateByPattern($pattern);
+            $this->line("  <fg=green>✓</> {$count} presentation item caches cleared for {$module}");
+        }
     }
 
     /**
@@ -138,7 +148,8 @@ class CacheClearCommand extends BaseCommand
         bool $indexOnly,
         bool $recordsOnly,
         bool $formattedItemsOnly,
-        bool $formItemsOnly
+        bool $formItemsOnly,
+        bool $presentationItemsOnly = false,
     ): void {
         if ($clearAll) {
             $this->info('Clearing all modularous caches...');
@@ -191,6 +202,13 @@ class CacheClearCommand extends BaseCommand
                 $pattern = "{$prefix}:{$moduleName}:*:formItem:*";
                 $count = ModularousCache::invalidateByPattern($pattern);
                 $this->line("  <fg=green>✓</> {$count} form item caches cleared for {$moduleName}");
+            }
+
+            if ($presentationItemsOnly) {
+                $prefix = ModularousCache::getPrefix();
+                $pattern = "{$prefix}:{$moduleName}:*:presentationItem:*";
+                $count = ModularousCache::invalidateByPattern($pattern);
+                $this->line("  <fg=green>✓</> {$count} presentation item caches cleared for {$moduleName}");
             }
         }
 
