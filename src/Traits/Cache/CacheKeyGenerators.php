@@ -66,6 +66,14 @@ trait CacheKeyGenerators
                 $specifierData = Arr::except($specifierData, ['id']);
 
                 break;
+            case 'presentationItem':
+                if (! isset($specifierData['id'])) {
+                    throw new \InvalidArgumentException('ID is required for presentation item cache type');
+                }
+                $specifierKey = 'presentationItem:' . $specifierData['id'];
+                $specifierData = Arr::except($specifierData, ['id']);
+
+                break;
             case 'record':
                 throw new \InvalidArgumentException('Record cache type is not ready yet');
                 if (! isset($specifierData['id'])) {
