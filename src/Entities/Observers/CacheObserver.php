@@ -52,7 +52,6 @@ class CacheObserver
      */
     public function saved(Model $model): void
     {
-        // dump('CacheObserver: saved');
         if ($model->newlyCreated) {
             return;
         }

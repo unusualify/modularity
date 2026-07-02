@@ -75,14 +75,12 @@ trait HasAuthorizable
             // observe the authorization record already written/removed.
             if (($model->modelIsAuthorizing || $model->modelIsUnauthorizing)
                 && $model->exists
-                && $model->usesTimestamps()
-                && ! is_null($model->getUpdatedAtColumn())) {
-                $model->{$model->getUpdatedAtColumn()} = $model->freshTimestamp();
+                && $model->usesTimestamps()) {
+                $model->updateTimestamps();
             }
         });
 
         static::updated(function (Model $model) {
-            // dump('HasAuthorizable: updated');
             if ($model->modelIsAuthorizing) {
                 $model->authorizationRecord()->updateOrCreate(
                     [], // Empty array as we want to update/create based on the relationship
