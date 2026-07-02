@@ -50,8 +50,12 @@ class CacheObserver
      * - All count caches (counts may depend on any field: status, type, category, etc.)
      * - Dependent module caches
      */
-    public function updated(Model $model): void
+    public function saved(Model $model): void
     {
+        // dump('CacheObserver: saved');
+        if ($model->newlyCreated) {
+            return;
+        }
         if (! $this->shouldInvalidate($model)) {
             return;
         }
