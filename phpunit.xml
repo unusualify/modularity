@@ -19,6 +19,7 @@
   </testsuites>
   <php>
     <env name="CACHE_DRIVER" value="array"/>
+    <env name="MODULAROUS_CACHE_OBSERVER_QUEUE" value="false"/>
     <!-- APP_KEY required for Passport client -->
     <env name="APP_KEY" value="base64:W99w+5JYz8SVGf5sx17gmPR6uoNCtWiEVc+9qu8iGEg="/>
     <ini name="memory_limit" value="1G"/>

@@ -20,33 +20,64 @@ final class CmsPublicSeo
     public const ROBOTS_TXT_STAGING_DISALLOW_ALL = "User-agent: *\nDisallow: /";
 
     /**
+     * Live request path — uses {@see Request} for host, path, and application locale.
+     *
      * @param object|null $translation e.g. {@see PageTranslation}
      * @return array{title: string, description: ?string, canonicalUrl: string, robotsMeta: string}
      */
     public static function build(Request $request, Model $item, CanonicalUrlResolverInterface $canonical): array
     {
+        return self::buildSeo(
+            app()->getLocale(),
+            $item,
+            self::resolveCanonicalFromRequest($request, $item, $canonical),
+        );
+    }
+
+    /**
+     * Cache / warmup path — explicit locale and registry path; no {@see Request} or app locale.
+     *
+     * @return array{title: string, description: ?string, canonicalUrl: string, robotsMeta: string}
+     */
+    public static function buildForCache(
+        string $locale,
+        string $registryPath,
+        Model $item,
+        CanonicalUrlResolverInterface $canonical,
+    ): array {
+        $browserPath = CmsFrontPath::publicBrowserPathForLocaleAndRegistryPath($locale, $registryPath, $canonical);
+
+        return self::buildSeo(
+            $locale,
+            $item,
+            self::resolveCanonicalForCache($locale, $browserPath, $item, $canonical),
+        );
+    }
+
+    /**
+     * @return array{title: string, description: ?string, canonicalUrl: string, robotsMeta: string}
+     */
+    private static function buildSeo(string $locale, Model $item, string $canonicalUrl): array
+    {
         $isTranslatable = @classHasTrait($item, HasTranslation::class);
-        $locale = app()->getLocale();
-        $title = (optional($isTranslatable ? $item->translate() : $item)->seo_title ?? null);
+        $translation = $isTranslatable ? $item->translate($locale) : $item;
+        $title = optional($translation)->seo_title ?? null;
 
         // #TODO: add default title and description for the page if not set
         if (is_array($title) && array_key_exists($locale, $title)) {
             $title = (string) $title[$locale] ?? $item->title ?? 'Page';
         } elseif ($title !== null) {
-            $title = (string) (optional($item->translate())->title
-                ?? 'Page');
+            $title = (string) (optional($translation)->title ?? 'Page');
         }
 
-        $description = optional($isTranslatable ? $item->translate() : $item)->seo_description;
+        $description = optional($translation)->seo_description;
         $description = $description !== null && $description !== '' ? $description : null;
         if (is_array($description) && array_key_exists($locale, $description)) {
             $description = (string) $description[$locale] ?? null;
         }
 
-        $canonicalUrl = self::resolveCanonical($request, $item, $canonical);
-
-        $robotsIndex = $isTranslatable ? optional($item->translate())->robots_index : $item->robots_index;
-        $robotsFollow = $isTranslatable ? optional($item->translate())->robots_follow : $item->robots_follow;
+        $robotsIndex = $isTranslatable ? optional($translation)->robots_index : $item->robots_index;
+        $robotsFollow = $isTranslatable ? optional($translation)->robots_follow : $item->robots_follow;
         if (is_array($robotsIndex) && array_key_exists($locale, $robotsIndex)) {
             $robotsIndex = (string) $robotsIndex[$locale] ?? null;
         }
@@ -96,11 +127,54 @@ final class CmsPublicSeo
         return self::ROBOTS_TXT_STAGING_DISALLOW_ALL . "\n";
     }
 
-    private static function resolveCanonical(Request $request, Model $item, CanonicalUrlResolverInterface $canonical): string
-    {
+    private static function resolveCanonicalFromRequest(
+        Request $request,
+        Model $item,
+        CanonicalUrlResolverInterface $canonical,
+    ): string {
+        return self::resolveCanonical(
+            app()->getLocale(),
+            $request->getHost(),
+            $request->getPathInfo() ?: '/',
+            $request->getSchemeAndHttpHost(),
+            $request->url(),
+            $item,
+            $canonical,
+        );
+    }
+
+    private static function resolveCanonicalForCache(
+        string $locale,
+        string $pathInfo,
+        Model $item,
+        CanonicalUrlResolverInterface $canonical,
+    ): string {
+        $schemeAndHttpHost = self::schemeAndHttpHostFromAppUrl();
+        $host = parse_url($schemeAndHttpHost, PHP_URL_HOST) ?: '';
+
+        return self::resolveCanonical(
+            $locale,
+            $host,
+            $pathInfo ?: '/',
+            $schemeAndHttpHost,
+            rtrim($schemeAndHttpHost, '/') . ($pathInfo ?: '/'),
+            $item,
+            $canonical,
+        );
+    }
+
+    private static function resolveCanonical(
+        string $locale,
+        string $host,
+        string $pathInfo,
+        string $schemeAndHttpHost,
+        string $fallbackUrl,
+        Model $item,
+        CanonicalUrlResolverInterface $canonical,
+    ): string {
         $isTranslatable = @classHasTrait($item, HasTranslation::class);
-        $locale = app()->getLocale();
-        $custom = $isTranslatable ? trim((string) ($item->translate()->canonical_url ?? '')) : '';
+        $translation = $isTranslatable ? $item->translate($locale) : $item;
+        $custom = $isTranslatable ? trim((string) (optional($translation)->canonical_url ?? '')) : '';
         if (is_array($custom) && isset($custom[$locale])) {
             $custom = (string) $custom[$locale];
         } else {
@@ -112,17 +186,31 @@ final class CmsPublicSeo
                 return $custom;
             }
 
-            return rtrim($request->getSchemeAndHttpHost(), '/') . '/' . ltrim($custom, '/');
+            return rtrim($schemeAndHttpHost, '/') . '/' . ltrim($custom, '/');
         }
 
+        $scheme = parse_url($schemeAndHttpHost, PHP_URL_SCHEME) ?: 'http';
+
         $resolved = $canonical->resolve(
-            $request->getHost(),
-            $request->getPathInfo() ?: '/',
-            app()->getLocale(),
-            ['redirect_to_canonical' => false]
+            $host,
+            $pathInfo ?: '/',
+            $locale,
+            [
+                'redirect_to_canonical' => false,
+                'scheme' => $scheme,
+            ]
         );
 
-        return $resolved['canonical_url'] ?? $request->url();
+        return $resolved['canonical_url'] ?? $fallbackUrl;
+    }
+
+    private static function schemeAndHttpHostFromAppUrl(): string
+    {
+        $appUrl = (string) config('app.url', 'http://localhost');
+        $scheme = parse_url($appUrl, PHP_URL_SCHEME) ?: 'http';
+        $host = parse_url($appUrl, PHP_URL_HOST) ?: 'localhost';
+
+        return $scheme . '://' . $host;
     }
 
     /**

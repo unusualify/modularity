@@ -170,6 +170,8 @@ class ModularousCacheService
         }
 
         $defaultBehavior = $this->config['all_modules'] ?? false;
+        $defaultModuleRouteBehavior = $this->config['all_module_routes'] ?? $defaultBehavior;
+        $defaultTypeBehavior = isset($this->config['default_types']) ? $this->config['default_types'][$type] ?? true : true;
 
         // Check module-specific enabled flag
         if ($moduleName !== null) {
@@ -183,14 +185,14 @@ class ModularousCacheService
 
             if ($moduleRouteName !== null && isset($moduleConfig['routes']) && isset($moduleConfig['routes'][$moduleRouteName])) {
                 $moduleRouteConfig = $moduleConfig['routes'][$moduleRouteName] ?? [];
-                $moduleRouteEnabled = $moduleRouteConfig['enabled'] ?? $defaultBehavior;
+                $moduleRouteEnabled = $moduleRouteConfig['enabled'] ?? $defaultModuleRouteBehavior;
 
                 if (! $moduleRouteEnabled) {
                     return false;
                 }
 
                 if ($type !== null && isset($moduleRouteConfig['types'][$type])) {
-                    return $moduleRouteConfig['types'][$type] ?? true;
+                    return $moduleRouteConfig['types'][$type] ?? $defaultTypeBehavior;
                 }
 
                 return $moduleRouteEnabled;
@@ -203,6 +205,66 @@ class ModularousCacheService
         }
 
         return true;
+    }
+
+    /**
+     * Route-level cache config merge for a module route.
+     */
+    public function getRouteCacheConfig(?string $moduleName, ?string $moduleRouteName): array
+    {
+        if ($moduleName === null || $moduleRouteName === null) {
+            return [];
+        }
+
+        $moduleName = Str::studly($moduleName);
+        $moduleRouteName = Str::studly($moduleRouteName);
+        $moduleConfig = $this->config['modules'][$moduleName] ?? [];
+
+        return $moduleConfig['routes'][$moduleRouteName] ?? [];
+    }
+
+    /**
+     * Whether the observer should auto-invalidate/warm a cache type for a route.
+     */
+    public function shouldAutoInvalidate(?string $moduleName, ?string $moduleRouteName, ?string $type = null): bool
+    {
+        if ($moduleName === null || $moduleRouteName === null) {
+            return true;
+        }
+
+        $observerAuto = (bool) ($this->config['observer']['auto_invalidate'] ?? true);
+        if (! $observerAuto) {
+            return false;
+        }
+
+        $routeConfig = $this->getRouteCacheConfig($moduleName, $moduleRouteName);
+        $globalManual = (bool) ($this->config['manual_purge'] ?? false);
+        $routeManual = (bool) ($routeConfig['manual_purge'] ?? $globalManual);
+
+        if ($type === null) {
+            return ! $routeManual;
+        }
+
+        $purgeTypes = $routeConfig['purge'] ?? [];
+        if (array_key_exists($type, $purgeTypes)) {
+            return ! (bool) $purgeTypes[$type];
+        }
+
+        return ! $routeManual;
+    }
+
+    /**
+     * Whether admin purge/warm actions should be exposed for a route.
+     */
+    public function hasAdminCacheActions(?string $moduleName, ?string $moduleRouteName): bool
+    {
+        if (! $this->isEnabled($moduleName, $moduleRouteName)) {
+            return false;
+        }
+
+        $routeConfig = $this->getRouteCacheConfig($moduleName, $moduleRouteName);
+
+        return (bool) ($routeConfig['admin_cache_actions'] ?? false);
     }
 
     /**
@@ -249,6 +311,54 @@ class ModularousCacheService
 
         // Fall back to global TTL
         return (int) ($this->config['ttl'][$type] ?? 300);
+    }
+
+    /**
+     * Resolve enabled cache types for admin actions (manual purge routes).
+     *
+     * @return array<string, bool>
+     */
+    public function resolveManualCacheTypes(string $moduleName, string $moduleRouteName): array
+    {
+        $types = ['counts', 'index', 'record', 'formItem', 'formattedItem', 'presentationItem'];
+        $resolved = [];
+
+        foreach ($types as $type) {
+            $resolved[$type] = $this->isEnabled($moduleName, $moduleRouteName, $type)
+                && ! $this->shouldAutoInvalidate($moduleName, $moduleRouteName, $type);
+        }
+
+        return $resolved;
+    }
+
+    /**
+     * Normalize a cache types array from request input.
+     *
+     * @param array<int, string>|string $typesInput
+     * @return array<string, bool>
+     */
+    public function normalizeCacheTypesInput(array|string $typesInput, string $moduleName, string $moduleRouteName): array
+    {
+        $allTypes = ['counts', 'index', 'record', 'formItem', 'formattedItem', 'presentationItem'];
+
+        if ($typesInput === 'all') {
+            $types = array_fill_keys($allTypes, true);
+        } else {
+            $types = array_fill_keys($allTypes, false);
+            foreach ((array) $typesInput as $type) {
+                if (is_string($type) && in_array($type, $allTypes, true)) {
+                    $types[$type] = true;
+                }
+            }
+        }
+
+        foreach ($allTypes as $type) {
+            if ($types[$type] && ! $this->isEnabled($moduleName, $moduleRouteName, $type)) {
+                $types[$type] = false;
+            }
+        }
+
+        return $types;
     }
 
     /**

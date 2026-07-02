@@ -8,9 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\View;
 use Modules\Cms\Entities\LayoutBuilder;
 use Modules\Cms\Entities\PageLayout;
-use Modules\Cms\Http\Controllers\Front\CmsController;
 use Modules\Cms\Services\CmsPageLayoutResolver;
-use Unusualify\Modularous\Http\Controllers\Traits\ManagePreview;
 
 /**
  * Wraps submodule {@code *.custom} (or mapped) presentation HTML in a {@see PageLayout} {@see LayoutBladeResolver} shell
@@ -19,6 +17,88 @@ use Unusualify\Modularous\Http\Controllers\Traits\ManagePreview;
  */
 final class CmsPageLayoutPresentationWrapper
 {
+    /**
+     * Renders the inner presentation body fragment (runs view composers on cache miss).
+     *
+     * When {@code previewBodyHtml} is already present in {@code $innerData} (from {@see CmsPublicPresentationItemCache}),
+     * that cached fragment is returned without re-rendering.
+     *
+     * @param array<string, mixed> $innerData
+     * @param array{module: string, route: string, viewPrefix?: string}|null $moduleRouteContext
+     */
+    public static function renderInnerPresentationHtml(
+        Model $item,
+        string $viewName,
+        array $innerData,
+        ?array $moduleRouteContext = null,
+        ?bool $hasStaticSegments = null,
+        ?string $innerViewName = null,
+    ): string {
+        if (isset($innerData['previewBodyHtml']) && is_string($innerData['previewBodyHtml'])) {
+            return $innerData['previewBodyHtml'];
+        }
+
+        $moduleRouteContext ??= LayoutBladeResolver::moduleRouteContextFromPresentationViewName($viewName)
+            ?? self::moduleRouteContextFromModel($item);
+
+        $staticSegmentsEnabled = (bool) modularousConfig(
+            'cms_page_layouts.filesystem_segments_without_db_binding_enabled',
+            true,
+        );
+        $hasStaticSegments ??= $staticSegmentsEnabled
+            && $moduleRouteContext !== null
+            && LayoutBladeResolver::hasFilesystemPageLayoutSegments($moduleRouteContext);
+
+        $innerViewName ??= self::innerPresentationViewName($viewName, $moduleRouteContext, $hasStaticSegments);
+
+        $innerHtml = $innerViewName !== null && View::exists($innerViewName)
+            ? View::make($innerViewName, $innerData)->render()
+            : '';
+
+        return self::extractBodyFragmentForShell($innerHtml);
+    }
+
+    /**
+     * Whether {@see documentOrNull()} will wrap this presentation in a page-layout shell (vs. plain view fallback).
+     */
+    public static function resolvesWithPageLayoutShell(Model $item, string $viewName): bool
+    {
+        if (! (bool) modularousConfig('cms_features.enabled', true)) {
+            return false;
+        }
+
+        if (! class_exists(CmsPageLayoutResolver::class) || ! class_exists(LayoutBladeResolver::class)) {
+            return false;
+        }
+
+        $class = $item::class;
+        if (method_exists($class, 'supportsPageLayoutBindings') && ! $class::supportsPageLayoutBindings()) {
+            return false;
+        }
+
+        $resolver = app(CmsPageLayoutResolver::class);
+        $pageLayout = $resolver->pageLayoutForModelClass($class);
+
+        $moduleRouteContext = LayoutBladeResolver::moduleRouteContextFromPresentationViewName($viewName)
+            ?? self::moduleRouteContextFromModel($item);
+
+        $staticSegmentsEnabled = (bool) modularousConfig(
+            'cms_page_layouts.filesystem_segments_without_db_binding_enabled',
+            true,
+        );
+        $hasStaticSegments = $staticSegmentsEnabled
+            && $moduleRouteContext !== null
+            && LayoutBladeResolver::hasFilesystemPageLayoutSegments($moduleRouteContext);
+
+        if ($pageLayout !== null || $hasStaticSegments) {
+            return true;
+        }
+
+        $layoutBuilder = $resolver->layoutBuilderShellForModelClass($class);
+
+        return $layoutBuilder !== null;
+    }
+
     /**
      * Full HTML document string, or {@code null} to fall back to rendering {@code $viewName} alone.
      *
@@ -54,10 +134,7 @@ final class CmsPageLayoutPresentationWrapper
             && LayoutBladeResolver::hasFilesystemPageLayoutSegments($moduleRouteContext);
 
         $innerViewName = self::innerPresentationViewName($viewName, $moduleRouteContext, $hasStaticSegments);
-        $innerHtml = $innerViewName !== null && View::exists($innerViewName)
-            ? View::make($innerViewName, $innerData)->render()
-            : '';
-        $innerHtml = self::extractBodyFragmentForShell($innerHtml);
+        $innerHtml = self::renderInnerPresentationHtml($item, $viewName, $innerData, $moduleRouteContext, $hasStaticSegments, $innerViewName);
 
         if ($pageLayout === null && ! $hasStaticSegments && $innerHtml === '') {
             return null;

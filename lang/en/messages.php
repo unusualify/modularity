@@ -123,4 +123,34 @@ return [
         ],
         'rate-limit-exceeded' => 'Remote API rate limit exceeded. Please wait and try again.',
     ],
+
+    'resource-cache' => [
+        'purge-record' => [
+            'label' => 'Clear cache',
+            'success' => 'Cache cleared for this record.',
+        ],
+        'warm-record' => [
+            'label' => 'Refresh cache',
+            'success' => 'Cache refresh started for this record.',
+        ],
+        'purge-all' => [
+            'label' => 'Clear all cache',
+            'success' => 'All caches cleared for this route.',
+            'confirmation-title' => 'Clear all cache?',
+            'confirmation-description' => 'This flushes every cached entry for this module route.',
+            'confirmation-confirmText' => 'Clear all',
+            'confirmation-cancelText' => 'Cancel',
+        ],
+        'warm-all' => [
+            'label' => 'Refresh all cache',
+            'success' => 'Cache warm job queued for this route.',
+            'confirmation-title' => 'Refresh all cache?',
+            'confirmation-description' => 'This queues a background job to warm all records on this route.',
+            'confirmation-confirmText' => 'Queue warm',
+            'confirmation-cancelText' => 'Cancel',
+        ],
+        'validation' => [
+            'types-required' => 'Select at least one cache type.',
+        ],
+    ],
 ];

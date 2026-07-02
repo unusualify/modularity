@@ -19,4 +19,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('test_module_items');
     }
-}
+};

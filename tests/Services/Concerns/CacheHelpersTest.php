@@ -488,6 +488,31 @@ class CacheHelpersTest extends TestCase
 
         $this->assertTrue($result);
     }
+
+    /** @test */
+    public function it_get_with_relations_uses_same_tags_as_put_with_relations()
+    {
+        $this->cacheService->setUsesTags(true);
+
+        $this->cacheService->putWithRelations(
+            'rel-get-key',
+            'rel-get-value',
+            60,
+            'TestModule',
+            'TestRoute',
+            ['Company' => 1]
+        );
+
+        $value = $this->cacheService->getWithRelations(
+            'rel-get-key',
+            null,
+            'TestModule',
+            'TestRoute',
+            ['Company' => 1]
+        );
+
+        $this->assertEquals('rel-get-value', $value);
+    }
 }
 
 /**

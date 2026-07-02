@@ -22,9 +22,13 @@ use Nwidart\Modules\Laravel\Module as NwidartModule;
 use Nwidart\Modules\Support\Config\GenerateConfigReader;
 use Unusualify\Modularous\Activators\ModuleActivator;
 use Unusualify\Modularous\Entities\Enums\Permission;
+use Unusualify\Modularous\Entities\Traits\HasRemoteApiSource;
 use Unusualify\Modularous\Exceptions\ModularousException;
 use Unusualify\Modularous\Facades\Modularous;
+use Unusualify\Modularous\Http\Controllers\Traits\ManageResourceCache;
 use Unusualify\Modularous\Repositories\Repository;
+use Unusualify\Modularous\Repositories\Traits\RemoteApiSourceTrait;
+use Unusualify\Modularous\Repositories\Traits\ResourceCacheActionsTrait;
 
 class Module extends NwidartModule
 {
@@ -69,6 +73,10 @@ class Module extends NwidartModule
         'clearRemoteCache',
         'previewRemote',
         'listRemoteCatalog',
+        'cachePurge',
+        'cacheWarm',
+        'cachePurgeAll',
+        'cacheWarmAll',
     ];
 
     /**
@@ -553,6 +561,36 @@ class Module extends NwidartModule
         $repository = $this->getRouteClass($routeName, 'repository', true);
 
         return classHasTrait(App::make($repository)->getModel(), $singularTrait);
+    }
+
+    /**
+     * check if the route has remote api source
+     */
+    public function hasRemoteApiSource(string $routeName): bool
+    {
+        $repository = $this->getRepository($routeName, true);
+        $model = $repository->getModel();
+
+        return classHasTrait($repository, RemoteApiSourceTrait::class)
+            && classHasTrait($model, HasRemoteApiSource::class);
+    }
+
+    /**
+     * isResourceCacheEnabled
+     */
+    public function isResourceCacheEnabled(string $routeName): bool
+    {
+        $repository = $this->getRepository($routeName, true);
+        $controller = $this->getController($routeName, true);
+
+        if (! class_uses_recursive($repository) || ! in_array(ResourceCacheActionsTrait::class, class_uses_recursive($repository))) {
+            return false;
+        }
+        if (! class_uses_recursive($controller) || ! in_array(ManageResourceCache::class, class_uses_recursive($controller))) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

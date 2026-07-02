@@ -47,10 +47,10 @@ trait CacheHelpers
      * @param string|null $routeName Route name (submodule)
      * @param array $relations Related models ['ModelClass' => id, ...]
      */
-    public function rememberWithRelations(string $key, int $ttl, Closure $callback, ?string $moduleName = null, ?string $moduleRouteName = null, array $relations = [])
+    public function rememberWithRelations(string $key, int $ttl, Closure $callback, ?string $moduleName = null, ?string $moduleRouteName = null, array $relations = [], ?string $type = null)
     {
         // Skip cache if disabled
-        if (! $this->isEnabled($moduleName, $moduleRouteName)) {
+        if (! $this->isEnabled($moduleName, $moduleRouteName, $type)) {
             return $callback();
         }
 
@@ -123,7 +123,23 @@ trait CacheHelpers
      */
     public function get(string $key, $default = null, ?string $moduleName = null, ?string $moduleRouteName = null)
     {
-        if (! $this->isEnabled($moduleName, $moduleRouteName)) {
+        return $this->getWithRelations($key, $default, $moduleName, $moduleRouteName);
+    }
+
+    /**
+     * Get a value from cache with relationship tags (must match {@see putWithRelations()} / {@see rememberWithRelations()}).
+     *
+     * @param array<string, int|string|array<int|string>> $relations
+     */
+    public function getWithRelations(
+        string $key,
+        $default = null,
+        ?string $moduleName = null,
+        ?string $moduleRouteName = null,
+        array $relations = [],
+        ?string $type = null,
+    ) {
+        if (! $this->isEnabled($moduleName, $moduleRouteName, $type)) {
             return $default;
         }
 
@@ -131,6 +147,10 @@ trait CacheHelpers
             $tags = $moduleRouteName !== null
                 ? $this->getModuleRouteTags($moduleName, $moduleRouteName)
                 : $this->getModuleTags($moduleName);
+
+            if (! empty($relations)) {
+                $tags = array_merge($tags, $this->generateRelationTags($relations));
+            }
 
             return $this->getStore()
                 ->tags($tags)
@@ -172,9 +192,9 @@ trait CacheHelpers
      * @param string|null $routeName Route name (submodule)
      * @param array $relations Related models ['ModelClass' => id, ...]
      */
-    public function putWithRelations(string $key, $value, int $ttl, ?string $moduleName = null, ?string $moduleRouteName = null, array $relations = []): bool
+    public function putWithRelations(string $key, $value, int $ttl, ?string $moduleName = null, ?string $moduleRouteName = null, array $relations = [], ?string $type = null): bool
     {
-        if (! $this->isEnabled($moduleName, $moduleRouteName)) {
+        if (! $this->isEnabled($moduleName, $moduleRouteName, $type)) {
             return false;
         }
 

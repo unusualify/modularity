@@ -13,7 +13,9 @@ use Modules\Cms\Http\Controllers\PageController;
 use Modules\Cms\Http\Controllers\Traits\ResolvesPublicPresentationView;
 use Modules\Cms\Services\CmsPublicModelResolver;
 use Modules\Cms\Support\CmsPageLayoutPresentationWrapper;
-use Modules\Cms\Support\CmsPublicSeo;
+use Modules\Cms\Support\CmsPublicFrontViewName;
+use Modules\Cms\Support\CmsPublicPresentationInnerData;
+use Modules\Cms\Support\CmsPublicPresentationItemCache;
 use Unusualify\Modularous\Http\Controllers\BaseController;
 use Unusualify\Modularous\Http\Controllers\CoreController;
 use Unusualify\Modularous\Http\Controllers\PanelController;
@@ -135,10 +137,14 @@ abstract class CmsController extends CoreController
          * it takes 50ms to resolve the item in local environment
          */
         $item = $this->resolvePublicItem($request);
+
         if ($item === null) {
             abort(404);
         }
 
+        // \Unusualify\Modularous\Facades\ModularousCache::warmupPresentationItem('BusinessPackage', 'PackageCountry', $item);
+
+        // dd('here');
         /**
          * #TODO: performance optimization, only render the presentation if it qualifies for auto public front
          * it takes up to 2500ms to render the presentation in local environment
@@ -166,25 +172,86 @@ abstract class CmsController extends CoreController
         CanonicalUrlResolverInterface $canonical,
         bool $forcePreviewRobotsNoIndex = false,
     ) {
-        $seo = CmsPublicSeo::build($request, $item, $canonical);
-        $seo['robotsMeta'] = CmsPublicSeo::resolveRobotsMeta($seo['robotsMeta'], $forcePreviewRobotsNoIndex);
-
         $viewName = $this->resolvePublicPresentationViewName($request, $item);
 
-        $innerData = [
-            'item' => $item,
-            'seoTitle' => $seo['title'],
-            'seoDescription' => $seo['description'],
-            'canonicalUrl' => $seo['canonicalUrl'],
-            'robotsMeta' => $seo['robotsMeta'],
-        ];
+        $innerData = CmsPublicPresentationInnerData::build($request, $item, $canonical, $forcePreviewRobotsNoIndex);
+
+        $cacheContext = $this->resolvePresentationItemCacheContext($item);
+        $presentationItemCacheEnabled = ! $forcePreviewRobotsNoIndex
+            && $cacheContext !== null
+            && CmsPublicPresentationItemCache::isEnabled(
+                $cacheContext['moduleName'],
+                $cacheContext['moduleRouteName'],
+            );
+
+        if (
+            $presentationItemCacheEnabled
+            && CmsPageLayoutPresentationWrapper::resolvesWithPageLayoutShell($item, $viewName)
+        ) {
+            $wrapped = CmsPublicPresentationItemCache::rememberWrappedDocumentHtml(
+                $cacheContext['moduleName'],
+                $cacheContext['moduleRouteName'],
+                $item,
+                $viewName,
+                $innerData,
+            );
+
+            if (is_string($wrapped) && $wrapped !== '') {
+                return view('cms::layout_builder.inline_document', ['document' => $wrapped]);
+            }
+        }
 
         $wrapped = CmsPageLayoutPresentationWrapper::documentOrNull($item, $viewName, $innerData);
         if ($wrapped !== null) {
             return view('cms::layout_builder.inline_document', ['document' => $wrapped]);
         }
 
+        if ($presentationItemCacheEnabled) {
+            return response(
+                CmsPublicPresentationItemCache::rememberFullViewHtml(
+                    $cacheContext['moduleName'],
+                    $cacheContext['moduleRouteName'],
+                    $item,
+                    $viewName,
+                    $innerData,
+                ),
+                200,
+                ['Content-Type' => 'text/html; charset=UTF-8'],
+            );
+        }
+
         return view($viewName, $innerData);
+    }
+
+    /**
+     * Resolves StudlyCase module + route for {@see CmsPublicPresentationItemCache} config keys.
+     *
+     * Universal {@see CmsPublicFrontController} uses {@see CmsPublicFrontViewName} from the resolved model;
+     * per-route front controllers fall back to {@see $moduleName} / {@see $routeName}.
+     *
+     * @return array{moduleName: string, moduleRouteName: string}|null
+     */
+    protected function resolvePresentationItemCacheContext(Model $item): ?array
+    {
+        $context = CmsPublicFrontViewName::presentationItemCacheContextForModel($item);
+        if ($context !== null) {
+            return $context;
+        }
+
+        $moduleName = $this->getModuleName();
+        $routeName = $this->getRouteName();
+        if (
+            $moduleName === null || $routeName === null
+            || $moduleName === '' || $routeName === ''
+            || ($moduleName === 'Cms' && $routeName === 'Public')
+        ) {
+            return null;
+        }
+
+        return [
+            'moduleName' => $moduleName,
+            'moduleRouteName' => $routeName,
+        ];
     }
 
     /**

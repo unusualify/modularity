@@ -19,6 +19,7 @@ use Unusualify\Modularous\Http\Controllers\Traits\ManageInertia;
 use Unusualify\Modularous\Http\Controllers\Traits\ManagePreview;
 use Unusualify\Modularous\Http\Controllers\Traits\ManagePrevious;
 use Unusualify\Modularous\Http\Controllers\Traits\ManageRemoteApiSync;
+use Unusualify\Modularous\Http\Controllers\Traits\ManageResourceCache;
 use Unusualify\Modularous\Http\Controllers\Traits\ManageSingleton;
 use Unusualify\Modularous\Http\Controllers\Traits\ManageTranslations;
 use Unusualify\Modularous\Http\Controllers\Traits\ManageUtilities;
@@ -30,6 +31,7 @@ abstract class BaseController extends PanelController
         ManageIndexAjax,
         ManagePrevious,
         ManageRemoteApiSync,
+        ManageResourceCache,
         ManageUtilities,
         ManageSingleton,
         ManageInertia,

@@ -146,7 +146,7 @@ class CoverageServiceTest extends TestCase
         $formats = ['main', 'origin/main', 'refs/heads/main', 'refs/tags/v1.0', 'refs/remotes/origin/develop'];
 
         foreach ($formats as $branch) {
-            $result = $mock->testGetGitChangedFiles($branch);
+            $result = $mock->test_get_git_changed_files($branch);
             $this->assertIsArray($result);
         }
     }
