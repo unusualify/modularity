@@ -57,6 +57,16 @@ class Modularous extends FileRepository
     private $retainModulesPath = null;
 
     /**
+     * @var array<string, Module>|null
+     */
+    private ?array $allModulesMemo = null;
+
+    /**
+     * @var array<bool, array<string, Module>>
+     */
+    private array $modulesByStatusMemo = [];
+
+    /**
      * The callback that should be used to create the page title.
      *
      * @var \Closure|null
@@ -144,11 +154,19 @@ class Modularous extends FileRepository
         return $paths;
     }
 
+    private function forgetModuleMemos(): void
+    {
+        $this->allModulesMemo = null;
+        $this->modulesByStatusMemo = [];
+    }
+
     /**
      * Get & scan all modules.
      */
     public function scan(): array
     {
+        $this->forgetModuleMemos();
+
         $paths = $this->getScanPaths();
 
         $modules = [];
@@ -222,6 +240,8 @@ class Modularous extends FileRepository
      */
     public function clearCache()
     {
+        $this->forgetModuleMemos();
+
         app('cache')->forget($this->config('cache.key'));
 
         if (method_exists($this->activator, 'flushCache')) {
@@ -244,11 +264,15 @@ class Modularous extends FileRepository
      */
     public function all(): array
     {
-        if ($this->app->runningInConsole() || ! $this->config('cache.enabled')) {
-            return $this->scan();
+        if ($this->allModulesMemo !== null) {
+            return $this->allModulesMemo;
         }
 
-        return $this->formatCached($this->getCached());
+        if ($this->app->runningInConsole() || ! $this->config('cache.enabled')) {
+            return $this->allModulesMemo = $this->scan();
+        }
+
+        return $this->allModulesMemo = $this->formatCached($this->getCached());
     }
 
     /**
@@ -256,6 +280,10 @@ class Modularous extends FileRepository
      */
     public function getByStatus($status): array
     {
+        if (array_key_exists($status, $this->modulesByStatusMemo)) {
+            return $this->modulesByStatusMemo[$status];
+        }
+
         $modules = [];
 
         /** @var Module $module */
@@ -265,7 +293,37 @@ class Modularous extends FileRepository
             }
         }
 
-        return $modules;
+        return $this->modulesByStatusMemo[$status] = $modules;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function enable(string $name): void
+    {
+        parent::enable($name);
+
+        $this->modulesByStatusMemo = [];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function disable(string $name): void
+    {
+        parent::disable($name);
+
+        $this->modulesByStatusMemo = [];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function resetModules(): static
+    {
+        $this->forgetModuleMemos();
+
+        return parent::resetModules();
     }
 
     /**
