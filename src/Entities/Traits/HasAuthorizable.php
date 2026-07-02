@@ -48,7 +48,13 @@ trait HasAuthorizable
 
                     $authorizedExists = $authorizedType::whereId($model->authorized_id)->exists();
 
-                    if ($authorizedExists) {
+                    $currentAuthorizedId = $model->hasAuthorizationRecord()
+                        ? ($model->relationLoaded('authorizationRecord')
+                            ? $model->authorizationRecord->authorized_id
+                            : $model->authorizationRecord()->value('authorized_id'))
+                        : null;
+
+                    if ($authorizedExists && (string) $currentAuthorizedId !== (string) $model->authorized_id) {
                         $model->modelIsAuthorizing = true;
                         $model->hasAuthorizableFields = [
                             'authorized_id' => $model->authorized_id,
@@ -56,17 +62,27 @@ trait HasAuthorizable
                         ];
                     }
                 }
-            } elseif ($authorizedIdProvided) {
-                // authorized_id was submitted but is empty/null => the user cleared the authorization.
+            } elseif ($authorizedIdProvided && $model->hasAuthorizationRecord()) {
                 $model->modelIsUnauthorizing = true;
             }
 
             foreach (static::$hasAuthorizableFillable as $field) {
                 $model->offsetUnset($field);
             }
+
+            // Force a timestamp so the UPDATE runs. Using updated() (not saved()) guarantees this work runs
+            // BEFORE listeners on the saved event (e.g. CacheObserver), which rebuild caches and must
+            // observe the authorization record already written/removed.
+            if (($model->modelIsAuthorizing || $model->modelIsUnauthorizing)
+                && $model->exists
+                && $model->usesTimestamps()
+                && ! is_null($model->getUpdatedAtColumn())) {
+                $model->{$model->getUpdatedAtColumn()} = $model->freshTimestamp();
+            }
         });
 
-        static::saved(function (Model $model) {
+        static::updated(function (Model $model) {
+            // dump('HasAuthorizable: updated');
             if ($model->modelIsAuthorizing) {
                 $model->authorizationRecord()->updateOrCreate(
                     [], // Empty array as we want to update/create based on the relationship
@@ -74,15 +90,9 @@ trait HasAuthorizable
                 );
                 $model->modelIsAuthorizing = false;
                 $model->hasAuthorizableFields = [];
-                if (! $model->wasRecentlyCreated && ! $model->isDirty()) {
-                    $model->touch();
-                }
             } elseif ($model->modelIsUnauthorizing) {
                 $model->authorizationRecord()->delete();
                 $model->modelIsUnauthorizing = false;
-                if (! $model->wasRecentlyCreated && ! $model->isDirty()) {
-                    $model->touch();
-                }
             }
         });
 
