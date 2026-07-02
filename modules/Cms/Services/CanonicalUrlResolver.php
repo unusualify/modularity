@@ -27,10 +27,11 @@ class CanonicalUrlResolver implements CanonicalUrlResolverInterface
         );
         $canonicalPath = rtrim($localePrefix . '/' . ltrim($withoutLocale, '/'), '/');
         $canonicalPath = $canonicalPath === '' ? '/' : $canonicalPath;
-        $canonicalUrl = 'https://' . $canonicalHost . $normalizedPath;
+        $scheme = $this->resolveScheme($options);
+        $canonicalUrl = $scheme . '://' . $canonicalHost . $normalizedPath;
 
         $effectiveHost = $host ?: request()->getHost();
-        $incomingUrl = 'https://' . $effectiveHost . $normalizedPath;
+        $incomingUrl = $scheme . '://' . $effectiveHost . $normalizedPath;
         $shouldRedirect = $redirectToCanonical && $incomingUrl !== $canonicalUrl;
 
         return [
@@ -92,5 +93,35 @@ class CanonicalUrlResolver implements CanonicalUrlResolverInterface
         }
 
         return $path;
+    }
+
+    /**
+     * URL scheme for canonical / redirect comparison.
+     *
+     * Priority: explicit {@code scheme} option → current request → {@see config('app.url')} → https.
+     */
+    protected function resolveScheme(array $options): string
+    {
+        if (isset($options['scheme']) && is_string($options['scheme']) && $options['scheme'] !== '') {
+            return strtolower(rtrim($options['scheme'], ':/'));
+        }
+
+        if (app()->bound('request')) {
+            $request = request();
+            if ($request !== null) {
+                $fromRequest = (string) $request->getScheme();
+                if ($fromRequest !== '') {
+                    return strtolower($fromRequest);
+                }
+            }
+        }
+
+        $appUrl = (string) config('app.url', '');
+        $fromApp = parse_url($appUrl, PHP_URL_SCHEME);
+        if (is_string($fromApp) && $fromApp !== '') {
+            return strtolower($fromApp);
+        }
+
+        return 'https';
     }
 }

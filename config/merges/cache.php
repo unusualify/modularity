@@ -70,8 +70,9 @@ return [
     | - counts: Filter count badges (all, published, trash, etc.)
     | - index: Repository paginated list data (raw Eloquent)
     | - record: Single record data
-    | - response:json: Controller-level formatted JSON response (fully transformed)
-    | - response:index: Controller-level index page response
+    | - formattedItem: Admin table row formatting (see CacheKeyGenerators)
+    | - formItem: Admin edit form payload
+    | - presentationItem: Public CMS inner body HTML (locale + record scoped)
     |
     */
     'ttl' => [
@@ -80,6 +81,7 @@ return [
         'record' => (int) env('MODULAROUS_RESOURCE_CACHE_TTL_RECORD', 1800),          // 30 minutes
         'formattedItem' => (int) env('MODULAROUS_RESOURCE_CACHE_TTL_FORMATTED_ITEM', 1800),          // 30 minutes
         'formItem' => (int) env('MODULAROUS_RESOURCE_CACHE_TTL_FORM_ITEM', 1800),          // 30 minutes
+        'presentationItem' => (int) env('MODULAROUS_RESOURCE_CACHE_TTL_PRESENTATION_ITEM', 900), // 15 minutes
 
         'response:json' => (int) env('MODULAROUS_RESOURCE_CACHE_TTL_RESPONSE', 300),  // 5 minutes (formatted JSON)
         'response:index' => (int) env('MODULAROUS_RESOURCE_CACHE_TTL_RESPONSE', 300), // 5 minutes (index page)
@@ -240,4 +242,70 @@ return [
     ],
     */
     'dependencies' => [],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Cache Operation Logging
+    |--------------------------------------------------------------------------
+    |
+    | Structured logs for invalidation and warmup (including dependent-triggered
+    | presentationItem warmup). Writes to the channel below when it exists.
+    |
+    | - enabled: true|false forces on/off; null (default) logs only when the
+    |   channel is registered in config/logging.php or by Modularous.
+    | - channel: Laravel log channel name (daily file recommended).
+    |
+    | Register in your app config/logging.php, or rely on the built-in channel:
+    |
+    | 'modularous-resource-cache' => [
+    |     'driver' => 'daily',
+    |     'path' => storage_path('logs/modularous-resource-cache.log'),
+    |     'level' => env('LOG_LEVEL', 'info'),
+    |     'days' => 10,
+    | ],
+    |
+    | Artisan: modularous:cache:warm ... --logChannel=modularous-resource-cache
+    |
+    */
+    'logging' => [
+        'enabled' => env('MODULAROUS_RESOURCE_CACHE_LOGGING_ENABLED', null),
+        'channel' => env('MODULAROUS_RESOURCE_CACHE_LOG_CHANNEL', 'modularous-resource-cache'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Observer Queue Settings
+    |--------------------------------------------------------------------------
+    |
+    | When queue is true and QUEUE_CONNECTION is not sync, CacheObserver dispatches
+    | invalidation/warmup jobs instead of blocking the admin save request.
+    |
+    */
+    'observer' => [
+        'queue' => env('MODULAROUS_CACHE_OBSERVER_QUEUE', true),
+        'queue_connection' => env('MODULAROUS_CACHE_QUEUE_CONNECTION', null),
+        'queue_name' => env('MODULAROUS_CACHE_QUEUE_NAME', 'modularous-cache'),
+        'auto_invalidate' => true,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Manual Purge (Global Default)
+    |--------------------------------------------------------------------------
+    |
+    | When true, the observer skips automatic invalidate/warm for routes that inherit
+    | this default. Per-route manual_purge and purge[type] overrides apply.
+    |
+    */
+    'manual_purge' => false,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Dedicated Cache Queue (alias for observer queue settings)
+    |--------------------------------------------------------------------------
+    */
+    'queue' => [
+        'connection' => env('MODULAROUS_CACHE_QUEUE_CONNECTION', null),
+        'name' => env('MODULAROUS_CACHE_QUEUE_NAME', 'modularous-cache'),
+    ],
 ];

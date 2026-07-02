@@ -660,5 +660,15 @@ class BaseServiceProvider extends ServiceProvider
             'days' => env('LOG_DAILY_DAYS', 14),
             'replace_placeholders' => true,
         ]);
+
+        if (! config('logging.channels.modularous-resource-cache')) {
+            $this->app['config']->set('logging.channels.modularous-resource-cache', [
+                'driver' => 'daily',
+                'path' => storage_path('logs/modularous-resource-cache.log'),
+                'level' => env('LOG_LEVEL', 'info'),
+                'days' => env('LOG_DAILY_DAYS', 10),
+                'replace_placeholders' => true,
+            ]);
+        }
     }
 }

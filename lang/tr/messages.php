@@ -117,4 +117,34 @@ return [
             'not-found' => 'Uzak kayıt bulunamadı.',
         ],
     ],
+
+    'resource-cache' => [
+        'purge-record' => [
+            'label' => 'Önbelleği Temizle',
+            'success' => 'Önbellek temizlendi.',
+        ],
+        'warm-record' => [
+            'label' => 'Önbelleği Güncelle',
+            'success' => 'Önbellek güncellendi.',
+        ],
+        'purge-all' => [
+            'label' => 'Tüm Önbelleği Temizle',
+            'success' => 'Tüm önbellek temizlendi.',
+            'confirmation-title' => 'Tüm önbelleği temizle?',
+            'confirmation-description' => 'Bu işlem tüm önbelleği temizleyecektir. Emin misiniz?',
+            'confirmation-confirmText' => 'Temizle',
+            'confirmation-cancelText' => 'İptal',
+        ],
+        'warm-all' => [
+            'label' => 'Tüm Önbelleği Güncelle',
+            'success' => 'Tüm önbellek güncellendi.',
+            'confirmation-title' => 'Tüm önbelleği güncelle?',
+            'confirmation-description' => 'Bu işlem tüm önbelleği güncellenecektir. Emin misiniz?',
+            'confirmation-confirmText' => 'Güncelle',
+            'confirmation-cancelText' => 'İptal',
+        ],
+        'validation' => [
+            'types-required' => 'En az bir önbellek türü seçilmelidir.',
+        ],
+    ],
 ];
