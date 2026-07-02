@@ -62,6 +62,59 @@ class CmsPublicSeoTest extends TestCase
         $this->assertSame('https://other.example/path', $out['canonicalUrl']);
     }
 
+    public function test_resolved_canonical_uses_app_url_scheme_when_http(): void
+    {
+        config(['app.url' => 'http://frontend.b2press.test']);
+        config(['modularous.cms_routing.canonical_host' => 'frontend.b2press.test']);
+        config(['modularous.cms_routing.front_route_prefix' => '']);
+        config(['modularous.cms_routing.hide_default_locale_segment' => true]);
+        config(['modularous.cms_routing.default_locale' => 'en']);
+
+        $page = $this->makePage([
+            'seo_title' => 'T',
+            'title' => 'T',
+            'canonical_url' => null,
+            'robots_index' => true,
+            'robots_follow' => true,
+        ]);
+
+        $canonical = new CanonicalUrlResolver;
+        $out = CmsPublicSeo::buildForCache(
+            'en',
+            '/country-pr-packages/brazil',
+            $page,
+            $canonical,
+        );
+
+        $this->assertSame(
+            'http://frontend.b2press.test/country-pr-packages/brazil',
+            $out['canonicalUrl'],
+        );
+    }
+
+    public function test_resolved_canonical_uses_request_scheme_on_live_requests(): void
+    {
+        config(['modularous.cms_routing.canonical_host' => 'frontend.b2press.test']);
+        config(['modularous.cms_routing.front_route_prefix' => '']);
+
+        $request = Request::create('http://frontend.b2press.test/country-pr-packages/brazil', 'GET');
+        $page = $this->makePage([
+            'seo_title' => 'T',
+            'title' => 'T',
+            'canonical_url' => null,
+            'robots_index' => true,
+            'robots_follow' => true,
+        ]);
+
+        $canonical = new CanonicalUrlResolver;
+        $out = CmsPublicSeo::build($request, $page, $canonical);
+
+        $this->assertSame(
+            'http://frontend.b2press.test/country-pr-packages/brazil',
+            $out['canonicalUrl'],
+        );
+    }
+
     /**
      * @param array<string, mixed> $translation
      */

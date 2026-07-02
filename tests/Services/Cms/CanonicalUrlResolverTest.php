@@ -19,6 +19,6 @@ class CanonicalUrlResolverTest extends TestCase
 
         $this->assertEquals('/tr/about', $resolved['canonical_path']);
         $this->assertTrue($resolved['should_redirect']);
-        $this->assertEquals('https://example.com/tr/about', $resolved['redirect_to']);
+        $this->assertEquals('http://example.com/tr/about', $resolved['redirect_to']);
     }
 }
