@@ -168,7 +168,7 @@ class RouteServiceProvider extends ServiceProvider
         $apiController_namespace = GenerateConfigReader::read('controller')->getNamespace();
         $api_controller_namespace = $apiController_namespace . '\\API';
 
-        if (modularousConfig('define_panel_routes_on_frontend_requests') || Modularous::isPanelUrl()) {
+        if (modularousConfig('define_panel_routes_on_frontend_requests') || Modularous::isPanelUrl() || $this->app->runningInConsole()) {
             foreach (Modularous::allEnabled() as $module) {
                 $_groupOptions = [
                     'prefix' => $module->fullPrefix(),
@@ -329,36 +329,6 @@ class RouteServiceProvider extends ServiceProvider
 
         Route::macro('additionalRoutes', function ($url, $routeName, $options) {
 
-            $defaults = [
-                'reorder',
-                // 'publish',
-                // 'bulkPublish',
-                // 'browser',
-                // 'feature',
-                // 'preview',
-                // 'bulkFeature',
-                'showView',
-                'listRevisions',
-                'restoreRevision',
-                'approveRevision',
-                'rejectRevision',
-
-                'restore',
-                'bulkRestore',
-                'forceDelete',
-                'bulkForceDelete',
-                'bulkDelete',
-                'duplicate',
-
-                'tags',
-                'tagsUpdate',
-
-                'assignments',
-                'createAssignment',
-            ];
-
-            $customRoutes = $defaults;
-
             $groupStack = Route::getGroupStack();
             $namespace = $groupStack[count($groupStack) - 1]['namespace'] ?? null;
             $controllerFqcn = ($namespace && $routeName !== '')
@@ -367,6 +337,38 @@ class RouteServiceProvider extends ServiceProvider
 
             $controllerResolvable = $controllerFqcn !== null
                 && class_exists($controllerFqcn);
+
+            $controllerInstance = $controllerResolvable ? app()->make($controllerFqcn) : null;
+            $module = $controllerInstance ? $controllerInstance->getModule() : null;
+            $isSingleton = $module ? $module->isSingleton($routeName) : false;
+
+            $customRoutes = [
+                ...(!$isSingleton ? [
+                    'reorder',
+                    // 'publish',
+                    // 'bulkPublish',
+                    // 'browser',
+                    // 'feature',
+                    // 'preview',
+                    // 'bulkFeature',
+                    'showView',
+                    'restore',
+                    'bulkRestore',
+                    'forceDelete',
+                    'bulkForceDelete',
+                    'bulkDelete',
+                    'duplicate',
+                ] : []),
+
+                'listRevisions',
+                'restoreRevision',
+                'approveRevision',
+                'rejectRevision',
+                'tags',
+                'tagsUpdate',
+                'assignments',
+                'createAssignment',
+            ];
 
             $bulkSheetController = null;
             $bulkSheetStepUpMiddleware = null;
@@ -392,13 +394,23 @@ class RouteServiceProvider extends ServiceProvider
                 }
             }
 
-            $customRoutes = array_merge($customRoutes, [
-                'syncRemote',
-                'syncRemoteAll',
-                'clearRemoteCache',
-                'previewRemote',
-                'listRemoteCatalog',
-            ]);
+            if($module && $module->isResourceCacheEnabled($routeName)) {
+                $customRoutes = array_merge($customRoutes, [
+                    'cachePurge',
+                    'cacheWarm',
+                    ...(!$isSingleton ? ['cachePurgeAll', 'cacheWarmAll'] : []),
+                ]);
+            }
+
+            if($module && $module->hasRemoteApiSource($routeName)) {
+                $customRoutes = array_merge($customRoutes, [
+                    'syncRemote',
+                    'syncRemoteAll',
+                    'clearRemoteCache',
+                    'previewRemote',
+                    'listRemoteCatalog',
+                ]);
+            }
 
             $controllerName = "{$routeName}Controller";
             $snakeCase = snakeCase($routeName);
@@ -499,9 +511,19 @@ class RouteServiceProvider extends ServiceProvider
                         'bulkForceDelete',
                         'syncRemoteAll',
                         'clearRemoteCache',
+                        'cachePurgeAll',
+                        'cacheWarmAll',
                     ])
                 ) {
                     Route::post($routeSlug, $mapping);
+                }
+
+                if (in_array($customRoute, ['cachePurge', 'cacheWarm'])) {
+                    Route::post("{$url}/cache/" . ($customRoute === 'cachePurge' ? 'purge' : 'warm') . "/{{$snakeCase}}", $mapping);
+                }
+
+                if (in_array($customRoute, ['cachePurgeAll', 'cacheWarmAll'])) {
+                    Route::post("{$url}/cache/" . ($customRoute === 'cachePurgeAll' ? 'purge-all' : 'warm-all'), $mapping);
                 }
 
                 if ($customRoute === 'listRemoteCatalog') {
