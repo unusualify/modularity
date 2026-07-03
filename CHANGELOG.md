@@ -2,6 +2,40 @@
 
 All notable changes to `modularous` will be documented in this file
 
+## v12.3.0 - 2026-07-03
+
+### :rocket: Features
+
+- enhance caching functionality with new presentation item cache and logging features; add cache management messages in English and Turkish by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/f2c4c446bb14a823e83cf34df759130f4a9b2d58
+- add caching methods and remote API source checks to enhance module functionality by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/82a097e9386c7d58cdcaf6238d50b58f4b78e61e
+- streamline route registration by consolidating additional route logic for admin and API types by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/da6d2887530f5148ebb021701d98c13da819b284
+- enhance route handling by adding console context support and expanding custom route options for modules by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/fee7e82a08c3689df9ae2d63f3e641db3dafd390
+- implement presentation item cache warmup functionality and enhance cache key generation with error handling for missing IDs by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/26845eb8cd0ba5e88d347ff06df29f1a211487a5
+- add support for presentation item cache clearing and warming in CacheClearCommand and CacheWarmCommand by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/c88cc032887188e98f5af917e4fbb98ef9f2a600
+
+### :wrench: Bug Fixes
+
+- update resource cache check to utilize ModularousCache for improved cache action validation by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/bfc7cd876b736a14cee34b416b41584785db4791
+
+### :recycle: Refactors
+
+- update import path for HasPresenter trait to new namespace structure by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/7b1b416548b01187b5cbac39a5e853edd3a33d47
+- standardize parameter annotations and improve cache handling methods across various classes by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/19da7b50ef726b7a3177bdb413a2fca2791e78e7
+- introduce ResourceCacheActionsTrait for enhanced resource cache management in repositories by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/bee07e2a2844ff2c11098e3ba5bbbf832652c41f
+
+### :memo: Documentation
+
+- add comprehensive documentation for module route cache, including configuration, cache types, invalidation, and console commands by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/3c38fcf880f9e604fa39608ca1cf27fa8e20cd5a
+
+### :white_check_mark: Testing
+
+- add tests for cache observer functionality and enhance cache configuration options by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/89566d451c4d1ee5aca9f5c5502b3d5d0de8ac0c
+- add missing newline at the end of the migration file for test_module_items table by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/fb446e0006b2fb64a1b06ff1bcf8a1c2f88f809d
+
+### :green_heart: Workflow
+
+- update branch reference in GitHub Actions workflow to use the default branch instead of a hardcoded value by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/82b115f7efd887e627fe33d2e99810f7846d07b8
+
 ## v12.2.0 - 2026-06-27
 
 ### :rocket: Features
