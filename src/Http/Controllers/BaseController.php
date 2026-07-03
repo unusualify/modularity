@@ -390,6 +390,8 @@ abstract class BaseController extends PanelController
      */
     public function destroy($id, $submoduleId = null)
     {
+        $this->getFormRequestClass();
+
         $params = $this->request->route()->parameters();
 
         $id = last($params);
