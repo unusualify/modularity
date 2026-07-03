@@ -38,6 +38,8 @@ export default function useItemActions(props, context) {
     || props.item
     || props.editedItem
 
+  const editedModel = context.editedModel ?? null
+
   const resolveParamValue = (config) => {
     if (!config.source || !config.find || !config.return) {
       return config;
@@ -81,6 +83,15 @@ export default function useItemActions(props, context) {
       } else {
         params[key] = config;
       }
+    }
+
+    if (action.includeFormData && editedModel) {
+      const fields = Array.isArray(action.includeFormData) ? action.includeFormData : Object.keys(editedModel)
+      fields.forEach(field => {
+        if (editedModel[field] !== undefined) {
+          params[field] = editedModel[field]
+        }
+      })
     }
 
     api[method](endpoint, params,
