@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Unusualify\Modularous\Repositories\Traits;
+namespace Unusualify\Modularous\Repositories\Logic;
 
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Facades\ModularousCache;
