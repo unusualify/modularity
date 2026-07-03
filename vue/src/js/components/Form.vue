@@ -49,6 +49,7 @@
               <!-- Title Center Form Actions -->
               <FormActions v-if="actionsPosition == 'title-center' && formActionsActive"
                 :modelValue="formItem"
+                :editedModel="model"
                 :actions="actions"
                 :is-editing="isEditing"
                 @action-complete="$emit('actionComplete', $event)"
@@ -69,6 +70,7 @@
               <!-- Title Right Form Actions -->
               <FormActions v-if="actionsPosition == 'title-right' && formActionsActive"
                 :modelValue="formItem"
+                :editedModel="model"
                 :actions="actions"
                 :is-editing="isEditing"
                 @action-complete="$emit('actionComplete', $event)"
@@ -140,6 +142,7 @@
             <!-- Top Form Actions -->
             <FormActions v-if="actionsPosition == 'top' && formActionsActive"
               :modelValue="formItem"
+              :editedModel="model"
               :actions="actions"
               :is-editing="isEditing"
               @action-complete="$emit('actionComplete', $event)"
@@ -157,6 +160,7 @@
             <!-- Middle Form Actions -->
             <FormActions v-if="actionsPosition == 'middle' && formActionsActive"
               :modelValue="formItem"
+              :editedModel="model"
               :actions="actions"
               :is-editing="isEditing"
               @action-complete="$emit('actionComplete', $event)"
@@ -252,6 +256,7 @@
             <!-- Bottom Form Actions -->
             <FormActions v-if="actionsPosition == 'bottom' && formActionsActive"
               :modelValue="formItem"
+              :editedModel="model"
               :actions="actions"
               :is-editing="isEditing"
               @action-complete="$emit('actionComplete', $event)"
@@ -285,6 +290,7 @@
                 <AdditionalSectionContent
                   :actions-position="actionsPosition"
                   :form-item="formItem"
+                  :editedModel="model"
                   :actions="actions"
                   :form-actions-active="formActionsActive"
                   @action-complete="$emit('actionComplete', $event)"
@@ -321,6 +327,7 @@
                     :actions-position="actionsPosition"
                     :is-editing="isEditing"
                     :form-item="formItem"
+                    :editedModel="model"
                     :actions="actions"
                     @action-complete="$emit('actionComplete', $event)"
                   >
@@ -419,6 +426,7 @@ const AdditionalSectionContent = {
   props: {
     actionsPosition: String,
     formItem: Object,
+    editedModel: { type: Object, default: null },
     actions: [Array, Object],
     formActionsActive: Boolean
   },
@@ -428,6 +436,7 @@ const AdditionalSectionContent = {
       <!-- Right Top Form Actions -->
       <FormActions v-if="actionsPosition == 'right-top' && formActionsActive"
         :modelValue="formItem"
+        :editedModel="editedModel"
         :actions="actions"
         :is-editing="isEditing"
         @action-complete="$emit('actionComplete', $event)"
@@ -445,6 +454,7 @@ const AdditionalSectionContent = {
       <!-- Right Middle Form Actions -->
       <FormActions v-if="actionsPosition == 'right-middle' && formActionsActive"
         :modelValue="formItem"
+        :editedModel="editedModel"
         :actions="actions"
         :is-editing="isEditing"
         @action-complete="$emit('actionComplete', $event)"
@@ -462,6 +472,7 @@ const AdditionalSectionContent = {
       <!-- Right Bottom Form Actions -->
       <FormActions v-if="actionsPosition == 'right-bottom' && formActionsActive"
         :modelValue="formItem"
+        :editedModel="editedModel"
         :actions="actions"
         :is-editing="isEditing"
         @action-complete="$emit('actionComplete', $event)"
