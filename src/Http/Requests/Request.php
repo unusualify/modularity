@@ -3,12 +3,15 @@
 namespace Unusualify\Modularous\Http\Requests;
 
 use Closure;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
-use Unusualify\Modularous\Traits\ManageTraits;
+use Illuminate\Validation\ValidationException;
+use Unusualify\Modularity\Services\MessageStage;
+use Unusualify\Modularity\Traits\ManageTraits;
 
 abstract class Request extends FormRequest
 {
@@ -45,10 +48,43 @@ abstract class Request extends FormRequest
             case 'PUT':
                 return $this->mergeRules(array_merge($this->rulesForAll(), $this->rulesForUpdate()));
 
+            case 'DELETE':
+                return $this->rulesForDelete();
+
             default:break;
         }
 
         return [];
+    }
+
+    public function rulesForDelete()
+    {
+        return [];
+    }
+
+    protected function prepareForValidation()
+    {
+        if ($this->method() === 'DELETE' && $this->route()) {
+            $parameters = $this->route()->parameters();
+
+            if (! empty($parameters) && ! $this->has('id')) {
+                $this->merge(['id' => last($parameters)]);
+            }
+        }
+    }
+
+    protected function failedValidation(Validator $validator)
+    {
+        if ($this->method() === 'DELETE') {
+            $response = response()->json([
+                'message' => $validator->errors()->first(),
+                'variant' => MessageStage::ERROR->value,
+            ]);
+
+            throw new ValidationException($validator, $response);
+        }
+
+        parent::failedValidation($validator);
     }
 
     public function mergeRules($rules)
