@@ -132,12 +132,16 @@ export default {
       type: Object,
       required: true
     },
-
+    editedModel: {
+      type: Object,
+      default: null
+    },
   },
   setup(props, context) {
     const { handleAction, allActions, hasActions } = useItemActions(props, {
       ...context,
-      actionItem: props.modelValue
+      actionItem: props.modelValue,
+      editedModel: props.editedModel,
     })
     const { generateButtonProps } = useGenerate()
     const { isBadge, badgeProps } = useBadge()
