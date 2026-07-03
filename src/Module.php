@@ -25,6 +25,7 @@ use Unusualify\Modularous\Entities\Enums\Permission;
 use Unusualify\Modularous\Entities\Traits\HasRemoteApiSource;
 use Unusualify\Modularous\Exceptions\ModularousException;
 use Unusualify\Modularous\Facades\Modularous;
+use Unusualify\Modularous\Facades\ModularousCache;
 use Unusualify\Modularous\Http\Controllers\Traits\ManageResourceCache;
 use Unusualify\Modularous\Repositories\Repository;
 use Unusualify\Modularous\Repositories\Traits\RemoteApiSourceTrait;
@@ -590,7 +591,7 @@ class Module extends NwidartModule
             return false;
         }
 
-        return true;
+        return ModularousCache::hasAdminCacheActions($this->getName(), $routeName);
     }
 
     /**
