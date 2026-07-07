@@ -2,6 +2,13 @@
 
 All notable changes to `modularous` will be documented in this file
 
+## v0.58.9 - 2026-07-07
+
+### :wrench: Bug Fixes
+
+- update event handling for model saves by @celikerde in https://github.com/unusualify/modularous/commit/efb8f4cd916f3093cf77a5181755390270589833
+- remove debug statements and streamline update logic by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/c7bf15c83a56039f73a3c194be91862d285a8c0b
+
 ## v12.3.0 - 2026-07-03
 
 ### :rocket: Features
