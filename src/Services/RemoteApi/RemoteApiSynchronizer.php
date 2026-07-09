@@ -118,6 +118,71 @@ class RemoteApiSynchronizer
     {
         $connector->resetRequestStats();
 
+        if (! $connector->configuration()->importNewFromRemoteList()) {
+            return $this->syncAllLinkedOnly($connector, $repository);
+        }
+
+        return $this->syncAllFromRemoteList($connector, $repository);
+    }
+
+    /**
+     * @return array{
+     *     created: int,
+     *     updated: int,
+     *     skipped: int,
+     *     total: int,
+     *     skipped_records: list<array{remote_id: int|string, reason: string, message: string}>,
+     *     http_requests: array{total: int, by_url: array<string, int>}
+     * }
+     */
+    private function syncAllLinkedOnly(RemoteApiConnectorInterface $connector, Repository $repository): array
+    {
+        $created = 0;
+        $updated = 0;
+        $skippedRecords = [];
+
+        foreach ($this->linkedRemoteIds($connector, $repository) as $remoteId) {
+            $row = $connector->fetchOne($remoteId);
+
+            if ($row === null) {
+                $skippedRecords[] = [
+                    'remote_id' => $remoteId,
+                    'reason' => 'not_in_remote_list',
+                    'message' => sprintf(
+                        'Linked remote record [%s] was not returned by the remote API; skipped (stale link or deleted remote record).',
+                        $remoteId,
+                    ),
+                ];
+
+                continue;
+            }
+
+            $result = $this->syncRecordFromRow($connector, $repository, $remoteId, $row);
+            $result['created'] ? $created++ : $updated++;
+        }
+
+        return [
+            'created' => $created,
+            'updated' => $updated,
+            'skipped' => count($skippedRecords),
+            'total' => $created + $updated,
+            'skipped_records' => $skippedRecords,
+            'http_requests' => $connector->flushRequestStats(),
+        ];
+    }
+
+    /**
+     * @return array{
+     *     created: int,
+     *     updated: int,
+     *     skipped: int,
+     *     total: int,
+     *     skipped_records: list<array{remote_id: int|string, reason: string, message: string}>,
+     *     http_requests: array{total: int, by_url: array<string, int>}
+     * }
+     */
+    private function syncAllFromRemoteList(RemoteApiConnectorInterface $connector, Repository $repository): array
+    {
         $created = 0;
         $updated = 0;
         $skippedRecords = [];
@@ -145,15 +210,13 @@ class RemoteApiSynchronizer
             $result['created'] ? $created++ : $updated++;
         }
 
-        if ($connector->configuration()->importNewFromRemoteList()) {
-            foreach ($remoteRowsById as $remoteId => $row) {
-                if (isset($processedRemoteIds[$remoteId])) {
-                    continue;
-                }
-
-                $result = $this->syncRecordFromRow($connector, $repository, $remoteId, $row);
-                $result['created'] ? $created++ : $updated++;
+        foreach ($remoteRowsById as $remoteId => $row) {
+            if (isset($processedRemoteIds[$remoteId])) {
+                continue;
             }
+
+            $result = $this->syncRecordFromRow($connector, $repository, $remoteId, $row);
+            $result['created'] ? $created++ : $updated++;
         }
 
         return [
@@ -174,20 +237,30 @@ class RemoteApiSynchronizer
         $configuration = $connector->configuration();
         $remoteIdColumn = $configuration->remoteIdColumn();
         $remoteIds = [];
+        $model = $repository->getModel();
+        $keyName = $model->getKeyName();
 
-        $records = $repository->getModel()->newQuery()->with('remoteApiSource')->get();
+        $model->newQuery()
+            ->whereHas('remoteApiSource', function ($query) use ($remoteIdColumn) {
+                $query->whereNotNull($remoteIdColumn)->where($remoteIdColumn, '!=', '');
+            })
+            ->select([$keyName])
+            ->with(['remoteApiSource' => function ($query) use ($remoteIdColumn) {
+                $query->select(['id', 'sourceable_id', 'sourceable_type', $remoteIdColumn]);
+            }])
+            ->chunkById(100, function ($records) use (&$remoteIds, $remoteIdColumn) {
+                foreach ($records as $record) {
+                    $remoteId = method_exists($record, 'getRemoteApiId')
+                        ? $record->getRemoteApiId()
+                        : ($record->remoteApiSource?->{$remoteIdColumn} ?? null);
 
-        foreach ($records as $record) {
-            $remoteId = method_exists($record, 'getRemoteApiId')
-                ? $record->getRemoteApiId()
-                : ($record->remoteApiSource?->{$remoteIdColumn} ?? null);
+                    if ($remoteId === null || $remoteId === '') {
+                        continue;
+                    }
 
-            if ($remoteId === null || $remoteId === '') {
-                continue;
-            }
-
-            $remoteIds[] = $remoteId;
-        }
+                    $remoteIds[] = $remoteId;
+                }
+            });
 
         return $remoteIds;
     }
