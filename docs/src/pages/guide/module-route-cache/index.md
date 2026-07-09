@@ -23,6 +23,9 @@ This cache layer targets the **admin CRUD stack** (repositories and controllers)
 | [Warmup](./warmup) | `warmupByModel`, artisan warm commands |
 | [Per-Module Setup](./per-module-setup) | `HasCaching` + config checklist |
 | [CMS Public Pages](./cms-public-pages) | Admin cache vs public CMS; b2press presentation + full-page plan |
+| [SWR](./swr) | Stale-while-revalidate and warm jobs |
+| [URL Stale Resilience](./url-stale-resilience) | File-primary URL cache |
+| [Webhook Revalidate](./webhook-revalidate) | HMAC webhook for external purge/warm |
 | [Console Commands](./console-commands) | Links to `guide/console/cache/` command reference |
 
 ## Quick Start

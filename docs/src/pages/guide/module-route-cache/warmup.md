@@ -86,9 +86,11 @@ php artisan modularous:cache:warm Blog Post --items --eager=author,category
 
 ```bash
 php artisan modularous:cache:graph rebuild
-php artisan modularous:cache:warm
+php artisan modularous:cache:warm-presentation --queue
 php artisan modularous:cache:stats
 ```
+
+For admin-only caches (`counts`, `formItem`, `formattedItem`), use `modularous:cache:warm` instead.
 
 ### After bulk import
 

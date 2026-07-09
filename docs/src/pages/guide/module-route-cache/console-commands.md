@@ -14,6 +14,8 @@ Artisan commands for clearing, warming, inspecting, and rebuilding module-route 
 | [Overview](../console/cache/overview) | — | Workflows and command index |
 | [cache:clear](../console/cache/cache-clear) | `modularous:cache:clear` | Invalidate all or targeted module/route caches |
 | [cache:warm](../console/cache/cache-warm) | `modularous:cache:warm` | Pre-populate after deploy or clear |
+| [cache:warm-presentation](../console/cache/cache-warm-presentation) | `modularous:cache:warm-presentation` | Pre-warm public presentationItem URL caches |
+| [cache:purge-presentation](../console/cache/cache-purge-presentation) | `modularous:cache:purge-presentation` | Purge public presentationItem filesystem caches |
 | [cache:stats](../console/cache/cache-stats) | `modularous:cache:stats` | Inspect key counts per module |
 | [cache:graph](../console/cache/cache-graph) | `modularous:cache:graph` | Show, rebuild, or analyze relationship graph |
 | [cache:versions](../console/cache/cache-versions) | `modularous:cache:versions` | Print cache version counters |
