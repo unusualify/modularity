@@ -6,7 +6,10 @@ use Astrotomic\Translatable\TranslatableServiceProvider;
 use Illuminate\Foundation\Application;
 use JoeDixon\Translation\TranslationServiceProvider;
 use Modules\SystemPayment\Entities\Payment;
+use Nwidart\Modules\Contracts\ActivatorInterface;
+use Nwidart\Modules\FileRepository;
 use Nwidart\Modules\LaravelModulesServiceProvider;
+use Nwidart\Modules\ModuleManifest;
 use Oobook\Database\Eloquent\ManageEloquentServiceProvider;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Permission\PermissionServiceProvider;
@@ -121,6 +124,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         ]);
 
         $app['config']->set('modules.activator', 'modularous');
+        $this->rebindModularousActivator($app);
 
         $app['config']->set('modularous.app_url', 'http://localhost');
         $app['config']->set('modularous.admin_app_url', '');
@@ -194,5 +198,19 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     public function moduleDirectory(string $moduleName): string
     {
         return realpath("{$this->modulesPath}/{$moduleName}");
+    }
+
+    /**
+     * nwidart resolves ActivatorInterface during provider register (via ModuleManifest),
+     * before getEnvironmentSetUp can switch modules.activator to modularous. Forget the
+     * early FileActivator singleton so later resolves use the test activator config.
+     */
+    protected function rebindModularousActivator($app): void
+    {
+        $app->forgetInstance(ActivatorInterface::class);
+        $app->forgetInstance(ModuleManifest::class);
+
+        $modulesProperty = new \ReflectionProperty(FileRepository::class, 'modules');
+        $modulesProperty->setValue(null, null);
     }
 }

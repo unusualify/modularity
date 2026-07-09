@@ -59,6 +59,7 @@ abstract class TestModulesCase extends TestCase
             'cache-lifetime' => 604800,
         ]);
         $app['config']->set('modules.activator', 'modularous');
+        $this->rebindModularousActivator($app);
     }
 
     protected function writeModuleActivationStatuses(array $statuses): void
