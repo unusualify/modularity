@@ -2,7 +2,10 @@
 
 namespace Unusualify\Modularous\Tests;
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Gate;
+use Mockery;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Module;
 use Unusualify\Modularous\Tests\Support\IsolatedTestModules;
@@ -408,5 +411,72 @@ class ModuleTest extends TestCase
     {
         $result = $this->module->isSingleton('Item');
         $this->assertIsBool($result);
+    }
+
+    public function test_generate_permission_helpers(): void
+    {
+        $permissionName = $this->module->generatePermissionName('create', 'Item');
+        $middleware = $this->module->generatePermissionMiddlewareDefinition('view', 'Item');
+
+        $this->assertSame('item_create', $permissionName);
+        $this->assertSame('can:item_view', $middleware);
+    }
+
+    public function test_user_has_permission_returns_false_without_authenticated_user(): void
+    {
+        Modularous::shouldReceive('getAuthGuardName')->andReturn('modularous');
+        Auth::shouldReceive('guard')->with('modularous')->andReturnSelf();
+        Auth::shouldReceive('user')->andReturn(null);
+
+        $this->assertFalse($this->module->userHasPermission('view', 'Item'));
+    }
+
+    public function test_allowed_permission_returns_false_without_gate_definition(): void
+    {
+        $this->assertFalse($this->module->allowedPermission('edit', 'Item'));
+    }
+
+    public function test_has_remote_api_source_and_resource_cache_flags(): void
+    {
+        $this->assertFalse($this->module->hasRemoteApiSource('Item'));
+        $this->assertFalse($this->module->isResourceCacheEnabled('Item'));
+    }
+
+    public function test_ensure_routes_statuses_file_creates_activator_file(): void
+    {
+        $statusesPath = $this->module->getDirectoryPath('routes_statuses.json');
+        @unlink($statusesPath);
+
+        $this->module->ensureRoutesStatusesFile();
+
+        $this->assertFileExists($statusesPath);
+    }
+
+    public function test_get_raw_route_configs_valid_filters_nameless_entries(): void
+    {
+        $this->module->setConfig([
+            'valid' => ['name' => 'Valid'],
+            'invalid' => ['headline' => 'Missing name'],
+        ], 'routes');
+
+        $validOnly = $this->module->getRawRouteConfigs(valid: true);
+
+        $this->assertArrayHasKey('valid', $validOnly);
+        $this->assertArrayNotHasKey('invalid', $validOnly);
+    }
+
+    public function test_is_status_throws_modularous_exception_when_activator_fails(): void
+    {
+        $activator = Mockery::mock($this->module->getActivator());
+        $activator->shouldReceive('hasStatus')->andThrow(new \RuntimeException('status file missing'));
+
+        $property = new \ReflectionProperty($this->module, 'moduleActivator');
+        $property->setAccessible(true);
+        $property->setValue($this->module, $activator);
+
+        $this->expectException(\Unusualify\Modularous\Exceptions\ModularousException::class);
+        $this->expectExceptionMessage('Failed to check module status');
+
+        $this->module->isStatus(true);
     }
 }

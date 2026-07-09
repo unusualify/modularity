@@ -347,4 +347,110 @@ class RelationshipTraitsTest extends TestCase
         $this->assertEquals('belongsTo', $data[0]['relationship_method']);
         $this->assertEquals('user', $data[0]['relationship_name']);
     }
+
+    /** @test */
+    public function it_parses_reverse_relationship_schema_for_morph_to_with_props()
+    {
+        $tester = $this->createTester('Comment');
+        $data = $tester->parseReverseRelationshipSchema('morphTo:User?commentable&postable', true);
+
+        $this->assertNotEmpty($data);
+        $this->assertEquals('morphMany', $data[0]['relationship_method']);
+    }
+
+    /** @test */
+    public function it_parses_reverse_relationship_schema_for_morph_to_many()
+    {
+        $tester = $this->createTester('Post');
+        $data = $tester->parseReverseRelationshipSchema('morphToMany:Tag:taggable', true);
+
+        $this->assertCount(1, $data);
+        $this->assertEquals('morphedByMany', $data[0]['relationship_method']);
+    }
+
+    /** @test */
+    public function it_parses_reverse_relationship_schema_for_belongs_to_many()
+    {
+        $tester = $this->createTester('Post');
+        $data = $tester->parseReverseRelationshipSchema('belongsToMany:Tag', true);
+
+        $this->assertCount(1, $data);
+        $this->assertEquals('belongsToMany', $data[0]['relationship_method']);
+        $this->assertEquals('posts', $data[0]['relationship_name']);
+    }
+
+    /** @test */
+    public function it_parses_reverse_relationship_schema_for_has_many_through()
+    {
+        $tester = $this->createTester('User');
+        $data = $tester->parseReverseRelationshipSchema('hasManyThrough:Country:User:country_id:user_id:id:id', true);
+
+        $this->assertCount(1, $data);
+        $this->assertEquals('hasOneThrough', $data[0]['relationship_method']);
+    }
+
+    /** @test */
+    public function it_parses_relationship_schema_with_belongs_to_many_pivot_chain()
+    {
+        UFinder::shouldReceive('getModel')->andReturn('App\\Models\\PostTagPivot');
+
+        $tester = $this->createTester('Post');
+        $parsed = $tester->parseRelationshipSchema('belongsToMany:Tag,withTimestamps');
+
+        $this->assertEquals('belongsToMany', $parsed['relationship_method']);
+        $this->assertNotEmpty($parsed['chain_methods']);
+        $this->assertEquals('using', $parsed['chain_methods'][0]['method_name']);
+    }
+
+    /** @test */
+    public function it_generates_morph_to_many_relationship_argument()
+    {
+        $tester = $this->createTester();
+        $args = $tester->getRelationshipArguments('morphToMany', 'morphToMany:Tag:taggable');
+
+        $this->assertContains('\\App\\Models\\Tag::class', $args);
+        $this->assertContains("'taggable'", $args);
+    }
+
+    /** @test */
+    public function it_generates_morph_to_argument_as_function()
+    {
+        $tester = $this->createTester();
+        $args = $tester->getRelationshipArguments('morphTo', 'morphTo:User:commentable');
+
+        $this->assertContains('__FUNCTION__', $args);
+    }
+
+    /** @test */
+    public function it_caches_model_class_from_multiple_possibles_via_modularous()
+    {
+        Modularous::shouldReceive('getModels')->with('User')->andReturn(['App\\Models\\UserA', 'App\\Models\\UserB']);
+        UFinder::shouldReceive('getPossibleModels')->with('User')->andReturn(['App\\Models\\UserA', 'App\\Models\\UserB']);
+
+        $tester = $this->createTester();
+        $ref = new \ReflectionClass($tester);
+        $prop = $ref->getProperty('modelClasses');
+        $prop->setAccessible(true);
+        $prop->setValue($tester, ['belongsTo' => ['User' => 'App\\Models\\UserB']]);
+
+        $this->assertEquals('App\\Models\\UserB', $tester->getModelClass('User', 'belongsTo'));
+    }
+
+    /** @test */
+    public function it_generates_related_method_name_for_morph_to_many()
+    {
+        $tester = $this->createTester('Post');
+        $name = $tester->getRelatedMethodName('morphToMany', 'morphToMany:Tag');
+
+        $this->assertEquals('tags', $name);
+    }
+
+    /** @test */
+    public function it_generates_related_method_name_for_morphed_by_many()
+    {
+        $tester = $this->createTester('Tag');
+        $name = $tester->getRelatedMethodName('morphedByMany', 'morphedByMany:Post');
+
+        $this->assertEquals('posts', $name);
+    }
 }

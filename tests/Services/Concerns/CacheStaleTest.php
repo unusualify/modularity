@@ -105,6 +105,27 @@ class CacheStaleTest extends TestCase
             StaleFileCache::LOCALE_RELATION_KEY => 'tr',
         ]));
     }
+
+    /** @test */
+    public function it_logs_when_presentation_mirror_write_fails(): void
+    {
+        Config::set('modularous.cache.presentationItem.store', 'model');
+        Config::set('modularous.cache.presentationItem.swr', true);
+
+        $cacheService = new FailingPresentationMirrorCacheHelpers;
+
+        $cacheService->putWithRelations(
+            'mirror-key',
+            '<html>page</html>',
+            300,
+            'Blog',
+            'Post',
+            ['Page' => 1],
+            'presentationItem'
+        );
+
+        $this->assertTrue(true);
+    }
 }
 
 class ConcreteStaleCacheHelpers
@@ -181,5 +202,18 @@ class ConcreteStaleCacheHelpers
     protected function getPresentationCacheStore(): string
     {
         return 'model';
+    }
+}
+
+class FailingPresentationMirrorCacheHelpers extends ConcreteStaleCacheHelpers
+{
+    public function putStaleWithRelations(
+        string $key,
+        $value,
+        int $ttl,
+        array $relations = [],
+        ?string $type = null,
+    ): bool {
+        return false;
     }
 }

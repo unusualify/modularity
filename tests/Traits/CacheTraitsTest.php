@@ -245,6 +245,29 @@ class CacheTraitsTest extends TestCase
     }
 
     /** @test */
+    public function it_throws_when_id_missing_for_form_item_cache_type()
+    {
+        $tester = new class
+        {
+            use Cacheable;
+
+            public function getModuleName()
+            {
+                return 'Blog';
+            }
+
+            public function getRouteName()
+            {
+                return 'Post';
+            }
+        };
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('ID is required for form item');
+        $tester->generateTypeCacheKey('formItem', []);
+    }
+
+    /** @test */
     public function it_throws_for_invalid_cache_type()
     {
         $tester = new class
@@ -429,6 +452,21 @@ class CacheTraitsTest extends TestCase
     }
 
     /** @test */
+    public function it_throws_for_record_cache_type(): void
+    {
+        $tester = new class
+        {
+            use CacheKeyGenerators {
+                resolveCacheSpecifiers as public exposeResolveCacheSpecifiers;
+            }
+        };
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Record cache type is not ready yet');
+        $tester->exposeResolveCacheSpecifiers('record', ['id' => 1]);
+    }
+
+    /** @test */
     public function it_adds_user_context_only_when_user_aware_cache_is_enabled(): void
     {
         $tester = new class
@@ -469,22 +507,22 @@ class CacheTraitsTest extends TestCase
             use WarmupCache;
         };
 
+        $mockModel = \Mockery::mock(\Illuminate\Database\Eloquent\Model::class);
+        $mockModel->shouldReceive('each')->andReturnUsing(function ($callback) {
+            $callback((object) ['id' => 5], 0);
+        });
+
         $mockRepo = \Mockery::mock(Repository::class);
         $mockRepo->shouldReceive('shouldUseUserAwareCache')->andReturn(false);
+        $mockRepo->shouldReceive('getModel')->andReturn($mockModel);
 
         $mockController = \Mockery::mock(BaseController::class);
         $mockController->shouldReceive('getRepository')->andReturn($mockRepo);
         $mockController->shouldReceive('getModuleName')->andReturn('Blog');
         $mockController->shouldReceive('getRouteName')->andReturn('Post');
-        $mockController->shouldReceive('preload')->once();
+        $mockController->shouldReceive('preload')->twice();
         $mockController->shouldReceive('getFormattedIndexItem')->once();
         $mockController->shouldReceive('getFormItem')->once();
-
-        $mockModel = \Mockery::mock(\Illuminate\Database\Eloquent\Model::class);
-        $mockModel->shouldReceive('each')->andReturnUsing(function ($callback) {
-            $callback((object) ['id' => 5], 0);
-        });
-        $mockController->shouldReceive('getModel')->andReturn($mockModel);
 
         ModularousCache::shouldReceive('isEnabled')->with('Blog', 'Post', 'formItem')->andReturn(true);
         ModularousCache::shouldReceive('isEnabled')->with('Blog', 'Post', 'formattedItem')->andReturn(true);
@@ -516,6 +554,11 @@ class CacheTraitsTest extends TestCase
             }
 
             public function getRouteName()
+            {
+                return 'Post';
+            }
+
+            public function getModuleRouteName()
             {
                 return 'Post';
             }

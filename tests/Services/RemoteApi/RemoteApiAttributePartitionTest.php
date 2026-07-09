@@ -71,4 +71,45 @@ class RemoteApiAttributePartitionTest extends TestCase
         $this->assertSame('€500', $result['remote']['synced_attributes']['price_formatted']);
         $this->assertSame(['id' => 42], $result['remote']['remote_payload']);
     }
+
+    public function test_decodes_json_strings_for_synced_values_and_payload(): void
+    {
+        $module = Mockery::mock(Module::class);
+        $module->shouldReceive('getName')->andReturn('BusinessPackage');
+
+        $configuration = new RemoteApiConfiguration($module, 'package', [
+            'enabled' => true,
+            'endpoint' => 'packages',
+            'mapping' => [
+                'remote_id' => 'id',
+                'synced_name' => 'name',
+                'remote_payload' => '@raw',
+                'remote_synced_at' => '@now',
+            ],
+            'fields' => [],
+            'sync' => ['preserve_local_fields' => []],
+        ]);
+
+        $model = new class extends Model
+        {
+            protected $guarded = [];
+
+            public function getFillable(): array
+            {
+                return ['name'];
+            }
+        };
+
+        $partitioner = new RemoteApiAttributePartition;
+        $result = $partitioner->partition($model, $configuration, [
+            'remote_id' => 1,
+            'synced_name' => '{"label":"Premium"}',
+            'remote_payload' => '{"id":1}',
+            'remote_synced_at' => '2026-06-21 12:00:00',
+            'name' => 'CMS Name',
+        ]);
+
+        $this->assertSame(['label' => 'Premium'], $result['remote']['synced_attributes']['synced_name']);
+        $this->assertSame(['id' => 1], $result['remote']['remote_payload']);
+    }
 }

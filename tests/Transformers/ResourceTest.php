@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Unusualify\Modularous\Tests\Transformers;
 
 use Illuminate\Http\Request;
@@ -8,39 +10,35 @@ use Unusualify\Modularous\Transformers\Resource;
 
 class ResourceTest extends TestCase
 {
-    public function test_merge_resource_preserves_parent_payload_for_arrays(): void
+    public function test_to_array_merges_parent_payload_with_merge_resource(): void
     {
-        $resource = new class(['id' => 1, 'name' => 'Basic']) extends Resource
+        $request = Request::create('/');
+        $resource = new class(['id' => 1, 'name' => 'Item']) extends Resource
         {
             protected function mergeResource($request): array
             {
                 return [
-                    'extra' => 'value',
+                    'slug' => $this->value('name'),
+                    'missing' => $this->value('missing', 'default'),
                 ];
             }
         };
 
-        $result = $resource->toArray(Request::create('/'));
+        $array = $resource->toArray($request);
 
-        $this->assertSame(1, $result['id']);
-        $this->assertSame('Basic', $result['name']);
-        $this->assertSame('value', $result['extra']);
+        $this->assertSame(1, $array['id']);
+        $this->assertSame('Item', $array['name']);
+        $this->assertSame('Item', $array['slug']);
+        $this->assertSame('default', $array['missing']);
     }
 
-    public function test_merge_resource_can_override_parent_keys(): void
+    public function test_merge_resource_defaults_to_empty_array(): void
     {
-        $resource = new class(['id' => 1, 'name' => 'Basic']) extends Resource
-        {
-            protected function mergeResource($request): array
-            {
-                return [
-                    'name' => 'Overridden',
-                ];
-            }
-        };
+        $request = Request::create('/');
+        $resource = new class(['id' => 2]) extends Resource {};
 
-        $result = $resource->toArray(Request::create('/'));
+        $array = $resource->toArray($request);
 
-        $this->assertSame('Overridden', $result['name']);
+        $this->assertSame(['id' => 2], $array);
     }
 }

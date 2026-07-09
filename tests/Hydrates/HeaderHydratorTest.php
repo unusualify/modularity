@@ -45,4 +45,22 @@ class HeaderHydratorTest extends TestCase
         $this->assertArrayHasKey('hideBelow', $result['responsive']);
         $this->assertEquals('md', $result['responsive']['hideBelow']);
     }
+
+    public function test_groupable_header_normalizes_group_order()
+    {
+        $header = ['groupable' => true, 'groupOrder' => 'desc', 'key' => 'status'];
+
+        $result = (new HeaderHydrator($header, null, null))->hydrate();
+
+        $this->assertSame('desc', $result['groupOrder']);
+    }
+
+    public function test_relation_sortable_is_disabled_for_relation_keys()
+    {
+        $header = ['sortable' => true, 'key' => 'owner_relation'];
+
+        $result = (new HeaderHydrator($header, null, null))->hydrate();
+
+        $this->assertFalse($result['sortable']);
+    }
 }

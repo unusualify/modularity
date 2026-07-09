@@ -387,6 +387,269 @@ class CacheInvalidationTest extends TestCase
         ], $service->warmedPresentationItemIds);
     }
 
+    /** @test */
+    public function it_purges_selected_per_id_cache_types_without_tags(): void
+    {
+        $model = new TestModel;
+        $model->id = 9;
+        $model->exists = true;
+
+        $this->cacheService->purgeModelCacheTypes($model, [
+            'counts' => false,
+            'index' => false,
+            'record' => true,
+            'formItem' => true,
+            'formattedItem' => true,
+            'presentationItem' => true,
+        ]);
+
+        $this->assertEquals([9], $this->cacheService->invalidatedRecordIds);
+        $this->assertEquals([9], $this->cacheService->invalidatedFormItemIds);
+        $this->assertEquals([9], $this->cacheService->invalidatedFormattedItemIds);
+        $this->assertEquals([9], $this->cacheService->invalidatedPresentationItemIds);
+        $this->assertEmpty($this->cacheService->invalidatedCountRoutes);
+        $this->assertEmpty($this->cacheService->invalidatedIndexRoutes);
+    }
+
+    /** @test */
+    public function it_purges_route_level_cache_types_without_tags(): void
+    {
+        $model = new TestModel;
+        $model->id = 11;
+        $model->exists = true;
+
+        $this->cacheService->purgeModelCacheTypes($model, [
+            'counts' => true,
+            'index' => true,
+            'record' => false,
+            'formItem' => false,
+            'formattedItem' => false,
+            'presentationItem' => false,
+        ]);
+
+        $this->assertEquals([['TestModule', 'TestRoute']], $this->cacheService->invalidatedCountRoutes);
+        $this->assertEquals([['TestModule', 'TestRoute']], $this->cacheService->invalidatedIndexRoutes);
+        $this->assertEmpty($this->cacheService->invalidatedFormItemIds);
+    }
+
+    /** @test */
+    public function it_flushes_the_route_once_when_purging_with_tags_enabled(): void
+    {
+        $this->cacheService->setUsesTags(true);
+
+        $model = new TestModel;
+        $model->id = 13;
+        $model->exists = true;
+
+        $this->cacheService->purgeModelCacheTypes($model, [
+            'formItem' => true,
+            'formattedItem' => false,
+            'presentationItem' => false,
+        ]);
+
+        $this->assertEquals([['TestModule', 'TestRoute']], $this->cacheService->invalidatedModuleRoutes);
+        $this->assertEmpty($this->cacheService->invalidatedFormItemIds);
+    }
+
+    /** @test */
+    public function it_invalidates_all_requested_types_for_model_without_tags(): void
+    {
+        $model = new TestModel;
+        $model->id = 17;
+        $model->exists = true;
+        $model->wasRecentlyCreated = false;
+
+        $this->cacheService->invalidateForModel($model, [
+            'counts' => true,
+            'index' => true,
+            'formItem' => true,
+            'formattedItem' => true,
+            'presentationItem' => true,
+        ], ['warmup' => false]);
+
+        $this->assertEquals([['TestModule', 'TestRoute']], $this->cacheService->invalidatedCountRoutes);
+        $this->assertEquals([['TestModule', 'TestRoute']], $this->cacheService->invalidatedIndexRoutes);
+        $this->assertEquals([17], $this->cacheService->invalidatedFormItemIds);
+        $this->assertEquals([17], $this->cacheService->invalidatedFormattedItemIds);
+        $this->assertEquals([17], $this->cacheService->invalidatedPresentationItemIds);
+        $this->assertEmpty($this->cacheService->warmedForModelCalls);
+    }
+
+    /** @test */
+    public function it_skips_per_id_invalidation_for_newly_created_models_without_tags(): void
+    {
+        $model = new TestModel;
+        $model->id = 18;
+        $model->exists = true;
+        $model->wasRecentlyCreated = true;
+
+        $this->cacheService->invalidateForModel($model, [
+            'counts' => true,
+            'index' => true,
+            'formItem' => true,
+            'formattedItem' => true,
+            'presentationItem' => true,
+        ], ['warmup' => false]);
+
+        $this->assertEquals([['TestModule', 'TestRoute']], $this->cacheService->invalidatedCountRoutes);
+        $this->assertEquals([['TestModule', 'TestRoute']], $this->cacheService->invalidatedIndexRoutes);
+        $this->assertEmpty($this->cacheService->invalidatedFormItemIds);
+        $this->assertEmpty($this->cacheService->invalidatedFormattedItemIds);
+        $this->assertEmpty($this->cacheService->invalidatedPresentationItemIds);
+    }
+
+    /** @test */
+    public function it_avoids_per_id_invalidation_when_invalidate_for_model_uses_tags(): void
+    {
+        $this->cacheService->setUsesTags(true);
+
+        $model = new TestModel;
+        $model->id = 19;
+        $model->exists = true;
+        $model->wasRecentlyCreated = false;
+
+        $this->cacheService->invalidateForModel($model, [
+            'formItem' => true,
+            'formattedItem' => true,
+        ], ['warmup' => false]);
+
+        $this->assertEmpty($this->cacheService->invalidatedFormItemIds);
+        $this->assertEmpty($this->cacheService->invalidatedFormattedItemIds);
+        $this->assertEmpty($this->cacheService->invalidatedModuleRoutes);
+    }
+
+    /** @test */
+    public function it_warms_after_invalidate_for_model_when_warmup_is_enabled(): void
+    {
+        $model = new TestModel;
+        $model->id = 20;
+        $model->exists = true;
+        $model->wasRecentlyCreated = false;
+
+        $this->cacheService->invalidateForModel($model, [
+            'formItem' => true,
+            'formattedItem' => false,
+            'presentationItem' => false,
+        ], ['warmup' => true]);
+
+        $this->assertCount(1, $this->cacheService->warmedForModelCalls);
+        $this->assertSame('TestModule', $this->cacheService->warmedForModelCalls[0]['moduleName']);
+    }
+
+    /** @test */
+    public function it_refreshes_model_caches_without_route_flush(): void
+    {
+        $model = new TestModel;
+        $model->id = 22;
+        $model->exists = true;
+        $model->wasRecentlyCreated = false;
+
+        $this->cacheService->refreshModelCaches($model, [
+            'presentationItem' => true,
+            'formItem' => false,
+        ], [
+            'moduleName' => 'TestModule',
+            'moduleRouteName' => 'TestRoute',
+            'locale' => 'en',
+        ]);
+
+        $this->assertCount(1, $this->cacheService->warmedForModelCalls);
+        $this->assertEmpty($this->cacheService->invalidatedModuleRoutes);
+        $this->assertEmpty($this->cacheService->invalidatedFormItemIds);
+    }
+
+    /** @test */
+    public function it_purges_presentation_item_files_for_model_and_route(): void
+    {
+        $service = new ConcreteCacheInvalidationWithFilesystemTracking;
+        $model = new TestModel;
+        $model->id = 23;
+        $model->exists = true;
+
+        $deleted = $service->purgePresentationItemForModel($model, 'TestModule', 'TestRoute');
+
+        $this->assertSame(0, $deleted);
+        $this->assertTrue($service->purgedRelation);
+        $this->assertTrue($service->purgedModuleRouteId);
+    }
+
+    /** @test */
+    public function it_purges_presentation_item_files_for_module_route(): void
+    {
+        $service = new ConcreteCacheInvalidationWithFilesystemTracking;
+
+        $deleted = $service->purgePresentationItemForModuleRoute('TestModule', 'TestRoute');
+
+        $this->assertGreaterThanOrEqual(0, $deleted);
+        $this->assertTrue($service->purgedModuleRoute);
+        $this->assertTrue($service->purgedUrlModuleRoute);
+    }
+
+    /** @test */
+    public function it_warms_module_route_counts_and_items(): void
+    {
+        $this->seedInvalidateAllItemsTable([5, 6]);
+
+        $mockModule = $this->mockInvalidateAllItemsModule(isSingleton: false);
+        Modularous::shouldReceive('find')->with('TestModule')->andReturn($mockModule);
+
+        $this->cacheService->warmModuleRouteCaches('TestModule', 'TestRoute', [
+            'counts' => true,
+            'formItem' => true,
+            'formattedItem' => false,
+            'presentationItem' => true,
+        ]);
+
+        $this->assertNotEmpty($this->cacheService->warmedControllerItems);
+        $this->assertCount(2, $this->cacheService->warmedPresentationItemIds);
+    }
+
+    /** @test */
+    public function it_invalidates_by_related_models_when_tags_are_enabled(): void
+    {
+        $service = new ConcreteCacheInvalidationWithFilesystemTracking;
+        $service->setUsesTags(true);
+
+        $count = $service->invalidateByRelatedModels([
+            'Company' => 1,
+            'User' => [2, 3],
+        ]);
+
+        $this->assertSame(3, $count);
+    }
+
+    /** @test */
+    public function it_invalidates_presentation_item_per_id_caches_without_tags(): void
+    {
+        $service = new ConcreteCacheInvalidation;
+        $service->setPresentationCacheStore('model');
+
+        $service->invalidatePresentationItemCache('TestModule', 'TestRoute', 44, TestModel::class);
+
+        $this->assertEquals([44], $service->invalidatedPresentationItemIds);
+    }
+
+    /** @test */
+    public function it_invalidates_record_cache_per_id_without_tags(): void
+    {
+        $this->cacheService->invalidateRecordCache('TestModule', 'TestRoute', 55);
+
+        $this->assertEquals([55], $this->cacheService->invalidatedRecordIds);
+    }
+
+    /** @test */
+    public function it_returns_early_from_invalidate_all_item_caches_when_disabled(): void
+    {
+        $service = new ConcreteCacheInvalidation;
+        $service->setEnabled(false);
+
+        Modularous::shouldReceive('find')->never();
+
+        $service->invalidateAllItemCaches('TestModule', 'TestRoute', ['formItem' => true]);
+
+        $this->assertEmpty($service->invalidatedFormItemIds);
+    }
+
     protected function seedInvalidateAllItemsTable(array $ids): void
     {
         Schema::create('invalidate_all_items_models', function (Blueprint $table) {
@@ -421,6 +684,8 @@ class ConcreteCacheInvalidation
     protected $usesTags = false;
 
     protected $enabled = true;
+
+    protected string $presentationCacheStore = 'model';
 
     protected StaleFileCache $staleFileCache;
 
@@ -490,9 +755,19 @@ class ConcreteCacheInvalidation
         $this->usesTags = $usesTags;
     }
 
+    public function setEnabled(bool $enabled): void
+    {
+        $this->enabled = $enabled;
+    }
+
+    public function setPresentationCacheStore(string $store): void
+    {
+        $this->presentationCacheStore = $store;
+    }
+
     protected function getPresentationCacheStore(): string
     {
-        return 'model';
+        return $this->presentationCacheStore;
     }
 
     protected function getModuleNameFromModel(Model $model): ?string
@@ -570,6 +845,48 @@ class ConcreteCacheInvalidation
         ];
 
         return true;
+    }
+}
+
+class ConcreteCacheInvalidationWithFilesystemTracking extends ConcreteCacheInvalidation
+{
+    public bool $purgedRelation = false;
+
+    public bool $purgedModuleRouteId = false;
+
+    public bool $purgedModuleRoute = false;
+
+    public bool $purgedUrlModuleRoute = false;
+
+    public function invalidateByRelatedModel(string $modelClass, $id): bool
+    {
+        if ($this->usesTags()) {
+            $this->purgedRelation = true;
+
+            return true;
+        }
+
+        return parent::invalidateByRelatedModel($modelClass, $id);
+    }
+
+    public function purgePresentationItemForModel(
+        Model $model,
+        ?string $moduleName = null,
+        ?string $moduleRouteName = null,
+        ?string $locale = null,
+    ): int {
+        $this->purgedRelation = true;
+        $this->purgedModuleRouteId = true;
+
+        return parent::purgePresentationItemForModel($model, $moduleName, $moduleRouteName, $locale);
+    }
+
+    public function purgePresentationItemForModuleRoute(string $moduleName, string $moduleRouteName): int
+    {
+        $this->purgedModuleRoute = true;
+        $this->purgedUrlModuleRoute = true;
+
+        return parent::purgePresentationItemForModuleRoute($moduleName, $moduleRouteName);
     }
 }
 
