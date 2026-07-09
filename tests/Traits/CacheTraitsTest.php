@@ -384,4 +384,158 @@ class CacheTraitsTest extends TestCase
 
         $tester->warmupModuleRouteCache('Blog', 'Post', 100);
     }
+
+    /** @test */
+    public function it_generates_cache_keys_for_remaining_cache_types(): void
+    {
+        $tester = new class
+        {
+            use CacheKeyGenerators {
+                resolveCacheSpecifiers as public exposeResolveCacheSpecifiers;
+                createCacheKey as public exposeCreateCacheKey;
+            }
+
+            public function addUserContext(array $params): array
+            {
+                return $params + ['_user' => 'u9'];
+            }
+        };
+
+        ModularousCache::shouldReceive('generateCacheKey')
+            ->with('Blog', 'Post', 'count:featured', ['_user' => 'u9'])
+            ->andReturn('blog:post:count:featured:u9');
+        ModularousCache::shouldReceive('generateCacheKey')
+            ->with('Blog', 'Post', 'index', ['_user' => 'u9'])
+            ->andReturn('blog:post:index:u9');
+        ModularousCache::shouldReceive('generateCacheKey')
+            ->with('Blog', 'Post', 'presentationItem:7', ['_user' => 'u9'])
+            ->andReturn('blog:post:presentationItem:7:u9');
+
+        $this->assertSame(
+            ['counts', 'count:featured', ['_user' => 'u9']],
+            $tester->exposeResolveCacheSpecifiers('count', ['slug' => 'featured'])
+        );
+        $this->assertSame(
+            ['index', 'index', ['_user' => 'u9']],
+            $tester->exposeResolveCacheSpecifiers('index', [])
+        );
+        $this->assertSame(
+            'blog:post:presentationItem:7:u9',
+            $tester->exposeCreateCacheKey('Blog', 'Post', 'presentationItem:7', ['_user' => 'u9'])
+        );
+
+        $this->expectException(\InvalidArgumentException::class);
+        $tester->exposeResolveCacheSpecifiers('presentationItem', []);
+    }
+
+    /** @test */
+    public function it_adds_user_context_only_when_user_aware_cache_is_enabled(): void
+    {
+        $tester = new class
+        {
+            use HasUserAwareCache;
+        };
+
+        Auth::shouldReceive('user')->andReturn(null);
+
+        $tester->withUserAwareCache(false);
+        $this->assertSame(['foo' => 'bar'], $tester->addUserContext(['foo' => 'bar']));
+
+        $tester->withUserAwareCache(true);
+        $this->assertSame(
+            ['foo' => 'bar', '_user' => 'guest'],
+            $tester->addUserContext(['foo' => 'bar'])
+        );
+    }
+
+    /** @test */
+    public function it_detects_user_aware_cache_from_declared_trait_property(): void
+    {
+        $tester = new class
+        {
+            use HasUserAwareCache;
+
+            public bool $hasUserAwareCacheHasUserAwareCache = true;
+        };
+
+        $this->assertTrue($tester->shouldUseUserAwareCache());
+    }
+
+    /** @test */
+    public function it_warmups_controller_items(): void
+    {
+        $tester = new class
+        {
+            use WarmupCache;
+        };
+
+        $mockRepo = \Mockery::mock(Repository::class);
+        $mockRepo->shouldReceive('shouldUseUserAwareCache')->andReturn(false);
+
+        $mockController = \Mockery::mock(BaseController::class);
+        $mockController->shouldReceive('getRepository')->andReturn($mockRepo);
+        $mockController->shouldReceive('getModuleName')->andReturn('Blog');
+        $mockController->shouldReceive('getRouteName')->andReturn('Post');
+        $mockController->shouldReceive('preload')->once();
+        $mockController->shouldReceive('getFormattedIndexItem')->once();
+        $mockController->shouldReceive('getFormItem')->once();
+
+        $mockModel = \Mockery::mock(\Illuminate\Database\Eloquent\Model::class);
+        $mockModel->shouldReceive('each')->andReturnUsing(function ($callback) {
+            $callback((object) ['id' => 5], 0);
+        });
+        $mockController->shouldReceive('getModel')->andReturn($mockModel);
+
+        ModularousCache::shouldReceive('isEnabled')->with('Blog', 'Post', 'formItem')->andReturn(true);
+        ModularousCache::shouldReceive('isEnabled')->with('Blog', 'Post', 'formattedItem')->andReturn(true);
+
+        $tester->warmupControllerItems($mockController, 50);
+    }
+
+    /** @test */
+    public function it_warmups_cache_from_model_metadata(): void
+    {
+        $tester = new class
+        {
+            use WarmupCache;
+        };
+
+        $mockRepo = \Mockery::mock(Repository::class);
+        $mockRepo->shouldReceive('shouldUseUserAwareCache')->andReturn(false);
+
+        $mockController = \Mockery::mock(BaseController::class);
+        $mockController->shouldReceive('getRepository')->andReturn($mockRepo);
+        $mockController->shouldReceive('preload')->once();
+        $mockController->shouldReceive('getFormattedIndexItem')->once();
+        $mockController->shouldReceive('getFormItem')->once();
+
+        $warmModel = new class extends \Illuminate\Database\Eloquent\Model {
+            public function getModuleName()
+            {
+                return 'Blog';
+            }
+
+            public function getRouteName()
+            {
+                return 'Post';
+            }
+
+            public function getKey()
+            {
+                return 9;
+            }
+        };
+
+        $mockModule = \Mockery::mock(Module::class);
+        $mockModule->shouldReceive('hasRoute')->with('Post')->andReturn(true);
+        $mockModule->shouldReceive('getController')->with('Post')->andReturn($mockController);
+
+        Modularous::shouldReceive('find')->with('Blog')->andReturn($mockModule);
+        ModularousCache::shouldReceive('isEnabled')->with('Blog', 'Post', 'counts')->andReturn(false);
+        ModularousCache::shouldReceive('isEnabled')->with('Blog', 'Post', 'formItem')->andReturn(true);
+        ModularousCache::shouldReceive('isEnabled')->with('Blog', 'Post', 'formattedItem')->andReturn(true);
+        ModularousCache::shouldReceive('isEnabled')->with('Blog', 'Post', 'presentationItem')->andReturn(false);
+
+        $tester->warmupByModel($warmModel);
+    }
 }

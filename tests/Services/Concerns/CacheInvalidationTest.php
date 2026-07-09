@@ -11,6 +11,10 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Schema;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Module;
+use Unusualify\Modularous\Contracts\Cache\UrlPresentationCacheStoreInterface;
+use Unusualify\Modularous\Services\Cache\FileUrlPresentationCacheDriver;
+use Unusualify\Modularous\Services\Cache\StaleFileCache;
+use Unusualify\Modularous\Services\Cache\UrlKeyedStaleCache;
 use Unusualify\Modularous\Services\Concerns\CacheInvalidation;
 use Unusualify\Modularous\Tests\TestCase;
 
@@ -418,6 +422,10 @@ class ConcreteCacheInvalidation
 
     protected $enabled = true;
 
+    protected StaleFileCache $staleFileCache;
+
+    protected UrlKeyedStaleCache $urlKeyedStaleCache;
+
     public bool $warmupControllerItemShouldThrow = false;
 
     public array $invalidatedFormItemIds = [];
@@ -443,6 +451,18 @@ class ConcreteCacheInvalidation
     public function __construct()
     {
         $this->store = Cache::store('array');
+        $this->staleFileCache = new StaleFileCache(sys_get_temp_dir() . '/modularous-stale-test-' . uniqid());
+        $this->urlKeyedStaleCache = new UrlKeyedStaleCache(sys_get_temp_dir() . '/modularous-url-stale-test-' . uniqid());
+    }
+
+    protected function getStaleFileCache(): StaleFileCache
+    {
+        return $this->staleFileCache;
+    }
+
+    protected function getUrlPresentationCacheStore(): UrlPresentationCacheStoreInterface
+    {
+        return new FileUrlPresentationCacheDriver($this->urlKeyedStaleCache);
     }
 
     protected function getStore(): Repository
@@ -468,6 +488,11 @@ class ConcreteCacheInvalidation
     public function setUsesTags(bool $usesTags): void
     {
         $this->usesTags = $usesTags;
+    }
+
+    protected function getPresentationCacheStore(): string
+    {
+        return 'model';
     }
 
     protected function getModuleNameFromModel(Model $model): ?string
