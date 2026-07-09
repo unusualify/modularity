@@ -136,8 +136,9 @@ class StaleFileCacheTest extends TestCase
             StaleFileCache::LOCALE_RELATION_KEY => 'tr',
         ])));
 
-        $enPath = $this->basePath . '/PrimaryPage/Home/StdClass/42/en/' . md5(serialize(['locale' => 'en'])) . '.html';
-        $trPath = $this->basePath . '/PrimaryPage/Home/StdClass/42/tr/' . md5(serialize(['locale' => 'tr'])) . '.html';
+        $modelSegment = class_basename(\stdClass::class);
+        $enPath = $this->basePath . "/PrimaryPage/Home/{$modelSegment}/42/en/" . md5(serialize(['locale' => 'en'])) . '.html';
+        $trPath = $this->basePath . "/PrimaryPage/Home/{$modelSegment}/42/tr/" . md5(serialize(['locale' => 'tr'])) . '.html';
 
         $this->assertFileExists($enPath);
         $this->assertFileExists($trPath);
