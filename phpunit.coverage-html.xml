@@ -8,11 +8,8 @@
   <testsuites>
     <testsuite name="Main">
         <directory>tests</directory>
-        <!-- <exclude>tests/Generators</exclude> -->
         <exclude>tests/Generators/StubsGeneratorTest.php</exclude>
-        <!-- <exclude>tests/Exceptions</exclude> -->
         <exclude>tests/Console</exclude>
-        <!-- <exclude>tests/Facades</exclude> -->
         <exclude>tests/Generated</exclude>
         <exclude>tests/Docs</exclude>
     </testsuite>
@@ -20,9 +17,8 @@
   <php>
     <env name="CACHE_DRIVER" value="array"/>
     <env name="MODULAROUS_CACHE_OBSERVER_QUEUE" value="false"/>
-    <!-- APP_KEY required for Passport client -->
     <env name="APP_KEY" value="base64:W99w+5JYz8SVGf5sx17gmPR6uoNCtWiEVc+9qu8iGEg="/>
-    <ini name="memory_limit" value="1G"/>
+    <ini name="memory_limit" value="-1"/>
   </php>
   <source>
     <include>
@@ -40,6 +36,8 @@
   <coverage>
     <report>
       <clover outputFile="coverage-clover.xml"/>
+      <html outputDirectory="coverage-html" lowUpperBound="50" highLowerBound="80"/>
+      <text outputFile="php://stdout" showOnlySummary="true"/>
     </report>
   </coverage>
 </phpunit>

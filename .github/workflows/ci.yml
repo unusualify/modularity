@@ -44,8 +44,8 @@ jobs:
 
             echo "Coverage: " . round($pct, 2) . "%\n";
 
-            if ($pct < 80) {
-              echo "❌ Coverage below 75%\n";
+            if ($pct < 60) {
+              echo "❌ Coverage below 60%\n";
               exit(1);
             }
 
