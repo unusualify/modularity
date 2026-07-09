@@ -12,6 +12,7 @@ use Unusualify\Modularous\Contracts\CanBulkSheet;
 use Unusualify\Modularous\Facades\HostRoutingRegistrar;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Facades\ModularousRoutes;
+use Unusualify\Modularous\Http\Controllers\Api\CacheRevalidateController;
 use Unusualify\Modularous\Http\Controllers\GlideController;
 
 class RouteServiceProvider extends ServiceProvider
@@ -139,6 +140,17 @@ class RouteServiceProvider extends ServiceProvider
             ],
             function ($router) {
                 require __DIR__ . '/../../routes/front.php';
+            }
+        );
+
+        $router->group(
+            [
+                'middleware' => ['api', 'modularous.cache.webhook'],
+                'prefix' => 'api',
+            ],
+            function ($router) {
+                $router->post('modularous/cache/revalidate', CacheRevalidateController::class)
+                    ->name('modularous.cache.revalidate');
             }
         );
 
@@ -511,8 +523,6 @@ class RouteServiceProvider extends ServiceProvider
                         'bulkForceDelete',
                         'syncRemoteAll',
                         'clearRemoteCache',
-                        'cachePurgeAll',
-                        'cacheWarmAll',
                     ])
                 ) {
                     Route::post($routeSlug, $mapping);

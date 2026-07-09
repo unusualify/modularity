@@ -14,7 +14,7 @@ use Unusualify\Modularous\Facades\ModularousCache;
 use Unusualify\Modularous\Jobs\Cache\Concerns\ModularousCacheJob;
 use Unusualify\Modularous\Support\ModularousCacheLogger;
 
-final class WarmPresentationItemJob implements ShouldQueue
+final class PurgePresentationItemJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, ModularousCacheJob, Queueable, SerializesModels;
 
@@ -36,39 +36,26 @@ final class WarmPresentationItemJob implements ShouldQueue
             }
         }
 
-        ModularousCacheLogger::info('cache.job.warm_presentation_item.start', [
+        ModularousCacheLogger::info('cache.job.purge_presentation_item.start', [
             'model' => get_class($this->model),
             'id' => $this->model->getKey(),
             'moduleName' => $this->moduleName,
             'moduleRouteName' => $this->moduleRouteName,
-        ]);
-
-        ModularousCache::refreshModelCaches($this->model, [
-            'presentationItem' => true,
-            'counts' => false,
-            'index' => false,
-            'record' => false,
-            'formItem' => false,
-            'formattedItem' => false,
-        ], [
-            'moduleName' => $this->moduleName,
-            'moduleRouteName' => $this->moduleRouteName,
             'locale' => $this->locale,
         ]);
+
+        ModularousCache::purgePresentationItemForModel(
+            $this->model,
+            $this->moduleName,
+            $this->moduleRouteName,
+            $this->locale,
+        );
     }
 
     protected function modularousCacheOverlapKey(): string
     {
-        if (class_exists(\Modules\Cms\Support\CmsPublicPresentationItemCache::class)) {
-            return \Modules\Cms\Support\CmsPublicPresentationItemCache::warmPresentationOverlapKey(
-                $this->model,
-                $this->moduleName ?? 'auto',
-                $this->moduleRouteName ?? 'auto',
-            );
-        }
-
         return sprintf(
-            'cache:warm-presentation:%s:%s:%s:%s',
+            'cache:purge-presentation:%s:%s:%s:%s',
             $this->moduleName ?? 'auto',
             $this->moduleRouteName ?? 'auto',
             get_class($this->model),

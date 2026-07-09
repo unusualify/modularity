@@ -36,8 +36,6 @@ class ModuleServiceProvider extends ServiceProvider implements DeferrableProvide
         $lang_folder = GenerateConfigReader::read('lang')->getPath();
         $component_class_namespace = GenerateConfigReader::read('component-class')->getNamespace();
 
-        // dd(config('modularous'));
-        // dd(Modularous::allEnabled(), Modularous::all());
         foreach (Modularous::allEnabled() as $module) {
 
             $module_name = $module->getName();

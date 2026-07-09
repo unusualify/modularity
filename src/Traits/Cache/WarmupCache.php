@@ -5,11 +5,11 @@ namespace Unusualify\Modularous\Traits\Cache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Schema;
 use Modules\Cms\Contracts\CanonicalUrlResolverInterface;
-use Modules\Cms\Contracts\CmsLocalizationContract;
 use Modules\Cms\Services\CmsUrlRouteRegistry;
 use Modules\Cms\Support\CmsPublicFrontViewName;
 use Modules\Cms\Support\CmsPublicPresentationInnerData;
 use Modules\Cms\Support\CmsPublicPresentationItemCache;
+use Modules\Cms\Support\CmsPublicPresentationWarmupContext;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Facades\ModularousCache;
 use Unusualify\Modularous\Http\Controllers\BaseController;
@@ -142,11 +142,12 @@ trait WarmupCache
             return;
             throw new \Exception("Module not found: {$moduleName}");
         }
-        $route = $module->getRoute($routeName);
-        if (! $route) {
-            return;
-            throw new \Exception("Route not found: {$routeName}");
-        }
+        // dd($module->getRoute($routeName));
+        // $route = $module->getRoute($routeName);
+        // if (! $route) {
+        //     return;
+        //     throw new \Exception("Route not found: {$routeName}");
+        // }
         $controller = $module->getController($routeName);
 
         if (! $controller) {
@@ -219,7 +220,7 @@ trait WarmupCache
     /**
      * Warmup {@see presentationItem} cache for a public CMS record (requires a resolved {@see Model}).
      */
-    public function warmupPresentationItem(string $moduleName, string $routeName, Model $item): bool
+    public function warmupPresentationItem(string $moduleName, string $routeName, Model $item, ?string $locale = null): bool
     {
         [$moduleName, $routeName] = $this->resolvePresentationItemWarmupContext($moduleName, $routeName, $item);
 
@@ -227,17 +228,14 @@ trait WarmupCache
             return false;
         }
 
-        if (! ModularousCache::isEnabled($moduleName, $routeName, 'presentationItem')) {
+        if (! class_exists(CmsPublicPresentationItemCache::class)
+            || ! CmsPublicPresentationItemCache::isEnabled($moduleName, $routeName)) {
             return false;
         }
 
         $item = $this->resolvePresentationWarmupModel($item);
 
         if ($item->getKey() === null) {
-            return false;
-        }
-
-        if (! class_exists(CmsPublicPresentationItemCache::class)) {
             return false;
         }
 
@@ -250,13 +248,21 @@ trait WarmupCache
         }
 
         $pathsByLocale = $this->resolvePresentationWarmupLocalesAndPaths($item);
+        if ($locale !== null && $locale !== '') {
+            $pathsByLocale = array_filter(
+                $pathsByLocale,
+                static fn (string $path, string $loc): bool => $loc === $locale,
+                ARRAY_FILTER_USE_BOTH,
+            );
+        }
+
         if ($pathsByLocale === []) {
             ModularousCacheLogger::info('cache.warmup.presentation_item.skip', [
                 'module' => $moduleName,
                 'route' => $routeName,
                 'model' => $item::class,
                 'id' => $item->getKey(),
-                'reason' => 'no_locale_paths',
+                'reason' => $locale !== null && $locale !== '' ? 'locale_not_found' : 'no_locale_paths',
             ]);
 
             return false;
@@ -272,19 +278,23 @@ trait WarmupCache
         ]);
 
         $warmedAny = false;
-        $previousLocale = app()->getLocale();
 
-        try {
-            foreach ($pathsByLocale as $locale => $normalizedPath) {
-                $this->applyPresentationWarmupLocale((string) $locale);
-
+        foreach ($pathsByLocale as $locale => $normalizedPath) {
+            $iterationWarmed = CmsPublicPresentationWarmupContext::run((string) $locale, function () use (
+                $moduleName,
+                $routeName,
+                $item,
+                $viewName,
+                $locale,
+                $normalizedPath,
+            ): bool {
                 $warmupItem = $this->resolvePresentationWarmupModelForLocale(
                     $item,
                     (string) $locale,
                 );
 
                 if ($warmupItem === null) {
-                    continue;
+                    return false;
                 }
 
                 $innerData = $this->buildPresentationWarmupInnerData(
@@ -301,20 +311,27 @@ trait WarmupCache
                     (string) $locale,
                 );
 
-                $cachedHtml = CmsPublicPresentationItemCache::rememberPublicPresentation(
+                $resolved = CmsPublicPresentationItemCache::resolvePresentationHtml(
                     $moduleName,
                     $routeName,
                     $warmupItem,
                     $viewName,
                     $innerData,
                     (string) $locale,
+                    bypassSwr: true,
+                    normalizedPath: (string) $normalizedPath,
                 );
 
-                $result = 'empty';
-                if (is_string($cachedHtml) && $cachedHtml !== '') {
-                    $warmedAny = true;
-                    $result = 'written';
-                }
+                $html = $resolved['html'] ?? null;
+                $urlStored = CmsPublicPresentationItemCache::usesUrlStore()
+                    && ModularousCache::getUrlPresentationCacheStore()->get((string) $locale, (string) $normalizedPath) !== null;
+
+                $result = match (true) {
+                    ! is_string($html) || $html === '' => 'empty',
+                    CmsPublicPresentationItemCache::usesUrlStore() && ! $urlStored => 'store_failed',
+                    $resolved['status'] === CmsPublicPresentationItemCache::CACHE_STATUS_HIT => 'hit',
+                    default => 'written',
+                };
 
                 ModularousCacheLogger::info('cache.warmup.presentation_item.locale', [
                     'module' => $moduleName,
@@ -326,10 +343,15 @@ trait WarmupCache
                     'canonicalUrl' => $innerData['canonicalUrl'] ?? null,
                     'cacheKey' => $cacheKey,
                     'result' => $result,
+                    'urlStored' => $urlStored,
                 ]);
+
+                return $result === 'written' || $result === 'hit';
+            });
+
+            if ($iterationWarmed) {
+                $warmedAny = true;
             }
-        } finally {
-            $this->restorePresentationWarmupLocale($previousLocale);
         }
 
         ModularousCacheLogger::info('cache.warmup.presentation_item.complete', [
@@ -489,42 +511,32 @@ trait WarmupCache
         return $paths;
     }
 
-    protected function applyPresentationWarmupLocale(string $locale): void
-    {
-        if (
-            interface_exists(CmsLocalizationContract::class)
-            && app()->bound(CmsLocalizationContract::class)
-        ) {
-            app(CmsLocalizationContract::class)->applyLocaleToApplication($locale);
-
-            return;
-        }
-
-        app()->setLocale($locale);
-    }
-
-    protected function restorePresentationWarmupLocale(string $locale): void
-    {
-        $this->applyPresentationWarmupLocale($locale);
-    }
-
     protected function resolvePresentationWarmupModelForLocale(Model $item, string $locale): ?Model
     {
         if ($item->getKey() === null) {
             return $item;
         }
 
-        $query = $item::class::query()->whereKey($item->getKey());
-
         if (class_exists(\Modules\Cms\Services\CmsPublicModelResolver::class)) {
-            \Modules\Cms\Services\CmsPublicModelResolver::applyPublishedVisibilityScopes($query, $item::class);
+            return \Modules\Cms\Services\CmsPublicModelResolver::loadForPresentationWarmup(
+                $item::class,
+                $item->getKey(),
+                $locale,
+            );
         }
+
+        $query = $item::class::query()->whereKey($item->getKey());
 
         if (method_exists($item::class, 'translations')) {
             $query->with(['translations' => fn ($q) => $q->where('locale', $locale)]);
         }
 
         $fresh = $query->first();
+
+        if ($fresh instanceof Model && method_exists($fresh, 'setDefaultLocale')) {
+            $fresh->setDefaultLocale($locale);
+            $fresh->unsetRelation('translation');
+        }
 
         return $fresh instanceof Model ? $fresh : null;
     }
