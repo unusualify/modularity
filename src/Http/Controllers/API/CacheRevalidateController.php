@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Unusualify\Modularous\Http\Controllers\Api;
+namespace Unusualify\Modularous\Http\Controllers\API;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

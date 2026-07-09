@@ -7,7 +7,7 @@ namespace Unusualify\Modularous\Tests\Providers;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
 use ReflectionMethod;
-use Unusualify\Modularous\Http\Controllers\Api\CacheRevalidateController;
+use Unusualify\Modularous\Http\Controllers\API\CacheRevalidateController;
 use Unusualify\Modularous\Http\Controllers\GlideController;
 use Unusualify\Modularous\Providers\RouteServiceProvider;
 use Unusualify\Modularous\Tests\TestModulesCase;

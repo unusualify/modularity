@@ -12,7 +12,7 @@ use Unusualify\Modularous\Contracts\CanBulkSheet;
 use Unusualify\Modularous\Facades\HostRoutingRegistrar;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Facades\ModularousRoutes;
-use Unusualify\Modularous\Http\Controllers\Api\CacheRevalidateController;
+use Unusualify\Modularous\Http\Controllers\API\CacheRevalidateController;
 use Unusualify\Modularous\Http\Controllers\GlideController;
 
 class RouteServiceProvider extends ServiceProvider
