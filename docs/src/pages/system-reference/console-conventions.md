@@ -76,6 +76,7 @@ Commands that create runtime records (DB entries, users).
 | modularous:cache:graph | CacheGraphCommand |
 | modularous:cache:stats | CacheStatsCommand |
 | modularous:cache:warm | CacheWarmCommand |
+| modularous:cache:warm-presentation | CacheWarmPresentationCommand |
 | modularous:flush | FlushCommand |
 | modularous:flush:sessions | FlushSessionsCommand |
 | modularous:flush:filepond | FlushFilepondCommand |

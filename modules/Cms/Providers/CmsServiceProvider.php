@@ -4,7 +4,9 @@ namespace Modules\Cms\Providers;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\AboutCommand;
+use Illuminate\Foundation\Http\Kernel as HttpKernel;
 use Illuminate\Support\Facades\Route;
+use Unusualify\Modularous\Facades\ModularousCache;
 use Illuminate\Support\ServiceProvider;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 use Modules\Cms\Console\CacheCmsPublicUrlRegistryCommand;
@@ -29,6 +31,7 @@ use Modules\Cms\Http\Controllers\PublicStyleSheetAssetController;
 use Modules\Cms\Http\Middleware\CanonicalLocaleMiddleware;
 use Modules\Cms\Http\Middleware\FallbackLocaleSluglessCanonicalMiddleware;
 use Modules\Cms\Http\Middleware\LayoutBuilderMiddleware;
+use Modules\Cms\Http\Middleware\ServeUrlKeyedStaleMiddleware;
 use Modules\Cms\Http\Middleware\VisitorRedirectMiddleware;
 use Modules\Cms\Jobs\ScanCmsPublishWindowBoundariesJob;
 use Modules\Cms\Localization\DelegatingCmsLocalizationAdapter;
@@ -50,6 +53,7 @@ use Modules\Cms\Services\CmsSitemapCacheService;
 use Modules\Cms\Services\CmsSiteSeoSettingsService;
 use Modules\Cms\Services\CmsSlugInputValidationService;
 use Modules\Cms\Services\CmsUrlRouteRegistry;
+use Modules\Cms\Contracts\CmsVisitorRequestContextResolverInterface;
 use Modules\Cms\Services\CmsVisitorRedirectResolver;
 use Modules\Cms\Services\DbFullTextSearchDriver;
 use Modules\Cms\Services\DefaultCmsPromotionScopeApplier;
@@ -96,6 +100,7 @@ class CmsServiceProvider extends ServiceProvider
         $this->app->singleton(CmsParentSegmentResolver::class);
         $this->app->singleton(CmsPageLayoutResolver::class);
         $this->app->singleton(CmsVisitorRedirectResolver::class);
+        $this->app->singleton(CmsVisitorRequestContextResolverInterface::class, CmsVisitorRedirectResolver::class);
         $this->app->singleton(CmsPublicModelResolver::class);
 
         $this->app->singleton(CmsUrlRouteRegistry::class);
@@ -162,7 +167,10 @@ class CmsServiceProvider extends ServiceProvider
             Route::aliasMiddleware('modules.cms.canonical.locale', CanonicalLocaleMiddleware::class);
             Route::aliasMiddleware('modules.cms.fallback.slugless.canonical', FallbackLocaleSluglessCanonicalMiddleware::class);
             Route::aliasMiddleware('modules.cms.visitor.redirect', VisitorRedirectMiddleware::class);
+            Route::aliasMiddleware('modules.cms.url_stale.serve', ServeUrlKeyedStaleMiddleware::class);
             Route::aliasMiddleware('modules.cms.layout_builder', LayoutBuilderMiddleware::class);
+
+            $this->registerUrlStaleServeMiddleware();
         }
 
         if (modularousConfig('cms_seo.robots.route_enabled', true)) {
@@ -180,6 +188,43 @@ class CmsServiceProvider extends ServiceProvider
         $this->registerCmsSignedPreviewRoutes();
         $this->registerCmsPublicStylesheetRoutes();
         $this->registerCmsPublishSchedule();
+    }
+
+    /**
+     * URL-keyed stale HTML must run before route matching so cached pages work on hosts
+     * that are not bound to {@see CmsFrontRouteRegistrar::resolvePublicFrontRouteDomain()}.
+     */
+    private function registerUrlStaleServeMiddleware(): void
+    {
+        $prepend = static function (HttpKernel $kernel): void {
+            if (! ModularousCache::isUrlStaleServeFirst()) {
+                return;
+            }
+
+            $ref = new \ReflectionClass($kernel);
+            $prop = $ref->getProperty('middleware');
+            $prop->setAccessible(true);
+            $stack = $prop->getValue($kernel);
+            if (in_array(ServeUrlKeyedStaleMiddleware::class, $stack, true)) {
+                return;
+            }
+
+            $kernel->prependMiddleware(ServeUrlKeyedStaleMiddleware::class);
+        };
+
+        $this->app->afterResolving(HttpKernel::class, $prepend);
+
+        if ($this->app->resolved(HttpKernel::class)) {
+            $prepend($this->app->make(HttpKernel::class));
+        }
+
+        $this->app->booted(static function (): void {
+            if (ModularousCache::isUrlStaleServeFirst()) {
+                return;
+            }
+
+            CmsFrontRouteRegistrar::syncUrlStaleServeMiddlewareOnRegisteredPublicFrontRoutes();
+        });
     }
 
     private function registerCmsSignedPreviewRoutes(): void

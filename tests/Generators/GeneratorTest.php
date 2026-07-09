@@ -120,6 +120,23 @@ class GeneratorTest extends TestCase
     }
 
     /** @test */
+    public function it_can_set_name()
+    {
+        $this->generator->setName('RenamedGenerator');
+
+        $this->assertSame('RenamedGenerator', $this->generator->getName());
+    }
+
+    /** @test */
+    public function it_returns_modularous_generator_config_array()
+    {
+        $this->assertSame(
+            ['path' => 'Entities', 'generate' => true],
+            $this->generator->getModularousGeneratorConfig('model')
+        );
+    }
+
+    /** @test */
     public function it_returns_target_path_as_false_when_no_module_is_set()
     {
         $this->assertFalse($this->generator->getTargetPath());

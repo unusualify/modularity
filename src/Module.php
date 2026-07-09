@@ -29,7 +29,7 @@ use Unusualify\Modularous\Facades\ModularousCache;
 use Unusualify\Modularous\Http\Controllers\Traits\ManageResourceCache;
 use Unusualify\Modularous\Repositories\Repository;
 use Unusualify\Modularous\Repositories\Traits\RemoteApiSourceTrait;
-use Unusualify\Modularous\Repositories\Traits\ResourceCacheActionsTrait;
+use Unusualify\Modularous\Repositories\Logic\ResourceCacheActionsTrait;
 
 class Module extends NwidartModule
 {
@@ -702,9 +702,11 @@ class Module extends NwidartModule
             $prefixes[] = $adminRouteNamePrefix;
         }
 
-        $prefixes[] = $this->fullRouteNamePrefix($isParent);
+        if($fullRouteNamePrefix = $this->fullRouteNamePrefix($isParent)) {
+            $prefixes[] = $fullRouteNamePrefix;
+        }
 
-        return implode('.', $prefixes);
+        return implode('.', $prefixes) . '.';
     }
 
     /**

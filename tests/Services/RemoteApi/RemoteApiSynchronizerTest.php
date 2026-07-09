@@ -219,12 +219,13 @@ class RemoteApiSynchronizerTest extends TestCase
         $connector->shouldReceive('resetRequestStats')->once();
         $connector->shouldReceive('flushRequestStats')->once()->andReturn([
             'total' => 1,
-            'by_url' => ['http://app.b2press.test/api/v1/packages' => 1],
+            'by_url' => ['http://app.b2press.test/api/v1/packages/42' => 1],
         ]);
-        $connector->shouldReceive('fetchList')->once()->andReturn([
-            ['id' => 42, 'name' => 'Premium API'],
+        $connector->shouldNotReceive('fetchList');
+        $connector->shouldReceive('fetchOne')->once()->with(42)->andReturn([
+            'id' => 42,
+            'name' => 'Premium API',
         ]);
-        $connector->shouldNotReceive('fetchOne');
         $connector->shouldReceive('mapRow')->andReturnUsing(
             fn (array $row, array $existing = []) => $adapter->mapToAttributes($row, $existing)
         );
@@ -247,11 +248,20 @@ class RemoteApiSynchronizerTest extends TestCase
         $existingQuery->shouldReceive('first')->andReturn($linked);
 
         $allQuery = Mockery::mock();
-        $allQuery->shouldReceive('with')->with('remoteApiSource')->andReturnSelf();
-        $allQuery->shouldReceive('get')->andReturn(collect([$linked]));
+        $allQuery->shouldReceive('whereHas')->once()->andReturnSelf();
+        $allQuery->shouldReceive('select')->with(['id'])->andReturnSelf();
+        $allQuery->shouldReceive('with')->with(Mockery::on(
+            static fn (array $relations): bool => isset($relations['remoteApiSource']) && is_callable($relations['remoteApiSource']),
+        ))->andReturnSelf();
+        $allQuery->shouldReceive('chunkById')->with(100, Mockery::type('Closure'))->andReturnUsing(function ($count, $callback) use ($linked) {
+            $callback(collect([$linked]));
+
+            return true;
+        });
 
         $model = Mockery::mock(SyncTestModel::class);
         $model->shouldReceive('newQuery')->andReturn($allQuery, $existingQuery);
+        $model->shouldReceive('getKeyName')->andReturn('id');
         $model->shouldReceive('getFillable')->andReturn(['name', 'published']);
 
         $repository = Mockery::mock(Repository::class);
@@ -267,7 +277,7 @@ class RemoteApiSynchronizerTest extends TestCase
         $this->assertSame(1, $result['http_requests']['total']);
     }
 
-    public function test_sync_all_skips_stale_linked_records_without_fetch_one(): void
+    public function test_sync_all_skips_stale_linked_records_when_remote_record_is_missing(): void
     {
         config(['modularous.remote_api.base_url' => 'http://app.b2press.test/api/v1']);
 
@@ -294,13 +304,18 @@ class RemoteApiSynchronizerTest extends TestCase
         $connector->shouldReceive('configuration')->andReturn($configuration);
         $connector->shouldReceive('resetRequestStats')->once();
         $connector->shouldReceive('flushRequestStats')->once()->andReturn([
-            'total' => 1,
-            'by_url' => ['http://app.b2press.test/api/v1/packages' => 1],
+            'total' => 2,
+            'by_url' => [
+                'http://app.b2press.test/api/v1/packages/42' => 1,
+                'http://app.b2press.test/api/v1/packages/274' => 1,
+            ],
         ]);
-        $connector->shouldReceive('fetchList')->once()->andReturn([
-            ['id' => 42, 'name' => 'Premium API'],
+        $connector->shouldNotReceive('fetchList');
+        $connector->shouldReceive('fetchOne')->with(42)->andReturn([
+            'id' => 42,
+            'name' => 'Premium API',
         ]);
-        $connector->shouldNotReceive('fetchOne');
+        $connector->shouldReceive('fetchOne')->with(274)->andReturn(null);
         $connector->shouldReceive('mapRow')->andReturnUsing(
             fn (array $row, array $existing = []) => $adapter->mapToAttributes($row, $existing)
         );
@@ -332,11 +347,20 @@ class RemoteApiSynchronizerTest extends TestCase
         $existingQuery->shouldReceive('first')->andReturn($linked);
 
         $allQuery = Mockery::mock();
-        $allQuery->shouldReceive('with')->with('remoteApiSource')->andReturnSelf();
-        $allQuery->shouldReceive('get')->andReturn(collect([$linked, $staleLinked]));
+        $allQuery->shouldReceive('whereHas')->once()->andReturnSelf();
+        $allQuery->shouldReceive('select')->with(['id'])->andReturnSelf();
+        $allQuery->shouldReceive('with')->with(Mockery::on(
+            static fn (array $relations): bool => isset($relations['remoteApiSource']) && is_callable($relations['remoteApiSource']),
+        ))->andReturnSelf();
+        $allQuery->shouldReceive('chunkById')->with(100, Mockery::type('Closure'))->andReturnUsing(function ($count, $callback) use ($linked, $staleLinked) {
+            $callback(collect([$linked, $staleLinked]));
+
+            return true;
+        });
 
         $model = Mockery::mock(SyncTestModel::class);
         $model->shouldReceive('newQuery')->andReturn($allQuery, $existingQuery);
+        $model->shouldReceive('getKeyName')->andReturn('id');
         $model->shouldReceive('getFillable')->andReturn(['name', 'published']);
 
         $repository = Mockery::mock(Repository::class);
@@ -349,6 +373,86 @@ class RemoteApiSynchronizerTest extends TestCase
         $this->assertSame(1, $result['skipped']);
         $this->assertSame(274, $result['skipped_records'][0]['remote_id']);
         $this->assertSame('not_in_remote_list', $result['skipped_records'][0]['reason']);
+    }
+
+    public function test_sync_all_imports_new_records_from_remote_list(): void
+    {
+        config(['modularous.remote_api.base_url' => 'http://app.b2press.test/api/v1']);
+
+        $module = Mockery::mock(Module::class);
+        $module->shouldReceive('getName')->andReturn('BusinessPackage');
+
+        $configuration = new RemoteApiConfiguration($module, 'package', [
+            'enabled' => true,
+            'endpoint' => 'packages',
+            'remote_id_column' => 'remote_id',
+            'mapping' => [
+                'remote_id' => 'id',
+                'synced_name' => 'name',
+                'remote_payload' => '@raw',
+                'remote_synced_at' => '@now',
+            ],
+            'sync' => [
+                'import_new_from_list' => true,
+            ],
+        ]);
+
+        $adapter = new ConfigurableRemoteApiAdapter($configuration, new RemoteApiFieldMapper($configuration));
+
+        $connector = Mockery::mock(RemoteApiConnectorInterface::class);
+        $connector->shouldReceive('configuration')->andReturn($configuration);
+        $connector->shouldReceive('resetRequestStats')->once();
+        $connector->shouldReceive('flushRequestStats')->once()->andReturn([
+            'total' => 0,
+            'by_url' => [],
+        ]);
+        $connector->shouldReceive('fetchList')->once()->andReturn([
+            ['id' => 99, 'name' => 'New Package'],
+        ]);
+        $connector->shouldReceive('mapRow')->andReturnUsing(
+            fn (array $row, array $existing = []) => $adapter->mapToAttributes($row, $existing)
+        );
+
+        $createdModel = Mockery::mock(SyncTestModel::class)->makePartial();
+        $createdModel->forceFill(['id' => 5, 'name' => 'New Package', 'published' => 1]);
+        $createdModel->setRelation('remoteApiSource', null);
+        $createdModel->shouldReceive('fresh')->with(['remoteApiSource'])->andReturnSelf();
+
+        $morphRelation = Mockery::mock(MorphOne::class);
+        $morphRelation->shouldReceive('create')->once()->with(Mockery::type('array'));
+        $createdModel->shouldReceive('remoteApiSource')->andReturn($morphRelation);
+
+        $existingQuery = Mockery::mock();
+        $existingQuery->shouldReceive('whereHas')->once()->andReturnSelf();
+        $existingQuery->shouldReceive('with')->with('remoteApiSource')->andReturnSelf();
+        $existingQuery->shouldReceive('first')->andReturn(null);
+
+        $allQuery = Mockery::mock();
+        $allQuery->shouldReceive('whereHas')->once()->andReturnSelf();
+        $allQuery->shouldReceive('select')->with(['id'])->andReturnSelf();
+        $allQuery->shouldReceive('with')->with(Mockery::type('array'))->andReturnSelf();
+        $allQuery->shouldReceive('chunkById')->with(100, Mockery::type('Closure'))->andReturnUsing(function ($count, $callback) {
+            $callback(collect());
+
+            return true;
+        });
+
+        $model = Mockery::mock(SyncTestModel::class);
+        $model->shouldReceive('newQuery')->andReturn($allQuery, $existingQuery);
+        $model->shouldReceive('getKeyName')->andReturn('id');
+        $model->shouldReceive('getFillable')->andReturn(['name', 'published']);
+
+        $repository = Mockery::mock(Repository::class);
+        $repository->shouldReceive('getModel')->andReturn($model);
+        $repository->shouldReceive('create')->once()->with(Mockery::on(function (array $attributes) {
+            return $attributes['name'] === 'New Package' && $attributes['published'] === 1;
+        }))->andReturn($createdModel);
+
+        $result = (new RemoteApiSynchronizer(new RemoteApiAttributePartition))->syncAll($connector, $repository);
+
+        $this->assertSame(1, $result['created']);
+        $this->assertSame(0, $result['updated']);
+        $this->assertSame(1, $result['total']);
     }
 
     public function test_sync_record_throws_when_remote_record_is_missing(): void

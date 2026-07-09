@@ -1,74 +1,121 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Unusualify\Modularous\Tests\Services;
 
+use Illuminate\Broadcasting\Channel;
+use Illuminate\Broadcasting\PrivateChannel;
 use Unusualify\Modularous\Services\BroadcastManager;
 use Unusualify\Modularous\Tests\TestCase;
 
 class BroadcastManagerTest extends TestCase
 {
-    /** @test */
-    public function test_constructor_stores_model_and_event_classes()
+    public function test_get_broadcast_configuration_groups_events_by_channel(): void
     {
-        $model = new \stdClass;
-        $events = ['Event1', 'Event2'];
+        $model = (object) ['id' => 7];
 
-        $manager = new BroadcastManager($model, $events);
+        $config = (new BroadcastManager($model, [
+            BroadcastCreatedEvent::class,
+            BroadcastUpdatedEvent::class,
+        ]))->getBroadcastConfiguration();
 
-        $this->assertInstanceOf(BroadcastManager::class, $manager);
+        $byName = collect($config)->keyBy('name');
+
+        $this->assertSame('public', $byName['models.7']['type']);
+        $this->assertCount(2, $byName['models.7']['events']);
+        $this->assertSame('modularous.broadcast.created', $byName['models.7']['events'][0]['event']);
+
+        $this->assertSame('public', $byName['model']['type']);
+        $this->assertCount(2, $byName['model']['events']);
     }
 
-    /** @test */
-    public function test_get_broadcast_configuration_returns_empty_for_no_events()
+    public function test_for_model_static_helper_returns_configuration(): void
     {
-        $model = new \stdClass;
+        $model = (object) ['id' => 3];
 
-        $manager = new BroadcastManager($model, []);
-        $config = $manager->getBroadcastConfiguration();
+        $config = BroadcastManager::forModel($model, [BroadcastCreatedEvent::class]);
 
-        $this->assertIsArray($config);
-        $this->assertEmpty($config);
+        $this->assertCount(2, $config);
+        $this->assertContains('models.3', array_column($config, 'name'));
+        $this->assertContains('model', array_column($config, 'name'));
     }
 
-    /** @test */
-    public function test_get_broadcast_configuration_skips_non_existent_classes()
+    public function test_skips_missing_event_classes(): void
     {
-        $model = new \stdClass;
+        $model = (object) ['id' => 1];
 
-        $manager = new BroadcastManager($model, ['NonExistentEventClass']);
-        $config = $manager->getBroadcastConfiguration();
+        $config = BroadcastManager::forModel($model, [
+            BroadcastCreatedEvent::class,
+            'Missing\\Event\\Class',
+        ]);
 
-        // Should skip non-existent classes
-        $this->assertIsArray($config);
-        $this->assertEmpty($config);
+        $this->assertCount(2, $config);
     }
 
-    /** @test */
-    public function test_for_model_static_helper_works()
+    public function test_resolves_channel_objects_and_private_channels(): void
     {
-        $model = new \stdClass;
+        $model = (object) ['id' => 9];
 
-        $config = BroadcastManager::forModel($model, []);
+        $config = BroadcastManager::forModel($model, [BroadcastPrivateChannelEvent::class]);
+        $byName = collect($config)->keyBy('name');
 
-        $this->assertIsArray($config);
+        $this->assertSame('private', $byName['private-models.9']['type']);
+        $this->assertSame('public', $byName['presence-room']['type']);
+        $this->assertSame('modularous.broadcast.private', $byName['private-models.9']['events'][0]['event']);
+    }
+}
+
+class BroadcastCreatedEvent
+{
+    public function __construct(public object $model) {}
+
+    public function broadcastOn(): array
+    {
+        return [
+            'models.' . $this->model->id,
+            'model',
+        ];
     }
 
-    /** @test */
-    public function test_handles_class_exists_check()
+    public function broadcastAs(): string
     {
-        $model = new \stdClass;
+        return 'modularous.broadcast.created';
+    }
+}
 
-        // Test that the service handles non-existent class strings gracefully
-        $manager = new BroadcastManager($model, ['FooBarBazEventThatDoesNotExist']);
-        $config = $manager->getBroadcastConfiguration();
+class BroadcastUpdatedEvent
+{
+    public function __construct(public object $model) {}
 
-        $this->assertIsArray($config);
-        $this->assertEmpty($config);
+    public function broadcastOn(): array
+    {
+        return [
+            'models.' . $this->model->id,
+            'model',
+        ];
     }
 
-    protected function tearDown(): void
+    public function broadcastAs(): string
     {
-        \Mockery::close();
-        parent::tearDown();
+        return 'modularous.broadcast.updated';
+    }
+}
+
+class BroadcastPrivateChannelEvent
+{
+    public function __construct(public object $model) {}
+
+    public function broadcastOn(): array
+    {
+        return [
+            new PrivateChannel('models.' . $this->model->id),
+            new Channel('presence-room'),
+        ];
+    }
+
+    public function broadcastAs(): string
+    {
+        return 'modularous.broadcast.private';
     }
 }

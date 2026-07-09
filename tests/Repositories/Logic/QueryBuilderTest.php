@@ -2,7 +2,9 @@
 
 namespace Unusualify\Modularous\Tests\Repositories\Logic;
 
+use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Config;
 use Unusualify\Modularous\Tests\Repositories\RepositorySources;
 use Unusualify\Modularous\Tests\Repositories\TestModel;
 use Unusualify\Modularous\Tests\RepositoryTestCase;
@@ -226,5 +228,99 @@ class QueryBuilderTest extends RepositoryTestCase
 
         $found = $this->repository->getById($bobId, scopes: ['name' => 'Bob']);
         $this->assertSame('Bob', $found->name);
+    }
+
+    public function test_get_paginator_delegates_to_get_when_cache_disabled(): void
+    {
+        $this->seedFilterFixtures();
+
+        $this->repository
+            ->setCacheModuleName('Blog')
+            ->setCacheModuleRouteName('Post')
+            ->withoutCache();
+
+        $paginator = $this->repository->getPaginator(perPage: 2, orders: ['id' => 'asc']);
+
+        $this->assertInstanceOf(LengthAwarePaginator::class, $paginator);
+        $this->assertSame([1, 2], $paginator->getCollection()->pluck('id')->all());
+    }
+
+    public function test_get_cached_round_trips_paginator_payload(): void
+    {
+        $this->seedFilterFixtures();
+
+        Config::set('modularous.cache.enabled', true);
+        Config::set('modularous.cache.modules.Blog.enabled', true);
+        Config::set('modularous.cache.modules.Blog.routes.Post.enabled', true);
+        Config::set('modularous.cache.modules.Blog.routes.Post.types.index', true);
+
+        $this->repository
+            ->setCacheModuleName('Blog')
+            ->setCacheModuleRouteName('Post')
+            ->withCache(true);
+
+        $first = $this->repository->getCached(perPage: 2, orders: ['id' => 'asc']);
+        $second = $this->repository->getCached(perPage: 2, orders: ['id' => 'asc']);
+
+        $this->assertInstanceOf(LengthAwarePaginator::class, $first);
+        $this->assertSame(5, $first->total());
+        $this->assertSame([1, 2], $first->getCollection()->pluck('id')->all());
+        $this->assertSame($first->total(), $second->total());
+        $this->assertSame($first->getCollection()->pluck('id')->all(), $second->getCollection()->pluck('id')->all());
+    }
+
+    public function test_paginate_reads_request_parameters(): void
+    {
+        $this->seedFilterFixtures();
+
+        $request = Request::create('/items', 'GET', [
+            'itemsPerPage' => 2,
+            'orders' => ['id' => 'asc'],
+            'scopes' => ['is_active' => true],
+            'eager' => 'owner',
+            'appends' => 'owner_name',
+            'exceptIds' => '3',
+        ]);
+
+        $paginator = $this->repository
+            ->withoutCache()
+            ->paginate($request);
+
+        $this->assertInstanceOf(LengthAwarePaginator::class, $paginator);
+        $this->assertSame(2, $paginator->perPage());
+        $this->assertSame([1, 4], $paginator->getCollection()->pluck('id')->all());
+        $this->assertArrayHasKey('owner_name', $paginator->getCollection()->first()->getAttributes());
+    }
+
+    public function test_get_by_id_with_scopes_enables_default_scopes_via_legacy_alias(): void
+    {
+        $this->seedFilterFixtures();
+        $bobId = TestModel::where('name', 'Bob')->value('id');
+
+        $found = $this->repository->getByIdWithScopes($bobId, scopes: ['name' => 'Bob']);
+
+        $this->assertSame('Bob', $found->name);
+    }
+
+    public function test_get_searches_translated_attributes_separately_from_base_columns(): void
+    {
+        $this->seedFilterFixtures();
+
+        $results = $this->repository->listAll(scopes: [
+            'searches' => ['name', 'context'],
+            'search' => 'Alice',
+        ]);
+
+        $this->assertSame(['Alice', 'Alice B'], $results->pluck('name')->sort()->values()->all());
+    }
+
+    public function test_get_by_ids_accepts_deprecated_is_formatted_flag(): void
+    {
+        $this->seedFilterFixtures();
+        $ids = TestModel::whereIn('name', ['Alice', 'Bob'])->pluck('id')->all();
+
+        $results = $this->repository->getByIds($ids, isFormatted: true);
+
+        $this->assertCount(2, $results);
     }
 }

@@ -37,6 +37,7 @@ use Unusualify\Modularous\Services\Currency\SystemPricingCurrencyProvider;
 use Unusualify\Modularous\Services\CurrencyExchangeService;
 use Unusualify\Modularous\Services\FilepondManager;
 use Unusualify\Modularous\Services\MigrationBackup;
+use Unusualify\Modularous\Contracts\Cache\UrlPresentationCacheStoreInterface;
 use Unusualify\Modularous\Services\ModularousCacheService;
 use Unusualify\Modularous\Services\RedirectService;
 use Unusualify\Modularous\Services\RemoteApi\RemoteApiConnectorFactory;
@@ -225,6 +226,10 @@ class BaseServiceProvider extends ServiceProvider
 
         $this->app->singleton('modularous.cache', function (Application $app) {
             return new ModularousCacheService;
+        });
+
+        $this->app->singleton(UrlPresentationCacheStoreInterface::class, function (Application $app) {
+            return $app->make('modularous.cache')->getUrlPresentationCacheStore();
         });
 
         $this->app->singleton('migration.backup', function (Application $app) {

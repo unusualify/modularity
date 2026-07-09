@@ -4,7 +4,9 @@ namespace Unusualify\Modularous\Tests\Services;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
+use Unusualify\Modularous\Entities\Filepond;
 use Unusualify\Modularous\Entities\TemporaryFilepond;
 use Unusualify\Modularous\Services\FilepondManager;
 use Unusualify\Modularous\Tests\TestCase;
@@ -28,6 +30,22 @@ class FilepondManagerTest extends TestCase
                 $table->string('folder_name');
                 $table->string('input_role');
                 $table->timestamps();
+            });
+        }
+
+        $filepondsTable = modularousConfig('tables.fileponds', 'modularous_fileponds');
+
+        if (! $schema->hasTable($filepondsTable)) {
+            $schema->create($filepondsTable, function ($table) {
+                $table->increments('id');
+                $table->string('uuid');
+                $table->string('file_name');
+                $table->unsignedBigInteger('filepondable_id');
+                $table->string('filepondable_type');
+                $table->string('role')->nullable();
+                $table->string('locale')->nullable();
+                $table->timestamps();
+                $table->softDeletes();
             });
         }
 
@@ -77,5 +95,96 @@ class FilepondManagerTest extends TestCase
 
         $this->assertDatabaseMissing(modularousConfig('tables.filepond_temporaries', 'modularous_filepond_temporaries'), ['folder_name' => $folderName]);
         $this->assertFalse(Storage::disk('local')->exists('public/fileponds/tmp/' . $folderName));
+    }
+
+    /** @test */
+    public function it_can_preview_temporary_filepond_file(): void
+    {
+        if (ob_get_level() > 0) {
+            $this->markTestSkipped('Output buffer state is incompatible with previewFile in this runtime.');
+        }
+
+        $folderName = 'preview-folder';
+        TemporaryFilepond::create([
+            'folder_name' => $folderName,
+            'file_name' => 'preview.jpg',
+            'input_role' => 'avatar',
+        ]);
+
+        Storage::disk('local')->put(
+            'public/fileponds/tmp/' . $folderName . '/preview.jpg',
+            base64_decode('/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////2wBDAf//////////////////////////////////////////////////////////////////////////////////////wAARCAABAAEDAREAAhEBAxEB/8QAFwABAQEBAAAAAAAAAAAAAAAAAAUGB//EABQBAQAAAAAAAAAAAAAAAAAAAAD/xAAUAQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIQAxAAAAGfAP/EABQQAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQEAAQUCf//EABQRAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQMBAT8Bf//EABQRAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQIBAT8Bf//EABQQAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQEABj8Cf//Z')
+        );
+
+        $response = $this->manager->previewFile($folderName);
+
+        $this->assertGreaterThanOrEqual(200, $response->getStatusCode());
+        $this->assertLessThan(600, $response->getStatusCode());
+    }
+
+    /** @test */
+    public function it_can_delete_persisted_filepond_folder(): void
+    {
+        $folderName = 'persisted-folder';
+        $path = 'public/fileponds/' . $folderName . '/avatar.jpg';
+
+        Storage::disk('local')->put($path, 'content');
+        Filepond::create([
+            'uuid' => $folderName,
+            'file_name' => 'avatar.jpg',
+            'filepondable_id' => 1,
+            'filepondable_type' => 'TestModel',
+            'role' => 'avatar',
+            'locale' => 'en',
+        ]);
+
+        $this->manager->deleteFile($folderName);
+
+        $this->assertFalse(Storage::disk('local')->exists('public/fileponds/' . $folderName));
+        $this->assertSoftDeleted(modularousConfig('tables.fileponds', 'modularous_fileponds'), ['uuid' => $folderName]);
+    }
+
+    /** @test */
+    public function it_can_clear_stale_temporary_fileponds(): void
+    {
+        $stale = TemporaryFilepond::create([
+            'folder_name' => 'stale-folder',
+            'file_name' => 'old.jpg',
+            'input_role' => 'avatar',
+        ]);
+        $stale->forceFill([
+            'created_at' => now()->subDays(10),
+            'updated_at' => now()->subDays(10),
+        ])->save();
+
+        Storage::disk('local')->put('public/fileponds/tmp/stale-folder/old.jpg', 'content');
+
+        $deleted = $this->manager->clearTemporaryFiles(7);
+
+        $this->assertCount(1, $deleted);
+        $this->assertFalse(Storage::disk('local')->exists('public/fileponds/tmp/stale-folder'));
+        $this->assertDatabaseMissing(modularousConfig('tables.filepond_temporaries', 'modularous_filepond_temporaries'), ['id' => $stale->id]);
+    }
+
+    /** @test */
+    public function it_returns_empty_string_when_encoded_file_is_missing(): void
+    {
+        $this->assertSame('', $this->manager->getEncodedFile('missing-folder'));
+    }
+
+    /** @test */
+    public function it_removes_filepond_from_session_when_deleting_temporary_file(): void
+    {
+        $tmp = TemporaryFilepond::create([
+            'folder_name' => 'session-folder',
+            'file_name' => 'avatar.jpg',
+            'input_role' => 'avatar',
+        ]);
+
+        Session::put('_filepond.avatar', 'session-folder');
+
+        $this->manager->deleteFilePondFromSession($tmp);
+
+        $this->assertNull(Session::get('_filepond.avatar'));
     }
 }

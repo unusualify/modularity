@@ -13,6 +13,7 @@ use Modules\Cms\Providers\CmsRouteServiceProvider;
 use Modules\Cms\Services\CmsPublicModelResolver;
 use Modules\Cms\Support\CmsFrontRouteRegistrationCache;
 use Unusualify\Modularous\Facades\Modularous;
+use Unusualify\Modularous\Facades\ModularousCache;
 use Unusualify\Modularous\Module;
 
 /**
@@ -378,6 +379,7 @@ final class CmsFrontRouteRegistrar
 
         return array_values(array_filter([
             'web',
+            $register ? 'modules.cms.url_stale.serve' : null,
             $useFallbackSluglessCanonicalMiddleware ? 'modules.cms.fallback.slugless.canonical' : null,
             $useMcamaraRoutesMiddleware ? LaravelLocalizationRoutes::class : null,
             $useCanonicalLocaleMiddleware ? 'modules.cms.canonical.locale' : null,
@@ -399,6 +401,86 @@ final class CmsFrontRouteRegistrar
     }
 
     /**
+     * Ensure URL stale middleware is on CMS public catch-alls (e.g. route cache built before it existed).
+     */
+    public static function syncUrlStaleServeMiddlewareOnRegisteredPublicFrontRoutes(): void
+    {
+        if (! modularousConfig('cms_features.register_middlewares', true)) {
+            return;
+        }
+
+        if (! ModularousCache::isUrlStaleServeFirst()) {
+            return;
+        }
+
+        /** @var array<string, true> $routeNames */
+        $routeNames = [];
+
+        foreach (Route::getRoutes() as $route) {
+            if (! $route instanceof \Illuminate\Routing\Route) {
+                continue;
+            }
+
+            if (! self::routeUsesCmsPublicFrontController($route)) {
+                continue;
+            }
+
+            $name = $route->getName();
+            if (is_string($name) && $name !== '') {
+                $routeNames[$name] = true;
+
+                continue;
+            }
+
+            self::patchUrlStaleMiddlewareOnRoute($route);
+        }
+
+        foreach (array_keys($routeNames) as $name) {
+            $target = Route::getRoutes()->getByName($name);
+            if ($target instanceof \Illuminate\Routing\Route) {
+                self::patchUrlStaleMiddlewareOnRoute($target);
+            }
+        }
+    }
+
+    private static function patchUrlStaleMiddlewareOnRoute(\Illuminate\Routing\Route $route): void
+    {
+        $alias = 'modules.cms.url_stale.serve';
+        $middleware = array_values($route->middleware());
+        if (in_array($alias, $middleware, true)) {
+            return;
+        }
+
+        $webIndex = array_search('web', $middleware, true);
+        if ($webIndex === false) {
+            array_unshift($middleware, $alias);
+        } else {
+            array_splice($middleware, $webIndex + 1, 0, [$alias]);
+        }
+
+        $action = $route->getAction();
+        $action['middleware'] = array_values($middleware);
+        $route->setAction($action);
+    }
+
+    private static function routeUsesCmsPublicFrontController(\Illuminate\Routing\Route $route): bool
+    {
+        $controller = $route->getAction('controller');
+        if (is_string($controller) && $controller !== '' && is_subclass_of($controller, CmsController::class, true)) {
+            return true;
+        }
+
+        $uses = $route->getAction('uses');
+        if (! is_string($uses) || $uses === '') {
+            return false;
+        }
+
+        $class = str_contains($uses, '@') ? strstr($uses, '@', true) : $uses;
+
+        return is_string($class) && $class !== '' && is_subclass_of($class, CmsController::class, true);
+    }
+
+    /**
      * First resolvable front controller for any enabled {@see ParentSegment} target (global gate + legacy macro).
      *
      * @return class-string|null
@@ -410,7 +492,7 @@ final class CmsFrontRouteRegistrar
         }
 
         if (! database_exists()) {
-            return null;
+            return self::resolveControllerForUrlStaleResilienceOrNull();
         }
 
         if (! CmsFrontRouteRegistrationCache::parentSegmentTableReady()) {
@@ -422,6 +504,29 @@ final class CmsFrontRouteRegistrar
         }
 
         return CmsFrontRouteRegistrationCache::publicFrontCatchAllControllerOrNull();
+    }
+
+    /**
+     * Keep the public catch-all routable when URL-keyed stale serve-first is on but the DB is unavailable.
+     *
+     * @return class-string|null
+     */
+    private static function resolveControllerForUrlStaleResilienceOrNull(): ?string
+    {
+        if (! ModularousCache::isUrlStaleServeFirst()) {
+            return null;
+        }
+
+        $fromSnapshot = CmsFrontRouteRegistrationCache::publicFrontCatchAllControllerOrNull();
+        if ($fromSnapshot !== null) {
+            return $fromSnapshot;
+        }
+
+        if (CmsFrontRouteRegistrationCache::usesUniversalPublicFront() && class_exists(CmsPublicFrontController::class)) {
+            return CmsPublicFrontController::class;
+        }
+
+        return null;
     }
 
     /**

@@ -126,6 +126,53 @@ class RemoteApiClientTest extends TestCase
         $this->assertNull($client->getItem('packages/274'));
     }
 
+    public function test_post_sends_json_payload_and_returns_response(): void
+    {
+        config(['modularous.remote_api.base_url' => 'http://app.b2press.test/api/v1']);
+
+        Http::fake([
+            'http://app.b2press.test/api/v1/packages*' => Http::response([
+                'data' => ['id' => 99, 'name' => 'Created'],
+            ], 201),
+        ]);
+
+        $client = new RemoteApiClient(
+            $this->makeConfiguration(),
+            new RemoteApiRateLimiter(['enabled' => false]),
+        );
+
+        $response = $client->post('packages', ['name' => 'Created']);
+
+        $this->assertSame(['id' => 99, 'name' => 'Created'], $response['data']);
+        Http::assertSent(static function ($request) {
+            return $request->method() === 'POST'
+                && $request->url() === 'http://app.b2press.test/api/v1/packages'
+                && $request['name'] === 'Created';
+        });
+    }
+
+    public function test_flush_request_stats_returns_tracker_snapshot(): void
+    {
+        config(['modularous.remote_api.base_url' => 'http://app.b2press.test/api/v1']);
+
+        Http::fake([
+            'http://app.b2press.test/api/v1/packages*' => Http::response(['data' => []]),
+        ]);
+
+        $client = new RemoteApiClient(
+            $this->makeConfiguration(),
+            new RemoteApiRateLimiter(['enabled' => false]),
+        );
+
+        $client->get('packages');
+
+        $stats = $client->flushRequestStats();
+
+        $this->assertSame(1, $stats['total']);
+        $this->assertSame(1, $stats['by_url']['http://app.b2press.test/api/v1/packages']);
+        $this->assertSame(0, $client->requestTracker()->total());
+    }
+
     public function test_get_throws_remote_api_sync_exception_on_404_when_not_allowed(): void
     {
         config(['modularous.remote_api.base_url' => 'http://app.b2press.test/api/v1']);

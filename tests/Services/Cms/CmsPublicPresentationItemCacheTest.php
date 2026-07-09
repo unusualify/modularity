@@ -12,6 +12,8 @@ use Unusualify\Modularous\Tests\TestCase;
 
 class CmsPublicPresentationItemCacheTest extends TestCase
 {
+    private string $urlStalePath;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -20,14 +22,26 @@ class CmsPublicPresentationItemCacheTest extends TestCase
             $this->markTestSkipped('Cms module is not loaded.');
         }
 
+        $this->urlStalePath = sys_get_temp_dir() . '/modularous-presentation-item-test-' . uniqid('', true);
+
         Config::set('modularous.cache.driver', 'array');
         Config::set('modularous.cache.enabled', true);
         Config::set('modularous.cache.use_tags', false);
         Config::set('modularous.cache.all_modules', false);
+        Config::set('modularous.cache.presentationItem.store', 'url');
+        Config::set('modularous.cache.presentationItem.url.base_path', $this->urlStalePath);
         Config::set('modularous.cache.modules.PrimaryPage.enabled', true);
         Config::set('modularous.cache.modules.PrimaryPage.routes.Home.enabled', true);
         Config::set('modularous.cache.modules.PrimaryPage.routes.Home.types.presentationItem', true);
         Config::set('modularous.cache.modules.PrimaryPage.routes.Home.types.formItem', false);
+
+        $this->app->forgetInstance('modularous.cache');
+    }
+
+    protected function tearDown(): void
+    {
+        $this->deleteDirectory($this->urlStalePath);
+        parent::tearDown();
     }
 
     /** @test */
@@ -62,29 +76,22 @@ class CmsPublicPresentationItemCacheTest extends TestCase
         $routeName = 'Home';
         $id = 77;
         $locale = 'en';
+        $path = '/pages/warmup-live-parity';
         app()->setLocale($locale);
 
         $cachedHtml = '<!DOCTYPE html><html><head></head><body>warmup-live-parity</body></html>';
         $item = new Page;
         $item->id = $id;
+        $item->published = true;
         $viewName = 'cms::page.custom';
 
-        $key = CmsPublicPresentationItemCache::cacheKeyForPublicPresentation(
-            $moduleName,
-            $routeName,
-            $item,
-            $viewName,
+        CmsPublicPresentationItemCache::storeUrlKeyedPresentation(
             $locale,
-        );
-
-        ModularousCache::putWithRelations(
-            $key,
+            $path,
             $cachedHtml,
-            3600,
+            $item,
             $moduleName,
             $routeName,
-            [Page::class => $id],
-            CmsPublicPresentationItemCache::CACHE_TYPE,
         );
 
         $result = CmsPublicPresentationItemCache::rememberPublicPresentation(
@@ -94,6 +101,7 @@ class CmsPublicPresentationItemCacheTest extends TestCase
             $viewName,
             ['item' => $item],
             $locale,
+            normalizedPath: $path,
         );
 
         $this->assertSame($cachedHtml, $result);
@@ -108,26 +116,21 @@ class CmsPublicPresentationItemCacheTest extends TestCase
         $routeName = 'Home';
         $id = 88;
         $locale = 'en';
+        $path = '/pages/already-warm';
 
         $cachedHtml = '<!DOCTYPE html><html><head></head><body>already-warm</body></html>';
         $item = new Page;
         $item->id = $id;
+        $item->published = true;
         $viewName = 'cms::page.custom';
 
-        ModularousCache::putWithRelations(
-            CmsPublicPresentationItemCache::cacheKeyForPublicPresentation(
-                $moduleName,
-                $routeName,
-                $item,
-                $viewName,
-                $locale,
-            ),
+        CmsPublicPresentationItemCache::storeUrlKeyedPresentation(
+            $locale,
+            $path,
             $cachedHtml,
-            3600,
+            $item,
             $moduleName,
             $routeName,
-            [Page::class => $id],
-            CmsPublicPresentationItemCache::CACHE_TYPE,
         );
 
         $result = CmsPublicPresentationItemCache::rememberPublicPresentation(
@@ -137,6 +140,7 @@ class CmsPublicPresentationItemCacheTest extends TestCase
             $viewName,
             ['item' => $item],
             $locale,
+            normalizedPath: $path,
         );
 
         $this->assertSame($cachedHtml, $result);
@@ -198,22 +202,23 @@ class CmsPublicPresentationItemCacheTest extends TestCase
         $routeName = 'Home';
         $id = 55;
         $locale = 'en';
+        $path = '/pages/cached-full-document';
         app()->setLocale($locale);
 
         $cachedHtml = '<!DOCTYPE html><html><head></head><body>cached-full-document</body></html>';
-        $key = CmsPublicPresentationItemCache::cacheKey($moduleName, $routeName, $id, $locale);
-
-        ModularousCache::putWithRelations(
-            $key,
-            $cachedHtml,
-            3600,
-            $moduleName,
-            $routeName,
-            [Page::class => $id],
-        );
 
         $item = new Page;
         $item->id = $id;
+        $item->published = true;
+
+        CmsPublicPresentationItemCache::storeUrlKeyedPresentation(
+            $locale,
+            $path,
+            $cachedHtml,
+            $item,
+            $moduleName,
+            $routeName,
+        );
 
         $result = CmsPublicPresentationItemCache::rememberWrappedDocumentHtml(
             $moduleName,
@@ -221,6 +226,7 @@ class CmsPublicPresentationItemCacheTest extends TestCase
             $item,
             'cms::page.custom',
             ['item' => $item],
+            normalizedPath: $path,
         );
 
         $this->assertSame($cachedHtml, $result);
@@ -235,22 +241,23 @@ class CmsPublicPresentationItemCacheTest extends TestCase
         $routeName = 'Home';
         $id = 55;
         $locale = 'en';
+        $path = '/pages/cached-full-document-tags';
         app()->setLocale($locale);
 
         $cachedHtml = '<!DOCTYPE html><html><head></head><body>cached-full-document</body></html>';
-        $key = CmsPublicPresentationItemCache::cacheKey($moduleName, $routeName, $id, $locale);
-
-        ModularousCache::putWithRelations(
-            $key,
-            $cachedHtml,
-            3600,
-            $moduleName,
-            $routeName,
-            [Page::class => $id],
-        );
 
         $item = new Page;
         $item->id = $id;
+        $item->published = true;
+
+        CmsPublicPresentationItemCache::storeUrlKeyedPresentation(
+            $locale,
+            $path,
+            $cachedHtml,
+            $item,
+            $moduleName,
+            $routeName,
+        );
 
         $result = CmsPublicPresentationItemCache::rememberWrappedDocumentHtml(
             $moduleName,
@@ -258,8 +265,29 @@ class CmsPublicPresentationItemCacheTest extends TestCase
             $item,
             'cms::page.custom',
             ['item' => $item],
+            normalizedPath: $path,
         );
 
         $this->assertSame($cachedHtml, $result);
+    }
+
+    private function deleteDirectory(string $directory): void
+    {
+        if (! is_dir($directory)) {
+            return;
+        }
+
+        foreach (scandir($directory) ?: [] as $item) {
+            if ($item === '.' || $item === '..') {
+                continue;
+            }
+            $path = $directory . '/' . $item;
+            if (is_dir($path)) {
+                $this->deleteDirectory($path);
+            } else {
+                @unlink($path);
+            }
+        }
+        @rmdir($directory);
     }
 }

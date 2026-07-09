@@ -12,7 +12,7 @@ use Unusualify\Modularous\Facades\ModularousCache;
 use Unusualify\Modularous\Http\Controllers\Traits\Form\FormActions;
 use Unusualify\Modularous\Http\Controllers\Traits\Table\TableActions;
 use Unusualify\Modularous\Jobs\Cache\WarmModuleRouteCachesJob;
-use Unusualify\Modularous\Repositories\Traits\ResourceCacheActionsTrait;
+use Unusualify\Modularous\Repositories\Logic\ResourceCacheActionsTrait;
 
 /**
  * Superadmin cache purge/warm endpoints and admin UI actions.
@@ -38,7 +38,10 @@ trait ManageResourceCache
             return;
         }
 
-        $routePrefix = $this->module->panelRouteNamePrefix() . '.' . Str::snake($this->routeName) . '.';
+        $module = $this->getModule();
+        $isParent = $module->isParentRoute($this->getRouteName());
+
+        $routePrefix = $module->panelRouteNamePrefix($isParent) . snakeCase($this->getRouteName()) . '.';
         $existing = is_array($this->tableActions ?? null) ? $this->tableActions : [];
         $actions = [];
 
