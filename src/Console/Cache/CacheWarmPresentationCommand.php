@@ -8,8 +8,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Str;
-use Throwable;
 use Modules\Cms\Services\CmsPublicModelResolver;
+use Throwable;
 use Unusualify\Modularous\Console\BaseCommand;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Facades\ModularousCache;
@@ -140,7 +140,7 @@ final class CacheWarmPresentationCommand extends BaseCommand
                     $chunkSize,
                 );
                 $queuedJobs++;
-                $this->line("  <fg=green>✓</> Queued route warmup job");
+                $this->line('  <fg=green>✓</> Queued route warmup job');
 
                 continue;
             }

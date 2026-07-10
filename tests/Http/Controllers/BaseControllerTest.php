@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Unusualify\Modularous\Tests\Http\Controllers;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route as RoutingRoute;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
+use Illuminate\View\View;
 use Mockery;
 use TestModules\TestModule\Controllers\ItemController;
 use Unusualify\Modularous\Http\Controllers\BaseController;
@@ -39,7 +41,7 @@ class BaseControllerTest extends TestModulesCase
 
     private function makeRepositoryMock(): Repository
     {
-        $model = new class extends \Illuminate\Database\Eloquent\Model
+        $model = new class extends Model
         {
             protected $table = 'base_controller_items';
 
@@ -112,7 +114,7 @@ class BaseControllerTest extends TestModulesCase
 
     public function test_store_creates_item_and_returns_ajax_success(): void
     {
-        $item = new class extends \Illuminate\Database\Eloquent\Model
+        $item = new class extends Model
         {
             protected $table = 'base_controller_items';
 
@@ -167,7 +169,7 @@ class BaseControllerTest extends TestModulesCase
 
     public function test_restore_returns_success_when_repository_restores_item(): void
     {
-        $item = new class extends \Illuminate\Database\Eloquent\Model
+        $item = new class extends Model
         {
             protected $table = 'base_controller_items';
 
@@ -217,7 +219,7 @@ class BaseControllerTest extends TestModulesCase
 
         $response = $controller->index();
 
-        $this->assertInstanceOf(\Illuminate\View\View::class, $response);
+        $this->assertInstanceOf(View::class, $response);
         $this->assertSame('TestModule', $controller->lastIndexData['module']);
     }
 
@@ -258,7 +260,7 @@ class BaseControllerTest extends TestModulesCase
 
         $response = $controller->create();
 
-        $this->assertInstanceOf(\Illuminate\View\View::class, $response);
+        $this->assertInstanceOf(View::class, $response);
         $this->assertNull($controller->lastFormData['id']);
 
         putenv('PERMISSION_GATES_DEACTIVATE');
@@ -275,7 +277,7 @@ class BaseControllerTest extends TestModulesCase
 
         $response = $controller->edit(12);
 
-        $this->assertInstanceOf(\Illuminate\View\View::class, $response);
+        $this->assertInstanceOf(View::class, $response);
         $this->assertSame(12, $controller->lastFormData['id']);
 
         putenv('PERMISSION_GATES_DEACTIVATE');
@@ -283,7 +285,7 @@ class BaseControllerTest extends TestModulesCase
 
     public function test_show_returns_json_for_ajax_requests(): void
     {
-        $item = new class extends \Illuminate\Database\Eloquent\Model
+        $item = new class extends Model
         {
             protected $table = 'base_controller_items';
 
@@ -312,7 +314,7 @@ class BaseControllerTest extends TestModulesCase
 
     public function test_update_returns_redirect_when_save_type_is_cancel(): void
     {
-        $item = new class extends \Illuminate\Database\Eloquent\Model
+        $item = new class extends Model
         {
             protected $table = 'base_controller_items';
 
@@ -335,7 +337,7 @@ class BaseControllerTest extends TestModulesCase
 
     public function test_update_returns_success_for_ajax_requests(): void
     {
-        $item = new class extends \Illuminate\Database\Eloquent\Model
+        $item = new class extends Model
         {
             protected $table = 'base_controller_items';
 
@@ -358,7 +360,7 @@ class BaseControllerTest extends TestModulesCase
 
     public function test_store_redirects_when_save_type_ends_with_close(): void
     {
-        $item = new class extends \Illuminate\Database\Eloquent\Model
+        $item = new class extends Model
         {
             protected $table = 'base_controller_items';
 
@@ -384,7 +386,7 @@ class BaseControllerTest extends TestModulesCase
 
     public function test_duplicate_returns_success_when_repository_duplicates_item(): void
     {
-        $item = new class extends \Illuminate\Database\Eloquent\Model
+        $item = new class extends Model
         {
             protected $table = 'base_controller_items';
 
@@ -392,7 +394,7 @@ class BaseControllerTest extends TestModulesCase
         };
         $item->exists = true;
 
-        $newItem = new class extends \Illuminate\Database\Eloquent\Model
+        $newItem = new class extends Model
         {
             protected $table = 'base_controller_items';
 

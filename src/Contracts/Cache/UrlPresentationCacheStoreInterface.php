@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace Unusualify\Modularous\Contracts\Cache;
 
 use Illuminate\Database\Eloquent\Model;
+use Unusualify\Modularous\Services\Cache\FileUrlPresentationCacheDriver;
 
 /**
  * Storage contract for URL-keyed public presentation HTML (locale + normalized path + optional query).
  *
- * Default driver: {@see \Unusualify\Modularous\Services\Cache\FileUrlPresentationCacheDriver} (local filesystem).
+ * Default driver: {@see FileUrlPresentationCacheDriver} (local filesystem).
  * Future drivers: shared_file (EFS/NFS), s3 (object storage sync), redis (presentationItem replay).
  *
  * @see config('modularous.cache.presentationItem.url.driver')

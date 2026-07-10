@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Unusualify\Modularous\Repositories\Logic;
 
-use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Facades\ModularousCache;
 use Unusualify\Modularous\Traits\Moduleable;
 

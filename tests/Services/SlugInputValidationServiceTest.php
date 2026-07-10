@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use InvalidArgumentException;
+use TestModules\TestModule\Entities\Item;
 use Unusualify\Modularous\Entities\Traits\HasSlug;
 use Unusualify\Modularous\Services\SlugInputValidationService;
 use Unusualify\Modularous\Tests\Repositories\TestModel;
@@ -87,7 +88,7 @@ class SlugInputValidationServiceTest extends TestModulesCase
     {
         $modelClass = $this->service->resolveModelClass('TestModule', 'Item');
 
-        $this->assertSame(\TestModules\TestModule\Entities\Item::class, $modelClass);
+        $this->assertSame(Item::class, $modelClass);
     }
 
     public function test_resolve_model_class_throws_for_missing_module(): void

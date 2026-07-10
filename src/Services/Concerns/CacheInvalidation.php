@@ -6,7 +6,10 @@ use Illuminate\Cache\Repository;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Str;
+use Modules\Cms\Entities\UrlRoute;
 use Unusualify\Modularous\Facades\Modularous;
+use Unusualify\Modularous\Services\Cache\FileUrlPresentationCacheDriver;
+use Unusualify\Modularous\Services\Cache\UrlKeyedStaleCache;
 use Unusualify\Modularous\Support\ModularousCacheLogger;
 use Unusualify\Modularous\Traits\Cache\WarmupCache;
 use Unusualify\Modularous\Traits\ModularModel;
@@ -727,10 +730,10 @@ trait CacheInvalidation
     /**
      * @deprecated Implement getUrlPresentationCacheStore() instead.
      */
-    protected function getUrlKeyedStaleCache(): \Unusualify\Modularous\Services\Cache\UrlKeyedStaleCache
+    protected function getUrlKeyedStaleCache(): UrlKeyedStaleCache
     {
         $store = $this->getUrlPresentationCacheStore();
-        if ($store instanceof \Unusualify\Modularous\Services\Cache\FileUrlPresentationCacheDriver) {
+        if ($store instanceof FileUrlPresentationCacheDriver) {
             return $store->underlyingFileCache();
         }
 
@@ -878,16 +881,16 @@ trait CacheInvalidation
         int|string $id,
         ?string $locale = null,
     ): int {
-        if (! class_exists(\Modules\Cms\Entities\UrlRoute::class)) {
+        if (! class_exists(UrlRoute::class)) {
             return 0;
         }
 
         try {
             $model = new $modelClass;
-            $query = \Modules\Cms\Entities\UrlRoute::query()
+            $query = UrlRoute::query()
                 ->where('urlable_type', $model->getMorphClass())
                 ->where('urlable_id', $id)
-                ->where('kind', \Modules\Cms\Entities\UrlRoute::KIND_PAGE_PUBLIC);
+                ->where('kind', UrlRoute::KIND_PAGE_PUBLIC);
 
             if ($locale !== null && $locale !== '') {
                 $query->where('locale', $locale);

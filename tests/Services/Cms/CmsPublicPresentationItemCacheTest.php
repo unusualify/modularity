@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\Config;
 use Modules\Cms\Entities\Page;
 use Modules\Cms\Support\CmsPageLayoutPresentationWrapper;
 use Modules\Cms\Support\CmsPublicPresentationItemCache;
-use Unusualify\Modularous\Facades\ModularousCache;
 use Unusualify\Modularous\Services\ModularousCacheService;
 use Unusualify\Modularous\Tests\TestCase;
 

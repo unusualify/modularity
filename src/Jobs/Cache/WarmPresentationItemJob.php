@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Modules\Cms\Support\CmsPublicPresentationItemCache;
 use Unusualify\Modularous\Facades\ModularousCache;
 use Unusualify\Modularous\Jobs\Cache\Concerns\ModularousCacheJob;
 use Unusualify\Modularous\Support\ModularousCacheLogger;
@@ -59,8 +60,8 @@ final class WarmPresentationItemJob implements ShouldQueue
 
     protected function modularousCacheOverlapKey(): string
     {
-        if (class_exists(\Modules\Cms\Support\CmsPublicPresentationItemCache::class)) {
-            return \Modules\Cms\Support\CmsPublicPresentationItemCache::warmPresentationOverlapKey(
+        if (class_exists(CmsPublicPresentationItemCache::class)) {
+            return CmsPublicPresentationItemCache::warmPresentationOverlapKey(
                 $this->model,
                 $this->moduleName ?? 'auto',
                 $this->moduleRouteName ?? 'auto',

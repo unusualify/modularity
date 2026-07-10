@@ -7,6 +7,7 @@ namespace Unusualify\Modularous\Services\Cache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
+use Modules\Cms\Support\CmsPublicPresentationItemCache;
 
 /**
  * Filesystem-backed public HTML keyed by locale + normalized URL path (+ optional query suffix).
@@ -204,15 +205,15 @@ final class UrlKeyedStaleCache
      */
     public function splitLookupKey(string $cacheLookupKey): array
     {
-        $pos = strpos($cacheLookupKey, '?');
+        $pos = mb_strpos($cacheLookupKey, '?');
 
         if ($pos === false) {
             return [$this->normalizePath($cacheLookupKey), ''];
         }
 
         return [
-            $this->normalizePath(substr($cacheLookupKey, 0, $pos)),
-            substr($cacheLookupKey, $pos + 1),
+            $this->normalizePath(mb_substr($cacheLookupKey, 0, $pos)),
+            mb_substr($cacheLookupKey, $pos + 1),
         ];
     }
 
@@ -229,8 +230,8 @@ final class UrlKeyedStaleCache
 
     protected function normalizeLocale(string $locale): string
     {
-        if (class_exists(\Modules\Cms\Support\CmsPublicPresentationItemCache::class)) {
-            return \Modules\Cms\Support\CmsPublicPresentationItemCache::normalizeCacheLocale($locale);
+        if (class_exists(CmsPublicPresentationItemCache::class)) {
+            return CmsPublicPresentationItemCache::normalizeCacheLocale($locale);
         }
 
         $locale = trim(mb_strtolower($locale));
@@ -322,7 +323,7 @@ final class UrlKeyedStaleCache
                     continue;
                 }
 
-                $htmlPath = substr($metaPath, 0, -5);
+                $htmlPath = mb_substr($metaPath, 0, -5);
                 if ($this->deleteFilePair($htmlPath)) {
                     $deleted++;
                 }

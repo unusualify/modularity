@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Route as RoutingRoute;
 use Illuminate\Support\Facades\Route;
 use Mockery;
-use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Module;
 use Unusualify\Modularous\Tests\Http\Controllers\ControllerUsingManageUtilities;
 use Unusualify\Modularous\Tests\TestCase;

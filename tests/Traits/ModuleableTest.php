@@ -7,8 +7,8 @@ namespace Unusualify\Modularous\Tests\Traits;
 use Illuminate\Database\Eloquent\Model;
 use Mockery;
 use Unusualify\Modularous\Repositories\Repository;
-use Unusualify\Modularous\Traits\Moduleable;
 use Unusualify\Modularous\Tests\TestCase;
+use Unusualify\Modularous\Traits\Moduleable;
 
 class ModuleableTest extends TestCase
 {

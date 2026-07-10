@@ -10,7 +10,6 @@ use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Module;
 use Unusualify\Modularous\Support\ModularousRoutes;
 use Unusualify\Modularous\Tests\MockModuleManager;
-use Unusualify\Modularous\Tests\Support\IsolatedTestModules;
 use Unusualify\Modularous\Tests\TestModulesCase;
 
 class ModularousRoutesTest extends TestModulesCase

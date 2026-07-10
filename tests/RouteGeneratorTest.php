@@ -2,10 +2,12 @@
 
 namespace Unusualify\Modularous\Tests;
 
+use Illuminate\Console\Command;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Collection;
 use JoeDixon\Translation\Drivers\Translation;
 use Mockery;
+use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Generators\RouteGenerator;
 use Unusualify\Modularous\Tests\Repositories\TestModel;
 
@@ -32,7 +34,7 @@ class RouteGeneratorTest extends TestCase
 
     public function test_setters_and_getters_cover_configuration_branches(): void
     {
-        $console = Mockery::mock(\Illuminate\Console\Command::class);
+        $console = Mockery::mock(Command::class);
 
         $generator = $this->routeGenerator
             ->setFix(true)
@@ -160,7 +162,7 @@ class RouteGeneratorTest extends TestCase
         $module = Mockery::mock($this->routeGenerator->getModule())->makePartial();
         $module->shouldReceive('enableRoute')->once()->with('Test');
 
-        \Unusualify\Modularous\Facades\Modularous::shouldReceive('findOrFail')
+        Modularous::shouldReceive('findOrFail')
             ->once()
             ->andReturn($module);
 
@@ -173,7 +175,7 @@ class RouteGeneratorTest extends TestCase
 
     public function test_generate_extra_migrations_handles_morphed_by_many(): void
     {
-        $console = Mockery::mock(\Illuminate\Console\Command::class);
+        $console = Mockery::mock(Command::class);
         $console->shouldReceive('call')->atLeast()->once();
 
         $module = Mockery::mock($this->routeGenerator->getModule())->makePartial();
@@ -215,7 +217,7 @@ class RouteGeneratorTest extends TestCase
 
     public function test_generate_runs_test_workflow_without_writing_files(): void
     {
-        $console = Mockery::mock(\Illuminate\Console\Command::class);
+        $console = Mockery::mock(Command::class);
         $console->shouldReceive('call')->atLeast()->once();
         $console->shouldReceive('info')->atLeast()->once();
 

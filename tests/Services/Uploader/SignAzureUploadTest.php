@@ -6,6 +6,7 @@ namespace Unusualify\Modularous\Tests\Services\Uploader;
 
 use Illuminate\Config\Repository as Config;
 use Illuminate\Http\Request;
+use MicrosoftAzure\Storage\Blob\BlobSharedAccessSignatureHelper;
 use Unusualify\Modularous\Services\Uploader\SignAzureUpload;
 use Unusualify\Modularous\Services\Uploader\SignUploadListener;
 use Unusualify\Modularous\Tests\TestCase;
@@ -23,7 +24,7 @@ class SignAzureUploadTest extends TestCase
 
     public function test_get_sas_url_returns_signed_url_for_put_requests(): void
     {
-        if (! class_exists(\MicrosoftAzure\Storage\Blob\BlobSharedAccessSignatureHelper::class)) {
+        if (! class_exists(BlobSharedAccessSignatureHelper::class)) {
             $this->markTestSkipped('Azure storage SDK is not installed.');
         }
 
@@ -71,7 +72,7 @@ class SignAzureUploadTest extends TestCase
 
     public function test_get_sas_url_returns_invalid_when_request_is_incomplete(): void
     {
-        if (! class_exists(\MicrosoftAzure\Storage\Blob\BlobSharedAccessSignatureHelper::class)) {
+        if (! class_exists(BlobSharedAccessSignatureHelper::class)) {
             $this->markTestSkipped('Azure storage SDK is not installed.');
         }
 

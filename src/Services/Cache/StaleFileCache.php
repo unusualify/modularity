@@ -6,6 +6,7 @@ namespace Unusualify\Modularous\Services\Cache;
 
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
+use Modules\Cms\Support\CmsPublicPresentationItemCache;
 
 /**
  * Filesystem-backed stale HTML store for SWR (independent of Redis).
@@ -411,8 +412,8 @@ final class StaleFileCache
 
     protected function normalizeCacheLocale(string $locale): string
     {
-        if (class_exists(\Modules\Cms\Support\CmsPublicPresentationItemCache::class)) {
-            return \Modules\Cms\Support\CmsPublicPresentationItemCache::normalizeCacheLocale($locale);
+        if (class_exists(CmsPublicPresentationItemCache::class)) {
+            return CmsPublicPresentationItemCache::normalizeCacheLocale($locale);
         }
 
         $locale = trim(mb_strtolower($locale));

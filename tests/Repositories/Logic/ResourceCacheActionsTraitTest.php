@@ -182,9 +182,7 @@ class RepositoryUsingResourceCacheActionsForFormActions
 {
     use ResourceCacheActionsTrait;
 
-    public function __construct(private Module $module)
-    {
-    }
+    public function __construct(private Module $module) {}
 
     public function getModuleName(): ?string
     {

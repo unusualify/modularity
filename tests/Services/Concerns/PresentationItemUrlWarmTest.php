@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Unusualify\Modularous\Tests\Services\Concerns;
 
 use Illuminate\Cache\Repository;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
@@ -14,10 +15,12 @@ use Modules\Cms\Entities\Page;
 use Modules\Cms\Http\Middleware\ServeUrlKeyedStaleMiddleware;
 use Modules\Cms\Support\CmsPublicPresentationItemCache;
 use Modules\Cms\Support\StalePublicationMeta;
-use Unusualify\Modularous\Facades\ModularousCache;
 use Unusualify\Modularous\Contracts\Cache\UrlPresentationCacheStoreInterface;
+use Unusualify\Modularous\Facades\ModularousCache;
 use Unusualify\Modularous\Services\Cache\FileUrlPresentationCacheDriver;
+use Unusualify\Modularous\Services\Cache\StaleFileCache;
 use Unusualify\Modularous\Services\Cache\UrlKeyedStaleCache;
+use Unusualify\Modularous\Services\Concerns\CacheInvalidation;
 use Unusualify\Modularous\Tests\TestCase;
 
 class PresentationItemUrlWarmTest extends TestCase
@@ -226,7 +229,7 @@ class PresentationItemUrlWarmTest extends TestCase
 
 class ConcreteUrlStoreCacheInvalidation
 {
-    use \Unusualify\Modularous\Services\Concerns\CacheInvalidation {
+    use CacheInvalidation {
         forgetPresentationStaleForModel as public forgetPresentationStaleForModelPublic;
     }
 
@@ -244,9 +247,9 @@ class ConcreteUrlStoreCacheInvalidation
         $this->urlKeyedStaleCache = new UrlKeyedStaleCache($urlStalePath);
     }
 
-    protected function getStaleFileCache(): \Unusualify\Modularous\Services\Cache\StaleFileCache
+    protected function getStaleFileCache(): StaleFileCache
     {
-        return new \Unusualify\Modularous\Services\Cache\StaleFileCache(sys_get_temp_dir() . '/unused-stale');
+        return new StaleFileCache(sys_get_temp_dir() . '/unused-stale');
     }
 
     protected function getUrlPresentationCacheStore(): UrlPresentationCacheStoreInterface
@@ -279,12 +282,12 @@ class ConcreteUrlStoreCacheInvalidation
         return true;
     }
 
-    protected function getModuleNameFromModel(\Illuminate\Database\Eloquent\Model $model): ?string
+    protected function getModuleNameFromModel(Model $model): ?string
     {
         return $model instanceof Page ? 'BusinessPackage' : null;
     }
 
-    protected function getModuleRouteNameFromModel(\Illuminate\Database\Eloquent\Model $model): ?string
+    protected function getModuleRouteNameFromModel(Model $model): ?string
     {
         return $model instanceof Page ? 'PackageCountry' : null;
     }

@@ -5,6 +5,7 @@ namespace Unusualify\Modularous\Tests\Http;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
+use Unusualify\Modularous\Http\Controllers\API\CacheRevalidateController;
 use Unusualify\Modularous\Jobs\Cache\RevalidatePresentationCacheJob;
 use Unusualify\Modularous\Tests\TestCase;
 
@@ -17,7 +18,7 @@ class CacheRevalidateWebhookTest extends TestCase
         Config::set('modularous.cache.webhook.enabled', true);
         Config::set('modularous.cache.webhook.secret', 'test-webhook-secret');
 
-        Route::post('/api/modularous/cache/revalidate', \Unusualify\Modularous\Http\Controllers\API\CacheRevalidateController::class)
+        Route::post('/api/modularous/cache/revalidate', CacheRevalidateController::class)
             ->middleware(['api', 'modularous.cache.webhook']);
     }
 

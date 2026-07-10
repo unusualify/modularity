@@ -7,10 +7,10 @@ namespace Modules\Cms\Support;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\View;
+use Unusualify\Modularous\Contracts\Cache\UrlPresentationCacheStoreInterface;
 use Unusualify\Modularous\Facades\ModularousCache;
 use Unusualify\Modularous\Jobs\Cache\WarmPresentationItemJob;
 use Unusualify\Modularous\Services\Cache\StaleFileCache;
-use Unusualify\Modularous\Contracts\Cache\UrlPresentationCacheStoreInterface;
 use Unusualify\Modularous\Support\ModularousCacheLogger;
 
 /**
@@ -423,7 +423,7 @@ final class CmsPublicPresentationItemCache
             'key' => $cacheKey,
             'locale' => $locale,
             'variant' => $wrapped ? 'wrapped' : 'full',
-            'result' => strtolower($resolved['status']),
+            'result' => mb_strtolower($resolved['status']),
         ]);
 
         return $resolved['html'];

@@ -11,7 +11,6 @@ use Modules\Cms\Entities\Page;
 use Modules\Cms\Support\CmsPublicPresentationItemCache;
 use Unusualify\Modularous\Facades\ModularousCache;
 use Unusualify\Modularous\Jobs\Cache\WarmPresentationItemJob;
-use Unusualify\Modularous\Services\Cache\StaleFileCache;
 use Unusualify\Modularous\Tests\TestCase;
 
 class CmsPublicPresentationItemCacheSwrTest extends TestCase
@@ -282,8 +281,8 @@ class CmsPublicPresentationItemCacheSwrTest extends TestCase
             'tr',
         );
 
-        $enHash = substr($enKey, strrpos($enKey, ':') + 1);
-        $trHash = substr($trKey, strrpos($trKey, ':') + 1);
+        $enHash = mb_substr($enKey, mb_strrpos($enKey, ':') + 1);
+        $trHash = mb_substr($trKey, mb_strrpos($trKey, ':') + 1);
 
         $this->assertFileExists($this->stalePath . '/PrimaryPage/Home/Page/303/en/' . $enHash . '.html');
         $this->assertFileExists($this->stalePath . '/PrimaryPage/Home/Page/303/tr/' . $trHash . '.html');

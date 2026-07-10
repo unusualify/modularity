@@ -7,7 +7,6 @@ namespace Unusualify\Modularous\Tests\Http\Controllers;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
-use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Unusualify\Modularous\Contracts\CanBulkSheet;
 use Unusualify\Modularous\Http\Controllers\Traits\ManageBulkSheet;
@@ -75,9 +74,7 @@ class ControllerUsingManageBulkSheet extends Controller implements CanBulkSheet
         return $this->bulkSheetUiStrings;
     }
 
-    public function shareInertiaStoreVariables(): void
-    {
-    }
+    public function shareInertiaStoreVariables(): void {}
 
     /**
      * @param array<string, mixed> $data

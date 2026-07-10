@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Unusualify\Modularous\Tests\Traits;
 
 use Illuminate\Support\Collection;
-use Unusualify\Modularous\Traits\ResponsiveVisibility;
 use Unusualify\Modularous\Tests\TestCase;
+use Unusualify\Modularous\Traits\ResponsiveVisibility;
 
 class ResponsiveVisibilityTest extends TestCase
 {

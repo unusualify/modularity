@@ -121,7 +121,7 @@ class ServeUrlKeyedStaleMiddlewareTest extends TestCase
         $this->assertFalse(database_exists());
 
         $resolver = $this->makeVisitorResolver();
-        $localization = new TranslatableCmsLocalizationAdapter(new CanonicalUrlResolver());
+        $localization = new TranslatableCmsLocalizationAdapter(new CanonicalUrlResolver);
 
         $middleware = new ServeUrlKeyedStaleMiddleware($resolver, $localization);
         $request = Request::create('/en/pages/blog', 'GET');

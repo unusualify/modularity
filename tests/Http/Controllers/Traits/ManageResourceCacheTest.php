@@ -373,9 +373,7 @@ class ManageResourceCacheTest extends TestCase
     }
 }
 
-final class RepositoryWithoutResourceCacheActions
-{
-}
+final class RepositoryWithoutResourceCacheActions {}
 
 final class RepositoryWithResourceCacheActions
 {
@@ -384,9 +382,7 @@ final class RepositoryWithResourceCacheActions
     /**
      * @param array<int, array<string, mixed>> $tableSchema
      */
-    public function __construct(private array $tableSchema = [])
-    {
-    }
+    public function __construct(private array $tableSchema = []) {}
 
     public function getModuleName(): string
     {

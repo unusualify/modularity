@@ -132,7 +132,7 @@ final class CmsPublicModelResolver
      */
     private function loadPublishedModel(string $modelClass, int|string $key, string $locale): ?Model
     {
-        $model = static::loadForPresentationWarmup($modelClass, $key, $locale);
+        $model = self::loadForPresentationWarmup($modelClass, $key, $locale);
 
         return $model;
     }
@@ -148,8 +148,8 @@ final class CmsPublicModelResolver
     public static function loadForPresentationWarmup(string $modelClass, int|string $key, string $locale): ?Model
     {
         $query = $modelClass::query()->whereKey($key);
-        static::applyPublishedVisibilityScopes($query, $modelClass);
-        static::applyPresentationWarmupEagerLoads($query, $modelClass, $locale);
+        self::applyPublishedVisibilityScopes($query, $modelClass);
+        self::applyPresentationWarmupEagerLoads($query, $modelClass, $locale);
 
         $model = $query->first();
 
@@ -157,7 +157,7 @@ final class CmsPublicModelResolver
             return null;
         }
 
-        static::applyPresentationWarmupLocaleOnModel($model, $locale);
+        self::applyPresentationWarmupLocaleOnModel($model, $locale);
 
         return $model;
     }

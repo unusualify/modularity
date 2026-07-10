@@ -12,8 +12,8 @@ use Modules\Cms\Support\CmsPublicPresentationItemCache;
 use Modules\Cms\Support\CmsSluglessFallbackLocale;
 use Modules\Cms\Support\StalePublicationGate;
 use Symfony\Component\HttpFoundation\Response;
-use Unusualify\Modularous\Facades\ModularousCache;
 use Unusualify\Modularous\Contracts\Cache\UrlPresentationCacheStoreInterface;
+use Unusualify\Modularous\Facades\ModularousCache;
 use Unusualify\Modularous\Support\ModularousCacheLogger;
 
 /**

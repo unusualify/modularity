@@ -14,8 +14,7 @@ class NavigationMiddlewareTest extends TestCase
         View::composer([
             modularousBaseKey() . '::layouts.*',
             'translation::layout',
-        ], function () {
-        });
+        ], function () {});
 
         $middleware = new NavigationMiddleware;
         $request = Request::create('/admin', 'GET');

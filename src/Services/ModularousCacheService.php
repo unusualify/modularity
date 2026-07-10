@@ -10,9 +10,9 @@ use Predis\Connection\ConnectionException;
 use Predis\Connection\Resource\Exception\StreamInitException;
 use Unusualify\Modularous\Contracts\Cache\UrlPresentationCacheStoreInterface;
 use Unusualify\Modularous\Services\Cache\FileUrlPresentationCacheDriver;
-use Unusualify\Modularous\Services\Cache\StaleFileCache;
 use Unusualify\Modularous\Services\Cache\PresentationUrlCacheKey;
 use Unusualify\Modularous\Services\Cache\PresentationUrlCacheKeyResolver;
+use Unusualify\Modularous\Services\Cache\StaleFileCache;
 use Unusualify\Modularous\Services\Cache\UrlKeyedStaleCache;
 use Unusualify\Modularous\Services\Concerns\CacheHelpers;
 use Unusualify\Modularous\Services\Concerns\CacheInvalidation;
@@ -408,7 +408,7 @@ class ModularousCacheService
     /**
      * URL presentation cache key strategy for a module route.
      *
-     * @see \Unusualify\Modularous\Services\Cache\PresentationUrlCacheKey
+     * @see PresentationUrlCacheKey
      */
     public function getPresentationCacheKeyStrategy(?string $moduleName, ?string $moduleRouteName): string
     {

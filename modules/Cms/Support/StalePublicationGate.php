@@ -90,7 +90,7 @@ final class StalePublicationGate
         try {
             $parsed = Carbon::parse((string) $value);
 
-            if (strlen(trim((string) $value)) <= 10) {
+            if (mb_strlen(trim((string) $value)) <= 10) {
                 return $parsed->startOfDay();
             }
 
@@ -109,7 +109,7 @@ final class StalePublicationGate
         try {
             $parsed = Carbon::parse((string) $value);
 
-            if (strlen(trim((string) $value)) <= 10) {
+            if (mb_strlen(trim((string) $value)) <= 10) {
                 return $parsed->endOfDay();
             }
 

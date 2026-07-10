@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Unusualify\Modularous\Tests\Http\Controllers;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
@@ -135,7 +136,7 @@ class PanelControllerTest extends TestModulesCase
 
     public function test_is_relation_field_detects_defined_relations(): void
     {
-        $model = new class extends \Illuminate\Database\Eloquent\Model
+        $model = new class extends Model
         {
             protected $table = 'relation_field_models';
 
@@ -187,7 +188,7 @@ class PanelControllerTest extends TestModulesCase
         ]);
 
         $repository = Mockery::mock(Repository::class);
-        $repository->shouldReceive('getModel')->andReturn(new class extends \Illuminate\Database\Eloquent\Model
+        $repository->shouldReceive('getModel')->andReturn(new class extends Model
         {
             protected $table = 'panel_form_models';
         });
@@ -211,7 +212,7 @@ class PanelControllerTest extends TestModulesCase
     {
         $repository = Mockery::mock(Repository::class);
         $repository->shouldReceive('hasColumn')->with('category_id')->andReturn(true);
-        $repository->shouldReceive('getModel')->andReturn(new class extends \Illuminate\Database\Eloquent\Model
+        $repository->shouldReceive('getModel')->andReturn(new class extends Model
         {
             protected $table = 'nested_scope_models';
         });
@@ -266,7 +267,7 @@ class PanelControllerTest extends TestModulesCase
 
     public function test_is_relation_field_matches_id_suffix_columns(): void
     {
-        $model = new class extends \Illuminate\Database\Eloquent\Model
+        $model = new class extends Model
         {
             protected $table = 'relation_field_models';
 

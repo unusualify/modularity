@@ -2,6 +2,7 @@
 
 namespace Unusualify\Modularous\Tests\Services\Cms;
 
+use Illuminate\Http\Request;
 use Modules\Cms\Support\CmsPublicSiteUrl;
 use Unusualify\Modularous\Tests\TestCase;
 
@@ -48,7 +49,7 @@ class CmsPublicSiteUrlTest extends TestCase
     {
         $this->app['config']->set('app.url', 'http://frontend.example.test');
         $this->app['config']->set('modularous.cms_routing.canonical_host', 'frontend.example.test');
-        $this->app->instance('request', \Illuminate\Http\Request::create('http://cms.example.test/admin', 'GET'));
+        $this->app->instance('request', Request::create('http://cms.example.test/admin', 'GET'));
 
         CmsPublicSiteUrl::runWithForcedPublicRootUrl(fn () => null);
 

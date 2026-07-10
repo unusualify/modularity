@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Unusualify\Modularous\Tests\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Routing\Route as RoutingRoute;
 use Mockery;
@@ -295,7 +297,7 @@ class CoreControllerTest extends TestModulesCase
         $paginator = new LengthAwarePaginator([['id' => 1]], 1, 10);
         $result = $controller->exposeGetTransformer($paginator);
 
-        $this->assertInstanceOf(\Illuminate\Http\Resources\Json\AnonymousResourceCollection::class, $result);
+        $this->assertInstanceOf(AnonymousResourceCollection::class, $result);
     }
 
     /**
@@ -317,7 +319,7 @@ class CoreControllerTest extends TestModulesCase
     }
 }
 
-class TestJsonResource extends \Illuminate\Http\Resources\Json\JsonResource
+class TestJsonResource extends JsonResource
 {
     public function toArray($request): array
     {

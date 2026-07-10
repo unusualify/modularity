@@ -54,7 +54,7 @@ class RelationshipsStub
 
     public function getSnakeCase(string $value): string
     {
-        return strtolower($value);
+        return mb_strtolower($value);
     }
 
     public function getForeignKey(): string

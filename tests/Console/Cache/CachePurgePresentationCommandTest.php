@@ -434,7 +434,5 @@ class PurgePresentationCommandCacheService
         return $model instanceof Item ? 'Item' : null;
     }
 
-    protected function warmupForModel(Model $model, array $types = [], ?string $moduleName = null, ?string $moduleRouteName = null, ?string $locale = null): void
-    {
-    }
+    protected function warmupForModel(Model $model, array $types = [], ?string $moduleName = null, ?string $moduleRouteName = null, ?string $locale = null): void {}
 }

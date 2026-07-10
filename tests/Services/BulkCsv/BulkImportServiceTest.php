@@ -33,7 +33,7 @@ class BulkImportServiceTest extends TestCase
     public function test_stream_export_delegates_to_orchestrator(): void
     {
         $bulkSheet = Mockery::mock(CanBulkSheet::class);
-        $response = new StreamedResponse();
+        $response = new StreamedResponse;
 
         $orchestrator = Mockery::mock(BulkCsvImportOrchestrator::class);
         $orchestrator->shouldReceive('streamExport')

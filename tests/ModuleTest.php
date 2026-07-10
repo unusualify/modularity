@@ -4,8 +4,8 @@ namespace Unusualify\Modularous\Tests;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Gate;
 use Mockery;
+use Unusualify\Modularous\Exceptions\ModularousException;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Module;
 use Unusualify\Modularous\Tests\Support\IsolatedTestModules;
@@ -474,7 +474,7 @@ class ModuleTest extends TestCase
         $property->setAccessible(true);
         $property->setValue($this->module, $activator);
 
-        $this->expectException(\Unusualify\Modularous\Exceptions\ModularousException::class);
+        $this->expectException(ModularousException::class);
         $this->expectExceptionMessage('Failed to check module status');
 
         $this->module->isStatus(true);

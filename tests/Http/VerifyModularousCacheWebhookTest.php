@@ -4,7 +4,8 @@ namespace Unusualify\Modularous\Tests\Http;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
-use Unusualify\Modularous\Facades\ModularousCache;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Unusualify\Modularous\Http\Middleware\VerifyModularousCacheWebhook;
 use Unusualify\Modularous\Tests\TestCase;
 
@@ -16,7 +17,7 @@ class VerifyModularousCacheWebhookTest extends TestCase
 
         $middleware = new VerifyModularousCacheWebhook;
 
-        $this->expectException(\Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class);
+        $this->expectException(NotFoundHttpException::class);
 
         $middleware->handle(Request::create('/hook', 'POST'), fn () => response('ok'));
     }
@@ -28,7 +29,7 @@ class VerifyModularousCacheWebhookTest extends TestCase
 
         $middleware = new VerifyModularousCacheWebhook;
 
-        $this->expectException(\Symfony\Component\HttpKernel\Exception\HttpException::class);
+        $this->expectException(HttpException::class);
 
         $middleware->handle(Request::create('/hook', 'POST'), fn () => response('ok'));
     }
@@ -62,7 +63,7 @@ class VerifyModularousCacheWebhookTest extends TestCase
 
         $middleware = new VerifyModularousCacheWebhook;
 
-        $this->expectException(\Symfony\Component\HttpKernel\Exception\HttpException::class);
+        $this->expectException(HttpException::class);
         $this->expectExceptionMessage('Signature mismatch.');
 
         $middleware->handle($request, fn () => response('accepted', 202));

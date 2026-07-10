@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Unusualify\Modularous\Tests\Services\Security;
 
 use Illuminate\Http\Request;
-use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;

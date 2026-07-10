@@ -3,6 +3,7 @@
 namespace Unusualify\Modularous\Tests\Traits;
 
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Facades\ModularousCache;
@@ -507,7 +508,7 @@ class CacheTraitsTest extends TestCase
             use WarmupCache;
         };
 
-        $mockModel = \Mockery::mock(\Illuminate\Database\Eloquent\Model::class);
+        $mockModel = \Mockery::mock(Model::class);
         $mockModel->shouldReceive('each')->andReturnUsing(function ($callback) {
             $callback((object) ['id' => 5], 0);
         });
@@ -547,7 +548,8 @@ class CacheTraitsTest extends TestCase
         $mockController->shouldReceive('getFormattedIndexItem')->once();
         $mockController->shouldReceive('getFormItem')->once();
 
-        $warmModel = new class extends \Illuminate\Database\Eloquent\Model {
+        $warmModel = new class extends Model
+        {
             public function getModuleName()
             {
                 return 'Blog';

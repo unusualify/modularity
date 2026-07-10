@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Unusualify\Modularous\Repositories\Logic\MethodTransformers;
+use Unusualify\Modularous\Repositories\Traits\SlugsTrait;
 use Unusualify\Modularous\Tests\RepositoryTestCase;
 
 class MethodTransformersTest extends RepositoryTestCase
@@ -27,6 +28,7 @@ class MethodTransformersTest extends RepositoryTestCase
         Schema::dropIfExists('method_transformer_models');
         parent::tearDown();
     }
+
     public function test_cleanup_fields_normalizes_checkboxes_and_nullables(): void
     {
         $repo = new MethodTransformersStub(new CheckboxNullableModel);
@@ -76,8 +78,8 @@ class MethodTransformersTest extends RepositoryTestCase
         $repo = new MethodTransformersStub(new CheckboxNullableModel);
         $repo->traitColumns = ['SlugsTrait' => ['slug']];
 
-        $this->assertTrue($repo->traitHasInput(\Unusualify\Modularous\Repositories\Traits\SlugsTrait::class, 'slug'));
-        $this->assertFalse($repo->traitHasInput(\Unusualify\Modularous\Repositories\Traits\SlugsTrait::class, 'title'));
+        $this->assertTrue($repo->traitHasInput(SlugsTrait::class, 'slug'));
+        $this->assertFalse($repo->traitHasInput(SlugsTrait::class, 'title'));
     }
 }
 

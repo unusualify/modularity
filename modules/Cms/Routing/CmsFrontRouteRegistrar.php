@@ -475,7 +475,7 @@ final class CmsFrontRouteRegistrar
             return false;
         }
 
-        $class = str_contains($uses, '@') ? strstr($uses, '@', true) : $uses;
+        $class = str_contains($uses, '@') ? mb_strstr($uses, '@', true) : $uses;
 
         return is_string($class) && $class !== '' && is_subclass_of($class, CmsController::class, true);
     }

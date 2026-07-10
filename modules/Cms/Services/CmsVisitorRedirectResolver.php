@@ -4,10 +4,10 @@ namespace Modules\Cms\Services;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Modules\Cms\Contracts\CanonicalUrlResolverInterface;
 use Modules\Cms\Contracts\CmsLocalizationContract;
+use Modules\Cms\Contracts\CmsVisitorRequestContextResolverInterface;
 use Modules\Cms\Entities\Redirect;
 use Modules\Cms\Entities\UrlRoute;
 use Modules\Cms\Routing\CmsFrontRouteLocalizationBinding;
@@ -20,7 +20,7 @@ use Unusualify\Modularous\Facades\ModularousCache;
  * Resolves {@see Redirect} rules for public HTTP requests (locale + normalized path).
  * Prefers {@see UrlRoute} registry when the table exists; falls back to scanning {@see Redirect} rows.
  */
-final class CmsVisitorRedirectResolver implements \Modules\Cms\Contracts\CmsVisitorRequestContextResolverInterface
+final class CmsVisitorRedirectResolver implements CmsVisitorRequestContextResolverInterface
 {
     public function __construct(
         private CanonicalUrlResolverInterface $canonicalUrlResolver,

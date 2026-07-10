@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Unusualify\Modularous\Tests\Repositories\Traits;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
@@ -220,7 +221,7 @@ class RevisionsTraitTestRevision extends Revision
 
 class RevisionsWorkflowTestModel extends RevisionsTraitTestModel
 {
-    public function revisions(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function revisions(): HasMany
     {
         return $this->hasMany($this->getRevisionModel(), 'revisions_trait_test_model_id');
     }
