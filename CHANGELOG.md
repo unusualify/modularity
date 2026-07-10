@@ -2,6 +2,48 @@
 
 All notable changes to `modularous` will be documented in this file
 
+## v12.4.0 - 2026-07-10
+
+### :rocket: Features
+
+- implement URL-keyed stale cache middleware and enhance presentation item caching logic by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/da3bf010d7f8b8f71e0f0f7707504f725efa4fc5
+- add commands for purging and warming presentation item caches with options for module, route, locale, and dry run by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/6b57a0e0ee1bf9d2139982f8ee83489bb8211ba5
+
+### :wrench: Bug Fixes
+
+- update CacheRevalidateController namespace from 'Api' to 'API' for consistency across the application by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/9aca5626bb3aceb7e4446197ca922d13cfa4b7a1
+
+### :zap: Performance
+
+- enhance synchronization logic to support linked records and improve handling of missing remote records by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/ced77f93dc30b6d8b5712158307ffbb923531232
+
+### :recycle: Refactors
+
+- update ResourceCacheActionsTrait import and improve panel route name prefix logic by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/6df9f0aff8abdc89f04df7fd480912e77c83f009
+
+### :memo: Documentation
+
+- expand documentation for public presentation item caching, including configuration, SWR, and webhook revalidation by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/655cf3334bf591f0b2f2815fbd5d06accc37283c
+
+### :lipstick: Styling
+
+- lint coding styles for v12.4.0 by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/e2b36edad76b7beda1945f9a3314afb162c488c8
+
+### :white_check_mark: Testing
+
+- add comprehensive tests for cache purging, warming, and revalidation functionality, including command line interactions and webhook handling by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/1242757a2ceab7524c60f698422de8ae339ddc6f
+- add extensive unit tests for various components including Module, RouteGenerator, and new HTTP middleware, enhancing coverage and functionality validation by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/b5d727595532d80f6d37f84672b04356d4dc61bb
+- rebind modularous activator in TestCase and TestModulesCase to ensure correct module activation during tests by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/423d05754c8a4b2ebb88f07a657a79242a3df066
+- update StaleFileCacheTest to use class basename for dynamic path generation, improving maintainability by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/6339011364a25108a8001bafa726686939025020
+
+### :green_heart: Workflow
+
+- remove deprecated branches from CI configurations and enhance coverage reporting in 12.x workflow by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/7992f9e8c3dc3ee04c0224a2b3d13ef50459c567
+
+### :beers: Other Stuff
+
+- update PHPUnit configuration for coverage reporting and add coverage driver script by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/bc7d47602c1c39bd6980f09b3a17626465b5b75c
+
 ## v0.58.9 - 2026-07-07
 
 ### :wrench: Bug Fixes
