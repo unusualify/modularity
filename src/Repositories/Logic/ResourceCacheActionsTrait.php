@@ -103,7 +103,11 @@ trait ResourceCacheActionsTrait
             return [];
         }
 
-        $routePrefix = $this->resolveResourceCacheFormActionRoutePrefix();
+        $module = $this->getModule();
+        $isParent = $module->isParentRoute($this->getRouteName());
+
+        $routePrefix = $this->getModule()->panelRouteNamePrefix($isParent) . snakeCase($this->getRouteName()) . '.';
+
         if ($routePrefix === null) {
             return [];
         }
@@ -138,21 +142,6 @@ trait ResourceCacheActionsTrait
         return $moduleName !== null
             && $routeName !== null
             && ModularousCache::hasAdminCacheActions($moduleName, $routeName);
-    }
-
-    protected function resolveResourceCacheFormActionRoutePrefix(): ?string
-    {
-        try {
-            $module = Modularous::find($this->getModuleName());
-        } catch (\Throwable) {
-            return null;
-        }
-
-        if ($module === null) {
-            return null;
-        }
-
-        return $module->panelRouteNamePrefix() . '.' . snakeCase($this->getRouteName()) . '.';
     }
 
     /**

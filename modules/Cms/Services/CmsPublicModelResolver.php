@@ -96,6 +96,10 @@ final class CmsPublicModelResolver
             return null;
         }
 
+        if (! database_exists()) {
+            return null;
+        }
+
         if (! Schema::hasTable((new UrlRoute)->getTable())) {
             return null;
         }
@@ -128,14 +132,75 @@ final class CmsPublicModelResolver
      */
     private function loadPublishedModel(string $modelClass, int|string $key, string $locale): ?Model
     {
-        $query = $modelClass::query()->whereKey($key);
-        $this->applyPublishedVisibilityScopes($query, $modelClass);
+        $model = static::loadForPresentationWarmup($modelClass, $key, $locale);
 
-        if (method_exists($modelClass, 'translations')) {
-            $query->with(['translations' => fn ($q) => $q->where('locale', $locale)]);
+        return $model;
+    }
+
+    /**
+     * Load a published CMS model for {@see presentationItem} warmup with locale-scoped relations.
+     *
+     * Mirrors {@see loadPublishedModel()} and applies Astrotomic default locale + presentation eager loads
+     * so Blade/helpers see the visitor locale translation, not the admin/CLI default.
+     *
+     * @param class-string<Model> $modelClass
+     */
+    public static function loadForPresentationWarmup(string $modelClass, int|string $key, string $locale): ?Model
+    {
+        $query = $modelClass::query()->whereKey($key);
+        static::applyPublishedVisibilityScopes($query, $modelClass);
+        static::applyPresentationWarmupEagerLoads($query, $modelClass, $locale);
+
+        $model = $query->first();
+
+        if (! $model instanceof Model) {
+            return null;
         }
 
-        return $query->first();
+        static::applyPresentationWarmupLocaleOnModel($model, $locale);
+
+        return $model;
+    }
+
+    /**
+     * @param class-string<Model> $modelClass
+     */
+    public static function applyPresentationWarmupEagerLoads(Builder $query, string $modelClass, string $locale): void
+    {
+        $with = [];
+
+        if (method_exists($modelClass, 'scopeWithActiveTranslations')) {
+            $query->withActiveTranslations($locale);
+        } elseif (method_exists($modelClass, 'translations')) {
+            $with['translations'] = static fn ($q) => $q->where('locale', $locale);
+        }
+
+        if (method_exists($modelClass, 'repeaters')) {
+            $with['repeaters'] = static fn ($q) => $q->where('locale', $locale);
+        }
+
+        if (method_exists($modelClass, 'medias')) {
+            $with[] = 'medias';
+        }
+
+        if (method_exists($modelClass, 'slugs')) {
+            $with['slugs'] = static fn ($q) => $q->where('locale', $locale);
+        }
+
+        if ($with !== []) {
+            $query->with($with);
+        }
+    }
+
+    public static function applyPresentationWarmupLocaleOnModel(Model $model, string $locale): void
+    {
+        if (method_exists($model, 'setDefaultLocale')) {
+            $model->setDefaultLocale($locale);
+        }
+
+        if ($model->relationLoaded('translation')) {
+            $model->unsetRelation('translation');
+        }
     }
 
     /**

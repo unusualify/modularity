@@ -5,7 +5,9 @@ namespace Unusualify\Modularous\Tests\Services;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use ReflectionMethod;
 use Unusualify\Modularous\Facades\MigrationBackup;
+use Unusualify\Modularous\Services\MigrationBackup as MigrationBackupService;
 use Unusualify\Modularous\Tests\TestCase;
 
 class MigrationBackupTest extends TestCase
@@ -303,6 +305,25 @@ class MigrationBackupTest extends TestCase
 
         $this->assertEquals(1, DB::table('test_users')->count());
         $this->assertEquals(1, DB::table('test_posts')->count());
+    }
+
+    public function test_get_schema_changes_returns_empty_when_no_snapshot_exists(): void
+    {
+        $service = new MigrationBackupService;
+        $caller = new \ReflectionProperty($service, 'caller');
+        $caller->setAccessible(true);
+        $caller->setValue($service, 'MigrationBackupTest');
+
+        $method = new ReflectionMethod($service, 'getSchemaChanges');
+        $method->setAccessible(true);
+
+        $changes = $method->invoke($service, 'missing_table');
+
+        $this->assertSame([
+            'added' => [],
+            'removed' => [],
+            'modified' => [],
+        ], $changes);
     }
 
     public function test_can_clear_backups()

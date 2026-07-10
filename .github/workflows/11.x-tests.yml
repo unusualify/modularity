@@ -13,7 +13,6 @@ on:
       - '**.yaml'
   pull_request:
     branches:
-      - 11.x-dev
       - 11.x
     paths-ignore:
       - '**.md'

@@ -116,3 +116,132 @@ Vue inputs expect schema props via `obj.schema` or `boundProps`:
 See `vue/src/js/components/inputs/registry.js` → `hydrateTypeMap` for the full mapping.
 
 Always ask for clarification if the request is ambiguous.
+
+---
+
+## Public presentation cache (agents reference)
+
+When working on CMS public pages, URL stale resilience, or `presentationItem` cache:
+
+### Store types
+
+| `MODULAROUS_PRESENTATION_CACHE_STORE` | Behavior |
+|---------------------------------------|----------|
+| `url` (default) | File-primary HTML at `modularous-stale-by-url` via `UrlPresentationCacheStoreInterface` |
+| `model` | Id-based `StaleFileCache` at `modularous-stale` |
+| `none` | Always render; no presentation cache |
+
+Admin types (`record`, `index`, `formItem`, `formattedItem`, `counts`) stay on Redis — independent of public store.
+
+### Key env vars
+
+| Env | Config key | Default | Notes |
+|-----|------------|---------|-------|
+| `MODULAROUS_PRESENTATION_CACHE_STORE` | `presentationItem.store` | `url` | `url` \| `model` \| `none` |
+| `MODULAROUS_PRESENTATION_CACHE_SWR` | `presentationItem.swr` | `false` | Stale window + warm in controller |
+| `MODULAROUS_PRESENTATION_CACHE_SERVE_FIRST` | `presentationItem.serve_first` | `true` | Middleware before controller (`url` only) |
+| `MODULAROUS_PRESENTATION_CACHE_STALE_TTL` | `presentationItem.stale_ttl` | `604800` | `stale_expires_at` in `.meta` |
+| `MODULAROUS_PRESENTATION_CACHE_URL_DRIVER` | `presentationItem.url.driver` | `file` | `shared_file` = EFS/NFS at `base_path` |
+| `MODULAROUS_CACHE_URL_STALE_PATH` | `presentationItem.url.base_path` | `…/modularous-stale-by-url` | URL store directory |
+| `MODULAROUS_RESOURCE_CACHE_SWR_STALE_PATH` | `presentationItem.model.stale_path` | `…/modularous-stale` | Model store (`store=model`) |
+| `MODULAROUS_RESOURCE_CACHE_SWR_WARM_COOLDOWN` | `presentationItem.warm_dispatch_cooldown` | `600` | Warm job dedup lock TTL |
+| `MODULAROUS_RESOURCE_CACHE_TTL_PRESENTATION_ITEM` | `ttl.presentationItem` | `900` | Fresh TTL → `expires_at` |
+
+**Legacy (when new vars unset):** `MODULAROUS_CACHE_URL_STALE_ENABLED` → store; `MODULAROUS_RESOURCE_CACHE_SWR_ENABLED` → swr; `MODULAROUS_CACHE_URL_STALE_SERVE_FIRST` → serve_first; `MODULAROUS_CACHE_URL_STALE_TTL` / `MODULAROUS_RESOURCE_CACHE_SWR_STALE_TTL` → stale_ttl.
+
+**Layer order:** global `enabled` → `store` → route `types.presentationItem` → store driver → `serve_first` → `swr` → query strategy → fresh/stale TTL.
+
+**Toggle notes:**
+- `store=url`: path files; no Redis for reads; middleware serves stale regardless of SWR
+- `store=model`: id files; writes only when `swr=true`; requires Redis for `isEnabled()`
+- `store=none`: always render
+- `swr=false` + `serve_first=true`: middleware may still return `URL_STALE` past fresh TTL
+
+### Middleware order
+
+1. `ServeUrlKeyedStaleMiddleware` (global HTTP when `serve_first=true`) — before route match
+2. CMS front route stack → `CmsController` → `CmsPublicPresentationItemCache`
+
+Middleware and controller both use `ModularousCache::getUrlPresentationCacheStore()`, not `UrlKeyedStaleCache` directly.
+
+### Query param caching
+
+Per route: `presentation_cache_key` + `presentation_cache_query` in module cache config.
+
+| Strategy | Behavior |
+|----------|----------|
+| `path_only` | Ignore query params |
+| `path_and_query_allowlist` | Only allowlisted params in key; unknown params bypass cache |
+| `path_and_query` | All query params sorted into key |
+
+Middleware-only paths: `presentationItem.url.path_query` map.
+
+### Purge / invalidation
+
+On model purge, unpublish, or path change, `CacheInvalidation` clears **all query variants** for affected locale + path:
+
+- `forgetByRelation(modelClass, id)`
+- `forgetByModuleRoute(module, route)`
+- `forgetPathVariants(locale, normalizedPath)` — scans meta files
+
+Also forgets via `UrlRoute` rows when CMS module is present.
+
+### DB-down resilience
+
+URL store serves HTML from disk using `.meta` publication snapshot (`StalePublicationGate`). No Redis or DB required on HIT when `store=url` and file exists + visible.
+
+### Admin warm must use public URL
+
+Warmup jobs must render via public site URL (`CmsPublicSiteUrl`) so cached HTML matches visitor-facing host/path. Do not warm from admin hostname.
+
+Each locale iteration must also run inside `CmsPublicPresentationWarmupContext` so `app()->getLocale()`, `trans()`, and locale-dependent Blade/helpers match the visitor locale (`tr`, `nl`, etc.) — not the admin session default.
+
+### Deployment warm command
+
+```bash
+# All presentationItem routes (queued by default; Horizon on modularous-cache)
+php artisan modularous:cache:warm-presentation
+
+# Force synchronous warm
+php artisan modularous:cache:warm-presentation --sync
+
+# Filtered
+php artisan modularous:cache:warm-presentation --module=Blog --route=BlogLanding --locale=en
+
+# Preview without dispatching (dry run)
+php artisan modularous:cache:warm-presentation --dry-run
+```
+
+Docs: `docs/src/pages/guide/console/cache/cache-warm-presentation.md`
+
+### Deployment purge command
+
+```bash
+# All presentationItem filesystem caches (queued by default)
+php artisan modularous:cache:purge-presentation
+
+# Force synchronous purge
+php artisan modularous:cache:purge-presentation --sync
+
+# Filtered
+php artisan modularous:cache:purge-presentation --module=Blog --route=BlogLanding --locale=en
+
+# Preview without purging (dry run)
+php artisan modularous:cache:purge-presentation --dry-run
+```
+
+Docs: `docs/src/pages/guide/console/cache/cache-purge-presentation.md`
+
+### Multi-node extension point
+
+| Piece | Path |
+|-------|------|
+| Interface | `src/Contracts/Cache/UrlPresentationCacheStoreInterface.php` |
+| Default driver | `src/Services/Cache/FileUrlPresentationCacheDriver.php` |
+| Resolution | `ModularousCacheService::resolveUrlPresentationCacheStore()` |
+| Config | `modularous.cache.presentationItem.url.driver` |
+| Container | `UrlPresentationCacheStoreInterface::class` singleton |
+
+To add a driver: implement the interface, register in `resolveUrlPresentationCacheStore()`, preserve key helpers and variant purge semantics.
+
+Docs: `docs/src/pages/guide/module-route-cache/url-stale-resilience.md`

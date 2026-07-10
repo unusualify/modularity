@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+extension_dir() {
+    php -r 'echo ini_get("extension_dir");' 2>/dev/null
+}
+
+coverage_driver_loaded() {
+    php -m 2>/dev/null | grep -qiE '^(pcov|xdebug)$'
+}
+
+xdebug_available() {
+    [[ -f "$(extension_dir)/xdebug.so" ]]
+}
+
+pcov_available() {
+    [[ -f "$(extension_dir)/pcov.so" ]]
+}
+
+MEMORY_LIMIT="${COVERAGE_MEMORY_LIMIT:--1}"
+MEMORY_FLAGS=(-d "memory_limit=${MEMORY_LIMIT}")
+
+if coverage_driver_loaded; then
+    COVERAGE_PHP_FLAGS=("${MEMORY_FLAGS[@]}")
+    COVERAGE_PARATEST_PASSTHRU=(--passthru-php="-d memory_limit=${MEMORY_LIMIT}")
+elif xdebug_available; then
+    XDEBUG_SO="$(extension_dir)/xdebug.so"
+    COVERAGE_PHP_FLAGS=(-d "zend_extension=${XDEBUG_SO}" -d xdebug.mode=coverage "${MEMORY_FLAGS[@]}")
+    COVERAGE_PARATEST_PASSTHRU=(--passthru-php="-d zend_extension=${XDEBUG_SO} -d xdebug.mode=coverage -d memory_limit=${MEMORY_LIMIT}")
+elif pcov_available; then
+    COVERAGE_PHP_FLAGS=(-d extension=pcov "${MEMORY_FLAGS[@]}")
+    COVERAGE_PARATEST_PASSTHRU=(--passthru-php="-d extension=pcov -d memory_limit=${MEMORY_LIMIT}")
+else
+    echo "No code coverage driver available. Install xdebug or pcov, or use setup-php with coverage." >&2
+    exit 1
+fi
+
+case "${1:-}" in
+    php)
+        shift
+        exec php "${COVERAGE_PHP_FLAGS[@]}" "$@"
+        ;;
+    paratest)
+        shift
+        exec php "${COVERAGE_PHP_FLAGS[@]}" vendor/bin/paratest "${COVERAGE_PARATEST_PASSTHRU[@]}" "$@"
+        ;;
+    *)
+        echo "Usage: $0 php|paratest ..." >&2
+        exit 1
+        ;;
+esac

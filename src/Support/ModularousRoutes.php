@@ -22,6 +22,7 @@ use Unusualify\Modularous\Http\Middleware\NavigationMiddleware;
 use Unusualify\Modularous\Http\Middleware\RedirectIfAuthenticatedMiddleware;
 use Unusualify\Modularous\Http\Middleware\RedirectorMiddleware;
 use Unusualify\Modularous\Http\Middleware\UtmMiddleware;
+use Unusualify\Modularous\Http\Middleware\VerifyModularousCacheWebhook;
 use Unusualify\Modularous\Module;
 
 class ModularousRoutes
@@ -186,6 +187,7 @@ class ModularousRoutes
         Route::aliasMiddleware('authorization', AuthorizationMiddleware::class);
         Route::aliasMiddleware('modularous.company.registration', CompanyRegistrationMiddleware::class);
         Route::aliasMiddleware('modularous.redirector', RedirectorMiddleware::class);
+        Route::aliasMiddleware('modularous.cache.webhook', VerifyModularousCacheWebhook::class);
 
         Route::middlewareGroup('modularous.panel', [
             // 'modularous.core',

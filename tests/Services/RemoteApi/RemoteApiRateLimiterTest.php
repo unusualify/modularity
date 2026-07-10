@@ -81,4 +81,38 @@ class RemoteApiRateLimiterTest extends TestCase
 
         $limiter->assertCanRequest('http://app.b2press.test/api/v1/packages/275');
     }
+
+    public function test_hour_limit_is_enforced(): void
+    {
+        RateLimiter::clear('remote-api-outgoing:app.b2press.test:/api/v1/packages:minute');
+        RateLimiter::clear('remote-api-outgoing:app.b2press.test:/api/v1/packages:hour');
+
+        $limiter = new RemoteApiRateLimiter([
+            'enabled' => true,
+            'per_minute' => 100,
+            'per_hour' => 1,
+        ]);
+
+        $url = 'http://app.b2press.test/api/v1/packages';
+
+        $limiter->assertCanRequest($url);
+        $limiter->hit($url);
+
+        $this->expectException(RemoteApiSyncException::class);
+        $limiter->assertCanRequest($url);
+    }
+
+    public function test_resolve_key_falls_back_when_parse_url_fails(): void
+    {
+        $limiter = new RemoteApiRateLimiter([
+            'enabled' => true,
+            'per_minute' => 5,
+            'per_hour' => 5,
+        ]);
+
+        $limiter->hit('://broken');
+        $limiter->assertCanRequest('://broken');
+
+        $this->assertTrue(true);
+    }
 }

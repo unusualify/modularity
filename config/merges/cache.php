@@ -1,5 +1,62 @@
 <?php
 
+$presentationItemStore = (static function (): string {
+    $store = env('MODULAROUS_PRESENTATION_CACHE_STORE');
+    if (is_string($store) && $store !== '') {
+        return in_array($store, ['url', 'model', 'none'], true) ? $store : 'url';
+    }
+
+    $legacyUrlStale = env('MODULAROUS_CACHE_URL_STALE_ENABLED');
+    if ($legacyUrlStale !== null) {
+        if (filter_var($legacyUrlStale, FILTER_VALIDATE_BOOLEAN)) {
+            return 'url';
+        }
+
+        $legacySwr = env('MODULAROUS_RESOURCE_CACHE_SWR_ENABLED');
+        if ($legacySwr !== null && filter_var($legacySwr, FILTER_VALIDATE_BOOLEAN)) {
+            return 'model';
+        }
+
+        return 'none';
+    }
+
+    return 'url';
+})();
+
+$presentationItemSwr = (static function (): bool {
+    $swr = env('MODULAROUS_PRESENTATION_CACHE_SWR');
+    if ($swr !== null) {
+        return filter_var($swr, FILTER_VALIDATE_BOOLEAN);
+    }
+
+    return filter_var(env('MODULAROUS_RESOURCE_CACHE_SWR_ENABLED', false), FILTER_VALIDATE_BOOLEAN);
+})();
+
+$presentationItemServeFirst = (static function (): bool {
+    $serveFirst = env('MODULAROUS_PRESENTATION_CACHE_SERVE_FIRST');
+    if ($serveFirst !== null) {
+        return filter_var($serveFirst, FILTER_VALIDATE_BOOLEAN);
+    }
+
+    return filter_var(env('MODULAROUS_CACHE_URL_STALE_SERVE_FIRST', true), FILTER_VALIDATE_BOOLEAN);
+})();
+
+$presentationItemStaleTtl = (int) (
+    env('MODULAROUS_PRESENTATION_CACHE_STALE_TTL')
+    ?? env('MODULAROUS_CACHE_URL_STALE_TTL')
+    ?? env('MODULAROUS_RESOURCE_CACHE_SWR_STALE_TTL', 604800)
+);
+
+$presentationItemModelStalePath = env(
+    'MODULAROUS_RESOURCE_CACHE_SWR_STALE_PATH',
+    storage_path('framework/cache/modularous-stale'),
+);
+
+$presentationItemUrlBasePath = env(
+    'MODULAROUS_CACHE_URL_STALE_PATH',
+    storage_path('framework/cache/modularous-stale-by-url'),
+);
+
 return [
     /*
     |--------------------------------------------------------------------------
@@ -307,5 +364,109 @@ return [
     'queue' => [
         'connection' => env('MODULAROUS_CACHE_QUEUE_CONNECTION', null),
         'name' => env('MODULAROUS_CACHE_QUEUE_NAME', 'modularous-cache'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Public presentationItem cache (consolidated)
+    |--------------------------------------------------------------------------
+    |
+    | Single store strategy for public CMS HTML. Behavioral flags are separate.
+    |
+    | store:
+    |   url   — UrlKeyedStaleCache (modularous-stale-by-url), path invalidation
+    |   model — id-based StaleFileCache (modularous-stale)
+    |   none  — always render, no presentation cache
+    |
+    | swr — serve past fresh TTL within stale window (applies to active store)
+    | serve_first — middleware serves URL disk cache before controller (store=url only)
+    |
+    | Legacy env (still read when new vars are unset):
+    |   MODULAROUS_RESOURCE_CACHE_SWR_ENABLED → presentationItem.swr
+    |   MODULAROUS_CACHE_URL_STALE_ENABLED → store=url when true (see resolver above)
+    |   MODULAROUS_CACHE_URL_STALE_SERVE_FIRST → serve_first
+    |   MODULAROUS_CACHE_URL_STALE_TTL / MODULAROUS_RESOURCE_CACHE_SWR_STALE_TTL → stale_ttl
+    |
+    */
+    'presentationItem' => [
+        'store' => $presentationItemStore,
+        'swr' => $presentationItemSwr,
+        'serve_first' => $presentationItemServeFirst,
+        'stale_ttl' => $presentationItemStaleTtl,
+        'model' => [
+            'stale_path' => $presentationItemModelStalePath,
+        ],
+        'url' => [
+            /*
+            | Driver for URL-keyed presentation HTML storage.
+            | file (default) — local filesystem via FileUrlPresentationCacheDriver
+            | shared_file — same as file; mount EFS/NFS at base_path for multi-node
+            | Future: redis, s3 — implement UrlPresentationCacheStoreInterface
+            */
+            'driver' => env('MODULAROUS_PRESENTATION_CACHE_URL_DRIVER', 'file'),
+            'base_path' => $presentationItemUrlBasePath,
+            /*
+            | Path → allowlisted query params for serve-first middleware (before route match).
+            | Per-route module config (presentation_cache_key / presentation_cache_query) is preferred
+            | in controllers; path_query covers middleware-only resolution.
+            |
+            | '/blog/search' => ['page', 'searchblogtext'],
+            */
+            'path_query' => [],
+        ],
+        'warm_dispatch_cooldown' => (int) env('MODULAROUS_RESOURCE_CACHE_SWR_WARM_COOLDOWN', 600),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Stale-While-Revalidate (SWR) — deprecated aliases
+    |--------------------------------------------------------------------------
+    |
+    | Prefer presentationItem.swr and presentationItem.store=model.
+    | Kept for production apps still reading modularous.cache.swr.* at runtime.
+    |
+    */
+    'swr' => [
+        'enabled' => $presentationItemSwr,
+        'stale_ttl' => $presentationItemStaleTtl,
+        'types' => [
+            'presentationItem' => true,
+        ],
+        'presentationItem' => [
+            'stale_driver' => 'file',
+            'stale_path' => $presentationItemModelStalePath,
+        ],
+        'warm_dispatch_cooldown' => (int) env('MODULAROUS_RESOURCE_CACHE_SWR_WARM_COOLDOWN', 600),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Cache Revalidate Webhook
+    |--------------------------------------------------------------------------
+    |
+    | HMAC-signed POST /api/modularous/cache/revalidate for external purge/warm.
+    | Disabled by default; set MODULAROUS_RESOURCE_CACHE_WEBHOOK_SECRET when enabling.
+    |
+    */
+    'webhook' => [
+        'enabled' => env('MODULAROUS_RESOURCE_CACHE_WEBHOOK_ENABLED', false),
+        'secret' => env('MODULAROUS_RESOURCE_CACHE_WEBHOOK_SECRET'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | URL-Keyed Stale Resilience — deprecated aliases
+    |--------------------------------------------------------------------------
+    |
+    | Prefer presentationItem.store=url and presentationItem.url.*.
+    |
+    */
+    'resilience' => [
+        'url_stale' => [
+            'enabled' => $presentationItemStore === 'url',
+            'serve_first' => $presentationItemServeFirst,
+            'base_path' => $presentationItemUrlBasePath,
+            'stale_ttl' => $presentationItemStaleTtl,
+        ],
     ],
 ];

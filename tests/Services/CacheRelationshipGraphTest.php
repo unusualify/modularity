@@ -284,4 +284,102 @@ class CacheRelationshipGraphTest extends TestModulesCase
         $this->assertIsArray($graph2);
         $this->assertTrue($this->service->isCached());
     }
+
+    /** @test */
+    public function it_maps_middleman_relationships_into_model_and_table_indexes(): void
+    {
+        $graph = [
+            'model_to_module_routes' => [],
+            'table_to_module_routes' => [],
+            'module_relationships' => [],
+            'submodule_to_module' => [],
+        ];
+
+        $method = new \ReflectionMethod($this->service, 'processRelationship');
+        $method->setAccessible(true);
+        $method->invokeArgs(
+            $this->service,
+            [
+                'Blog',
+                'Post',
+                'tags',
+                [
+                    'relationship_model' => 'Modules\\Blog\\Entities\\Tag',
+                    'relationship_table' => 'tags',
+                    'relationship_class' => 'BelongsToMany',
+                    'has_middleman' => true,
+                    'middleman_model' => 'Modules\\Blog\\Entities\\PostTag',
+                    'middleman_table' => 'post_tag',
+                ],
+                &$graph,
+            ]
+        );
+
+        $this->assertSame(
+            [['moduleName' => 'Blog', 'moduleRouteName' => 'Post']],
+            $graph['model_to_module_routes']['Modules\\Blog\\Entities\\Tag']
+        );
+        $this->assertSame(
+            [['moduleName' => 'Blog', 'moduleRouteName' => 'Post']],
+            $graph['table_to_module_routes']['tags']
+        );
+        $this->assertSame(
+            [['moduleName' => 'Blog', 'moduleRouteName' => 'Post']],
+            $graph['model_to_module_routes']['Modules\\Blog\\Entities\\PostTag']
+        );
+        $this->assertSame(
+            [['moduleName' => 'Blog', 'moduleRouteName' => 'Post']],
+            $graph['table_to_module_routes']['post_tag']
+        );
+    }
+
+    /** @test */
+    public function it_builds_visual_graph_with_affected_by_metadata(): void
+    {
+        $graph = [
+            'model_to_module_routes' => [
+                'Modules\\Blog\\Entities\\Author' => [
+                    ['moduleName' => 'Blog', 'moduleRouteName' => 'Post'],
+                ],
+            ],
+            'table_to_module_routes' => [],
+            'module_relationships' => [
+                'Blog' => [
+                    'Post' => [
+                        'model_class' => 'Modules\\Blog\\Entities\\Post',
+                        'parent_module' => 'Blog',
+                        'relationships' => [
+                            'author' => [
+                                'model' => 'Modules\\Blog\\Entities\\Author',
+                                'type' => 'BelongsTo',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'submodule_to_module' => [],
+        ];
+
+        $property = new \ReflectionProperty($this->service, 'graph');
+        $property->setAccessible(true);
+        $property->setValue($this->service, $graph);
+
+        $visual = $this->service->getVisualGraph();
+
+        $this->assertArrayHasKey('Blog', $visual);
+        $this->assertSame('Modules\\Blog\\Entities\\Post', $visual['Blog']['module_routes']['Post']['model_class']);
+        $this->assertContains('Author', $visual['Blog']['module_routes']['Post']['affected_by']);
+    }
+
+    /** @test */
+    public function it_scans_entity_directories_for_concrete_models(): void
+    {
+        $directory = __DIR__ . '/../Stubs/Modules/SourceModule/Entities';
+
+        $method = new \ReflectionMethod($this->service, 'scanDirectoryForModels');
+        $method->setAccessible(true);
+        $models = $method->invoke($this->service, $directory, 'Modules\\SourceModule\\Entities');
+
+        $this->assertContains('Modules\\SourceModule\\Entities\\RelationshipSourceModel', $models);
+    }
 }

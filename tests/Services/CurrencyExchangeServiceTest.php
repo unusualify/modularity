@@ -65,4 +65,27 @@ class CurrencyExchangeServiceTest extends TestCase
         $rate = $this->service->getExchangeRate('USD');
         $this->assertEquals(1.1, $rate);
     }
+
+    /** @test */
+    public function it_throws_when_fetch_fails(): void
+    {
+        Http::fake([
+            'api.test/*' => Http::response(['error' => 'down'], 500),
+        ]);
+
+        Cache::forget('exchange_rates');
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Failed to fetch exchange rates');
+
+        $this->service->fetchExchangeRates();
+    }
+
+    /** @test */
+    public function it_uses_ceil_rounding_for_exchange_rate_lookup(): void
+    {
+        Cache::put('exchange_rates', ['USD' => 1.115], 3600);
+
+        $this->assertSame(2.0, $this->service->getExchangeRate('USD', 0, 'ceil'));
+    }
 }

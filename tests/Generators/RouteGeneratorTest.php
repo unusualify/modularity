@@ -560,12 +560,11 @@ class RouteGeneratorTest extends TestCase
     /** @test */
     public function it_updates_routes_statuses()
     {
-        $reflection = new \ReflectionClass($this->generator);
-        $method = $reflection->getMethod('updateRoutesStatuses');
-        $method->setAccessible(true);
+        Modularous::shouldReceive('findOrFail')->andReturn($this->module);
+        $this->module->shouldReceive('enableRoute')->once()->with('TestRoute');
 
-        // Method has conditional logic; verify it executes
-        $this->assertTrue(method_exists($this->generator, 'updateRoutesStatuses'));
+        $this->generator->updateRoutesStatuses();
+        $this->assertTrue(true);
     }
 
     /** @test */
@@ -596,11 +595,71 @@ class RouteGeneratorTest extends TestCase
     }
 
     /** @test */
-    public function it_has_run_test_method()
+    public function it_runs_test_workflow_via_generate()
     {
-        // runTest() is a complex protected method
-        // Verify it exists for completeness
+        $this->generator->setTest(true)->setSchema('name:string')->setPlain(true);
+        $this->module->shouldReceive('getRawRouteConfig')->with('TestRoute')->andReturn(null);
+        $this->console->shouldReceive('info')->atLeast()->once();
+
+        $this->assertSame(0, $this->generator->generate());
+    }
+
+    /** @test */
+    public function it_generates_extra_migrations_for_morphed_by_many()
+    {
+        $this->generator->setRelationships('tags:morphedByMany');
+        $this->module->shouldReceive('isFileExists')->andReturn(false);
+        $this->console->shouldReceive('call')->atLeast()->once();
+
+        $this->assertTrue($this->generator->generateExtraMigrations());
+    }
+
+    /** @test */
+    public function it_generates_files_when_stubs_are_configured()
+    {
+        $this->app['config']->set('modularous.stubs.files', [
+            'routes/web' => 'Routes/web.php',
+        ]);
+
+        $this->filesystem->shouldReceive('isDirectory')->andReturn(false);
+        $this->filesystem->shouldReceive('makeDirectory')->andReturn(true);
+        $this->filesystem->shouldReceive('put')->once()->andReturn(true);
+        $this->console->shouldReceive('info')->once();
+
+        $this->generator->generateFiles();
+        $this->assertTrue(true);
+    }
+
+    /** @test */
+    public function it_update_config_file_returns_true_in_test_mode()
+    {
+        $this->module->shouldReceive('getSnakeName')->andReturn('test_module');
+        $this->module->shouldReceive('getConfigPath')->andReturn('/tmp/config.php');
+        $this->app['config']->set('test_module', []);
+        $this->filesystem->shouldReceive('exists')->with('/tmp/config.php')->andReturn(false);
+        $this->generator->setTest(true)->setSchema('name:string');
+
+        $result = $this->generator->updateConfigFile();
+
+        $this->assertTrue($this->generator->getTest());
+        $this->assertContains($result, [1, true]);
+    }
+
+    /** @test */
+    public function it_gets_replacement_for_json_stub()
+    {
+        $this->app['config']->set('modularous.stubs.replacements', [
+            'json' => ['STUDLY_NAME', 'MODULE_NAMESPACE'],
+        ]);
+        $this->app['config']->set('modules.namespace', 'Modules\\Test');
+
         $reflection = new \ReflectionClass($this->generator);
-        $this->assertTrue($reflection->hasMethod('runTest'));
+        $method = $reflection->getMethod('getReplacement');
+        $method->setAccessible(true);
+
+        $replacements = $method->invoke($this->generator, 'json');
+
+        $this->assertSame('TestRoute', $replacements['STUDLY_NAME']);
+        $this->assertStringContainsString('Modules', $replacements['MODULE_NAMESPACE']);
     }
 }

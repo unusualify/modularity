@@ -26,4 +26,31 @@ class RemoteApiRequestTrackerTest extends TestCase
         $this->assertSame(3, $flushed['total']);
         $this->assertSame(0, $tracker->total());
     }
+
+    public function test_to_array_and_reset_clear_state(): void
+    {
+        $tracker = new RemoteApiRequestTracker;
+
+        $tracker->record('http://app.b2press.test/api/v1/packages');
+
+        $this->assertSame([
+            'total' => 1,
+            'by_url' => ['http://app.b2press.test/api/v1/packages' => 1],
+        ], $tracker->toArray());
+
+        $tracker->reset();
+
+        $this->assertSame(0, $tracker->total());
+        $this->assertSame([], $tracker->countsByUrl());
+    }
+
+    public function test_normalize_url_returns_original_when_parse_fails(): void
+    {
+        $tracker = new RemoteApiRequestTracker;
+        $method = new \ReflectionMethod(RemoteApiRequestTracker::class, 'normalizeUrl');
+        $method->setAccessible(true);
+
+        $malformed = 'http:///';
+        $this->assertSame($malformed, $method->invoke($tracker, $malformed));
+    }
 }

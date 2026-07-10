@@ -113,6 +113,11 @@ final class McamaraCmsLocalizationAdapter implements CmsLocalizationContract
     public function applyLocaleToApplication(string $locale): void
     {
         app()->setLocale($locale);
+
+        try {
+            LaravelLocalization::setLocale($locale);
+        } catch (\Throwable) {
+        }
     }
 
     /**

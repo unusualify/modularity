@@ -134,7 +134,11 @@
         ],
         "test:parallel:coverage": [
             "@test-clean",
-            "@php -d memory_limit=1G vendor/bin/paratest --processes=2 --stop-on-defect --coverage-html coverage-html"
+            "bin/with-coverage-driver paratest --processes=2 --stop-on-defect"
+        ],
+        "test:parallel:coverage:html": [
+            "@test-clean",
+            "COVERAGE_MEMORY_LIMIT=-1 bin/with-coverage-driver paratest -c phpunit.coverage-html.xml --processes=2 --stop-on-defect"
         ],
         "test:fast": [
             "@test-clean",
@@ -142,7 +146,11 @@
         ],
         "test:fast:coverage": [
             "@test-clean",
-            "@php -d memory_limit=1G vendor/bin/paratest --processes=4 --stop-on-defect --coverage-html coverage-html"
+            "bin/with-coverage-driver paratest --processes=2 --stop-on-defect"
+        ],
+        "test:fast:coverage:html": [
+            "@test-clean",
+            "COVERAGE_MEMORY_LIMIT=-1 bin/with-coverage-driver paratest -c phpunit.coverage-html.xml --processes=2 --stop-on-defect"
         ],
         "test:brokers": "vendor/bin/phpunit --stop-on-defect --no-coverage tests/Brokers",
         "test:events": "vendor/bin/phpunit --stop-on-defect --no-coverage tests/Events",
@@ -154,11 +162,12 @@
         "test:repositories": "vendor/bin/phpunit --stop-on-defect --no-coverage tests/Repositories",
         "test:services": "vendor/bin/phpunit --stop-on-defect --no-coverage tests/Services",
         "test:stop:defect": "vendor/bin/phpunit --stop-on-defect --no-coverage",
-        "test:coverage": "vendor/bin/phpunit --stop-on-defect",
+        "test:coverage": "bin/with-coverage-driver php vendor/bin/phpunit --stop-on-defect",
+        "test:coverage:html": "COVERAGE_MEMORY_LIMIT=-1 bin/with-coverage-driver php vendor/bin/phpunit -c phpunit.coverage-html.xml --stop-on-defect",
         "test:generated": "vendor/bin/phpunit -c phpunit.generated.xml --stop-on-defect --no-coverage --testsuite Generated",
-        "test:coverage:generated": "vendor/bin/phpunit -c phpunit.generated.xml --stop-on-defect --testsuite Generated",
+        "test:coverage:generated": "bin/with-coverage-driver php vendor/bin/phpunit -c phpunit.generated.xml --stop-on-defect --testsuite Generated",
         "test:all": "vendor/bin/phpunit -c phpunit.all.xml --stop-on-defect --no-coverage --testsuite All",
-        "test:coverage:all": "vendor/bin/phpunit -c phpunit.all.xml --stop-on-defect --testsuite All",
+        "test:coverage:all": "bin/with-coverage-driver php vendor/bin/phpunit -c phpunit.all.xml --stop-on-defect --testsuite All",
         "pint": "vendor/bin/pint",
         "pint:test": "vendor/bin/pint --test",
         "pint:bail": "vendor/bin/pint --bail",

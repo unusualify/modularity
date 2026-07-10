@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         bootstrap="tests/bootstrap.php"
+         colors="true"
+         cacheDirectory=".phpunit.cache"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.4/phpunit.xsd"
+>
+  <testsuites>
+    <testsuite name="Main">
+        <directory>tests</directory>
+        <exclude>tests/Generators/StubsGeneratorTest.php</exclude>
+        <exclude>tests/Console</exclude>
+        <exclude>tests/Generated</exclude>
+        <exclude>tests/Docs</exclude>
+    </testsuite>
+  </testsuites>
+  <php>
+    <env name="CACHE_DRIVER" value="array"/>
+    <env name="MODULAROUS_CACHE_OBSERVER_QUEUE" value="false"/>
+    <env name="APP_KEY" value="base64:W99w+5JYz8SVGf5sx17gmPR6uoNCtWiEVc+9qu8iGEg="/>
+    <ini name="memory_limit" value="-1"/>
+  </php>
+  <source>
+    <include>
+      <directory suffix=".php">src</directory>
+    </include>
+    <exclude>
+      <directory>src/Contracts</directory>
+      <directory>src/Console</directory>
+      <directory>src/Database/migrations</directory>
+      <directory>tests</directory>
+      <directory>vendor</directory>
+      <file>src/bootstrap.php</file>
+    </exclude>
+  </source>
+  <coverage>
+    <report>
+      <clover outputFile="coverage-clover.xml"/>
+      <html outputDirectory="coverage-html" lowUpperBound="50" highLowerBound="80"/>
+      <text outputFile="php://stdout" showOnlySummary="true"/>
+    </report>
+  </coverage>
+</phpunit>

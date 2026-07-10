@@ -22,6 +22,7 @@ final class WarmPresentationItemJob implements ShouldQueue
         public Model $model,
         public ?string $moduleName = null,
         public ?string $moduleRouteName = null,
+        public ?string $locale = null,
     ) {
         $this->configureModularousCacheQueue();
     }
@@ -52,11 +53,20 @@ final class WarmPresentationItemJob implements ShouldQueue
         ], [
             'moduleName' => $this->moduleName,
             'moduleRouteName' => $this->moduleRouteName,
+            'locale' => $this->locale,
         ]);
     }
 
     protected function modularousCacheOverlapKey(): string
     {
+        if (class_exists(\Modules\Cms\Support\CmsPublicPresentationItemCache::class)) {
+            return \Modules\Cms\Support\CmsPublicPresentationItemCache::warmPresentationOverlapKey(
+                $this->model,
+                $this->moduleName ?? 'auto',
+                $this->moduleRouteName ?? 'auto',
+            );
+        }
+
         return sprintf(
             'cache:warm-presentation:%s:%s:%s:%s',
             $this->moduleName ?? 'auto',

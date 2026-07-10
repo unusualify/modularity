@@ -65,6 +65,8 @@ trait CacheInvalidation
      */
     public function invalidateModuleRoute(string $moduleName, string $moduleRouteName): bool
     {
+        $urlStaleDeleted = $this->forgetUrlStaleForModuleRoute($moduleName, $moduleRouteName);
+
         if ($this->usesTags()) {
             // Route-scoped flush only — including the root modularous tag would wipe unrelated routes
             // (e.g. dependent PackageCountry warmup entries cleared by CountryPackagesHub invalidation).
@@ -77,7 +79,8 @@ trait CacheInvalidation
         $moduleName = Str::studly($moduleName);
         $moduleRouteName = Str::studly($moduleRouteName);
 
-        return $this->invalidateByPattern("{$this->getPrefix()}:{$moduleName}:{$moduleRouteName}:*") > 0;
+        return $this->invalidateByPattern("{$this->getPrefix()}:{$moduleName}:{$moduleRouteName}:*") > 0
+            || $urlStaleDeleted > 0;
     }
 
     /**
@@ -103,6 +106,7 @@ trait CacheInvalidation
 
         try {
             $this->getStore()->tags([$tag])->flush();
+            $this->forgetStaleFilesByRelation($modelClass, $id);
 
             return true;
         } catch (\Exception $e) {
@@ -254,8 +258,21 @@ trait CacheInvalidation
         $this->invalidateByPattern("{$this->getPrefix()}:{$moduleName}:{$moduleRouteName}:formItem:{$id}:*");
     }
 
-    public function invalidatePresentationItemCache(string $moduleName, string $moduleRouteName, $id): void
+    public function invalidatePresentationItemCache(string $moduleName, string $moduleRouteName, $id, ?string $modelClass = null): void
     {
+        $store = $this->getPresentationCacheStore();
+
+        if ($modelClass !== null && $id !== null) {
+            if ($store === 'model') {
+                $this->getStaleFileCache()->forgetByRelation($modelClass, $id);
+            }
+            if ($store === 'url') {
+                $this->forgetUrlStaleForModel($modelClass, $id);
+            }
+        } elseif ($id !== null && $store === 'model') {
+            $this->forgetStaleFilesByModuleRouteId($moduleName, $moduleRouteName, $id);
+        }
+
         if ($this->usesTags()) {
             $this->getStore()->tags($this->getModuleRouteTags($moduleName, $moduleRouteName, onlyRoute: true))->flush();
 
@@ -266,6 +283,9 @@ trait CacheInvalidation
         $moduleRouteName = Str::studly($moduleRouteName);
 
         $this->invalidateByPattern("{$this->getPrefix()}:{$moduleName}:{$moduleRouteName}:presentationItem:{$id}:*");
+        if ($store === 'model' && $id !== null) {
+            $this->forgetStaleFilesByModuleRouteId($moduleName, $moduleRouteName, $id);
+        }
     }
 
     public function invalidateRecordCache(string $moduleName, string $moduleRouteName, $id): void
@@ -299,6 +319,14 @@ trait CacheInvalidation
 
         $newlyCreated = $model->wasRecentlyCreated;
 
+        $shouldForgetPresentationStale = ! $newlyCreated
+            && ($types['presentationItem'] ?? true)
+            && $this->isEnabled($moduleName, $moduleRouteName, 'presentationItem');
+
+        if ($shouldForgetPresentationStale) {
+            $this->forgetPresentationStaleForModel($model);
+        }
+
         $tagFlushResult = null;
 
         if (! $skipInvalidation) {
@@ -328,7 +356,7 @@ trait CacheInvalidation
 
                 if (((isset($types['presentationItem']) ? $types['presentationItem'] : true)) && $this->isEnabled($moduleName, $moduleRouteName, 'presentationItem')) {
                     if (! $newlyCreated) {
-                        $this->invalidatePresentationItemCache($moduleName, $moduleRouteName, $model->getKey());
+                        $this->invalidatePresentationItemCache($moduleName, $moduleRouteName, $model->getKey(), $model::class);
                     }
                 }
             }
@@ -374,7 +402,21 @@ trait CacheInvalidation
             'types' => $types,
         ]);
 
-        $this->warmupForModel($model, $types, $moduleName, $moduleRouteName);
+        if (
+            ! $model->wasRecentlyCreated
+            && ($types['presentationItem'] ?? false)
+            && $moduleName
+            && $moduleRouteName
+            && $this->isEnabled($moduleName, $moduleRouteName, 'presentationItem')
+        ) {
+            $this->forgetPresentationStaleForModel($model);
+        }
+
+        $locale = isset($options['locale']) && is_string($options['locale']) && $options['locale'] !== ''
+            ? $options['locale']
+            : null;
+
+        $this->warmupForModel($model, $types, $moduleName, $moduleRouteName, $locale);
     }
 
     /**
@@ -411,13 +453,23 @@ trait CacheInvalidation
         )) {
             $this->invalidateModuleRoute($moduleName, $moduleRouteName);
 
+            if (($types['presentationItem'] ?? false) && $id !== null) {
+                if ($this->getPresentationCacheStore() === 'model') {
+                    $this->forgetStaleFilesByRelation($model::class, $id);
+                    $this->forgetStaleFilesByModuleRouteId($moduleName, $moduleRouteName, $id);
+                }
+                if ($this->getPresentationCacheStore() === 'url') {
+                    $this->forgetUrlStaleForModel($model::class, $id);
+                }
+            }
+
             return;
         }
 
         $this->invalidateRouteLevelCaches($moduleName, $moduleRouteName, $types);
 
         if ($id !== null) {
-            $this->invalidatePerIdCachesForRoute($moduleName, $moduleRouteName, $id, $types);
+            $this->invalidatePerIdCachesForRoute($moduleName, $moduleRouteName, $id, $types, $model);
         }
     }
 
@@ -472,7 +524,7 @@ trait CacheInvalidation
     /**
      * Warm caches for a single model, respecting the requested cache types.
      */
-    protected function warmupForModel(Model $model, array $types = [], ?string $moduleName = null, ?string $moduleRouteName = null): void
+    protected function warmupForModel(Model $model, array $types = [], ?string $moduleName = null, ?string $moduleRouteName = null, ?string $locale = null): void
     {
         $moduleName ??= $this->getModuleNameFromModel($model);
         $moduleRouteName ??= $this->getModuleRouteNameFromModel($model);
@@ -516,7 +568,7 @@ trait CacheInvalidation
 
         if ($warmPresentationItem) {
             try {
-                $this->warmupPresentationItem($moduleName, $moduleRouteName, $model);
+                $this->warmupPresentationItem($moduleName, $moduleRouteName, $model, $locale);
             } catch (\Exception $e) {
                 logger()->error("Failed to warm up presentation item cache for model {$model->getKey()}: " . $e->getMessage(), ['exception' => $e->getTraceAsString()]);
             }
@@ -576,7 +628,7 @@ trait CacheInvalidation
         }
     }
 
-    protected function invalidatePerIdCachesForRoute(string $moduleName, string $moduleRouteName, $id, array $types): void
+    protected function invalidatePerIdCachesForRoute(string $moduleName, string $moduleRouteName, $id, array $types, ?Model $model = null): void
     {
         if (($types['record'] ?? false) && $this->isEnabled($moduleName, $moduleRouteName, 'record')) {
             $this->invalidateRecordCache($moduleName, $moduleRouteName, $id);
@@ -591,7 +643,8 @@ trait CacheInvalidation
         }
 
         if (($types['presentationItem'] ?? false) && $this->isEnabled($moduleName, $moduleRouteName, 'presentationItem')) {
-            $this->invalidatePresentationItemCache($moduleName, $moduleRouteName, $id);
+            $modelClass = $model !== null ? $model::class : null;
+            $this->invalidatePresentationItemCache($moduleName, $moduleRouteName, $id, $modelClass);
         }
     }
 
@@ -665,5 +718,192 @@ trait CacheInvalidation
         if ($warmPresentationItem) {
             $this->warmupPresentationItem($moduleName, $moduleRouteName, $model);
         }
+    }
+
+    abstract protected function getStaleFileCache(): \Unusualify\Modularous\Services\Cache\StaleFileCache;
+
+    abstract protected function getUrlPresentationCacheStore(): \Unusualify\Modularous\Contracts\Cache\UrlPresentationCacheStoreInterface;
+
+    /**
+     * @deprecated Implement getUrlPresentationCacheStore() instead.
+     */
+    protected function getUrlKeyedStaleCache(): \Unusualify\Modularous\Services\Cache\UrlKeyedStaleCache
+    {
+        $store = $this->getUrlPresentationCacheStore();
+        if ($store instanceof \Unusualify\Modularous\Services\Cache\FileUrlPresentationCacheDriver) {
+            return $store->underlyingFileCache();
+        }
+
+        throw new \RuntimeException('getUrlKeyedStaleCache() requires file driver.');
+    }
+
+    abstract protected function getPresentationCacheStore(): string;
+
+    /**
+     * Purge all presentationItem filesystem caches for a model (model-id stale + URL store).
+     *
+     * Clears both {@see StaleFileCache} and {@see UrlPresentationCacheStoreInterface} regardless of
+     * the active `presentationItem.store` config (safe when migrating store modes).
+     */
+    public function purgePresentationItemForModel(
+        Model $model,
+        ?string $moduleName = null,
+        ?string $moduleRouteName = null,
+        ?string $locale = null,
+    ): int {
+        if ($model->getKey() === null) {
+            return 0;
+        }
+
+        $deleted = $this->getStaleFileCache()->forgetByRelation($model::class, $model->getKey());
+
+        $moduleName ??= $this->getModuleNameFromModel($model);
+        $moduleRouteName ??= $this->getModuleRouteNameFromModel($model);
+
+        if ($moduleName && $moduleRouteName) {
+            $deleted += $this->getStaleFileCache()->forgetByModuleRouteId(
+                $moduleName,
+                $moduleRouteName,
+                $model->getKey(),
+            );
+        }
+
+        $deleted += $this->purgeAllUrlPresentationForModel($model::class, $model->getKey(), $locale);
+
+        ModularousCacheLogger::info('cache.invalidation.purge_presentation_item_for_model', [
+            'model' => $model::class,
+            'id' => $model->getKey(),
+            'moduleName' => $moduleName,
+            'moduleRouteName' => $moduleRouteName,
+            'locale' => $locale,
+            'deleted' => $deleted,
+        ]);
+
+        return $deleted;
+    }
+
+    /**
+     * Purge all presentationItem filesystem caches for a module route (no per-record iteration).
+     */
+    public function purgePresentationItemForModuleRoute(string $moduleName, string $moduleRouteName): int
+    {
+        $deleted = $this->getUrlPresentationCacheStore()->forgetByModuleRoute($moduleName, $moduleRouteName);
+        $deleted += $this->getStaleFileCache()->forgetByModuleRoute($moduleName, $moduleRouteName);
+
+        ModularousCacheLogger::info('cache.invalidation.purge_presentation_item_for_module_route', [
+            'moduleName' => $moduleName,
+            'moduleRouteName' => $moduleRouteName,
+            'deleted' => $deleted,
+        ]);
+
+        return $deleted;
+    }
+
+    protected function forgetPresentationStaleForModel(Model $model): void
+    {
+        if ($model->getKey() === null) {
+            return;
+        }
+
+        $store = $this->getPresentationCacheStore();
+
+        if ($store === 'model') {
+            $this->getStaleFileCache()->forgetByRelation($model::class, $model->getKey());
+            $moduleName = $this->getModuleNameFromModel($model);
+            $moduleRouteName = $this->getModuleRouteNameFromModel($model);
+            if ($moduleName && $moduleRouteName) {
+                $this->forgetStaleFilesByModuleRouteId($moduleName, $moduleRouteName, $model->getKey());
+            }
+        }
+
+        if ($store === 'url') {
+            $this->forgetUrlStaleForModel($model::class, $model->getKey());
+        }
+    }
+
+    protected function forgetStaleFilesByRelation(string $modelClass, int|string $id): void
+    {
+        if ($this->getPresentationCacheStore() === 'model') {
+            $this->getStaleFileCache()->forgetByRelation($modelClass, $id);
+        }
+
+        if ($this->getPresentationCacheStore() === 'url') {
+            $this->forgetUrlStaleForModel($modelClass, $id);
+        }
+    }
+
+    protected function forgetStaleFilesByModuleRouteId(string $moduleName, string $moduleRouteName, int|string $id): void
+    {
+        $this->getStaleFileCache()->forgetByModuleRouteId($moduleName, $moduleRouteName, $id);
+    }
+
+    protected function forgetUrlStaleByLocalePath(string $locale, string $normalizedPath): int
+    {
+        return $this->getUrlPresentationCacheStore()->forgetPathVariants($locale, $normalizedPath);
+    }
+
+    protected function forgetUrlStaleForModuleRoute(string $moduleName, string $moduleRouteName): int
+    {
+        if ($this->getPresentationCacheStore() !== 'url') {
+            return 0;
+        }
+
+        return $this->getUrlPresentationCacheStore()->forgetByModuleRoute($moduleName, $moduleRouteName);
+    }
+
+    protected function forgetUrlStaleForModel(string $modelClass, int|string $id): int
+    {
+        if ($this->getPresentationCacheStore() !== 'url') {
+            return 0;
+        }
+
+        return $this->purgeAllUrlPresentationForModel($modelClass, $id);
+    }
+
+    protected function purgeAllUrlPresentationForModel(string $modelClass, int|string $id, ?string $locale = null): int
+    {
+        if ($locale !== null && $locale !== '') {
+            return $this->purgeUrlPresentationPathVariantsForModel($modelClass, $id, $locale);
+        }
+
+        $deleted = $this->getUrlPresentationCacheStore()->forgetByRelation($modelClass, $id);
+
+        $deleted += $this->purgeUrlPresentationPathVariantsForModel($modelClass, $id);
+
+        return $deleted;
+    }
+
+    protected function purgeUrlPresentationPathVariantsForModel(
+        string $modelClass,
+        int|string $id,
+        ?string $locale = null,
+    ): int {
+        if (! class_exists(\Modules\Cms\Entities\UrlRoute::class)) {
+            return 0;
+        }
+
+        try {
+            $model = new $modelClass;
+            $query = \Modules\Cms\Entities\UrlRoute::query()
+                ->where('urlable_type', $model->getMorphClass())
+                ->where('urlable_id', $id)
+                ->where('kind', \Modules\Cms\Entities\UrlRoute::KIND_PAGE_PUBLIC);
+
+            if ($locale !== null && $locale !== '') {
+                $query->where('locale', $locale);
+            }
+
+            $rows = $query->get(['locale', 'normalized_path']);
+        } catch (\Throwable) {
+            return 0;
+        }
+
+        $deleted = 0;
+
+        foreach ($rows as $row) {
+            $deleted += $this->forgetUrlStaleByLocalePath((string) $row->locale, (string) $row->normalized_path);
+        }
+
+        return $deleted;
     }
 }
