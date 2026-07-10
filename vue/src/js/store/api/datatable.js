@@ -53,7 +53,10 @@ export default {
     // const url = window[import.meta.env.VUE_APP_NAME].ENDPOINTS.destroy.replace(':id', id)
     // var url = window[import.meta.env.VUE_APP_NAME].ENDPOINTS.index.replace(':id', item.id);
     url = url.replace(':id', id)
-    axios.delete(url).then(function (resp) {
+    console.log(url)
+    axios.delete(url, {
+      validateStatus: status => (status >= 200 && status < 300) || status === 422
+    }).then(function (resp) {
       if (callback && typeof callback === 'function') callback(resp)
     }, function (resp) {
       const error = {
@@ -68,7 +71,9 @@ export default {
   forceDelete (url, id, callback, errorCallback) {
     // const url = window[import.meta.env.VUE_APP_NAME].ENDPOINTS.forceDelete
     url = url.replace(':id', id)
-    axios.put(url, { id }).then(function (resp) {
+    axios.put(url, { id }, {
+      validateStatus: status => (status >= 200 && status < 300) || status === 422
+    }).then(function (resp) {
       if (callback && typeof callback === 'function') callback(resp)
     }, function (resp) {
       const error = {
@@ -83,7 +88,9 @@ export default {
   restore (url, id, callback) {
     // const url = window[import.meta.env.VUE_APP_NAME].ENDPOINTS.restore
     url = url.replace(':id', id)
-    axios.put(url, { id }).then(function (resp) {
+    axios.put(url, { id }, {
+      validateStatus: status => (status >= 200 && status < 300) || status === 422
+    }).then(function (resp) {
       if (callback && typeof callback === 'function') callback(resp)
     }, function (resp) {
       const error = {
@@ -120,7 +127,6 @@ export default {
       globalError(component, error)
     })
   },
-
   bulkPublish (url, params, callback) {
     // const url = window[import.meta.env.VUE_APP_NAME].CMS_URLS.bulkPublish
     axios.post(url, { ids: params.ids, publish: params.toPublish }).then(function (resp) {

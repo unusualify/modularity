@@ -736,7 +736,11 @@ export default function useTable (props, context) {
       }
 
       let successCallback = (res) => {
-        if(res.status === 200) {
+        if (res.status === 422) {
+          if (runAlert && res.data?.message) {
+            store.dispatch(ACTIONS.SHOW_ALERT, res.data)
+          }
+        } else if (res.status === 200) {
 
           if(runAlert && res.data.variant && res.data.message){
             store.dispatch(ACTIONS.SHOW_ALERT, res.data)
