@@ -49,9 +49,9 @@
               <!-- Title Center Form Actions -->
               <FormActions v-if="actionsPosition == 'title-center' && formActionsActive"
                 :modelValue="formItem"
-                :editedModel="model"
                 :actions="actions"
                 :is-editing="isEditing"
+                :form-dirty="isDirty"
                 @action-complete="$emit('actionComplete', $event)"
               >
                 <template #prepend>
@@ -70,9 +70,9 @@
               <!-- Title Right Form Actions -->
               <FormActions v-if="actionsPosition == 'title-right' && formActionsActive"
                 :modelValue="formItem"
-                :editedModel="model"
                 :actions="actions"
                 :is-editing="isEditing"
+                :form-dirty="isDirty"
                 @action-complete="$emit('actionComplete', $event)"
               >
                 <template #prepend="actionsScope">
@@ -142,9 +142,9 @@
             <!-- Top Form Actions -->
             <FormActions v-if="actionsPosition == 'top' && formActionsActive"
               :modelValue="formItem"
-              :editedModel="model"
               :actions="actions"
               :is-editing="isEditing"
+              :form-dirty="isDirty"
               @action-complete="$emit('actionComplete', $event)"
             >
               <template #prepend="actionsScope">
@@ -160,9 +160,9 @@
             <!-- Middle Form Actions -->
             <FormActions v-if="actionsPosition == 'middle' && formActionsActive"
               :modelValue="formItem"
-              :editedModel="model"
               :actions="actions"
               :is-editing="isEditing"
+              :form-dirty="isDirty"
               @action-complete="$emit('actionComplete', $event)"
             >
               <template #prepend="actionsScope">
@@ -256,9 +256,9 @@
             <!-- Bottom Form Actions -->
             <FormActions v-if="actionsPosition == 'bottom' && formActionsActive"
               :modelValue="formItem"
-              :editedModel="model"
               :actions="actions"
               :is-editing="isEditing"
+              :form-dirty="isDirty"
               @action-complete="$emit('actionComplete', $event)"
             >
               <template #prepend="actionsScope">
@@ -286,23 +286,23 @@
                 ...(rightSlotMaxWidth ? {maxWidth: `${rightSlotMaxWidth}px`} : {})
               }"
             >
-              <slot name="right" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema}">
+              <slot name="right" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema, isDirty}">
                 <AdditionalSectionContent
                   :actions-position="actionsPosition"
                   :form-item="formItem"
-                  :editedModel="model"
                   :actions="actions"
                   :form-actions-active="formActionsActive"
+                  :form-actions-dirty="isDirty"
                   @action-complete="$emit('actionComplete', $event)"
                 >
                   <template #right-top>
-                    <slot name="right.top" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
+                    <slot name="right.top" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema, isDirty}"></slot>
                   </template>
                   <template #right-middle>
-                    <slot name="right.middle" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
+                    <slot name="right.middle" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema, isDirty}"></slot>
                   </template>
                   <template #right-bottom>
-                    <slot name="right.bottom" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
+                    <slot name="right.bottom" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema, isDirty}"></slot>
                   </template>
                 </AdditionalSectionContent>
               </slot>
@@ -327,18 +327,19 @@
                     :actions-position="actionsPosition"
                     :is-editing="isEditing"
                     :form-item="formItem"
-                    :editedModel="model"
                     :actions="actions"
+                    :form-actions-active="formActionsActive"
+                    :form-actions-dirty="isDirty"
                     @action-complete="$emit('actionComplete', $event)"
                   >
                     <template #right-top>
-                      <slot name="right.top" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
+                      <slot name="right.top" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema, isDirty}"></slot>
                     </template>
                     <template #right-middle>
-                      <slot name="right.middle" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
+                      <slot name="right.middle" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema, isDirty}"></slot>
                     </template>
                     <template #right-bottom>
-                      <slot name="right.bottom" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
+                      <slot name="right.bottom" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema, isDirty}"></slot>
                     </template>
                   </AdditionalSectionContent>
                 </slot>
@@ -413,7 +414,7 @@
 </template>
 
 <script>
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, watch } from 'vue'
 import { useStore } from 'vuex'
 import { useI18n } from 'vue-i18n'
 import { useForm, makeFormProps } from '@/hooks'
@@ -426,9 +427,9 @@ const AdditionalSectionContent = {
   props: {
     actionsPosition: String,
     formItem: Object,
-    editedModel: { type: Object, default: null },
     actions: [Array, Object],
-    formActionsActive: Boolean
+    formActionsActive: Boolean,
+    formActionsDirty: { type: Boolean, default: false }
   },
   emits: ['action-complete'],
   template: `
@@ -436,9 +437,9 @@ const AdditionalSectionContent = {
       <!-- Right Top Form Actions -->
       <FormActions v-if="actionsPosition == 'right-top' && formActionsActive"
         :modelValue="formItem"
-        :editedModel="editedModel"
         :actions="actions"
         :is-editing="isEditing"
+        :form-dirty="formActionsDirty"
         @action-complete="$emit('actionComplete', $event)"
       >
         <template #prepend="actionsScope">
@@ -454,9 +455,9 @@ const AdditionalSectionContent = {
       <!-- Right Middle Form Actions -->
       <FormActions v-if="actionsPosition == 'right-middle' && formActionsActive"
         :modelValue="formItem"
-        :editedModel="editedModel"
         :actions="actions"
         :is-editing="isEditing"
+        :form-dirty="formActionsDirty"
         @action-complete="$emit('actionComplete', $event)"
       >
         <template #prepend="actionsScope">
@@ -472,9 +473,9 @@ const AdditionalSectionContent = {
       <!-- Right Bottom Form Actions -->
       <FormActions v-if="actionsPosition == 'right-bottom' && formActionsActive"
         :modelValue="formItem"
-        :editedModel="editedModel"
         :actions="actions"
         :is-editing="isEditing"
+        :form-dirty="formActionsDirty"
         @action-complete="$emit('actionComplete', $event)"
       >
         <template #prepend="actionsScope">

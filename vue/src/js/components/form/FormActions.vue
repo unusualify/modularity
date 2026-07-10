@@ -132,16 +132,15 @@ export default {
       type: Object,
       required: true
     },
-    editedModel: {
-      type: Object,
-      default: null
+    formDirty: {
+      type: Boolean,
+      default: false
     },
   },
   setup(props, context) {
     const { handleAction, allActions, hasActions } = useItemActions(props, {
       ...context,
-      actionItem: props.modelValue,
-      editedModel: props.editedModel,
+      actionItem: props.modelValue
     })
     const { generateButtonProps } = useGenerate()
     const { isBadge, badgeProps } = useBadge()

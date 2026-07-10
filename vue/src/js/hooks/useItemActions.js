@@ -213,9 +213,8 @@ export default function useItemActions(props, context) {
         action = castObjectAttributes(action, editingItem)
       }
 
-      if(!validateAction(action)) {
-        action.disabled = true
-      }
+      action.disabled = !validateAction(action)
+        || (props.formDirty === true && action.disableOnDirty === true)
 
       return action
     })
