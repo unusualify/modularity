@@ -78,8 +78,9 @@ abstract class Request extends FormRequest
         if ($this->method() === 'DELETE') {
             $response = response()->json([
                 'message' => $validator->errors()->first(),
+                'errors' => $validator->errors(),
                 'variant' => MessageStage::ERROR->value,
-            ]);
+            ], 422);
 
             throw new ValidationException($validator, $response);
         }
