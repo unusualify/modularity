@@ -377,6 +377,56 @@ class ModularousNavigationTest extends TestCase
         $this->assertArrayHasKey('badgeProps', $items[0]);
     }
 
+    /** @test */
+    public function it_processes_menu_items_collection_key(): void
+    {
+        $menuItem = [
+            'name' => 'Parent',
+            'menuItems' => [
+                [
+                    'name' => 'Child',
+                    'icon' => 'mdi-file',
+                ],
+            ],
+        ];
+
+        $result = $this->navigation->sidebarMenuItem($menuItem);
+
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('menuItems', $result);
+        $this->assertIsArray($result['menuItems'][0]);
+    }
+
+    /** @test */
+    public function it_returns_false_when_allowed_roles_check_fails(): void
+    {
+        $user = $this->makeUser(['role' => 'editor']);
+        $user->shouldReceive('hasRole')->with(['admin'])->andReturn(false);
+        $this->actingAs($user);
+
+        $menuItem = [
+            'name' => 'Admin Only',
+            'allowedRoles' => ['admin'],
+        ];
+
+        $this->assertFalse($this->navigation->sidebarMenuItem($menuItem));
+    }
+
+    /** @test */
+    public function it_applies_default_badge_props_for_positive_counts(): void
+    {
+        $menuItem = [
+            'name' => 'Alerts',
+            'badge' => 3,
+        ];
+
+        $result = $this->navigation->sidebarMenuItem($menuItem);
+
+        $this->assertSame(3, $result['badge']);
+        $this->assertSame('secondary', $result['badgeProps']['color']);
+        $this->assertSame('text-white', $result['badgeProps']['class']);
+    }
+
     /**
      * Helper method to create a mock user
      */

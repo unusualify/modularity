@@ -118,4 +118,30 @@ class AssetsTest extends TestCase
 
         $this->assertSame('/unusual/js/app.js', $service->asset('app.js'));
     }
+
+    public function test_get_manifest_filename_falls_back_to_vendor_dist_path(): void
+    {
+        config()->set('modularous.vendor_path', 'vendor/unusualify/modularous');
+        config()->set('modularous.public_dir', 'unusual');
+        config()->set('modularous.manifest', 'unusual-manifest.json');
+
+        $manifestPath = base_path('vendor/unusualify/modularous/vue/dist/unusual/unusual-manifest.json');
+        $manifestDir = dirname($manifestPath);
+
+        if (! is_dir($manifestDir)) {
+            mkdir($manifestDir, 0777, true);
+        }
+
+        file_put_contents($manifestPath, '{}');
+
+        $service = new Assets;
+
+        $this->assertSame($manifestPath, $service->getManifestFilename());
+
+        @unlink($manifestPath);
+        @rmdir($manifestDir);
+        @rmdir(dirname($manifestDir));
+        @rmdir(dirname($manifestDir, 2));
+        @rmdir(dirname($manifestDir, 3));
+    }
 }

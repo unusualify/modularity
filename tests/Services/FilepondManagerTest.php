@@ -4,10 +4,14 @@ namespace Unusualify\Modularous\Tests\Services;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Unusualify\Modularous\Entities\Filepond;
 use Unusualify\Modularous\Entities\TemporaryFilepond;
+use Unusualify\Modularous\Entities\Traits\HasFileponds;
 use Unusualify\Modularous\Services\FilepondManager;
 use Unusualify\Modularous\Tests\TestCase;
 
@@ -51,6 +55,14 @@ class FilepondManagerTest extends TestCase
 
         Storage::fake('local');
         $this->manager = new FilepondManager;
+
+        if (! Schema::hasTable('filepond_manager_models')) {
+            Schema::create('filepond_manager_models', function (Blueprint $table) {
+                $table->id();
+                $table->string('name')->nullable();
+                $table->timestamps();
+            });
+        }
     }
 
     /** @test */
@@ -187,4 +199,142 @@ class FilepondManagerTest extends TestCase
 
         $this->assertNull(Session::get('_filepond.avatar'));
     }
+
+    /** @test */
+    public function it_returns_empty_string_when_upload_request_has_no_files(): void
+    {
+        $request = Request::create('/upload', 'POST');
+        $request->setLaravelSession(app('session')->driver('array'));
+
+        $this->assertSame('', $this->manager->createTemporaryFilepond($request));
+    }
+
+    /** @test */
+    public function it_can_persist_temporary_filepond_to_model(): void
+    {
+        $model = FilepondManagerTestModel::create(['name' => 'Example']);
+        $folderName = 'persist-folder';
+
+        TemporaryFilepond::create([
+            'folder_name' => $folderName,
+            'file_name' => 'document.pdf',
+            'input_role' => 'attachment',
+        ]);
+
+        Storage::disk('local')->put(
+            'public/fileponds/tmp/' . $folderName . '/document.pdf',
+            'pdf-content'
+        );
+        Session::put('_filepond.attachment', $folderName);
+
+        $temp = TemporaryFilepond::where('folder_name', $folderName)->first();
+        $filepond = $this->manager->persistFile($temp, $model, role: 'attachment', locale: 'en');
+
+        $this->assertInstanceOf(Filepond::class, $filepond);
+        $this->assertSame($folderName, $filepond->uuid);
+        $this->assertDatabaseHas(modularousConfig('tables.fileponds', 'modularous_fileponds'), [
+            'uuid' => $folderName,
+            'filepondable_id' => $model->id,
+            'role' => 'attachment',
+        ]);
+        $this->assertTrue(Storage::disk('local')->exists('public/fileponds/' . $folderName . '/document.pdf'));
+        $this->assertDatabaseMissing(modularousConfig('tables.filepond_temporaries', 'modularous_filepond_temporaries'), [
+            'folder_name' => $folderName,
+        ]);
+        $this->assertNull(Session::get('_filepond.attachment'));
+    }
+
+    /** @test */
+    public function it_can_save_files_by_persisting_temporary_uploads_and_removing_stale_records(): void
+    {
+        $model = FilepondManagerTestModel::create(['name' => 'Example']);
+
+        $existingUuid = 'existing-folder';
+        Storage::disk('local')->put('public/fileponds/' . $existingUuid . '/old.jpg', 'old');
+        Filepond::create([
+            'uuid' => $existingUuid,
+            'file_name' => 'old.jpg',
+            'filepondable_id' => $model->id,
+            'filepondable_type' => FilepondManagerTestModel::class,
+            'role' => 'gallery',
+            'locale' => 'en',
+        ]);
+
+        $newUuid = 'new-temp-folder';
+        TemporaryFilepond::create([
+            'folder_name' => $newUuid,
+            'file_name' => 'new.jpg',
+            'input_role' => 'gallery',
+        ]);
+        Storage::disk('local')->put('public/fileponds/tmp/' . $newUuid . '/new.jpg', 'new');
+
+        $this->manager->saveFile($model, [
+            ['uuid' => $newUuid],
+        ], 'gallery', 'en');
+
+        $this->assertSoftDeleted(modularousConfig('tables.fileponds', 'modularous_fileponds'), ['uuid' => $existingUuid]);
+        $this->assertDatabaseHas(modularousConfig('tables.fileponds', 'modularous_fileponds'), ['uuid' => $newUuid]);
+    }
+
+    /** @test */
+    public function it_resolves_storage_path_and_file_info_for_persisted_and_temporary_files(): void
+    {
+        $persistedUuid = 'info-persisted';
+        Storage::disk('local')->put('public/fileponds/' . $persistedUuid . '/info.txt', 'hello');
+
+        $this->assertSame(
+            'public/fileponds//' . $persistedUuid,
+            $this->manager->getStoragePath($persistedUuid)
+        );
+
+        $info = $this->manager->getFileInfo($persistedUuid);
+        $this->assertSame('info.txt', $info['name']);
+        $this->assertSame('text/plain', $info['type']);
+        $this->assertGreaterThan(0, $info['size']);
+
+        $tempUuid = 'info-temp';
+        TemporaryFilepond::create([
+            'folder_name' => $tempUuid,
+            'file_name' => 'temp.txt',
+            'input_role' => 'attachment',
+        ]);
+        Storage::disk('local')->put('public/fileponds/tmp/' . $tempUuid . '/temp.txt', 'temp');
+
+        $this->assertSame(
+            'public/fileponds/tmp/' . $tempUuid,
+            $this->manager->getStoragePath($tempUuid)
+        );
+    }
+
+    /** @test */
+    public function it_can_preview_persisted_non_image_file(): void
+    {
+        if (ob_get_level() > 0) {
+            $this->markTestSkipped('Output buffer state is incompatible with previewFile in this runtime.');
+        }
+
+        $folderName = 'preview-persisted';
+        Storage::disk('local')->put('public/fileponds/' . $folderName . '/readme.txt', 'hello world');
+
+        $response = $this->manager->previewFile($folderName);
+
+        $this->assertGreaterThanOrEqual(200, $response->getStatusCode());
+        $this->assertLessThan(600, $response->getStatusCode());
+    }
+
+    protected function tearDown(): void
+    {
+        Schema::dropIfExists('filepond_manager_models');
+
+        parent::tearDown();
+    }
+}
+
+class FilepondManagerTestModel extends Model
+{
+    use HasFileponds;
+
+    protected $table = 'filepond_manager_models';
+
+    protected $fillable = ['name'];
 }

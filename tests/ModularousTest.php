@@ -3,6 +3,12 @@
 namespace Unusualify\Modularous\Tests;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Mockery;
+use Nwidart\Modules\Contracts\ActivatorInterface;
+use TestModules\TestModule\Entities\Item as TestModuleItem;
+use Unusualify\Modularous\Activators\ModularousActivator;
+use Unusualify\Modularous\Contracts\CurrencyProviderInterface;
 use Unusualify\Modularous\Exceptions\ModularousSystemPathException;
 use Unusualify\Modularous\Modularous;
 
@@ -36,6 +42,9 @@ class ModularousTest extends TestModulesCase
     {
         $app = app();
         $app['config']->set('modules.cache.enabled', true);
+        $app['config']->set('modules.cache.driver', 'array');
+        $app['config']->set('modules.cache.key', 'modularous-test-format-cache');
+        $app['config']->set('modules.cache.lifetime', 600);
 
         $path = $app['config']->get('modules.paths.modules');
 
@@ -45,6 +54,71 @@ class ModularousTest extends TestModulesCase
 
         $this->assertArrayHasKey('systemmodule', $allModules);
         $this->assertArrayHasKey('testmodule', $allModules);
+    }
+
+    public function test_get_cached_reads_from_cache_store_after_first_population(): void
+    {
+        $this->app['config']->set('modules.cache.enabled', true);
+        $this->app['config']->set('modules.cache.driver', 'array');
+        $this->app['config']->set('modules.cache.key', 'modularous-test-get-cached');
+        $this->app['config']->set('modules.cache.lifetime', 600);
+
+        $modularous = new Modularous($this->app, $this->app['config']->get('modules.paths.modules'));
+        $method = new \ReflectionMethod($modularous, 'getCached');
+        $method->setAccessible(true);
+
+        $first = $method->invoke($modularous);
+        $this->assertIsArray($first);
+        $this->assertTrue($this->app['cache']->store('array')->has('modularous-test-get-cached'));
+
+        $second = $method->invoke($modularous);
+        $this->assertSame($first, $second);
+    }
+
+    public function test_format_cached_resets_when_cached_path_is_outside_application(): void
+    {
+        $modularous = new Modularous($this->app, $this->app['config']->get('modules.paths.modules'));
+        $method = new \ReflectionMethod($modularous, 'formatCached');
+        $method->setAccessible(true);
+
+        $modules = $method->invoke($modularous, [
+            'ghost' => ['path' => '/tmp/not-under-base-path/module'],
+        ]);
+
+        $this->assertArrayHasKey('testmodule', $modules);
+        $this->assertArrayHasKey('systemmodule', $modules);
+    }
+
+    public function test_format_cached_reuses_valid_cached_module_paths(): void
+    {
+        $modularous = new Modularous($this->app, $this->app['config']->get('modules.paths.modules'));
+        $method = new \ReflectionMethod($modularous, 'formatCached');
+        $method->setAccessible(true);
+
+        $testModulePath = $modularous->find('TestModule')->getPath();
+        $modules = $method->invoke($modularous, [
+            'testmodule' => ['path' => $testModulePath],
+        ]);
+
+        $this->assertArrayHasKey('testmodule', $modules);
+        $this->assertSame($testModulePath, $modules['testmodule']->getPath());
+    }
+
+    public function test_all_uses_cached_modules_when_cache_enabled_and_not_in_console(): void
+    {
+        $this->app['config']->set('modules.cache.enabled', true);
+        $this->app['config']->set('modules.cache.driver', 'array');
+        $this->app['config']->set('modules.cache.key', 'modularous-test-all-cache');
+        $this->app['config']->set('modules.cache.lifetime', 600);
+
+        $app = Mockery::mock($this->app)->makePartial();
+        $app->shouldReceive('runningInConsole')->andReturn(false);
+
+        $modularous = new Modularous($app, $this->app['config']->get('modules.paths.modules'));
+        $modules = $modularous->all();
+
+        $this->assertArrayHasKey('testmodule', $modules);
+        $this->assertArrayHasKey('systemmodule', $modules);
     }
 
     public function test_has_module()
@@ -66,6 +140,26 @@ class ModularousTest extends TestModulesCase
     //     $this->assertArrayNotHasKey('testmodule', $activeModules);
     // }
 
+    public function test_get_by_status_returns_only_matching_modules(): void
+    {
+        $this->writeModuleActivationStatuses([
+            'TestModule' => false,
+            'SystemModule' => true,
+        ]);
+
+        $activeModules = $this->modularous->getByStatus(true);
+        $inactiveModules = $this->modularous->getByStatus(false);
+
+        $this->assertArrayHasKey('systemmodule', $activeModules);
+        $this->assertArrayNotHasKey('testmodule', $activeModules);
+        $this->assertArrayHasKey('testmodule', $inactiveModules);
+    }
+
+    public function test_get_auth_guard_name(): void
+    {
+        $this->assertSame('modularous', Modularous::getAuthGuardName());
+    }
+
     public function test_development_production()
     {
         $this->assertFalse($this->modularous->isDevelopment());
@@ -75,6 +169,14 @@ class ModularousTest extends TestModulesCase
     public function test_feature_methods()
     {
         $this->assertTrue($this->modularous->shouldUseInertia());
+
+        $this->app['config']->set('modularous.use_collation_for_search', true);
+        $this->app['config']->set('modularous.include_transaction_fee', true);
+        $this->app['config']->set('modularous.use_country_based_vat_rates', true);
+
+        $this->assertTrue($this->modularous->shouldUseCollationForSearch());
+        $this->assertTrue($this->modularous->shouldIncludeTransactionFee());
+        $this->assertTrue($this->modularous->shouldUseCountryBasedVatRates());
 
         $this->assertEquals(config('app.name'), $this->modularous->pageTitle());
         Modularous::createPageTitle(fn () => 'Test Page Title');
@@ -101,6 +203,26 @@ class ModularousTest extends TestModulesCase
 
         // Verify cache is cleared
         $this->assertFalse($this->app['cache']->has('test-modules-cache'));
+    }
+
+    public function test_clear_cache_flushes_activator_cache_when_supported(): void
+    {
+        $activator = new class($this->app) extends ModularousActivator
+        {
+            public int $flushCount = 0;
+
+            public function flushCache(): void
+            {
+                $this->flushCount++;
+            }
+        };
+
+        $this->app->instance(ActivatorInterface::class, $activator);
+
+        $modularous = new Modularous($this->app, $this->app['config']->get('modules.paths.modules'));
+        $modularous->clearCache();
+
+        $this->assertSame(1, $activator->flushCount);
     }
 
     public function test_disable_cache()
@@ -131,22 +253,26 @@ class ModularousTest extends TestModulesCase
 
     public function test_set_and_revert_system_modules_path()
     {
-        // Skip if production
-        if ($this->modularous->isProduction()) {
-            $this->expectException(ModularousSystemPathException::class);
-            $this->modularous->setSystemModulesPath();
-        } else {
-            $originalPath = config('modules.paths.modules');
+        $this->expectException(ModularousSystemPathException::class);
+        $this->modularous->setSystemModulesPath();
+    }
 
-            $this->modularous->setSystemModulesPath();
-            $newPath = config('modules.paths.modules');
-            $this->assertNotEquals($originalPath, $newPath);
-            $this->assertStringContainsString('modules', $newPath);
+    public function test_revert_system_modules_path_restores_retained_modules_path(): void
+    {
+        $retainedPath = config('modules.paths.modules');
 
-            $this->modularous->revertSystemModulesPath();
-            $revertedPath = config('modules.paths.modules');
-            $this->assertEquals($originalPath, $revertedPath);
-        }
+        config(['modules.paths.modules' => '/tmp/changed-modules-path']);
+
+        $this->modularous->revertSystemModulesPath();
+
+        $this->assertSame($retainedPath, config('modules.paths.modules'));
+    }
+
+    public function test_get_app_url(): void
+    {
+        $this->app['config']->set('modularous.app_url', 'http://example.test');
+
+        $this->assertSame('http://example.test', $this->modularous->getAppUrl());
     }
 
     public function test_get_app_host()
@@ -188,6 +314,25 @@ class ModularousTest extends TestModulesCase
         $this->assertFalse($this->modularous->isPanelUrl('http://localhost/home'));
     }
 
+    public function test_is_panel_url_returns_false_when_request_has_no_segment_and_url_is_provided(): void
+    {
+        $this->app['config']->set('modularous.app_url', 'http://localhost');
+        $this->app['config']->set('modularous.admin_app_url', '');
+        $this->app['config']->set('modularous.admin_app_path', 'admin');
+
+        $request = Request::create('http://localhost', 'GET');
+        $this->app->instance('request', $request);
+
+        $this->assertFalse($this->modularous->isPanelUrl('http://localhost/admin/dashboard'));
+    }
+
+    public function test_get_admin_url_prefix_returns_false_when_using_admin_subdomain(): void
+    {
+        $this->app['config']->set('modularous.admin_app_url', 'http://admin.localhost');
+
+        $this->assertFalse($this->modularous->getAdminUrlPrefix());
+    }
+
     public function test_is_modularous_route()
     {
         $this->app['config']->set('modularous.admin_route_name_prefix', 'admin');
@@ -213,30 +358,27 @@ class ModularousTest extends TestModulesCase
 
     public function test_get_translations()
     {
-        try {
-            $translations = $this->modularous->getTranslations();
-            $this->assertIsArray($translations);
-        } catch (\UnexpectedValueException $e) {
-            // Translation directory might not exist in test environment, which is acceptable
-            $this->assertTrue(true);
-        }
+        // Use a real translator binding (instance, not facade mock) so the
+        // assertion is deterministic without fragile facade expectations that
+        // break when the full suite runs.
+        $translator = Mockery::mock(\Illuminate\Contracts\Translation\Translator::class);
+        $translator->shouldReceive('getTranslations')->andReturn(['en' => ['greeting' => 'Hello']]);
+        $this->app->instance('translator', $translator);
+
+        Cache::store('file')->forget('modularous-languages');
+
+        $translations = $this->modularous->getTranslations();
+
+        $this->assertSame(['en' => ['greeting' => 'Hello']], $translations);
     }
 
     public function test_clear_translations()
     {
-        try {
-            // Populate translations cache
-            $this->modularous->getTranslations();
+        Cache::put('modularous-languages', ['cached'], 600);
 
-            // Clear translations
-            $this->modularous->clearTranslations();
+        $this->modularous->clearTranslations();
 
-            // Verify it doesn't throw errors
-            $this->assertTrue(true);
-        } catch (\UnexpectedValueException $e) {
-            // Translation directory might not exist in test environment, which is acceptable
-            $this->assertTrue(true);
-        }
+        $this->assertFalse(Cache::has('modularous-languages'));
     }
 
     public function test_get_grouped_modules()
@@ -343,5 +485,90 @@ class ModularousTest extends TestModulesCase
         $this->app['config']->set('modularous.use_language_based_prices', false);
         $shouldUse = $this->modularous->shouldUseLanguageBasedPrices();
         $this->assertFalse($shouldUse);
+    }
+
+    public function test_get_currency_for_language_based_prices_returns_false_when_disabled(): void
+    {
+        Modularous::createDisableLanguageBasedPrices(null);
+        $this->app['config']->set('modularous.use_language_based_prices', false);
+
+        $this->assertFalse($this->modularous->getCurrencyForLanguageBasedPrices());
+    }
+
+    public function test_get_currency_for_language_based_prices_returns_false_when_provider_unavailable(): void
+    {
+        $this->app['config']->set('modularous.use_language_based_prices', true);
+
+        $provider = Mockery::mock(CurrencyProviderInterface::class);
+        $provider->shouldReceive('isAvailable')->once()->andReturn(false);
+        $this->app->instance(CurrencyProviderInterface::class, $provider);
+
+        $this->assertFalse($this->modularous->getCurrencyForLanguageBasedPrices());
+    }
+
+    public function test_get_currency_for_language_based_prices_returns_currency_for_locale(): void
+    {
+        $this->app['config']->set('modularous.use_language_based_prices', true);
+        $this->app['config']->set('modularous.language_currencies', ['en' => 'USD']);
+        $this->app->setLocale('en');
+
+        $currency = (object) ['id' => 1, 'iso_4217' => 'USD'];
+        $provider = Mockery::mock(CurrencyProviderInterface::class);
+        $provider->shouldReceive('isAvailable')->once()->andReturn(true);
+        $provider->shouldReceive('findByIso4217')->once()->with('USD')->andReturn($currency);
+        $this->app->instance(CurrencyProviderInterface::class, $provider);
+
+        $this->assertSame($currency, $this->modularous->getCurrencyForLanguageBasedPrices());
+    }
+
+    public function test_get_currency_for_language_based_prices_returns_false_without_locale_mapping(): void
+    {
+        $this->app['config']->set('modularous.use_language_based_prices', true);
+        $this->app['config']->set('modularous.language_currencies', []);
+        $this->app->setLocale('en');
+
+        $provider = Mockery::mock(CurrencyProviderInterface::class);
+        $provider->shouldReceive('isAvailable')->once()->andReturn(true);
+        $this->app->instance(CurrencyProviderInterface::class, $provider);
+
+        $this->assertFalse($this->modularous->getCurrencyForLanguageBasedPrices());
+    }
+
+    public function test_get_models_finds_enabled_module_entities(): void
+    {
+        $models = $this->modularous->getModels('Item');
+
+        $this->assertContains(TestModuleItem::class, $models);
+    }
+
+    public function test_get_module_route_model_select_items_and_resolve_target(): void
+    {
+        $items = $this->modularous->getModuleRouteModelSelectItems();
+
+        $this->assertNotEmpty($items);
+
+        $testModuleItem = collect($items)->first(
+            fn (array $item): bool => $item['value'] === TestModuleItem::class
+        );
+
+        $this->assertNotNull($testModuleItem);
+        $this->assertSame('TestModule - Item', $testModuleItem['title']);
+
+        $this->assertSame(
+            'TestModule::Item',
+            $this->modularous->resolveTargetModuleRouteForModelClass(TestModuleItem::class)
+        );
+        $this->assertNull($this->modularous->resolveTargetModuleRouteForModelClass('Unknown\\Model'));
+    }
+
+    public function test_get_module_route_model_select_items_supports_trait_filters(): void
+    {
+        $parentSegmentOnly = $this->modularous->getModuleRouteModelSelectItems(true, false);
+        $pageLayoutOnly = $this->modularous->getModuleRouteModelSelectItems(false, true);
+        $both = $this->modularous->getModuleRouteModelSelectItems(true, true);
+
+        $this->assertIsArray($parentSegmentOnly);
+        $this->assertIsArray($pageLayoutOnly);
+        $this->assertIsArray($both);
     }
 }

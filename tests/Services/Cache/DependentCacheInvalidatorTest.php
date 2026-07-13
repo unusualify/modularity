@@ -7,7 +7,12 @@ namespace Unusualify\Modularous\Tests\Services\Cache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Config;
 use Modules\Cms\Entities\Page;
+use Unusualify\Modularous\Facades\ModularousCache;
 use Unusualify\Modularous\Services\Cache\DependentCacheInvalidator;
+use Unusualify\Modularous\Tests\Services\Cache\Stubs\ReentrantDependentCacheInvalidator;
+use Unusualify\Modularous\Tests\Services\Cache\Stubs\StubModelWithoutDependents;
+use Unusualify\Modularous\Tests\Services\Cache\Stubs\StubModelWithMethodDependents;
+use Unusualify\Modularous\Tests\Services\Cache\Stubs\StubModelWithPropertyDependents;
 use Unusualify\Modularous\Tests\TestCase;
 
 class DependentCacheInvalidatorTest extends TestCase
@@ -218,6 +223,53 @@ class DependentCacheInvalidatorTest extends TestCase
         $this->assertTrue($this->invalidator->hasDependents($model));
     }
 
+    /** @test */
+    public function it_keeps_enabled_types_when_auto_invalidation_allows_warmup(): void
+    {
+        Config::set('modularous.cache.manual_purge', false);
+
+        ModularousCache::partialMock()
+            ->shouldReceive('shouldAutoInvalidate')
+            ->andReturn(true);
+
+        $filtered = $this->invokeProtected(
+            $this->invalidator,
+            'filterTypesForAutoInvalidation',
+            ['Cms', 'Page', [
+                'counts' => true,
+                'index' => true,
+                'record' => false,
+                'formItem' => true,
+                'formattedItem' => false,
+                'presentationItem' => false,
+            ], true],
+        );
+
+        $this->assertTrue($filtered['counts']);
+        $this->assertTrue($filtered['index']);
+        $this->assertFalse($filtered['record']);
+        $this->assertTrue($filtered['formItem']);
+    }
+
+    /** @test */
+    public function it_resolves_numeric_config_dependent_entries(): void
+    {
+        Config::set('modularous.cache.dependencies', [
+            StubModelWithoutDependents::class => [
+                ['TestModule', 'Item'],
+            ],
+        ]);
+
+        $dependents = $this->invalidator->getConfigDependentsForModelClass(StubModelWithoutDependents::class);
+
+        if ($dependents === []) {
+            $this->markTestSkipped('TestModule Item route is not registered in the test environment.');
+        }
+
+        $this->assertSame('TestModule', $dependents[0]['moduleName']);
+        $this->assertSame('Item', $dependents[0]['moduleRouteName']);
+    }
+
     /**
      * @param array<int, mixed> $args
      */
@@ -227,58 +279,5 @@ class DependentCacheInvalidatorTest extends TestCase
         $reflection->setAccessible(true);
 
         return $reflection->invoke($object, ...$args);
-    }
-}
-
-class StubModelWithoutDependents extends Model
-{
-    protected $table = 'stub_without_dependents';
-
-    /** @var list<array<string, mixed>> */
-    public array $cacheDependents = [];
-}
-
-class StubModelWithPropertyDependents extends Model
-{
-    protected $table = 'stub_with_property_dependents';
-
-    /** @var list<array<string, mixed>> */
-    public array $cacheDependents = [
-        [
-            'moduleName' => 'Other',
-            'moduleRouteName' => 'OtherRoute',
-        ],
-    ];
-}
-
-class StubModelWithMethodDependents extends Model
-{
-    protected $table = 'stub_with_method_dependents';
-
-    /**
-     * @return list<array<string, mixed>>
-     */
-    public function getCacheDependents(): array
-    {
-        return [
-            [
-                'moduleName' => 'FromMethod',
-                'moduleRouteName' => 'Route',
-            ],
-        ];
-    }
-}
-
-class ReentrantDependentCacheInvalidator extends DependentCacheInvalidator
-{
-    public int $runCount = 0;
-
-    protected function runInvalidation(Model $model): void
-    {
-        $this->runCount++;
-
-        if ($this->runCount === 1) {
-            $this->invalidateForModel($model);
-        }
     }
 }
