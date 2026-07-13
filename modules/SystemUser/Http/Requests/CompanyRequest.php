@@ -45,6 +45,22 @@ class CompanyRequest extends Request
         ];
     }
 
+    public function rulesForDelete()
+    {
+        return [
+            'id' => [
+                'required',
+                function ($attribute, $value, $fail) {
+                    $company = $this->model()->find($value);
+
+                    if ($company && $company->users()->exists()) {
+                        $fail(__('This company has registered users and cannot be deleted.'));
+                    }
+                },
+            ],
+        ];
+    }
+
     public function messages()
     {
         return [
