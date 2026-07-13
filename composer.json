@@ -146,11 +146,11 @@
         ],
         "test:fast:coverage": [
             "@test-clean",
-            "bin/with-coverage-driver paratest --processes=2 --stop-on-defect"
+            "bin/with-coverage-driver paratest --processes=4 --stop-on-defect"
         ],
         "test:fast:coverage:html": [
             "@test-clean",
-            "COVERAGE_MEMORY_LIMIT=-1 bin/with-coverage-driver paratest -c phpunit.coverage-html.xml --processes=2 --stop-on-defect"
+            "bin/with-coverage-driver paratest -c phpunit.coverage-html.xml --processes=4 --stop-on-defect"
         ],
         "test:brokers": "vendor/bin/phpunit --stop-on-defect --no-coverage tests/Brokers",
         "test:events": "vendor/bin/phpunit --stop-on-defect --no-coverage tests/Events",
@@ -194,6 +194,7 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "config": {
+        "process-timeout": 300,
         "sort-packages": true,
         "preferred-install": "dist",
         "optimize-autoloader": true,
