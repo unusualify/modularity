@@ -61,4 +61,4 @@ php artisan modularous:make:controller Blog PostController
 - [make:controller:api](./controller-api) — REST API variant
 - [make:controller:front](./controller-front) — front-end variant
 - [make:route](./route) — generates controller as part of a full route scaffold
-- [System Reference](/system-reference/backend/console/make#makecontrollercommand)
+- [System Reference](/guide/console/make/overview)

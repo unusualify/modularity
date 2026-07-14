@@ -7,18 +7,20 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
 use Modules\Cms\Contracts\CanonicalUrlResolverInterface;
 use Modules\Cms\Contracts\CmsLocalizationContract;
+use Modules\Cms\Contracts\CmsVisitorRequestContextResolverInterface;
 use Modules\Cms\Entities\Redirect;
 use Modules\Cms\Entities\UrlRoute;
 use Modules\Cms\Routing\CmsFrontRouteLocalizationBinding;
 use Modules\Cms\Support\CmsFrontPath;
 use Modules\Cms\Support\CmsSluglessFallbackLocale;
 use Unusualify\Modularous\Facades\Modularous;
+use Unusualify\Modularous\Facades\ModularousCache;
 
 /**
  * Resolves {@see Redirect} rules for public HTTP requests (locale + normalized path).
  * Prefers {@see UrlRoute} registry when the table exists; falls back to scanning {@see Redirect} rows.
  */
-final class CmsVisitorRedirectResolver
+final class CmsVisitorRedirectResolver implements CmsVisitorRequestContextResolverInterface
 {
     public function __construct(
         private CanonicalUrlResolverInterface $canonicalUrlResolver,
@@ -35,6 +37,10 @@ final class CmsVisitorRedirectResolver
         }
 
         if ($this->shouldExcludeRequest($request)) {
+            return null;
+        }
+
+        if ($this->shouldSkipRedirectLookupsForUrlStaleResilience()) {
             return null;
         }
 
@@ -158,6 +164,14 @@ final class CmsVisitorRedirectResolver
      */
     public function isActivePagePath(string $locale, string $pathKey, bool $innerHadExplicitLocale): bool
     {
+        if ($this->shouldSkipRedirectLookupsForUrlStaleResilience()) {
+            return false;
+        }
+
+        if (! database_exists()) {
+            return false;
+        }
+
         if (! Schema::hasTable((new UrlRoute)->getTable())) {
             return false;
         }
@@ -180,7 +194,15 @@ final class CmsVisitorRedirectResolver
 
     protected function findMatchingRedirect(string $locale, string $pathKey): ?Redirect
     {
+        if ($this->shouldSkipRedirectLookupsForUrlStaleResilience()) {
+            return null;
+        }
+
         $variants = $this->canonicalUrlResolver->normalizedPathRegistryLookupVariants($pathKey);
+
+        if (! database_exists()) {
+            return null;
+        }
 
         if (Schema::hasTable((new UrlRoute)->getTable())) {
             $row = UrlRoute::query()
@@ -232,5 +254,10 @@ final class CmsVisitorRedirectResolver
         }
 
         return tap(redirect()->to($target), fn (RedirectResponse $r) => $r->setStatusCode($code));
+    }
+
+    private function shouldSkipRedirectLookupsForUrlStaleResilience(): bool
+    {
+        return ModularousCache::isUrlStaleServeFirst() && ! database_exists();
     }
 }

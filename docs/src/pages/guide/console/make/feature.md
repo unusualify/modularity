@@ -105,4 +105,4 @@ Feature created successfully
 - [make:model:trait](./model-trait) — create a trait standalone
 - [make:repository:trait](./repository-trait) — create a repository trait standalone
 - [make:vue:input](./vue-input) — create a Vue input standalone
-- [System Reference](/system-reference/backend/console/make#makefeaturecommand)
+- [System Reference](/guide/console/make/overview)

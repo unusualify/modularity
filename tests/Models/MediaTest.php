@@ -180,7 +180,7 @@ class MediaTest extends ModelTestCase
             'height' => 1080,
             'tags' => Collection::make([
                 'test-tag',
-            ])->map(fn ($tag) => $tag),
+            ])->map(fn ($tag) => $tag)->toArray(),
             'deleteUrl' => moduleRoute('media', adminRouteNamePrefix() . '.media-library', 'destroy', ['media' => $this->media->id]),
             'updateUrl' => route(Route::hasAdmin('media-library.media.single-update')),
             'updateBulkUrl' => route(Route::hasAdmin('media-library.media.bulk-update')),

@@ -306,7 +306,7 @@
       </v-card>
 
       <!-- EMOJI COMPONENT -->
-      <Emojis
+      <ue-emojis
         v-if="!noEmoji"
         v-model="showEmojiPicker"
         :disabled="loadingAttachment"
@@ -347,15 +347,12 @@
 <script>
   import { useInput, makeInputProps, makeInputEmits, useValidation } from '@/hooks'
   import ChatMessage from '@/components/others/ChatMessage.vue';
-  import Emojis from './Emojis.vue';
-  import WellPrint from '@/components/WellPrint.vue';
+
   export default {
     name: 'v-input-chat',
     emits: [...makeInputEmits],
     components: {
-      ChatMessage,
-      Emojis,
-      WellPrint
+      ChatMessage
     },
     props: {
       ...makeInputProps(),

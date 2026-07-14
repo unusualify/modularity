@@ -6,14 +6,15 @@ name: Tests
 on:
   push:
     branches:
-      - 12.x-dev
+      - dev
+      - 12.x
     paths-ignore:
       - '**.md'
       - '**.yml'
       - '**.yaml'
   pull_request:
     branches:
-      - 12.x-dev
+      - dev
       - 12.x
     paths-ignore:
       - '**.md'
@@ -42,7 +43,7 @@ jobs:
     if: ${{ needs.vue_changes.outputs.is_changed == 'true' }}
     strategy:
       matrix:
-        node-version: [20.x]
+        node-version: [22.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
@@ -93,6 +94,11 @@ jobs:
         include:
           - laravel: 12.x
             testbench: ^10.0
+            coverage: false
+          - php: 8.3
+            laravel: 12.x
+            testbench: ^10.0
+            coverage: true
 
     # This name will now resolve correctly for every combination
     name: PHP ${{ matrix.php }} - Laravel ${{ matrix.laravel }} - ${{ matrix.dependency_version }}
@@ -106,7 +112,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick, fileinfo
-          coverage: none
+          coverage: ${{ matrix.coverage == true && 'xdebug' || 'none' }}
 
       - name: Install dependencies
         run: |
@@ -115,5 +121,48 @@ jobs:
             composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
             # composer update --prefer-dist --no-interaction
       - name: Execute Laravel tests
-        run: composer test:fast
+        run: |
+          if [ "${{ matrix.coverage }}" = "true" ]; then
+            composer test:coverage
+          else
+            composer test
+          fi
+
+      - name: Upload coverage
+        if: matrix.coverage == true
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-clover
+          path: coverage-clover.xml
+          retention-days: 7
+
+  coverage-gate:
+    name: Coverage threshold
+    needs: laravel
+    runs-on: ubuntu-latest
+    if: ${{ needs.laravel.result == 'success' }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: coverage-clover
+      - name: Enforce coverage threshold (80%)
+        run: |
+          php -r '
+            $xml = simplexml_load_file("coverage-clover.xml");
+
+            $metrics = $xml->project->metrics;
+            $covered = (int)$metrics["coveredstatements"];
+            $total   = (int)$metrics["statements"];
+
+            $pct = $total > 0 ? ($covered / $total) * 100 : 0;
+
+            echo "Coverage: " . round($pct, 2) . "%\n";
+
+            if ($pct < 60) {
+              echo "❌ Coverage below 60%\n";
+              exit(1);
+            }
+
+            echo "✅ Coverage OK\n";
+          '
 

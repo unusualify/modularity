@@ -150,6 +150,7 @@ async function factory(props = {}, options = {}, customStore = null) {
       stubs: {
         'ue-modal': true,
         'ue-form': true,
+        'ue-title': true,
         'ue-list-section': true,
         'ue-filepond-preview': true,
         'v-btn-secondary': true,

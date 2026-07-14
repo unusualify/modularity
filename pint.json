@@ -20,6 +20,9 @@
         "phpdoc_align": {
             "align": "left"
         },
+        "php_unit_method_casing": {
+            "case": "snake_case"
+        },
         "whitespace_after_comma_in_array": true
     }
 }

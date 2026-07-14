@@ -5,6 +5,10 @@ namespace Unusualify\Modularous\Tests\Services\Concerns;
 use Illuminate\Cache\Repository;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
+use Unusualify\Modularous\Contracts\Cache\UrlPresentationCacheStoreInterface;
+use Unusualify\Modularous\Services\Cache\FileUrlPresentationCacheDriver;
+use Unusualify\Modularous\Services\Cache\StaleFileCache;
+use Unusualify\Modularous\Services\Cache\UrlKeyedStaleCache;
 use Unusualify\Modularous\Services\Concerns\CacheHelpers;
 use Unusualify\Modularous\Tests\TestCase;
 
@@ -488,6 +492,70 @@ class CacheHelpersTest extends TestCase
 
         $this->assertTrue($result);
     }
+
+    /** @test */
+    public function it_get_with_relations_uses_same_tags_as_put_with_relations()
+    {
+        $this->cacheService->setUsesTags(true);
+
+        $this->cacheService->putWithRelations(
+            'rel-get-key',
+            'rel-get-value',
+            60,
+            'TestModule',
+            'TestRoute',
+            ['Company' => 1]
+        );
+
+        $value = $this->cacheService->getWithRelations(
+            'rel-get-key',
+            null,
+            'TestModule',
+            'TestRoute',
+            ['Company' => 1]
+        );
+
+        $this->assertEquals('rel-get-value', $value);
+    }
+
+    /** @test */
+    public function it_stores_stale_values_on_filesystem_not_redis(): void
+    {
+        $key = 'modularous:TestModule:TestRoute:presentationItem:1:' . md5('en');
+        $html = '<html>stale</html>';
+
+        $this->assertTrue($this->cacheService->putStaleWithRelations(
+            $key,
+            $html,
+            3600,
+            ['Company' => 1],
+            'presentationItem',
+        ));
+
+        $this->assertSame($html, $this->cacheService->getStale($key, null, [], 'presentationItem'));
+        $this->assertNull(Cache::store('array')->get($key . ':stale'));
+    }
+
+    /** @test */
+    public function it_mirrors_presentation_item_html_to_stale_store_when_swr_enabled(): void
+    {
+        $key = 'modularous:Blog:Post:presentationItem:42:' . md5('en');
+        $html = '<html>presentation</html>';
+
+        $this->cacheService = new PresentationMirrorCacheHelpers;
+
+        $this->assertTrue($this->cacheService->putWithRelations(
+            $key,
+            $html,
+            900,
+            'Blog',
+            'Post',
+            ['Post' => 42],
+            'presentationItem',
+        ));
+
+        $this->assertSame($html, $this->cacheService->getStale($key, null, ['Post' => 42], 'presentationItem'));
+    }
 }
 
 /**
@@ -505,9 +573,30 @@ class ConcreteCacheHelpers
 
     protected $enabled = true;
 
+    protected StaleFileCache $staleFileCache;
+
+    protected UrlKeyedStaleCache $urlKeyedStaleCache;
+
     public function __construct()
     {
         $this->store = Cache::store('array');
+        $this->staleFileCache = new StaleFileCache(sys_get_temp_dir() . '/modularous-stale-test-' . uniqid());
+        $this->urlKeyedStaleCache = new UrlKeyedStaleCache(sys_get_temp_dir() . '/modularous-url-stale-test-' . uniqid());
+    }
+
+    protected function getStaleFileCache(): StaleFileCache
+    {
+        return $this->staleFileCache;
+    }
+
+    protected function getUrlPresentationCacheStore(): UrlPresentationCacheStoreInterface
+    {
+        return new FileUrlPresentationCacheDriver($this->urlKeyedStaleCache);
+    }
+
+    protected function usesFileStaleStore(?string $type = null): bool
+    {
+        return true;
     }
 
     protected function getStore(): Repository
@@ -538,5 +627,28 @@ class ConcreteCacheHelpers
     public function setUsesTags(bool $usesTags): void
     {
         $this->usesTags = $usesTags;
+    }
+
+    protected function getPresentationCacheStore(): string
+    {
+        return 'model';
+    }
+}
+
+class PresentationMirrorCacheHelpers extends ConcreteCacheHelpers
+{
+    protected function isSwrEnabled(?string $moduleName = null, ?string $moduleRouteName = null, ?string $type = null): bool
+    {
+        return true;
+    }
+
+    protected function getStaleTtl(?string $type = null): int
+    {
+        return 3600;
+    }
+
+    protected function getPresentationCacheStore(): string
+    {
+        return 'model';
     }
 }

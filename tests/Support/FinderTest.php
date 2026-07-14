@@ -2,7 +2,6 @@
 
 namespace Unusualify\Modularous\Tests\Support;
 
-use Illuminate\Support\Facades\File;
 use TestModules\TestModule\Entities\Item;
 use TestModules\TestModule\Repositories\ItemRepository;
 use Unusualify\Modularous\Support\Finder;
@@ -20,22 +19,16 @@ class FinderTest extends TestModulesCase
         MockModuleManager::initialize();
 
         // Only enable TestModule so getRouteModel/getRouteRepository return TestModule's Item (not SystemModule's)
-        $statusFilePath = config('modules.activators.modularous.statuses-file');
-        File::put($statusFilePath, json_encode(['TestModule' => true], JSON_PRETTY_PRINT));
+        $this->enableOnlyModules('TestModule');
 
-        $module = MockModuleManager::getTestModule();
-        $statusesFile = $module->getDirectoryPath('routes_statuses.json');
-        if (! is_file($statusesFile)) {
-            file_put_contents($statusesFile, '{}');
-        }
-        file_put_contents($statusesFile, json_encode(['Item' => true], JSON_PRETTY_PRINT));
+        IsolatedTestModules::seedRoutesStatuses(['TestModule' => ['Item' => true]]);
 
         $this->finder = new Finder;
     }
 
     public function test_it_can_find_classes_in_path(): void
     {
-        $path = realpath(__DIR__ . '/../../test-modules/TestModule/Entities');
+        $path = IsolatedTestModules::path() . '/TestModule/Entities';
         $classes = $this->finder->getClasses($path);
 
         $this->assertNotEmpty($classes);

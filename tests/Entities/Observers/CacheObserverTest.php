@@ -3,23 +3,39 @@
 namespace Unusualify\Modularous\Tests\Entities\Observers;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Config;
 use Unusualify\Modularous\Entities\Observers\CacheObserver;
+use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Facades\ModularousCache;
-use Unusualify\Modularous\Facades\RelationshipGraph;
+use Unusualify\Modularous\Module;
+use Unusualify\Modularous\Services\Cache\DependentCacheInvalidator;
 use Unusualify\Modularous\Tests\TestCase;
 
 class CacheObserverTest extends TestCase
 {
-    protected CacheObserver $observer;
+    protected TestableCacheObserver $observer;
+
+    protected TestableDependentCacheInvalidator $dependentInvalidator;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         Config::set('modularous.cache.enabled', false);
+        Config::set('modularous.cache.observer.queue', false);
+        RelationshipSourceModelWithoutMetadata::$findResult = null;
+        RelationshipSourceModelWithMetadata::$findResult = null;
+        PackageRegionStub::$findResult = null;
 
-        $this->observer = new CacheObserver;
+        $this->dependentInvalidator = new TestableDependentCacheInvalidator;
+        $this->app->instance(DependentCacheInvalidator::class, $this->dependentInvalidator);
+        $this->observer = new TestableCacheObserver;
+    }
+
+    protected function mockAutoInvalidationEnabled(): void
+    {
+        ModularousCache::shouldReceive('shouldAutoInvalidate')->andReturn(true);
     }
 
     public function test_created_does_not_throw_when_cache_disabled()
@@ -67,124 +83,310 @@ class CacheObserverTest extends TestCase
         $this->assertTrue(true);
     }
 
-    public function test_created_invalidates_model_cache_when_enabled()
+    public function test_config_dependents_run_when_tag_invalidation_succeeds(): void
     {
-        // Covers CacheObserver lines 37-39: when caching is enabled for the
-        // model's module, created() must invalidate the model's cache.
-        $model = $this->createTestModel();
+        Config::set('modularous.cache.enabled', true);
+        Config::set('modularous.cache.dependencies', [
+            SourceCacheDependentModel::class => [
+                [
+                    'moduleName' => 'DependentModule',
+                    'moduleRouteName' => 'DependentRoute',
+                    'types' => [
+                        'formItem' => true,
+                        'formattedItem' => true,
+                    ],
+                ],
+            ],
+        ]);
 
-        // getCacheDependents() (used by shouldInvalidate) touches the graph.
-        RelationshipGraph::shouldReceive('getAffectedModuleRoutes')->andReturn([]);
-        RelationshipGraph::shouldReceive('getAffectedModuleRoutesByTable')->andReturn([]);
+        $model = new SourceCacheDependentModel;
+        $model->setRawAttributes(['id' => 5]);
+        $model->exists = true;
 
-        // Enabled both globally (no args) and for the module/route (two args).
-        ModularousCache::shouldReceive('isEnabled')->andReturn(true);
-        // Granular invalidation "succeeds" so the dependent-module fallback is skipped.
-        ModularousCache::shouldReceive('invalidateByRelatedModel')->andReturn(true);
+        $mockModule = $this->mockDependentModule();
 
-        // The assertion: line 38 runs exactly once.
-        ModularousCache::shouldReceive('invalidateForModel')->once();
+        Modularous::shouldReceive('hasModule')->with('DependentModule')->andReturn(true);
+        Modularous::shouldReceive('find')->with('DependentModule')->andReturn($mockModule);
 
-        $this->observer->created($model);
+        ModularousCache::shouldReceive('isEnabled')
+            ->with('DependentModule', 'DependentRoute')
+            ->andReturn(true);
+
+        $this->mockAutoInvalidationEnabled();
+
+        $this->observer->exposeInvalidateDependentModules($model);
+
+        $this->assertCount(1, $this->dependentInvalidator->invalidateAllItemCachesCalls);
+        $this->assertSame('DependentModule', $this->dependentInvalidator->invalidateAllItemCachesCalls[0]['moduleName']);
+        $this->assertSame('DependentRoute', $this->dependentInvalidator->invalidateAllItemCachesCalls[0]['moduleRouteName']);
     }
 
-    public function test_updated_invalidates_refreshed_model_cache_when_enabled()
+    public function test_get_config_dependents_preserves_presentation_item_type(): void
     {
-        // Covers CacheObserver lines 59-63: when caching is enabled for the
-        // model's module, updated() clones + refreshes the model and invalidates
-        // the clone's cache. refresh() is a no-op here to avoid a DB round-trip.
-        $model = new class extends Model
-        {
-            protected $table = 'test_models';
+        Config::set('modularous.cache.dependencies', [
+            SourceCacheDependentModel::class => [
+                [
+                    'moduleName' => 'DependentModule',
+                    'moduleRouteName' => 'DependentRoute',
+                    'types' => [
+                        'presentationItem' => true,
+                        'counts' => false,
+                    ],
+                ],
+            ],
+        ]);
 
-            public function getKey()
-            {
-                return 1;
-            }
+        $mockModule = $this->mockDependentModule();
 
-            public function refresh()
-            {
-                return $this;
-            }
-        };
-        $model->setRawAttributes(['id' => 1]);
+        Modularous::shouldReceive('hasModule')->with('DependentModule')->andReturn(true);
+        Modularous::shouldReceive('find')->with('DependentModule')->andReturn($mockModule);
 
-        // getCacheDependents() (used by shouldInvalidate) touches the graph.
-        RelationshipGraph::shouldReceive('getAffectedModuleRoutes')->andReturn([]);
-        RelationshipGraph::shouldReceive('getAffectedModuleRoutesByTable')->andReturn([]);
+        $this->mockAutoInvalidationEnabled();
 
-        // Enabled both globally (no args) and for the module/route (two args).
-        ModularousCache::shouldReceive('isEnabled')->andReturn(true);
-        // Granular invalidation "succeeds" so the dependent-module fallback is skipped.
-        ModularousCache::shouldReceive('invalidateByRelatedModel')->andReturn(true);
+        $dependents = $this->dependentInvalidator->exposeGetConfigDependents(SourceCacheDependentModel::class);
 
-        // The assertion: line 62 runs exactly once (on the refreshed clone).
-        ModularousCache::shouldReceive('invalidateForModel')->once();
-
-        $this->observer->updated($model);
+        $this->assertCount(1, $dependents);
+        $this->assertTrue($dependents[0]['types']['presentationItem']);
+        $this->assertFalse($dependents[0]['types']['counts']);
+        $this->assertTrue($dependents[0]['types']['formItem']);
     }
 
-    public function test_deleted_invalidates_model_cache_when_enabled()
+    public function test_dependent_with_should_warm_false_skips_warmup(): void
     {
-        // Covers CacheObserver lines 84-86: when caching is enabled for the
-        // model's module, deleted() must invalidate the model's cache.
-        $model = $this->createTestModel();
+        Config::set('modularous.cache.enabled', true);
+        Config::set('modularous.cache.dependencies', [
+            SourceCacheDependentModel::class => [
+                [
+                    'moduleName' => 'DependentModule',
+                    'moduleRouteName' => 'DependentRoute',
+                    'types' => [
+                        'presentationItem' => true,
+                    ],
+                    'shouldWarm' => false,
+                ],
+            ],
+        ]);
 
-        // getCacheDependents() (used by shouldInvalidate) touches the graph.
-        RelationshipGraph::shouldReceive('getAffectedModuleRoutes')->andReturn([]);
-        RelationshipGraph::shouldReceive('getAffectedModuleRoutesByTable')->andReturn([]);
+        $model = new SourceCacheDependentModel;
+        $model->setRawAttributes(['id' => 5]);
+        $model->exists = true;
 
-        // Enabled both globally (no args) and for the module/route (two args).
-        ModularousCache::shouldReceive('isEnabled')->andReturn(true);
-        // Granular invalidation "succeeds" so the dependent-module fallback is skipped.
-        ModularousCache::shouldReceive('invalidateByRelatedModel')->andReturn(true);
+        $mockModule = $this->mockDependentModule();
 
-        // The assertion: line 85 runs exactly once.
-        ModularousCache::shouldReceive('invalidateForModel')->once();
+        Modularous::shouldReceive('hasModule')->with('DependentModule')->andReturn(true);
+        Modularous::shouldReceive('find')->with('DependentModule')->andReturn($mockModule);
 
-        $this->observer->deleted($model);
+        ModularousCache::shouldReceive('isEnabled')
+            ->with('DependentModule', 'DependentRoute')
+            ->andReturn(true);
+
+        $this->mockAutoInvalidationEnabled();
+
+        $this->observer->exposeInvalidateDependentModules($model);
+
+        $this->assertCount(1, $this->dependentInvalidator->invalidateAllItemCachesCalls);
+        $this->assertFalse($this->dependentInvalidator->invalidateAllItemCachesCalls[0]['shouldWarmDependentModules']);
     }
 
-    public function test_restored_invalidates_model_cache_when_enabled()
+    public function test_package_region_update_warms_all_package_country_presentation_items_when_tags_invalidate_succeeds(): void
     {
-        // Covers CacheObserver lines 106-108: when caching is enabled for the
-        // model's module, restored() must invalidate the model's cache.
-        $model = $this->createTestModel();
+        Config::set('modularous.cache.enabled', true);
+        Config::set('modularous.cache.dependencies', [
+            PackageRegionStub::class => [
+                [
+                    'moduleName' => 'BusinessPackage',
+                    'moduleRouteName' => 'PackageCountry',
+                    'types' => [
+                        'counts' => false,
+                        'index' => false,
+                        'record' => false,
+                        'formattedItem' => false,
+                        'formItem' => false,
+                        'presentationItem' => true,
+                    ],
+                    'targetRelationshipName' => 'packageCountries',
+                    'shouldWarm' => true,
+                ],
+            ],
+        ]);
 
-        // getCacheDependents() (used by shouldInvalidate) touches the graph.
-        RelationshipGraph::shouldReceive('getAffectedModuleRoutes')->andReturn([]);
-        RelationshipGraph::shouldReceive('getAffectedModuleRoutesByTable')->andReturn([]);
+        $region = new PackageRegionStub;
+        $region->setRawAttributes(['id' => 9]);
+        $region->exists = true;
 
-        // Enabled both globally (no args) and for the module/route (two args).
-        ModularousCache::shouldReceive('isEnabled')->andReturn(true);
-        // Granular invalidation "succeeds" so the dependent-module fallback is skipped.
-        ModularousCache::shouldReceive('invalidateByRelatedModel')->andReturn(true);
+        $firstCountry = new PackageCountryStub;
+        $firstCountry->setRawAttributes(['id' => 201]);
+        $firstCountry->exists = true;
 
-        // The assertion: line 107 runs exactly once.
-        ModularousCache::shouldReceive('invalidateForModel')->once();
+        $secondCountry = new PackageCountryStub;
+        $secondCountry->setRawAttributes(['id' => 202]);
+        $secondCountry->exists = true;
 
-        $this->observer->restored($model);
+        $region->setRelation('packageCountries', collect([$firstCountry, $secondCountry]));
+        PackageRegionStub::$findResult = $region;
+
+        $mockModule = \Mockery::mock(Module::class);
+        $mockModule->shouldReceive('hasRoute')->with('PackageCountry')->andReturn(true);
+        $mockModule->shouldReceive('isEnabledRoute')->with('PackageCountry')->andReturn(true);
+        $mockModule->shouldReceive('getModel')->with('PackageCountry')->andReturn(new PackageCountryStub);
+
+        Modularous::shouldReceive('hasModule')->with('BusinessPackage')->andReturn(true);
+        Modularous::shouldReceive('find')->with('BusinessPackage')->andReturn($mockModule);
+
+        ModularousCache::shouldReceive('isEnabled')
+            ->with('BusinessPackage', 'PackageCountry')
+            ->andReturn(true);
+
+        $this->mockAutoInvalidationEnabled();
+
+        ModularousCache::shouldReceive('invalidateForModel')->never();
+        ModularousCache::shouldReceive('refreshModelCaches')
+            ->once()
+            ->with($firstCountry, \Mockery::on(function (array $types): bool {
+                return $types['presentationItem'] === true
+                    && $types['formItem'] === false
+                    && $types['formattedItem'] === false;
+            }), [
+                'moduleName' => 'BusinessPackage',
+                'moduleRouteName' => 'PackageCountry',
+            ]);
+
+        ModularousCache::shouldReceive('refreshModelCaches')
+            ->once()
+            ->with($secondCountry, \Mockery::type('array'), [
+                'moduleName' => 'BusinessPackage',
+                'moduleRouteName' => 'PackageCountry',
+            ]);
+
+        $this->observer->exposeInvalidateDependentModules($region);
+
+        $this->assertEmpty($this->dependentInvalidator->invalidateAllItemCachesCalls);
     }
 
-    public function test_force_deleted_invalidates_model_cache_when_enabled()
+    public function test_target_relationship_strict_gate_skips_without_get_eloquent_relationships(): void
     {
-        // Covers CacheObserver lines 125-127: when caching is enabled for the
-        // model's module, forceDeleted() must invalidate the model's cache.
-        $model = $this->createTestModel();
+        Config::set('modularous.cache.enabled', true);
+        Config::set('modularous.cache.dependencies', [
+            RelationshipSourceModelWithoutMetadata::class => [
+                [
+                    'moduleName' => 'DependentModule',
+                    'moduleRouteName' => 'DependentRoute',
+                    'types' => [
+                        'presentationItem' => true,
+                    ],
+                    'targetRelationshipName' => 'dependentItems',
+                    'shouldWarm' => true,
+                ],
+            ],
+        ]);
 
-        // getCacheDependents() (used by shouldInvalidate) touches the graph.
-        RelationshipGraph::shouldReceive('getAffectedModuleRoutes')->andReturn([]);
-        RelationshipGraph::shouldReceive('getAffectedModuleRoutesByTable')->andReturn([]);
+        $source = new RelationshipSourceModelWithoutMetadata;
+        $source->setRawAttributes(['id' => 3]);
+        $source->exists = true;
 
-        // Enabled both globally (no args) and for the module/route (two args).
-        ModularousCache::shouldReceive('isEnabled')->andReturn(true);
-        // Granular invalidation "succeeds" so the dependent-module fallback is skipped.
-        ModularousCache::shouldReceive('invalidateByRelatedModel')->andReturn(true);
+        $firstTarget = new DependentRouteModel;
+        $firstTarget->setRawAttributes(['id' => 101]);
+        $firstTarget->exists = true;
 
-        // The assertion: line 126 runs exactly once.
-        ModularousCache::shouldReceive('invalidateForModel')->once();
+        $source->setRelation('dependentItems', collect([$firstTarget]));
+        RelationshipSourceModelWithoutMetadata::$findResult = $source;
 
-        $this->observer->forceDeleted($model);
+        $mockModule = $this->mockDependentModule();
+
+        Modularous::shouldReceive('hasModule')->with('DependentModule')->andReturn(true);
+        Modularous::shouldReceive('find')->with('DependentModule')->andReturn($mockModule);
+
+        ModularousCache::shouldReceive('isEnabled')
+            ->with('DependentModule', 'DependentRoute')
+            ->andReturn(true);
+
+        $this->mockAutoInvalidationEnabled();
+
+        ModularousCache::shouldReceive('invalidateForModel')->never();
+        ModularousCache::shouldReceive('warmupModelCaches')->never();
+        ModularousCache::shouldReceive('refreshModelCaches')->never();
+
+        $this->observer->exposeInvalidateDependentModules($source);
+
+        $this->assertEmpty($this->dependentInvalidator->invalidateAllItemCachesCalls);
+    }
+
+    public function test_target_relationship_with_metadata_invalidates_once_and_warms_each_related_item(): void
+    {
+        Config::set('modularous.cache.enabled', true);
+        Config::set('modularous.cache.dependencies', [
+            RelationshipSourceModelWithMetadata::class => [
+                [
+                    'moduleName' => 'DependentModule',
+                    'moduleRouteName' => 'DependentRoute',
+                    'types' => [
+                        'presentationItem' => true,
+                        'formItem' => false,
+                        'formattedItem' => false,
+                        'record' => false,
+                        'counts' => false,
+                        'index' => false,
+                    ],
+                    'targetRelationshipName' => 'dependentItems',
+                    'shouldWarm' => true,
+                ],
+            ],
+        ]);
+
+        $source = new RelationshipSourceModelWithMetadata;
+        $source->setRawAttributes(['id' => 3]);
+        $source->exists = true;
+
+        $firstTarget = new DependentRouteModel;
+        $firstTarget->setRawAttributes(['id' => 101]);
+        $firstTarget->exists = true;
+
+        $secondTarget = new DependentRouteModel;
+        $secondTarget->setRawAttributes(['id' => 102]);
+        $secondTarget->exists = true;
+
+        $source->setRelation('dependentItems', collect([$firstTarget, $secondTarget]));
+        RelationshipSourceModelWithMetadata::$findResult = $source;
+
+        $mockModule = $this->mockDependentModule();
+
+        Modularous::shouldReceive('hasModule')->with('DependentModule')->andReturn(true);
+        Modularous::shouldReceive('find')->with('DependentModule')->andReturn($mockModule);
+
+        ModularousCache::shouldReceive('isEnabled')
+            ->with('DependentModule', 'DependentRoute')
+            ->andReturn(true);
+
+        $this->mockAutoInvalidationEnabled();
+
+        ModularousCache::shouldReceive('invalidateForModel')->never();
+        ModularousCache::shouldReceive('refreshModelCaches')
+            ->once()
+            ->with($firstTarget, \Mockery::type('array'), [
+                'moduleName' => 'DependentModule',
+                'moduleRouteName' => 'DependentRoute',
+            ]);
+
+        ModularousCache::shouldReceive('refreshModelCaches')
+            ->once()
+            ->with($secondTarget, \Mockery::type('array'), [
+                'moduleName' => 'DependentModule',
+                'moduleRouteName' => 'DependentRoute',
+            ]);
+
+        $this->observer->exposeInvalidateDependentModules($source);
+
+        $this->assertEmpty($this->dependentInvalidator->invalidateAllItemCachesCalls);
+    }
+
+    private function mockDependentModule(): Module
+    {
+        $mockModule = \Mockery::mock(Module::class);
+        $mockModule->shouldReceive('hasRoute')->with('DependentRoute')->andReturn(true);
+        $mockModule->shouldReceive('isEnabledRoute')->with('DependentRoute')->andReturn(true);
+        $mockModule->shouldReceive('getModel')->with('DependentRoute')->andReturn(new DependentRouteModel);
+
+        return $mockModule;
     }
 
     private function createTestModel(): Model
@@ -201,5 +403,131 @@ class CacheObserverTest extends TestCase
         $model->setRawAttributes(['id' => 1]);
 
         return $model;
+    }
+}
+
+class TestableCacheObserver extends CacheObserver
+{
+    public function exposeInvalidateDependentModules(Model $model): void
+    {
+        app(DependentCacheInvalidator::class)->invalidateForModel($model);
+    }
+}
+
+class TestableDependentCacheInvalidator extends DependentCacheInvalidator
+{
+    public array $invalidateAllItemCachesCalls = [];
+
+    public function exposeGetConfigDependents(string $modelClass): array
+    {
+        return $this->getConfigDependentsForModelClass($modelClass);
+    }
+
+    protected function invalidateAllItemCaches(
+        string $moduleName,
+        string $moduleRouteName,
+        array $types,
+        bool $shouldWarmDependentModules = true,
+    ): void {
+        $this->invalidateAllItemCachesCalls[] = [
+            'moduleName' => $moduleName,
+            'moduleRouteName' => $moduleRouteName,
+            'types' => $types,
+            'shouldWarmDependentModules' => $shouldWarmDependentModules,
+        ];
+    }
+}
+
+class SourceCacheDependentModel extends Model
+{
+    protected $table = 'source_models';
+}
+
+class DependentRouteModel extends Model
+{
+    protected $table = 'dependent_models';
+
+    public $timestamps = false;
+}
+
+class PackageRegionStub extends Model
+{
+    protected $table = 'package_regions';
+
+    public $timestamps = false;
+
+    public static ?self $findResult = null;
+
+    public static function find($id, $columns = ['*'])
+    {
+        return static::$findResult;
+    }
+
+    public function getEloquentRelationships(): array
+    {
+        return [
+            'packageCountries' => [
+                'relationship_class' => PackageCountryStub::class,
+            ],
+        ];
+    }
+
+    public function packageCountries(): HasMany
+    {
+        return $this->hasMany(PackageCountryStub::class);
+    }
+}
+
+class PackageCountryStub extends Model
+{
+    protected $table = 'package_countries';
+
+    public $timestamps = false;
+}
+
+class RelationshipSourceModelWithoutMetadata extends Model
+{
+    protected $table = 'relationship_source_models';
+
+    public $timestamps = false;
+
+    public static ?self $findResult = null;
+
+    public static function find($id, $columns = ['*'])
+    {
+        return static::$findResult;
+    }
+
+    public function dependentItems(): HasMany
+    {
+        return $this->hasMany(DependentRouteModel::class);
+    }
+}
+
+class RelationshipSourceModelWithMetadata extends Model
+{
+    protected $table = 'relationship_source_models_with_metadata';
+
+    public $timestamps = false;
+
+    public static ?self $findResult = null;
+
+    public static function find($id, $columns = ['*'])
+    {
+        return static::$findResult;
+    }
+
+    public function getEloquentRelationships(): array
+    {
+        return [
+            'dependentItems' => [
+                'relationship_class' => DependentRouteModel::class,
+            ],
+        ];
+    }
+
+    public function dependentItems(): HasMany
+    {
+        return $this->hasMany(DependentRouteModel::class);
     }
 }

@@ -12,6 +12,7 @@ use Unusualify\Modularous\Contracts\CanBulkSheet;
 use Unusualify\Modularous\Facades\HostRoutingRegistrar;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Facades\ModularousRoutes;
+use Unusualify\Modularous\Http\Controllers\API\CacheRevalidateController;
 use Unusualify\Modularous\Http\Controllers\GlideController;
 
 class RouteServiceProvider extends ServiceProvider
@@ -142,6 +143,17 @@ class RouteServiceProvider extends ServiceProvider
             }
         );
 
+        $router->group(
+            [
+                'middleware' => ['api', 'modularous.cache.webhook'],
+                'prefix' => 'api',
+            ],
+            function ($router) {
+                $router->post('modularous/cache/revalidate', CacheRevalidateController::class)
+                    ->name('modularous.cache.revalidate');
+            }
+        );
+
         if (
             modularousConfig('media_library.image_service') ===
             'Unusualify\Modularous\Services\MediaLibrary\Glide'
@@ -168,7 +180,7 @@ class RouteServiceProvider extends ServiceProvider
         $apiController_namespace = GenerateConfigReader::read('controller')->getNamespace();
         $api_controller_namespace = $apiController_namespace . '\\API';
 
-        if (modularousConfig('define_panel_routes_on_frontend_requests') || Modularous::isPanelUrl()) {
+        if (modularousConfig('define_panel_routes_on_frontend_requests') || Modularous::isPanelUrl() || $this->app->runningInConsole()) {
             foreach (Modularous::allEnabled() as $module) {
                 $_groupOptions = [
                     'prefix' => $module->fullPrefix(),
@@ -329,36 +341,6 @@ class RouteServiceProvider extends ServiceProvider
 
         Route::macro('additionalRoutes', function ($url, $routeName, $options) {
 
-            $defaults = [
-                'reorder',
-                // 'publish',
-                // 'bulkPublish',
-                // 'browser',
-                // 'feature',
-                // 'preview',
-                // 'bulkFeature',
-                'showView',
-                'listRevisions',
-                'restoreRevision',
-                'approveRevision',
-                'rejectRevision',
-
-                'restore',
-                'bulkRestore',
-                'forceDelete',
-                'bulkForceDelete',
-                'bulkDelete',
-                'duplicate',
-
-                'tags',
-                'tagsUpdate',
-
-                'assignments',
-                'createAssignment',
-            ];
-
-            $customRoutes = $defaults;
-
             $groupStack = Route::getGroupStack();
             $namespace = $groupStack[count($groupStack) - 1]['namespace'] ?? null;
             $controllerFqcn = ($namespace && $routeName !== '')
@@ -367,6 +349,38 @@ class RouteServiceProvider extends ServiceProvider
 
             $controllerResolvable = $controllerFqcn !== null
                 && class_exists($controllerFqcn);
+
+            $controllerInstance = $controllerResolvable ? app()->make($controllerFqcn) : null;
+            $module = $controllerInstance ? $controllerInstance->getModule() : null;
+            $isSingleton = $module ? $module->isSingleton($routeName) : false;
+
+            $customRoutes = [
+                ...(! $isSingleton ? [
+                    'reorder',
+                    // 'publish',
+                    // 'bulkPublish',
+                    // 'browser',
+                    // 'feature',
+                    // 'preview',
+                    // 'bulkFeature',
+                    'showView',
+                    'restore',
+                    'bulkRestore',
+                    'forceDelete',
+                    'bulkForceDelete',
+                    'bulkDelete',
+                    'duplicate',
+                ] : []),
+
+                'listRevisions',
+                'restoreRevision',
+                'approveRevision',
+                'rejectRevision',
+                'tags',
+                'tagsUpdate',
+                'assignments',
+                'createAssignment',
+            ];
 
             $bulkSheetController = null;
             $bulkSheetStepUpMiddleware = null;
@@ -390,6 +404,24 @@ class RouteServiceProvider extends ServiceProvider
                 } catch (\Throwable) {
                     // Submodule may omit this controller; skip bulk sheet routes.
                 }
+            }
+
+            if ($module && $module->isResourceCacheEnabled($routeName)) {
+                $customRoutes = array_merge($customRoutes, [
+                    'cachePurge',
+                    'cacheWarm',
+                    ...(! $isSingleton ? ['cachePurgeAll', 'cacheWarmAll'] : []),
+                ]);
+            }
+
+            if ($module && $module->hasRemoteApiSource($routeName)) {
+                $customRoutes = array_merge($customRoutes, [
+                    'syncRemote',
+                    'syncRemoteAll',
+                    'clearRemoteCache',
+                    'previewRemote',
+                    'listRemoteCatalog',
+                ]);
             }
 
             $controllerName = "{$routeName}Controller";
@@ -477,7 +509,7 @@ class RouteServiceProvider extends ServiceProvider
                     Route::put($routeSlug, $mapping);
                 }
 
-                if (in_array($customRoute, ['duplicate', 'preview', 'showView', 'approveRevision', 'rejectRevision'])) {
+                if (in_array($customRoute, ['duplicate', 'preview', 'showView', 'approveRevision', 'rejectRevision', 'syncRemote', 'previewRemote'])) {
                     Route::put($routeSlug . "/{{$snakeCase}}", $mapping);
                 }
 
@@ -489,9 +521,23 @@ class RouteServiceProvider extends ServiceProvider
                         'bulkDelete',
                         'bulkRestore',
                         'bulkForceDelete',
+                        'syncRemoteAll',
+                        'clearRemoteCache',
                     ])
                 ) {
                     Route::post($routeSlug, $mapping);
+                }
+
+                if (in_array($customRoute, ['cachePurge', 'cacheWarm'])) {
+                    Route::post("{$url}/cache/" . ($customRoute === 'cachePurge' ? 'purge' : 'warm') . "/{{$snakeCase}}", $mapping);
+                }
+
+                if (in_array($customRoute, ['cachePurgeAll', 'cacheWarmAll'])) {
+                    Route::post("{$url}/cache/" . ($customRoute === 'cachePurgeAll' ? 'purge-all' : 'warm-all'), $mapping);
+                }
+
+                if ($customRoute === 'listRemoteCatalog') {
+                    Route::get($routeSlug, $mapping);
                 }
 
             }

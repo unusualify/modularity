@@ -92,4 +92,59 @@ return [
     'save-success' => 'Kayıt Başarıyla Tamamlandı!',
     'success' => 'Başarıyla Tamamlandı!',
     'warning' => 'Bir Uyarı Var!',
+
+    'remote-api' => [
+        'sync-record' => [
+            'label' => 'API\'den Senkronize Et',
+        ],
+        'sync-all' => [
+            'label' => 'Tüm API\'den Senkronize Et',
+            'confirmation-title' => 'Tüm API\'den Senkronize Et?',
+            'confirmation-description' => 'Bu işlem tüm kayıtları API\'den senkronize edecektir. Emin misiniz?',
+            'confirmation-confirmText' => 'Senkronize Et',
+            'confirmation-cancelText' => 'İptal',
+        ],
+        'clear-cache' => [
+            'label' => 'API Önbelleğini Temizle',
+            'confirmation-title' => 'API Önbelleğini Temizle?',
+            'confirmation-description' => 'Bu işlem API önbelleğini temizleyecektir. Emin misiniz?',
+            'confirmation-confirmText' => 'Temizle',
+            'confirmation-cancelText' => 'İptal',
+        ],
+        'preview' => [
+            'label' => 'API Kaydını Önizle',
+            'close' => 'Kapat',
+            'not-found' => 'Uzak kayıt bulunamadı.',
+        ],
+    ],
+
+    'resource-cache' => [
+        'purge-record' => [
+            'label' => 'Önbelleği Temizle',
+            'success' => 'Önbellek temizlendi.',
+        ],
+        'warm-record' => [
+            'label' => 'Önbelleği Güncelle',
+            'success' => 'Önbellek güncellendi.',
+        ],
+        'purge-all' => [
+            'label' => 'Tüm Önbelleği Temizle',
+            'success' => 'Tüm önbellek temizlendi.',
+            'confirmation-title' => 'Tüm önbelleği temizle?',
+            'confirmation-description' => 'Bu işlem tüm önbelleği temizleyecektir. Emin misiniz?',
+            'confirmation-confirmText' => 'Temizle',
+            'confirmation-cancelText' => 'İptal',
+        ],
+        'warm-all' => [
+            'label' => 'Tüm Önbelleği Güncelle',
+            'success' => 'Tüm önbellek güncellendi.',
+            'confirmation-title' => 'Tüm önbelleği güncelle?',
+            'confirmation-description' => 'Bu işlem tüm önbelleği güncellenecektir. Emin misiniz?',
+            'confirmation-confirmText' => 'Güncelle',
+            'confirmation-cancelText' => 'İptal',
+        ],
+        'validation' => [
+            'types-required' => 'En az bir önbellek türü seçilmelidir.',
+        ],
+    ],
 ];

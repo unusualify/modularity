@@ -6,6 +6,11 @@ use Illuminate\Cache\Repository;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Str;
+use Modules\Cms\Entities\UrlRoute;
+use Unusualify\Modularous\Facades\Modularous;
+use Unusualify\Modularous\Services\Cache\FileUrlPresentationCacheDriver;
+use Unusualify\Modularous\Services\Cache\UrlKeyedStaleCache;
+use Unusualify\Modularous\Support\ModularousCacheLogger;
 use Unusualify\Modularous\Traits\Cache\WarmupCache;
 use Unusualify\Modularous\Traits\ModularModel;
 
@@ -63,8 +68,12 @@ trait CacheInvalidation
      */
     public function invalidateModuleRoute(string $moduleName, string $moduleRouteName): bool
     {
+        $urlStaleDeleted = $this->forgetUrlStaleForModuleRoute($moduleName, $moduleRouteName);
+
         if ($this->usesTags()) {
-            $this->getStore()->tags($this->getModuleRouteTags($moduleName, $moduleRouteName, onlyRoute: false))->flush();
+            // Route-scoped flush only — including the root modularous tag would wipe unrelated routes
+            // (e.g. dependent PackageCountry warmup entries cleared by CountryPackagesHub invalidation).
+            $this->getStore()->tags($this->getModuleRouteTags($moduleName, $moduleRouteName, onlyRoute: true))->flush();
 
             return true;
         }
@@ -73,7 +82,8 @@ trait CacheInvalidation
         $moduleName = Str::studly($moduleName);
         $moduleRouteName = Str::studly($moduleRouteName);
 
-        return $this->invalidateByPattern("{$this->getPrefix()}:{$moduleName}:{$moduleRouteName}:*") > 0;
+        return $this->invalidateByPattern("{$this->getPrefix()}:{$moduleName}:{$moduleRouteName}:*") > 0
+            || $urlStaleDeleted > 0;
     }
 
     /**
@@ -97,10 +107,9 @@ trait CacheInvalidation
 
         $tag = $this->generateRelationTag($modelClass, $id);
 
-        // dd($tag);
-
         try {
             $this->getStore()->tags([$tag])->flush();
+            $this->forgetStaleFilesByRelation($modelClass, $id);
 
             return true;
         } catch (\Exception $e) {
@@ -227,7 +236,7 @@ trait CacheInvalidation
     public function invalidateFormattedItemCache(string $moduleName, string $moduleRouteName, $id): void
     {
         if ($this->usesTags()) {
-            $this->getStore()->tags($this->getModuleRouteTags($moduleName, $moduleRouteName, onlyRoute: false))->flush();
+            $this->getStore()->tags($this->getModuleRouteTags($moduleName, $moduleRouteName, onlyRoute: true))->flush();
 
             return;
         }
@@ -241,7 +250,9 @@ trait CacheInvalidation
     public function invalidateFormItemCache(string $moduleName, string $moduleRouteName, $id): void
     {
         if ($this->usesTags()) {
-            $this->getStore()->tags($this->getModuleRouteTags($moduleName, $moduleRouteName, onlyRoute: false))->flush();
+            $this->getStore()->tags($this->getModuleRouteTags($moduleName, $moduleRouteName, onlyRoute: true))->flush();
+
+            return;
         }
 
         $moduleName = Str::studly($moduleName);
@@ -250,64 +261,652 @@ trait CacheInvalidation
         $this->invalidateByPattern("{$this->getPrefix()}:{$moduleName}:{$moduleRouteName}:formItem:{$id}:*");
     }
 
+    public function invalidatePresentationItemCache(string $moduleName, string $moduleRouteName, $id, ?string $modelClass = null): void
+    {
+        $store = $this->getPresentationCacheStore();
+
+        if ($modelClass !== null && $id !== null) {
+            if ($store === 'model') {
+                $this->getStaleFileCache()->forgetByRelation($modelClass, $id);
+            }
+            if ($store === 'url') {
+                $this->forgetUrlStaleForModel($modelClass, $id);
+            }
+        } elseif ($id !== null && $store === 'model') {
+            $this->forgetStaleFilesByModuleRouteId($moduleName, $moduleRouteName, $id);
+        }
+
+        if ($this->usesTags()) {
+            $this->getStore()->tags($this->getModuleRouteTags($moduleName, $moduleRouteName, onlyRoute: true))->flush();
+
+            return;
+        }
+
+        $moduleName = Str::studly($moduleName);
+        $moduleRouteName = Str::studly($moduleRouteName);
+
+        $this->invalidateByPattern("{$this->getPrefix()}:{$moduleName}:{$moduleRouteName}:presentationItem:{$id}:*");
+        if ($store === 'model' && $id !== null) {
+            $this->forgetStaleFilesByModuleRouteId($moduleName, $moduleRouteName, $id);
+        }
+    }
+
+    public function invalidateRecordCache(string $moduleName, string $moduleRouteName, $id): void
+    {
+        if ($this->usesTags()) {
+            $this->getStore()->tags($this->getModuleRouteTags($moduleName, $moduleRouteName, onlyRoute: true))->flush();
+
+            return;
+        }
+
+        $moduleName = Str::studly($moduleName);
+        $moduleRouteName = Str::studly($moduleRouteName);
+
+        $this->invalidateByPattern("{$this->getPrefix()}:{$moduleName}:{$moduleRouteName}:record:{$id}:*");
+    }
+
     /**
      * Invalidate all caches related to a model.
      */
     public function invalidateForModel(Model $model, $types = [], $options = []): void
     {
         $warmup = isset($options['warmup']) ? $options['warmup'] : true;
+        $skipInvalidation = (bool) ($options['skipInvalidation'] ?? false);
 
-        $moduleName = $this->getModuleNameFromModel($model);
-        $moduleRouteName = $this->getModuleRouteNameFromModel($model);
+        $moduleName = $options['moduleName'] ?? $this->getModuleNameFromModel($model);
+        $moduleRouteName = $options['moduleRouteName'] ?? $this->getModuleRouteNameFromModel($model);
 
         if (! $moduleName || ! $moduleRouteName) {
             return;
         }
 
-        if ($this->usesTags()) {
-            // With tags, flush the route-specific tag
-            $this->getStore()->tags($this->getModuleRouteTags($moduleName, $moduleRouteName, onlyRoute: false))->flush();
-
-            return;
-        }
-
         $newlyCreated = $model->wasRecentlyCreated;
 
-        // // Without tags, invalidate specific patterns
-        // $recordKey = $this->generateRecordKey($module, $routeName, $model->getKey());
-        // $this->forget($recordKey, $module, $routeName);
+        $shouldForgetPresentationStale = ! $newlyCreated
+            && ($types['presentationItem'] ?? true)
+            && $this->isEnabled($moduleName, $moduleRouteName, 'presentationItem');
 
-        if (((isset($types['counts']) ? $types['counts'] : true)) && $this->isEnabled($moduleName, $moduleRouteName, 'counts')) {
-            $this->invalidateCountCaches($moduleName, $moduleRouteName, onlyRoute: false);
+        if ($shouldForgetPresentationStale) {
+            $this->forgetPresentationStaleForModel($model);
         }
 
-        if (((isset($types['index']) ? $types['index'] : true)) && $this->isEnabled($moduleName, $moduleRouteName, 'index')) {
-            $this->invalidateIndexCaches($moduleName, $moduleRouteName, onlyRoute: false);
-        }
+        $tagFlushResult = null;
 
-        if (((isset($types['formattedItem']) ? $types['formattedItem'] : true)) && $this->isEnabled($moduleName, $moduleRouteName, 'formattedItem')) {
-            if (! $newlyCreated) {
-                $this->invalidateFormattedItemCache($moduleName, $moduleRouteName, $model->getKey());
+        if (! $skipInvalidation) {
+            if ($this->usesTags()) {
+                $this->getStore()->tags($this->getModuleRouteTags($moduleName, $moduleRouteName, onlyRoute: true))->flush();
+                $tagFlushResult = true;
+            } else {
+                if (((isset($types['counts']) ? $types['counts'] : true)) && $this->isEnabled($moduleName, $moduleRouteName, 'counts')) {
+                    $this->invalidateCountCaches($moduleName, $moduleRouteName, onlyRoute: false);
+                }
+
+                if (((isset($types['index']) ? $types['index'] : true)) && $this->isEnabled($moduleName, $moduleRouteName, 'index')) {
+                    $this->invalidateIndexCaches($moduleName, $moduleRouteName, onlyRoute: false);
+                }
+
+                if (((isset($types['formattedItem']) ? $types['formattedItem'] : true)) && $this->isEnabled($moduleName, $moduleRouteName, 'formattedItem')) {
+                    if (! $newlyCreated) {
+                        $this->invalidateFormattedItemCache($moduleName, $moduleRouteName, $model->getKey());
+                    }
+                }
+
+                if (((isset($types['formItem']) ? $types['formItem'] : true)) && $this->isEnabled($moduleName, $moduleRouteName, 'formItem')) {
+                    if (! $newlyCreated) {
+                        $this->invalidateFormItemCache($moduleName, $moduleRouteName, $model->getKey());
+                    }
+                }
+
+                if (((isset($types['presentationItem']) ? $types['presentationItem'] : true)) && $this->isEnabled($moduleName, $moduleRouteName, 'presentationItem')) {
+                    if (! $newlyCreated) {
+                        $this->invalidatePresentationItemCache($moduleName, $moduleRouteName, $model->getKey(), $model::class);
+                    }
+                }
             }
         }
 
-        if (((isset($types['formItem']) ? $types['formItem'] : true)) && $this->isEnabled($moduleName, $moduleRouteName, 'formItem')) {
-            if (! $newlyCreated) {
-                $this->invalidateFormItemCache($moduleName, $moduleRouteName, $model->getKey());
-            }
-        }
+        ModularousCacheLogger::info('cache.invalidation.invalidate_for_model', [
+            'model' => get_class($model),
+            'id' => $model->getKey(),
+            'moduleName' => $moduleName,
+            'moduleRouteName' => $moduleRouteName,
+            'types' => $types,
+            'warmup' => $warmup,
+            'skipInvalidation' => $skipInvalidation,
+            'newlyCreated' => $newlyCreated,
+            'usesTags' => $this->usesTags(),
+            'tagFlushResult' => $tagFlushResult,
+        ]);
 
         try {
-            // if laravel model is not new created, warmUp cache
             if (! $newlyCreated && $warmup) {
-                $this->warmupByModel($model);
+                $this->warmupForModel($model, $types, $moduleName, $moduleRouteName);
             }
         } catch (\Exception $e) {
             logger()->error("Failed to warm up caches for model {$model->getKey()}: " . $e->getMessage(), ['exception' => $e->getTraceAsString()]);
         }
+    }
 
-        // if(($rewarmItemEnabled = $this->isEnabled($module, $routeName, 'rewarmItem')) && $rewarmItemEnabled) {
-        //     $this->rewarmItemCache($module, $routeName, $model->getKey());
-        // }
+    /**
+     * Warm caches for a model without flushing tags first.
+     *
+     * @param array<string, mixed> $options
+     */
+    public function refreshModelCaches(Model $model, array $types = [], array $options = []): void
+    {
+        $moduleName = $options['moduleName'] ?? $this->getModuleNameFromModel($model);
+        $moduleRouteName = $options['moduleRouteName'] ?? $this->getModuleRouteNameFromModel($model);
+
+        ModularousCacheLogger::info('cache.invalidation.refresh_model_caches', [
+            'model' => get_class($model),
+            'id' => $model->getKey(),
+            'moduleName' => $moduleName,
+            'moduleRouteName' => $moduleRouteName,
+            'types' => $types,
+        ]);
+
+        if (
+            ! $model->wasRecentlyCreated
+            && ($types['presentationItem'] ?? false)
+            && $moduleName
+            && $moduleRouteName
+            && $this->isEnabled($moduleName, $moduleRouteName, 'presentationItem')
+        ) {
+            $this->forgetPresentationStaleForModel($model);
+        }
+
+        $locale = isset($options['locale']) && is_string($options['locale']) && $options['locale'] !== ''
+            ? $options['locale']
+            : null;
+
+        $this->warmupForModel($model, $types, $moduleName, $moduleRouteName, $locale);
+    }
+
+    /**
+     * Purge selected cache types for a single model (no warmup).
+     *
+     * @param array<string, bool> $types
+     */
+    public function purgeModelCacheTypes(Model $model, array $types = [], ?string $moduleName = null, ?string $moduleRouteName = null): void
+    {
+        $moduleName ??= $this->getModuleNameFromModel($model);
+        $moduleRouteName ??= $this->getModuleRouteNameFromModel($model);
+
+        if (! $moduleName || ! $moduleRouteName) {
+            return;
+        }
+
+        $id = $model->getKey();
+
+        ModularousCacheLogger::info('cache.invalidation.purge_model_cache_types', [
+            'model' => get_class($model),
+            'id' => $id,
+            'moduleName' => $moduleName,
+            'moduleRouteName' => $moduleRouteName,
+            'types' => $types,
+        ]);
+
+        if ($this->usesTags() && (
+            ($types['counts'] ?? false)
+            || ($types['index'] ?? false)
+            || ($types['record'] ?? false)
+            || ($types['formItem'] ?? false)
+            || ($types['formattedItem'] ?? false)
+            || ($types['presentationItem'] ?? false)
+        )) {
+            $this->invalidateModuleRoute($moduleName, $moduleRouteName);
+
+            if (($types['presentationItem'] ?? false) && $id !== null) {
+                if ($this->getPresentationCacheStore() === 'model') {
+                    $this->forgetStaleFilesByRelation($model::class, $id);
+                    $this->forgetStaleFilesByModuleRouteId($moduleName, $moduleRouteName, $id);
+                }
+                if ($this->getPresentationCacheStore() === 'url') {
+                    $this->forgetUrlStaleForModel($model::class, $id);
+                }
+            }
+
+            return;
+        }
+
+        $this->invalidateRouteLevelCaches($moduleName, $moduleRouteName, $types);
+
+        if ($id !== null) {
+            $this->invalidatePerIdCachesForRoute($moduleName, $moduleRouteName, $id, $types, $model);
+        }
+    }
+
+    /**
+     * Warm all records for a module route (chunked).
+     *
+     * @param array<string, bool> $types
+     */
+    public function warmModuleRouteCaches(string $moduleName, string $moduleRouteName, array $types = []): void
+    {
+        if (! $this->isEnabled($moduleName, $moduleRouteName)) {
+            return;
+        }
+
+        $module = Modularous::find($moduleName);
+        if (! $module || ! $module->hasRoute($moduleRouteName)) {
+            return;
+        }
+
+        if ($types === []) {
+            $types = [
+                'counts' => true,
+                'formItem' => true,
+                'formattedItem' => true,
+                'presentationItem' => true,
+            ];
+        }
+
+        if (($types['counts'] ?? false) && $this->isEnabled($moduleName, $moduleRouteName, 'counts')) {
+            $controller = $module->getController($moduleRouteName);
+            if ($controller) {
+                try {
+                    $this->warmupControllerCounts($controller);
+                } catch (\Exception $e) {
+                    logger()->error("Failed to warm count caches for {$moduleName}/{$moduleRouteName}: " . $e->getMessage());
+                }
+            }
+        }
+
+        $modelClass = get_class($module->getModel($moduleRouteName));
+        $this->warmupAllItemCachesForRoute($module, $moduleName, $moduleRouteName, $modelClass, $types);
+    }
+
+    /**
+     * Warm caches for a single model without invalidating first.
+     */
+    public function warmupModelCaches(Model $model, array $types = [], ?string $moduleName = null, ?string $moduleRouteName = null): void
+    {
+        $this->warmupForModel($model, $types, $moduleName, $moduleRouteName);
+    }
+
+    /**
+     * Warm caches for a single model, respecting the requested cache types.
+     */
+    protected function warmupForModel(Model $model, array $types = [], ?string $moduleName = null, ?string $moduleRouteName = null, ?string $locale = null): void
+    {
+        $moduleName ??= $this->getModuleNameFromModel($model);
+        $moduleRouteName ??= $this->getModuleRouteNameFromModel($model);
+
+        if (! $moduleName || ! $moduleRouteName) {
+            return;
+        }
+
+        $module = Modularous::find($moduleName);
+
+        if (! $module || ! $module->hasRoute($moduleRouteName)) {
+            return;
+        }
+
+        $warmCounts = ($types['counts'] ?? true) && $this->isEnabled($moduleName, $moduleRouteName, 'counts');
+        $warmFormItem = ($types['formItem'] ?? true) && $this->isEnabled($moduleName, $moduleRouteName, 'formItem');
+        $warmFormattedItem = ($types['formattedItem'] ?? true) && $this->isEnabled($moduleName, $moduleRouteName, 'formattedItem');
+        $warmPresentationItem = ($types['presentationItem'] ?? true) && $this->isEnabled($moduleName, $moduleRouteName, 'presentationItem');
+
+        if (! $warmCounts && ! $warmFormItem && ! $warmFormattedItem && ! $warmPresentationItem) {
+            return;
+        }
+
+        $controller = $module->getController($moduleRouteName);
+
+        if ($warmCounts && $controller) {
+            try {
+                $this->warmupControllerCounts($controller);
+            } catch (\Exception $e) {
+                logger()->error("Failed to warm up count caches for model {$model->getKey()}: " . $e->getMessage(), ['exception' => $e->getTraceAsString()]);
+            }
+        }
+
+        if (($warmFormItem || $warmFormattedItem) && $controller) {
+            try {
+                $this->warmupControllerItem($controller, $model, $warmFormItem, $warmFormattedItem);
+            } catch (\Exception $e) {
+                logger()->error("Failed to warm up controller item caches for model {$model->getKey()}: " . $e->getMessage(), ['exception' => $e->getTraceAsString()]);
+            }
+        }
+
+        if ($warmPresentationItem) {
+            try {
+                $this->warmupPresentationItem($moduleName, $moduleRouteName, $model, $locale);
+            } catch (\Exception $e) {
+                logger()->error("Failed to warm up presentation item cache for model {$model->getKey()}: " . $e->getMessage(), ['exception' => $e->getTraceAsString()]);
+            }
+        }
+    }
+
+    /**
+     * Invalidate item caches for every record in a module route.
+     */
+    public function invalidateAllItemCaches(string $moduleName, string $moduleRouteName, array $types, bool $shouldWarmDependentModules = true): void
+    {
+        if (! $this->isEnabled($moduleName, $moduleRouteName)) {
+            return;
+        }
+
+        $module = Modularous::find($moduleName);
+        if (! $module || ! $module->hasRoute($moduleRouteName)) {
+            return;
+        }
+
+        $model = $module->getModel($moduleRouteName);
+        $modelClass = get_class($model);
+
+        if ($this->usesTags()) {
+            $this->invalidateAllItemRouteCachesWithTags($moduleName, $moduleRouteName, $types);
+
+            if ($shouldWarmDependentModules) {
+                $this->warmupAllItemCachesForRoute($module, $moduleName, $moduleRouteName, $modelClass, $types);
+            }
+
+            return;
+        }
+
+        $this->invalidateRouteLevelCaches($moduleName, $moduleRouteName, $types);
+
+        $this->eachRouteRecordId($module, $moduleRouteName, $modelClass, function ($id) use ($module, $moduleName, $moduleRouteName, $modelClass, $types, $shouldWarmDependentModules) {
+            $this->invalidatePerIdCachesForRoute($moduleName, $moduleRouteName, $id, $types);
+
+            if ($shouldWarmDependentModules) {
+                try {
+                    $this->warmupItemCachesForRouteId($module, $moduleName, $moduleRouteName, $modelClass, $id, $types);
+                } catch (\Exception $e) {
+                    logger()->error("Failed to warm up caches for model {$id}: " . $e->getMessage(), ['exception' => $e->getTraceAsString()]);
+                }
+            }
+        });
+    }
+
+    protected function invalidateRouteLevelCaches(string $moduleName, string $moduleRouteName, array $types): void
+    {
+        if (($types['counts'] ?? false) && $this->isEnabled($moduleName, $moduleRouteName, 'counts')) {
+            $this->invalidateCountCaches($moduleName, $moduleRouteName, onlyRoute: false);
+        }
+
+        if (($types['index'] ?? false) && $this->isEnabled($moduleName, $moduleRouteName, 'index')) {
+            $this->invalidateIndexCaches($moduleName, $moduleRouteName, onlyRoute: false);
+        }
+    }
+
+    protected function invalidatePerIdCachesForRoute(string $moduleName, string $moduleRouteName, $id, array $types, ?Model $model = null): void
+    {
+        if (($types['record'] ?? false) && $this->isEnabled($moduleName, $moduleRouteName, 'record')) {
+            $this->invalidateRecordCache($moduleName, $moduleRouteName, $id);
+        }
+
+        if (($types['formattedItem'] ?? false) && $this->isEnabled($moduleName, $moduleRouteName, 'formattedItem')) {
+            $this->invalidateFormattedItemCache($moduleName, $moduleRouteName, $id);
+        }
+
+        if (($types['formItem'] ?? false) && $this->isEnabled($moduleName, $moduleRouteName, 'formItem')) {
+            $this->invalidateFormItemCache($moduleName, $moduleRouteName, $id);
+        }
+
+        if (($types['presentationItem'] ?? false) && $this->isEnabled($moduleName, $moduleRouteName, 'presentationItem')) {
+            $modelClass = $model !== null ? $model::class : null;
+            $this->invalidatePresentationItemCache($moduleName, $moduleRouteName, $id, $modelClass);
+        }
+    }
+
+    protected function invalidateAllItemRouteCachesWithTags(string $moduleName, string $moduleRouteName, array $types): void
+    {
+        $needsRouteFlush = ($types['counts'] ?? false)
+            || ($types['index'] ?? false)
+            || ($types['record'] ?? false)
+            || ($types['formItem'] ?? false)
+            || ($types['formattedItem'] ?? false)
+            || ($types['presentationItem'] ?? false);
+
+        if ($needsRouteFlush) {
+            $this->invalidateModuleRoute($moduleName, $moduleRouteName);
+        }
+    }
+
+    protected function eachRouteRecordId($module, string $moduleRouteName, string $modelClass, callable $callback, int $chunkSize = 100): void
+    {
+        if ($module->isSingleton($moduleRouteName)) {
+            $record = $modelClass::query()->select('id')->first();
+
+            if ($record !== null && $record->getKey() !== null) {
+                $callback($record->getKey());
+            }
+
+            return;
+        }
+
+        $modelClass::query()->select('id')->chunk($chunkSize, function ($records) use ($callback) {
+            foreach ($records as $record) {
+                if ($record->getKey() !== null) {
+                    $callback($record->getKey());
+                }
+            }
+        });
+    }
+
+    protected function warmupAllItemCachesForRoute($module, string $moduleName, string $moduleRouteName, string $modelClass, array $types): void
+    {
+        $this->eachRouteRecordId($module, $moduleRouteName, $modelClass, function ($id) use ($module, $moduleName, $moduleRouteName, $modelClass, $types) {
+            try {
+                $this->warmupItemCachesForRouteId($module, $moduleName, $moduleRouteName, $modelClass, $id, $types);
+            } catch (\Exception $e) {
+                logger()->error("Failed to warm up caches for model {$id}: " . $e->getMessage(), ['exception' => $e->getTraceAsString()]);
+            }
+        });
+    }
+
+    protected function warmupItemCachesForRouteId($module, string $moduleName, string $moduleRouteName, string $modelClass, $id, array $types): void
+    {
+        $model = $modelClass::find($id);
+
+        if (! $model instanceof Model) {
+            return;
+        }
+
+        $warmFormItem = ($types['formItem'] ?? false) && $this->isEnabled($moduleName, $moduleRouteName, 'formItem');
+        $warmFormattedItem = ($types['formattedItem'] ?? false) && $this->isEnabled($moduleName, $moduleRouteName, 'formattedItem');
+        $warmPresentationItem = ($types['presentationItem'] ?? false) && $this->isEnabled($moduleName, $moduleRouteName, 'presentationItem');
+
+        if (! $warmFormItem && ! $warmFormattedItem && ! $warmPresentationItem) {
+            return;
+        }
+
+        if ($warmFormItem || $warmFormattedItem) {
+            $controller = $module->getController($moduleRouteName);
+            $this->warmupControllerItem($controller, $model, $warmFormItem, $warmFormattedItem);
+        }
+
+        if ($warmPresentationItem) {
+            $this->warmupPresentationItem($moduleName, $moduleRouteName, $model);
+        }
+    }
+
+    abstract protected function getStaleFileCache(): \Unusualify\Modularous\Services\Cache\StaleFileCache;
+
+    abstract protected function getUrlPresentationCacheStore(): \Unusualify\Modularous\Contracts\Cache\UrlPresentationCacheStoreInterface;
+
+    /**
+     * @deprecated Implement getUrlPresentationCacheStore() instead.
+     */
+    protected function getUrlKeyedStaleCache(): UrlKeyedStaleCache
+    {
+        $store = $this->getUrlPresentationCacheStore();
+        if ($store instanceof FileUrlPresentationCacheDriver) {
+            return $store->underlyingFileCache();
+        }
+
+        throw new \RuntimeException('getUrlKeyedStaleCache() requires file driver.');
+    }
+
+    abstract protected function getPresentationCacheStore(): string;
+
+    /**
+     * Purge all presentationItem filesystem caches for a model (model-id stale + URL store).
+     *
+     * Clears both {@see StaleFileCache} and {@see UrlPresentationCacheStoreInterface} regardless of
+     * the active `presentationItem.store` config (safe when migrating store modes).
+     */
+    public function purgePresentationItemForModel(
+        Model $model,
+        ?string $moduleName = null,
+        ?string $moduleRouteName = null,
+        ?string $locale = null,
+    ): int {
+        if ($model->getKey() === null) {
+            return 0;
+        }
+
+        $deleted = $this->getStaleFileCache()->forgetByRelation($model::class, $model->getKey());
+
+        $moduleName ??= $this->getModuleNameFromModel($model);
+        $moduleRouteName ??= $this->getModuleRouteNameFromModel($model);
+
+        if ($moduleName && $moduleRouteName) {
+            $deleted += $this->getStaleFileCache()->forgetByModuleRouteId(
+                $moduleName,
+                $moduleRouteName,
+                $model->getKey(),
+            );
+        }
+
+        $deleted += $this->purgeAllUrlPresentationForModel($model::class, $model->getKey(), $locale);
+
+        ModularousCacheLogger::info('cache.invalidation.purge_presentation_item_for_model', [
+            'model' => $model::class,
+            'id' => $model->getKey(),
+            'moduleName' => $moduleName,
+            'moduleRouteName' => $moduleRouteName,
+            'locale' => $locale,
+            'deleted' => $deleted,
+        ]);
+
+        return $deleted;
+    }
+
+    /**
+     * Purge all presentationItem filesystem caches for a module route (no per-record iteration).
+     */
+    public function purgePresentationItemForModuleRoute(string $moduleName, string $moduleRouteName): int
+    {
+        $deleted = $this->getUrlPresentationCacheStore()->forgetByModuleRoute($moduleName, $moduleRouteName);
+        $deleted += $this->getStaleFileCache()->forgetByModuleRoute($moduleName, $moduleRouteName);
+
+        ModularousCacheLogger::info('cache.invalidation.purge_presentation_item_for_module_route', [
+            'moduleName' => $moduleName,
+            'moduleRouteName' => $moduleRouteName,
+            'deleted' => $deleted,
+        ]);
+
+        return $deleted;
+    }
+
+    protected function forgetPresentationStaleForModel(Model $model): void
+    {
+        if ($model->getKey() === null) {
+            return;
+        }
+
+        $store = $this->getPresentationCacheStore();
+
+        if ($store === 'model') {
+            $this->getStaleFileCache()->forgetByRelation($model::class, $model->getKey());
+            $moduleName = $this->getModuleNameFromModel($model);
+            $moduleRouteName = $this->getModuleRouteNameFromModel($model);
+            if ($moduleName && $moduleRouteName) {
+                $this->forgetStaleFilesByModuleRouteId($moduleName, $moduleRouteName, $model->getKey());
+            }
+        }
+
+        if ($store === 'url') {
+            $this->forgetUrlStaleForModel($model::class, $model->getKey());
+        }
+    }
+
+    protected function forgetStaleFilesByRelation(string $modelClass, int|string $id): void
+    {
+        if ($this->getPresentationCacheStore() === 'model') {
+            $this->getStaleFileCache()->forgetByRelation($modelClass, $id);
+        }
+
+        if ($this->getPresentationCacheStore() === 'url') {
+            $this->forgetUrlStaleForModel($modelClass, $id);
+        }
+    }
+
+    protected function forgetStaleFilesByModuleRouteId(string $moduleName, string $moduleRouteName, int|string $id): void
+    {
+        $this->getStaleFileCache()->forgetByModuleRouteId($moduleName, $moduleRouteName, $id);
+    }
+
+    protected function forgetUrlStaleByLocalePath(string $locale, string $normalizedPath): int
+    {
+        return $this->getUrlPresentationCacheStore()->forgetPathVariants($locale, $normalizedPath);
+    }
+
+    protected function forgetUrlStaleForModuleRoute(string $moduleName, string $moduleRouteName): int
+    {
+        if ($this->getPresentationCacheStore() !== 'url') {
+            return 0;
+        }
+
+        return $this->getUrlPresentationCacheStore()->forgetByModuleRoute($moduleName, $moduleRouteName);
+    }
+
+    protected function forgetUrlStaleForModel(string $modelClass, int|string $id): int
+    {
+        if ($this->getPresentationCacheStore() !== 'url') {
+            return 0;
+        }
+
+        return $this->purgeAllUrlPresentationForModel($modelClass, $id);
+    }
+
+    protected function purgeAllUrlPresentationForModel(string $modelClass, int|string $id, ?string $locale = null): int
+    {
+        if ($locale !== null && $locale !== '') {
+            return $this->purgeUrlPresentationPathVariantsForModel($modelClass, $id, $locale);
+        }
+
+        $deleted = $this->getUrlPresentationCacheStore()->forgetByRelation($modelClass, $id);
+
+        $deleted += $this->purgeUrlPresentationPathVariantsForModel($modelClass, $id);
+
+        return $deleted;
+    }
+
+    protected function purgeUrlPresentationPathVariantsForModel(
+        string $modelClass,
+        int|string $id,
+        ?string $locale = null,
+    ): int {
+        if (! class_exists(UrlRoute::class)) {
+            return 0;
+        }
+
+        try {
+            $model = new $modelClass;
+            $query = UrlRoute::query()
+                ->where('urlable_type', $model->getMorphClass())
+                ->where('urlable_id', $id)
+                ->where('kind', UrlRoute::KIND_PAGE_PUBLIC);
+
+            if ($locale !== null && $locale !== '') {
+                $query->where('locale', $locale);
+            }
+
+            $rows = $query->get(['locale', 'normalized_path']);
+        } catch (\Throwable) {
+            return 0;
+        }
+
+        $deleted = 0;
+
+        foreach ($rows as $row) {
+            $deleted += $this->forgetUrlStaleByLocalePath((string) $row->locale, (string) $row->normalized_path);
+        }
+
+        return $deleted;
     }
 }

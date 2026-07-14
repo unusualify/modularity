@@ -4,8 +4,7 @@ namespace Modules\Cms\Observers;
 
 use Modules\Cms\Contracts\PublicUrlRegistryContract;
 use Modules\Cms\Entities\ParentSegment;
-use Modules\Cms\Entities\UrlRoute;
-use Modules\Cms\Services\CmsParentSegmentResolver;
+use Modules\Cms\Support\CmsPublicUrlRegistryCacheManager;
 use WeakMap;
 
 /**
@@ -24,6 +23,7 @@ final class ParentSegmentUrlRouteObserver
 
     public function __construct(
         private PublicUrlRegistryContract $registry,
+        private CmsPublicUrlRegistryCacheManager $registryCacheManager,
     ) {}
 
     public function saving(ParentSegment $parentSegment): void
@@ -33,42 +33,40 @@ final class ParentSegmentUrlRouteObserver
 
     public function created(ParentSegment $parentSegment): void
     {
-        if (! $this->resyncEnabled()) {
-            return;
+        if ($this->resyncEnabled()) {
+            foreach ($this->uniqueFqdns($this->currentTargetFqdns($parentSegment)) as $fqcn) {
+                $this->registry->syncPublicPageRoutesForAllModelsOfClass($fqcn);
+            }
         }
 
-        foreach ($this->uniqueFqdns($this->currentTargetFqdns($parentSegment)) as $fqcn) {
-            $this->registry->syncPublicPageRoutesForAllModelsOfClass($fqcn);
-        }
+        $this->invalidateParentSegmentRegistry();
     }
 
     public function updated(ParentSegment $parentSegment): void
     {
-        if (! $this->resyncEnabled()) {
-            return;
-        }
-
         if (! $parentSegment->wasChanged(self::SYNC_KEYS)) {
             return;
         }
 
-        foreach ($this->uniqueFqdns($this->updateResyncFqdns($parentSegment)) as $fqcn) {
-            $this->registry->syncPublicPageRoutesForAllModelsOfClass($fqcn);
+        if ($this->resyncEnabled()) {
+            foreach ($this->uniqueFqdns($this->updateResyncFqdns($parentSegment)) as $fqcn) {
+                $this->registry->syncPublicPageRoutesForAllModelsOfClass($fqcn);
+            }
         }
+
+        $this->invalidateParentSegmentRegistry();
     }
 
     public function deleted(ParentSegment $parentSegment): void
     {
-        if (! $this->resyncEnabled()) {
-            return;
+        if ($this->resyncEnabled()) {
+            $fqcn = trim((string) $parentSegment->target_model_class);
+            if ($fqcn !== '') {
+                $this->registry->syncPublicPageRoutesForAllModelsOfClass($fqcn);
+            }
         }
 
-        $fqcn = trim((string) $parentSegment->target_model_class);
-        if ($fqcn === '') {
-            return;
-        }
-
-        $this->registry->syncPublicPageRoutesForAllModelsOfClass($fqcn);
+        $this->invalidateParentSegmentRegistry();
     }
 
     private function stashPreviousTargetFqcnBeforeTargetChange(ParentSegment $parentSegment): void
@@ -165,5 +163,12 @@ final class ParentSegmentUrlRouteObserver
     private function resyncEnabled(): bool
     {
         return (bool) modularousConfig('cms_routing.resync_registry_after_parent_segments_change', true);
+    }
+
+    private function invalidateParentSegmentRegistry(): void
+    {
+        $this->registryCacheManager->invalidateParentSegmentRegistry(
+            (bool) modularousConfig('cms_routing.warm_front_route_registration_cache_on_invalidate', false)
+        );
     }
 }

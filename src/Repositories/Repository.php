@@ -33,7 +33,8 @@ abstract class Repository implements CacheableInterface, ModuleableInterface, Re
         Logic\Schema,
         Logic\CollationSelector,
         Logic\CacheableTrait,
-        Logic\TouchableEloquentModel;
+        Logic\TouchableEloquentModel,
+        Logic\ResourceCacheActionsTrait;
 
     /**
      * @var Model

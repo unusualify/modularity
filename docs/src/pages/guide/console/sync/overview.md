@@ -46,4 +46,4 @@ php artisan modularous:sync:translations
 ## Related
 
 - [Module Features](/guide/module-features/overview) — includes `HasStateable` and `HasTranslations`
-- [Database commands](../database/overview) — the prerequisite for sync
+- [Database commands](../migration/overview) — the prerequisite for sync

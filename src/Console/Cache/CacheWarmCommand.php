@@ -8,6 +8,7 @@ use Unusualify\Modularous\Console\BaseCommand;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Facades\ModularousCache;
 use Unusualify\Modularous\Module;
+use Unusualify\Modularous\Support\ModularousCacheLogger;
 
 class CacheWarmCommand extends BaseCommand
 {
@@ -19,11 +20,12 @@ class CacheWarmCommand extends BaseCommand
     protected $signature = 'modularous:cache:warm
                             {module? : The module name to warm cache for}
                             {routeName? : The route name to warm cache for}
-                            {--logChannel= : Log the cache warming process}
+                            {--logChannel= : Log channel for cache warming (default: modularous.cache.logging.channel)}
                             {--counts : Warm only count caches}
                             {--items : Warm only item caches}
                             {--formItems : Warm only form item caches}
                             {--formattedItems : Warm only formatted item caches}
+                            {--presentationItems : Warm only presentation item caches}
                             {--eager= : eager load items}
                             {--limit= : Limit the number of items to warm up}
                             ';
@@ -43,15 +45,37 @@ class CacheWarmCommand extends BaseCommand
         parent::__construct();
     }
 
-    protected function getLogChannel(): string
+    protected function getLogChannel(): ?string
     {
-        return $this->option('logChannel') ?? '';
+        $channel = $this->option('logChannel');
+
+        if (is_string($channel) && $channel !== '') {
+            return $channel;
+        }
+
+        return ModularousCacheLogger::resolveChannel();
+    }
+
+    protected function configureCacheLogging(): void
+    {
+        ModularousCacheLogger::setChannelOverride($this->option('logChannel') ?: null);
     }
 
     /**
      * Execute the console command.
      */
     public function handle(): int
+    {
+        $this->configureCacheLogging();
+
+        try {
+            return $this->executeWarm();
+        } finally {
+            ModularousCacheLogger::clearChannelOverride();
+        }
+    }
+
+    protected function executeWarm(): int
     {
         $moduleName = $this->argument('module');
         $routeName = $this->argument('routeName');
@@ -62,6 +86,19 @@ class CacheWarmCommand extends BaseCommand
 
             return 1;
         }
+
+        ModularousCacheLogger::info('cache.command.warm.start', [
+            'module' => $moduleName,
+            'route' => $routeName,
+            'logChannel' => $this->getLogChannel(),
+            'options' => [
+                'counts' => (bool) $this->option('counts'),
+                'items' => (bool) $this->option('items'),
+                'formItems' => (bool) $this->option('formItems'),
+                'formattedItems' => (bool) $this->option('formattedItems'),
+                'limit' => $this->option('limit'),
+            ],
+        ]);
 
         if ($moduleName) {
             $module = Modularous::find($moduleName);
@@ -99,6 +136,11 @@ class CacheWarmCommand extends BaseCommand
             $this->warmAllModulesCache();
         }
 
+        ModularousCacheLogger::info('cache.command.warm.complete', [
+            'module' => $moduleName,
+            'route' => $routeName,
+        ]);
+
         return 0;
     }
 
@@ -112,6 +154,8 @@ class CacheWarmCommand extends BaseCommand
             $type = 'formItems';
         } elseif ($this->option('formattedItems')) {
             $type = 'formattedItems';
+        } elseif ($this->option('presentationItems')) {
+            $type = 'presentationItems';
         }
 
         return $type;
@@ -155,6 +199,7 @@ class CacheWarmCommand extends BaseCommand
             case 'items':
             case 'formItems':
             case 'formattedItems':
+            case 'presentationItems':
                 $this->warmModuleItems($module, $routeName);
 
                 break;
@@ -208,13 +253,18 @@ class CacheWarmCommand extends BaseCommand
             $this->error("{$module->getName()} -> {$routeName}: Failed to warm caches: " . $e->getMessage(), verbosity: 'vv');
             $this->error($e->getTraceAsString(), verbosity: 'vvv');
             if (($logChannel = $this->getLogChannel())) {
-                // if log channel is exists, log the error
                 Log::channel($logChannel)->error('Cache warm COUNTS error: ' . $e->getMessage(), [
                     'module' => $module->getName(),
                     'routeName' => $routeName,
                     'exception' => $e->getTraceAsString(),
                 ]);
             }
+
+            ModularousCacheLogger::error('cache.command.warm.counts_failed', [
+                'module' => $module->getName(),
+                'route' => $routeName,
+                'message' => $e->getMessage(),
+            ]);
         }
     }
 
@@ -228,6 +278,7 @@ class CacheWarmCommand extends BaseCommand
             // Try to find and instantiate the repository for this module
             $cacheFormItem = ModularousCache::isEnabled($module->getName(), $routeName, 'formItem');
             $cacheFormattedItem = ModularousCache::isEnabled($module->getName(), $routeName, 'formattedItem');
+            $cachePresentationItem = ModularousCache::isEnabled($module->getName(), $routeName, 'presentationItem');
 
             if ($cacheFormItem) {
                 $this->line("  <fg=green>✓</> {$module->getName()} -> {$routeName}: Warming form item cache", verbosity: 'vv');
@@ -243,11 +294,16 @@ class CacheWarmCommand extends BaseCommand
 
             if ($type === 'formItems') {
                 $cacheFormattedItem = false;
+                $cachePresentationItem = false;
             } elseif ($type === 'formattedItems') {
                 $cacheFormItem = false;
+                $cachePresentationItem = false;
+            } elseif ($type === 'presentationItems') {
+                $cacheFormItem = false;
+                $cacheFormattedItem = false;
             }
 
-            if (! $cacheFormItem && ! $cacheFormattedItem) {
+            if (! $cacheFormItem && ! $cacheFormattedItem && ! $cachePresentationItem) {
                 return;
             }
 
@@ -273,12 +329,25 @@ class CacheWarmCommand extends BaseCommand
             }
 
             $count = 0;
-            $callback = function ($item, $key) use ($controller, &$count, $cacheFormItem, $cacheFormattedItem) {
+            $callback = function ($item, $key) use ($controller, &$count, $cacheFormItem, $cacheFormattedItem, $cachePresentationItem, $module, $routeName) {
                 if ($cacheFormItem) {
                     $controller->getFormItem($item->id, withoutDefaultScopes: true, item: $item);
                 }
                 if ($cacheFormattedItem) {
                     $controller->getFormattedIndexItem($item);
+                }
+                if ($cachePresentationItem) {
+                    ModularousCache::refreshModelCaches($item, [
+                        'presentationItem' => true,
+                        'counts' => false,
+                        'index' => false,
+                        'record' => false,
+                        'formItem' => false,
+                        'formattedItem' => false,
+                    ], [
+                        'moduleName' => $module->getName(),
+                        'moduleRouteName' => $routeName,
+                    ]);
                 }
                 $count++;
             };
@@ -295,13 +364,18 @@ class CacheWarmCommand extends BaseCommand
             $this->error($e->getTraceAsString(), verbosity: 'vvv');
 
             if (($logChannel = $this->getLogChannel())) {
-                // if log channel is exists, log the error
                 Log::channel($logChannel)->error('Cache warm ITEMS error: ' . $e->getMessage(), [
                     'module' => $module->getName(),
                     'routeName' => $routeName,
                     'exception' => $e->getTraceAsString(),
                 ]);
             }
+
+            ModularousCacheLogger::error('cache.command.warm.items_failed', [
+                'module' => $module->getName(),
+                'route' => $routeName,
+                'message' => $e->getMessage(),
+            ]);
         }
     }
 

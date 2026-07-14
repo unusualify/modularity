@@ -5,7 +5,7 @@ namespace Unusualify\Modularous\Entities;
 use Illuminate\Database\Eloquent\Model as BaseModel;
 use Unusualify\Modularous\Entities\Traits\HasFiles;
 use Unusualify\Modularous\Entities\Traits\HasImages;
-use Unusualify\Modularous\Entities\Traits\HasPresenter;
+use Unusualify\Modularous\Entities\Traits\Secondary\HasPresenter;
 use Unusualify\Modularous\Entities\Traits\Secondary\HasRelated;
 
 class Block extends BaseModel

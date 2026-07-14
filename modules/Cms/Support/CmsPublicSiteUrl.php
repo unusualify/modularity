@@ -50,6 +50,47 @@ final class CmsPublicSiteUrl
     }
 
     /**
+     * Root URL (scheme + host, no trailing slash) for public CMS link generation.
+     */
+    public static function resolvePublicSiteRootUrl(): string
+    {
+        $host = self::resolvePublicSiteHost();
+        if ($host !== '') {
+            return self::resolvePublicSiteScheme() . '://' . $host;
+        }
+
+        return rtrim((string) config('app.url', 'http://localhost'), '/');
+    }
+
+    /**
+     * Force Laravel's URL generator to the public front base for the duration of {@code $callback}.
+     *
+     * Used when rendering {@see CmsPublicPresentationItemCache} HTML during admin warmup or cache miss
+     * so {@code asset()}, {@code url()}, and {@code route()} do not inherit the admin request host.
+     *
+     * @template T
+     *
+     * @param callable(): T $callback
+     * @return T
+     */
+    public static function runWithForcedPublicRootUrl(callable $callback): mixed
+    {
+        $rootUrl = self::resolvePublicSiteRootUrl();
+        $scheme = parse_url($rootUrl, PHP_URL_SCHEME);
+        $scheme = is_string($scheme) && $scheme !== '' ? $scheme : self::resolvePublicSiteScheme();
+
+        URL::forceRootUrl($rootUrl);
+        URL::forceScheme($scheme);
+
+        try {
+            return $callback();
+        } finally {
+            URL::forceRootUrl(null);
+            URL::forceScheme(null);
+        }
+    }
+
+    /**
      * Absolute URL for a path that {@see CmsFrontPath::publicBrowserPathForLocaleAndRegistryPath()} would produce.
      */
     public static function absoluteUrlForPath(string $path): string

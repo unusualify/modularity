@@ -1,67 +1,73 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Unusualify\Modularous\Tests\Traits;
 
+use Illuminate\Database\Eloquent\Model;
+use Mockery;
+use Unusualify\Modularous\Repositories\Repository;
 use Unusualify\Modularous\Tests\TestCase;
 use Unusualify\Modularous\Traits\Moduleable;
 
 class ModuleableTest extends TestCase
 {
-    public function test_get_module_name_returns_explicit_module_name()
+    public function test_get_module_name_from_explicit_setter(): void
     {
-        $tester = new class
-        {
-            use Moduleable;
-        };
-        $tester->setModuleName('ExplicitModule');
-
-        $this->assertEquals('ExplicitModule', $tester->getModuleName());
-    }
-
-    public function test_get_module_name_from_class_basename_when_no_module_in_namespace()
-    {
-        $tester = new class
+        $subject = new class
         {
             use Moduleable;
         };
 
-        $result = $tester->getModuleName();
-        $this->assertNotNull($result);
-        $this->assertIsString($result);
+        $this->assertSame('Blog', $subject->setModuleName('Blog')->getModuleName());
     }
 
-    public function test_set_module_name_returns_self_and_sets_value()
+    public function test_get_module_name_from_repository(): void
     {
-        $tester = new class
+        $model = new class extends Model
         {
-            use Moduleable;
+            protected $table = 'items';
         };
 
-        $result = $tester->setModuleName('CustomModule');
-        $this->assertSame($tester, $result);
-        $this->assertEquals('CustomModule', $tester->getModuleName());
-    }
+        $repository = Mockery::mock(Repository::class);
+        $repository->shouldReceive('getModel')->andReturn($model);
 
-    public function test_get_route_name_returns_explicit_route_name()
-    {
-        $tester = new class
+        $subject = new class($repository)
         {
             use Moduleable;
-        };
-        $tester->setRouteName('ExplicitRoute');
 
-        $this->assertEquals('ExplicitRoute', $tester->getRouteName());
+            public function __construct(public Repository $repository) {}
+        };
+
+        $this->assertSame(class_basename($model), $subject->getModuleName());
     }
 
-    public function test_set_route_name_returns_self_and_sets_value()
+    public function test_get_module_name_from_model_property(): void
     {
-        $tester = new class
+        $model = new class extends Model
+        {
+            protected $table = 'articles';
+        };
+
+        $subject = new class($model)
         {
             use Moduleable;
+
+            public function __construct(public Model $model) {}
         };
 
-        $result = $tester->setRouteName('CustomRoute');
-        $this->assertSame($tester, $result);
-        $this->assertEquals('CustomRoute', $tester->getRouteName());
+        $this->assertSame(class_basename($model), $subject->getModuleName());
     }
+
+    public function test_get_route_name_from_request_suffix(): void
+    {
+        $request = new PostStoreRequest;
+
+        $this->assertSame('PostStore', $request->getRouteName());
+    }
+}
+
+class PostStoreRequest
+{
+    use Moduleable;
 }

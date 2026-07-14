@@ -4,12 +4,41 @@ namespace Unusualify\Modularous\Tests\Services;
 
 use TestModules\TestModule\Entities\Item;
 use Unusualify\Modularous\Exceptions\ModuleNotFoundException;
+use Unusualify\Modularous\Facades\Modularous;
+use Unusualify\Modularous\Module;
 use Unusualify\Modularous\Repositories\Repository;
 use Unusualify\Modularous\Services\Connector;
 use Unusualify\Modularous\Tests\TestModulesCase;
 
 class ConnectorTest extends TestModulesCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->ensureConnectorEndpointRoute();
+    }
+
+    private function ensureConnectorEndpointRoute(): void
+    {
+        $module = Modularous::find('TestModule');
+
+        if (! $module instanceof Module) {
+            return;
+        }
+
+        if ($this->moduleRouteActionIsAvailable($module, 'Item', 'index')) {
+            return;
+        }
+
+        $this->registerStubModuleRouteAction($module, 'Item', 'index');
+
+        $this->assertTrue(
+            $this->moduleRouteActionIsAvailable($module, 'Item', 'index'),
+            'Unable to register TestModule Item index route required by Connector endpoint tests.'
+        );
+    }
+
     /** @test */
     public function it_constructs_without_connector()
     {

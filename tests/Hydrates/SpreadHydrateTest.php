@@ -49,4 +49,28 @@ class SpreadHydrateTest extends TestCase
         $this->assertEquals(12, $result['col']['cols']);
         $this->assertArrayHasKey('reservedKeys', $result);
     }
+
+    public function test_spread_hydrate_without_module_context_uses_defaults()
+    {
+        $input = [
+            'type' => 'spread',
+        ];
+
+        $result = (new SpreadHydrate($input, null, null, true))->render();
+
+        $this->assertSame('spread_payload', $result['name']);
+        $this->assertSame([], $result['reservedKeys']);
+    }
+
+    public function test_spread_hydrate_enables_scrollable_flag()
+    {
+        $input = [
+            'type' => 'spread',
+            'scrollable',
+        ];
+
+        $result = (new SpreadHydrate($input, null, null, true))->render();
+
+        $this->assertTrue($result['scrollable']);
+    }
 }

@@ -67,4 +67,4 @@ php artisan modularous:make:repository:trait Filterable
 
 - [make:model:trait](./model-trait) — create an entity trait
 - [make:feature](./feature) — wizard that can call this command
-- [System Reference](/system-reference/backend/console/make#makerepositoryrtraitcommand)
+- [System Reference](/guide/console/make/overview)

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
-import ConfigurableCard from '../../src/js/components/ConfigurableCard.vue'
+import ConfigurableCard from '../../src/js/components/shared/ConfigurableCard.vue'
 import vuetify from '../../src/js/plugins/vuetify'
 import UEConfig from '../../src/js/plugins/UEConfig'
 

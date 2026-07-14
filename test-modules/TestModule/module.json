@@ -1,1 +1,12 @@
-{"name":"TestModule","alias":"test_module","description":"","keywords":[],"priority":0,"providers":[],"files":[]}
+{
+    "name": "TestModule",
+    "alias": "test_module",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [],
+    "aliases": {
+        "TestModuleItemAlias": "TestModules\\TestModule\\Entities\\Item"
+    },
+    "files": []
+}

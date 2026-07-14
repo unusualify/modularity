@@ -3,7 +3,6 @@
 namespace Unusualify\Modularous\Http\Controllers\Traits;
 
 use Illuminate\Support\Facades\Config;
-use Unusualify\Modularous\Entities\Traits\HasPosition;
 
 trait ManageTable
 {
@@ -13,7 +12,8 @@ trait ManageTable
         Table\TableRows,
         Table\TableBulkActions,
         Table\TableActions,
-        Table\TableItem;
+        Table\TableItem,
+        Table\TableDraggable;
 
     /**
      * @param Application $app
@@ -41,7 +41,6 @@ trait ManageTable
         $this->defaultTableAttributes = (array) Config::get(modularousBaseKey() . '.default_table_attributes');
 
         $this->tableAttributes = array_merge_recursive_preserve($this->getTableAttributes(), $this->tableAttributes ?? []);
-
     }
 
     public function setupDefaultFilters()
@@ -68,7 +67,7 @@ trait ManageTable
     public function getDefaultTableOptions()
     {
         return [
-            'itemsPerPage' => $this->getTableAttribute('itemsPerPage') ?? $this->perPage ?? 10,
+            'itemsPerPage' => $this->resolveIndexItemsPerPage(),
             'page' => 1,
             'search' => '',
             'sortBy' => [],
@@ -85,7 +84,9 @@ trait ManageTable
     {
         return array_merge($this->getDefaultTableOptions(), [
             'page' => request()->has('page') ? intval(request()->query('page')) : 1,
-            'itemsPerPage' => request()->has('itemsPerPage') ? intval(request()->query('itemsPerPage')) : ($this->getTableAttribute('itemsPerPage') ?? $this->perPage ?? 10),
+            'itemsPerPage' => request()->has('itemsPerPage')
+                ? intval(request()->query('itemsPerPage'))
+                : $this->resolveIndexItemsPerPage(),
             'sortBy' => request()->has('sortBy') ? [request()->get('sortBy')] : [],
             'groupBy' => [],
             'search' => '',
@@ -97,22 +98,14 @@ trait ManageTable
     }
 
     /**
-     * Get the table draggable options
-     *
-     * @return array
+     * Resolve itemsPerPage for index JSON + default table options.
      */
-    protected function getTableDraggableOptions()
+    protected function resolveIndexItemsPerPage(): int
     {
-        if ($this->repository) {
-            return [
-                'draggable' => classHasTrait($this->repository->getModel(), HasPosition::class),
-                'orderKey' => 'position',
-            ];
+        if ($this->shouldUseUnpaginatedDraggableIndex()) {
+            return -1;
         }
 
-        return [
-            'draggable' => false,
-        ];
-
+        return (int) ($this->getTableAttribute('itemsPerPage') ?? $this->perPage ?? 10);
     }
 }

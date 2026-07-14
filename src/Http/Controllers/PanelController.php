@@ -21,7 +21,6 @@ use Unusualify\Modularous\Http\Controllers\Traits\ManageAppends;
 use Unusualify\Modularous\Http\Controllers\Traits\ManageAuthorization;
 use Unusualify\Modularous\Http\Controllers\Traits\ManageScopes;
 use Unusualify\Modularous\Http\Controllers\Traits\ManageWiths;
-use Unusualify\Modularous\Transformers;
 
 abstract class PanelController extends CoreController implements CacheableInterface
 {
@@ -474,8 +473,14 @@ abstract class PanelController extends CoreController implements CacheableInterf
             $orders = $this->request->get('orders', []);
             $perPage = $this->request->get('itemsPerPage', $this->perPage);
 
-            return $this->getTransformer(
-                $this->repository->list(column: $column, with: $with, scopes: $scopes, orders: $orders, perPage: $perPage, appends: $appends, forcePagination: true)
+            return $this->repository->list(
+                column: $column,
+                with: $with,
+                scopes: $scopes,
+                orders: $orders,
+                perPage: $perPage,
+                appends: $appends,
+                forcePagination: true
             );
         }
 
@@ -483,7 +488,7 @@ abstract class PanelController extends CoreController implements CacheableInterf
         $this->addFormAppends();
         $paginator = $this->getIndexItems(with: $with, scopes: $scopes, appends: $appends);
 
-        return $this->getTransformer($this->getFormattedIndexItems($paginator));
+        return $this->getFormattedIndexItems($paginator);
     }
 
     /**
@@ -571,31 +576,6 @@ abstract class PanelController extends CoreController implements CacheableInterf
         }
 
         return implode('.', $routePrefixes);
-    }
-
-    /**
-     * @return \Unusualify\Modularous\Transformers\
-     */
-    protected function getTransformer($data = [])
-    {
-
-        if (! ($concrete = $this->getTransformerClass())) {
-            return $data;
-        }
-
-        return App::makeWith($concrete, ['resource' => $data]);
-    }
-
-    /**
-     * @return Transformers
-     */
-    protected function getTransformerClass()
-    {
-        if (@class_exists($class = "$this->namespace\Transformers\\" . $this->modelName . 'Resource')) {
-            return $class;
-        }
-
-        return null;
     }
 
     /**
@@ -771,11 +751,11 @@ abstract class PanelController extends CoreController implements CacheableInterf
      */
     protected function getIndexItems($with = [], $scopes = [], $appends = [], $forcePagination = false)
     {
-        $perPage = $this->request->get('itemsPerPage') ?? $this->getTableAttribute('itemsPerPage') ?? $this->perPage ?? 10;
-
-        if (! $this->request->ajax()) {
-            $perPage = 0;
-        }
+        $perPage = method_exists($this, 'resolveIndexQueryPerPage')
+            ? $this->resolveIndexQueryPerPage()
+            : ($this->request->ajax()
+                ? (int) ($this->request->get('itemsPerPage') ?? $this->perPage ?? 10)
+                : 0);
 
         $exceptIds = $this->request->get('exceptIds') ?? [];
 

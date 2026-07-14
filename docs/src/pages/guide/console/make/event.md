@@ -90,4 +90,4 @@ php artisan modularous:make:event OrderShipped --should-dispatch-after-commit
 ## See also
 
 - [make:listener](./listener) — create the matching listener
-- [System Reference](/system-reference/backend/console/make#makeeventcommand)
+- [System Reference](/guide/console/make/overview)

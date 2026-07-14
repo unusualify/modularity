@@ -55,4 +55,4 @@ php artisan modularous:make:controller:front Blog Post
 
 - [make:controller](./controller) — admin-panel variant
 - [make:controller:api](./controller-api) — API variant
-- [System Reference](/system-reference/backend/console/make#makecontrollerfrontcommand)
+- [System Reference](/guide/console/make/overview)

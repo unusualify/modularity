@@ -300,16 +300,24 @@ trait MethodTransformers
         if (! $noSerialization) {
             $fields = $object->attributesToArray();
         } else {
-            $fields = array_reduce($chunkedInputs, function ($acc, $item) use ($object) {
+            $fillable = $object->getFillable();
+            $fields = array_reduce($chunkedInputs, function ($acc, $item) use ($object, $fillable) {
+                $found = false;
                 switch ($item['type']) {
                     case 'text':
                     case 'textarea':
                     case 'input-date':
+                        $found = true;
                         $acc[$item['name']] = $object->{$item['name']} ?? null;
 
                         break;
                     default:
 
+                }
+
+                if (! $found && in_array($item['name'], $fillable)) {
+                    $found = true;
+                    $acc[$item['name']] = $object->{$item['name']} ?? null;
                 }
 
                 return $acc;

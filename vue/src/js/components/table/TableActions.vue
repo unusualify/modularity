@@ -1,6 +1,5 @@
 <script setup>
-  import { computed } from 'vue'
-  import { useAttrs, useSlots } from 'vue'
+  import { computed, useAttrs, useSlots, watch } from 'vue'
   import { useItemActions } from '@/hooks'
   import useGenerate from '@/hooks/utils/useGenerate.js'
   import useBadge from '@/hooks/utils/useBadge.js'
@@ -12,7 +11,7 @@
     },
   })
 
-  const emits = defineEmits(['actionComplete'])
+  const emit = defineEmits(['actionComplete', 'update:loading'])
   const attrs = useAttrs()
   const slots = useSlots()
 
@@ -35,11 +34,29 @@
 
   const { isBadge, badgeProps } = useBadge()
 
-  const { handleAction, allActions, hasActions } = useItemActions(props, {
-    ...attrs,
-    ...slots,
-    ...emits,
+  const { handleAction, allActions, hasActions, loading, isActionLoading } = useItemActions(props, {
+    attrs,
+    slots,
+    emit,
     actionItem: props.modelValue
+  })
+
+  watch(loading, (value) => {
+    emit('update:loading', value)
+  }, { immediate: true })
+
+  const getActionButtonProps = (action, key, tooltipProps = {}) => ({
+    ...buttonsProps.value[key],
+    ...tooltipProps,
+    loading: isActionLoading(action),
+    disabled: (buttonsProps.value[key]?.disabled ?? false) || loading.value,
+  })
+
+  const getModalButtonProps = (action, modalActivatorScope, tooltipProps = {}) => ({
+    ...generateButtonProps(action),
+    ...modalActivatorScope.props,
+    ...tooltipProps,
+    disabled: (action.disabled ?? action.componentProps?.disabled ?? false) || loading.value,
   })
 </script>
 
@@ -74,19 +91,11 @@
                 :text-color="action.badgeTextColor ?? 'white'"
               >
                 <v-btn
-                  v-bind="{
-                    ...generateButtonProps(action),
-                    ...modalActivatorScope.props,
-                    ...props
-                  }"
+                  v-bind="getModalButtonProps(action, modalActivatorScope, props)"
                 />
               </v-badge>
               <v-btn v-else
-                v-bind="{
-                  ...generateButtonProps(action),
-                  ...modalActivatorScope.props,
-                  ...props
-                }"
+                v-bind="getModalButtonProps(action, modalActivatorScope, props)"
               />
             </template>
 
@@ -125,12 +134,13 @@
               :text-color="action.badgeTextColor ?? 'white'"
             >
               <v-btn
-                v-bind="{...buttonsProps[key], ...props}"
+                v-bind="getActionButtonProps(action, key, props)"
+                @click="handleAction(action)"
               />
             </v-badge>
             <v-btn v-else
-              v-bind="{...buttonsProps[key], ...props}"
-              @click="() => console.log(buttonsProps[key])"
+              v-bind="getActionButtonProps(action, key, props)"
+              @click="handleAction(action)"
             />
           </template>
         </template>

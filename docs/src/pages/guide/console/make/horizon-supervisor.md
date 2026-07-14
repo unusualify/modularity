@@ -80,4 +80,4 @@ sudo supervisorctl start {programName}
 
 ## See also
 
-- [System Reference](/system-reference/backend/console/make#makehorizonsupervisorcommand)
+- [System Reference](/guide/console/make/overview)

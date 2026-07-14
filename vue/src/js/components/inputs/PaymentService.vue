@@ -98,10 +98,10 @@
         <template v-if="isCreditCardForm">
           <template v-if="selectedCurrency.has_built_in_form">
             <v-progress-circular v-if="builtInFormLoading" indeterminate />
-            <!-- <ue-revolut-checkout v-else
+            <!-- <RevolutCheckout v-else
               v-bind="builtInFormAttributes"
             /> -->
-            <ue-revolut-checkout-modal v-else
+            <RevolutCheckoutModal v-else
               @cancel="runBuiltInForm"
               @success="handlePaymentSuccess"
               v-bind="builtInFormAttributes"
@@ -129,7 +129,7 @@
                   </v-btn>
                 </div>
               </template>
-            </ue-revolut-checkout-modal>
+            </RevolutCheckoutModal>
           </template>
           <CreditCardForm v-else
             v-model:cardName="localCreditCard.card_name"
@@ -205,12 +205,16 @@ import _ from 'lodash-es';
 import { getModel, getSchema } from '@/utils/getFormData.js'
 import { makeInputProps, makeInputEmits, useCurrency } from '@/hooks';
 import CreditCardForm from '@/components/inputs/CreditCardForm';
+import RevolutCheckoutModal from '__components/payment/RevolutCheckoutModal.vue'
+import RevolutCheckout from '__components/payment/RevolutCheckout.vue'
 
 export default {
   name: 'PaymentService',
 
   components: {
-    CreditCardForm
+    CreditCardForm,
+    RevolutCheckoutModal,
+    RevolutCheckout
   },
 
   emits: [

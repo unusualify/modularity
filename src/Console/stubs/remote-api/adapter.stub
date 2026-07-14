@@ -1,0 +1,30 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Modules\$MODULE$\RemoteApi;
+
+use Unusualify\Modularous\Services\RemoteApi\AbstractRemoteApiAdapter;
+use Unusualify\Modularous\Services\RemoteApi\Contracts\RemoteApiDtoInterface;
+
+class $ROUTE$RemoteApiAdapter extends AbstractRemoteApiAdapter
+{
+    /**
+     * @param array<string, mixed> $attributes
+     * @param array<string, mixed> $existingAttributes
+     *
+     * @return array<string, mixed>
+     */
+    protected function afterMap(array $attributes, RemoteApiDtoInterface $dto, array $existingAttributes = []): array
+    {
+        return parent::afterMap($attributes, $dto, $existingAttributes);
+    }
+
+    /**
+     * @param array<string, mixed> $row
+     */
+    protected function transformField(string $column, mixed $value, array $row): mixed
+    {
+        return parent::transformField($column, $value, $row);
+    }
+}

@@ -7,8 +7,10 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Routing\Controller as LaravelController;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Response;
@@ -188,6 +190,33 @@ abstract class CoreController extends LaravelController implements ModuleableInt
 
         // TODO if repository is not exists
         return TwillCapsules::getCapsuleForModel($model)->getRepositoryClass();
+    }
+
+    /**
+     * @return \Unusualify\Modularity\Transformers\
+     */
+    protected function getTransformer($data = [])
+    {
+        if (! ($concrete = $this->getTransformerClass())) {
+            return $data;
+        }
+        if ($data instanceof AbstractPaginator || $data instanceof Collection) {
+            return $concrete::collection($data);
+        }
+
+        return App::makeWith($concrete, ['resource' => $data]);
+    }
+
+    /**
+     * @return Transformers
+     */
+    protected function getTransformerClass()
+    {
+        if (@class_exists($class = "$this->namespace\Transformers\\" . $this->modelName . 'Resource')) {
+            return $class;
+        }
+
+        return null;
     }
 
     /**

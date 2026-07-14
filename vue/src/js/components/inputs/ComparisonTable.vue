@@ -80,18 +80,12 @@
 
 <script>
   import { useInput, makeInputProps, makeInputEmits } from '@/hooks'
-  import Table from '../Table.vue'
   import { find, toUpper, isNumber, isString, get, isNaN } from 'lodash-es';
-  import { RecursiveStuff } from '@/utils/recursiveStuff';
   import { checkItemConditions } from '@/utils/itemConditions';
-
 
   export default {
     name: 'v-input-comparison-table',
     emits: [...makeInputEmits],
-    components: {
-      Table
-    },
     props: {
       ...makeInputProps(),
       schema: {

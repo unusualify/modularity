@@ -36,7 +36,7 @@ class ResetPasswordNotificationTest extends TestCase
         $property->setValue($callback);
 
         $notification = new ResetPasswordNotification('test-token');
-        $notifiable = $this->createMockNotifiable();
+        $notifiable = $this->create_mock_notifiable();
 
         $result = $notification->toMail($notifiable);
 
@@ -80,7 +80,7 @@ class ResetPasswordNotificationTest extends TestCase
             });
 
         $notification = new ResetPasswordNotification('reset-token');
-        $notifiable = $this->createMockNotifiable('John Doe', 'john@example.com');
+        $notifiable = $this->create_mock_notifiable('John Doe', 'john@example.com');
 
         $mailMessage = $notification->toMail($notifiable);
 
@@ -117,7 +117,7 @@ class ResetPasswordNotificationTest extends TestCase
             });
 
         $notification = new ResetPasswordNotification('token');
-        $notifiable = $this->createMockNotifiable('Jane Smith', 'jane@example.com');
+        $notifiable = $this->create_mock_notifiable('Jane Smith', 'jane@example.com');
 
         $notification->toMail($notifiable);
 
@@ -145,7 +145,7 @@ class ResetPasswordNotificationTest extends TestCase
     //         });
 
     //     $notification = new ResetPasswordNotification('token');
-    //     $notifiable = $this->createMockNotifiable('User', 'user@test.com');
+    //     $notifiable = $this->create_mock_notifiable('User', 'user@test.com');
 
     //     $notification->toMail($notifiable);
 

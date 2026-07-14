@@ -12,7 +12,10 @@ class RemoveModuleCommand extends BaseCommand
      *
      * @var string
      */
-    protected $signature = 'modularous:remove:module {module}';
+    protected $signature = 'modularous:remove:module
+                            {module : The name of the module to remove}
+                            {--force : Force the command to run.}
+                            {--dry-run : Dry run the command.}';
 
     /**
      * The console command description.
@@ -34,17 +37,29 @@ class RemoveModuleCommand extends BaseCommand
      */
     public function handle(): int
     {
-        Modularous::disableCache();
-
+        $isProduction = $this->laravel->isProduction();
+        $force = $this->option('force');
+        $dryRun = $this->option('dry-run');
         $moduleName = $this->argument('module');
 
-        $module = Modularous::find($moduleName);
+        if ($isProduction && ! $force && ! $this->confirm('Are you sure you want to remove the module?')) {
+            $this->info('Module removal cancelled.');
 
-        // $this->call('optimize:clear');
+            return 0;
+        }
+
+        Modularous::disableCache();
 
         $this->call('modularous:migrate:rollback', [
             'module' => $moduleName,
+            '--pretend' => $dryRun,
         ]);
+
+        if ($dryRun) {
+            $this->info("Module [{$moduleName}] would be removed completely!");
+
+            return 0;
+        }
 
         Modularous::deleteModule($moduleName);
 

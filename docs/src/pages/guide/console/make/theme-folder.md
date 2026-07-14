@@ -79,4 +79,4 @@ resources/vendor/modularous/themes/mytheme/
 ## See also
 
 - [make:theme](./theme) — promote a custom theme to built-in
-- [System Reference](/system-reference/backend/console/make#makethemefoldercommand)
+- [System Reference](/guide/console/make/overview)

@@ -85,4 +85,4 @@ php artisan modularous:make:vue:test VInputColorPicker component --importDir=inp
 - [make:vue:input](./vue-input) — create the Vue component being tested
 - [make:laravel:test](./laravel-test) — create a PHPUnit test instead
 - [make:feature](./feature) — wizard that optionally creates both
-- [System Reference](/system-reference/backend/console/make#makevuetestcommand)
+- [System Reference](/guide/console/make/overview)

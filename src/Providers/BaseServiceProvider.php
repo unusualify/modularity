@@ -18,6 +18,7 @@ use Illuminate\Support\Str;
 use Nwidart\Modules\Contracts\RepositoryInterface;
 use Torann\GeoIP\Facades\GeoIP;
 use Unusualify\Modularous\Brokers\RegisterBrokerManager;
+use Unusualify\Modularous\Contracts\Cache\UrlPresentationCacheStoreInterface;
 use Unusualify\Modularous\Contracts\CurrencyProviderInterface;
 use Unusualify\Modularous\Exceptions\AuthConfigurationException;
 use Unusualify\Modularous\Facades\ModularousVite;
@@ -39,6 +40,10 @@ use Unusualify\Modularous\Services\FilepondManager;
 use Unusualify\Modularous\Services\MigrationBackup;
 use Unusualify\Modularous\Services\ModularousCacheService;
 use Unusualify\Modularous\Services\RedirectService;
+use Unusualify\Modularous\Services\RemoteApi\RemoteApiConnectorFactory;
+use Unusualify\Modularous\Services\RemoteApi\RemoteApiConnectorResolver;
+use Unusualify\Modularous\Services\RemoteApi\RemoteApiRateLimiter;
+use Unusualify\Modularous\Services\RemoteApi\RemoteApiSynchronizer;
 use Unusualify\Modularous\Services\UtmParameters;
 use Unusualify\Modularous\Services\View\ModularousNavigation;
 use Unusualify\Modularous\Support\CommandDiscovery;
@@ -169,6 +174,11 @@ class BaseServiceProvider extends ServiceProvider
 
         $this->app->singleton('modularous.navigation', ModularousNavigation::class);
 
+        $this->app->singleton(RemoteApiConnectorResolver::class);
+        $this->app->singleton(RemoteApiRateLimiter::class);
+        $this->app->singleton(RemoteApiConnectorFactory::class);
+        $this->app->singleton(RemoteApiSynchronizer::class);
+
         $this->app->singleton('model.relation.namespace', function () {
             return "Illuminate\Database\Eloquent\Relations";
         });
@@ -216,6 +226,10 @@ class BaseServiceProvider extends ServiceProvider
 
         $this->app->singleton('modularous.cache', function (Application $app) {
             return new ModularousCacheService;
+        });
+
+        $this->app->singleton(UrlPresentationCacheStoreInterface::class, function (Application $app) {
+            return $app->make('modularous.cache')->getUrlPresentationCacheStore();
         });
 
         $this->app->singleton('migration.backup', function (Application $app) {
@@ -644,5 +658,22 @@ class BaseServiceProvider extends ServiceProvider
             'level' => env('MODULAROUS_NOTIFICATION_FAILURE_LOG_LEVEL', 'error'),
             'days' => 14,
         ]);
+        $this->app['config']->set('logging.channels.modularous-remote-api', [
+            'driver' => 'daily',
+            'path' => storage_path('logs/modularous-remote-api.log'),
+            'level' => env('MODULAROUS_REMOTE_API_LOG_LEVEL', 'info'),
+            'days' => env('LOG_DAILY_DAYS', 14),
+            'replace_placeholders' => true,
+        ]);
+
+        if (! config('logging.channels.modularous-resource-cache')) {
+            $this->app['config']->set('logging.channels.modularous-resource-cache', [
+                'driver' => 'daily',
+                'path' => storage_path('logs/modularous-resource-cache.log'),
+                'level' => env('LOG_LEVEL', 'info'),
+                'days' => env('LOG_DAILY_DAYS', 10),
+                'replace_placeholders' => true,
+            ]);
+        }
     }
 }

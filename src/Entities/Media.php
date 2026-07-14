@@ -91,7 +91,7 @@ class Media extends Model
             'height' => $this->height,
             'tags' => $this->tags->map(function ($tag) {
                 return $tag->name;
-            }),
+            })->values()->all(),
             'deleteUrl' => $this->canDeleteSafely() ? moduleRoute('media', $routeNamePrefix . 'media-library', 'destroy', ['media' => $this->id]) : null,
             'updateUrl' => route(Route::hasAdmin('media-library.media.single-update')),
             'updateBulkUrl' => route(Route::hasAdmin('media-library.media.bulk-update')),

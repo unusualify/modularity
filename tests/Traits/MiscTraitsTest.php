@@ -119,12 +119,12 @@ class MiscTraitsTest extends TestCase
 
             public function run()
             {
-                return $this->traitsMethods('testMethod');
+                return $this->traitsMethods('test_method');
             }
         };
 
         $methods = $tester->run();
-        $this->assertContains('testMethodTraitify', $methods);
+        $this->assertContains('test_method_traitify', $methods);
     }
 
     /** @test */

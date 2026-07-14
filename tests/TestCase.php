@@ -6,7 +6,10 @@ use Astrotomic\Translatable\TranslatableServiceProvider;
 use Illuminate\Foundation\Application;
 use JoeDixon\Translation\TranslationServiceProvider;
 use Modules\SystemPayment\Entities\Payment;
+use Nwidart\Modules\Contracts\ActivatorInterface;
+use Nwidart\Modules\FileRepository;
 use Nwidart\Modules\LaravelModulesServiceProvider;
+use Nwidart\Modules\ModuleManifest;
 use Oobook\Database\Eloquent\ManageEloquentServiceProvider;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Permission\PermissionServiceProvider;
@@ -15,6 +18,7 @@ use Unusualify\Modularous\Entities\Enums\PaymentStatus;
 use Unusualify\Modularous\Entities\Observers\PriceableObserver;
 use Unusualify\Modularous\LaravelServiceProvider;
 use Unusualify\Modularous\Providers\ModularousProvider;
+use Unusualify\Modularous\Tests\Support\IsolatedTestModules;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
@@ -101,12 +105,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         $app['config']->set('modularous.base_key', 'modularous');
         $app['config']->set('modularous.stubs.path', realpath(__DIR__ . '/../src/Console/stubs'));
 
-        $statusesFile = 'modules_statuses.json';
-        if (getenv('TEST_TOKEN')) {
-            $statusesFile = 'modules_statuses_' . getenv('TEST_TOKEN') . '.json';
-        } elseif (function_exists('getmypid')) {
-            $statusesFile = 'modules_statuses_' . getmypid() . '.json';
-        }
+        $statusesFile = 'modules_statuses_' . IsolatedTestModules::testTokenSuffix() . '.json';
         $statusFilePath = base_path($statusesFile);
 
         $app['files']->put($statusFilePath, json_encode([
@@ -120,11 +119,12 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         $app['config']->set('modules.activators.modularous', [
             'class' => ModularousActivator::class,
             'statuses-file' => $statusFilePath,
-            'cache-key' => 'modularous.activator.installed',
+            'cache-key' => 'modularous.activator.installed.' . IsolatedTestModules::testTokenSuffix(),
             'cache-lifetime' => 604800,
         ]);
 
         $app['config']->set('modules.activator', 'modularous');
+        $this->rebindModularousActivator($app);
 
         $app['config']->set('modularous.app_url', 'http://localhost');
         $app['config']->set('modularous.admin_app_url', '');
@@ -198,5 +198,19 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     public function moduleDirectory(string $moduleName): string
     {
         return realpath("{$this->modulesPath}/{$moduleName}");
+    }
+
+    /**
+     * nwidart resolves ActivatorInterface during provider register (via ModuleManifest),
+     * before getEnvironmentSetUp can switch modules.activator to modularous. Forget the
+     * early FileActivator singleton so later resolves use the test activator config.
+     */
+    protected function rebindModularousActivator($app): void
+    {
+        $app->forgetInstance(ActivatorInterface::class);
+        $app->forgetInstance(ModuleManifest::class);
+
+        $modulesProperty = new \ReflectionProperty(FileRepository::class, 'modules');
+        $modulesProperty->setValue(null, null);
     }
 }

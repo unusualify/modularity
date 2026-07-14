@@ -86,4 +86,4 @@ Define `formatter` on a header object in your module config:
 
 ## See Also
 
-- [Data Tables](/guide/components/data-tables) — how formatters are declared in the table config
+- [Data Tables](/guide/components/shared/data-tables) — how formatters are declared in the table config

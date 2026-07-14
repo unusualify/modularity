@@ -42,7 +42,7 @@ import Transition from '@/directives/transition'
 import commonMethods from '@/utils/commonMethods'
 import { ALERT } from '@/store/mutations'
 
-const includeGlobalComponents = import.meta.glob('__components/*.vue', {eager: true})
+const includeGlobalComponents = import.meta.glob('__components/shared/*.vue', {eager: true})
 const includeIteratorComponents = import.meta.glob('__components/data_iterators/*.vue', {eager: true})
 const includeLayouts = import.meta.glob('__components/layouts/*.vue', {eager:true})
 const includeFormInputs = import.meta.glob('__components/inputs/*.vue', {eager: true})

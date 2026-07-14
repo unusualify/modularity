@@ -84,8 +84,6 @@ class Modularous extends FileRepository
 
         if (isset($versions['unusualify/modularous'])) {
             $this->vendorPath = realpath($versions['unusualify/modularous']['install_path']);
-        } elseif (isset($versions['unusualify/modularous'])) {
-            $this->vendorPath = realpath($versions['unusualify/modularous']['install_path']);
         } else {
             throw new \Exception('Modularous or Modularous not found in composer.json');
         }
@@ -540,10 +538,6 @@ class Modularous extends FileRepository
         $cache_key = static::$translationCacheKey;
 
         $cache = Cache::store('file');
-
-        if ($cache->has($cache_key) && false) {
-            return $cache->get($cache_key);
-        }
 
         $translations = app('translator')->getTranslations();
 

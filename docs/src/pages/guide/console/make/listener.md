@@ -89,4 +89,4 @@ php artisan modularous:make:listener LogOrderShipped
 ## See also
 
 - [make:event](./event) — create the matching event
-- [System Reference](/system-reference/backend/console/make#makelistenercommand)
+- [System Reference](/guide/console/make/overview)

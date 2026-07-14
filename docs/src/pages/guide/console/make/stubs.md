@@ -76,4 +76,4 @@ php artisan modularous:make:stubs Blog Post --except=migration
 
 - [make:route](./route) — full route scaffold including migrations
 - [make:module](./module) — `--just-stubs` flag for bulk stub refresh
-- [System Reference](/system-reference/backend/console/make#makestubscommand)
+- [System Reference](/guide/console/make/overview)

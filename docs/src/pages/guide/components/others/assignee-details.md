@@ -1,61 +1,59 @@
 ---
-sidebarPos: 2
-sidebarTitle: Assignee Details
+sidebarPos: 50
+sidebarTitle: Assignee & Assignment
 ---
+# Assignee & Assignment
 
-# AssigneeDetails
+These two components handle task/assignment UI patterns: viewing assignment details and creating/editing an assignment through a modal form.
 
-`AssigneeDetails` renders a `v-menu` popup that displays the full details of an assignment. The activator is a `v-list` item showing the assignee's name and avatar. Clicking it opens a card with the task summary, description, preliminary documents, submitted attachments, and (when the viewer is the assignee) a file upload area and action buttons.
+## `ue-assignee-details`
 
-## Usage
+Renders a compact list item showing the current assignee's avatar and name. Clicking it opens a popover card with the full assignment summary, description, and attachment list.
 
-```html
-<assignee-details
-  :assignment="assignment"
-  :formatted-assignment="formattedAssignment"
-  :is-assignee="currentUser.id === assignment.assignee_id"
-  :is-authorized="currentUser.canManageAssignments"
-  :filepond="filepond"
-  v-model:attachments="attachments"
-  v-model:attachments-loading="attachmentsLoading"
-  @click:complete="completeAssignment"
-  @click:save="saveAttachments"
-/>
-```
-
-## Props
+### Props
 
 | Prop | Type | Default | Description |
-|---|---|---|---|
-| `assignment` | `Object` | `{}` | Raw assignment data. Uses `description`, `preliminaries`, `attachments`, and `status`. |
-| `formattedAssignment` | `Object` | `{}` | Pre-formatted display object. Used for the activator list and the card header. Must include `prependAvatar`, `assigneeName`, `title`, and `subDescription`. |
-| `isAssignee` | `Boolean` | `false` | When `true`, shows the file upload field and the Complete/Save action buttons. |
-| `isAuthorized` | `Boolean` | `false` | When `true`, shows the assignee activator list and (when not the assignee) the submitted attachments list. |
-| `filepond` | `Object` | `null` | Filepond config forwarded to `v-input-filepond`. The `type` key is stripped before forwarding. Shown only when `isAssignee` is `true`. |
-| `attachments` | `Array` | `[]` | Two-way bound (`v-model:attachments`) list of uploaded file objects. |
-| `attachmentsLoading` | `Boolean` | `false` | Two-way bound (`v-model:attachments-loading`). Set to `true` while files are uploading. |
-| `loading` | `Boolean` | `false` | Loading state applied to the Save button. |
+|------|------|---------|-------------|
+| `assignment` | `Object` | `{}` | Raw assignment record (due date, description, etc.) |
+| `formattedAssignment` | `Object` | `{}` | Pre-formatted version for display (`prependAvatar`, `assigneeName`, `subDescription`) |
+| `isAssignee` | `Boolean` | `false` | Whether the current user is the assignee (controls visibility) |
+| `isAuthorized` | `Boolean` | `false` | Whether the current user can view/edit the assignment |
+| `attachments` | `Array` | `[]` | File attachments linked to the assignment |
+| `attachmentsLoading` | `Boolean` | `false` | Show a loading indicator on the attachments section |
+| `filepond` | `Object` | `null` | FilePond config for uploading new attachments |
 
-## Emits
+### Events
 
-| Event | Payload | Description |
-|---|---|---|
-| `update:attachments` | `Array` | Emitted when the attachments model changes |
-| `update:attachmentsLoading` | `Boolean` | Emitted when file loading state changes |
-| `click:complete` | — | Emitted when the **Complete** button is clicked |
-| `click:save` | `{ attachments: Array }` | Emitted when the **Save** button is clicked (only when `attachments.length > 0`) |
+| Event | Description |
+|-------|-------------|
+| `update:attachments` | Emitted when attachments change |
+| `update:attachmentsLoading` | Emitted when attachment loading state changes |
+| `click:complete` | Emitted when the "Mark Complete" action is triggered |
+| `click:save` | Emitted when the "Save" action is triggered |
 
-## Card sections
+---
 
-| Section | Visibility | Content |
-|---|---|---|
-| Task summary header | Always | `formattedAssignment.title` + `subDescription` via `v-list` |
-| Description | Always | `assignment.description` with `mdi-information-outline` icon |
-| Preliminary documents | When `assignment.preliminaries.length > 0` | File preview via `ue-filepond-preview` |
-| Submitted attachments | `isAuthorized && !isAssignee && attachments.length > 0` | File preview via `ue-filepond-preview` |
-| File upload | `isAssignee` | `v-input-filepond` bound to `attachments`; disabled when `assignment.status !== 'pending'` |
-| Action buttons | `isAssignee` | **Complete** (disabled if not pending) and **Save** (disabled if no attachments or not pending) |
+## `ue-assignment-modal`
 
-## Status gating
+Renders a modal form for creating or editing an assignment. Includes fields for assignee, due date, description, and preliminary tasks.
 
-Both the file upload and the action buttons are disabled when `assignment.status !== 'pending'`. This prevents modifications to completed or cancelled assignments.
+### Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `modelValue` | `Object` | `{}` | Controls modal open state via `v-model` |
+| `loading` | `Boolean` | `false` | Show a loading state on submit buttons |
+| `form` | `Object` | `{}` | Initial form model (assignee_id, due_at, description, preliminaries) |
+| `users` | `Array` | `[]` | List of available assignee options |
+| `filepond` | `Object` | `{}` | FilePond config for file attachments |
+| `variant` | `String` | `'outlined'` | Vuetify variant for form inputs |
+| `disabled` | `Boolean` | `false` | Disable all form inputs |
+| `minDueDays` | `Number` | `0` | Minimum number of days in the future for the due date |
+
+### Events
+
+| Event | Description |
+|-------|-------------|
+| `update:modelValue` | Emitted to close/open the modal |
+| `update:form` | Emitted when form fields change |
+| `submit` | Emitted on form submission |

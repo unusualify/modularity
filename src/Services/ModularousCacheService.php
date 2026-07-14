@@ -8,6 +8,12 @@ use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Str;
 use Predis\Connection\ConnectionException;
 use Predis\Connection\Resource\Exception\StreamInitException;
+use Unusualify\Modularous\Contracts\Cache\UrlPresentationCacheStoreInterface;
+use Unusualify\Modularous\Services\Cache\FileUrlPresentationCacheDriver;
+use Unusualify\Modularous\Services\Cache\PresentationUrlCacheKey;
+use Unusualify\Modularous\Services\Cache\PresentationUrlCacheKeyResolver;
+use Unusualify\Modularous\Services\Cache\StaleFileCache;
+use Unusualify\Modularous\Services\Cache\UrlKeyedStaleCache;
 use Unusualify\Modularous\Services\Concerns\CacheHelpers;
 use Unusualify\Modularous\Services\Concerns\CacheInvalidation;
 use Unusualify\Modularous\Services\Concerns\CacheTags;
@@ -34,11 +40,31 @@ class ModularousCacheService
     protected $store;
 
     /**
+     * Filesystem stale cache (SWR).
+     */
+    protected StaleFileCache $staleFileCache;
+
+    /**
+     * URL-keyed public presentation HTML store (file-primary by default).
+     */
+    protected UrlPresentationCacheStoreInterface $urlPresentationCacheStore;
+
+    /**
      * Create a new cache service instance.
      */
     public function __construct()
     {
         $this->config = config('modularous.cache', []);
+
+        $stalePath = (string) ($this->config['presentationItem']['model']['stale_path']
+            ?? $this->config['swr']['presentationItem']['stale_path']
+            ?? storage_path('framework/cache/modularous-stale'));
+        $this->staleFileCache = new StaleFileCache(
+            $stalePath,
+            (int) ($this->config['presentationItem']['stale_ttl'] ?? $this->config['swr']['stale_ttl'] ?? 86400),
+        );
+
+        $this->urlPresentationCacheStore = $this->resolveUrlPresentationCacheStore();
 
         $driverName = $this->getDriver();
 
@@ -46,43 +72,36 @@ class ModularousCacheService
             if (! extension_loaded('redis')) {
                 logger()->error('Redis extension is not installed on php.ini on modularous cache');
                 $this->connected = false;
-
-                return;
-            }
-
-            try {
-                $redis = Redis::connection('cache');
-                $redis->ping();
-                if (! $redis->ping()) {
-                    logger()->error('Redis connection failed on modularous cache');
-                } else {
-                    $this->connected = true;
+            } else {
+                try {
+                    $redis = Redis::connection('cache');
+                    $redis->ping();
+                    if (! $redis->ping()) {
+                        logger()->error('Redis connection failed on modularous cache');
+                    } else {
+                        $this->connected = true;
+                    }
+                } catch (ConnectionException $e) {
+                    logger()->error('Redis connection failed with connection exception on modularous cache: ' . $e->getMessage());
+                } catch (StreamInitException $e) {
+                    logger()->error('Redis connection failed with stream init exception on modularous cache: ' . $e->getMessage());
+                } catch (\Exception $e) {
+                    logger()->error('Redis connection failed with exception on modularous cache: ' . $e->getMessage(), ['exception' => get_class($e), 'trace' => $e->getTraceAsString()]);
                 }
-            } catch (ConnectionException $e) {
-                logger()->error('Redis connection failed with connection exception on modularous cache: ' . $e->getMessage());
-            } catch (StreamInitException $e) {
-                logger()->error('Redis connection failed with stream init exception on modularous cache: ' . $e->getMessage());
-            } catch (\Exception $e) {
-                logger()->error('Redis connection failed with exception on modularous cache: ' . $e->getMessage(), ['exception' => get_class($e), 'trace' => $e->getTraceAsString()]);
             }
         } elseif ($driverName === 'memcached') {
-
             try {
-                // check if memcached extension is installed on php.ini
                 if (! extension_loaded('memcached')) {
                     logger()->error('Memcached extension is not installed on php.ini on modularous cache');
                     $this->connected = false;
-
-                    return;
+                } else {
+                    $memcached = Cache::store('memcached')->getStore()->getMemcached();
+                    if (! $memcached->getStats()) {
+                        logger()->error('Memcached connection failed on modularous cache');
+                    } else {
+                        $this->connected = true;
+                    }
                 }
-
-                $memcached = Cache::store('memcached')->getStore()->getMemcached();
-                if (! $memcached->getStats()) {
-                    logger()->error('Memcached connection failed on modularous cache');
-
-                    return;
-                }
-                $this->connected = true;
             } catch (\Exception $e) {
                 logger()->error('Memcached connection failed with exception on modularous cache: ' . $e->getMessage(), ['exception' => get_class($e), 'trace' => $e->getTraceAsString()]);
             }
@@ -90,7 +109,7 @@ class ModularousCacheService
             $this->connected = true;
         }
 
-        $this->store = Cache::store($driverName);
+        $this->store = Cache::store($this->connected ? $driverName : 'array');
 
         // Detect Laravel version and tag support
         $this->detectTagSupport();
@@ -147,6 +166,169 @@ class ModularousCacheService
         return $this->store;
     }
 
+    public function getStaleFileCache(): StaleFileCache
+    {
+        return $this->staleFileCache;
+    }
+
+    public function getUrlPresentationCacheStore(): UrlPresentationCacheStoreInterface
+    {
+        return $this->urlPresentationCacheStore;
+    }
+
+    /**
+     * @deprecated Use getUrlPresentationCacheStore() — returns underlying file cache when driver=file.
+     */
+    public function getUrlKeyedStaleCache(): UrlKeyedStaleCache
+    {
+        if ($this->urlPresentationCacheStore instanceof FileUrlPresentationCacheDriver) {
+            return $this->urlPresentationCacheStore->underlyingFileCache();
+        }
+
+        throw new \RuntimeException(
+            'getUrlKeyedStaleCache() is only available when presentationItem.url.driver is file.',
+        );
+    }
+
+    protected function resolveUrlPresentationCacheStore(): UrlPresentationCacheStoreInterface
+    {
+        $driver = (string) ($this->config['presentationItem']['url']['driver'] ?? 'file');
+
+        return match ($driver) {
+            'file', 'shared_file' => new FileUrlPresentationCacheDriver($this->createUrlKeyedStaleCache()),
+            default => new FileUrlPresentationCacheDriver($this->createUrlKeyedStaleCache()),
+        };
+    }
+
+    protected function createUrlKeyedStaleCache(): UrlKeyedStaleCache
+    {
+        $urlStalePath = (string) ($this->config['presentationItem']['url']['base_path']
+            ?? $this->config['resilience']['url_stale']['base_path']
+            ?? storage_path('framework/cache/modularous-stale-by-url'));
+
+        return new UrlKeyedStaleCache(
+            $urlStalePath,
+            (int) ($this->config['presentationItem']['stale_ttl'] ?? $this->config['resilience']['url_stale']['stale_ttl'] ?? 604800),
+        );
+    }
+
+    /**
+     * Active public presentationItem store: url | model | none.
+     */
+    public function getPresentationCacheStore(): string
+    {
+        $store = (string) ($this->config['presentationItem']['store'] ?? 'url');
+
+        return in_array($store, ['url', 'model', 'none'], true) ? $store : 'url';
+    }
+
+    public function isPresentationCacheEnabled(): bool
+    {
+        return $this->getPresentationCacheStore() !== 'none';
+    }
+
+    public function isUrlStaleEnabled(): bool
+    {
+        return $this->getPresentationCacheStore() === 'url';
+    }
+
+    public function isModelStaleEnabled(): bool
+    {
+        return $this->getPresentationCacheStore() === 'model';
+    }
+
+    public function isUrlStaleServeFirst(): bool
+    {
+        return $this->isUrlStaleEnabled()
+            && (bool) ($this->config['presentationItem']['serve_first']
+                ?? $this->config['resilience']['url_stale']['serve_first']
+                ?? true);
+    }
+
+    public function getUrlStaleTtl(): int
+    {
+        return (int) ($this->config['presentationItem']['stale_ttl']
+            ?? $this->config['resilience']['url_stale']['stale_ttl']
+            ?? 604800);
+    }
+
+    /**
+     * Route/type cache toggle from config only — does not require Redis connectivity.
+     */
+    public function isCacheTypeConfigured(?string $moduleName = null, ?string $moduleRouteName = null, ?string $type = null): bool
+    {
+        if (! ($this->config['enabled'] ?? true)) {
+            return false;
+        }
+
+        $defaultBehavior = $this->config['all_modules'] ?? false;
+        $defaultModuleRouteBehavior = $this->config['all_module_routes'] ?? $defaultBehavior;
+        $defaultTypeBehavior = isset($this->config['default_types']) ? $this->config['default_types'][$type] ?? true : true;
+
+        if ($moduleName !== null) {
+            $moduleConfig = $this->config['modules'][$moduleName] ?? [];
+            $moduleEnabled = $moduleConfig['enabled'] ?? $defaultBehavior;
+
+            if (! $moduleEnabled) {
+                return false;
+            }
+
+            if ($moduleRouteName !== null && isset($moduleConfig['routes'][$moduleRouteName])) {
+                $moduleRouteConfig = $moduleConfig['routes'][$moduleRouteName] ?? [];
+                $moduleRouteEnabled = $moduleRouteConfig['enabled'] ?? $defaultModuleRouteBehavior;
+
+                if (! $moduleRouteEnabled) {
+                    return false;
+                }
+
+                if ($type !== null && isset($moduleRouteConfig['types'][$type])) {
+                    return (bool) ($moduleRouteConfig['types'][$type] ?? $defaultTypeBehavior);
+                }
+
+                return $moduleRouteEnabled;
+            } elseif ($moduleRouteName !== null) {
+                return $defaultBehavior;
+            }
+
+            return $moduleEnabled;
+        }
+
+        return true;
+    }
+
+    /**
+     * Whether stale entries use the filesystem driver (required for presentationItem SWR).
+     */
+    public function usesFileStaleStore(?string $type = null): bool
+    {
+        if ($type === 'presentationItem') {
+            return $this->getPresentationCacheStore() === 'model'
+                && ($this->config['swr']['presentationItem']['stale_driver'] ?? 'file') === 'file';
+        }
+
+        if ($type === null) {
+            return ($this->config['swr']['presentationItem']['stale_driver'] ?? 'file') === 'file';
+        }
+
+        return false;
+    }
+
+    /**
+     * Whether filesystem stale storage is available (independent of Redis/Memcached connectivity).
+     */
+    public function isStaleStorageEnabled(?string $type = null): bool
+    {
+        if (! ($this->config['enabled'] ?? true)) {
+            return false;
+        }
+
+        if ($type === 'presentationItem') {
+            return $this->getPresentationCacheStore() === 'model';
+        }
+
+        return $this->usesFileStaleStore($type);
+    }
+
     /**
      * Get the cache prefix.
      */
@@ -170,6 +352,8 @@ class ModularousCacheService
         }
 
         $defaultBehavior = $this->config['all_modules'] ?? false;
+        $defaultModuleRouteBehavior = $this->config['all_module_routes'] ?? $defaultBehavior;
+        $defaultTypeBehavior = isset($this->config['default_types']) ? $this->config['default_types'][$type] ?? true : true;
 
         // Check module-specific enabled flag
         if ($moduleName !== null) {
@@ -183,14 +367,14 @@ class ModularousCacheService
 
             if ($moduleRouteName !== null && isset($moduleConfig['routes']) && isset($moduleConfig['routes'][$moduleRouteName])) {
                 $moduleRouteConfig = $moduleConfig['routes'][$moduleRouteName] ?? [];
-                $moduleRouteEnabled = $moduleRouteConfig['enabled'] ?? $defaultBehavior;
+                $moduleRouteEnabled = $moduleRouteConfig['enabled'] ?? $defaultModuleRouteBehavior;
 
                 if (! $moduleRouteEnabled) {
                     return false;
                 }
 
                 if ($type !== null && isset($moduleRouteConfig['types'][$type])) {
-                    return $moduleRouteConfig['types'][$type] ?? true;
+                    return $moduleRouteConfig['types'][$type] ?? $defaultTypeBehavior;
                 }
 
                 return $moduleRouteEnabled;
@@ -203,6 +387,97 @@ class ModularousCacheService
         }
 
         return true;
+    }
+
+    /**
+     * Route-level cache config merge for a module route.
+     */
+    public function getRouteCacheConfig(?string $moduleName, ?string $moduleRouteName): array
+    {
+        if ($moduleName === null || $moduleRouteName === null) {
+            return [];
+        }
+
+        $moduleName = Str::studly($moduleName);
+        $moduleRouteName = Str::studly($moduleRouteName);
+        $moduleConfig = $this->config['modules'][$moduleName] ?? [];
+
+        return $moduleConfig['routes'][$moduleRouteName] ?? [];
+    }
+
+    /**
+     * URL presentation cache key strategy for a module route.
+     *
+     * @see PresentationUrlCacheKey
+     */
+    public function getPresentationCacheKeyStrategy(?string $moduleName, ?string $moduleRouteName): string
+    {
+        $strategy = (string) ($this->getRouteCacheConfig($moduleName, $moduleRouteName)['presentation_cache_key'] ?? PresentationUrlCacheKey::STRATEGY_PATH_ONLY);
+
+        return in_array($strategy, [
+            PresentationUrlCacheKey::STRATEGY_PATH_ONLY,
+            PresentationUrlCacheKey::STRATEGY_PATH_AND_QUERY,
+            PresentationUrlCacheKey::STRATEGY_PATH_AND_QUERY_ALLOWLIST,
+        ], true) ? $strategy : PresentationUrlCacheKey::STRATEGY_PATH_ONLY;
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function getPresentationCacheQueryAllowlist(?string $moduleName, ?string $moduleRouteName): array
+    {
+        $allowlist = $this->getRouteCacheConfig($moduleName, $moduleRouteName)['presentation_cache_query'] ?? [];
+
+        return array_values(array_map('strval', (array) $allowlist));
+    }
+
+    public function getPresentationUrlCacheKeyResolver(): PresentationUrlCacheKeyResolver
+    {
+        return new PresentationUrlCacheKeyResolver($this, $this->urlPresentationCacheStore);
+    }
+
+    /**
+     * Whether the observer should auto-invalidate/warm a cache type for a route.
+     */
+    public function shouldAutoInvalidate(?string $moduleName, ?string $moduleRouteName, ?string $type = null): bool
+    {
+        if ($moduleName === null || $moduleRouteName === null) {
+            return true;
+        }
+
+        $observerAuto = (bool) ($this->config['observer']['auto_invalidate'] ?? true);
+        if (! $observerAuto) {
+            return false;
+        }
+
+        $routeConfig = $this->getRouteCacheConfig($moduleName, $moduleRouteName);
+        $globalManual = (bool) ($this->config['manual_purge'] ?? false);
+        $routeManual = (bool) ($routeConfig['manual_purge'] ?? $globalManual);
+
+        if ($type === null) {
+            return ! $routeManual;
+        }
+
+        $purgeTypes = $routeConfig['purge'] ?? [];
+        if (array_key_exists($type, $purgeTypes)) {
+            return ! (bool) $purgeTypes[$type];
+        }
+
+        return ! $routeManual;
+    }
+
+    /**
+     * Whether admin purge/warm actions should be exposed for a route.
+     */
+    public function hasAdminCacheActions(?string $moduleName, ?string $moduleRouteName): bool
+    {
+        if (! $this->isEnabled($moduleName, $moduleRouteName)) {
+            return false;
+        }
+
+        $routeConfig = $this->getRouteCacheConfig($moduleName, $moduleRouteName);
+
+        return (bool) ($routeConfig['admin_cache_actions'] ?? false);
     }
 
     /**
@@ -222,6 +497,72 @@ class ModularousCacheService
         } catch (\BadMethodCallException $e) {
             return false;
         }
+    }
+
+    /**
+     * Whether stale-while-revalidate is enabled for a cache type and route.
+     */
+    public function isSwrEnabled(?string $moduleName = null, ?string $moduleRouteName = null, ?string $type = null): bool
+    {
+        if ($type === 'presentationItem' || $type === null) {
+            if (! $this->isPresentationCacheEnabled()) {
+                return false;
+            }
+
+            $swrEnabled = (bool) ($this->config['presentationItem']['swr'] ?? $this->config['swr']['enabled'] ?? false);
+            if (! $swrEnabled) {
+                return false;
+            }
+        } elseif (! ($this->config['swr']['enabled'] ?? false)) {
+            return false;
+        }
+
+        if ($type !== null && $type !== 'presentationItem') {
+            $typeEnabled = $this->config['swr']['types'][$type] ?? true;
+            if (! $typeEnabled) {
+                return false;
+            }
+        }
+
+        if ($moduleName !== null && $moduleRouteName !== null && $type !== null) {
+            if ($type === 'presentationItem' && $this->getPresentationCacheStore() === 'url') {
+                return $this->isCacheTypeConfigured($moduleName, $moduleRouteName, $type);
+            }
+
+            return $this->isEnabled($moduleName, $moduleRouteName, $type);
+        }
+
+        return true;
+    }
+
+    /**
+     * Stale TTL for SWR entries (seconds).
+     */
+    public function getStaleTtl(?string $type = null): int
+    {
+        if ($type === 'presentationItem' || $type === null) {
+            return (int) ($this->config['presentationItem']['stale_ttl'] ?? $this->config['swr']['stale_ttl'] ?? 86400);
+        }
+
+        return (int) ($this->config['swr']['stale_ttl'] ?? 86400);
+    }
+
+    /**
+     * Whether the cache revalidate webhook endpoint is enabled.
+     */
+    public function isWebhookEnabled(): bool
+    {
+        return (bool) ($this->config['webhook']['enabled'] ?? false);
+    }
+
+    /**
+     * Shared secret for webhook HMAC verification.
+     */
+    public function getWebhookSecret(): ?string
+    {
+        $secret = $this->config['webhook']['secret'] ?? null;
+
+        return is_string($secret) && $secret !== '' ? $secret : null;
     }
 
     /**
@@ -249,6 +590,54 @@ class ModularousCacheService
 
         // Fall back to global TTL
         return (int) ($this->config['ttl'][$type] ?? 300);
+    }
+
+    /**
+     * Resolve enabled cache types for admin actions (manual purge routes).
+     *
+     * @return array<string, bool>
+     */
+    public function resolveManualCacheTypes(string $moduleName, string $moduleRouteName): array
+    {
+        $types = ['counts', 'index', 'record', 'formItem', 'formattedItem', 'presentationItem'];
+        $resolved = [];
+
+        foreach ($types as $type) {
+            $resolved[$type] = $this->isEnabled($moduleName, $moduleRouteName, $type)
+                && ! $this->shouldAutoInvalidate($moduleName, $moduleRouteName, $type);
+        }
+
+        return $resolved;
+    }
+
+    /**
+     * Normalize a cache types array from request input.
+     *
+     * @param array<int, string>|string $typesInput
+     * @return array<string, bool>
+     */
+    public function normalizeCacheTypesInput(array|string $typesInput, string $moduleName, string $moduleRouteName): array
+    {
+        $allTypes = ['counts', 'index', 'record', 'formItem', 'formattedItem', 'presentationItem'];
+
+        if ($typesInput === 'all') {
+            $types = array_fill_keys($allTypes, true);
+        } else {
+            $types = array_fill_keys($allTypes, false);
+            foreach ((array) $typesInput as $type) {
+                if (is_string($type) && in_array($type, $allTypes, true)) {
+                    $types[$type] = true;
+                }
+            }
+        }
+
+        foreach ($allTypes as $type) {
+            if ($types[$type] && ! $this->isEnabled($moduleName, $moduleRouteName, $type)) {
+                $types[$type] = false;
+            }
+        }
+
+        return $types;
     }
 
     /**

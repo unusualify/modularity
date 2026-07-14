@@ -39,7 +39,7 @@ Commands that create runtime records (DB entries, users).
 | `modularous:migrate:*` | Migrate*Command | MigrateCommand |
 | `modularous:flush:*` | Flush*Command | FlushCommand |
 | `modularous:route:*` | Route*Command | RouteDisableCommand |
-| `modularous:sync:*` | Sync*Command | SyncTranslationsCommand |
+| `modularous:sync:*` | Sync*Command | SyncTranslationsCommand, SyncRemoteApiCommand |
 | `modularous:replace:*` | Replace*Command | ReplaceRegexCommand |
 
 ## Class Naming by Folder
@@ -76,6 +76,7 @@ Commands that create runtime records (DB entries, users).
 | modularous:cache:graph | CacheGraphCommand |
 | modularous:cache:stats | CacheStatsCommand |
 | modularous:cache:warm | CacheWarmCommand |
+| modularous:cache:warm-presentation | CacheWarmPresentationCommand |
 | modularous:flush | FlushCommand |
 | modularous:flush:sessions | FlushSessionsCommand |
 | modularous:flush:filepond | FlushFilepondCommand |

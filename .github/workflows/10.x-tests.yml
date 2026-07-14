@@ -15,7 +15,6 @@ on:
     branches:
       - 0.x
       - 10.x
-      - 10.x-dev
     paths-ignore:
       - '**.md'
       - '**.yml'

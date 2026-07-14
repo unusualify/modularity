@@ -24,6 +24,12 @@ Modularous (Modularous) is a Laravel package that provides a modular admin panel
 | [Entities](./entities) | Models, entity traits, enums |
 | [Features Pattern](./features) | Entity + Repository + Hydrate triple pattern |
 
+**Guides**
+
+| Page | Description |
+|------|-------------|
+| [Remote API](/guide/remote-api/overview) | Sync entities from external JSON APIs (connector, cache, admin UI) |
+
 ## Quick Reference
 
 **Key config keys**

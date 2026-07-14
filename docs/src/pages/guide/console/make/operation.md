@@ -83,4 +83,4 @@ php artisan modularous:make:operation AddDefaultSettings --self
 ## See also
 
 - [Operations: process-operations](/guide/console/operations/process-operations) — run all pending operations
-- [System Reference](/system-reference/backend/console/make#makeoperationcommand)
+- [System Reference](/guide/console/make/overview)

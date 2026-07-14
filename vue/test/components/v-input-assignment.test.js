@@ -1,5 +1,5 @@
 // test/components/v-input-assignment.test.js
-import { describe, expect, test, vi, beforeEach } from 'vitest'
+import { describe, expect, test, vi, beforeEach, afterEach } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
 import UEConfig from '../../src/js/plugins/UEConfig'
 import VInputAssignment from '../../src/js/components/inputs/Assignment.vue'
@@ -11,10 +11,8 @@ class ResizeObserver {
   disconnect() {}
 }
 
-// Add to global object before tests run
 global.ResizeObserver = ResizeObserver
 
-// Mock Intersection Observer
 global.IntersectionObserver = class IntersectionObserver {
   constructor() {}
   observe() {}
@@ -22,7 +20,8 @@ global.IntersectionObserver = class IntersectionObserver {
   disconnect() {}
 }
 
-// Mock axios with full structure - include status for Assignment.vue fetchAssignments
+global.__log = vi.fn()
+
 vi.mock('axios', () => ({
   default: {
     get: vi.fn(() => Promise.resolve({ status: 200, data: [] })),
@@ -43,7 +42,17 @@ vi.mock('axios', () => ({
   }
 }))
 
-// Import axios after mocking
+vi.mock('@/hooks', async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    useAuthorization: () => ({
+      hasRoles: vi.fn().mockReturnValue(true),
+      isYou: vi.fn().mockReturnValue(false)
+    })
+  }
+})
+
 import axios from 'axios'
 
 const defaultProps = {
@@ -59,8 +68,53 @@ const defaultProps = {
   authorizedRoles: ['admin']
 }
 
-// Note: Assignment uses createFormModal.value.validateForm() and saveRequest callbacks.
-// Tests that depend on refs or complex async flows may need component stubs.
+const assignmentModalValidateForm = vi.fn().mockResolvedValue({ valid: true })
+
+const AssignmentModalStub = {
+  name: 'AssignmentModal',
+  props: {
+    modelValue: { type: Boolean, default: false },
+    form: { type: Object, default: () => ({}) },
+    loading: { type: Boolean, default: false },
+    disabled: { type: Boolean, default: false },
+    variant: { type: String, default: 'outlined' },
+    users: { type: Array, default: () => [] },
+    minDueDays: { type: Number, default: 0 },
+    filepond: { type: Object, default: null },
+  },
+  emits: ['update:modelValue', 'update:form', 'submit'],
+  template: '<form id="createAssignmentForm" v-show="modelValue" @submit.prevent="$emit(\'submit\')"></form>',
+  setup(_, { expose }) {
+    expose({ validateForm: assignmentModalValidateForm })
+  },
+}
+
+function mountAssignment(props = {}, options = {}) {
+  return mount(VInputAssignment, {
+    props: { ...defaultProps, ...props },
+    attachTo: document.body,
+    global: {
+      plugins: [UEConfig],
+      mocks: {
+        t: vi.fn(str => str),
+        d: vi.fn(() => '2024-03-20'),
+        $notif: vi.fn()
+      },
+      stubs: {
+        AssignmentModal: AssignmentModalStub,
+        'v-input-filepond': true,
+        'ue-filepond-preview': true,
+        'v-input-date': true,
+        'ue-dynamic-component-renderer': true,
+        'v-img': true,
+        VImg: true,
+        ...(options.global?.stubs ?? {}),
+      },
+      ...(options.global ?? {}),
+    },
+    ...options,
+  })
+}
 
 const mockAssignment = {
   id: 1,
@@ -73,7 +127,6 @@ const mockAssignment = {
   due_at: '2024-04-01T00:00:00Z',
   created_at: '2024-03-20T00:00:00Z',
   status: 'pending',
-  assignee_avatar: 'avatar.jpg',
 }
 
 describe('VInputAssignment', () => {
@@ -81,37 +134,17 @@ describe('VInputAssignment', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks()
-
-    const globalMocks = {
-      plugins: [UEConfig],
-      mocks: {
-        t: vi.fn(str => str),
-        d: vi.fn(() => '2024-03-20'),
-        $notif: vi.fn()
-      }
-    }
-
-    // Mock the useAuthorization hook instead of hasRoles directly
-    vi.mock('@/hooks', async (importOriginal) => {
-      const actual = await importOriginal()
-      return {
-        ...actual,
-        useAuthorization: () => ({
-          hasRoles: vi.fn().mockReturnValue(true),
-          isYou: vi.fn().mockReturnValue(false)
-        })
-      }
-    })
-
-    wrapper = mount(VInputAssignment, {
-      props: defaultProps,
-      global: globalMocks,
-      attachTo: document.body
-    })
-
+    assignmentModalValidateForm.mockResolvedValue({ valid: true })
+    wrapper?.unmount()
+    document.body.innerHTML = ''
+    wrapper = mountAssignment()
   })
 
-  // Unit Tests
+  afterEach(() => {
+    wrapper?.unmount()
+    document.body.innerHTML = ''
+  })
+
   describe('Unit Tests', () => {
     test('renders correctly with default props', () => {
       expect(wrapper.exists()).toBe(true)
@@ -131,26 +164,21 @@ describe('VInputAssignment', () => {
     })
   })
 
-
-  // Add test for modal opening
   test('create form modal opens correctly', async () => {
     wrapper.vm.loading = false
     await wrapper.vm.$nextTick()
 
-    // Initially closed
     expect(wrapper.vm.createFormModalActive).toBe(false)
 
-    // Find and click create button
     const createBtn = wrapper.find('#createAssignmentBtn')
     await createBtn.trigger('click')
 
     expect(wrapper.vm.createFormModalActive).toBe(true)
 
-    // Check if form is rendered
     const form = document.querySelector('#createAssignmentForm')
     expect(form).not.toBeNull()
   })
-  // Feature Tests
+
   describe('Feature Tests', () => {
     test('fetches assignments on creation', async () => {
       axios.get.mockResolvedValueOnce({
@@ -178,10 +206,6 @@ describe('VInputAssignment', () => {
 
       wrapper.vm.createFormModel = newAssignment
 
-      // Component uses createFormModal.value.validateForm()
-      const mockValidateForm = vi.fn().mockResolvedValue({ valid: true })
-      wrapper.vm.createFormModal = { validateForm: mockValidateForm }
-
       axios.post.mockResolvedValueOnce({
         status: 200,
         data: { ...mockAssignment, ...newAssignment }
@@ -190,7 +214,7 @@ describe('VInputAssignment', () => {
       await wrapper.vm.createAssignment()
       await flushPromises()
 
-      expect(mockValidateForm).toHaveBeenCalled()
+      expect(assignmentModalValidateForm).toHaveBeenCalled()
       expect(axios.post).toHaveBeenCalledWith(
         '/api/assignments/123/create',
         expect.objectContaining({
@@ -222,7 +246,6 @@ describe('VInputAssignment', () => {
         '/api/assignments/123/create',
         { status: 'completed' }
       )
-      // assignments is a ref; success callback sets assignments.value from response.data.assignments
       const assignments = wrapper.vm.assignments
       expect(Array.isArray(assignments)).toBe(true)
       expect(assignments[0].status).toBe('completed')
@@ -242,16 +265,13 @@ describe('VInputAssignment', () => {
     })
   })
 
-  // UI Interaction Tests
   describe('UI Interactions', () => {
     test('opens create assignment modal on button click', async () => {
-      // Reset the modal state first to ensure we're testing the click effect
-      wrapper.vm.createFormModal = false
+      wrapper.vm.createFormModalActive = false
       wrapper.vm.loading = false
 
       await wrapper.vm.$nextTick()
 
-      // Use the ID selector instead of the icon attribute
       const assignBtn = wrapper.find('#createAssignmentBtn')
 
       expect(assignBtn.exists()).toBe(true)
@@ -279,7 +299,6 @@ describe('VInputAssignment', () => {
     test('displays assignment info in the list', async () => {
       wrapper.vm.loading = false
       wrapper.vm.assignments = [mockAssignment]
-      // wrapper.vm.$isYou = vi.fn().mockReturnValue(true)
 
       await wrapper.vm.$nextTick()
 
@@ -287,7 +306,6 @@ describe('VInputAssignment', () => {
       expect(assignmentList.exists()).toBe(true)
 
       expect(assignmentList.html()).toContain('User 1')
-      // expect(assignmentList.html()).toContain('Admin')
     })
   })
 
@@ -309,9 +327,6 @@ describe('VInputAssignment', () => {
 
       wrapper.vm.createFormModel = newAssignment
 
-      const mockValidateForm = vi.fn().mockResolvedValue({ valid: true })
-      wrapper.vm.createFormModal = { validateForm: mockValidateForm }
-
       axios.post.mockResolvedValueOnce({
         status: 200,
         data: { id: 1, ...newAssignment }
@@ -320,7 +335,7 @@ describe('VInputAssignment', () => {
       await wrapper.vm.createAssignment()
       await flushPromises()
 
-      expect(mockValidateForm).toHaveBeenCalled()
+      expect(assignmentModalValidateForm).toHaveBeenCalled()
 
       expect(axios.post).toHaveBeenCalledWith(
         '/api/assignments/123/create',
@@ -337,12 +352,11 @@ describe('VInputAssignment', () => {
       wrapper.vm.loading = false
       await wrapper.vm.$nextTick()
 
-      const mockValidateForm = vi.fn().mockResolvedValue({ valid: false })
-      wrapper.vm.createFormModal = { validateForm: mockValidateForm }
+      assignmentModalValidateForm.mockResolvedValueOnce({ valid: false })
 
       await wrapper.vm.createAssignment()
 
-      expect(mockValidateForm).toHaveBeenCalled()
+      expect(assignmentModalValidateForm).toHaveBeenCalled()
       expect(axios.post).not.toHaveBeenCalled()
     })
 
@@ -356,6 +370,4 @@ describe('VInputAssignment', () => {
       expect(document.querySelector('#createAssignmentForm')).not.toBeNull()
     })
   })
-
 })
-

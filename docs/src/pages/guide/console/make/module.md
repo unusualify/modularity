@@ -121,4 +121,4 @@ php artisan modularous:make:module Blog --test
 
 - [make:route](./route) — add a subsequent route to the same module
 - [make:stubs](./stubs) — regenerate specific stub files
-- [System Reference](/system-reference/backend/console/make#makemodulecommand) — class internals
+- [System Reference](/guide/console/make/overview) — class internals

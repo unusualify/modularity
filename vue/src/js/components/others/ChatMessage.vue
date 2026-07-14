@@ -179,12 +179,8 @@
 </template>
 
 <script>
-  import WellPrint from '@/components/WellPrint.vue'
 
   export default {
-    components: {
-      WellPrint
-    },
     props: {
       modelValue: {
         type: Object,

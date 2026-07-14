@@ -19,6 +19,7 @@ describe('input registry', () => {
     expect(mapTypeToComponent('input-checklist')).toBe('VInputChecklist')
     expect(mapTypeToComponent('input-tagger')).toBe('VInputTagger')
     expect(mapTypeToComponent('input-file')).toBe('VInputFile')
+    expect(mapTypeToComponent('input-editor')).toBe('VInputEditor')
     expect(mapTypeToComponent('input-json-field')).toBe('VInputJsonField')
     expect(mapTypeToComponent('input-layout-blades')).toBe('VInputLayoutBlades')
   })

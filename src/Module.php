@@ -22,10 +22,14 @@ use Nwidart\Modules\Laravel\Module as NwidartModule;
 use Nwidart\Modules\Support\Config\GenerateConfigReader;
 use Unusualify\Modularous\Activators\ModuleActivator;
 use Unusualify\Modularous\Entities\Enums\Permission;
+use Unusualify\Modularous\Entities\Traits\HasRemoteApiSource;
 use Unusualify\Modularous\Exceptions\ModularousException;
 use Unusualify\Modularous\Facades\Modularous;
+use Unusualify\Modularous\Facades\ModularousCache;
+use Unusualify\Modularous\Http\Controllers\Traits\ManageResourceCache;
+use Unusualify\Modularous\Repositories\Logic\ResourceCacheActionsTrait;
 use Unusualify\Modularous\Repositories\Repository;
-use Unusualify\Modularous\Support\Finder;
+use Unusualify\Modularous\Repositories\Traits\RemoteApiSourceTrait;
 
 class Module extends NwidartModule
 {
@@ -65,6 +69,15 @@ class Module extends NwidartModule
         'rejectRevision',
         'showView',
         'listRevisions',
+        'syncRemote',
+        'syncRemoteAll',
+        'clearRemoteCache',
+        'previewRemote',
+        'listRemoteCatalog',
+        'cachePurge',
+        'cacheWarm',
+        'cachePurgeAll',
+        'cacheWarmAll',
     ];
 
     /**
@@ -187,6 +200,14 @@ class Module extends NwidartModule
                 }
             }
         }
+    }
+
+    /**
+     * Ensure the routes statuses file exists as an empty object.
+     */
+    public function ensureRoutesStatusesFile(): void
+    {
+        $this->moduleActivator->ensureFileExists();
     }
 
     /**
@@ -544,6 +565,36 @@ class Module extends NwidartModule
     }
 
     /**
+     * check if the route has remote api source
+     */
+    public function hasRemoteApiSource(string $routeName): bool
+    {
+        $repository = $this->getRepository($routeName, true);
+        $model = $repository->getModel();
+
+        return classHasTrait($repository, RemoteApiSourceTrait::class)
+            && classHasTrait($model, HasRemoteApiSource::class);
+    }
+
+    /**
+     * isResourceCacheEnabled
+     */
+    public function isResourceCacheEnabled(string $routeName): bool
+    {
+        $repository = $this->getRepository($routeName, true);
+        $controller = $this->getController($routeName, true);
+
+        if (! class_uses_recursive($repository) || ! in_array(ResourceCacheActionsTrait::class, class_uses_recursive($repository))) {
+            return false;
+        }
+        if (! class_uses_recursive($controller) || ! in_array(ManageResourceCache::class, class_uses_recursive($controller))) {
+            return false;
+        }
+
+        return ModularousCache::hasAdminCacheActions($this->getName(), $routeName);
+    }
+
+    /**
      * hasSystemPrefix
      */
     public function hasSystemPrefix(): mixed
@@ -651,9 +702,11 @@ class Module extends NwidartModule
             $prefixes[] = $adminRouteNamePrefix;
         }
 
-        $prefixes[] = $this->fullRouteNamePrefix($isParent);
+        if ($fullRouteNamePrefix = $this->fullRouteNamePrefix($isParent)) {
+            $prefixes[] = $fullRouteNamePrefix;
+        }
 
-        return implode('.', $prefixes);
+        return implode('.', $prefixes) . '.';
     }
 
     /**
@@ -960,7 +1013,13 @@ class Module extends NwidartModule
      */
     public function getRepository($routeName, $asClass = true): Repository|string
     {
-        return (new Finder)->getRouteRepository($routeName, $asClass);
+        $classNamespace = $this->getRouteClass($routeName, 'repository');
+
+        if (! class_exists($classNamespace)) {
+            return false;
+        }
+
+        return $asClass ? App::make($classNamespace) : $classNamespace;
     }
 
     /**
@@ -972,6 +1031,10 @@ class Module extends NwidartModule
     public function getModel($routeName, $asClass = true): Model|string
     {
         $repository = $this->getRepository($routeName);
+
+        if (is_null($repository) || empty($repository) || ! class_exists(get_class($repository))) {
+            throw new \Exception('Repository not found for ' . $routeName . ' on module ' . $this->getName());
+        }
 
         $model = $repository->getModel();
 

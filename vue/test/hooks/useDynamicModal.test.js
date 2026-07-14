@@ -10,7 +10,9 @@ const mockModalService = {
 
 const TestComponent = defineComponent({
   setup() {
-    return useDynamicModal()
+    const modal = useDynamicModal()
+
+    return { modal }
   },
   render: () => h('div')
 })
@@ -24,7 +26,7 @@ describe('useDynamicModal', () => {
         }
       }
     })
-    expect(wrapper.vm).toEqual(mockModalService)
+    expect(wrapper.vm.modal).toBe(mockModalService)
   })
 
   test('throws when modalService not provided', () => {

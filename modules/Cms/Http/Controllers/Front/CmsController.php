@@ -12,8 +12,12 @@ use Modules\Cms\Http\Controllers\CmsSignedPublicPreviewController;
 use Modules\Cms\Http\Controllers\PageController;
 use Modules\Cms\Http\Controllers\Traits\ResolvesPublicPresentationView;
 use Modules\Cms\Services\CmsPublicModelResolver;
+use Modules\Cms\Services\CmsVisitorRedirectResolver;
 use Modules\Cms\Support\CmsPageLayoutPresentationWrapper;
-use Modules\Cms\Support\CmsPublicSeo;
+use Modules\Cms\Support\CmsPublicFrontViewName;
+use Modules\Cms\Support\CmsPublicPresentationInnerData;
+use Modules\Cms\Support\CmsPublicPresentationItemCache;
+use Unusualify\Modularous\Facades\ModularousCache;
 use Unusualify\Modularous\Http\Controllers\BaseController;
 use Unusualify\Modularous\Http\Controllers\CoreController;
 use Unusualify\Modularous\Http\Controllers\PanelController;
@@ -130,6 +134,10 @@ abstract class CmsController extends CoreController
         Request $request,
         CanonicalUrlResolverInterface $canonical,
     ) {
+        /**
+         * #TODO: performance optimization, only resolve the item if it qualifies for auto public front
+         * it takes 50ms to resolve the item in local environment
+         */
         $item = $this->resolvePublicItem($request);
 
         if ($item === null) {
@@ -159,25 +167,114 @@ abstract class CmsController extends CoreController
         CanonicalUrlResolverInterface $canonical,
         bool $forcePreviewRobotsNoIndex = false,
     ) {
-        $seo = CmsPublicSeo::build($request, $item, $canonical);
-        $seo['robotsMeta'] = CmsPublicSeo::resolveRobotsMeta($seo['robotsMeta'], $forcePreviewRobotsNoIndex);
-
         $viewName = $this->resolvePublicPresentationViewName($request, $item);
 
-        $innerData = [
-            'item' => $item,
-            'seoTitle' => $seo['title'],
-            'seoDescription' => $seo['description'],
-            'canonicalUrl' => $seo['canonicalUrl'],
-            'robotsMeta' => $seo['robotsMeta'],
-        ];
+        $innerData = CmsPublicPresentationInnerData::build($request, $item, $canonical, $forcePreviewRobotsNoIndex);
+
+        $cacheContext = $this->resolvePresentationItemCacheContext($item);
+        $presentationItemCacheEnabled = ! $forcePreviewRobotsNoIndex
+            && $cacheContext !== null
+            && CmsPublicPresentationItemCache::isEnabled(
+                $cacheContext['moduleName'],
+                $cacheContext['moduleRouteName'],
+            );
+
+        $cacheHeader = null;
+        $normalizedPath = $this->resolvePublicPresentationPathKey($request);
+        $cacheLookupKey = $this->resolvePublicPresentationCacheLookupKey($request, $cacheContext, $normalizedPath);
+
+        if ($presentationItemCacheEnabled) {
+            $resolved = CmsPublicPresentationItemCache::resolvePresentationHtml(
+                $cacheContext['moduleName'],
+                $cacheContext['moduleRouteName'],
+                $item,
+                $viewName,
+                $innerData,
+                bypassSwr: $forcePreviewRobotsNoIndex,
+                normalizedPath: $normalizedPath,
+                cacheLookupKey: $cacheLookupKey,
+            );
+
+            $cacheHeader = CmsPublicPresentationItemCache::cacheHeaderValue($resolved['status']);
+            $html = $resolved['html'];
+
+            if (is_string($html) && $html !== '') {
+                if (CmsPageLayoutPresentationWrapper::resolvesWithPageLayoutShell($item, $viewName)) {
+                    return response(
+                        view('cms::layout_builder.inline_document', ['document' => $html]),
+                        200,
+                        $this->presentationCacheHeaders($cacheHeader),
+                    );
+                }
+
+                return response(
+                    $html,
+                    200,
+                    array_merge(
+                        ['Content-Type' => 'text/html; charset=UTF-8'],
+                        $this->presentationCacheHeaders($cacheHeader),
+                    ),
+                );
+            }
+        }
 
         $wrapped = CmsPageLayoutPresentationWrapper::documentOrNull($item, $viewName, $innerData);
         if ($wrapped !== null) {
-            return view('cms::layout_builder.inline_document', ['document' => $wrapped]);
+            return response(
+                view('cms::layout_builder.inline_document', ['document' => $wrapped]),
+                200,
+                $this->presentationCacheHeaders($cacheHeader),
+            );
         }
 
-        return view($viewName, $innerData);
+        return response(
+            view($viewName, $innerData),
+            200,
+            $this->presentationCacheHeaders($cacheHeader),
+        );
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    protected function presentationCacheHeaders(?string $cacheHeader): array
+    {
+        if ($cacheHeader === null || $cacheHeader === '') {
+            return [];
+        }
+
+        return ['X-Modularous-Cache' => $cacheHeader];
+    }
+
+    /**
+     * Resolves StudlyCase module + route for {@see CmsPublicPresentationItemCache} config keys.
+     *
+     * Universal {@see CmsPublicFrontController} uses {@see CmsPublicFrontViewName} from the resolved model;
+     * per-route front controllers fall back to {@see $moduleName} / {@see $routeName}.
+     *
+     * @return array{moduleName: string, moduleRouteName: string}|null
+     */
+    protected function resolvePresentationItemCacheContext(Model $item): ?array
+    {
+        $context = CmsPublicFrontViewName::presentationItemCacheContextForModel($item);
+        if ($context !== null) {
+            return $context;
+        }
+
+        $moduleName = $this->getModuleName();
+        $routeName = $this->getRouteName();
+        if (
+            $moduleName === null || $routeName === null
+            || $moduleName === '' || $routeName === ''
+            || ($moduleName === 'Cms' && $routeName === 'Public')
+        ) {
+            return null;
+        }
+
+        return [
+            'moduleName' => $moduleName,
+            'moduleRouteName' => $routeName,
+        ];
     }
 
     /**
@@ -187,5 +284,43 @@ abstract class CmsController extends CoreController
     protected function resolvePublicPresentationViewName(Request $request, Model $item): string
     {
         return $this->publicCmsViewName();
+    }
+
+    protected function resolvePublicPresentationPathKey(Request $request): ?string
+    {
+        if (! class_exists(CmsVisitorRedirectResolver::class)) {
+            return null;
+        }
+
+        try {
+            [, $pathKey] = app(CmsVisitorRedirectResolver::class)->resolveLocalePathKeyAndExplicitFlag($request);
+
+            return $pathKey !== '' ? $pathKey : null;
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    /**
+     * @param array{moduleName: string, moduleRouteName: string}|null $cacheContext
+     */
+    protected function resolvePublicPresentationCacheLookupKey(
+        Request $request,
+        ?array $cacheContext,
+        ?string $normalizedPath,
+    ): ?string {
+        if ($normalizedPath === null || $normalizedPath === '') {
+            return null;
+        }
+
+        $moduleName = $cacheContext['moduleName'] ?? null;
+        $moduleRouteName = $cacheContext['moduleRouteName'] ?? null;
+
+        return ModularousCache::getPresentationUrlCacheKeyResolver()->resolve(
+            $request,
+            $normalizedPath,
+            $moduleName,
+            $moduleRouteName,
+        );
     }
 }

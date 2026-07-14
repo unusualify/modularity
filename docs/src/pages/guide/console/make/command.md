@@ -71,4 +71,4 @@ php artisan modularous:make:command ImportData \
 
 ## See also
 
-- [System Reference](/system-reference/backend/console/make#makeconsolecommand)
+- [System Reference](/guide/console/make/overview)

@@ -58,7 +58,7 @@ final class LayoutBuilderShellDraftPreviewController
             'blade_segments.footer' => 'nullable|string',
             'blade_source' => 'nullable|string|in:db,filesystem',
             'blade_view_name' => 'nullable|string|max:512',
-            'style_sheet_id' => 'nullable|integer|exists:'.$styleSheetsTable.',id',
+            'style_sheet_id' => 'nullable|integer|exists:' . $styleSheetsTable . ',id',
             'style_sheet_slugs' => 'nullable|array',
             'style_sheet_slugs.*' => 'nullable|string',
             'target_model_class' => 'nullable|string|max:512',

@@ -4,7 +4,6 @@ namespace Unusualify\Modularous\Console\Migration;
 
 use Illuminate\Console\Command;
 use Nwidart\Modules\Module;
-use Symfony\Component\Console\Input\InputArgument;
 use Unusualify\Modularous\Facades\Modularous;
 
 class MigrateCommand extends Command
@@ -14,7 +13,9 @@ class MigrateCommand extends Command
      *
      * @var string
      */
-    protected $name = 'modularous:migrate';
+    protected $signature = 'modularous:migrate
+                            {module : The name of the module to migrate}
+                            {--pretend : Dump the SQL queries that would be run.}';
 
     /**
      * The console command description.
@@ -31,10 +32,15 @@ class MigrateCommand extends Command
         /** @var Module $module */
         $module = Modularous::findOrFail($this->argument('module'));
 
-        $this->call('migrate', [
-            '--path' => $module->getDirectoryPath('Database/Migrations', true),
-        ]);
         try {
+            $params = [
+                '--path' => $module->getDirectoryPath('Database/Migrations', true),
+            ];
+
+            if ($this->option('pretend')) {
+                $params['--pretend'] = true;
+            }
+            $this->call('migrate', $params);
 
         } catch (\Throwable $th) {
             $this->comment(" {$module->getStudlyName()} Module cannot migrated.");
@@ -42,17 +48,5 @@ class MigrateCommand extends Command
         }
 
         return 0;
-    }
-
-    /**
-     * Get the console command arguments.
-     *
-     * @return array
-     */
-    protected function getArguments()
-    {
-        return [
-            ['module', InputArgument::REQUIRED, 'Module name.'],
-        ];
     }
 }

@@ -3,13 +3,14 @@
     <template v-if="languages && languages.length && languages.length > 0">
       <template v-for="language in languages" :key="language.value">
         <component
+          v-if="shouldRenderLocaleInput(language)"
           v-bind:is="`${type}`"
           v-bind="$lodash.omit(attributesPerLang[`${language.value}`], ['class'])"
           :obj="obj"
           :localeKey="language.value"
           :class="[
             attributesPerLang[`${language.value}`].class ?? '',
-            language.value === currentLocale.value || isCustomForm ? '' : 'd-none'
+            shouldHideInactiveLocale(language) ? 'd-none' : ''
           ]"
           @update:modelValue="modelUpdated($event, language.value)"
           >
@@ -42,7 +43,7 @@
             >
               {{ displayedLocale }}
             </v-chip>
-            <v-chip v-else-if="!labelScope.label && ['v-select', 'v-combobox', 'v-autocomplete', 'v-input-tag'].includes(type)" style=""
+            <v-chip v-else-if="!labelScope.label && ['v-select', 'v-combobox', 'v-autocomplete', 'v-input-tag', 'v-input-editor', 'VInputEditor'].includes(type)" style=""
               size="x-small"
               density="compact"
               color="primary"
@@ -131,6 +132,9 @@ export default {
     }
   },
   computed: {
+    isHeavyInput () {
+      return ['VInputEditor', 'v-input-editor', 'input-editor'].includes(this.type)
+    },
     input: {
       get () {
         return this.modelValue
@@ -219,6 +223,20 @@ export default {
 
   },
   methods: {
+    shouldRenderLocaleInput (language) {
+      if (!this.isHeavyInput) {
+        return true
+      }
+
+      return language.value === this.currentLocale.value || this.isCustomForm
+    },
+    shouldHideInactiveLocale (language) {
+      if (this.isHeavyInput) {
+        return false
+      }
+
+      return !(language.value === this.currentLocale.value || this.isCustomForm)
+    },
     attributesPerLang_: function (lang) {
       const language = this.languages.find(l => l.value === lang)
 

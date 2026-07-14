@@ -113,6 +113,8 @@ class MakeModuleCommand extends BaseCommand
             '--plain' => true,
         ]);
 
+        $plain = $this->getPlainOption();
+
         $this->call('modularous:make:route', [
             'module' => $this->argument('module'),
             'route' => $this->argument('module'),
@@ -125,11 +127,15 @@ class MakeModuleCommand extends BaseCommand
             + ($this->option('no-defaults') ? ['--no-defaults' => true] : [])
             + ($this->option('no-migration') ? ['--no-migration' => true] : [])
             + ($this->option('table-name') ? ['--table-name' => $this->option('table-name')] : [])
-            + (['-p' => $this->getPlainOption()])
+            + (['-p' => $plain])
             + $console_traits
             + ['--notAsk' => true]
             + ['--test' => $this->option('test')]
         );
+
+        if ($plain) {
+            Modularous::findOrFail($this->argument('module'))->ensureRoutesStatusesFile();
+        }
 
         Modularous::clearCache();
 

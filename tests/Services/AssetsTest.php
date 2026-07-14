@@ -1,159 +1,147 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Unusualify\Modularous\Tests\Services;
 
-use Illuminate\Support\Facades\Config;
 use Unusualify\Modularous\Services\Assets;
 use Unusualify\Modularous\Tests\TestCase;
 
 class AssetsTest extends TestCase
 {
-    protected Assets $assets;
+    private string $publicDir;
+
+    private string $manifestPath;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->assets = new Assets;
-    }
 
-    /** @test */
-    public function test_asset_returns_dev_asset_when_in_dev_mode()
-    {
-        // Mock app environment
-        $this->app->instance('env', 'local');
+        $this->publicDir = sys_get_temp_dir() . '/modularous-assets-' . uniqid('', true);
+        mkdir($this->publicDir, 0777, true);
 
-        Config::shouldReceive('get')
-            ->andReturnUsing(function ($key, $default = null) {
-                if ($key === 'app.env') {
-                    return 'local';
-                }
+        $this->manifestPath = $this->publicDir . '/unusual-manifest.json';
+        file_put_contents($this->manifestPath, json_encode([
+            'app.js' => '/unusual/js/app.js',
+            'app.css' => '/unusual/css/app.css',
+        ], JSON_THROW_ON_ERROR));
 
-                return $default;
-            });
-
-        // This test is complex due to devAsset needing HTTP call
-        // Testing that asset() method exists and can be called
-        $this->assertTrue(method_exists($this->assets, 'asset'));
-    }
-
-    /** @test */
-    public function test_prod_asset_uses_manifest_when_available()
-    {
-        // This test verifies the method exists and can handle manifest files
-        // Since readManifest is private, we test through public interface
-        Config::shouldReceive('get')
-            ->andReturnUsing(function ($key, $default = null) {
-                if (str_contains($key, 'public_dir')) {
-                    return 'unusual';
-                }
-
-                return $default;
-            });
-
-        // Test that prodAsset doesn't throw errors
-        $this->assertTrue(method_exists($this->assets, 'prodAsset'));
-    }
-
-    /** @test */
-    public function test_prod_asset_returns_default_path_for_non_existent_file()
-    {
-        Config::shouldReceive('get')
-            ->andReturnUsing(function ($key, $default = null) {
-                if (str_contains($key, 'public_dir')) {
-                    return 'unusual';
-                }
-                if (str_contains($key, 'manifest')) {
-                    return 'unusual-manifest.json';
-                }
-                if (str_contains($key, 'vendor_path')) {
-                    return 'vendor/unusualify/modularous';
-                }
-
-                return $default;
-            });
-
-        // Test that method exists and returns a string
-        $this->assertTrue(method_exists($this->assets, 'prodAsset'));
-    }
-
-    /** @test */
-    public function test_get_manifest_filename_checks_public_path_first()
-    {
-        Config::shouldReceive('get')
-            ->andReturnUsing(function ($key, $default = null) {
-                if (str_contains($key, 'public_dir')) {
-                    return 'unusual';
-                }
-                if (str_contains($key, 'manifest')) {
-                    return 'unusual-manifest.json';
-                }
-
-                return $default;
-            });
-
-        $filename = $this->assets->getManifestFilename();
-
-        // Should return some path
-        $this->assertIsString($filename);
-        $this->assertStringContainsString('unusual', $filename);
-    }
-
-    /** @test */
-    public function test_dev_mode_returns_false_in_production()
-    {
-        $this->app->instance('env', 'production');
-
-        Config::shouldReceive('get')
-            ->andReturnUsing(function ($key, $default = null) {
-                if ($key === 'app.env') {
-                    return 'production';
-                }
-                if (str_contains($key, 'is_development')) {
-                    return false;
-                }
-
-                return $default;
-            });
-
-        // Use reflection to test private method
-        $reflection = new \ReflectionClass($this->assets);
-        $method = $reflection->getMethod('devMode');
-        $method->setAccessible(true);
-
-        $result = $method->invoke($this->assets);
-
-        $this->assertFalse($result);
-    }
-
-    /** @test */
-    public function test_dev_mode_returns_true_in_local_with_development_flag()
-    {
-        $this->app->instance('env', 'local');
-
-        Config::shouldReceive('get')
-            ->andReturnUsing(function ($key, $default = null) {
-                if ($key === 'app.env') {
-                    return 'local';
-                }
-                if (str_contains($key, 'is_development')) {
-                    return true;
-                }
-
-                return $default;
-            });
-
-        $reflection = new \ReflectionClass($this->assets);
-        $method = $reflection->getMethod('devMode');
-        $method->setAccessible(true);
-
-        $result = $method->invoke($this->assets);
-
-        $this->assertTrue($result);
+        config()->set('modularous.public_dir', 'unusual');
+        config()->set('modularous.manifest', 'unusual-manifest.json');
+        config()->set('modularous.is_development', false);
     }
 
     protected function tearDown(): void
     {
-        \Mockery::close();
+        if (is_file($this->manifestPath)) {
+            @unlink($this->manifestPath);
+        }
+        if (is_dir($this->publicDir)) {
+            @rmdir($this->publicDir);
+        }
+
         parent::tearDown();
+    }
+
+    public function test_prod_asset_reads_manifest_entry(): void
+    {
+        $service = new class extends Assets
+        {
+            public function exposeManifestPath(string $path): void
+            {
+                $this->manifestPathOverride = $path;
+            }
+
+            public function getManifestFilename()
+            {
+                return $this->manifestPathOverride ?? parent::getManifestFilename();
+            }
+
+            private ?string $manifestPathOverride = null;
+        };
+
+        $service->exposeManifestPath($this->manifestPath);
+
+        $this->assertSame('/unusual/js/app.js', $service->prodAsset('app.js'));
+    }
+
+    public function test_prod_asset_falls_back_to_public_dir_when_manifest_entry_missing(): void
+    {
+        $service = new class extends Assets
+        {
+            public function exposeManifestPath(string $path): void
+            {
+                $this->manifestPathOverride = $path;
+            }
+
+            public function getManifestFilename()
+            {
+                return $this->manifestPathOverride ?? parent::getManifestFilename();
+            }
+
+            private ?string $manifestPathOverride = null;
+        };
+
+        $service->exposeManifestPath($this->manifestPath);
+
+        $this->assertSame('/unusual/missing.js', $service->prodAsset('missing.js'));
+    }
+
+    public function test_dev_asset_returns_null_outside_development(): void
+    {
+        config()->set('modularous.is_development', false);
+        app()['env'] = 'production';
+
+        $service = new Assets;
+
+        $this->assertNull($service->devAsset('app.js'));
+    }
+
+    public function test_asset_prefers_production_manifest_path(): void
+    {
+        $service = new class extends Assets
+        {
+            public function exposeManifestPath(string $path): void
+            {
+                $this->manifestPathOverride = $path;
+            }
+
+            public function getManifestFilename()
+            {
+                return $this->manifestPathOverride ?? parent::getManifestFilename();
+            }
+
+            private ?string $manifestPathOverride = null;
+        };
+
+        $service->exposeManifestPath($this->manifestPath);
+
+        $this->assertSame('/unusual/js/app.js', $service->asset('app.js'));
+    }
+
+    public function test_get_manifest_filename_falls_back_to_vendor_dist_path(): void
+    {
+        config()->set('modularous.vendor_path', 'vendor/unusualify/modularous');
+        config()->set('modularous.public_dir', 'unusual');
+        config()->set('modularous.manifest', 'unusual-manifest.json');
+
+        $manifestPath = base_path('vendor/unusualify/modularous/vue/dist/unusual/unusual-manifest.json');
+        $manifestDir = dirname($manifestPath);
+
+        if (! is_dir($manifestDir)) {
+            mkdir($manifestDir, 0777, true);
+        }
+
+        file_put_contents($manifestPath, '{}');
+
+        $service = new Assets;
+
+        $this->assertSame($manifestPath, $service->getManifestFilename());
+
+        @unlink($manifestPath);
+        @rmdir($manifestDir);
+        @rmdir(dirname($manifestDir));
+        @rmdir(dirname($manifestDir, 2));
+        @rmdir(dirname($manifestDir, 3));
     }
 }

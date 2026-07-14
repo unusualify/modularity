@@ -28,5 +28,5 @@ php artisan modularous:refresh
 
 ## Related
 
-- [build](./assets/build) — rebuild custom Vue assets
+- [build](./build) — rebuild custom Vue assets
 - [get:version](./get-version) — confirm the installed Modularous version

@@ -4,7 +4,6 @@ namespace Unusualify\Modularous\Console\Migration;
 
 use Illuminate\Console\Command;
 use Nwidart\Modules\Module;
-use Symfony\Component\Console\Input\InputArgument;
 use Unusualify\Modularous\Facades\Modularous;
 
 class MigrateRefreshCommand extends Command
@@ -14,7 +13,9 @@ class MigrateRefreshCommand extends Command
      *
      * @var string
      */
-    protected $name = 'modularous:migrate:refresh';
+    protected $signature = 'modularous:migrate:refresh
+                            {module : The name of the module to refresh}
+                            {--pretend : Dump the SQL queries that would be run.}';
 
     /**
      * The console command description.
@@ -32,30 +33,16 @@ class MigrateRefreshCommand extends Command
         $module = Modularous::findOrFail($this->argument('module'));
 
         try {
-            $this->call('modularous:migrate:rollback', [
+            $params = [
                 'module' => $module->getName(),
-            ]);
-            $this->call('modularous:migrate', [
-                'module' => $module->getName(),
-            ]);
-
+                '--pretend' => $this->option('pretend'),
+            ];
+            $this->call('modularous:migrate:rollback', $params);
+            $this->call('modularous:migrate', $params);
         } catch (\Throwable $th) {
             $this->comment(" {$module->getStudlyName()} Module cannot be refreshed.");
-
         }
 
         return 0;
-    }
-
-    /**
-     * Get the console command arguments.
-     *
-     * @return array
-     */
-    protected function getArguments()
-    {
-        return [
-            ['module', InputArgument::REQUIRED, 'Module name.'],
-        ];
     }
 }
