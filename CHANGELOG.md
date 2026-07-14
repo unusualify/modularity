@@ -2,6 +2,21 @@
 
 All notable changes to `modularous` will be documented in this file
 
+## v0.58.10 - 2026-07-14
+
+### :wrench: Bug Fixes
+
+- add form request class retrieval in destroy method by @celikerde in https://github.com/unusualify/modularous/commit/c089f5cde28071e574ebfe863b8547c4d2f630c4
+- add DELETE method handling and validation response by @celikerde in https://github.com/unusualify/modularous/commit/12985436800f604e6a118a780b20764232ce7b97
+- add validation rules for DELETE requests by @celikerde in https://github.com/unusualify/modularous/commit/66699b0373548f2c99f7f1abe18e0e85434c3b17
+- add missing translation for company deletion restriction by @celikerde in https://github.com/unusualify/modularous/commit/cb4b2c7ddc65679d4cba61ffd4228761505b983d
+- add editedModel prop to enhance form handling by @celikerde in https://github.com/unusualify/modularous/commit/b79991b321d1c92006d9308707cf13bdbb878fa1
+- add editedModel prop to FormActions for improved form state management by @celikerde in https://github.com/unusualify/modularous/commit/2e5fa56c05bac44bd59059b26970aa23c4e3f02d
+- incorporate editedModel for enhanced parameter handling by @celikerde in https://github.com/unusualify/modularous/commit/2e518da623f20e3a18dd391fe262b3a3826003a3
+- implement loading overlay for page actions by @celikerde in https://github.com/unusualify/modularous/commit/88e345c8c179d5dc60f62b42bfbf68077ac22c76
+- enhance form state management with isDirty tracking by @celikerde in https://github.com/unusualify/modularous/commit/66dac82b69e257f144f21f1697c73b3a838688e0
+- enhance DELETE request validation and error handling by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/232057529653b489b42e7400ea7d48e34a4b3a2f
+
 ## v12.4.0 - 2026-07-10
 
 ### :rocket: Features
