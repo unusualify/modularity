@@ -1,10 +1,16 @@
 <script setup>
-import { computed, ref, onMounted } from 'vue'
+import { computed, ref, onMounted, provide } from 'vue'
 import { usePage, Head } from '@inertiajs/vue3'
 
 const page = usePage()
 
 const loading = ref(true)
+
+const showBusyOverlay = ref(false)
+const showSpinner = () => { showBusyOverlay.value = true }
+const hideSpinner = () => { showBusyOverlay.value = false }
+
+provide('pageLoadingOverlay', { show: showSpinner, hide: hideSpinner })
 
 const headData = computed(() => {
   return page.props.headLayoutData
@@ -73,6 +79,21 @@ defineOptions({
     <div class="ue-loading-spinner" id="loading-spinner" v-show="loading">
       <div class="ue-spinner"></div>
     </div>
+
+    <v-overlay
+      :model-value="showBusyOverlay"
+      class="align-center justify-center"
+      persistent
+      scrim="rgba(255, 255, 255, 0.97)"
+      :z-index="9998"
+    >
+      <v-progress-circular
+        color="primary"
+        indeterminate
+        size="56"
+        width="5"
+      />
+    </v-overlay>
   </div>
 </template>
 

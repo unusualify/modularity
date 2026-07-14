@@ -1,5 +1,5 @@
 // hooks/useItemActions.js
-import { toRefs, computed, reactive, ref } from 'vue'
+import { toRefs, computed, reactive, ref, inject } from 'vue'
 import { router } from '@inertiajs/vue3'
 import { useStore } from 'vuex'
 import _ from 'lodash-es'
@@ -29,6 +29,8 @@ export default function useItemActions(props, context) {
   const { shouldUseInertia } = useConfig()
   const { castObjectAttributes } = useCastAttributes()
   const dynamicModal = useDynamicModal()
+
+  const pageLoading = inject('pageLoadingOverlay', null)
 
   const Actions = _.cloneDeep(props.actions)
 
@@ -93,10 +95,15 @@ export default function useItemActions(props, context) {
         }
       })
     }
+    pageLoading?.show();
 
     api[method](endpoint, params,
       (response) => {
-        if (response.data.message) {
+        const showAlert = () => {
+          if (!response.data.message) {
+            return;
+          }
+
           let actionResponseMessage = action.responseMessage || {};
           let message = response.data.message;
           let variant = response.data.variant;
@@ -117,21 +124,32 @@ export default function useItemActions(props, context) {
             variant: variant
           });
         }
+
         context.emit('actionComplete', { action, response });
 
         // Reload the page after successful operation
         if (action.reloadOnSuccess === true) {
           const forceRefresh = action.forceRefresh || false
           if(shouldUseInertia.value && !forceRefresh) {
-            router.reload({ only: ['formAttributes', ...(action.reloadOnly || [])] })
+            router.reload({
+              only: ['formAttributes', ...(action.reloadOnly || [])],
+              onFinish: () => {
+                pageLoading?.hide();
+                showAlert();
+              }
+            })
           } else {
             setTimeout(() => {
               window.location.reload()
             }, action.reloadDelay || 1000); // 1 second delay to show the success message
           }
+        } else {
+          pageLoading?.hide();
+          showAlert();
         }
       },
       (error) => {
+        pageLoading?.hide();
         store.commit(ALERT.SET_ALERT, {
           message: error.data?.message || 'Action failed',
           variant: 'error'
