@@ -40,6 +40,8 @@ export default function useItemActions(props, context) {
     || props.item
     || props.editedItem
 
+  const editedModel = context.editedModel ?? null
+
   const resolveParamValue = (config) => {
     if (!config.source || !config.find || !config.return) {
       return config;
@@ -85,6 +87,14 @@ export default function useItemActions(props, context) {
       }
     }
 
+    if (action.includeFormData && editedModel) {
+      const fields = Array.isArray(action.includeFormData) ? action.includeFormData : Object.keys(editedModel)
+      fields.forEach(field => {
+        if (editedModel[field] !== undefined) {
+          params[field] = editedModel[field]
+        }
+      })
+    }
     pageLoading?.show();
 
     api[method](endpoint, params,
@@ -221,9 +231,8 @@ export default function useItemActions(props, context) {
         action = castObjectAttributes(action, editingItem)
       }
 
-      if(!validateAction(action)) {
-        action.disabled = true
-      }
+      action.disabled = !validateAction(action)
+        || (props.formDirty === true && action.disableOnDirty === true)
 
       return action
     })

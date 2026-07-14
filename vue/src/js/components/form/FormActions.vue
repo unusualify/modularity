@@ -132,7 +132,10 @@ export default {
       type: Object,
       required: true
     },
-
+    formDirty: {
+      type: Boolean,
+      default: false
+    },
   },
   setup(props, context) {
     const { handleAction, allActions, hasActions } = useItemActions(props, {
