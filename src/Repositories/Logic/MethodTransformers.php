@@ -307,8 +307,9 @@ trait MethodTransformers
                     case 'text':
                     case 'textarea':
                     case 'input-date':
+                    case 'input-phone':
                         $found = true;
-                        $acc[$item['name']] = $object->{$item['name']} ?? null;
+                        $acc[$item['name']] = data_get($object, $item['name'], null) ?? null;
 
                         break;
                     default:
