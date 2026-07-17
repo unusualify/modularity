@@ -87,7 +87,10 @@
                 "Unusualify\\Modularous\\Providers\\ModularousProvider"
             ],
             "aliases": {
-                "ModularousVite": "Unusualify\\Modularous\\Facades\\ModularousVite"
+                "ModularousVite": "Unusualify\\Modularous\\Facades\\ModularousVite",
+                "SystemSettings": "Unusualify\\Modularous\\Facades\\SystemSettings",
+                "CmsSettings": "Unusualify\\Modularous\\Facades\\CmsSettings",
+                "SiteSettings": "Unusualify\\Modularous\\Facades\\SiteSettings"
             }
         },
         "branch-alias": {
