@@ -7,6 +7,7 @@ use Modules\Cms\Services\CanonicalUrlResolver;
 use Modules\Cms\Services\CmsAdminWarnings;
 use Modules\Cms\Services\CmsSiteSeoSettingsService;
 use Modules\Cms\Support\CmsPublicSeo;
+use Modules\SystemSetting\Support\MigrateRobotsTxtFromSiteSetting;
 use Unusualify\Modularous\Entities\Traits\Core\HasScopes;
 
 return [
@@ -32,19 +33,23 @@ return [
      * Global robots.txt (served at GET /robots.txt when route enabled).
      *
      * @see RobotsTxtController
+     * @see CmsSiteSeoSettingsService
      */
     'robots' => [
         'route_enabled' => env('MODULAROUS_CMS_ROBOTS_TXT_ROUTE_ENABLED', true),
         'global_robots_txt' => env('MODULAROUS_CMS_SEO_GLOBAL_ROBOTS_TXT', ''),
         /**
-         * When true, GET /robots.txt prefers {@see CmsSiteSeoSettingsService} (um_cms_site_settings).
+         * When true, GET /robots.txt prefers {@see CmsSiteSeoSettingsService}
+         * ({@see \Unusualify\Modularous\Facades\SiteSettings} → CmsSettings with SystemSettings fallback).
          * When false, only env/config {@code global_robots_txt} is used (legacy / headless deploys).
          */
-        'use_site_settings' => env('MODULAROUS_CMS_SEO_ROBOTS_USE_SITE_SETTINGS', true),
+        'use_system_settings' => env('MODULAROUS_CMS_SEO_ROBOTS_USE_SYSTEM_SETTINGS', env('MODULAROUS_CMS_SEO_ROBOTS_USE_SITE_SETTINGS', true)),
         /**
-         * Composite key for the global robots.txt body row (must match unique index on site_settings).
+         * Legacy KV row keys used only by {@see MigrateRobotsTxtFromSiteSetting}.
+         *
+         * @deprecated Robots.txt is stored on SystemSetting General / Cms SiteSetting (IsSingular).
          */
-        'site_setting' => [
+        'legacy_site_setting' => [
             'group_key' => env('MODULAROUS_CMS_SEO_ROBOTS_SITE_GROUP', 'seo'),
             'key' => env('MODULAROUS_CMS_SEO_ROBOTS_SITE_KEY', 'global_robots_txt'),
             'locale' => env('MODULAROUS_CMS_SEO_ROBOTS_SITE_LOCALE', '*'),
