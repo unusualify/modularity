@@ -101,17 +101,19 @@ trait FilesTrait
      */
     private function detachFilesForRoleLocale($object, string $role, string $locale): void
     {
-        $relatedKey = $object->files()->getRelated()->getQualifiedKeyName();
-        $ids = $object->files()
-            ->wherePivot('role', $role)
-            ->wherePivot('locale', $locale)
-            ->pluck($relatedKey);
+        $relation = $object->files();
+        $deleted = $relation->newPivotStatement()
+            ->where($relation->getMorphType(), $object->getMorphClass())
+            ->where($relation->getForeignPivotKeyName(), $object->getKey())
+            ->where('role', $role)
+            ->where('locale', $locale)
+            ->delete();
 
-        if ($ids->isEmpty()) {
+        if ($deleted === 0) {
             return;
         }
 
-        $object->files()->detach($ids->all());
+        $object->unsetRelation('files');
         $this->mustTouchEloquentModel();
     }
 
