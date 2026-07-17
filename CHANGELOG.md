@@ -2,6 +2,16 @@
 
 All notable changes to `modularous` will be documented in this file
 
+## v12.5.1 - 2026-07-17
+
+### :wrench: Bug Fixes
+
+- simplify SEO title and description resolution logic for improved clarity by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/06e29a1be827b6a49f87e65b8ae9763148ecfde0
+
+### :memo: Documentation
+
+- extract built output for v12.5.0 by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/b417f9d6615c7323d39401d88177533116434721
+
 ## v12.5.0 - 2026-07-17
 
 ### :rocket: Features
