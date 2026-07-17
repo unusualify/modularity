@@ -2,10 +2,11 @@
 
 use Illuminate\Support\Facades\Route;
 use Modules\Cms\Http\Controllers\API\PromotionController;
+use Modules\Cms\Http\Controllers\LayoutBuilderHtmlPreviewController;
+use Modules\Cms\Http\Controllers\LayoutBuilderShellDraftPreviewController;
 use Modules\Cms\Http\Controllers\PromotionToolController;
 use Modules\Cms\Http\Controllers\SignedPublicPreviewMintController;
 use Modules\Cms\Http\Controllers\SitemapController;
-use Modules\Cms\Http\Controllers\SiteSeoSettingsController;
 use Modules\Cms\Http\Controllers\SiteSeoToolController;
 use Unusualify\Modularous\Facades\ModularousRoutes;
 

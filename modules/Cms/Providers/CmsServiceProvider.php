@@ -46,6 +46,7 @@ use Modules\Cms\Services\CmsPageLayoutResolver;
 use Modules\Cms\Services\CmsParentSegmentResolver;
 use Modules\Cms\Services\CmsPromotionService;
 use Modules\Cms\Services\CmsPublicModelResolver;
+use Modules\Cms\Services\CmsSettingsService;
 use Modules\Cms\Services\CmsSignedPreviewTargetResolver;
 use Modules\Cms\Services\CmsSignedPreviewUrlGenerator;
 use Modules\Cms\Services\CmsSitemapBuildService;
@@ -58,6 +59,7 @@ use Modules\Cms\Services\DbFullTextSearchDriver;
 use Modules\Cms\Services\DefaultCmsPromotionScopeApplier;
 use Modules\Cms\Services\NullLeadDelivery;
 use Modules\Cms\Services\RedirectValidationService;
+use Modules\Cms\Services\SiteSettingsService;
 use Modules\Cms\Services\Stylesheet\FrameworkArtifactResolver;
 use Modules\Cms\Services\Stylesheet\FrameworkScriptResolver;
 use Modules\Cms\Services\Stylesheet\RootVariablesEmitter;
@@ -66,6 +68,7 @@ use Modules\Cms\Services\Stylesheet\StylesheetCompilerService;
 use Modules\Cms\Services\Stylesheet\UtilityCssGenerator;
 use Modules\Cms\Support\CmsPublicUrlRegistryAboutReporter;
 use Modules\Cms\Support\CmsPublicUrlRegistryCacheManager;
+use Modules\Cms\Support\DuplicateSystemSettingsToCmsSettings;
 use Unusualify\Modularous\Facades\ModularousCache;
 use Unusualify\Modularous\Services\Security\SecurityService;
 use Unusualify\Modularous\Services\SlugInputValidationService;
@@ -110,6 +113,11 @@ class CmsServiceProvider extends ServiceProvider
         $this->app->singleton(CmsSitemapCacheService::class);
         $this->app->singleton(CmsAdminWarnings::class);
         $this->app->singleton(CmsSiteSeoSettingsService::class);
+        $this->app->singleton(CmsSettingsService::class);
+        $this->app->alias(CmsSettingsService::class, 'cms.settings');
+        $this->app->singleton(SiteSettingsService::class);
+        $this->app->alias(SiteSettingsService::class, 'site.settings');
+        $this->app->singleton(DuplicateSystemSettingsToCmsSettings::class);
         $this->app->singleton(SlugInputValidationService::class, CmsSlugInputValidationService::class);
         $this->app->singleton(CmsSignedPreviewUrlGenerator::class);
         $this->app->singleton(CmsSignedPreviewTargetResolver::class);
@@ -188,6 +196,12 @@ class CmsServiceProvider extends ServiceProvider
         $this->registerCmsSignedPreviewRoutes();
         $this->registerCmsPublicStylesheetRoutes();
         $this->registerCmsPublishSchedule();
+
+        try {
+            $this->app->make(DuplicateSystemSettingsToCmsSettings::class)->duplicateIfNeeded();
+        } catch (\Throwable) {
+            // Seed is best-effort when singletons / DB are unavailable.
+        }
     }
 
     /**

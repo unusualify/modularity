@@ -2,23 +2,15 @@
 
 namespace Modules\Cms\Services;
 
-use Modules\Cms\Entities\SiteSetting;
-use Modules\Cms\Http\Controllers\Front\RobotsTxtController;
-use Modules\Cms\Repositories\SiteSettingRepository;
 use Modules\Cms\Support\CmsPublicSeo;
+use Unusualify\Modularous\Facades\SiteSettings;
 
 /**
- * Persists site-wide SEO options in {@see SiteSetting} (key-value rows).
- *
- * Global robots.txt body is stored under the configured group/key/locale and read by
- * {@see RobotsTxtController} when `cms_seo.robots.use_site_settings` is true.
+ * Site-wide SEO helpers. Global robots.txt is resolved via {@see SiteSettings}
+ * (CmsSettings on frontend with SystemSettings fallback).
  */
 class CmsSiteSeoSettingsService
 {
-    public function __construct(
-        protected SiteSettingRepository $siteSettings,
-    ) {}
-
     /**
      * Body served at GET /robots.txt (normalized trailing newline).
      */
@@ -31,7 +23,7 @@ class CmsSiteSeoSettingsService
         $default = "User-agent: *\nAllow: /";
         $raw = null;
 
-        if (modularousConfig('cms_seo.robots.use_site_settings', true)) {
+        if (modularousConfig('cms_seo.robots.use_system_settings', true)) {
             $persisted = $this->persistedGlobalRobotsTxt();
             if ($persisted !== null) {
                 $raw = trim($persisted);
@@ -53,14 +45,17 @@ class CmsSiteSeoSettingsService
     }
 
     /**
-     * Raw value from DB, or null when unset (use env/config in UI and public fallback).
+     * Raw value from SiteSettings, or null when unset (use env/config in UI and public fallback).
      */
     public function persistedGlobalRobotsTxt(): ?string
     {
-        [$g, $k, $locale] = $this->robotsSettingKeys();
-        $row = $this->siteSettings->findScoped($g, $k, $locale);
+        if (! SiteSettings::forFrontend()->has('seo.robots_txt')) {
+            return null;
+        }
 
-        return $row !== null ? (string) $row->value : null;
+        $value = SiteSettings::forFrontend()->get('seo.robots_txt');
+
+        return $value !== null ? (string) $value : null;
     }
 
     /**
@@ -88,21 +83,9 @@ class CmsSiteSeoSettingsService
 
     public function saveGlobalRobotsTxt(?string $value): void
     {
-        [$g, $k, $locale] = $this->robotsSettingKeys();
-        $this->siteSettings->putScoped($g, $k, $locale, $value);
-    }
+        $normalized = $value === null || trim($value) === '' ? null : rtrim($value, "\r\n");
 
-    /**
-     * @return array{0: string, 1: string, 2: string}
-     */
-    protected function robotsSettingKeys(): array
-    {
-        $cfg = (array) modularousConfig('cms_seo.robots.site_setting', []);
-
-        return [
-            (string) ($cfg['group_key'] ?? 'seo'),
-            (string) ($cfg['key'] ?? 'global_robots_txt'),
-            (string) ($cfg['locale'] ?? '*'),
-        ];
+        // Panel SEO tool writes the system-wide default; CMS Site Settings can override per frontend.
+        SiteSettings::forBackend()->set('seo.robots_txt', $normalized);
     }
 }
