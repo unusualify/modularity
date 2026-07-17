@@ -2,6 +2,60 @@
 
 All notable changes to `modularous` will be documented in this file
 
+## v12.5.0 - 2026-07-17
+
+### :rocket: Features
+
+- add getFrontendUrl method and include frontend URL in mediableFormat by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/7d0009c38fcb463f012cf2419ad83c66e686412f
+- introduce comprehensive system settings module with SMTP configuration, analytics support, and migration for legacy robots.txt by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/6c5de69ba37d43cbb8e676fd4ccd4a5dad50af9e
+- implement new site settings management with structured sections for site, social, contact, and SEO; deprecate legacy SEO settings handling by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/42a09b78c6a436ccb3169442cd42e1175ee3b027
+- add new collapsible wrap and group input types for enhanced UI structure by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/32d3dd53485f0dc9a3f8cf67790bd6e95eff1bb1
+- add new configuration file for system settings with support for analytics, SMTP overrides, and social links management by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/a6ab42c0efb369b5a17c18e782aae5ca79a11a1a
+- update robots.txt configuration to use system settings, deprecate legacy site settings, and introduce new cms_settings.php for cache and sensitive keys management by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/85ab33c7067398d69fce0a5cdd79b485e77da2c9
+- introduce new facade classes for CmsSettings, SiteSettings, and SystemSettings; enhance composer.json with new aliases for improved settings management by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/32351d3541048b90167bb9aea5dacdca54e7daa9
+- update favicon handling to prioritize SystemSettings for dynamic favicon URLs, enhancing site customization options by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/2575f12beb59a009208977b766e4a59e3214e5fa
+- enhance hasTranslatedInput method to support nested schema arrays for improved input handling by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/a9d0b55421275b54971089bc3e8ab787e4fab859
+- remove legacy robots.txt input and update UI to direct users to System Settings for SEO management by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/864e5577105dfd678bbef72f9fe2f489b259dcfc
+
+### :wrench: Bug Fixes
+
+- add missing translation for company deletion restriction by @celikerde in https://github.com/unusualify/modularous/commit/57b2c3130f2ef20eebf63a9b4437c4bb9e651c2c
+- add DELETE method handling and validation response by @celikerde in https://github.com/unusualify/modularous/commit/222071df16aa4f2e428b19d0ac413d33272e597e
+- add validation rules for DELETE requests by @celikerde in https://github.com/unusualify/modularous/commit/435c0132bbf0f2d164d98c1ce3d49797e88ed5f7
+- add form request class retrieval in destroy method by @celikerde in https://github.com/unusualify/modularous/commit/b24fbba84f894046f69ce241771487a93e6512df
+- handle 422 status response and update axios delete/put requests to validate status by @celikerde in https://github.com/unusualify/modularous/commit/1d763b04a235a7616aa37270ef9ec073527366af
+- update getFormFields method to use data_get for improved null handling by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/206860fb753011fae2aeeb1881b7ff3477142c5b
+- enhance attachment role checks with data_get for improved null handling by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/dab0c2bbca80e7c171a48e7d6df77e03cd67dec9
+- update batch activity properties handling to ensure compatibility with Collection types before merging properties by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/bea33c36cd1bc6f782f6482f92ce24a39784758c
+
+### :recycle: Refactors
+
+- remove redundant vendorPath check and clean up translation caching logic by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/87323fa488b029479903646fcdbb7857ca90d9d3
+- improve installed composer retrieval logic and handle missing files gracefully by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/67267a6eb20f2ab7d52a1f69a2a120a973573757
+- optimize detach methods for files and medias by using newPivotStatement for improved performance by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/38b598ee6d432faeb28613e4f5d9554820cf1242
+
+### :memo: Documentation
+
+- add CmsSettings and SiteSettings facades, enhancing settings management with context-aware routing and shared API; update overview documentation for facades and services by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/1c9923ad36490c0bb7d16f80da7e30ec37a9f4e3
+
+### :lipstick: Styling
+
+- lint coding styles for v12.5.0 by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/b9b07c9e1ae8acebbf9e102df4717eec13e811b4
+
+### :white_check_mark: Testing
+
+- add console command and middleware, update module configuration with aliases by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/8a7c2cfebca45e5d6ef8f514763c82eccaf780c6
+- add tests for SiteSettings and SystemSettings services, enhancing configuration management and SEO settings handling by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/6215d936199000b12ea6765478f2d2e54fc4b54a
+- refine translatable model batch activity tests to ensure accurate property updates and exception handling by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/73373adf6c81c0506132cb36de0922c98be560e4
+
+### :package: Build
+
+- update build artifacts for v12.5.0 by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/48bb4bbe50d3d9348c5a07b28ed58f8dcbe87f5c
+
+### :beers: Other Stuff
+
+- increase parallel test processes to 4 and set process timeout to 300 seconds by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/41a11be02c2139138a4435a07c6baad94caeb342
+
 ## v0.58.10 - 2026-07-14
 
 ### :wrench: Bug Fixes
