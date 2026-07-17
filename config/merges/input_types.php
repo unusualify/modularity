@@ -3,6 +3,24 @@
 use Camroncade\Timezone\Timezone;
 
 return [
+    '@collapsible_wrap' => [
+        'type' => 'wrap',
+        'typeInt' => 'ue-collapsible',
+        'typeIntModelValue' => false,
+        'typeIntTitle' => 'Wrap',
+        'noLabel' => true,
+        'bordered' => true,
+        'col' => ['cols' => 12,'sm' => 12,'md' => 12,'lg' => 12,'xl' => 12],
+    ],
+    '@collapsible_group' => [
+        'type' => 'group',
+        'typeInt' => 'ue-collapsible',
+        'typeIntModelValue' => false,
+        'typeIntTitle' => 'Group',
+        'noLabel' => true,
+        'bordered' => true,
+        'col' => ['cols' => 12,'sm' => 12,'md' => 12,'lg' => 12,'xl' => 12],
+    ],
     '_language' => [
         'type' => 'select',
         'name' => 'language',
