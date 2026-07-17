@@ -164,6 +164,50 @@ class ImagesTraitTest extends RepositoryTestCase
         $this->assertSame('en', $pivot->locale);
     }
 
+    public function test_detach_media_for_one_locale_does_not_remove_same_media_from_other_locale()
+    {
+        config(['translatable.locales' => ['en', 'tr']]);
+
+        $media = Media::create([
+            'uuid' => 'uploads/folder/shared.jpg',
+            'filename' => 'shared.jpg',
+            'alt_text' => 'shared.jpg',
+            'caption' => 'shared.jpg',
+            'width' => 100,
+            'height' => 100,
+        ]);
+
+        $schema = [
+            'image-1' => [
+                'type' => 'image',
+                'name' => 'image-1',
+                'translated' => true,
+            ],
+        ];
+
+        $inputsMap = Arr::mapWithKeys($schema, fn ($i) => [$i['name'] => $i]);
+        $repo = new ImagesTestRepositoryTranslated(new ImagesTestModel, $inputsMap);
+        $model = $repo->create(['name' => 'Shared Media'], $schema);
+
+        $repo->update($model->id, [
+            'image-1' => [
+                'en' => [['id' => $media->id, 'metadatas' => ['default' => ['caption' => null, 'altText' => null, 'video' => null]]]],
+                'tr' => [['id' => $media->id, 'metadatas' => ['default' => ['caption' => null, 'altText' => null, 'video' => null]]]],
+            ],
+        ], $schema);
+
+        $repo->update($model->id, [
+            'image-1' => [
+                'en' => [],
+                'tr' => [['id' => $media->id, 'metadatas' => ['default' => ['caption' => null, 'altText' => null, 'video' => null]]]],
+            ],
+        ], $schema);
+
+        $fresh = $model->fresh()->load('medias');
+        $this->assertCount(1, $fresh->medias);
+        $this->assertSame('tr', $fresh->medias->first()->pivot->locale);
+    }
+
     public function test_ignored_medias_field_skips_sync_and_attachment()
     {
         $media = Media::create([

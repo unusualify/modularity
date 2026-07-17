@@ -203,6 +203,45 @@ class FilesTraitTest extends RepositoryTestCase
         $this->assertSame('en', $pivot->locale);
     }
 
+    public function test_detach_files_for_one_locale_does_not_remove_same_file_from_other_locale()
+    {
+        config(['translatable.locales' => ['en', 'tr']]);
+
+        $file = LibraryFile::create([
+            'uuid' => 'uploads/folder/shared.pdf',
+            'filename' => 'shared.pdf',
+            'size' => 100,
+        ]);
+
+        $model = $this->repository->create(['name' => 'Shared File']);
+
+        $schema = [
+            'file-1' => [
+                'type' => 'input-file',
+                'name' => 'file-1',
+                'translated' => true,
+            ],
+        ];
+
+        $this->repository->update($model->id, [
+            'file-1' => [
+                'en' => [['id' => $file->id]],
+                'tr' => [['id' => $file->id]],
+            ],
+        ], $schema);
+
+        $this->repository->update($model->id, [
+            'file-1' => [
+                'en' => [],
+                'tr' => [['id' => $file->id]],
+            ],
+        ], $schema);
+
+        $fresh = $model->fresh()->load('files');
+        $this->assertCount(1, $fresh->files);
+        $this->assertSame('tr', $fresh->files->first()->pivot->locale);
+    }
+
     public function test_ignored_files_field_skips_sync_and_attachment()
     {
         $file = LibraryFile::create([

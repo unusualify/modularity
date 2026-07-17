@@ -2,39 +2,42 @@
 
 namespace Unusualify\Modularous\Tests\Services\Cms;
 
-use Modules\Cms\Entities\SiteSetting;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\Cms\Http\Controllers\Front\RobotsTxtController;
-use Modules\Cms\Repositories\SiteSettingRepository;
+use Modules\Cms\Services\CmsSettingsService;
 use Modules\Cms\Services\CmsSiteSeoSettingsService;
+use Modules\Cms\Services\SiteSettingsService;
 use Modules\Cms\Support\CmsPublicSeo;
-use Unusualify\Modularous\Tests\TestCase;
+use Modules\SystemSetting\Services\SystemSettingsService;
+use Unusualify\Modularous\Facades\SystemSettings;
+use Unusualify\Modularous\Tests\ModelTestCase;
 
-class CmsSiteSeoSettingsServiceTest extends TestCase
+class CmsSiteSeoSettingsServiceTest extends ModelTestCase
 {
-    public function test_resolved_prefers_persisted_value_when_use_site_settings(): void
+    use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->app->singleton(SystemSettingsService::class);
+        $this->app->alias(SystemSettingsService::class, 'system.settings');
+        $this->app->singleton(CmsSettingsService::class);
+        $this->app->alias(CmsSettingsService::class, 'cms.settings');
+        $this->app->singleton(SiteSettingsService::class);
+        $this->app->alias(SiteSettingsService::class, 'site.settings');
+    }
+
+    public function test_resolved_prefers_persisted_system_settings_value(): void
     {
         config([
-            'modularous.cms_seo.robots.use_site_settings' => true,
+            'modularous.cms_seo.robots.use_system_settings' => true,
             'modularous.cms_seo.robots.global_robots_txt' => 'User-agent: *\nAllow: /',
-            'modularous.cms_seo.robots.site_setting' => [
-                'group_key' => 'seo',
-                'key' => 'global_robots_txt',
-                'locale' => '*',
-            ],
         ]);
 
-        $row = $this->getMockBuilder(SiteSetting::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods([])
-            ->getMock();
-        $row->setRawAttributes([
-            'value' => "User-agent: *\nDisallow: /staging",
-        ]);
+        SystemSettings::set('seo.robots_txt', "User-agent: *\nDisallow: /staging");
 
-        $repo = $this->createMock(SiteSettingRepository::class);
-        $repo->method('findScoped')->with('seo', 'global_robots_txt', '*')->willReturn($row);
-
-        $service = new CmsSiteSeoSettingsService($repo);
+        $service = $this->app->make(CmsSiteSeoSettingsService::class);
         $body = $service->resolvedRobotsTxtBody();
 
         $this->assertStringContainsString('Disallow: /staging', $body);
@@ -44,20 +47,11 @@ class CmsSiteSeoSettingsServiceTest extends TestCase
     public function test_resolved_body_static_accepts_injected_service(): void
     {
         config([
-            'modularous.cms_seo.robots.use_site_settings' => true,
-            'modularous.cms_seo.robots.site_setting' => [
-                'group_key' => 'seo',
-                'key' => 'global_robots_txt',
-                'locale' => '*',
-            ],
+            'modularous.cms_seo.robots.use_system_settings' => true,
+            'modularous.cms_seo.robots.global_robots_txt' => 'User-agent: *\nDisallow: /cfg',
         ]);
 
-        $repo = $this->createMock(SiteSettingRepository::class);
-        $repo->method('findScoped')->willReturn(null);
-
-        $service = new CmsSiteSeoSettingsService($repo);
-        config(['modularous.cms_seo.robots.global_robots_txt' => 'User-agent: *\nDisallow: /cfg']);
-
+        $service = $this->app->make(CmsSiteSeoSettingsService::class);
         $body = RobotsTxtController::resolvedBody($service);
 
         $this->assertStringContainsString('/cfg', $body);
@@ -67,26 +61,12 @@ class CmsSiteSeoSettingsServiceTest extends TestCase
     {
         config([
             'modularous.cms_seo.staging.force_noindex' => true,
-            'modularous.cms_seo.robots.use_site_settings' => true,
-            'modularous.cms_seo.robots.site_setting' => [
-                'group_key' => 'seo',
-                'key' => 'global_robots_txt',
-                'locale' => '*',
-            ],
+            'modularous.cms_seo.robots.use_system_settings' => true,
         ]);
 
-        $row = $this->getMockBuilder(SiteSetting::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods([])
-            ->getMock();
-        $row->setRawAttributes([
-            'value' => "User-agent: *\nAllow: /",
-        ]);
+        SystemSettings::set('seo.robots_txt', "User-agent: *\nAllow: /");
 
-        $repo = $this->createMock(SiteSettingRepository::class);
-        $repo->method('findScoped')->with('seo', 'global_robots_txt', '*')->willReturn($row);
-
-        $service = new CmsSiteSeoSettingsService($repo);
+        $service = $this->app->make(CmsSiteSeoSettingsService::class);
         $body = $service->resolvedRobotsTxtBody();
 
         $this->assertSame(CmsPublicSeo::ROBOTS_TXT_STAGING_DISALLOW_ALL . "\n", $body);
