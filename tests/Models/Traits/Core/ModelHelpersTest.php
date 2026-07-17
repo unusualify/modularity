@@ -501,8 +501,6 @@ class ModelHelpersTest extends ModelTestCase
 
     public function test_translatable_model_updates_existing_batch_activity()
     {
-        $this->expectException(\TypeError::class);
-
         $this->app['config']->set('activitylog.enabled', true);
         Auth::login($this->user);
 
@@ -531,7 +529,7 @@ class ModelHelpersTest extends ModelTestCase
         $batchUuid = LogBatch::getUuid();
         $this->assertNotNull($batchUuid);
 
-        Activity::create([
+        $batchActivity = Activity::create([
             'log_name' => 'default',
             'description' => 'created',
             'subject_type' => TranslatableModel::class,
@@ -545,9 +543,30 @@ class ModelHelpersTest extends ModelTestCase
             ],
         ]);
 
+        $activitiesBefore = Activity::forBatch($batchUuid)
+            ->where('subject_type', TranslatableModel::class)
+            ->where('subject_id', $model->id)
+            ->count();
+
         $model->translate('en')->name = 'Updated Name';
         $model->translate('en')->description = 'Updated Description';
-        $model->save(); // TypeError thrown here
+        $model->save();
+
+        $activitiesAfter = Activity::forBatch($batchUuid)
+            ->where('subject_type', TranslatableModel::class)
+            ->where('subject_id', $model->id)
+            ->count();
+
+        $this->assertEquals($activitiesBefore, $activitiesAfter);
+
+        $batchActivity->refresh();
+
+        $this->assertEquals('Updated Name', $batchActivity->properties['attributes']['en']['name']);
+        $this->assertEquals('Updated Description', $batchActivity->properties['attributes']['en']['description']);
+        $this->assertEquals('Original Name', $batchActivity->properties['old']['en']['name']);
+        $this->assertEquals('Original Description', $batchActivity->properties['old']['en']['description']);
+
+        LogBatch::endBatch();
     }
 
     public function test_translatable_model_creates_new_activity_when_no_batch_activity_exists()
