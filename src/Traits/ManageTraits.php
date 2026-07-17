@@ -37,6 +37,12 @@ trait ManageTraits
                 $hasTranslated = true;
 
                 break;
+            } elseif (isset($input['schema']) && is_array($input['schema'])) {
+                $hasTranslated = $this->hasTranslatedInput($input['schema']);
+
+                if ($hasTranslated) {
+                    break;
+                }
             }
         }
 
