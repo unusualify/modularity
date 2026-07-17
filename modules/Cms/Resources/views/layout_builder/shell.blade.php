@@ -5,11 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-
     @php
         $resolvedSiteName = SiteSettings::get('site.name', config('app.name'));
-        $resolvedMetaTitle = $seoTitle ?? $siteTitle ?? SiteSettings::get('seo.default_meta_title', $resolvedSiteName);
-        $resolvedMetaDescription = $seoDescription ?? SiteSettings::get('seo.default_meta_description', '');
+        $resolvedMetaTitle = filled($seoTitle ?? null) ? $seoTitle : SiteSettings::get('seo.default_meta_title', $resolvedSiteName);
+        $resolvedMetaDescription = filled($seoDescription ?? null) ? $seoDescription : SiteSettings::get('seo.default_meta_description', '');
         $resolvedFavicon = SiteSettings::value('site.favicon.original') ?: asset('favicon.ico');
     @endphp
 
