@@ -2,6 +2,7 @@
 
 namespace Unusualify\Modularous\Tests;
 
+use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Mockery;
@@ -361,7 +362,7 @@ class ModularousTest extends TestModulesCase
         // Use a real translator binding (instance, not facade mock) so the
         // assertion is deterministic without fragile facade expectations that
         // break when the full suite runs.
-        $translator = Mockery::mock(\Illuminate\Contracts\Translation\Translator::class);
+        $translator = Mockery::mock(Translator::class);
         $translator->shouldReceive('getTranslations')->andReturn(['en' => ['greeting' => 'Hello']]);
         $this->app->instance('translator', $translator);
 

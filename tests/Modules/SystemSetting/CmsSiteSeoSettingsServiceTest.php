@@ -6,6 +6,7 @@ namespace Unusualify\Modularous\Tests\Modules\SystemSetting;
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Modules\Cms\Services\CmsSettingsService;
 use Modules\Cms\Services\CmsSiteSeoSettingsService;
@@ -58,7 +59,7 @@ class CmsSiteSeoSettingsServiceTest extends ModelTestCase
             });
         }
 
-        \Illuminate\Support\Facades\DB::table($legacyTable)->insert([
+        DB::table($legacyTable)->insert([
             'group_key' => 'seo',
             'key' => 'global_robots_txt',
             'locale' => '*',

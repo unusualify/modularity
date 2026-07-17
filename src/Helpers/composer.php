@@ -29,7 +29,7 @@ if (! function_exists('get_installed_composer')) {
             }
         }
 
-        throw new \RuntimeException('Composer installed.php could not be located.');
+        throw new RuntimeException('Composer installed.php could not be located.');
     }
 }
 

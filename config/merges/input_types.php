@@ -10,7 +10,7 @@ return [
         'typeIntTitle' => 'Wrap',
         'noLabel' => true,
         'bordered' => true,
-        'col' => ['cols' => 12,'sm' => 12,'md' => 12,'lg' => 12,'xl' => 12],
+        'col' => ['cols' => 12, 'sm' => 12, 'md' => 12, 'lg' => 12, 'xl' => 12],
     ],
     '@collapsible_group' => [
         'type' => 'group',
@@ -19,7 +19,7 @@ return [
         'typeIntTitle' => 'Group',
         'noLabel' => true,
         'bordered' => true,
-        'col' => ['cols' => 12,'sm' => 12,'md' => 12,'lg' => 12,'xl' => 12],
+        'col' => ['cols' => 12, 'sm' => 12, 'md' => 12, 'lg' => 12, 'xl' => 12],
     ],
     '_language' => [
         'type' => 'select',

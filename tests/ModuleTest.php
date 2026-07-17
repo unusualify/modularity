@@ -2,15 +2,18 @@
 
 namespace Unusualify\Modularous\Tests;
 
+use Illuminate\Console\Application;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Foundation\AliasLoader;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Mockery;
 use Unusualify\Modularous\Exceptions\ModularousException;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Module;
+use Unusualify\Modularous\Repositories\Repository;
 use Unusualify\Modularous\Tests\Support\IsolatedTestModules;
 
 class ModuleTest extends TestCase
@@ -519,7 +522,7 @@ class ModuleTest extends TestCase
     {
         $this->module->registerAliases();
 
-        $aliases = \Illuminate\Foundation\AliasLoader::getInstance()->getAliases();
+        $aliases = AliasLoader::getInstance()->getAliases();
 
         $this->assertSame(
             'TestModules\TestModule\Entities\Item',
@@ -562,11 +565,11 @@ class ModuleTest extends TestCase
 
     public function test_load_commands_registers_console_command(): void
     {
-        \Illuminate\Console\Application::forgetBootstrappers();
+        Application::forgetBootstrappers();
 
         $this->module->loadCommands();
 
-        $artisan = new \Illuminate\Console\Application(
+        $artisan = new Application(
             $this->app,
             $this->app->make('events'),
             '11.0'
@@ -574,7 +577,7 @@ class ModuleTest extends TestCase
 
         $this->assertTrue($artisan->has('test-module:ping'));
 
-        \Illuminate\Console\Application::forgetBootstrappers();
+        Application::forgetBootstrappers();
     }
 
     public function test_flush_module_cache_when_cache_enabled(): void
@@ -638,7 +641,7 @@ class ModuleTest extends TestCase
     {
         $repository = $this->module->getRepository('UnknownRoute');
 
-        $this->assertNotInstanceOf(\Unusualify\Modularous\Repositories\Repository::class, $repository);
+        $this->assertNotInstanceOf(Repository::class, $repository);
     }
 
     public function test_route_has_table_when_table_exists(): void

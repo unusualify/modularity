@@ -66,13 +66,12 @@ class Local implements ImageServiceInterface
 
     /**
      * @param string $id
-     * @param array $params
      * @return string
      */
     public function getFrontendUrl($id, array $params = [])
     {
         /** @var FilesystemAdapter $disk */
-        $disk = Storage::disk(config(modularousBaseKey().'.media_library.disk'));
+        $disk = Storage::disk(config(modularousBaseKey() . '.media_library.disk'));
         $storageUrl = $disk->url($id);
         $endpoint = parse_url($storageUrl, PHP_URL_PATH) ?: $storageUrl;
 

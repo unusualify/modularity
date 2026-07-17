@@ -40,6 +40,6 @@ return [
                 ['name' => 'url', 'type' => 'text', 'label' => 'URL', 'rules' => 'required'],
                 ['name' => 'icon', 'type' => 'image', 'label' => 'Icon', 'rules' => 'nullable'],
             ],
-        ]
+        ],
     ],
 ];

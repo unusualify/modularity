@@ -192,7 +192,7 @@ class SiteSettingsService
     /**
      * Drop empty leaves so SystemSettings values remain visible under array_replace_recursive.
      *
-     * @param  array<string, mixed>  $tree
+     * @param array<string, mixed> $tree
      * @return array<string, mixed>
      */
     protected function filterEmptyBranches(array $tree): array

@@ -9,10 +9,8 @@ use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Module;
 use Unusualify\Modularous\Services\RemoteApi\ConfigurableRemoteApiAdapter;
 use Unusualify\Modularous\Services\RemoteApi\DefaultRemoteApiConnector;
-use Unusualify\Modularous\Services\RemoteApi\RemoteApiConfiguration;
 use Unusualify\Modularous\Services\RemoteApi\RemoteApiConnectorFactory;
 use Unusualify\Modularous\Services\RemoteApi\RemoteApiConnectorResolver;
-use Unusualify\Modularous\Services\RemoteApi\RemoteApiFieldMapper;
 use Unusualify\Modularous\Services\RemoteApi\RemoteApiRateLimiter;
 use Unusualify\Modularous\Tests\TestCase;
 

@@ -181,7 +181,7 @@ abstract class AbstractSingularSettingsService
     }
 
     /**
-     * @param  TModel  $model
+     * @param TModel $model
      * @return array<string, mixed>
      */
     protected function snapshotFromModel(object $model): array
@@ -226,7 +226,7 @@ abstract class AbstractSingularSettingsService
     }
 
     /**
-     * @param  array<string, mixed>  $data
+     * @param array<string, mixed> $data
      */
     protected function walkPath(array $data, string $key, string $locale): mixed
     {
@@ -252,7 +252,7 @@ abstract class AbstractSingularSettingsService
     }
 
     /**
-     * @param  array<string, mixed>  $data
+     * @param array<string, mixed> $data
      */
     protected function resolveLeafViaLocalePaths(array $data, string $parentKey, string $leaf, string $locale): mixed
     {
@@ -311,7 +311,7 @@ abstract class AbstractSingularSettingsService
     }
 
     /**
-     * @param  array<string, mixed>  $data
+     * @param array<string, mixed> $data
      */
     protected function walkPathRaw(array $data, string $key): mixed
     {
@@ -333,7 +333,7 @@ abstract class AbstractSingularSettingsService
     }
 
     /**
-     * @param  list<string>  $segments
+     * @param list<string> $segments
      */
     protected function isExpandableListResult(mixed $value, array $segments): bool
     {
@@ -366,7 +366,7 @@ abstract class AbstractSingularSettingsService
     }
 
     /**
-     * @param  array<string, mixed>  $tree
+     * @param array<string, mixed> $tree
      * @return array<string, mixed>
      */
     protected function resolveTranslatedTree(array $tree, string $locale): array
@@ -387,7 +387,7 @@ abstract class AbstractSingularSettingsService
     }
 
     /**
-     * @param  array<string, mixed>  $value
+     * @param array<string, mixed> $value
      */
     protected function looksLikeLocaleMap(array $value): bool
     {

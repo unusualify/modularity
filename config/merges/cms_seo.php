@@ -9,6 +9,7 @@ use Modules\Cms\Services\CmsSiteSeoSettingsService;
 use Modules\Cms\Support\CmsPublicSeo;
 use Modules\SystemSetting\Support\MigrateRobotsTxtFromSiteSetting;
 use Unusualify\Modularous\Entities\Traits\Core\HasScopes;
+use Unusualify\Modularous\Facades\SiteSettings;
 
 return [
     /**
@@ -40,7 +41,7 @@ return [
         'global_robots_txt' => env('MODULAROUS_CMS_SEO_GLOBAL_ROBOTS_TXT', ''),
         /**
          * When true, GET /robots.txt prefers {@see CmsSiteSeoSettingsService}
-         * ({@see \Unusualify\Modularous\Facades\SiteSettings} → CmsSettings with SystemSettings fallback).
+         * ({@see SiteSettings} → CmsSettings with SystemSettings fallback).
          * When false, only env/config {@code global_robots_txt} is used (legacy / headless deploys).
          */
         'use_system_settings' => env('MODULAROUS_CMS_SEO_ROBOTS_USE_SYSTEM_SETTINGS', env('MODULAROUS_CMS_SEO_ROBOTS_USE_SITE_SETTINGS', true)),

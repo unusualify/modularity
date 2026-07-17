@@ -127,6 +127,6 @@ HTML;
             return null;
         }
 
-        return strtoupper($id);
+        return mb_strtoupper($id);
     }
 }

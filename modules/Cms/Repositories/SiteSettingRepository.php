@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Cms\Repositories;
 
+use Illuminate\Database\Eloquent\Model;
 use Modules\Cms\Entities\SiteSetting;
 use Unusualify\Modularous\Repositories\Repository;
 use Unusualify\Modularous\Repositories\Traits\ImagesTrait;
@@ -19,8 +20,8 @@ class SiteSettingRepository extends Repository
     }
 
     /**
-     * @param  \Illuminate\Database\Eloquent\Model  $object
-     * @param  array<string, mixed>  $fields
+     * @param Model $object
+     * @param array<string, mixed> $fields
      */
     public function afterSave($object, $fields): void
     {

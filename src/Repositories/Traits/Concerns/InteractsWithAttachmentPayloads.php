@@ -79,7 +79,7 @@ trait InteractsWithAttachmentPayloads
             return true;
         }
 
-        if(data_get($fields, $role) !== null) {
+        if (data_get($fields, $role) !== null) {
             return true;
         }
 
@@ -101,7 +101,7 @@ trait InteractsWithAttachmentPayloads
             return $fields[$role];
         }
 
-        if(($notation = data_get($fields, $role)) !== null) {
+        if (($notation = data_get($fields, $role)) !== null) {
             return $notation;
         }
 

@@ -73,7 +73,6 @@ abstract class Request extends FormRequest
         }
     }
 
-
     protected function failedValidation(Validator $validator)
     {
         if ($this->method() === 'DELETE') {
@@ -88,7 +87,6 @@ abstract class Request extends FormRequest
 
         parent::failedValidation($validator);
     }
-
 
     public function mergeRules($rules)
     {

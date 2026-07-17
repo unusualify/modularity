@@ -3,6 +3,7 @@
 namespace Unusualify\Modularous\Entities\Traits\Core;
 
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Oobook\Database\Eloquent\Concerns\ManageEloquent;
 use Spatie\Activitylog\ActivityLogger;
@@ -97,7 +98,7 @@ trait ModelHelpers
                         // dd($attributesToBeLogged);
                         if ($batchActivityModel) {
                             $batchActivityProperties = $batchActivityModel->properties;
-                            if($batchActivityProperties instanceof \Illuminate\Support\Collection) {
+                            if ($batchActivityProperties instanceof Collection) {
                                 $batchActivityProperties = $batchActivityProperties->toArray();
                             }
                             $batchActivityModel->update(

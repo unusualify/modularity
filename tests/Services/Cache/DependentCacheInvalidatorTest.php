@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace Unusualify\Modularous\Tests\Services\Cache;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Config;
 use Modules\Cms\Entities\Page;
 use Unusualify\Modularous\Facades\ModularousCache;
 use Unusualify\Modularous\Services\Cache\DependentCacheInvalidator;
 use Unusualify\Modularous\Tests\Services\Cache\Stubs\ReentrantDependentCacheInvalidator;
-use Unusualify\Modularous\Tests\Services\Cache\Stubs\StubModelWithoutDependents;
 use Unusualify\Modularous\Tests\Services\Cache\Stubs\StubModelWithMethodDependents;
+use Unusualify\Modularous\Tests\Services\Cache\Stubs\StubModelWithoutDependents;
 use Unusualify\Modularous\Tests\Services\Cache\Stubs\StubModelWithPropertyDependents;
 use Unusualify\Modularous\Tests\TestCase;
 

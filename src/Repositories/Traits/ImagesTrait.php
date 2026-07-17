@@ -11,6 +11,7 @@ use Unusualify\Modularous\Repositories\Traits\Concerns\InteractsWithAttachmentPa
 trait ImagesTrait
 {
     use InteractsWithAttachmentPayloads;
+
     /**
      * When true, {@see RevisionsTrait::bypassAfterSaves} may set `passAfterSaveImagesTrait` during pending-only
      * revision saves so {@see afterSaveImagesTrait} is skipped.

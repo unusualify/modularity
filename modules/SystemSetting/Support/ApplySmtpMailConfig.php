@@ -71,7 +71,7 @@ final class ApplySmtpMailConfig
             return null;
         }
 
-        return match (strtolower($encryption)) {
+        return match (mb_strtolower($encryption)) {
             'ssl', 'smtps' => 'smtps',
             'tls', 'smtp' => 'smtp',
             default => 'smtp',
