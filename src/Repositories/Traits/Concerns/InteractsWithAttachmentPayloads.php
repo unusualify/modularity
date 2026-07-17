@@ -79,6 +79,10 @@ trait InteractsWithAttachmentPayloads
             return true;
         }
 
+        if(data_get($fields, $role) !== null) {
+            return true;
+        }
+
         foreach (getLocales() as $locale) {
             if (array_key_exists($role, $fields[$locale] ?? [])) {
                 return true;
@@ -95,6 +99,10 @@ trait InteractsWithAttachmentPayloads
     {
         if (array_key_exists($role, $fields)) {
             return $fields[$role];
+        }
+
+        if(($notation = data_get($fields, $role)) !== null) {
+            return $notation;
         }
 
         $nested = [];

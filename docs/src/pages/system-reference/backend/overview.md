@@ -235,9 +235,11 @@ Events fire at lifecycle boundaries (model created/updated, user registered, sta
 
 **Directory**: `src/Facades/` · **Namespace**: `Unusualify\Modularous\Facades`
 
-18 Laravel facades providing static-style access to bound services. Each facade aliases a container entry to a concrete service class.
+21 Laravel facades providing static-style access to bound services. Each facade aliases a container entry to a concrete service class.
 
-**Selected facades**: [`Coverage`](/system-reference/backend/facades/coverage), [`CurrencyExchange`](/system-reference/backend/facades/currency-exchange), [`Filepond`](/system-reference/backend/facades/filepond), [`HostRouting`](/system-reference/backend/facades/host-routing), [`MigrationBackup`](/system-reference/backend/facades/migration-backup), [`Modularous`](/system-reference/backend/facades/modularous), [`ModularousCache`](/system-reference/backend/facades/modularous-cache), [`ModularousRoutes`](/system-reference/backend/facades/modularous-routes), [`ModularousVite`](/system-reference/backend/facades/modularous-vite), [`Navigation`](/system-reference/backend/facades/navigation), [`Redirect`](/system-reference/backend/facades/redirect), [`Register`](/system-reference/backend/facades/register), [`RelationshipGraph`](/system-reference/backend/facades/relationship-graph), [`Utm`](/system-reference/backend/facades/utm).
+**Selected facades**: [`Coverage`](/system-reference/backend/facades/coverage), [`CurrencyExchange`](/system-reference/backend/facades/currency-exchange), [`Filepond`](/system-reference/backend/facades/filepond), [`HostRouting`](/system-reference/backend/facades/host-routing), [`MigrationBackup`](/system-reference/backend/facades/migration-backup), [`Modularous`](/system-reference/backend/facades/modularous), [`ModularousCache`](/system-reference/backend/facades/modularous-cache), [`ModularousRoutes`](/system-reference/backend/facades/modularous-routes), [`ModularousVite`](/system-reference/backend/facades/modularous-vite), [`Navigation`](/system-reference/backend/facades/navigation), [`Redirect`](/system-reference/backend/facades/redirect), [`Register`](/system-reference/backend/facades/register), [`RelationshipGraph`](/system-reference/backend/facades/relationship-graph), [`SiteSettings`](/system-reference/backend/facades/site-settings), [`SystemSettings`](/system-reference/backend/facades/system-settings), [`CmsSettings`](/system-reference/backend/facades/cms-settings), [`Utm`](/system-reference/backend/facades/utm).
+
+Settings deep-dive: [Settings Services](/system-reference/backend/services/settings/overview).
 
 → [Full Facades reference](/system-reference/backend/facades/overview)
 
@@ -446,6 +448,7 @@ Bound in the service container; injected via constructor or accessed through the
 | **Cache concerns** | CacheHelpers, CacheInvalidation, CacheTags | [Cache Concerns →](/system-reference/backend/services/cache-concerns/overview) |
 | **Core services** | Assets, BroadcastManager, Connector, CoverageService, CurrencyExchangeService, FilepondManager, FileTranslation, MessageStage, MigrationBackup, ModularousCacheService, RedirectService, Translation, UtmParameters | [Services →](/system-reference/backend/services/overview) |
 | **Currency** | NullCurrencyProvider, SystemPricingCurrencyProvider | [Currency →](/system-reference/backend/services/currency/overview) |
+| **Settings** | AbstractSingularSettingsService, SystemSettingsService, CmsSettingsService, SiteSettingsService | [Settings →](/system-reference/backend/services/settings/overview) |
 | **FileLibrary** | Disk, FileService | [FileLibrary →](/system-reference/backend/services/file-library/overview) |
 | **MediaLibrary** | Glide, Imgix, Local, TwicPics drivers | [MediaLibrary →](/system-reference/backend/services/media-library/overview) |
 | **Uploader** | SignAzureUpload, SignS3Upload, SignUploadListener | [Uploader →](/system-reference/backend/services/uploader/overview) |

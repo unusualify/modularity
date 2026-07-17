@@ -107,4 +107,9 @@ return [
             'name' => 'State | States | {n} State',
         ],
     ],
+    'system_setting' => [
+        'general' => [
+            'name' => 'General Settings | General Settings | {n} General Settings',
+        ],
+    ],
 ];

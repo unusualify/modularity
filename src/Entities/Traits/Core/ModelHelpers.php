@@ -96,9 +96,13 @@ trait ModelHelpers
 
                         // dd($attributesToBeLogged);
                         if ($batchActivityModel) {
+                            $batchActivityProperties = $batchActivityModel->properties;
+                            if($batchActivityProperties instanceof \Illuminate\Support\Collection) {
+                                $batchActivityProperties = $batchActivityProperties->toArray();
+                            }
                             $batchActivityModel->update(
                                 [
-                                    'properties' => array_merge_recursive_preserve($batchActivityModel->properties, $properties),
+                                    'properties' => array_merge_recursive_preserve($batchActivityProperties, $properties),
                                 ]
                             );
                         } else {

@@ -7,12 +7,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Inertia\Response;
-use Modules\Cms\Services\CmsSiteSeoSettingsService;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Http\Controllers\BaseController;
 
 /**
- * Inertia shell for CMS site-wide SEO (global robots.txt body stored in site_settings).
+ * Inertia shell for CMS site-wide SEO tools (page-level SEO; robots.txt lives in System Settings).
  */
 class SiteSeoToolController extends BaseController
 {
@@ -25,7 +24,7 @@ class SiteSeoToolController extends BaseController
         parent::__construct($app, $request);
     }
 
-    public function __invoke(CmsSiteSeoSettingsService $siteSeo): Response
+    public function __invoke(): Response
     {
         $pageTitle = __('Site SEO') . ' - ' . Modularous::pageTitle();
         $headerTitle = __('Site SEO');
@@ -40,18 +39,30 @@ class SiteSeoToolController extends BaseController
 
         $this->shareInertiaStoreVariables();
 
-        $prefix = $this->module->panelRouteNamePrefix() . '.';
+        $systemSettingsUrl = $this->resolveSystemSettingsUrl();
 
         return Inertia::render('SiteSeo', [
-            'siteSeoEndpoints' => [
-                'save' => route($prefix . 'siteSeo.save'),
-            ],
-            'globalRobotsTxt' => $siteSeo->globalRobotsTxtForEditor(),
-            'useSiteSettings' => (bool) modularousConfig('cms_seo.robots.use_site_settings', true),
+            'systemSettingsUrl' => $systemSettingsUrl,
             'endpoints' => new \stdClass,
             'mainConfiguration' => $this->getInertiaMainConfiguration($data),
             'headLayoutData' => $this->getHeadLayoutData($data),
         ]);
+    }
+
+    protected function resolveSystemSettingsUrl(): ?string
+    {
+        $candidates = [
+            systemRouteNamePrefix() . '.systemsetting.general.index',
+            modularousConfig('admin_route_name_prefix', 'admin') . '.system.systemsetting.general.index',
+        ];
+
+        foreach ($candidates as $routeName) {
+            if (Route::has($routeName)) {
+                return route($routeName);
+            }
+        }
+
+        return null;
     }
 
     /**

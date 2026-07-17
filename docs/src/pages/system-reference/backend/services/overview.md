@@ -25,3 +25,4 @@ The `src/Services/` directory contains the top-level service classes that power 
 | [CurrencyExchangeService](/system-reference/backend/services/currency-exchange-service) | `CurrencyExchange` | Fetches and caches live exchange rates |
 | [CacheRelationshipGraph](/system-reference/backend/services/cache-relationship-graph) | — | Builds a model→module-route dependency graph for targeted cache invalidation |
 | [CoverageService](/system-reference/backend/services/coverage-service) | `coverage.service` | Parses Clover XML reports; generates coverage reports and PR checks |
+| [Settings](/system-reference/backend/services/settings/overview) | `SystemSettings` / `CmsSettings` / `SiteSettings` | Singular system & CMS settings (dot paths, locale, media leaves, context routing) |

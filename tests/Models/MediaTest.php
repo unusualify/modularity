@@ -175,6 +175,7 @@ class MediaTest extends ModelTestCase
             'name' => 'test-image.jpg',
             'thumbnail' => ImageService::getCmsUrl('test-uuid-1', ['h' => '256']),
             'original' => ImageService::getRawUrl('test-uuid-1'),
+            'frontend' => ImageService::getFrontendUrl('test-uuid-1'),
             'medium' => ImageService::getUrl('test-uuid-1', ['h' => '430']),
             'width' => 1920,
             'height' => 1080,

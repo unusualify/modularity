@@ -6,9 +6,11 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Unusualify\Modularous\Entities\Media;
 use Unusualify\Modularous\Entities\Model;
+use Unusualify\Modularous\Repositories\Traits\Concerns\InteractsWithAttachmentPayloads;
 
 trait ImagesTrait
 {
+    use InteractsWithAttachmentPayloads;
     /**
      * When true, {@see RevisionsTrait::bypassAfterSaves} may set `passAfterSaveImagesTrait` during pending-only
      * revision saves so {@see afterSaveImagesTrait} is skipped.
@@ -199,20 +201,21 @@ trait ImagesTrait
      */
     private function detachMediasForRoleLocale($object, string $role, string $locale): void
     {
-        $relatedKey = $object->medias()->getRelated()->getQualifiedKeyName();
-        $relation = $object->medias()->wherePivot('role', $role);
+        $relation = $object->medias();
+        $query = $relation->newPivotStatement()
+            ->where($relation->getMorphType(), $object->getMorphClass())
+            ->where($relation->getForeignPivotKeyName(), $object->getKey())
+            ->where('role', $role);
 
         if (modularousConfig('media_library.translated_form_fields', false)) {
-            $relation->wherePivot('locale', $locale);
+            $query->where('locale', $locale);
         }
 
-        $ids = $relation->pluck($relatedKey);
-
-        if ($ids->isEmpty()) {
+        if ($query->delete() === 0) {
             return;
         }
 
-        $object->medias()->detach($ids->all());
+        $object->unsetRelation('medias');
         $this->mustTouchEloquentModel();
     }
 
@@ -242,9 +245,10 @@ trait ImagesTrait
     public function getFormFieldsImagesTrait($object, $fields, $schema)
     {
         $imageInputs = $this->getColumns(__TRAIT__);
+
         if (! empty($imageInputs) && $object->has('medias')) {
             $schema = $schema ?? $this->inputs();
-            $schema = $this->chunkInputs($schema, all: true, noGroupChunk: true);
+            $schema = $this->chunkInputs($schema, all: true, noGroupChunk: false);
             $mediasByRole = $object->medias->groupBy('pivot.role');
             $default_locale = config('app.locale');
             $fallback_locale = config('app.fallback_locale');
