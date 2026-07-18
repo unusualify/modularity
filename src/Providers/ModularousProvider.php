@@ -20,6 +20,7 @@ class ModularousProvider extends ServiceProvider
         RouteServiceProvider::class,
         AuthServiceProvider::class,
         CoverageServiceProvider::class,
+        ArtisanRunnerServiceProvider::class,
 
         // AuthServiceProvider::class,
         // ValidationServiceProvider::class,

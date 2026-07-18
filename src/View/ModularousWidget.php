@@ -82,6 +82,7 @@ class ModularousWidget extends Component
 
         if (count($this->attributes) > 0) {
             $this->attributes = $this->hydrateAttributes($this->attributes);
+            $this->attributesHydrated = true;
         }
     }
 
@@ -165,12 +166,21 @@ class ModularousWidget extends Component
 
         $component = new Component;
 
+        // Merge raw widget-config attributes with instance attributes.
+        // Do not hydrate the config side separately then merge: that doubles numeric
+        // list props via array_merge_recursive_preserve (e.g. SystemConsole cacheCommands).
+        $attributes = array_merge_recursive_preserve(
+            $this->widgetConfigUsable ? ($componentConfig['attributes'] ?? []) : [],
+            $this->attributes ?? []
+        );
+
+        if (! $this->attributesHydrated) {
+            $attributes = $this->hydrateAttributes($attributes);
+        }
+
         $component = $component->makeComponent(
             tag: $this->tag,
-            attributes: array_merge_recursive_preserve(
-                $this->widgetConfigUsable ? $this->hydrateAttributes($componentConfig['attributes'] ?? []) : [],
-                $this->attributes ?? []
-            ),
+            attributes: $attributes,
             elements: $this->elements,
             slots: array_merge(
                 $this->widgetConfigUsable ? $componentConfig['slots'] ?? [] : [],
