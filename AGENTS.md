@@ -26,7 +26,7 @@ vue/src/                 # Frontend source
 
 ## PATTERNS TO ALWAYS USE
 2. **Use Traits**: ManageMedias, HasMedias, MediasTrait etc.
-3. **Register in ServiceProvider**: Every new feature if necessary
+3. **Feature ServiceProvider**: New feature singletons/bindings go in a dedicated `src/Providers/{Feature}ServiceProvider.php` (e.g. `RemoteApiServiceProvider`, `ArtisanRunnerServiceProvider`, `CoverageServiceProvider`) — register it from `ModularousProvider::$providers`. Do **not** dump feature bindings into `BaseServiceProvider`.
 4. **Write Tests**: tests/$FOLDERNAME
 5. **Type Hints**: Always use PHP 8.1+ type hints
 6. **Config-Driven**: Use config('modularous.xxx') (under merges folder)
@@ -45,10 +45,22 @@ vue/src/                 # Frontend source
 - Use Vuetify 3 components (not plain HTML)
 
 ## WHEN ADDING FEATURES
-1. Create class in appropriate src/ subdirectory
-2. Register in ModularousServiceProvider
-3. Write unit + feature tests
-4. Update documentation
+1. Create classes under the feature folder (e.g. `src/Services/{Feature}/`)
+2. Create `src/Providers/{Feature}ServiceProvider.php` for that feature’s singletons, aliases, log channels, and feature-specific boot logic
+3. Register the provider in `ModularousProvider::$providers`
+4. Write unit + feature tests
+5. Update documentation
+
+## FEATURE SERVICE PROVIDERS
+
+| Feature | Provider |
+|---------|----------|
+| Coverage | `CoverageServiceProvider` |
+| Security | `SecurityServiceProvider` |
+| RemoteApi | `RemoteApiServiceProvider` |
+| ArtisanRunner | `ArtisanRunnerServiceProvider` |
+
+`BaseServiceProvider` stays for package-wide core bindings only (Modularous, navigation, cache, filepond, etc.).
 
 ## FORBIDDEN
 - ❌ Business logic in controllers
