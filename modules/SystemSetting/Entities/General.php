@@ -25,6 +25,7 @@ class General extends Model
         'smtp',
         'analytics',
         'locale',
+        'down_presets',
     ];
 
     /**
@@ -38,6 +39,7 @@ class General extends Model
         'smtp' => 'array',
         'analytics' => 'array',
         'locale' => 'array',
+        'down_presets' => 'array',
         'published' => 'boolean',
     ];
 
@@ -46,6 +48,6 @@ class General extends Model
      */
     public static function settingsSections(): array
     {
-        return ['site', 'social', 'contact', 'seo', 'smtp', 'analytics', 'locale'];
+        return ['site', 'social', 'contact', 'seo', 'smtp', 'analytics', 'locale', 'down_presets'];
     }
 }
