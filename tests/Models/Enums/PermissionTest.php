@@ -22,6 +22,7 @@ class PermissionTest extends TestCase
             'BULKDELETE' => 'bulkDelete',
             'BULKFORCEDELETE' => 'bulkForceDelete',
             'BULKRESTORE' => 'bulkRestore',
+            'CACHING' => 'caching',
             'REVISION_APPROVE' => 'revisionApprove',
             'REVISION_REJECT' => 'revisionReject',
             'REVISION_RESTORE' => 'revisionRestore',
@@ -38,13 +39,13 @@ class PermissionTest extends TestCase
     public function test_all_cases_exist()
     {
         $cases = Permission::cases();
-        $this->assertCount(17, $cases);
+        $this->assertCount(18, $cases);
 
         $caseValues = array_map(fn ($case) => $case->value, $cases);
         $expectedValues = [
             'create', 'view', 'edit', 'delete', 'forceDelete', 'restore',
             'duplicate', 'reorder', 'bulk', 'bulkDelete', 'bulkForceDelete',
-            'bulkRestore', 'activity', 'show', 'revisionApprove', 'revisionReject', 'revisionRestore',
+            'bulkRestore', 'caching', 'activity', 'show', 'revisionApprove', 'revisionReject', 'revisionRestore',
         ];
 
         foreach ($expectedValues as $value) {
@@ -66,6 +67,7 @@ class PermissionTest extends TestCase
         $this->assertEquals('bulkDelete', Permission::get('BULKDELETE'));
         $this->assertEquals('bulkForceDelete', Permission::get('BULKFORCEDELETE'));
         $this->assertEquals('bulkRestore', Permission::get('BULKRESTORE'));
+        $this->assertEquals('caching', Permission::get('CACHING'));
         $this->assertEquals('activity', Permission::get('ACTIVITY'));
         $this->assertEquals('show', Permission::get('SHOW'));
         $this->assertNull(Permission::get('INVALID'));
@@ -76,7 +78,7 @@ class PermissionTest extends TestCase
         $validValues = [
             'create', 'view', 'edit', 'delete', 'forceDelete', 'restore',
             'duplicate', 'reorder', 'bulk', 'bulkDelete', 'bulkForceDelete',
-            'bulkRestore', 'activity', 'show',
+            'bulkRestore', 'caching', 'activity', 'show',
         ];
 
         foreach ($validValues as $value) {
@@ -95,7 +97,7 @@ class PermissionTest extends TestCase
         $validValues = [
             'create', 'view', 'edit', 'delete', 'forceDelete', 'restore',
             'duplicate', 'reorder', 'bulk', 'bulkDelete', 'bulkForceDelete',
-            'bulkRestore', 'activity', 'show',
+            'bulkRestore', 'caching', 'activity', 'show',
         ];
 
         foreach ($validValues as $value) {
@@ -168,6 +170,7 @@ class PermissionTest extends TestCase
         $this->assertEquals('BULKDELETE', Permission::BULKDELETE->name);
         $this->assertEquals('BULKFORCEDELETE', Permission::BULKFORCEDELETE->name);
         $this->assertEquals('BULKRESTORE', Permission::BULKRESTORE->name);
+        $this->assertEquals('CACHING', Permission::CACHING->name);
         $this->assertEquals('ACTIVITY', Permission::ACTIVITY->name);
         $this->assertEquals('SHOW', Permission::SHOW->name);
     }
@@ -186,6 +189,7 @@ class PermissionTest extends TestCase
         $this->assertEquals('bulkDelete', Permission::BULKDELETE->value);
         $this->assertEquals('bulkForceDelete', Permission::BULKFORCEDELETE->value);
         $this->assertEquals('bulkRestore', Permission::BULKRESTORE->value);
+        $this->assertEquals('caching', Permission::CACHING->value);
         $this->assertEquals('activity', Permission::ACTIVITY->value);
         $this->assertEquals('show', Permission::SHOW->value);
     }

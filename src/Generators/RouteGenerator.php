@@ -1083,6 +1083,7 @@ class RouteGenerator extends Generator
             $repository->firstOrCreate(['name' => $kebabCase . '_' . Permission::BULKDELETE->value, 'guard_name' => $modularousAuthGuardName]);
             $repository->firstOrCreate(['name' => $kebabCase . '_' . Permission::BULKFORCEDELETE->value, 'guard_name' => $modularousAuthGuardName]);
             $repository->firstOrCreate(['name' => $kebabCase . '_' . Permission::BULKRESTORE->value, 'guard_name' => $modularousAuthGuardName]);
+            $repository->firstOrCreate(['name' => $kebabCase . '_' . Permission::CACHING->value, 'guard_name' => $modularousAuthGuardName]);
 
         } catch (\Throwable $e) {
             return true;
