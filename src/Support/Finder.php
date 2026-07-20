@@ -6,6 +6,7 @@ use Composer\ClassMapGenerator\ClassMapGenerator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Unusualify\Modularous\Facades\Modularous;
+use Unusualify\Modularous\Module;
 use Unusualify\Modularous\Traits\ManageNames;
 
 class Finder
@@ -254,6 +255,36 @@ class Finder
     {
         return $this->getAllModels()
             ->filter(fn ($model) => in_array($trait, class_uses_recursive($model)))->values()->toArray();
+    }
+
+    /**
+     * Get all models that are used in all module routes.
+     *
+     * @return Collection
+     */
+    public function getAllModuleRouteModels(): Collection
+    {
+        return Collection::make(Modularous::allEnabled())
+            ->reduce(function (Collection $carry, Module $module) {
+                return $carry->merge(collect($module->getRouteNames())->map(function (string $routeName) use ($module) {
+                    return $module->getModel($routeName);
+                }));
+            }, collect())->unique()->values();
+    }
+
+    /**
+     * Get all repositories that are used in all module routes.
+     *
+     * @return Collection
+     */
+    public function getAllModuleRouteRepositories(): Collection
+    {
+        return Collection::make(Modularous::allEnabled())
+            ->reduce(function (Collection $carry, Module $module) {
+                return $carry->merge(collect($module->getRouteNames())->map(function (string $routeName) use ($module) {
+                    return $module->getRepository($routeName);
+                }));
+            }, collect())->unique()->values();
     }
 
     /**
