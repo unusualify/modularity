@@ -6,6 +6,7 @@ namespace Unusualify\Modularous\Tests\Repositories\Traits;
 
 use Mockery;
 use Unusualify\Modularous\Entities\Model;
+use Unusualify\Modularous\Entities\User;
 use Unusualify\Modularous\Module;
 use Unusualify\Modularous\Repositories\Repository;
 use Unusualify\Modularous\Repositories\Traits\RemoteApiSourceTrait;
@@ -34,7 +35,7 @@ class RemoteApiSourceTraitTest extends TestCase
             routePrefix: 'admin.business_package.package.',
         );
 
-        $actions = $repository->getFormActionsRemoteApiSourceTrait();
+        $actions = $repository->getFormActionsRemoteApiSourceTrait(Mockery::mock(User::class));
 
         $this->assertArrayHasKey('syncRemote', $actions);
         $this->assertArrayHasKey('previewRemote', $actions);
@@ -76,7 +77,7 @@ class RemoteApiSourceTraitTest extends TestCase
             ),
         );
 
-        $actions = $repository->getFormActionsRemoteApiSourceTrait();
+        $actions = $repository->getFormActionsRemoteApiSourceTrait(Mockery::mock(User::class));
 
         $this->assertSame('fields', $actions['previewRemote']['responseDisplay']);
         $this->assertSame([
@@ -93,7 +94,7 @@ class RemoteApiSourceTraitTest extends TestCase
             routePrefix: 'admin.business_package.package.',
         );
 
-        $this->assertSame([], $repository->getFormActionsRemoteApiSourceTrait());
+        $this->assertSame([], $repository->getFormActionsRemoteApiSourceTrait(Mockery::mock(User::class)));
     }
 
     /**
