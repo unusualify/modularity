@@ -94,4 +94,21 @@ class SiteSettingsServiceTest extends ModelTestCase
         $this->assertSame($a->id, $b->id);
         $this->assertSame(General::single()->getTable(), $a->getTable());
     }
+
+    public function test_console_defaults_to_system_settings(): void
+    {
+        $this->assertTrue($this->app->runningInConsole());
+        $this->assertFalse(SiteSettings::usesCmsLayer());
+    }
+
+    public function test_while_frontend_forces_cms_layer_in_console(): void
+    {
+        $this->assertTrue($this->app->runningInConsole());
+        $this->assertFalse(SiteSettings::usesCmsLayer());
+
+        $usesCms = SiteSettings::whileFrontend(fn (): bool => SiteSettings::usesCmsLayer());
+
+        $this->assertTrue($usesCms);
+        $this->assertFalse(SiteSettings::usesCmsLayer());
+    }
 }

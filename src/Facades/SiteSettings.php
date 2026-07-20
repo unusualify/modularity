@@ -12,6 +12,7 @@ use Modules\SystemSetting\Services\SystemSettingsService;
 /**
  * Context-aware settings: frontend → CmsSettings (fallback SystemSettings), backend → SystemSettings.
  *
+ * @method static mixed whileFrontend(callable $callback)
  * @method static SiteSettingsService forFrontend()
  * @method static SiteSettingsService forBackend()
  * @method static SiteSettingsService forCms()

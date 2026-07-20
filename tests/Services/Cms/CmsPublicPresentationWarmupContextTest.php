@@ -11,7 +11,11 @@ use Illuminate\Support\Facades\URL;
 use Modules\Cms\Contracts\CmsLocalizationContract;
 use Modules\Cms\Localization\TranslatableCmsLocalizationAdapter;
 use Modules\Cms\Services\CanonicalUrlResolver;
+use Modules\Cms\Services\CmsSettingsService;
+use Modules\Cms\Services\SiteSettingsService;
 use Modules\Cms\Support\CmsPublicPresentationWarmupContext;
+use Modules\SystemSetting\Services\SystemSettingsService;
+use Unusualify\Modularous\Facades\SiteSettings;
 use Unusualify\Modularous\Tests\TestCase;
 
 class CmsPublicPresentationWarmupContextTest extends TestCase
@@ -35,6 +39,13 @@ class CmsPublicPresentationWarmupContextTest extends TestCase
         Config::set('app.url', 'http://frontend.test');
         app()->setLocale('en');
         URL::defaults(['locale' => 'en']);
+
+        $this->app->singleton(SystemSettingsService::class);
+        $this->app->alias(SystemSettingsService::class, 'system.settings');
+        $this->app->singleton(CmsSettingsService::class);
+        $this->app->alias(CmsSettingsService::class, 'cms.settings');
+        $this->app->singleton(SiteSettingsService::class);
+        $this->app->alias(SiteSettingsService::class, 'site.settings');
     }
 
     /** @test */
@@ -85,5 +96,19 @@ class CmsPublicPresentationWarmupContextTest extends TestCase
 
         $this->assertSame('tr', $observed['appLocale']);
         $this->assertSame('tr', $observed['langLocale']);
+    }
+
+    /** @test */
+    public function it_forces_site_settings_cms_layer_during_run_in_console(): void
+    {
+        $this->assertTrue($this->app->runningInConsole());
+        $this->assertFalse(SiteSettings::usesCmsLayer());
+
+        $usesCms = CmsPublicPresentationWarmupContext::run('tr', function (): bool {
+            return SiteSettings::usesCmsLayer();
+        });
+
+        $this->assertTrue($usesCms);
+        $this->assertFalse(SiteSettings::usesCmsLayer());
     }
 }
