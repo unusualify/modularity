@@ -68,6 +68,28 @@ trait Moduleable
     }
 
     /**
+     * Get the permission prefix for the model.
+     *
+     * @return string
+     */
+    public function getPermissionPrefix(): string
+    {
+        return kebabCase($this->getRouteName());
+    }
+
+    /**
+     * Get the permission name for the model.
+     *
+     * @param string $suffix
+     * @return string
+     * @throws \InvalidArgumentException
+     */
+    public function getPermissionName($suffix): string
+    {
+        return "{$this->getPermissionPrefix()}_{$suffix}";
+    }
+
+    /**
      * @return $this
      */
     public function setModuleName(string $moduleName): static
