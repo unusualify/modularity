@@ -165,7 +165,8 @@ class BaseServiceProvider extends ServiceProvider
 
             return new Modularous($app, $path);
         });
-        $this->app->alias(Modularous::class, 'modularous');
+        $this->app->alias(RepositoryInterface::class, Modularous::class);
+        $this->app->alias(RepositoryInterface::class, 'modularous');
 
         // $this->app->singleton(FileActivator::class, function ($app) {
         // $this->app->singleton('modularous.activator', function (Application $app) {
@@ -478,10 +479,9 @@ class BaseServiceProvider extends ServiceProvider
      */
     private function bootBaseMigrations()
     {
-        // LOAD BASE MIGRATIONS
+        // Avoid Modularous facade here: package:discover may run before Nwidart binds ActivatorInterface.
         $this->loadMigrationsFrom(
-            // get_modularous_vendor_path('database/migrations/default')
-            \Unusualify\Modularous\Facades\Modularous::getVendorPath('database/migrations/default')
+            __DIR__ . '/../../database/migrations/default'
         );
     }
 

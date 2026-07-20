@@ -3,7 +3,6 @@
 namespace Unusualify\Modularous;
 
 use Illuminate\Support\ServiceProvider;
-use Unusualify\Modularous\Facades\Modularous;
 
 final class LaravelServiceProvider extends ServiceProvider
 {
@@ -109,14 +108,14 @@ final class LaravelServiceProvider extends ServiceProvider
     private function publishOperations(): void
     {
         $this->publishes([
-            Modularous::getVendorPath('operations') => base_path('operations'),
+            __DIR__ . '/../operations' => base_path('operations'),
         ], 'operations');
     }
 
     private function publishMigrations(): void
     {
         $this->publishes([
-            Modularous::getVendorPath('database/migrations/default') => $this->app->databasePath('migrations'),
+            __DIR__ . '/../database/migrations/default' => $this->app->databasePath('migrations'),
         ], 'modularous-migrations');
     }
 }
