@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Middleware;
 use Unusualify\Modularous\Entities\File;
 use Unusualify\Modularous\Entities\Media;
+use Unusualify\Modularous\Facades\Modularous;
+use Unusualify\Modularous\Services\BroadcastManager;
 use Unusualify\Modularous\Support\ModularousFlashWarnings;
 
 class HandleInertiaRequests extends Middleware
@@ -39,7 +41,7 @@ class HandleInertiaRequests extends Middleware
     {
         return array_merge(parent::share($request), [
             'auth' => [
-                'user' => $request->user(),
+                'user' => $this->modularousUser($request),
             ],
             'flash' => [
                 'message' => fn () => $request->session()->get('message'),
@@ -62,11 +64,19 @@ class HandleInertiaRequests extends Middleware
     }
 
     /**
+     * Resolve the Modularous panel user (not the default `web` guard).
+     */
+    protected function modularousUser(Request $request): mixed
+    {
+        return $request->user(Modularous::getAuthGuardName());
+    }
+
+    /**
      * Get authorization data for the current user
      */
     protected function getAuthorizationData(Request $request): array
     {
-        $user = $request->user();
+        $user = $this->modularousUser($request);
 
         if (! $user) {
             return [];
@@ -88,7 +98,7 @@ class HandleInertiaRequests extends Middleware
      */
     protected function getStoreData(Request $request): array
     {
-        $user = $request->user();
+        $user = $this->modularousUser($request);
 
         return [
             'config' => [
@@ -145,6 +155,7 @@ class HandleInertiaRequests extends Middleware
                     'COMPOSER' => env('COMPOSER', 'Not Found'),
                 ],
             ],
+            'broadcast' => BroadcastManager::panelConfig($user),
         ];
     }
 

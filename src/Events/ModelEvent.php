@@ -4,17 +4,18 @@ namespace Unusualify\Modularous\Events;
 
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithBroadcasting;
-use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Support\Str;
 use Unusualify\Modularous\Events\Traits\EventChanges;
 use Unusualify\Modularous\Events\Traits\EventStateable;
 use Unusualify\Modularous\Events\Traits\EventUrls;
 use Unusualify\Modularous\Events\Traits\EventUser;
+use Unusualify\Modularous\Events\Traits\GatesBroadcastAvailability;
 
-abstract class ModelEvent
+abstract class ModelEvent implements ShouldBroadcast
 {
-    use EventUrls, EventChanges, EventStateable, EventUser;
+    use EventUrls, EventChanges, EventStateable, EventUser, GatesBroadcastAvailability;
 
     /**
      * The class of the model.
@@ -52,33 +53,29 @@ abstract class ModelEvent
      */
     public function broadcastOn(): array
     {
-        // dd(
-        //     $this->model,
-        //     $this->modelType,
-        //     $this->broadcastService
-        // );
         return [
-            // new PrivateChannel('models.'.$this->type.'.'.$this->model->id),
-            // new PresenceChannel('models.'.$this->model->id),
             new PrivateChannel('models.' . $this->model->id),
             new Channel('model'),
         ];
     }
 
-    /**
-     * Determine if this event should broadcast.
-     */
-    public function broadcastWhen(): bool
+    public function broadcastAs(): string
     {
-        return true;
-        // return $this->order->value > 100;
+        return 'modularous.' . Str::replace('_', '.', Str::replace('_event', '', Str::snake(get_class_short_name($this))));
     }
 
-    public function broadcastAs()
+    /**
+     * Minimal payload for frontend listeners (PII stays on notification mail/database).
+     *
+     * @return array<string, mixed>
+     */
+    public function broadcastWith(): array
     {
-        // dd(
-        //     'modularous.' . Str::replace('_', '.', Str::replace('_event', '', Str::snake(get_class_short_name($this))))
-        // );
-        return 'modularous.' . Str::replace('_', '.', Str::replace('_event', '', Str::snake(get_class_short_name($this))));
+        return [
+            'id' => $this->model->id ?? null,
+            'model_type' => $this->modelType,
+            'model_id' => $this->model->id ?? null,
+            'user_id' => $this->hasUser() ? $this->getUser()?->id : null,
+        ];
     }
 }

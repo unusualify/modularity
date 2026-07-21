@@ -30,6 +30,35 @@ describe('logoutButton behavior', () => {
     expect(logoutForm.submit).toHaveBeenCalled()
   })
 
+  test('disconnects Echo before submitting logout form', () => {
+    const disconnectEcho = vi.fn()
+    window.disconnectEcho = disconnectEcho
+
+    logoutButton()
+
+    const clickEvent = new MouseEvent('click', { bubbles: true })
+    logoutBtn.dispatchEvent(clickEvent)
+
+    expect(disconnectEcho).toHaveBeenCalled()
+    expect(logoutForm.submit).toHaveBeenCalled()
+
+    delete window.disconnectEcho
+  })
+
+  test('falls back to Echo.disconnect when disconnectEcho helper is missing', () => {
+    window.Echo = { disconnect: vi.fn() }
+
+    logoutButton()
+
+    const clickEvent = new MouseEvent('click', { bubbles: true })
+    logoutBtn.dispatchEvent(clickEvent)
+
+    expect(window.Echo.disconnect).toHaveBeenCalled()
+    expect(logoutForm.submit).toHaveBeenCalled()
+
+    delete window.Echo
+  })
+
   test('does nothing when logout form does not exist', () => {
     document.body.removeChild(logoutForm)
 

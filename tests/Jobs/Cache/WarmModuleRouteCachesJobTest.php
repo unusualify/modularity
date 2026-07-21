@@ -7,8 +7,10 @@ namespace Unusualify\Modularous\Tests\Jobs\Cache;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
 use TestModules\TestModule\Entities\Item;
+use Unusualify\Modularous\Events\Cache\CacheWarmProgress;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Facades\ModularousCache;
 use Unusualify\Modularous\Jobs\Cache\WarmModuleRouteCachesJob;
@@ -78,6 +80,8 @@ class WarmModuleRouteCachesJobTest extends TestCase
     /** @test */
     public function it_returns_early_when_route_caching_is_disabled(): void
     {
+        Event::fake([CacheWarmProgress::class]);
+
         ModularousCache::shouldReceive('isEnabled')
             ->with('TestModule', 'Item')
             ->andReturn(false);
@@ -85,9 +89,26 @@ class WarmModuleRouteCachesJobTest extends TestCase
         ModularousCache::shouldReceive('warmupModelCaches')->never();
         Bus::fake();
 
-        (new WarmModuleRouteCachesJob('TestModule', 'Item'))->handle();
+        (new WarmModuleRouteCachesJob('TestModule', 'Item', [], 100, 9))->handle();
 
         Bus::assertNothingDispatched();
+
+        Event::assertDispatched(CacheWarmProgress::class, function (CacheWarmProgress $event) {
+            if ($event->status !== CacheWarmProgress::STATUS_SKIPPED) {
+                return false;
+            }
+
+            $payload = $event->broadcastWith();
+            $toast = $payload['toast'] ?? null;
+
+            return $event->initiatorUserId === 9
+                && ($payload['skipped'] ?? false) === true
+                && ($payload['reason'] ?? null) === 'cache_disabled'
+                && $event->broadcastAs() === 'modularous.cache.warm.skipped'
+                && is_array($toast)
+                && ($toast['variant'] ?? null) === 'warning'
+                && ($toast['detail'] ?? null) === 'TestModule:Item';
+        });
     }
 
     /** @test */
@@ -141,5 +162,44 @@ class WarmModuleRouteCachesJobTest extends TestCase
         (new WarmModuleRouteCachesJob('TestModule', 'Item', ['presentationItem' => true]))->handle();
 
         Bus::assertDispatchedTimes(WarmPresentationItemJob::class, 2);
+    }
+
+    /** @test */
+    public function it_broadcasts_structured_toast_with_module_route_detail_without_id(): void
+    {
+        Event::fake([CacheWarmProgress::class]);
+
+        ModularousCache::partialMock()
+            ->shouldReceive('isEnabled')
+            ->andReturn(true)
+            ->shouldReceive('refreshModelCaches')
+            ->twice();
+
+        (new WarmModuleRouteCachesJob('TestModule', 'Item', ['presentationItem' => true], 100, 7))->handle();
+
+        Event::assertDispatched(CacheWarmProgress::class, function (CacheWarmProgress $event) {
+            if ($event->status !== CacheWarmProgress::STATUS_STARTED) {
+                return false;
+            }
+
+            $toast = $event->broadcastWith()['toast'] ?? null;
+
+            return $event->initiatorUserId === 7
+                && is_array($toast)
+                && ($toast['detail'] ?? null) === 'TestModule:Item'
+                && ($toast['variant'] ?? null) === 'info';
+        });
+
+        Event::assertDispatched(CacheWarmProgress::class, function (CacheWarmProgress $event) {
+            if ($event->status !== CacheWarmProgress::STATUS_COMPLETED) {
+                return false;
+            }
+
+            $toast = $event->broadcastWith()['toast'] ?? null;
+
+            return is_array($toast)
+                && ($toast['detail'] ?? null) === 'TestModule:Item'
+                && ($toast['variant'] ?? null) === 'success';
+        });
     }
 }

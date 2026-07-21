@@ -162,6 +162,7 @@
     </ue-modal>
 
     <ue-alert ref="alertRef" />
+    <ue-broadcast-toasts />
     <ue-dynamic-modal />
 
     <ue-modal

@@ -161,4 +161,12 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
     {
         return $this->language ?? app()->getLocale();
     }
+
+    /**
+     * The private channel name for broadcast notifications.
+     */
+    public function receivesBroadcastNotificationsOn(): string
+    {
+        return 'users.' . $this->id;
+    }
 }

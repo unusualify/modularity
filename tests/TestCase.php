@@ -67,6 +67,20 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             'prefix' => '',
         ]);
 
+        // ShouldBroadcast events hardcode $connection = 'redis' and may broadcastVia('reverb').
+        // Keep package tests free of phpredis / Pusher credentials.
+        $app['config']->set('queue.default', 'sync');
+        $app['config']->set('queue.connections.redis', [
+            'driver' => 'sync',
+        ]);
+        $app['config']->set('broadcasting.default', 'null');
+        $app['config']->set('broadcasting.connections.reverb', [
+            'driver' => 'null',
+        ]);
+        $app['config']->set('broadcasting.connections.pusher', [
+            'driver' => 'null',
+        ]);
+
         $app['config']->set('cache.prefix', 'spatie_tests---');
         $app['config']->set('cache.default', getenv('CACHE_DRIVER') ?: 'array');
         $app['config']->set('modules.scan.enabled', true);

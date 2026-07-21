@@ -4,14 +4,16 @@ namespace Modules\SystemNotification\Events;
 
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use Unusualify\Modularous\Entities\Assignment;
+use Unusualify\Modularous\Events\Traits\GatesBroadcastAvailability;
 
-class AssignmentCreated implements ShouldDispatchAfterCommit
+class AssignmentCreated implements ShouldBroadcast, ShouldDispatchAfterCommit
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use Dispatchable, InteractsWithSockets, SerializesModels, GatesBroadcastAvailability;
 
     /**
      * The name of the queue connection to use when broadcasting the event.
@@ -36,6 +38,25 @@ class AssignmentCreated implements ShouldDispatchAfterCommit
     {
         return [
             new Channel('assignable'),
+        ];
+    }
+
+    public function broadcastAs(): string
+    {
+        return 'modularous.assignment.created';
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function broadcastWith(): array
+    {
+        return [
+            'id' => $this->model->id,
+            'model_type' => Assignment::class,
+            'model_id' => $this->model->id,
+            'assignee_id' => $this->model->assignee_id ?? null,
+            'assigner_id' => $this->model->assigner_id ?? null,
         ];
     }
 }

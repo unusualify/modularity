@@ -5,6 +5,7 @@ namespace Modules\SystemNotification\Notifications;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Arr;
@@ -12,6 +13,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Unusualify\Modularous\Facades\Modularous;
+use Unusualify\Modularous\Support\BroadcastAvailability;
 
 abstract class FeatureNotification extends Notification implements ShouldQueue
 {
@@ -165,6 +167,7 @@ abstract class FeatureNotification extends Notification implements ShouldQueue
         return [
             'mail' => modularousConfig('notifications.mail_connection'),
             'database' => modularousConfig('notifications.database_connection'),
+            'broadcast' => modularousConfig('notifications.broadcast_connection'),
         ];
     }
 
@@ -209,10 +212,19 @@ abstract class FeatureNotification extends Notification implements ShouldQueue
         $channels = config("modularous.notifications.{$class}.channels", null);
 
         if ($channels !== null && is_string($channels)) {
-            return $this->getValidChannels(explode(',', $channels));
+            $resolved = $this->getValidChannels(explode(',', $channels));
+        } else {
+            $resolved = $this->defaultChannels;
         }
 
-        return $this->defaultChannels;
+        if (! BroadcastAvailability::isEnabled()) {
+            $resolved = array_values(array_filter(
+                $resolved,
+                static fn ($channel): bool => $channel !== 'broadcast'
+            ));
+        }
+
+        return $resolved;
     }
 
     public function via($notifiable): array
@@ -678,6 +690,25 @@ abstract class FeatureNotification extends Notification implements ShouldQueue
         }
 
         return $fields;
+    }
+
+    /**
+     * Get the broadcast representation of the notification.
+     */
+    public function toBroadcast(object $notifiable): BroadcastMessage
+    {
+        $fields = $this->toDatabaseFeatureFields($notifiable);
+
+        return (new BroadcastMessage([
+            'token' => $fields['token'] ?? null,
+            'subject' => $fields['subject'] ?? null,
+            'message' => $fields['message'] ?? null,
+            'htmlMessage' => $fields['htmlMessage'] ?? null,
+            'redirectorText' => $fields['redirectorText'] ?? null,
+            'redirector' => $fields['redirector'] ?? null,
+            'hasRedirector' => $fields['hasRedirector'] ?? false,
+            'notification_type' => class_basename(static::class),
+        ]))->onConnection(config('modularous.notifications.broadcast_connection', config('queue.default')));
     }
 
     /**

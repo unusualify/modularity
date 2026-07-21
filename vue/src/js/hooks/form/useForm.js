@@ -6,7 +6,7 @@ import { useI18n } from 'vue-i18n'
 import { cloneDeep, isEqual, find, reduce, set, get, isArray } from 'lodash-es'
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
 
-import { useConfig, useInputHandlers, useValidation, useLocale, useItemActions, useAuthorization, useUser } from '@/hooks'
+import { useConfig, useInputHandlers, useValidation, useLocale, useItemActions, useAuthorization, useUser, useEditPresence } from '@/hooks'
 import useFormResponseStatus from './useFormResponseStatus'
 import { LANGUAGE } from '@/store/mutations/index'
 import ACTIONS from '@/store/actions'
@@ -92,6 +92,10 @@ export const makeFormProps = propsFactory({
   isEditing: {
     type: Boolean,
     default: false
+  },
+  editPresenceModelType: {
+    type: String,
+    default: null
   },
   hasDivider: {
     type: Boolean,
@@ -212,6 +216,20 @@ export default function useForm(props, context) {
   const locale = useLocale()
   const { hasRoles } = useAuthorization()
   const { handleSuccessResponse, handleErrorResponse } = useFormResponseStatus()
+
+  const presenceEnabled = computed(() => props.isEditing && !!props.editPresenceModelType && !!(props.modelValue?.id))
+  const presenceModelType = computed(() => props.editPresenceModelType)
+  const presenceModelId = computed(() => props.modelValue?.id ?? null)
+  // Keep presence computeds as refs — do not bury them in reactive()+toRefs
+  // (that can break template updates for the second concurrent editor).
+  const {
+    hasOtherEditors,
+    lockMessage: editPresenceLockMessage,
+  } = useEditPresence({
+    enabled: presenceEnabled,
+    modelType: presenceModelType,
+    modelId: presenceModelId,
+  })
 
   // Data refs
   const VForm = ref(null)
@@ -358,7 +376,7 @@ export default function useForm(props, context) {
       if (!schema || typeof schema !== 'object') return false
       return Object.values(schema).some(s => Object.prototype.hasOwnProperty.call(s, 'sourceLoading') && s.sourceLoading === true
         || (Object.prototype.hasOwnProperty.call(s, 'type') && (s.type === 'wrap' || s.type === 'group') && s.schema && Object.values(s.schema).some(nested => Object.prototype.hasOwnProperty.call(nested, 'sourceLoading') && nested.sourceLoading === true)))
-    })
+    }),
   })
   // Methods
 
@@ -784,6 +802,8 @@ export default function useForm(props, context) {
     ...validations,
     ...locale,
     validModel,
+    hasOtherEditors,
+    editPresenceLockMessage,
     // ...itemActions,
     // handleInput,
     // createModel,

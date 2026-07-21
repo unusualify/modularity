@@ -7,6 +7,7 @@ namespace Unusualify\Modularous\Http\Controllers\Traits;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Unusualify\Modularous\Entities\Enums\Permission;
 use Unusualify\Modularous\Facades\ModularousCache;
 use Unusualify\Modularous\Http\Controllers\Traits\Form\FormActions;
 use Unusualify\Modularous\Http\Controllers\Traits\Table\TableActions;
@@ -29,6 +30,11 @@ trait ManageResourceCache
         }
 
         if (! ModularousCache::hasAdminCacheActions($this->getModuleName(), $this->getRouteName())) {
+            return;
+        }
+
+        $permissionName = $this->repository->getPermissionName(Permission::CACHING->value, $this->getRouteName());
+        if (! $this->user || ! $this->user->can($permissionName)) {
             return;
         }
 
@@ -173,10 +179,13 @@ trait ManageResourceCache
         $this->authorizeResourceCacheAction();
 
         $types = $this->resolveResourceCacheTypes($request);
+        $initiatorUserId = isset($this->user->id) ? (int) $this->user->id : null;
         $job = WarmModuleRouteCachesJob::dispatch(
             $this->getModuleName(),
             $this->getRouteName(),
             $types,
+            100,
+            $initiatorUserId,
         );
 
         return response()->json([
@@ -193,7 +202,9 @@ trait ManageResourceCache
             abort(404);
         }
 
-        if (! $this->user || ! $this->user->is_superadmin) {
+        $permissionName = $this->repository->getPermissionName(Permission::CACHING->value, $this->getRouteName());
+
+        if (! $this->user || ! $this->user->can($permissionName)) {
             abort(403);
         }
     }

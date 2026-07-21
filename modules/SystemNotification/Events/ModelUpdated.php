@@ -4,12 +4,13 @@ namespace Modules\SystemNotification\Events;
 
 use Illuminate\Broadcasting\InteractsWithBroadcasting;
 use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use Unusualify\Modularous\Events\ModelEvent;
 
-class ModelUpdated extends ModelEvent implements ShouldDispatchAfterCommit
+class ModelUpdated extends ModelEvent implements ShouldBroadcast, ShouldDispatchAfterCommit
 {
     use Dispatchable, InteractsWithSockets, InteractsWithBroadcasting, SerializesModels;
 

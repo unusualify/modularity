@@ -7,10 +7,17 @@ namespace Unusualify\Modularous\Tests\Services;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\PrivateChannel;
 use Unusualify\Modularous\Services\BroadcastManager;
+use Unusualify\Modularous\Support\BroadcastAvailability;
 use Unusualify\Modularous\Tests\TestCase;
 
 class BroadcastManagerTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        BroadcastAvailability::clearFake();
+
+        parent::tearDown();
+    }
     public function test_get_broadcast_configuration_groups_events_by_channel(): void
     {
         $model = (object) ['id' => 7];
@@ -63,6 +70,48 @@ class BroadcastManagerTest extends TestCase
         $this->assertSame('private', $byName['private-models.9']['type']);
         $this->assertSame('public', $byName['presence-room']['type']);
         $this->assertSame('modularous.broadcast.private', $byName['private-models.9']['events'][0]['event']);
+    }
+
+    public function test_panel_config_includes_user_channel_and_domain_channels(): void
+    {
+        BroadcastAvailability::fakePusherSdkAvailable(true);
+        config([
+            'modularous.broadcasting.enabled' => true,
+            'broadcasting.default' => 'null',
+        ]);
+
+        $user = (object) ['id' => 42];
+
+        $config = BroadcastManager::panelConfig($user);
+
+        $this->assertTrue($config['enabled']);
+        $this->assertSame(42, $config['userId']);
+        $this->assertSame('users.42', $config['userChannel']);
+        $this->assertContains('assignable', $config['domainChannels']);
+        $this->assertContains('payment', $config['domainChannels']);
+        $this->assertContains('model', $config['domainChannels']);
+    }
+
+    public function test_panel_config_enabled_false_when_broadcasting_unavailable(): void
+    {
+        config([
+            'modularous.broadcasting.enabled' => false,
+            'broadcasting.default' => 'null',
+        ]);
+
+        $config = BroadcastManager::panelConfig((object) ['id' => 1]);
+
+        $this->assertFalse($config['enabled']);
+    }
+
+    public function test_encode_and_decode_model_type(): void
+    {
+        $class = 'Modules\\Blog\\Entities\\Post';
+
+        $encoded = BroadcastManager::encodeModelType($class);
+
+        $this->assertSame('Modules-Blog-Entities-Post', $encoded);
+        $this->assertSame($class, BroadcastManager::decodeModelType($encoded));
     }
 }
 

@@ -16,6 +16,7 @@ use Unusualify\Modularous\Entities\Traits\Core\ChangeRelationships;
 use Unusualify\Modularous\Entities\Traits\HasStateable;
 use Unusualify\Modularous\Entities\User;
 use Unusualify\Modularous\Events\ModelEvent;
+use Unusualify\Modularous\Support\BroadcastAvailability;
 use Unusualify\Modularous\Tests\ModelTestCase;
 
 class ModelEventTest extends ModelTestCase
@@ -39,6 +40,13 @@ class ModelEventTest extends ModelTestCase
             'name' => 'Test Model',
             'email' => 'test@example.com',
         ]);
+    }
+
+    protected function tearDown(): void
+    {
+        BroadcastAvailability::clearFake();
+
+        parent::tearDown();
     }
 
     public function test_constructor_sets_model_and_model_type()
@@ -112,9 +120,40 @@ class ModelEventTest extends ModelTestCase
 
     public function test_broadcast_when_returns_true()
     {
+        BroadcastAvailability::fakePusherSdkAvailable(true);
+        config([
+            'modularous.broadcasting.enabled' => true,
+            'broadcasting.default' => 'null',
+        ]);
+
         $event = new TestModelEvent($this->testModel);
 
         $this->assertTrue($event->broadcastWhen());
+    }
+
+    public function test_broadcast_when_returns_false_when_disabled()
+    {
+        config([
+            'modularous.broadcasting.enabled' => false,
+            'broadcasting.default' => 'null',
+        ]);
+
+        $event = new TestModelEvent($this->testModel);
+
+        $this->assertFalse($event->broadcastWhen());
+    }
+
+    public function test_broadcast_when_returns_false_when_pusher_sdk_missing_for_reverb()
+    {
+        config([
+            'modularous.broadcasting.enabled' => true,
+            'broadcasting.default' => 'reverb',
+        ]);
+        BroadcastAvailability::fakePusherSdkAvailable(false);
+
+        $event = new TestModelEvent($this->testModel);
+
+        $this->assertFalse($event->broadcastWhen());
     }
 
     public function test_broadcast_as_returns_correct_event_name()
@@ -208,6 +247,12 @@ class ModelEventTest extends ModelTestCase
 
     public function test_broadcasting_integration()
     {
+        BroadcastAvailability::fakePusherSdkAvailable(true);
+        config([
+            'modularous.broadcasting.enabled' => true,
+            'broadcasting.default' => 'null',
+        ]);
+
         // Test that the event can be used with Laravel's broadcasting system
         $event = new TestBroadcastingModelEvent($this->testModel, ['action' => 'created']);
 
@@ -220,6 +265,14 @@ class ModelEventTest extends ModelTestCase
 
         // Test broadcast name
         $this->assertEquals('modularous.test.broadcasting.model', $event->broadcastAs());
+
+        $this->assertInstanceOf(\Illuminate\Contracts\Broadcasting\ShouldBroadcast::class, $event);
+        $this->assertSame([
+            'id' => 1,
+            'model_type' => TestModel::class,
+            'model_id' => 1,
+            'user_id' => null,
+        ], $event->broadcastWith());
     }
 
     public function test_event_with_null_model_id()

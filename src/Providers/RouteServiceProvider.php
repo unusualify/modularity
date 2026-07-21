@@ -5,6 +5,7 @@ namespace Unusualify\Modularous\Providers;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Nwidart\Modules\Support\Config\GenerateConfigReader;
@@ -14,6 +15,7 @@ use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Facades\ModularousRoutes;
 use Unusualify\Modularous\Http\Controllers\API\CacheRevalidateController;
 use Unusualify\Modularous\Http\Controllers\GlideController;
+use Unusualify\Modularous\Support\BroadcastAvailability;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -32,9 +34,30 @@ class RouteServiceProvider extends ServiceProvider
 
         $this->bootRouteMiddlewares($this->app->get('router'));
 
-        require __DIR__ . '/../../routes/channels.php';
+        $this->bootBroadcastChannels();
 
         parent::boot();
+    }
+
+    /**
+     * Register broadcast auth routes and channel callbacks when broadcasting is available.
+     *
+     * Skips entirely when Modularous broadcasting is disabled or the driver SDK is missing
+     * (avoids resolving Pusher/Reverb broadcasters when packages are not installed).
+     * When only the config toggle is on but the SDK is missing, auth routes are still
+     * skipped to prevent boot-time Class "Pusher\Pusher" not found errors.
+     */
+    protected function bootBroadcastChannels(): void
+    {
+        if (! BroadcastAvailability::isEnabled()) {
+            return;
+        }
+
+        Broadcast::routes([
+            'middleware' => ['web', 'modularous.auth:' . Modularous::getAuthGuardName()],
+        ]);
+
+        require __DIR__ . '/../../routes/channels.php';
     }
 
     /**
