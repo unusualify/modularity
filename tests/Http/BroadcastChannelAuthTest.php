@@ -46,6 +46,10 @@ class BroadcastChannelAuthTest extends TestCase
             return $user !== null;
         }, $broadcastGuards);
 
+        Broadcast::channel('chats.{chatId}', function ($user, $chatId) {
+            return $user !== null;
+        }, $broadcastGuards);
+
         Broadcast::channel('editing.{modelType}.{modelId}', function ($user, $modelType, $modelId) {
             if ($user === null) {
                 return false;
@@ -107,6 +111,18 @@ class BroadcastChannelAuthTest extends TestCase
         $this->assertFalse($authorize(null, '1'));
     }
 
+    public function test_chats_channel_requires_authenticated_user(): void
+    {
+        $user = new User;
+        $user->id = 1;
+
+        $callback = Broadcast::driver()->getChannels()['chats.{chatId}'] ?? null;
+        $this->assertIsCallable($callback);
+
+        $this->assertTrue((bool) $callback($user, '12'));
+        $this->assertFalse((bool) $callback(null, '12'));
+    }
+
     public function test_editing_presence_channel_returns_user_payload(): void
     {
         $user = new User;
@@ -149,6 +165,10 @@ class BroadcastChannelAuthTest extends TestCase
         $this->assertSame(
             [Modularous::getAuthGuardName()],
             $options['users.{userId}']['guards'] ?? null
+        );
+        $this->assertSame(
+            [Modularous::getAuthGuardName()],
+            $options['chats.{chatId}']['guards'] ?? null
         );
         $this->assertSame(
             [Modularous::getAuthGuardName()],

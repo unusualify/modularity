@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Schema;
 use Modules\SystemNotification\Events\UnreadChatMessage;
+use Modules\SystemNotification\Notifications\ChatableMessageBroadcastNotification;
 use Modules\SystemNotification\Notifications\ChatableUnreadNotification;
 use Spatie\Permission\Models\Role;
 use Unusualify\Modularous\Entities\Chat;
@@ -752,6 +753,7 @@ class ChatableTest extends ModelTestCase
         $chatableModel->handleChatableNotification();
         Notification::assertSentTimes(ChatableUnreadNotification::class, 1);
         Notification::assertSentTo([$chatableCreator], ChatableUnreadNotification::class);
+        $this->assertNotNull($message->fresh()->notified_at);
     }
 
     public function test_handle_chatable_notification_from_chatable_model_with_authorizable()
@@ -807,6 +809,173 @@ class ChatableTest extends ModelTestCase
         Notification::assertSentTo([$chatableCreator], ChatableUnreadNotification::class);
     }
 
+    public function test_resolve_chatable_notification_recipients_default_uses_creator(): void
+    {
+        $chatableCreator = User::create([
+            'name' => 'Creator User',
+            'email' => 'creator-recipients@example.com',
+            'published' => true,
+        ]);
+
+        $messageCreator = User::create([
+            'name' => 'Message Creator',
+            'email' => 'message-recipients@example.com',
+            'published' => true,
+        ]);
+
+        $chatableModel = new TestChatableModelWithCreator(['name' => 'Chatable Model']);
+        $chatableModel->save();
+
+        $chatableModel->creatorRecord()->create([
+            'creator_id' => $chatableCreator->id,
+            'creator_type' => User::class,
+            'guard_name' => 'web',
+        ]);
+        $chatableModel->refresh();
+
+        $message = $chatableModel->chat->messages()->create([
+            'content' => 'Hello',
+            'is_read' => false,
+        ]);
+        $message->creatorRecord()->create([
+            'creator_id' => $messageCreator->id,
+            'creator_type' => User::class,
+            'guard_name' => 'web',
+        ]);
+        $message->refresh();
+
+        $recipients = iterator_to_array($chatableModel->resolveChatableNotificationRecipients($message));
+
+        $this->assertCount(1, $recipients);
+        $this->assertTrue($recipients[0]->is($chatableCreator));
+    }
+
+    public function test_resolve_chatable_notification_recipients_can_be_overridden(): void
+    {
+        $overrideRecipient = User::create([
+            'name' => 'Override User',
+            'email' => 'override-recipients@example.com',
+            'published' => true,
+        ]);
+
+        $messageCreator = User::create([
+            'name' => 'Message Creator',
+            'email' => 'message-override@example.com',
+            'published' => true,
+        ]);
+
+        $chatableModel = new TestChatableModelWithCustomRecipients(['name' => 'Custom Recipients']);
+        $chatableModel->overrideRecipient = $overrideRecipient;
+        $chatableModel->save();
+
+        $message = $chatableModel->chat->messages()->create([
+            'content' => 'Hello',
+            'is_read' => false,
+        ]);
+        $message->creatorRecord()->create([
+            'creator_id' => $messageCreator->id,
+            'creator_type' => User::class,
+            'guard_name' => 'web',
+        ]);
+        $message->refresh();
+
+        $recipients = iterator_to_array($chatableModel->resolveChatableNotificationRecipients($message));
+
+        $this->assertCount(1, $recipients);
+        $this->assertTrue($recipients[0]->is($overrideRecipient));
+    }
+
+    public function test_notify_chatable_message_broadcast_notifies_recipients_without_stamping_notified_at(): void
+    {
+        $chatableCreator = User::create([
+            'name' => 'Creator User',
+            'email' => 'creator-immediate@example.com',
+            'published' => true,
+        ]);
+
+        $messageCreator = User::create([
+            'name' => 'Message Creator',
+            'email' => 'message-immediate@example.com',
+            'published' => true,
+        ]);
+
+        $chatableModel = new TestChatableModelWithCreator(['name' => 'Chatable Model']);
+        $chatableModel->save();
+
+        $chatableModel->creatorRecord()->create([
+            'creator_id' => $chatableCreator->id,
+            'creator_type' => User::class,
+            'guard_name' => 'web',
+        ]);
+        $chatableModel->refresh();
+
+        $message = $chatableModel->chat->messages()->create([
+            'content' => 'Immediate hello',
+            'is_read' => false,
+        ]);
+        $message->creatorRecord()->create([
+            'creator_id' => $messageCreator->id,
+            'creator_type' => User::class,
+            'guard_name' => 'web',
+        ]);
+        $message->refresh();
+
+        Notification::fake();
+        config([
+            'modularous.notifications.'.ChatableMessageBroadcastNotification::class.'.channels' => 'broadcast',
+        ]);
+
+        $chatableModel->notifyChatableMessageBroadcast($message);
+
+        Notification::assertSentTimes(ChatableMessageBroadcastNotification::class, 1);
+        Notification::assertSentTo([$chatableCreator], ChatableMessageBroadcastNotification::class);
+        Notification::assertNotSentTo([$messageCreator], ChatableMessageBroadcastNotification::class);
+        $this->assertNull($message->fresh()->notified_at);
+    }
+
+    public function test_notify_chatable_message_broadcast_does_not_send_interval_unread_notification(): void
+    {
+        $chatableCreator = User::create([
+            'name' => 'Creator User',
+            'email' => 'creator-no-interval@example.com',
+            'published' => true,
+        ]);
+
+        $messageCreator = User::create([
+            'name' => 'Message Creator',
+            'email' => 'message-no-interval@example.com',
+            'published' => true,
+        ]);
+
+        $chatableModel = new TestChatableModelWithCreator(['name' => 'Chatable Model']);
+        $chatableModel->save();
+
+        $chatableModel->creatorRecord()->create([
+            'creator_id' => $chatableCreator->id,
+            'creator_type' => User::class,
+            'guard_name' => 'web',
+        ]);
+        $chatableModel->refresh();
+
+        $message = $chatableModel->chat->messages()->create([
+            'content' => 'Immediate hello',
+            'is_read' => false,
+        ]);
+        $message->creatorRecord()->create([
+            'creator_id' => $messageCreator->id,
+            'creator_type' => User::class,
+            'guard_name' => 'web',
+        ]);
+        $message->refresh();
+
+        Notification::fake();
+
+        $chatableModel->notifyChatableMessageBroadcast($message);
+
+        Notification::assertNotSentTo([$chatableCreator], ChatableUnreadNotification::class);
+        Notification::assertSentTo([$chatableCreator], ChatableMessageBroadcastNotification::class);
+    }
+
     protected function tearDown(): void
     {
         Schema::dropIfExists('test_chatable_models');
@@ -856,4 +1025,20 @@ class TestChatableModelWithCreator extends Model
     protected $table = 'test_chatable_models';
 
     protected $fillable = ['name'];
+}
+
+class TestChatableModelWithCustomRecipients extends Model
+{
+    use Chatable, ModelHelpers;
+
+    protected $table = 'test_chatable_models';
+
+    protected $fillable = ['name'];
+
+    public $overrideRecipient;
+
+    public function resolveChatableNotificationRecipients(ChatMessage $latestChatMessage): iterable
+    {
+        return $this->overrideRecipient ? [$this->overrideRecipient] : [];
+    }
 }

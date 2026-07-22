@@ -182,23 +182,25 @@
             @load="loadMoreMessages"
             :load-more-text="loadMoreText ? loadMoreText : $t('Load More Messages')"
           >
-            <div v-for="(message, index) in formattedMessages" :key="index" class="v-input-chat__messages">
-              <slot name="message" :message="message" :index="index">
-                <ChatMessage
-                  :class="[
-                    'v-input-chat__message',
-                    message.loading  ? 'v-input-chat__message--loading' : '',
-                  ]"
-                  :modelValue="message"
-                  @update:modelValue="updatedMessage($event, index)"
-                  :reverse="message.reverse"
-                  :updateEndpoint="endpoints.update"
-                  :noStarring="noStarring"
-                  :noPinning="noPinning"
-                  :contentTruncateLength="contentTruncateLength"
-                  v-bind="$attrs"
-                />
-              </slot>
+            <div class="v-input-chat__messages">
+              <div v-for="(message, index) in formattedMessages" :key="index">
+                <slot name="message" :message="message" :index="index">
+                  <ChatMessage
+                    :class="[
+                      'v-input-chat__message',
+                      message.loading  ? 'v-input-chat__message--loading' : '',
+                    ]"
+                    :modelValue="message"
+                    @update:modelValue="updatedMessage($event, index)"
+                    :reverse="message.reverse"
+                    :updateEndpoint="endpoints.update"
+                    :noStarring="noStarring"
+                    :noPinning="noPinning"
+                    :contentTruncateLength="contentTruncateLength"
+                    v-bind="$attrs"
+                  />
+                </slot>
+              </div>
             </div>
             <template v-slot:load-more="{ props }">
               <v-btn
@@ -347,6 +349,7 @@
 <script>
   import { useInput, makeInputProps, makeInputEmits, useValidation } from '@/hooks'
   import ChatMessage from '@/components/others/ChatMessage.vue';
+  import { RETAINABLE_NOTIFICATION } from '@/store/mutations'
 
   export default {
     name: 'v-input-chat',
@@ -484,6 +487,7 @@
         uploadedAttachmentsDialog: false,
 
         refreshInterval: null,
+        chatChannelName: null,
         pinnedMessage: null,
         showEmojiPicker: false,
         pinnedMessageExpanded: false,
@@ -493,6 +497,15 @@
     computed: {
       currentUser() {
         return this.$store.getters.userProfile;
+      },
+      canUseBroadcastSync() {
+        const ns = import.meta.env.VUE_APP_NAME
+        const broadcastEnabled = window[ns]?.STORE?.broadcast?.enabled !== false
+
+        return broadcastEnabled
+          && typeof window !== 'undefined'
+          && window.Echo
+          && typeof window.Echo.private === 'function'
       },
       formattedMessages() {
         return this.formatMessages(this.messages);
@@ -841,10 +854,106 @@
           }
 
           if(response.status === 401) {
-            clearInterval(this.refreshInterval);
-            this.refreshInterval = null;
+            this.stopRefreshPolling();
           }
         });
+      },
+      startRefreshPolling() {
+        if (this.refreshInterval) {
+          return
+        }
+
+        this.refreshInterval = setInterval(() => {
+          this.refreshMessages();
+        }, this.refreshTime);
+      },
+      stopRefreshPolling() {
+        if (this.refreshInterval) {
+          clearInterval(this.refreshInterval);
+          this.refreshInterval = null;
+        }
+      },
+      /**
+       * Clear retainable tray items for this chat when the user opens it.
+       * Matches backend `ChatableMessageBroadcastNotification::getRetainGroup()`.
+       */
+      dismissRetainableForChat() {
+        if (!this.input || this.input <= -1) {
+          return
+        }
+
+        this.$store?.commit?.(RETAINABLE_NOTIFICATION.DISMISS_BY_GROUP, `chat:${this.input}`)
+      },
+      subscribeChatChannel() {
+        if (!this.canUseBroadcastSync || !this.input || this.input <= -1) {
+          return false
+        }
+
+        const channelName = `chats.${this.input}`
+        this.chatChannelName = channelName
+
+        window.Echo.private(channelName)
+          .listen('.modularous.chatable.message.synced', (payload) => {
+            this.handleChatMessageSynced(payload)
+          })
+
+        this.dismissRetainableForChat()
+
+        return true
+      },
+      unsubscribeChatChannel() {
+        if (this.chatChannelName && window.Echo && typeof window.Echo.leave === 'function') {
+          window.Echo.leave(this.chatChannelName)
+        }
+        this.chatChannelName = null
+      },
+      handleChatMessageSynced(payload) {
+        const action = payload?.action
+        const message = payload?.message
+        if (!action || !message) {
+          return
+        }
+
+        if (action === 'created') {
+          const existingIndex = this.messages.findIndex((m) => m.id && m.id === message.id)
+          if (existingIndex !== -1) {
+            this.messages.splice(existingIndex, 1, this.formatMessage({
+              ...this.messages[existingIndex],
+              ...message,
+              loading: false,
+              tempId: undefined,
+            }))
+          } else {
+            this.addMessage(this.formatMessage(message))
+          }
+
+          if (message.attachments?.length) {
+            this.getAttachments()
+          }
+
+          this.$nextTick(() => {
+            this.scrollEndInfiniteScroll()
+          })
+
+          return
+        }
+
+        if (action === 'updated') {
+          const index = this.messages.findIndex((m) => m.id === message.id)
+          if (index !== -1) {
+            this.messages.splice(index, 1, this.formatMessage({
+              ...this.messages[index],
+              ...message,
+              loading: false,
+            }))
+          }
+
+          return
+        }
+
+        if (action === 'deleted') {
+          this.messages = this.messages.filter((m) => m.id !== message.id)
+        }
       },
       handleEnterKey(event) {
         // If Shift is pressed, allow default behavior (new line)
@@ -1117,17 +1226,17 @@
       if(this.input && this.input > -1) {
         this.loadMessages();
         this.getAttachments();
-        this.refreshInterval = setInterval(() => {
-          this.refreshMessages();
-        }, this.refreshTime);
+        if (!this.subscribeChatChannel()) {
+          // Broadcast unavailable — still clear tray for this chat on open.
+          this.dismissRetainableForChat();
+          this.startRefreshPolling();
+        }
       }
 
     },
     beforeUnmount() {
-      clearInterval(this.refreshInterval);
-      this.refreshInterval = null;
-      if(this.input && this.input > -1) {
-      }
+      this.stopRefreshPolling();
+      this.unsubscribeChatChannel();
     }
   }
 </script>

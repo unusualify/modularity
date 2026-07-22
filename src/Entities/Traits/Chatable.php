@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Facades\DB;
 use Modules\SystemNotification\Events\UnreadChatMessage;
+use Modules\SystemNotification\Notifications\ChatableMessageBroadcastNotification;
 use Modules\SystemNotification\Notifications\ChatableUnreadNotification;
 use Unusualify\Modularous\Entities\Chat;
 use Unusualify\Modularous\Entities\ChatMessage;
@@ -61,7 +62,10 @@ trait Chatable
 
     public function chatMessages(): HasManyThrough
     {
-        return $this->hasManyThrough(ChatMessage::class, Chat::class, 'chatable_id', 'chat_id', 'id', 'id');
+        $chatTable = (new Chat)->getTable();
+
+        return $this->hasManyThrough(ChatMessage::class, Chat::class, 'chatable_id', 'chat_id', 'id', 'id')
+            ->where("{$chatTable}.chatable_type", static::class);
     }
 
     public function creatorChatMessages(): HasManyThrough
@@ -83,6 +87,7 @@ trait Chatable
         $chatMessageTable = (new ChatMessage)->getTable();
 
         return $this->hasOneThrough(ChatMessage::class, Chat::class, 'chatable_id', 'chat_id', 'id', 'id')
+            ->where("{$chatTable}.chatable_type", static::class)
             ->whereRaw("{$chatMessageTable}.created_at = (select max(created_at) from {$chatMessageTable} where {$chatMessageTable}.chat_id = {$chatTable}.id)");
     }
 
@@ -192,6 +197,65 @@ trait Chatable
         return ! $latestChatMessage->is_read;
     }
 
+    /**
+     * Resolve who should receive unread-chat notifications for the latest message.
+     * Override on chatable models to customize recipient routing.
+     *
+     * @return iterable<object>
+     */
+    public function resolveChatableNotificationRecipients(ChatMessage $latestChatMessage): iterable
+    {
+        $messageCreator = $latestChatMessage->creator;
+
+        if (! $messageCreator) {
+            return [];
+        }
+
+        $chatableCreator = null;
+        if (in_array('Unusualify\Modularous\Entities\Traits\HasCreator', class_uses_recursive($this))) {
+            $chatableCreator = $this->creator;
+        }
+
+        $chatableAuthorizedUser = in_array('Unusualify\Modularous\Entities\Traits\HasAuthorizable', class_uses_recursive($this))
+            ? ($this->is_authorized ? $this->authorizedUser : null)
+            : null;
+
+        $recipients = [];
+
+        if (
+            $chatableCreator
+            && in_array('Illuminate\Notifications\RoutesNotifications', class_uses_recursive($chatableCreator))
+            && ! $chatableCreator->is($messageCreator)
+        ) {
+            $recipients[] = $chatableCreator;
+        } elseif (
+            $chatableAuthorizedUser
+            && in_array('Illuminate\Notifications\RoutesNotifications', class_uses_recursive($chatableAuthorizedUser))
+            && ! $chatableAuthorizedUser->is($messageCreator)
+        ) {
+            $recipients[] = $chatableAuthorizedUser;
+        }
+
+        return $recipients;
+    }
+
+    /**
+     * Immediately broadcast a retainable toast to other parties when a message is created.
+     * Does not stamp notified_at — interval {@see handleChatableNotification} stays independent.
+     */
+    public function notifyChatableMessageBroadcast(ChatMessage $message): void
+    {
+        $chat = $this->relationLoaded('chat') ? $this->chat : $this->chat()->first();
+
+        if (! $chat) {
+            return;
+        }
+
+        foreach ($this->resolveChatableNotificationRecipients($message) as $notifiable) {
+            $notifiable->notifyNow(new ChatableMessageBroadcastNotification($chat));
+        }
+    }
+
     public function handleChatableNotification(): void
     {
         $latestChatMessage = $this->latestChatMessage()->first();
@@ -201,25 +265,18 @@ trait Chatable
             && $latestChatMessage->created_at->diffInMinutes(now()) > static::getChatableNotificationInterval()
             && ! $latestChatMessage->notified_at
         ) {
-            UnreadChatMessage::dispatch($latestChatMessage);
+            try {
+                // Domain fan-out (public channel) — not user-targeted.
+                UnreadChatMessage::dispatch($latestChatMessage);
 
-            $chatableCreator = null;
-            if (in_array('Unusualify\Modularous\Entities\Traits\HasCreator', class_uses_recursive($this))) {
-                $chatableCreator = $this->creator;
-            }
-
-            $messageCreator = $latestChatMessage->creator;
-
-            $chatableAuthorizedUser = in_array('Unusualify\Modularous\Entities\Traits\HasAuthorizable', class_uses_recursive($this))
-                ? ($this->is_authorized ? $this->authorizedUser : null)
-                : null;
-
-            if ($messageCreator) {
-                if ($chatableCreator && in_array('Illuminate\Notifications\RoutesNotifications', class_uses_recursive($chatableCreator)) && ! $chatableCreator->is($messageCreator)) {
-                    $chatableCreator->notifyNow(new ChatableUnreadNotification($this->chat));
-                } elseif ($chatableAuthorizedUser && in_array('Illuminate\Notifications\RoutesNotifications', class_uses_recursive($chatableAuthorizedUser)) && ! $chatableAuthorizedUser->is($messageCreator)) {
-                    $chatableAuthorizedUser->notifyNow(new ChatableUnreadNotification($this->chat));
+                // User-targeted channels (database / mail / broadcast → users.{id}).
+                foreach ($this->resolveChatableNotificationRecipients($latestChatMessage) as $notifiable) {
+                    $notifiable->notifyNow(new ChatableUnreadNotification($this->chat));
                 }
+            } finally {
+                // Always stamp so a thrown NotificationSent listener (e.g. Telescope)
+                // cannot leave notified_at null and re-broadcast forever.
+                $latestChatMessage->forceFill(['notified_at' => now()])->saveQuietly();
             }
         }
     }

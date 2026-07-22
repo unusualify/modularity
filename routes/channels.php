@@ -37,6 +37,10 @@ Broadcast::channel('models.{modelId}', function ($user, $modelId) {
     return $user !== null;
 }, $broadcastGuards);
 
+Broadcast::channel('chats.{chatId}', function ($user, $chatId) {
+    return $user !== null;
+}, $broadcastGuards);
+
 Broadcast::channel('editing.{modelType}.{modelId}', function ($user, $modelType, $modelId) {
     if ($user === null) {
         return false;

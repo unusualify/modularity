@@ -4,26 +4,32 @@ namespace Modules\SystemNotification\Notifications;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Model;
-use Modules\SystemNotification\Notifications\Contracts\AfterSendable;
 use Unusualify\Modularous\Entities\Chat;
-use Unusualify\Modularous\Facades\ModularousLog;
 
-class ChatableUnreadNotification extends FeatureNotification implements AfterSendable, ShouldQueue
+/**
+ * Immediate retainable toast when a chat message is created.
+ *
+ * Separate from {@see ChatableUnreadNotification} (scheduler interval path):
+ * this must not stamp `notified_at` / implement AfterSendable.
+ */
+class ChatableMessageBroadcastNotification extends FeatureNotification implements ShouldQueue
 {
     /**
      * Fallback when config channels are unset or blank (empty env override).
      *
      * @var array<string>
      */
-    public $defaultChannels = ['database', 'mail', 'broadcast'];
+    public $defaultChannels = ['database', 'broadcast'];
 
     /**
-     * Guard so multi-channel NotificationSent hooks only stamp once.
+     * The chat that received the message (parent model is the chatable).
      */
-    protected bool $notifiedAtStamped = false;
+    protected Chat $chat;
 
     public function __construct(Chat $model)
     {
+        $this->chat = $model;
+
         parent::__construct($model->chatable);
     }
 
@@ -32,11 +38,25 @@ class ChatableUnreadNotification extends FeatureNotification implements AfterSen
         return true;
     }
 
+    /**
+     * Immediate message alerts stay in the retainable tray until closed or TTL.
+     */
+    public function isRetainable(): bool
+    {
+        return true;
+    }
+
+    /**
+     * One tray slot per chat — later messages upsert the same retainable item.
+     */
+    public function getRetainGroup(): ?string
+    {
+        return 'chat:'.$this->chat->getKey();
+    }
+
     public function toArray($notifiable): array
     {
-        return [
-
-        ];
+        return [];
     }
 
     public function getNotificationSubject(object $notifiable, Model $model): string
@@ -78,29 +98,14 @@ class ChatableUnreadNotification extends FeatureNotification implements AfterSen
         return $default;
     }
 
-    public function afterNotificationSent($notifiable): void
+    public function getNotificationActionText(object $notifiable, Model $model): string
     {
-        // Idempotent: handleChatableNotification also stamps notified_at after notifyNow.
-        // Keep this as a safety net when the notification is sent outside the scheduler.
-        if ($this->notifiedAtStamped) {
-            return;
+        $default = __('Look');
+
+        if (isset(static::$actionTextCallbacks[static::class]) && is_callable(static::$actionTextCallbacks[static::class])) {
+            return call_user_func(static::$actionTextCallbacks[static::class], $notifiable, $model, $default);
         }
 
-        try {
-            $message = $this->model->latestChatMessage()->first();
-            if (! $message || $message->notified_at) {
-                $this->notifiedAtStamped = true;
-
-                return;
-            }
-
-            $message->forceFill(['notified_at' => now()])->saveQuietly();
-            $this->notifiedAtStamped = true;
-        } catch (\Throwable $e) {
-            ModularousLog::error('Error updating notified_at for chatable model: ' . get_class($this->model), [
-                'model' => $this->model,
-                'error' => $e->getMessage(),
-            ]);
-        }
+        return $default;
     }
 }
