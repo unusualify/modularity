@@ -276,7 +276,7 @@ trait PaymentTrait
             : [];
     }
 
-    public function getFormActionsPaymentTrait(User $user, array $scope = []): array
+    public function getFormActionsPaymentTrait(?User $user, array $scope = []): array
     {
         return [
             'paymentTrait' => [

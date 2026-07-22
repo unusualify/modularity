@@ -98,14 +98,14 @@ trait ResourceCacheActionsTrait
     /**
      * @return array<string, array<string, mixed>>
      */
-    public function getFormActionsResourceCacheActionsTrait(User $user, array $scope = []): array
+    public function getFormActionsResourceCacheActionsTrait(?User $user, array $scope = []): array
     {
         if (! $this->resourceCacheActionsEnabled()) {
             return [];
         }
 
         $permissionName = $this->getPermissionName(Permission::CACHING->value, $this->getRouteName());
-        if (! $user->can($permissionName)) {
+        if ($user !== null && ! $user->can($permissionName)) {
             return [];
         }
 

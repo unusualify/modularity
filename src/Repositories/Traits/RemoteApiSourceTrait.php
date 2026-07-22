@@ -207,7 +207,7 @@ trait RemoteApiSourceTrait
     /**
      * @return array<string, array<string, mixed>>
      */
-    public function getFormActionsRemoteApiSourceTrait(User $user, array $scope = []): array
+    public function getFormActionsRemoteApiSourceTrait(?User $user, array $scope = []): array
     {
         if (! $this->remoteApiConnectorIsEnabled()) {
             return [];

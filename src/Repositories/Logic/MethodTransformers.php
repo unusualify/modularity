@@ -381,7 +381,7 @@ trait MethodTransformers
      * @param array $scope
      * @return array
      */
-    public function getFormActions(User $user, array $scope = [])
+    public function getFormActions(?User $user, array $scope = [])
     {
         $formActions = [];
 
