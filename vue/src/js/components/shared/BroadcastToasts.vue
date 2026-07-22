@@ -31,6 +31,20 @@
           >
             {{ toast.detail }}
           </div>
+          <div
+            v-if="toast.hasRedirector && toast.redirector"
+            class="ue-broadcast-toasts__actions"
+          >
+            <v-btn
+              size="small"
+              variant="flat"
+              color="white"
+              density="comfortable"
+              @click.stop="openRedirector(toast.redirector)"
+            >
+              {{ toast.redirectorText || 'Look' }}
+            </v-btn>
+          </div>
         </div>
       </v-alert>
     </transition-group>
@@ -50,6 +64,14 @@ const ALERT_TYPES = new Set(['success', 'info', 'warning', 'error'])
 
 function alertType (variant) {
   return ALERT_TYPES.has(variant) ? variant : 'info'
+}
+
+function openRedirector (url) {
+  if (!url) {
+    return
+  }
+
+  window.open(url, '_blank', 'noopener')
 }
 
 function clearTimer (id) {
@@ -142,6 +164,10 @@ onBeforeUnmount(() => {
   font-size: 0.75rem;
   line-height: 1.3;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.ue-broadcast-toasts__actions {
+  margin-top: 8px;
 }
 
 .ue-broadcast-toast-enter-active,

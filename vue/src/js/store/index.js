@@ -3,6 +3,7 @@ import { createStore } from 'vuex'
 import mediaLibrary from './modules/media-library'
 import alert from './modules/alert'
 import broadcastToast from './modules/broadcastToast'
+import retainableNotification from './modules/retainableNotification'
 import config from './modules/config'
 import user from './modules/user'
 import language from './modules/language'
@@ -16,6 +17,7 @@ export default createStore({
     user,
     alert,
     broadcastToast,
+    retainableNotification,
     config,
     language,
     mediaLibrary,

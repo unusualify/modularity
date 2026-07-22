@@ -163,6 +163,7 @@
 
     <ue-alert ref="alertRef" />
     <ue-broadcast-toasts />
+    <ue-retainable-notifications />
     <ue-dynamic-modal />
 
     <ue-modal

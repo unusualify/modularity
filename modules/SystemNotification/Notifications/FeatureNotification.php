@@ -211,8 +211,13 @@ abstract class FeatureNotification extends Notification implements ShouldQueue
 
         $channels = config("modularous.notifications.{$class}.channels", null);
 
-        if ($channels !== null && is_string($channels)) {
+        // Blank env values (e.g. MODULAROUS_…_CHANNELS=) override package env()
+        // defaults with "" — treat empty / whitespace-only as "use $defaultChannels".
+        if (is_string($channels) && trim($channels) !== '') {
             $resolved = $this->getValidChannels(explode(',', $channels));
+            if ($resolved === []) {
+                $resolved = $this->defaultChannels;
+            }
         } else {
             $resolved = $this->defaultChannels;
         }
@@ -693,11 +698,55 @@ abstract class FeatureNotification extends Notification implements ShouldQueue
     }
 
     /**
+     * Whether this notification should be retained in the bottom-right tray
+     * (close or TTL) instead of only the ephemeral top toast stack.
+     * Per-notification opt-in — override on concrete classes (e.g. ChatableMessageBroadcastNotification).
+     */
+    public function isRetainable(): bool
+    {
+        return false;
+    }
+
+    /**
+     * Stable tray slot key for retainable notifications (one item per logical entity).
+     * Distinct from {@see getToken()} which remains unique per notification instance
+     * for DB/mail redirect lookup. Override on concrete classes (e.g. `chat:{id}`).
+     */
+    public function getRetainGroup(): ?string
+    {
+        return null;
+    }
+
+    /**
+     * Hours a retainable notification stays in the tray before auto-expiry.
+     */
+    public function getRetainHours(): int
+    {
+        return 6;
+    }
+
+    /**
      * Get the broadcast representation of the notification.
+     *
+     * Prefers the notification-record show URL (marks as read, then redirects to
+     * the model) when a database notification row exists for this token — same
+     * pattern as {@see toMail()}. Falls back to the direct model redirector when
+     * the DB row is not yet available (e.g. broadcast-only channel, or race if
+     * database_connection is not sync).
      */
     public function toBroadcast(object $notifiable): BroadcastMessage
     {
         $fields = $this->toDatabaseFeatureFields($notifiable);
+
+        $recordRedirector = $this->getNotificationMailRedirector($notifiable, $this->model);
+        $redirector = $recordRedirector ?? ($fields['redirector'] ?? null);
+        $hasRedirector = $redirector ? true : false;
+
+        $retainable = $this->isRetainable();
+        $retainUntil = $retainable
+            ? now()->addHours($this->getRetainHours())->toIso8601String()
+            : null;
+        $retainGroup = $retainable ? $this->getRetainGroup() : null;
 
         return (new BroadcastMessage([
             'token' => $fields['token'] ?? null,
@@ -705,9 +754,12 @@ abstract class FeatureNotification extends Notification implements ShouldQueue
             'message' => $fields['message'] ?? null,
             'htmlMessage' => $fields['htmlMessage'] ?? null,
             'redirectorText' => $fields['redirectorText'] ?? null,
-            'redirector' => $fields['redirector'] ?? null,
-            'hasRedirector' => $fields['hasRedirector'] ?? false,
+            'redirector' => $redirector,
+            'hasRedirector' => $hasRedirector,
             'notification_type' => class_basename(static::class),
+            'retainable' => $retainable,
+            'retainUntil' => $retainUntil,
+            'retainGroup' => $retainGroup,
         ]))->onConnection(config('modularous.notifications.broadcast_connection', config('queue.default')));
     }
 

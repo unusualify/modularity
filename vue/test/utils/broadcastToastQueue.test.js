@@ -20,22 +20,24 @@ describe('broadcastToastQueue', () => {
     state = enqueueBroadcastToast(state, toast(2))
     state = enqueueBroadcastToast(state, toast(3))
     state = enqueueBroadcastToast(state, toast(4))
+    state = enqueueBroadcastToast(state, toast(5))
+    state = enqueueBroadcastToast(state, toast(6))
 
-    expect(state.visible.map((t) => t.id)).toEqual([1, 2])
-    expect(state.queue.map((t) => t.id)).toEqual([3, 4])
-    expect(BROADCAST_TOAST_MAX_VISIBLE).toBe(2)
+    expect(state.visible.map((t) => t.id)).toEqual([1, 2, 3, 4])
+    expect(state.queue.map((t) => t.id)).toEqual([5, 6])
+    expect(BROADCAST_TOAST_MAX_VISIBLE).toBe(4)
   })
 
   test('promotes next queued toast when a visible one dismisses', () => {
     let state = {
-      visible: [toast(1), toast(2)],
-      queue: [toast(3), toast(4)],
+      visible: [toast(1), toast(2), toast(3), toast(4)],
+      queue: [toast(5), toast(6)],
     }
 
     state = dequeueBroadcastToast(state, 1)
 
-    expect(state.visible.map((t) => t.id)).toEqual([2, 3])
-    expect(state.queue.map((t) => t.id)).toEqual([4])
+    expect(state.visible.map((t) => t.id)).toEqual([2, 3, 4, 5])
+    expect(state.queue.map((t) => t.id)).toEqual([6])
   })
 
   test('ignores dismiss for unknown id', () => {
@@ -66,14 +68,16 @@ describe('broadcastToast vuex module', () => {
     store.commit(BROADCAST_TOAST.PUSH, { message: 'a', variant: 'info' })
     store.commit(BROADCAST_TOAST.PUSH, { message: 'b', variant: 'success' })
     store.commit(BROADCAST_TOAST.PUSH, { message: 'c', variant: 'error' })
+    store.commit(BROADCAST_TOAST.PUSH, { message: 'd', variant: 'warning' })
+    store.commit(BROADCAST_TOAST.PUSH, { message: 'e', variant: 'info' })
 
-    expect(store.state.broadcastToast.visible.map((t) => t.description)).toEqual(['a', 'b'])
-    expect(store.state.broadcastToast.queue.map((t) => t.description)).toEqual(['c'])
+    expect(store.state.broadcastToast.visible.map((t) => t.description)).toEqual(['a', 'b', 'c', 'd'])
+    expect(store.state.broadcastToast.queue.map((t) => t.description)).toEqual(['e'])
 
     const firstId = store.state.broadcastToast.visible[0].id
     store.commit(BROADCAST_TOAST.DISMISS, firstId)
 
-    expect(store.state.broadcastToast.visible.map((t) => t.description)).toEqual(['b', 'c'])
+    expect(store.state.broadcastToast.visible.map((t) => t.description)).toEqual(['b', 'c', 'd', 'e'])
     expect(store.state.broadcastToast.queue).toEqual([])
   })
 
@@ -103,6 +107,23 @@ describe('broadcastToast vuex module', () => {
     expect(item.title).toBeNull()
     expect(item.description).toBe('Hello')
     expect(item.message).toBe('Hello')
+  })
+
+  test('PUSH stores redirector fields for Look button', () => {
+    const store = createToastStore()
+    store.commit(BROADCAST_TOAST.PUSH, {
+      title: 'Unread chat',
+      description: 'New message',
+      redirector: '/admin/chatables/1',
+      hasRedirector: true,
+      redirectorText: 'Look',
+      variant: 'info',
+    })
+
+    const [item] = store.state.broadcastToast.visible
+    expect(item.redirector).toBe('/admin/chatables/1')
+    expect(item.hasRedirector).toBe(true)
+    expect(item.redirectorText).toBe('Look')
   })
 
   test('PUSH ignores empty content', () => {

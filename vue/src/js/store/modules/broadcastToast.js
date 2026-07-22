@@ -23,7 +23,7 @@ const getters = {
  * Normalize toast payload: prefer title/description/detail; treat legacy `message` as description.
  *
  * @param {object} payload
- * @returns {{ title: string|null, description: string|null, detail: string|null }|null}
+ * @returns {{ title: string|null, description: string|null, detail: string|null, redirector: string|null, hasRedirector: boolean, redirectorText: string|null }|null}
  */
 function normalizeToastContent (payload) {
   if (!payload || typeof payload !== 'object') {
@@ -52,7 +52,16 @@ function normalizeToastContent (payload) {
     ? String(payload.detail)
     : null
 
-  return { title, description, detail }
+  const redirector = payload.redirector != null && String(payload.redirector).trim() !== ''
+    ? String(payload.redirector)
+    : null
+  const hasRedirector = (payload.hasRedirector === true || (!!redirector && payload.hasRedirector !== false))
+    && !!redirector
+  const redirectorText = payload.redirectorText != null && String(payload.redirectorText).trim() !== ''
+    ? String(payload.redirectorText)
+    : null
+
+  return { title, description, detail, redirector, hasRedirector, redirectorText }
 }
 
 const mutations = {
@@ -69,6 +78,9 @@ const mutations = {
       detail: content.detail,
       // Keep message for any older consumers expecting it.
       message: content.description ?? content.title,
+      redirector: content.redirector,
+      hasRedirector: content.hasRedirector,
+      redirectorText: content.redirectorText,
       variant: payload.variant ?? 'info',
       timeout: payload.timeout ?? BROADCAST_TOAST_DEFAULT_TIMEOUT,
       location: payload.location ?? 'top end',

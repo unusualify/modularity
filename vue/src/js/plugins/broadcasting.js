@@ -1,6 +1,6 @@
 import Echo from 'laravel-echo'
 import Pusher from 'pusher-js'
-import { BROADCAST_TOAST } from '@/store/mutations'
+import { BROADCAST_TOAST, RETAINABLE_NOTIFICATION } from '@/store/mutations'
 
 const DOMAIN_CHANNELS = [
   'assignable',
@@ -33,7 +33,7 @@ function resolveStore (app) {
  * Prefers `payload.toast` when present; otherwise maps notification-like fields.
  *
  * @param {Record<string, any>|string|null|undefined} payload
- * @returns {{ title: string|null, description: string|null, detail: string|null, variant: string|null, timeout?: number }|null}
+ * @returns {{ title: string|null, description: string|null, detail: string|null, variant: string|null, redirector: string|null, hasRedirector: boolean, redirectorText: string|null, retainable: boolean, retainUntil: string|null, retainGroup: string|null, token: string|null, notificationType: string|null, timeout?: number }|null}
  */
 export function resolveBroadcastToastPayload (payload) {
   if (!payload) {
@@ -46,6 +46,14 @@ export function resolveBroadcastToastPayload (payload) {
       description: payload,
       detail: null,
       variant: null,
+      redirector: null,
+      hasRedirector: false,
+      redirectorText: null,
+      retainable: false,
+      retainUntil: null,
+      retainGroup: null,
+      token: null,
+      notificationType: null,
     }
   }
 
@@ -61,17 +69,38 @@ export function resolveBroadcastToastPayload (payload) {
     return null
   }
 
+  const redirector = source.redirector != null && String(source.redirector).trim() !== ''
+    ? String(source.redirector)
+    : null
+  const hasRedirector = source.hasRedirector === true || (!!redirector && source.hasRedirector !== false)
+  const redirectorText = source.redirectorText != null && String(source.redirectorText).trim() !== ''
+    ? String(source.redirectorText)
+    : null
+
+  const retainGroup = source.retainGroup != null && String(source.retainGroup).trim() !== ''
+    ? String(source.retainGroup)
+    : null
+
   return {
     title,
     description,
     detail,
     variant: source.variant ?? null,
+    redirector: hasRedirector ? redirector : null,
+    hasRedirector: hasRedirector && !!redirector,
+    redirectorText,
+    retainable: source.retainable === true,
+    retainUntil: source.retainUntil ?? null,
+    retainGroup,
+    token: source.token ?? null,
+    notificationType: source.notification_type ?? source.notificationType ?? null,
     ...(source.timeout !== undefined ? { timeout: source.timeout } : {}),
   }
 }
 
 /**
- * Push a toast from any broadcast payload that carries toast or notification fields.
+ * Push ephemeral toast and/or retainable tray item from broadcast payload.
+ * Retainable notifications go to the bottom-right tray; others keep the top toast stack.
  *
  * @param {import('vuex').Store|null} store
  * @param {Record<string, any>|string|null|undefined} payload
@@ -87,11 +116,32 @@ export function pushBroadcastToastFromPayload (store, payload, fallbackVariant =
     return
   }
 
+  if (toast.retainable) {
+    store.commit(RETAINABLE_NOTIFICATION.PUSH, {
+      title: toast.title,
+      description: toast.description,
+      detail: toast.detail,
+      variant: toast.variant ?? fallbackVariant,
+      redirector: toast.redirector,
+      hasRedirector: toast.hasRedirector,
+      redirectorText: toast.redirectorText,
+      retainUntil: toast.retainUntil,
+      retainGroup: toast.retainGroup,
+      token: toast.token,
+      notificationType: toast.notificationType,
+    })
+
+    return
+  }
+
   store.commit(BROADCAST_TOAST.PUSH, {
     title: toast.title,
     description: toast.description,
     detail: toast.detail,
     variant: toast.variant ?? fallbackVariant,
+    redirector: toast.redirector,
+    hasRedirector: toast.hasRedirector,
+    redirectorText: toast.redirectorText,
     ...(toast.timeout !== undefined ? { timeout: toast.timeout } : {}),
   })
 }
@@ -101,8 +151,14 @@ function invalidateMyNotifications (store) {
     return
   }
 
-  if (typeof store.dispatch === 'function') {
-    store.dispatch('datatable/getDatatableData').catch(() => {})
+  // Datatable module is only registered on pages that mount a datatable;
+  // dispatching when absent logs Vuex "unknown action type" even with .catch().
+  const hasDatatableAction = typeof store.hasModule === 'function'
+    ? store.hasModule('datatable')
+    : !!store._actions?.['datatable/getDatatableData']
+
+  if (hasDatatableAction && typeof store.dispatch === 'function') {
+    Promise.resolve(store.dispatch('datatable/getDatatableData')).catch(() => {})
   }
 
   window.dispatchEvent(new CustomEvent('modularous:notifications-updated'))
@@ -118,29 +174,98 @@ function resolveBroadcastUserId (storeBootstrap) {
   return Number.isFinite(id) && id > 0 ? id : null
 }
 
+/**
+ * Map a Laravel notification broadcast payload into toast/retainable fields.
+ *
+ * @param {Record<string, any>} notification
+ * @returns {Record<string, any>}
+ */
+function mapNotificationPayload (notification) {
+  return {
+    title: notification.subject || null,
+    description: notification.message || notification.subject || 'New notification',
+    detail: notification.detail || null,
+    variant: 'info',
+    redirector: notification.redirector || null,
+    hasRedirector: notification.hasRedirector === true || !!notification.redirector,
+    redirectorText: notification.redirectorText || null,
+    retainable: notification.retainable === true,
+    retainUntil: notification.retainUntil || null,
+    retainGroup: notification.retainGroup || null,
+    token: notification.token || null,
+    notification_type: notification.notification_type || null,
+  }
+}
+
+/**
+ * True when payload looks like Illuminate's BroadcastNotificationCreated data
+ * (has notification `type` FQCN plus subject/message), not a domain toast event.
+ *
+ * @param {Record<string, any>|null|undefined} payload
+ * @returns {boolean}
+ */
+function isLaravelNotificationPayload (payload) {
+  if (!payload || typeof payload !== 'object' || payload.toast) {
+    return false
+  }
+
+  if (typeof payload.type !== 'string' || payload.type === '') {
+    return false
+  }
+
+  return !!(payload.subject || payload.message || payload.retainable === true)
+}
+
 function subscribeUserChannel (EchoInstance, userId, store) {
   if (!userId) {
+    if (import.meta.env.DEV) {
+      console.warn('[echo] skip private users.{id} subscription — no broadcast userId')
+    }
     return
   }
 
   const channel = EchoInstance.private(`users.${userId}`)
+  const seenNotificationIds = new Set()
 
-  channel.notification((notification) => {
-    pushBroadcastToastFromPayload(store, {
-      title: notification.subject || null,
-      description: notification.message || notification.subject || 'New notification',
-      detail: notification.detail || null,
-      variant: 'info',
-    })
-    invalidateMyNotifications(store)
-  })
-
-  // Any private-user event with a structured `toast` object (backend-owned fields).
-  channel.listenToAll((_eventName, payload) => {
-    if (!payload?.toast) {
+  const handleNotification = (notification) => {
+    if (!notification || typeof notification !== 'object') {
       return
     }
-    pushBroadcastToastFromPayload(store, payload)
+
+    // Deduplicate when both .notification() and listenToAll see the same event.
+    const dedupeKey = notification.id || notification.token || null
+    if (dedupeKey) {
+      if (seenNotificationIds.has(dedupeKey)) {
+        return
+      }
+      seenNotificationIds.add(dedupeKey)
+      if (seenNotificationIds.size > 50) {
+        const first = seenNotificationIds.values().next().value
+        seenNotificationIds.delete(first)
+      }
+    }
+
+    if (import.meta.env.DEV) {
+      console.debug('[echo] notification', `users.${userId}`, notification)
+    }
+
+    pushBroadcastToastFromPayload(store, mapNotificationPayload(notification))
+    invalidateMyNotifications(store)
+  }
+
+  channel.notification(handleNotification)
+
+  // Any private-user event with a structured `toast` object (backend-owned fields),
+  // plus a fallback for Laravel notification payloads when the Echo `.notification()`
+  // event-name binding misses (broadcastAs / client version skew).
+  channel.listenToAll((_eventName, payload) => {
+    if (payload?.toast) {
+      pushBroadcastToastFromPayload(store, payload)
+      return
+    }
+    if (isLaravelNotificationPayload(payload)) {
+      handleNotification(payload)
+    }
   })
 }
 
