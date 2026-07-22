@@ -174,4 +174,18 @@ return [
             'types-required' => 'Select at least one cache type.',
         ],
     ],
+
+    'chatable' => [
+        'form-action' => [
+            'label' => 'Chat Messages',
+            'tooltip' => 'Open chat',
+            'input' => [
+                'label' => 'Chat',
+                'subtitle' => '',
+            ],
+        ],
+        'input' => [
+            'label' => 'Chat Messages',
+        ],
+    ],
 ];

@@ -168,4 +168,18 @@ return [
             'types-required' => 'En az bir önbellek türü seçilmelidir.',
         ],
     ],
+
+    'chatable' => [
+        'form-action' => [
+            'label' => 'Chat Mesajları',
+            'tooltip' => 'Chat aç',
+            'input' => [
+                'label' => 'Chat',
+                'subtitle' => '',
+            ],
+        ],
+        'input' => [
+            'label' => 'Chat Mesajları',
+        ],
+    ],
 ];
