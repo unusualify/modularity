@@ -675,5 +675,14 @@ class BaseServiceProvider extends ServiceProvider
                 'replace_placeholders' => true,
             ]);
         }
+
+        if (! config('logging.channels.scheduler')) {
+            $this->app['config']->set('logging.channels.scheduler', [
+                'driver' => 'single',
+                'path' => storage_path('logs/scheduler.log'),
+                'level' => env('LOG_LEVEL', 'info'),
+                'replace_placeholders' => true,
+            ]);
+        }
     }
 }
