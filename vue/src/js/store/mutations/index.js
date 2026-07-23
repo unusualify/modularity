@@ -21,3 +21,9 @@ export { default as USER } from './user'
 
 /* cache */
 export { default as CACHE } from './cache'
+
+/* broadcast toasts (stackable; separate from ALERT) */
+export { default as BROADCAST_TOAST } from './broadcastToast'
+
+/* retainable notification tray (per-notification opt-in) */
+export { default as RETAINABLE_NOTIFICATION } from './retainableNotification'

@@ -7,13 +7,19 @@ outline: deep
 
 # Broadcasting
 
-Modularous uses **Laravel Reverb** (or any Pusher-compatible driver) to broadcast `ModelEvent` subclasses over WebSockets. Every event that extends `ModelEvent` and implements `ShouldBroadcast` is automatically broadcast to two channels when it fires.
+Modularous uses **Laravel Reverb** (or any Pusher-compatible driver) for realtime updates. There are two complementary paths:
+
+1. **Domain events** — `ShouldBroadcast` classes (often `ModelEvent` subclasses, or focused events like `ChatableMessageSynced`) that fan out on public/private channels for live UI sync.
+2. **User notifications** — `FeatureNotification` subclasses with the `broadcast` channel, delivered to `private-users.{id}` and consumed as ephemeral toasts or a retainable tray.
+
+Both paths are gated by `BroadcastAvailability` / `modularous.broadcasting.enabled` (and the Pusher PHP SDK when using `reverb` / `pusher`).
 
 ## In This Section
 
 | Page | Purpose |
 |------|---------|
-| **Overview** (this page) | Setup, default channels, Echo integration |
+| **Overview** (this page) | When to use what, ModelEvent channels, Echo setup, ops checklist |
+| [Feature Notifications](./notifications) | `FeatureNotification` broadcast payload, retainable tray, chat end-to-end |
 | [Testing](./testing) | `Event::fake()` patterns, asserting channels and payloads |
 | [Troubleshooting](./troubleshooting) | Common issues (`.` prefix, auth failures, duplicate dispatches, proxies) |
 
@@ -21,12 +27,77 @@ Class references live under `system-reference/backend/`:
 
 - [ModelEvent](/system-reference/backend/events/model-event) — base class + `EventUser`, `EventUrls`, `EventChanges`, `EventStateable` traits
 - [BroadcastManager](/system-reference/backend/services/broadcast-manager) — build frontend channel/event config from PHP
+- [FeatureNotification](/system-reference/backend/notifications/feature-notification) — full contract, retainable tray + `retainGroup`
+- [Chatable](/system-reference/backend/entity-traits/relationships/chatable) · [ChatableScheduler](/system-reference/backend/scheduled-jobs/chatable-scheduler)
+
+---
+
+## When to Use What
+
+Pick the path that matches the audience and UI job:
+
+| Goal | Mechanism | Typical channel | UI |
+|------|-----------|-----------------|----|
+| Live sync for anyone looking at a record / chat | Domain `ShouldBroadcast` event (+ `GatesBroadcastAvailability` when not extending `ModelEvent`) | e.g. `private-chats.{id}`, `private-models.{id}`, public `model` | Update local state (list, badges) — **not** a toast |
+| Alert a specific user (toast / tray / inbox) | `FeatureNotification` with `broadcast` in `via()` | Laravel → `private-users.{id}` via `BroadcastNotificationCreated` | Echo `channel.notification` → toast or retainable tray |
+| Domain fan-out (optional listeners / dashboards) | Public channel event | e.g. `unread-chat-message` | Optional; chat **toasts still go through** user notifications |
+
+**Rules of thumb**
+
+- **Same-screen collaboration** (open chat thread, concurrent editors) → domain private channel + payload your Vue component already understands.
+- **“Something happened while you were elsewhere”** → `FeatureNotification` → user private channel → toast/tray (+ `database` / `mail` as needed).
+- **Do not** put toast copy on a domain event and hope the admin shell picks it up — user toasts are wired to `users.{id}` notification broadcasts (see [Feature Notifications](./notifications)).
+
+### Domain event vs user notification (chat)
+
+```
+Message created
+    ├── ChatableMessageSynced  →  private chats.{id}     →  open Chat.vue list sync
+    ├── ChatableMessageBroadcastNotification (retainable)
+    │                         →  users.{recipientId}     →  bottom-right tray
+    └── (later, scheduler) ChatableUnreadNotification (ephemeral)
+                              →  users.{recipientId}     →  top toast + mail/DB
+```
+
+Full walkthrough: [Chat as an end-to-end example](./notifications#chat-as-an-end-to-end-example).
+
+---
+
+## Retainable notifications (tray)
+
+Feature notifications may opt into a **retainable** bottom-right tray via `isRetainable()`. Ephemeral toasts stay in the top stack; retainable ones persist until dismiss, TTL, or a **group dismiss**.
+
+Use `retainGroup` (not `token`) as the stable tray slot key — e.g. chat uses `chat:{id}` and `Chat.vue` commits `DISMISS_BY_GROUP` when that chat opens.
+
+```php
+use Modules\SystemNotification\Notifications\FeatureNotification;
+
+class OrderReadyNotification extends FeatureNotification
+{
+    public function isRetainable(): bool
+    {
+        return true;
+    }
+
+    /** One tray slot per order — later broadcasts upsert the same item. */
+    public function getRetainGroup(): ?string
+    {
+        return 'order:'.$this->model->getKey();
+    }
+}
+```
+
+Dismiss that slot from the UI with Vuex `DISMISS_BY_GROUP` / `dismissByGroup('order:123')`. Real consumer: `ChatableMessageBroadcastNotification` (`chat:{id}`).
+
+→ Full contract & payload fields: [Feature Notifications guide](./notifications) · [FeatureNotification reference](/system-reference/backend/notifications/feature-notification#retainable-tray--retaingrouproup)
 
 ---
 
 ## How It Works
 
 When a `ModelEvent` subclass that uses `InteractsWithBroadcasting` is dispatched, the constructor calls `$this->broadcastVia($this->broadcastService)` (defaults to `'reverb'`). Laravel then serializes and delivers the event payload over WebSockets.
+
+Events that do **not** extend `ModelEvent` should use the `GatesBroadcastAvailability` trait so `broadcastWhen()` respects `BroadcastAvailability::isEnabled()`.
 
 ### Default Channels
 
@@ -112,6 +183,31 @@ class OrderShipped extends ModelEvent implements ShouldBroadcast
 ```
 
 That's all — `ModelEvent` provides `broadcastOn()` and `broadcastAs()` automatically.
+
+### Standalone events (non-ModelEvent)
+
+```php
+use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Unusualify\Modularous\Events\Traits\GatesBroadcastAvailability;
+
+class ChatableMessageSynced implements ShouldBroadcast
+{
+    use GatesBroadcastAvailability;
+
+    public function broadcastOn(): array
+    {
+        return [new PrivateChannel('chats.' . $this->chatId)];
+    }
+
+    public function broadcastAs(): string
+    {
+        return 'modularous.chatable.message.synced';
+    }
+}
+```
+
+Register authorization for any new private channel in package/app `routes/channels.php` (Modularous already registers `users.{id}`, `models.{id}`, `chats.{id}`, `editing.{modelType}.{modelId}`).
 
 ### Overriding Channels
 
@@ -200,13 +296,18 @@ Inertia::share('broadcastConfig', BroadcastManager::forModel($model, $eventClass
 
 ## Frontend — Subscribing with Laravel Echo
 
-### 1. Install Echo and the Reverb client
+The Modularous admin shell already boots Echo from `vue/src/js/plugins/broadcasting.js` when `STORE.broadcast.enabled` is not `false` and `VITE_REVERB_APP_KEY` is set. It:
+
+- Subscribes to `private-users.{userId}` and handles `channel.notification` (toasts / retainable tray)
+- Optionally listens on public domain channels (`model`, `stateable`, …)
+
+For **feature-specific** live sync (e.g. an open chat), subscribe in the component — see [Feature Notifications → Chat](./notifications#live-list-chatablemessagesynced).
+
+### Manual Echo setup (custom frontends)
 
 ```bash
 npm install laravel-echo pusher-js
 ```
-
-### 2. Configure Echo
 
 ```js
 // resources/js/bootstrap.js
@@ -226,7 +327,7 @@ window.Echo = new Echo({
 })
 ```
 
-### 3. Subscribe Using BroadcastManager Config
+### Subscribe Using BroadcastManager Config
 
 ```js
 function subscribeToBroadcast(broadcastConfig) {
@@ -253,14 +354,13 @@ subscribeToBroadcast(broadcastConfig)
 Laravel Echo requires a leading `.` before custom event names: `.modularous.model.created`. Without it, Echo treats the name as a Laravel event class string.
 :::
 
-### 4. Authorizing Private Channels
+### Authorizing Private Channels
 
-Private channels require the `Broadcast::channel()` authorization to be registered. Add to `routes/channels.php`:
+Private channels require `Broadcast::channel()` authorization. Modularous registers core channels with the **Modularous auth guard** (not `web` alone) — see package `routes/channels.php`.
 
 ```php
 use Illuminate\Support\Facades\Broadcast;
 
-// Authorize any authenticated user to subscribe to their model's channel
 Broadcast::channel('models.{modelId}', function ($user, $modelId) {
     return $user !== null; // adjust to your auth logic
 });
@@ -268,10 +368,27 @@ Broadcast::channel('models.{modelId}', function ($user, $modelId) {
 
 ---
 
+## Ops Checklist
+
+Short path to a working broadcast stack in local / staging:
+
+1. **Reverb** — `php artisan reverb:start` (or process manager in production). Match `REVERB_*` and `VITE_REVERB_*`.
+2. **Queue / Horizon** — `FeatureNotification` implements `ShouldQueue`. Broadcast delivery uses `BroadcastNotificationCreated` on the notification `broadcast` connection (`modularous.notifications.broadcast_connection`). Run Horizon / `queue:work` for that connection.
+3. **Chatable interval** — schedule `modularous:scheduler:chatable` (see [ChatableScheduler](/system-reference/backend/scheduled-jobs/chatable-scheduler)) for delayed unread reminders.
+4. **Frontend gate** — admin Echo only starts when `STORE.broadcast.enabled !== false` and a Reverb key is present. Ensure bootstrap shares `broadcast.userId` (or user profile id) so `users.{id}` can subscribe.
+5. **Config cache** — after `.env` / broadcasting changes: `php artisan config:clear` (and restart Reverb / Horizon).
+
+Master toggle: `MODULAROUS_BROADCAST_ENABLED` → `modularous.broadcasting.enabled`. When false (or Pusher SDK missing for reverb/pusher), domain `broadcastWhen()` skips and FeatureNotification strips the `broadcast` channel.
+
+More failure modes: [Troubleshooting](./troubleshooting).
+
+---
+
 ## Environment Variables
 
 ```dotenv
 BROADCAST_DRIVER=reverb
+MODULAROUS_BROADCAST_ENABLED=true
 
 REVERB_APP_ID=your-app-id
 REVERB_APP_KEY=your-app-key

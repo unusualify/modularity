@@ -12,7 +12,7 @@ class PaymentFailedNotification extends FeatureNotification implements ShouldQue
 {
     use Queueable;
 
-    public $defaultChannels = ['database', 'mail'];
+    public $defaultChannels = ['database', 'mail', 'broadcast'];
 
     /**
      * Create a new notification instance.

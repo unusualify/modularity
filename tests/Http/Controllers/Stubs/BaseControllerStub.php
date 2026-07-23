@@ -6,8 +6,10 @@ namespace Unusualify\Modularous\Tests\Http\Controllers\Stubs;
 
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View as ViewContract;
 use Inertia\Response as InertiaResponse;
+use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Http\Controllers\BaseController;
 use Unusualify\Modularous\Repositories\Repository;
 
@@ -116,6 +118,10 @@ class BaseControllerStub extends BaseController
 
     public function exposePreloadBase(): void
     {
+        // Mirrors PanelController middleware: user is set before preload() runs.
+        // Prefer the Modularous guard (actingAs often targets it); fall back to default.
+        $this->user = Auth::guard(Modularous::getAuthGuardName())->user() ?? Auth::user();
+
         $this->preload();
     }
 

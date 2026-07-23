@@ -1066,7 +1066,8 @@ return [
                 [
                     'type' => 'checklist',
                     'isTreeview' => true,
-                    '_type' => 'input-treeview',
+                    // Large permission catalogs: mount group headers only until expanded.
+                    'closeAllGroups' => true,
                     'name' => 'permissions',
                     'label' => 'Permissions of the role',
                     'col' => [

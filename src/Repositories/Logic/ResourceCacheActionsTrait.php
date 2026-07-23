@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Unusualify\Modularous\Repositories\Logic;
 
+use Unusualify\Modularous\Entities\Enums\Permission;
+use Unusualify\Modularous\Entities\User;
 use Unusualify\Modularous\Facades\ModularousCache;
 use Unusualify\Modularous\Traits\Moduleable;
 
@@ -96,9 +98,14 @@ trait ResourceCacheActionsTrait
     /**
      * @return array<string, array<string, mixed>>
      */
-    public function getFormActionsResourceCacheActionsTrait($scope = []): array
+    public function getFormActionsResourceCacheActionsTrait(?User $user, array $scope = []): array
     {
         if (! $this->resourceCacheActionsEnabled()) {
+            return [];
+        }
+
+        $permissionName = $this->getPermissionName(Permission::CACHING->value, $this->getRouteName());
+        if ($user !== null && ! $user->can($permissionName)) {
             return [];
         }
 

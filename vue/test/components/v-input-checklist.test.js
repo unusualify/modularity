@@ -57,47 +57,52 @@ describe('checklist tests', () => {
       ]
     })
 
-    // expect( wrapper.get('[data-test="title"]').text() ).toBe('Checklist label')
-
     const checkboxComponent = await wrapper.findAll('[data-test="checkbox"]')[0]
-
-    // await checkboxComponent.setChecked(true)
-    // await checkboxComponent.find('input').setChecked()
-
     const input = await checkboxComponent.find('input[type="checkbox"]')
-    // await input.trigger('click')
-
-    // await input.setChecked(true)
-    // input.element.checked = true
-    // await input.trigger('click')
     await input.setValue()
-    // await input.trigger('change')
-
-    // await checkboxComponent.trigger('click')
-    // await checkboxComponent.trigger('change')
-
-    // console.log(
-
-    //   wrapper.vm.input,
-    //   checkboxComponent.classes(),
-    //   input.element.checked
-    // )
 
     const updateModelEvent = wrapper.emitted('update:modelValue')
-
-    // expect(updateModelEvent).toHaveProperty('update:modelValue')
 
     expect(updateModelEvent[0][0]).toEqual(['role'])
 
     expect(input.element.checked).toBeTruthy()
-    // console.log(checkbox.element.value)
+  })
 
-    // // await checkbox.trigger('click')
-    // // await checkbox.setValue('click')
+  test('registers only the outer v-input with VForm when items are present', async () => {
+    const { defineComponent, h, nextTick, ref } = await import('vue')
+    const { VForm } = await import('vuetify/components')
 
-    // console.log(wrapper.vm.modelValue)
-    // // expect(wrapper.vm.input).toBe(1)
-    // expect( wrapper.findAll('[data-test="checkbox"]')[0] ).click(2)
+    const formRef = ref(null)
+
+    const Host = defineComponent({
+      setup () {
+        return () => h(VForm, {
+          ref: formRef
+        }, {
+          default: () => h(Checklist, {
+            label: 'Permissions',
+            modelValue: [],
+            items: Array.from({ length: 30 }, (_, i) => ({
+              id: i + 1,
+              name: `perm_${i + 1}`
+            }))
+          })
+        })
+      }
+    })
+
+    const wrapper = mount(Host, {
+      global: {
+        plugins: [UEConfig]
+      }
+    })
+
+    await nextTick()
+
+    // Nested checkboxes must not register — otherwise large item lists break form validity.
+    expect(formRef.value.items.length).toBe(1)
+
+    wrapper.unmount()
   })
 
 })

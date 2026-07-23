@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Unusualify\Modularous\Tests\Repositories\Logic;
 
 use Mockery;
+use Unusualify\Modularous\Entities\User;
 use Unusualify\Modularous\Facades\ModularousCache;
 use Unusualify\Modularous\Module;
 use Unusualify\Modularous\Repositories\Logic\ResourceCacheActionsTrait;
@@ -69,9 +70,12 @@ class ResourceCacheActionsTraitTest extends TestCase
         $module->shouldReceive('isParentRoute')->with('TestRoute')->andReturn(false);
         $module->shouldReceive('panelRouteNamePrefix')->with(false)->andReturn('admin.test_module.');
 
+        $user = Mockery::mock(User::class);
+        $user->shouldReceive('can')->once()->with('test_route_caching')->andReturn(true);
+
         $repository = new RepositoryUsingResourceCacheActionsForFormActions($module);
 
-        $actions = $repository->getFormActionsResourceCacheActionsTrait();
+        $actions = $repository->getFormActionsResourceCacheActionsTrait($user);
 
         $this->assertArrayHasKey('cacheWarm', $actions);
         $this->assertSame('admin.test_module.test_route.cacheWarm', $actions['cacheWarm']['endpoint']);
@@ -197,6 +201,11 @@ class RepositoryUsingResourceCacheActionsForFormActions
     public function getModule(): ?Module
     {
         return $this->module;
+    }
+
+    public function getPermissionName(string $suffix, ?string $routeName = null): string
+    {
+        return 'test_route_' . $suffix;
     }
 
     protected function resourceCacheActionsEnabled(): bool

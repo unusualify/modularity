@@ -96,6 +96,8 @@ class ManageResourceCacheTest extends TestCase
             ->with('TestModule', 'TestRoute')
             ->andReturn(true);
 
+        $this->authorizeWithCachingPermission();
+
         $this->controller->invokeSetTableActionsManageResourceCache();
 
         $this->assertCount(2, $this->controller->tableActions);
@@ -142,11 +144,12 @@ class ManageResourceCacheTest extends TestCase
 
     public function test_cache_purge_purges_selected_types_for_record(): void
     {
-        $this->authorizeAsSuperadmin();
+        $this->authorizeWithCachingPermission();
         $model = $this->makeModel(42);
         $types = ['record' => true, 'index' => false];
 
         $this->controller->repository = Mockery::mock();
+        $this->controller->repository->shouldReceive('getPermissionName')->andReturn('test_route_caching');
         $this->controller->repository->shouldReceive('getById')->once()->with(42)->andReturn($model);
 
         ModularousCache::shouldReceive('hasAdminCacheActions')
@@ -170,11 +173,12 @@ class ManageResourceCacheTest extends TestCase
 
     public function test_cache_warm_refreshes_selected_types_for_record(): void
     {
-        $this->authorizeAsSuperadmin();
+        $this->authorizeWithCachingPermission();
         $model = $this->makeModel(7);
         $types = ['record' => true, 'presentationItem' => true, 'index' => false];
 
         $this->controller->repository = Mockery::mock();
+        $this->controller->repository->shouldReceive('getPermissionName')->andReturn('test_route_caching');
         $this->controller->repository->shouldReceive('getById')->once()->with(7)->andReturn($model);
 
         ModularousCache::shouldReceive('hasAdminCacheActions')
@@ -201,7 +205,8 @@ class ManageResourceCacheTest extends TestCase
 
     public function test_cache_purge_all_invalidates_module_route(): void
     {
-        $this->authorizeAsSuperadmin();
+        $this->authorizeWithCachingPermission();
+        $this->controller->repository = $this->makeRepositoryWithCachingPermission();
 
         ModularousCache::shouldReceive('hasAdminCacheActions')
             ->once()
@@ -221,7 +226,8 @@ class ManageResourceCacheTest extends TestCase
     {
         Bus::fake();
 
-        $this->authorizeAsSuperadmin();
+        $this->authorizeWithCachingPermission();
+        $this->controller->repository = $this->makeRepositoryWithCachingPermission();
         $types = ['record' => true, 'index' => false];
 
         ModularousCache::shouldReceive('hasAdminCacheActions')
@@ -242,7 +248,9 @@ class ManageResourceCacheTest extends TestCase
         Bus::assertDispatched(WarmModuleRouteCachesJob::class, function (WarmModuleRouteCachesJob $job) use ($types): bool {
             return $job->moduleName === 'TestModule'
                 && $job->moduleRouteName === 'TestRoute'
-                && $job->types === $types;
+                && $job->types === $types
+                && $job->chunkSize === 100
+                && $job->initiatorUserId === 99;
         });
     }
 
@@ -258,15 +266,17 @@ class ManageResourceCacheTest extends TestCase
         $this->controller->invokeAuthorizeResourceCacheAction();
     }
 
-    public function test_authorize_resource_cache_action_aborts_with_403_when_not_superadmin(): void
+    public function test_authorize_resource_cache_action_aborts_with_403_when_user_lacks_permission(): void
     {
         ModularousCache::shouldReceive('hasAdminCacheActions')
             ->once()
             ->with('TestModule', 'TestRoute')
             ->andReturn(true);
 
-        $user = new \stdClass;
-        $user->is_superadmin = false;
+        $this->controller->repository = $this->makeRepositoryWithCachingPermission();
+
+        $user = Mockery::mock();
+        $user->shouldReceive('can')->once()->with('test_route_caching')->andReturn(false);
         $this->controller->user = $user;
 
         try {
@@ -284,6 +294,7 @@ class ManageResourceCacheTest extends TestCase
             ->with('TestModule', 'TestRoute')
             ->andReturn(true);
 
+        $this->controller->repository = $this->makeRepositoryWithCachingPermission();
         $this->controller->user = null;
 
         try {
@@ -340,11 +351,20 @@ class ManageResourceCacheTest extends TestCase
         $this->assertSame($types, $resolved);
     }
 
-    protected function authorizeAsSuperadmin(): void
+    protected function authorizeWithCachingPermission(): void
     {
-        $user = new \stdClass;
-        $user->is_superadmin = true;
+        $user = Mockery::mock();
+        $user->id = 99;
+        $user->shouldReceive('can')->with('test_route_caching')->andReturn(true);
         $this->controller->user = $user;
+    }
+
+    protected function makeRepositoryWithCachingPermission(): \Mockery\MockInterface
+    {
+        $repository = Mockery::mock();
+        $repository->shouldReceive('getPermissionName')->andReturn('test_route_caching');
+
+        return $repository;
     }
 
     protected function makeModuleMock(): Module
@@ -397,6 +417,11 @@ final class RepositoryWithResourceCacheActions
     public function getModule(): ?Module
     {
         return null;
+    }
+
+    public function getPermissionName(string $suffix, ?string $routeName = null): string
+    {
+        return 'test_route_' . $suffix;
     }
 
     /**

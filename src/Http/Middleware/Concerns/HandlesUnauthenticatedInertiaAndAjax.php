@@ -27,18 +27,21 @@ trait HandlesUnauthenticatedInertiaAndAjax
         try {
             $response = parent::handle($request, $next, ...$guards);
         } catch (AuthenticationException $e) {
-            $loginUrl = $e->redirectTo($request) ?? $this->fallbackLoginUrlForUnauthenticated();
+            // Prefer Modularous fallback — AuthenticationException::redirectTo() may invoke
+            // Laravel's global redirectUsing callback (route('login')), which apps often lack.
+            $loginUrl = $this->resolveUnauthenticatedLoginUrl();
 
             if ($request->header('X-Inertia')) {
                 return response('', 409)->withHeaders([
-                    'X-Inertia-Location' => $loginUrl,
+                    'X-Inertia-Location' => $loginUrl ?: '/',
                 ]);
             }
 
-            if ($request->ajax()) {
+            // Echo /broadcasting/auth sends Accept: application/json but may omit X-Requested-With.
+            if ($request->ajax() || $request->expectsJson()) {
                 return response()->json([
                     'message' => $e->getMessage(),
-                    'login_url' => $loginUrl ?: null,
+                    'login_url' => $loginUrl,
                     'redirect' => (bool) $loginUrl,
                 ], 401);
             }
@@ -55,7 +58,7 @@ trait HandlesUnauthenticatedInertiaAndAjax
                 ]);
             }
 
-            if ($request->ajax()) {
+            if ($request->ajax() || $request->expectsJson()) {
                 return response()->json([
                     'message' => __('Unauthenticated.'),
                     'login_url' => $response->getTargetUrl(),
@@ -85,5 +88,19 @@ trait HandlesUnauthenticatedInertiaAndAjax
     protected function fallbackLoginUrlForUnauthenticated(): string
     {
         return route('login');
+    }
+
+    /**
+     * Resolve a safe login URL without tripping Laravel's default route('login') callback.
+     */
+    protected function resolveUnauthenticatedLoginUrl(): ?string
+    {
+        try {
+            $url = $this->fallbackLoginUrlForUnauthenticated();
+
+            return filled($url) ? $url : null;
+        } catch (\Throwable) {
+            return null;
+        }
     }
 }

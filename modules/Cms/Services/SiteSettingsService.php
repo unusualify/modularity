@@ -13,16 +13,43 @@ use Unusualify\Modularous\Facades\Modularous;
  * - Frontend (non-panel) requests → {@see CmsSettingsService}, falling back to {@see SystemSettingsService}
  * - Backend / panel / console → {@see SystemSettingsService}
  *
- * Force a layer with {@see forFrontend()} / {@see forBackend()} / {@see forCms()} / {@see forSystem()}.
+ * Force a layer with {@see forFrontend()} / {@see forBackend()} / {@see forCms()} / {@see forSystem()},
+ * or temporarily with {@see whileFrontend()} (used by public presentation warmup under queue/console).
  */
 class SiteSettingsService
 {
     private ?string $forcedContext = null;
 
+    /**
+     * Re-entrant override so public HTML warmup (queue / artisan) reads CmsSettings
+     * even though {@see app()->runningInConsole()} is true.
+     */
+    private static int $frontendOverrideDepth = 0;
+
     public function __construct(
         protected SystemSettingsService $systemSettings,
         protected CmsSettingsService $cmsSettings,
     ) {}
+
+    /**
+     * Temporarily treat SiteSettings as frontend (CMS layer + SystemSettings fallback),
+     * including under console / queue workers.
+     *
+     * @template T
+     *
+     * @param  callable(): T  $callback
+     * @return T
+     */
+    public function whileFrontend(callable $callback): mixed
+    {
+        self::$frontendOverrideDepth++;
+
+        try {
+            return $callback();
+        } finally {
+            self::$frontendOverrideDepth--;
+        }
+    }
 
     /**
      * Force CMS layer with SystemSettings fallback (frontend semantics).
@@ -64,7 +91,7 @@ class SiteSettingsService
 
     public function usesCmsLayer(): bool
     {
-        if ($this->forcedContext === 'frontend') {
+        if (self::$frontendOverrideDepth > 0 || $this->forcedContext === 'frontend') {
             return true;
         }
 

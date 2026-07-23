@@ -143,8 +143,43 @@ return [
             'confirmation-confirmText' => 'Güncelle',
             'confirmation-cancelText' => 'İptal',
         ],
+        'warm-toast' => [
+            'module-route' => [
+                'title' => 'Önbellek ısıtma',
+                'started' => 'Bu rota için önbellek ısıtılıyor…',
+                'progress' => ':processed kayıt ısıtıldı…',
+                'completed' => ':processed kayıt ısıtıldı.',
+                'completed-skipped' => 'Atlandı: :reason',
+                'failed' => 'Isıtma başarısız: :message',
+            ],
+            'presentation-item' => [
+                'title' => 'Sunum önbelleği',
+                'started' => 'Sunum öğesi ısıtılıyor…',
+                'completed' => 'Sunum öğesi ısıtıldı.',
+                'completed-skipped' => 'Atlandı: :reason',
+                'failed' => 'Isıtma başarısız: :message',
+            ],
+            'reason' => [
+                'cache_disabled' => 'bu rota için önbellek kapalı',
+                'module_or_route_missing' => 'modül veya rota bulunamadı',
+            ],
+        ],
         'validation' => [
             'types-required' => 'En az bir önbellek türü seçilmelidir.',
+        ],
+    ],
+
+    'chatable' => [
+        'form-action' => [
+            'label' => 'Chat Mesajları',
+            'tooltip' => 'Chat aç',
+            'input' => [
+                'label' => 'Chat',
+                'subtitle' => '',
+            ],
+        ],
+        'input' => [
+            'label' => 'Chat Mesajları',
         ],
     ],
 ];

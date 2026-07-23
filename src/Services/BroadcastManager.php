@@ -4,6 +4,7 @@ namespace Unusualify\Modularous\Services;
 
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\PrivateChannel;
+use Unusualify\Modularous\Support\BroadcastAvailability;
 
 /**
  * BroadcastManager
@@ -108,5 +109,45 @@ class BroadcastManager
         $instance = new static($model, $eventClasses);
 
         return $instance->getBroadcastConfiguration();
+    }
+
+    /**
+     * Encode a model FQCN for presence channel segments (URL-safe, single segment).
+     */
+    public static function encodeModelType(string $modelClass): string
+    {
+        return str_replace('\\', '-', $modelClass);
+    }
+
+    /**
+     * Decode a presence channel model type segment back to FQCN.
+     */
+    public static function decodeModelType(string $encoded): string
+    {
+        return str_replace('-', '\\', $encoded);
+    }
+
+    /**
+     * Frontend bootstrap config for Echo subscriptions.
+     *
+     * @return array{enabled: bool, userId: int|null, userChannel: string|null, domainChannels: array<int, string>}
+     */
+    public static function panelConfig(?object $user = null): array
+    {
+        $enabled = BroadcastAvailability::isEnabled();
+        $userId = $user?->id ?? null;
+
+        return [
+            'enabled' => $enabled,
+            'userId' => $userId ? (int) $userId : null,
+            'userChannel' => $userId ? 'users.' . $userId : null,
+            'domainChannels' => [
+                'assignable',
+                'payment',
+                'stateable',
+                'unread-chat-message',
+                'model',
+            ],
+        ];
     }
 }

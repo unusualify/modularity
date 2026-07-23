@@ -9,11 +9,13 @@ use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\URL;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 use Modules\Cms\Contracts\CmsLocalizationContract;
+use Unusualify\Modularous\Facades\SiteSettings;
 use Unusualify\Modularous\Support\ModularousCacheLogger;
 
 /**
  * Applies visitor-facing presentation context during admin warmup or cache render:
- * application locale, optional mcamara locale, route URL defaults, and public site root URL.
+ * application locale, optional mcamara locale, route URL defaults, public site root URL,
+ * and frontend SiteSettings (CmsSettings) so queue/console warm matches HTTP visitors.
  */
 final class CmsPublicPresentationWarmupContext
 {
@@ -30,7 +32,16 @@ final class CmsPublicPresentationWarmupContext
         try {
             self::apply($locale);
 
-            return CmsPublicSiteUrl::runWithForcedPublicRootUrl($callback);
+            $run = static fn () => CmsPublicSiteUrl::runWithForcedPublicRootUrl($callback);
+
+            // Queue / artisan warm runs in console → SiteSettings defaults to SystemSettings.
+            // Force CMS layer so Blade (e.g. site.logo.frontend) matches public HTTP renders.
+            // Skip when Cms module has not bound site.settings (e.g. isolated package tests).
+            if (app()->bound('site.settings')) {
+                return SiteSettings::whileFrontend($run);
+            }
+
+            return $run();
         } finally {
             self::restore($snapshot);
         }

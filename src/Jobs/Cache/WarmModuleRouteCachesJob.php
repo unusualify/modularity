@@ -11,14 +11,17 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Str;
+use Throwable;
+use Unusualify\Modularous\Events\Cache\CacheWarmProgress;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Facades\ModularousCache;
+use Unusualify\Modularous\Jobs\Cache\Concerns\BuildsCacheWarmBroadcastToast;
 use Unusualify\Modularous\Jobs\Cache\Concerns\ModularousCacheJob;
 use Unusualify\Modularous\Support\ModularousCacheLogger;
 
 final class WarmModuleRouteCachesJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, ModularousCacheJob, Queueable, SerializesModels;
+    use BuildsCacheWarmBroadcastToast, Dispatchable, InteractsWithQueue, ModularousCacheJob, Queueable, SerializesModels;
 
     /**
      * @param array<string, bool> $types
@@ -28,6 +31,7 @@ final class WarmModuleRouteCachesJob implements ShouldQueue
         public string $moduleRouteName,
         public array $types = [],
         public int $chunkSize = 100,
+        public ?int $initiatorUserId = null,
     ) {
         $this->configureModularousCacheQueue();
     }
@@ -42,56 +46,186 @@ final class WarmModuleRouteCachesJob implements ShouldQueue
             'moduleRouteName' => $moduleRouteName,
             'types' => $this->types,
             'chunkSize' => $this->chunkSize,
+            'initiatorUserId' => $this->initiatorUserId,
         ]);
 
-        if (! ModularousCache::isEnabled($moduleName, $moduleRouteName)) {
-            return;
-        }
+        $detail = $this->cacheWarmDetail($moduleName, $moduleRouteName);
 
-        $module = Modularous::find($moduleName);
-        if (! $module || ! $module->hasRoute($moduleRouteName)) {
-            return;
-        }
+        try {
+            if (! ModularousCache::isEnabled($moduleName, $moduleRouteName)) {
+                $this->broadcastWarm(CacheWarmProgress::STATUS_SKIPPED, [
+                    'job' => 'WarmModuleRouteCachesJob',
+                    'moduleName' => $moduleName,
+                    'moduleRouteName' => $moduleRouteName,
+                    'skipped' => true,
+                    'reason' => 'cache_disabled',
+                    'toast' => $this->cacheWarmToast(
+                        CacheWarmProgress::STATUS_SKIPPED,
+                        __('messages.resource-cache.warm-toast.module-route.title'),
+                        __('messages.resource-cache.warm-toast.module-route.completed-skipped', [
+                            'reason' => __('messages.resource-cache.warm-toast.reason.cache_disabled'),
+                        ]),
+                        $detail,
+                    ),
+                ]);
 
-        $types = $this->resolveTypes($moduleName, $moduleRouteName);
-
-        if (($types['counts'] ?? false) && ModularousCache::isEnabled($moduleName, $moduleRouteName, 'counts')) {
-            ModularousCache::warmupModuleRouteCacheCounts($moduleName, $moduleRouteName);
-        }
-
-        $model = $module->getModel($moduleRouteName);
-        $modelClass = get_class($model);
-
-        if ($module->isSingleton($moduleRouteName)) {
-            $record = $modelClass::query()->select('id')->first();
-            if ($record !== null && $record->getKey() !== null) {
-                $this->warmRecord($modelClass, $record->getKey(), $moduleName, $moduleRouteName, $types);
+                return;
             }
 
-            return;
-        }
+            $module = Modularous::find($moduleName);
+            if (! $module || ! $module->hasRoute($moduleRouteName)) {
+                $this->broadcastWarm(CacheWarmProgress::STATUS_SKIPPED, [
+                    'job' => 'WarmModuleRouteCachesJob',
+                    'moduleName' => $moduleName,
+                    'moduleRouteName' => $moduleRouteName,
+                    'skipped' => true,
+                    'reason' => 'module_or_route_missing',
+                    'toast' => $this->cacheWarmToast(
+                        CacheWarmProgress::STATUS_SKIPPED,
+                        __('messages.resource-cache.warm-toast.module-route.title'),
+                        __('messages.resource-cache.warm-toast.module-route.completed-skipped', [
+                            'reason' => __('messages.resource-cache.warm-toast.reason.module_or_route_missing'),
+                        ]),
+                        $detail,
+                    ),
+                ]);
 
-        $modelClass::query()
-            ->select('id')
-            ->orderBy('id')
-            ->chunk($this->chunkSize, function ($records) use ($modelClass, $moduleName, $moduleRouteName, $types) {
-                foreach ($records as $record) {
-                    if ($record->getKey() === null) {
-                        continue;
-                    }
+                return;
+            }
 
-                    if (($types['presentationItem'] ?? false) && $this->shouldDispatchPresentationAsync()) {
-                        $item = $modelClass::find($record->getKey());
-                        if ($item instanceof Model) {
-                            WarmPresentationItemJob::dispatch($item, $moduleName, $moduleRouteName);
+            $this->broadcastWarm(CacheWarmProgress::STATUS_STARTED, [
+                'job' => 'WarmModuleRouteCachesJob',
+                'moduleName' => $moduleName,
+                'moduleRouteName' => $moduleRouteName,
+                'toast' => $this->cacheWarmToast(
+                    CacheWarmProgress::STATUS_STARTED,
+                    __('messages.resource-cache.warm-toast.module-route.title'),
+                    __('messages.resource-cache.warm-toast.module-route.started'),
+                    $detail,
+                ),
+            ]);
+
+            $types = $this->resolveTypes($moduleName, $moduleRouteName);
+
+            if (($types['counts'] ?? false) && ModularousCache::isEnabled($moduleName, $moduleRouteName, 'counts')) {
+                ModularousCache::warmupModuleRouteCacheCounts($moduleName, $moduleRouteName);
+            }
+
+            $model = $module->getModel($moduleRouteName);
+            $modelClass = get_class($model);
+            $processed = 0;
+
+            if ($module->isSingleton($moduleRouteName)) {
+                $record = $modelClass::query()->select('id')->first();
+                if ($record !== null && $record->getKey() !== null) {
+                    $this->warmRecord($modelClass, $record->getKey(), $moduleName, $moduleRouteName, $types);
+                    $processed = 1;
+                }
+
+                $this->broadcastWarm(CacheWarmProgress::STATUS_COMPLETED, [
+                    'job' => 'WarmModuleRouteCachesJob',
+                    'moduleName' => $moduleName,
+                    'moduleRouteName' => $moduleRouteName,
+                    'processed' => $processed,
+                    'toast' => $this->cacheWarmToast(
+                        CacheWarmProgress::STATUS_COMPLETED,
+                        __('messages.resource-cache.warm-toast.module-route.title'),
+                        __('messages.resource-cache.warm-toast.module-route.completed', [
+                            'processed' => $processed,
+                        ]),
+                        $detail,
+                    ),
+                ]);
+
+                return;
+            }
+
+            $modelClass::query()
+                ->select('id')
+                ->orderBy('id')
+                ->chunk($this->chunkSize, function ($records) use ($modelClass, $moduleName, $moduleRouteName, $types, $detail, &$processed) {
+                    foreach ($records as $record) {
+                        if ($record->getKey() === null) {
+                            continue;
                         }
 
-                        continue;
+                        if (($types['presentationItem'] ?? false) && $this->shouldDispatchPresentationAsync()) {
+                            $item = $modelClass::find($record->getKey());
+                            if ($item instanceof Model) {
+                                WarmPresentationItemJob::dispatch(
+                                    $item,
+                                    $moduleName,
+                                    $moduleRouteName,
+                                    null,
+                                    $this->initiatorUserId,
+                                );
+                            }
+
+                            $processed++;
+
+                            continue;
+                        }
+
+                        $this->warmRecord($modelClass, $record->getKey(), $moduleName, $moduleRouteName, $types);
+                        $processed++;
                     }
 
-                    $this->warmRecord($modelClass, $record->getKey(), $moduleName, $moduleRouteName, $types);
-                }
-            });
+                    $this->broadcastWarm(CacheWarmProgress::STATUS_PROGRESS, [
+                        'job' => 'WarmModuleRouteCachesJob',
+                        'moduleName' => $moduleName,
+                        'moduleRouteName' => $moduleRouteName,
+                        'processed' => $processed,
+                        'toast' => $this->cacheWarmToast(
+                            CacheWarmProgress::STATUS_PROGRESS,
+                            __('messages.resource-cache.warm-toast.module-route.title'),
+                            __('messages.resource-cache.warm-toast.module-route.progress', [
+                                'processed' => $processed,
+                            ]),
+                            $detail,
+                        ),
+                    ]);
+                });
+
+            $this->broadcastWarm(CacheWarmProgress::STATUS_COMPLETED, [
+                'job' => 'WarmModuleRouteCachesJob',
+                'moduleName' => $moduleName,
+                'moduleRouteName' => $moduleRouteName,
+                'processed' => $processed,
+                'toast' => $this->cacheWarmToast(
+                    CacheWarmProgress::STATUS_COMPLETED,
+                    __('messages.resource-cache.warm-toast.module-route.title'),
+                    __('messages.resource-cache.warm-toast.module-route.completed', [
+                        'processed' => $processed,
+                    ]),
+                    $detail,
+                ),
+            ]);
+        } catch (Throwable $e) {
+            $this->broadcastWarm(CacheWarmProgress::STATUS_FAILED, [
+                'job' => 'WarmModuleRouteCachesJob',
+                'moduleName' => $moduleName,
+                'moduleRouteName' => $moduleRouteName,
+                'message' => $e->getMessage(),
+                'toast' => $this->cacheWarmToast(
+                    CacheWarmProgress::STATUS_FAILED,
+                    __('messages.resource-cache.warm-toast.module-route.title'),
+                    __('messages.resource-cache.warm-toast.module-route.failed', [
+                        'message' => $e->getMessage(),
+                    ]),
+                    $detail,
+                ),
+            ]);
+
+            throw $e;
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     */
+    protected function broadcastWarm(string $status, array $payload = []): void
+    {
+        event(new CacheWarmProgress($status, $this->initiatorUserId, $payload));
     }
 
     protected function modularousCacheOverlapKey(): string

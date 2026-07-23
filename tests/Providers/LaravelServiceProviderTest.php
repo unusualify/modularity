@@ -7,7 +7,6 @@ namespace Unusualify\Modularous\Tests\Providers;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 use ReflectionClass;
 use ReflectionMethod;
-use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\LaravelServiceProvider;
 use Unusualify\Modularous\Tests\TestCase;
 
@@ -42,7 +41,12 @@ class LaravelServiceProviderTest extends TestCase
                 static fn (string $source): bool => str_ends_with($source, '/lang')
             )
         );
-        $this->assertArrayHasKey(Modularous::getVendorPath('operations'), $publishes);
+        $this->assertTrue(
+            (bool) array_filter(
+                array_keys($publishes),
+                static fn (string $source): bool => str_ends_with($source, '/operations')
+            )
+        );
     }
 
     public function test_publish_migrations_registers_modularous_migrations(): void
@@ -54,14 +58,21 @@ class LaravelServiceProviderTest extends TestCase
         $method->invoke($provider);
 
         $publishes = $this->publishedPaths(LaravelServiceProvider::class, 'modularous-migrations');
+        $expectedSource = realpath(__DIR__ . '/../../database/migrations/default')
+            ?: __DIR__ . '/../../database/migrations/default';
 
-        $this->assertArrayHasKey(
-            Modularous::getVendorPath('database/migrations/default'),
-            $publishes
-        );
+        $matchedSource = null;
+        foreach (array_keys($publishes) as $source) {
+            if ((realpath($source) ?: $source) === $expectedSource) {
+                $matchedSource = $source;
+                break;
+            }
+        }
+
+        $this->assertNotNull($matchedSource);
         $this->assertSame(
             $this->app->databasePath('migrations'),
-            $publishes[Modularous::getVendorPath('database/migrations/default')]
+            $publishes[$matchedSource]
         );
     }
 

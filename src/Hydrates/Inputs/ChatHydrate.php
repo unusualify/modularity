@@ -64,7 +64,7 @@ class ChatHydrate extends InputHydrate
         ])['filepond'];
 
         $input['name'] = '_chat_id';
-        $input['label'] ??= __('form-labels.Messages');
+        $input['label'] ??= __('messages.chatable.input.label');
 
         $input['noSubmit'] = true;
         $input['creatable'] = 'hidden';

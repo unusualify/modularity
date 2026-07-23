@@ -2,9 +2,9 @@
 
 namespace Unusualify\Modularous\Http\Controllers\Utility;
 
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Modules\SystemNotification\Events\ChatableMessageSynced;
 use Unusualify\Modularous\Entities\Chat;
 use Unusualify\Modularous\Entities\ChatMessage;
 use Unusualify\Modularous\Facades\Filepond;
@@ -65,6 +65,21 @@ class ChatController extends Controller
 
         $chat->chatable->touch();
 
+        $chatMessage->refresh();
+        $chatMessage->loadMissing(['creator']);
+
+        event(new ChatableMessageSynced(
+            ChatableMessageSynced::ACTION_CREATED,
+            $chat->id,
+            $chatMessage->toArray(),
+        ));
+
+        // Immediate retainable toast for other parties (does not stamp notified_at).
+        $chatable = $chat->chatable;
+        if ($chatable && method_exists($chatable, 'notifyChatableMessageBroadcast')) {
+            $chatable->notifyChatableMessageBroadcast($chatMessage);
+        }
+
         return response()->json($chatMessage);
     }
 
@@ -81,6 +96,15 @@ class ChatController extends Controller
 
         $message->chat->chatable->touch();
 
+        $message->refresh();
+        $message->loadMissing(['creator']);
+
+        event(new ChatableMessageSynced(
+            ChatableMessageSynced::ACTION_UPDATED,
+            $message->chat_id,
+            $message->toArray(),
+        ));
+
         return response()->json($message);
     }
 
@@ -93,10 +117,28 @@ class ChatController extends Controller
 
     public function destroy(Request $request, ChatMessage $message)
     {
+        $message->loadMissing(['creator']);
+        $snapshot = $message->toArray();
+        $chatId = $message->chat_id;
+        $chat = $message->chat;
+
         $message->delete();
 
-        $message->chat->chatable->touch();
+        if ($chat && $chat->chatable) {
+            $chat->chatable->touch();
+        }
+
+        event(new ChatableMessageSynced(
+            ChatableMessageSynced::ACTION_DELETED,
+            $chatId,
+            $snapshot,
+        ));
 
         return response()->json($message);
+    }
+
+    public function show(Request $request, ChatMessage $chat_message)
+    {
+        return response()->json($chat_message);
     }
 }

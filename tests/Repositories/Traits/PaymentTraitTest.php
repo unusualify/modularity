@@ -159,7 +159,8 @@ class PaymentTraitTest extends RepositoryTestCase
 
     public function test_get_form_actions_payment_trait_delegates_to_model(): void
     {
-        $actions = $this->repository->getFormActions();
+        $user = \Mockery::mock(User::class);
+        $actions = $this->repository->getFormActions($user);
 
         $this->assertIsArray($actions['paymentTrait']);
         $this->assertTrue(Arr::isAssoc($actions['paymentTrait']));

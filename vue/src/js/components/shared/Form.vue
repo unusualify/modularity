@@ -22,6 +22,14 @@
         scrollable ? 'flex-grow-0' : '',
         'pb-2'
       ]">
+        <v-alert
+          v-if="hasOtherEditors && editPresenceLockMessage"
+          type="warning"
+          variant="tonal"
+          density="compact"
+          class="mb-3"
+          :text="editPresenceLockMessage"
+        />
         <div class="d-flex flex-column flex-sm-row">
           <div class="d-flex flex-column flex-1-1-100 min-width-0">
           <ue-title v-if="!noTitle && title"

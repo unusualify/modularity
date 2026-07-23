@@ -12,16 +12,22 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\View\View;
 use Mockery;
 use TestModules\TestModule\Controllers\ItemController;
+use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Http\Controllers\BaseController;
 use Unusualify\Modularous\Repositories\Repository;
 use Unusualify\Modularous\Tests\Http\Controllers\Stubs\BaseControllerStub;
+use Unusualify\Modularous\Tests\Repositories\RepositorySources;
 use Unusualify\Modularous\Tests\TestModulesCase;
 
 class BaseControllerTest extends TestModulesCase
 {
+    use RepositorySources;
+
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->loadRepositorySources();
 
         config()->set('modularous.use_inertia', false);
 
@@ -205,6 +211,12 @@ class BaseControllerTest extends TestModulesCase
 
     public function test_preload_sets_up_form_schema_and_withs(): void
     {
+        $guardName = Modularous::getAuthGuardName();
+        $adminRole = \Spatie\Permission\Models\Role::create(['name' => 'admin', 'guard_name' => $guardName]);
+        $admin = \Unusualify\Modularous\Entities\User::create(['name' => 'Admin', 'email' => 'admin@example.com']);
+        $admin->assignRole($adminRole);
+        $this->actingAs($admin, $guardName);
+
         $controller = new BaseControllerStub($this->app, Request::create('/admin/test-module/items'));
         $controller->module = $controller->getModule();
         $controller->exposePreloadBase();
@@ -386,6 +398,12 @@ class BaseControllerTest extends TestModulesCase
 
     public function test_duplicate_returns_success_when_repository_duplicates_item(): void
     {
+        $guardName = Modularous::getAuthGuardName();
+        $adminRole = \Spatie\Permission\Models\Role::create(['name' => 'admin', 'guard_name' => $guardName]);
+        $admin = \Unusualify\Modularous\Entities\User::create(['name' => 'Admin', 'email' => 'admin-duplicate@example.com']);
+        $admin->assignRole($adminRole);
+        $this->actingAs($admin, $guardName);
+
         $item = new class extends Model
         {
             protected $table = 'base_controller_items';
@@ -401,7 +419,6 @@ class BaseControllerTest extends TestModulesCase
             public $id = 22;
         };
         $newItem->exists = true;
-
         $repository = $this->makeRepositoryMock();
         $repository->shouldReceive('getById')->with(2)->andReturn($item);
         $repository->shouldReceive('duplicate')->with(2, 'name', [])->andReturn($newItem);
@@ -409,7 +426,8 @@ class BaseControllerTest extends TestModulesCase
         $request = $this->requestWithRoute(['item' => 2], 'POST');
         $controller = new BaseControllerStub($this->app, $request, $repository);
         $controller->module = $controller->getModule();
-        $controller->preload();
+        // duplicate() calls preload(); user must be set as PanelController middleware would.
+        $controller->exposePreloadBase();
 
         $response = $controller->duplicate(2);
 

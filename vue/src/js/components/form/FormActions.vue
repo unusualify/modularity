@@ -6,20 +6,18 @@
     <slot name="prepend" v-bind="{item: modelValue, isEditing}"></slot>
     <template v-for="(action, key) in allActions">
       <v-tooltip
-        v-if="action.type !== 'modalx'"
         :disabled="!action.icon || action.forceLabel"
         :location="action.tooltipLocation ?? 'top'"
       >
         <template v-slot:activator="tooltipActivatorScope">
-          <v-switch
-            v-if="action.type === 'publish'"
+          <v-switch v-if="action.type === 'publish'"
             :modelValue="editedItem[action.key ?? 'published'] ?? action.default ?? false"
             v-bind="{...action.componentProps, ...tooltipActivatorScope.props}"
 
             :disabled="action.disabled ?? false"
             @update:modelValue="handleAction(action)"
           />
-          <ue-modal v-else-if="action.type === 'modal' && action.endpoint && action.schema"
+          <ue-modal v-else-if="action.type === 'modal' && (action?.formAttributes?.hasSubmit ?? true ? action.endpoint : true) && action.schema"
             :close-on-content-click="false"
             transition="scale-transition"
             widthType="md"
@@ -33,6 +31,7 @@
             description-body-class="d-flex flex-column fill-height w-100"
           >
             <template v-slot:activator="modalActivatorScope">
+              {{ console.log(action) }}
               <v-badge v-if="isBadge(action)"
                 v-bind="badgeProps(action)"
               >
@@ -60,7 +59,7 @@
                 :modelValue="createModel(action.schema, action)"
                 :title="action.formTitle ?? null"
                 :schema="action.schema"
-                :action-url="action.endpoint.replace(':id', modelValue.id)"
+                :action-url="action?.formAttributes?.hasSubmit ?? true ? action.endpoint.replace(':id', modelValue.id) : null"
                 :valid="valids[key]"
                 :is-editing="action.isEditing ?? isEditing"
 
@@ -131,8 +130,7 @@ export default {
     actions: {
       type: Object,
       required: true
-    },
-
+    }
   },
   setup(props, context) {
     const { handleAction, allActions, hasActions } = useItemActions(props, {
@@ -142,7 +140,6 @@ export default {
     const { generateButtonProps } = useGenerate()
     const { isBadge, badgeProps } = useBadge()
     const valids = computed(() => allActions.value.map(action => true))
-
 
     const createModel = (schema, action) => {
       const model = getModel(schema, props.modelValue)
