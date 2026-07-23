@@ -31,9 +31,9 @@ Aşağıdaki sıra, tipik bir **GET public sayfa** isteğinde genel olarak geçi
 ```mermaid
 flowchart TB
     subgraph L1["1 — HTTP / rota"]
-        R1["CmsFrontRouteRegistrar\nGET {path} veya {locale}/{path}\n+ isteğe bağlı Route::domain(host)"]
-        R2["İmzalı önizleme\nCmsServiceProvider\nGET cms/preview/{module}/{route}/{id}/{locale?}\n→ CmsSignedPublicPreviewController"]
-        R3["Statik\n/robots.txt, /sitemap.xml"]
+        R0["CmsPublicSystemRoutes\n/robots.txt, /sitemap.xml, /sitemap.xsl,\ncms/preview, cms/stylesheets\n(boot, public domain)"]
+        RHost["Host routes/web.php\n(booted, önce catch-all)"]
+        R1["CmsFrontRouteRegistrar\nGET {path} veya {locale}/{path}\n(booted, en son)"]
     end
 
     subgraph L2["2 — Middleware (cms_routing + cms_features)"]
@@ -86,7 +86,10 @@ flowchart TB
 
 **Okuma ipuçları**
 
-- Catch-all `{path}` **imzalı önizleme önekini** (`cms_routing.signed_preview.path_prefix`, varsayılan `cms/preview`) eşleştirmez; böylece önizleme rotası sayfa catch-all’ına takılmaz (`CmsFrontRouteRegistrar::catchAllPathParameterPattern`).
+- **Kayıt sırası:** built-in sistem rotaları (`CmsPublicSystemRouteRegistrar`, provider `boot`) → host `routes/web.php` (framework `booted`) → CMS catch-all (`CmsRouteServiceProvider` `booted`). Host’taki spesifik path’ler catch-all’ı sırayla yener.
+- **Yeni built-in sistem endpoint:** `CmsPublicSystemRoutes::definitions()` satırı ekle (domain + catch-all exclude otomatik). Host `/test` için Modularous’a dokunma; `routes/web.php` yeter (gerekirse `public_front_catch_all_exclude_path_prefixes`).
+- Catch-all `{path}` **reserved prefix’leri** eşleştirmez (`CmsPublicSystemRoutes::reservedPathPrefixes()` → `CmsFrontRouteRegistrar::catchAllPathParameterPattern`).
+- Kısa host/app rehberi: VitePress [CMS → Public routing](/guide/cms/public-routing).
 - **Implicit (prefix’siz) URL**’ler yalnızca **slugless fallback locale** (veya slugless kapalıysa CMS default locale) için `UrlRoute` satırıyla eşleşir; başka dilde tek satır varsa prefix’siz istek 404 olur (`CmsPublicModelResolver::resolveUrlRouteWhenLocaleImplicit`).
 
 ---
@@ -95,7 +98,8 @@ flowchart TB
 
 | Konu | Ana sınıf / dosya | Config anahtarları (örnek) |
 |------|-------------------|----------------------------|
-| Public catch-all kaydı | `modules/Cms/Routing/CmsFrontRouteRegistrar.php` | `cms_routing.*`, `cms_features.enabled` |
+| Public catch-all kaydı | `modules/Cms/Routing/CmsFrontRouteRegistrar.php` (booted) | `cms_routing.*`, `cms_features.enabled` |
+| Built-in sistem rotaları | `CmsPublicSystemRoutes` + `CmsPublicSystemRouteRegistrar` | `cms_seo.robots`, `cms_sitemap`, `signed_preview`, `cms_stylesheets` |
 | Locale’li route grubu | `CmsFrontRouteLocalizationBinding` | `public_front_route_group_mode`, `localization_driver` |
 | Domain’e bağlama | `CmsFrontRouteRegistrar::resolvePublicFrontRouteDomain` | `public_front_route_domain`, `public_front_routes_allow_any_host` |
 | Ziyaretçi yönlendirme | `CmsVisitorRedirectResolver`, `VisitorRedirectMiddleware` | `visitor_redirects_enabled` |
@@ -115,6 +119,7 @@ flowchart TB
 2. **Domain politikası** — Public catch-all varsayılan olarak `APP_URL` host’una sıkılaştırılabilir; tam tersi için `public_front_routes_allow_any_host` veya eski `bind_public_routes_to_app_url_host` ters-mantık uyumu.
 3. **locale_param + slugless** — Hem `{locale}/{path}` hem prefix’siz `{path}` kayıtları (slugless açıkken).
 4. **Implicit locale = yalnızca fallback/default** — Prefix’siz URL yalnızca belirlenen implicit locale’nin `UrlRoute` satırıyla eşleşir; yalnızca TR satırı varken `/tr/...` kullanılmalı.
+5. **Public system route catalog** — `CmsPublicSystemRoutes` + `CmsPublicSystemRouteRegistrar`; catch-all `booted` ile host `web.php` sonrasında; reserved prefix’ler katalogdan.
 
 ---
 
@@ -124,4 +129,4 @@ flowchart TB
 
 ---
 
-*Son güncelleme: bu belge CMS public stack kapanışı için oluşturuldu; mimari değişince tablo ve diyagram güncellenmelidir.*
+*Son güncelleme: CMS public stack; VitePress rehber: [CMS](src/pages/guide/cms/overview.md).*

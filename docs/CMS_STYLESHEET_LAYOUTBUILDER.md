@@ -1,5 +1,7 @@
 # CMS Stylesheet subsystem and LayoutBuilder contract
 
+> **Guide:** Prefer the VitePress section [CMS](/guide/cms/overview) — [Stylesheets](/guide/cms/stylesheets), [Layout builders](/guide/cms/layout-builders), [Page layouts](/guide/cms/page-layouts) (read in that order). This file remains a deeper engineering note.
+
 This document describes how **style sheets** relate to **layout builders** rendered as Blade/HTML.
 
 ## Data model (`layout_builders`)
