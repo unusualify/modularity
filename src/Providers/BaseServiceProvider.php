@@ -40,10 +40,6 @@ use Unusualify\Modularous\Services\FilepondManager;
 use Unusualify\Modularous\Services\MigrationBackup;
 use Unusualify\Modularous\Services\ModularousCacheService;
 use Unusualify\Modularous\Services\RedirectService;
-use Unusualify\Modularous\Services\RemoteApi\RemoteApiConnectorFactory;
-use Unusualify\Modularous\Services\RemoteApi\RemoteApiConnectorResolver;
-use Unusualify\Modularous\Services\RemoteApi\RemoteApiRateLimiter;
-use Unusualify\Modularous\Services\RemoteApi\RemoteApiSynchronizer;
 use Unusualify\Modularous\Services\UtmParameters;
 use Unusualify\Modularous\Services\View\ModularousNavigation;
 use Unusualify\Modularous\Support\CommandDiscovery;
@@ -173,11 +169,6 @@ class BaseServiceProvider extends ServiceProvider
         // });
 
         $this->app->singleton('modularous.navigation', ModularousNavigation::class);
-
-        $this->app->singleton(RemoteApiConnectorResolver::class);
-        $this->app->singleton(RemoteApiRateLimiter::class);
-        $this->app->singleton(RemoteApiConnectorFactory::class);
-        $this->app->singleton(RemoteApiSynchronizer::class);
 
         $this->app->singleton('model.relation.namespace', function () {
             return "Illuminate\Database\Eloquent\Relations";
@@ -657,13 +648,6 @@ class BaseServiceProvider extends ServiceProvider
             'path' => storage_path('logs/modularous-notification-failure.log'),
             'level' => env('MODULAROUS_NOTIFICATION_FAILURE_LOG_LEVEL', 'error'),
             'days' => 14,
-        ]);
-        $this->app['config']->set('logging.channels.modularous-remote-api', [
-            'driver' => 'daily',
-            'path' => storage_path('logs/modularous-remote-api.log'),
-            'level' => env('MODULAROUS_REMOTE_API_LOG_LEVEL', 'info'),
-            'days' => env('LOG_DAILY_DAYS', 14),
-            'replace_placeholders' => true,
         ]);
 
         if (! config('logging.channels.modularous-resource-cache')) {

@@ -75,12 +75,6 @@ Route::middleware(ModularousRoutes::webPanelMiddlewares())->group(function () {
         ? 'modularous.security.step_up:' . $sitemapCommitAbility
         : null;
 
-    $siteSeoSave = Route::post('site-seo', [SiteSeoSettingsController::class, 'update'])
-        ->name('siteSeo.save');
-
-    if ($siteSeoStepUpMiddleware) {
-        $siteSeoSave->middleware($siteSeoStepUpMiddleware);
-    }
 
     $sitemapDryRun = Route::post('sitemap/dry-run', [SitemapController::class, 'dryRun'])
         ->name('sitemap.dryRun.web');

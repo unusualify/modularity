@@ -23,6 +23,7 @@ class GeneralRepository extends Repository
     public function prepareFieldsBeforeCreate($fields)
     {
         $fields = $this->encryptSmtpPassword($fields);
+        $fields = $this->encryptDownPresetSecret($fields);
 
         return parent::prepareFieldsBeforeCreate($fields);
     }
@@ -35,6 +36,7 @@ class GeneralRepository extends Repository
     public function prepareFieldsBeforeSave($object, $fields)
     {
         $fields = $this->encryptSmtpPassword($fields, $object);
+        $fields = $this->encryptDownPresetSecret($fields, $object);
 
         return parent::prepareFieldsBeforeSave($object, $fields);
     }
@@ -79,6 +81,34 @@ class GeneralRepository extends Repository
 
         if (is_string($password) && ! $this->alreadyEncrypted($password)) {
             Arr::set($fields, 'smtp.password', encrypt($password, false));
+        }
+
+        return $fields;
+    }
+
+    /**
+     * @param  array<string, mixed>  $fields
+     * @return array<string, mixed>
+     */
+    protected function encryptDownPresetSecret(array $fields, mixed $object = null): array
+    {
+        $secret = Arr::get($fields, 'down_presets.secret');
+
+        if ($secret === null) {
+            return $fields;
+        }
+
+        if ($secret === '') {
+            if ($object !== null) {
+                $existing = is_array($object->down_presets ?? null) ? $object->down_presets : [];
+                Arr::set($fields, 'down_presets.secret', $existing['secret'] ?? null);
+            }
+
+            return $fields;
+        }
+
+        if (is_string($secret) && ! $this->alreadyEncrypted($secret)) {
+            Arr::set($fields, 'down_presets.secret', encrypt($secret, false));
         }
 
         return $fields;

@@ -247,6 +247,8 @@ class Component extends LaravelComponent
             $attributes
         ));
 
+        $this->attributesHydrated = true;
+
         return $this;
     }
 

@@ -35,6 +35,11 @@ return [
                 'icon' => '$header',
             ],
             ...Navigation::systemMenu(),
+            '_artisan_runner' => [
+                'name' => 'Artisan Runner',
+                'icon' => 'mdi-console',
+                'route_name' => 'admin.artisan-runner',
+            ],
             'media_library' => [
                 'name' => 'Media Library',
                 'icon' => '$media',
