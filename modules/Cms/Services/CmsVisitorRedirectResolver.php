@@ -11,6 +11,7 @@ use Modules\Cms\Contracts\CmsVisitorRequestContextResolverInterface;
 use Modules\Cms\Entities\Redirect;
 use Modules\Cms\Entities\UrlRoute;
 use Modules\Cms\Routing\CmsFrontRouteLocalizationBinding;
+use Modules\Cms\Routing\CmsPublicSystemRoutes;
 use Modules\Cms\Support\CmsFrontPath;
 use Modules\Cms\Support\CmsSluglessFallbackLocale;
 use Unusualify\Modularous\Facades\Modularous;
@@ -61,18 +62,12 @@ final class CmsVisitorRedirectResolver implements CmsVisitorRequestContextResolv
     public function shouldExcludeRequest(Request $request): bool
     {
         $normalized = $this->canonicalUrlResolver->normalizePath($request->path());
-        $previewPrefix = '/' . trim((string) modularousConfig('cms_routing.signed_preview.path_prefix', 'cms/preview'), '/');
-        if (modularousConfig('cms_routing.signed_preview.enabled', true)
-            && $previewPrefix !== '/'
-            && ($normalized === $previewPrefix || str_starts_with($normalized, $previewPrefix . '/'))) {
-            return true;
-        }
 
-        $stylesheetPrefix = '/' . trim((string) modularousConfig('cms_stylesheets.public_route.path_prefix', 'cms/stylesheets'), '/');
-        if ((bool) modularousConfig('cms_stylesheets.public_route.enabled', true)
-            && $stylesheetPrefix !== '/'
-            && ($normalized === $stylesheetPrefix || str_starts_with($normalized, $stylesheetPrefix . '/'))) {
-            return true;
+        foreach (CmsPublicSystemRoutes::reservedPathPrefixes() as $prefix) {
+            $p = '/' . trim($prefix, '/');
+            if ($p !== '/' && ($normalized === $p || str_starts_with($normalized, $p . '/'))) {
+                return true;
+            }
         }
 
         $first = explode('/', trim($normalized, '/'))[0] ?? '';

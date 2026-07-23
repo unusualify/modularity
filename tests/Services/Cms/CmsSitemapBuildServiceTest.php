@@ -33,6 +33,7 @@ class CmsSitemapBuildServiceTest extends TestCase
         $build = $this->app->make(CmsSitemapBuildService::class);
         $xml = $build->buildXml();
         $this->assertStringContainsString('<urlset', $xml);
+        $this->assertStringContainsString('<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>', $xml);
         $this->assertStringNotContainsString('<url>', $xml);
     }
 
@@ -45,6 +46,14 @@ class CmsSitemapBuildServiceTest extends TestCase
         $sample = '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>' . "\n";
         $cache->commit($sample);
         $this->assertSame($sample, $cache->getCommittedXml());
+    }
+
+    public function test_empty_urlset_includes_stylesheet_pi(): void
+    {
+        $cache = $this->app->make(CmsSitemapCacheService::class);
+        $xml = $cache->emptyUrlset();
+        $this->assertStringContainsString('<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>', $xml);
+        $this->assertStringContainsString('<urlset', $xml);
     }
 
     public function test_get_panel_item_rows_is_empty_without_urlable_data(): void

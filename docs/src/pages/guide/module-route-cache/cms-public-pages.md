@@ -8,6 +8,8 @@ outline: deep
 
 Public CMS pages can opt into the **`presentationItem`** cache type — file-primary HTML keyed by locale + URL path, configured per route at `CmsController::renderPublicCmsPresentation()`. Admin types (`formItem`, `formattedItem`, etc.) stay on Redis.
 
+For CMS routing, layouts, and stylesheets, see the [CMS guide](/guide/cms/overview).
+
 See [URL Stale Resilience](./url-stale-resilience) for the disk-first middleware, path layout, and [multi-node extension point](./url-stale-resilience#multi-node-scaling).
 
 ## Two Layers

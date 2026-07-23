@@ -103,24 +103,100 @@
       </template>
     </v-data-table>
 
-    <v-card
-      v-if="lastDryPayload"
-      class="mt-6"
+    <div
+      v-if="lastDryPayload && !dryRunPreviewOpen"
+      class="mt-4"
     >
-      <v-card-title class="text-subtitle-1">
-        {{ t('modules.cms.sitemap.last_dry', 'Last dry-run') }}
-      </v-card-title>
-      <v-card-text>
-        <div class="text-body-2 mb-2">
-          {{ t('modules.cms.sitemap.url_count', 'URL count') }}: {{ lastDryPayload.urlCount }}
-          ·
-          {{ t('modules.cms.sitemap.bytes', 'Bytes') }}: {{ lastDryPayload.bytes }}
-        </div>
-        <pre
-          class="text-caption overflow-auto sitemap-xml-preview"
-        >{{ lastDryPayload.xml }}</pre>
-      </v-card-text>
-    </v-card>
+      <v-btn
+        variant="tonal"
+        color="primary"
+        prepend-icon="mdi-eye"
+        @click="dryRunPreviewOpen = true"
+      >
+        {{ t('modules.cms.sitemap.reopen_preview', 'Reopen last dry-run preview') }}
+      </v-btn>
+    </div>
+
+    <v-dialog
+      v-model="dryRunPreviewOpen"
+      max-width="1280"
+      width="92vw"
+      scrollable
+    >
+      <v-card v-if="lastDryPayload">
+        <v-card-title class="d-flex align-center flex-wrap ga-2 pe-2">
+          <span class="text-subtitle-1">
+            {{ t('modules.cms.sitemap.last_dry', 'Last dry-run') }}
+          </span>
+          <v-spacer />
+          <span class="text-body-2 text-medium-emphasis font-weight-regular">
+            {{ t('modules.cms.sitemap.url_count', 'URL count') }}: {{ lastDryPayload.urlCount }}
+            ·
+            {{ t('modules.cms.sitemap.bytes', 'Bytes') }}: {{ lastDryPayload.bytes }}
+          </span>
+          <v-btn
+            icon="mdi-close"
+            variant="text"
+            size="small"
+            @click="dryRunPreviewOpen = false"
+          />
+        </v-card-title>
+
+        <v-tabs
+          v-model="dryRunPreviewTab"
+          color="primary"
+          density="compact"
+          class="px-4"
+        >
+          <v-tab value="browser">
+            {{ t('modules.cms.sitemap.preview_browser', 'Browser view') }}
+          </v-tab>
+          <v-tab value="raw">
+            {{ t('modules.cms.sitemap.preview_raw', 'Raw XML') }}
+          </v-tab>
+        </v-tabs>
+
+        <v-divider />
+
+        <v-card-text class="pa-0 sitemap-preview-dialog-body">
+          <v-tabs-window v-model="dryRunPreviewTab">
+            <v-tabs-window-item value="browser">
+              <div class="pa-4">
+                <iframe
+                  v-if="lastDryPayload.html"
+                  class="sitemap-html-preview"
+                  title="Sitemap dry-run preview"
+                  :srcdoc="lastDryPayload.html"
+                />
+                <v-alert
+                  v-else
+                  type="warning"
+                  variant="tonal"
+                  density="compact"
+                >
+                  {{ t('modules.cms.sitemap.styled_preview_unavailable', 'Styled preview unavailable; use the Raw XML tab.') }}
+                </v-alert>
+              </div>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="raw">
+              <pre class="text-caption overflow-auto sitemap-xml-preview ma-4">{{ lastDryPayload.xml }}</pre>
+            </v-tabs-window-item>
+          </v-tabs-window>
+        </v-card-text>
+
+        <v-divider />
+
+        <v-card-actions>
+          <v-spacer />
+          <v-btn
+            variant="text"
+            @click="dryRunPreviewOpen = false"
+          >
+            {{ te('messages.close') ? t('messages.close') : 'Close' }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
     <v-dialog
       v-model="confirmCommit"
@@ -248,15 +324,55 @@
   const loadingCommit = ref(false)
   const lastDryPayload = ref(null)
   const confirmCommit = ref(false)
+  const dryRunPreviewOpen = ref(false)
+  const dryRunPreviewTab = ref('browser')
+
+  function transformXmlWithXsl (xmlString, xslString) {
+    if (!xmlString || !xslString || typeof window.XSLTProcessor === 'undefined') {
+      return null
+    }
+    try {
+      const parser = new DOMParser()
+      const xmlDoc = parser.parseFromString(xmlString, 'application/xml')
+      const xslDoc = parser.parseFromString(xslString, 'application/xml')
+      if (xmlDoc.querySelector('parsererror') || xslDoc.querySelector('parsererror')) {
+        return null
+      }
+      const proc = new XSLTProcessor()
+      proc.importStylesheet(xslDoc)
+      const result = proc.transformToDocument(xmlDoc)
+      if (!result) {
+        return null
+      }
+      return new XMLSerializer().serializeToString(result)
+    } catch (e) {
+      console.warn('[CmsSitemap] client XSLT failed', e)
+      return null
+    }
+  }
+
+  function withStyledHtml (payload) {
+    if (!payload || typeof payload !== 'object') {
+      return payload
+    }
+    if (payload.html) {
+      return payload
+    }
+    const html = transformXmlWithXsl(payload.xml, payload.xsl)
+    return html ? { ...payload, html } : payload
+  }
 
   async function runDryRun () {
     const url = sitemapEndpoints.value.dryRun
     if (!url) { return }
     loadingDry.value = true
     lastDryPayload.value = null
+    dryRunPreviewOpen.value = false
     try {
       const { data } = await postJson(url, {})
-      lastDryPayload.value = data
+      lastDryPayload.value = withStyledHtml(data)
+      dryRunPreviewTab.value = lastDryPayload.value?.html ? 'browser' : 'raw'
+      dryRunPreviewOpen.value = true
       openAlert({
         message: t('modules.cms.sitemap.dry_ok', 'Dry-run complete.'),
         variant: 'success',
@@ -332,5 +448,20 @@
 <style scoped>
 .sitemap-cf { min-width: 150px; max-width: 200px; }
 .sitemap-prio { max-width: 110px; }
-.sitemap-xml-preview { max-height: 280px; }
+.sitemap-preview-dialog-body {
+  min-height: 60vh;
+}
+.sitemap-xml-preview {
+  max-height: calc(70vh - 48px);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.sitemap-html-preview {
+  display: block;
+  width: 100%;
+  height: calc(70vh - 48px);
+  border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+  border-radius: 8px;
+  background: #fff;
+}
 </style>

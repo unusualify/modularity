@@ -8,6 +8,7 @@ use Modules\Cms\Services\CmsSitemapCacheService;
 return [
     /**
      * GET /sitemap.xml serves committed XML from cache ({@see CmsSitemapCacheService}).
+     * When enabled, also registers GET /sitemap.xsl (browser XSLT; cosmetic only).
      */
     'route_enabled' => env('MODULAROUS_CMS_SITEMAP_ROUTE_ENABLED', true),
 
