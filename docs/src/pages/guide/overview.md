@@ -5,7 +5,21 @@ sidebarTitle: Guide Overview
 
 # Guide
 
-This section covers UI components, forms, and tables used in admin panel of Modularous.
+This section covers UI components, forms, tables, and CMS public-site features in Modularous.
+
+## CMS
+
+| Page | Description |
+|------|-------------|
+| [CMS Overview](/guide/cms/overview) | Building blocks, request flow, relationships |
+| [Public routing](/guide/cms/public-routing) | Catch-all order, host `web.php`, excludes |
+| [Parent segments & URL routes](/guide/cms/parent-segments-and-url-routes) | Prefixes + UrlRoute registry |
+| [Stylesheets](/guide/cms/stylesheets) | CSS bundles + public `.css` route |
+| [Layout builders](/guide/cms/layout-builders) | Document shells + Blade sources |
+| [Page layouts](/guide/cms/page-layouts) | Per-model presentation shells |
+| [Redirects](/guide/cms/redirects) | Visitor redirect rules |
+| [Sitemap & SEO](/guide/cms/sitemap-and-seo) | `/sitemap.xml`, robots.txt |
+| [Configuration](/guide/cms/configuration) | `modularous.cms_*` keys |
 
 ## Components
 
