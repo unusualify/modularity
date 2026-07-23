@@ -12,7 +12,7 @@ use Unusualify\Modularous\Module;
 use Unusualify\Modularous\Support\ModularousRoutes;
 use Unusualify\Modularous\Tests\Support\IsolatedTestModules;
 
-abstract class TestModulesCase extends TestCase
+abstract class TestModulesCase extends RepositoryTestCase
 {
     protected $statusesFilePath;
 

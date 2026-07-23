@@ -4,13 +4,15 @@ namespace Modules\SystemNotification\Events;
 
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Unusualify\Modularous\Events\Traits\GatesBroadcastAvailability;
 
-class StateableUpdated implements ShouldDispatchAfterCommit
+class StateableUpdated implements ShouldBroadcast, ShouldDispatchAfterCommit
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use Dispatchable, InteractsWithSockets, SerializesModels, GatesBroadcastAvailability;
 
     /**
      * The name of the queue connection to use when broadcasting the event.
@@ -35,6 +37,25 @@ class StateableUpdated implements ShouldDispatchAfterCommit
     {
         return [
             new Channel('stateable'),
+        ];
+    }
+
+    public function broadcastAs(): string
+    {
+        return 'modularous.stateable.updated';
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function broadcastWith(): array
+    {
+        return [
+            'id' => $this->model->id ?? null,
+            'model_type' => get_class($this->model),
+            'model_id' => $this->model->id ?? null,
+            'new_state' => is_object($this->newState) ? ($this->newState->code ?? $this->newState->id ?? null) : $this->newState,
+            'old_state' => is_object($this->oldState) ? ($this->oldState->code ?? $this->oldState->id ?? null) : $this->oldState,
         ];
     }
 }

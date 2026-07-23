@@ -3,11 +3,15 @@
 namespace Unusualify\Modularous\Providers;
 
 use Camroncade\Timezone\TimezoneServiceProvider;
+use Nwidart\Modules\LaravelModulesServiceProvider;
 use Torann\GeoIP\GeoIPServiceProvider;
 
 class ModularousProvider extends ServiceProvider
 {
     protected $providers = [
+        // Bind ActivatorInterface when package:discover only loads this package.
+        LaravelModulesServiceProvider::class,
+
         // Third Party Providers
         GeoIPServiceProvider::class,
         TimezoneServiceProvider::class,
@@ -16,9 +20,11 @@ class ModularousProvider extends ServiceProvider
         BaseServiceProvider::class,
         ModuleServiceProvider::class,
         SecurityServiceProvider::class,
+        RemoteApiServiceProvider::class,
         RouteServiceProvider::class,
         AuthServiceProvider::class,
         CoverageServiceProvider::class,
+        ArtisanRunnerServiceProvider::class,
 
         // AuthServiceProvider::class,
         // ValidationServiceProvider::class,

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Unusualify\Modularous\Entities\User;
 use Unusualify\Modularous\Models\Model;
 use Unusualify\Modularous\Traits\ManageTraits;
 
@@ -380,12 +381,12 @@ trait MethodTransformers
      * @param array $scope
      * @return array
      */
-    public function getFormActions($scope = [])
+    public function getFormActions(?User $user, array $scope = [])
     {
         $formActions = [];
 
         foreach ($this->traitsMethods(__FUNCTION__) as $method) {
-            $formActions = array_merge($formActions, $this->$method($scope));
+            $formActions = array_merge($formActions, $this->$method($user, $scope));
         }
 
         return $formActions;

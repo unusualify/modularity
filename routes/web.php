@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Session;
 use Unusualify\Modularous\Http\Controllers\Utility\ChatController;
 use Unusualify\Modularous\Http\Controllers\Utility\ProcessController;
 use Unusualify\Modularous\Http\Controllers\Utility\TagController;
+use Unusualify\Modularous\Http\Controllers\ArtisanRunner\ArtisanRunnerController;
+use Unusualify\Modularous\Http\Controllers\ArtisanRunner\ArtisanRunnerToolController;
 
 /*
 |--------------------------------------------------------------------------
@@ -44,6 +46,8 @@ Route::put('profile/ui-preferences', 'Utility\UIPreferencesController@update')->
 
 Route::resource('', 'DashboardController', ['as' => 'dashboard', 'names' => ['index' => 'dashboard']])->only(['index']);
 
+Route::get('artisan-runner', ArtisanRunnerToolController::class)->name('artisan-runner');
+
 Route::get('users/impersonate/stop', 'Utility\ImpersonateController@stopImpersonate')->name('impersonate.stop');
 Route::get('users/impersonate/{id}', 'Utility\ImpersonateController@impersonate')->name('impersonate');
 
@@ -75,6 +79,17 @@ Route::prefix('api')->group(function () {
         Route::get('{process}', [ProcessController::class, 'show'])->name('show');
         Route::put('{process}', [ProcessController::class, 'update'])->name('update');
     });
+
+    ############## ArtisanRunner API routes ##############
+    Route::group(['prefix' => 'artisan-runner', 'as' => 'artisan-runner.', 'controller' => ArtisanRunnerController::class], function () {
+        Route::get('commands', 'commands')->name('commands');
+        Route::get('commands/{name}', 'definition')
+            ->where('name', '.*')
+            ->name('commands.show');
+        Route::post('runs', 'run')->name('runs');
+        Route::post('runs/{runId}/answer', 'answer')->name('runs.answer');
+    });
+    ############## End of ArtisanRunner API routes ##############
 
     Route::group(['prefix' => 'tag', 'as' => 'tag.', 'controller' => TagController::class], function () {
         Route::get('index', 'index')->name('index');

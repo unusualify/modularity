@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Unusualify\Modularous\Repositories\Traits;
 
 use Illuminate\Database\Eloquent\Model;
+use Unusualify\Modularous\Entities\User;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Services\RemoteApi\AbstractRemoteApiConnector;
 use Unusualify\Modularous\Services\RemoteApi\Contracts\RemoteApiConnectorInterface;
@@ -206,7 +207,7 @@ trait RemoteApiSourceTrait
     /**
      * @return array<string, array<string, mixed>>
      */
-    public function getFormActionsRemoteApiSourceTrait($scope = []): array
+    public function getFormActionsRemoteApiSourceTrait(?User $user, array $scope = []): array
     {
         if (! $this->remoteApiConnectorIsEnabled()) {
             return [];

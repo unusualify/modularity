@@ -1,5 +1,5 @@
 ---
-sidebarPos: 3
+sidebarPos: 4
 sidebarTitle: Troubleshooting
 outline: deep
 ---

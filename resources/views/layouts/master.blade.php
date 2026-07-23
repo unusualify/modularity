@@ -125,8 +125,11 @@
         uiPreferences: {!! json_encode(get_modularous_ui_preferences()) !!},
         uiPreferencesEndpoint: '{{ \Illuminate\Support\Facades\Route::hasAdmin("profile.ui-preferences") ? route(\Illuminate\Support\Facades\Route::hasAdmin("profile.ui-preferences")) : "" }}',
     },
+    @php
+        $modularousGuardUser = auth(\Unusualify\Modularous\Facades\Modularous::getAuthGuardName())->user();
+    @endphp
     window['{{ modularousConfig('js_namespace') }}'].STORE.user = {
-        isGuest: {{ json_encode(auth()->guest()) }},
+        isGuest: {{ json_encode($modularousGuardUser === null) }},
         profile: {!! json_encode($currentUser) !!},
         profileRoute: '{{ route(Route::hasAdmin('profile.update')) }}',
         profileShortcutModel: {!! json_encode($profileShortcutModel ?? new StdClass()) !!},
@@ -136,6 +139,7 @@
         loginShortcutSchema: {!! json_encode($loginShortcutSchema ?? new StdClass()) !!},
         loginRoute: '{{ route('admin.login') }}',
     },
+    window['{{ modularousConfig('js_namespace') }}'].STORE.broadcast = {!! json_encode(\Unusualify\Modularous\Services\BroadcastManager::panelConfig($modularousGuardUser)) !!},
 
     @if (modularousConfig('enabled.media-library'))
         window['{{ modularousConfig('js_namespace') }}'].STORE.medias.types.push({

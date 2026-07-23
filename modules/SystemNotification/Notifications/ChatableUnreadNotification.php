@@ -10,6 +10,18 @@ use Unusualify\Modularous\Facades\ModularousLog;
 
 class ChatableUnreadNotification extends FeatureNotification implements AfterSendable, ShouldQueue
 {
+    /**
+     * Fallback when config channels are unset or blank (empty env override).
+     *
+     * @var array<string>
+     */
+    public $defaultChannels = ['database', 'mail', 'broadcast'];
+
+    /**
+     * Guard so multi-channel NotificationSent hooks only stamp once.
+     */
+    protected bool $notifiedAtStamped = false;
+
     public function __construct(Chat $model)
     {
         parent::__construct($model->chatable);
@@ -68,9 +80,23 @@ class ChatableUnreadNotification extends FeatureNotification implements AfterSen
 
     public function afterNotificationSent($notifiable): void
     {
+        // Idempotent: handleChatableNotification also stamps notified_at after notifyNow.
+        // Keep this as a safety net when the notification is sent outside the scheduler.
+        if ($this->notifiedAtStamped) {
+            return;
+        }
+
         try {
-            $this->model->latestChatMessage()->first()->touchQuietly('notified_at');
-        } catch (\Exception $e) {
+            $message = $this->model->latestChatMessage()->first();
+            if (! $message || $message->notified_at) {
+                $this->notifiedAtStamped = true;
+
+                return;
+            }
+
+            $message->forceFill(['notified_at' => now()])->saveQuietly();
+            $this->notifiedAtStamped = true;
+        } catch (\Throwable $e) {
             ModularousLog::error('Error updating notified_at for chatable model: ' . get_class($this->model), [
                 'model' => $this->model,
                 'error' => $e->getMessage(),

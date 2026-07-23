@@ -19,6 +19,7 @@ return [
     'mail_override_enabled' => (bool) env('MODULAROUS_SYSTEM_SETTINGS_MAIL_OVERRIDE', false),
     'sensitive_keys' => [
         'smtp.password',
+        'down_presets.secret',
     ],
     'extra_inputs' => [],
     'input_overrides' => [],

@@ -7,7 +7,9 @@ namespace Unusualify\Modularous\Tests\Jobs\Cache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
+use Unusualify\Modularous\Events\Cache\CacheWarmProgress;
 use Unusualify\Modularous\Facades\ModularousCache;
 use Unusualify\Modularous\Jobs\Cache\WarmPresentationItemJob;
 use Unusualify\Modularous\Tests\TestCase;
@@ -55,6 +57,9 @@ class WarmPresentationItemJobTest extends TestCase
     {
         $model = WarmPresentationItemTestModel::query()->create(['name' => 'Cached']);
 
+        ModularousCache::shouldReceive('isEnabled')
+            ->with('Blog', 'BlogLanding', 'presentationItem')
+            ->andReturn(true);
         ModularousCache::shouldReceive('refreshModelCaches')
             ->once()
             ->withArgs(function (Model $passedModel, array $types, array $options) use ($model) {
@@ -77,6 +82,9 @@ class WarmPresentationItemJobTest extends TestCase
         $stale->id = $model->getKey();
         $stale->exists = false;
 
+        ModularousCache::shouldReceive('isEnabled')
+            ->with('Blog', 'BlogLanding', 'presentationItem')
+            ->andReturn(true);
         ModularousCache::shouldReceive('refreshModelCaches')
             ->once()
             ->withArgs(function (Model $passedModel) use ($model) {
@@ -84,6 +92,68 @@ class WarmPresentationItemJobTest extends TestCase
             });
 
         (new WarmPresentationItemJob($stale, 'Blog', 'BlogLanding'))->handle();
+    }
+
+    /** @test */
+    public function it_broadcasts_structured_toast_with_module_route_id_detail(): void
+    {
+        Event::fake([CacheWarmProgress::class]);
+
+        $model = WarmPresentationItemTestModel::query()->create(['name' => 'Cached']);
+
+        ModularousCache::shouldReceive('isEnabled')
+            ->with('Blog', 'Post', 'presentationItem')
+            ->andReturn(true);
+        ModularousCache::shouldReceive('refreshModelCaches')->once();
+
+        (new WarmPresentationItemJob($model, 'Blog', 'Post', 'en', 42))->handle();
+
+        Event::assertDispatched(CacheWarmProgress::class, function (CacheWarmProgress $event) use ($model) {
+            if ($event->status !== CacheWarmProgress::STATUS_COMPLETED) {
+                return false;
+            }
+
+            $toast = $event->broadcastWith()['toast'] ?? null;
+
+            return $event->initiatorUserId === 42
+                && is_array($toast)
+                && ($toast['title'] ?? null) === __('messages.resource-cache.warm-toast.presentation-item.title')
+                && ($toast['description'] ?? null) === __('messages.resource-cache.warm-toast.presentation-item.completed')
+                && ($toast['detail'] ?? null) === 'Blog:Post:'.$model->getKey()
+                && ($toast['variant'] ?? null) === 'success';
+        });
+    }
+
+    /** @test */
+    public function it_broadcasts_skipped_when_presentation_cache_is_disabled(): void
+    {
+        Event::fake([CacheWarmProgress::class]);
+
+        $model = WarmPresentationItemTestModel::query()->create(['name' => 'Cached']);
+
+        ModularousCache::shouldReceive('isEnabled')
+            ->with('Blog', 'Post', 'presentationItem')
+            ->andReturn(false);
+        ModularousCache::shouldReceive('refreshModelCaches')->never();
+
+        (new WarmPresentationItemJob($model, 'Blog', 'Post', 'en', 42))->handle();
+
+        Event::assertDispatched(CacheWarmProgress::class, function (CacheWarmProgress $event) use ($model) {
+            if ($event->status !== CacheWarmProgress::STATUS_SKIPPED) {
+                return false;
+            }
+
+            $payload = $event->broadcastWith();
+            $toast = $payload['toast'] ?? null;
+
+            return $event->initiatorUserId === 42
+                && $event->broadcastAs() === 'modularous.cache.warm.skipped'
+                && ($payload['skipped'] ?? false) === true
+                && ($payload['reason'] ?? null) === 'cache_disabled'
+                && is_array($toast)
+                && ($toast['variant'] ?? null) === 'warning'
+                && ($toast['detail'] ?? null) === 'Blog:Post:'.$model->getKey();
+        });
     }
 }
 

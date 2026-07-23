@@ -22,6 +22,7 @@ enum Permission: string
     case REVISION_APPROVE = 'revisionApprove';
     case REVISION_REJECT = 'revisionReject';
     case REVISION_RESTORE = 'revisionRestore';
+    case CACHING = 'caching';
 
     case ACTIVITY = 'activity';
     case SHOW = 'show';

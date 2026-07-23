@@ -42,14 +42,22 @@ class ChatableScheduler extends Command
     {
         try {
             $models = ModularousFinder::getModelsWithTrait(Chatable::class);
+            $processed = 0;
 
             foreach ($models as $model) {
-                $model::hasNotifiableMessage()->chunk(100, function ($items) {
+                $model::hasNotifiableMessage()->chunk(100, function ($items) use (&$processed) {
                     foreach ($items as $item) {
                         $item->handleChatableNotification();
+                        $processed++;
                     }
                 });
             }
+
+            Log::channel('scheduler')
+                ->info('Modularous: Chatable scheduler completed', [
+                    'models' => count($models),
+                    'processed' => $processed,
+                ]);
         } catch (\Throwable $th) {
             Log::channel('scheduler')
                 ->error('Modularous: Chatable scheduler error', [

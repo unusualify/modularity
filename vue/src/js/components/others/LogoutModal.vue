@@ -36,7 +36,7 @@
           <v-btn class="" variant="outlined" @click="dialog=false" density="compact">
             {{ $t('authentication.logout-cancel') }}
           </v-btn>
-          <v-form method="post" action="/logout">
+          <v-form method="post" action="/logout" @submit="disconnectBroadcasting">
             <input type="hidden" name="_token" :value="$csrf()">
             <v-btn variant="elevated" type="submit" density="compact">
               {{ $t('authentication.logout-confirm') }}
@@ -60,6 +60,20 @@ export default {
   data () {
     return {
       dialog: false
+    }
+  },
+  methods: {
+    disconnectBroadcasting () {
+      // Close WS before session invalidate so presence members get member_removed.
+      if (typeof window.disconnectEcho === 'function') {
+        window.disconnectEcho()
+        return
+      }
+      try {
+        window.Echo?.disconnect?.()
+      } catch (_) {
+        // ignore
+      }
     }
   }
 }

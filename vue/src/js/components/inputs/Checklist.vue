@@ -4,15 +4,15 @@
     hideDetails="auto"
     :disabled="disabled"
     class="v-input-checklist"
-    >
-    <template v-slot:default="defaultSlot">
-      <div
-        :class="[
-          'w-100 d-flex flex-wrap',
-        ]"
-        style="max-width: 100%;"
-      >
-        <div v-if="label"
+  >
+    <template v-slot:default>
+      <!--
+        Isolate leaf controls from VForm. Each nested v-checkbox/v-input would
+        otherwise register (~items.length fields) and keep form validity at null.
+      -->
+      <checklist-form-isolation class="w-100 d-flex flex-wrap" style="max-width: 100%;">
+        <div
+          v-if="label"
           class="d-flex flex-column mb-2 mr-md-3"
           :style="[
             'max-width: 100%;',
@@ -22,7 +22,8 @@
           <ue-title v-if="label" padding="" data-test="title" :color="labelColor" transform="none">
             <span v-html="label"></span>
           </ue-title>
-          <ue-title v-if="subtitle"
+          <ue-title
+            v-if="subtitle"
             padding=""
             type="caption"
             weight="medium"
@@ -34,27 +35,27 @@
           </ue-title>
         </div>
 
-        <v-divider v-if="(flexColumn && $vuetify.display.mdAndUp) && (label || subtitle)" vertical class="mr-3 border-current"></v-divider>
+        <v-divider
+          v-if="(flexColumn && $vuetify.display.mdAndUp) && (label || subtitle)"
+          vertical
+          class="mr-3 border-current"
+        />
 
         <!-- treeview -->
-        <v-row v-if="isTreeview"
+        <v-row
+          v-if="isTreeview"
           :style="[
             flexColumn && $vuetify.display.mdAndUp ? 'flex: 1 0 70%;' : 'flex: 1 1;'
           ]"
         >
-          <v-col v-bind="{...treeviewCols}">
-
+          <v-col v-bind="{ ...treeviewCols }">
             <v-list
               v-model:opened="openedGroups"
-              :class="[
-                'd-flex flex-column',
-                `ga-${groupExpandGap}`
-              ]"
+              :class="['d-flex flex-column', `ga-${groupExpandGap}`]"
             >
-
               <template
                 v-for="(group, key) in groupedItems"
-                :key="`checkbox-${key}`"
+                :key="`group-${group.name ?? key}`"
               >
                 <!-- group items -->
                 <template v-if="$isset(group.items) && group.items.length > 0">
@@ -63,216 +64,219 @@
                     collapse-icon=""
                     expand-icon=""
                     :value="group.name"
-                    >
-
-                    <!-- group expand activator -->
-                    <template v-slot:activator="{ props, isOpen }">
-                      <v-checkbox v-if="!noGroupAllSelectable"
-                        class="ue-checklist-checkbox"
-                        :label="group[`${itemTitle}`]"
-                        color="success"
-                        hide-details
-                        :indeterminate="isIndeterminateGroup(group)"
-                        density="compact"
-                        :modelValue="isAllSelected(group)"
-                        @update:modelValue="updatedParent($event, group)"
-                        :readonly="isMandatoryItem(group) || readonly"
-
-                        v-bind="props"
+                  >
+                    <template v-slot:activator="{ props: activatorProps, isOpen }">
+                      <div
+                        v-if="!noGroupAllSelectable"
+                        class="d-flex align-center ue-checklist-checkbox"
+                        v-bind="activatorProps"
                       >
-                        <template v-if="!chunkField" v-slot:prepend>
-                          <v-icon
-                            v-bind="props"
-                            :icon="!isOpen ? '$expand' : '$collapse'"
-                            >
-                          </v-icon>
-                        </template>
-                        <template #label="labelScope">
-                          <label v-bind="props">
-                            {{ labelScope.label }}
-                          </label>
-                        </template>
-                      </v-checkbox>
-                      <ue-title v-else
-                        :text="group.title ?? group[`${itemTitle}`]"
+                        <v-icon
+                          v-if="!chunkField"
+                          class="mr-1"
+                          :icon="!isOpen ? '$expand' : '$collapse'"
+                        />
+                        <v-checkbox-btn
+                          :label="group[itemTitle]"
+                          color="success"
+                          density="compact"
+                          :indeterminate="isIndeterminateGroup(group)"
+                          :model-value="isAllSelected(group)"
+                          :readonly="isMandatoryItem(group) || readonly"
+                          @update:model-value="updatedParent($event, group)"
+                        >
+                          <template #label="{ label: groupLabel, props: labelProps }">
+                            <label v-bind="labelProps">{{ groupLabel }}</label>
+                          </template>
+                        </v-checkbox-btn>
+                      </div>
+                      <ue-title
+                        v-else
+                        :text="group.title ?? group[itemTitle]"
                         type="body-1"
                         color="grey-darken-5"
                         weight="bold"
                         justify="space-between"
-                        v-bind="{...groupExpandTitleProps, ...props}"
+                        v-bind="{ ...groupExpandTitleProps, ...activatorProps }"
                       >
                         <template v-slot:right>
                           <div class="d-flex align-center">
-                            <v-icon
-                              :icon="!isOpen ? '$expand' : '$collapse'"
-                              >
-                            </v-icon>
+                            <v-icon :icon="!isOpen ? '$expand' : '$collapse'" />
                           </div>
                         </template>
                       </ue-title>
-                      <v-divider v-if="hasGroupBottomDivider" class="mt-0"></v-divider>
+                      <v-divider v-if="hasGroupBottomDivider" class="mt-0" />
                     </template>
 
-                    <!-- list items -->
-                    <v-list-item v-if="chunkField"
-                      style="padding-inline-start: 0px !important;"
-                    >
-                      <v-row
-                        no-gutters
-                        :style="[
-                          !flexColumn ? 'flex: 1 0 60%;' : ''
-                        ]"
+                    <!-- Only mount open group children (large permission lists) -->
+                    <template v-if="isGroupOpened(group.name)">
+                      <v-list-item
+                        v-if="chunkField"
+                        style="padding-inline-start: 0px !important;"
                       >
-                        <v-col
-                          v-for="(item, index) in group.items"
-                          :key="`checkbox-${index}`"
-                          v-bind="checkboxCol"
-                          class="pb-0 pr-0 "
+                        <v-row
+                          no-gutters
+                          :style="[!flexColumn ? 'flex: 1 0 60%;' : '']"
                         >
-                          <div
-                            :class="getCheckboxContainerClasses(item)"
+                          <v-col
+                            v-for="item in group.items"
+                            :key="`checkbox-${item[itemValue]}`"
+                            v-bind="checkboxCol"
+                            class="pb-0 pr-0"
                           >
-                            <!-- checkbox -->
-                            <v-checkbox
-                              data-test="checkbox"
-                              v-model="input"
-                              :disabled="($attrs.disabled ?? false) || (!canSelectMore() && !input.includes(item[itemValue]))"
-                              :value="item[itemValue]"
-                              :color="checkboxColor ?? color ?? 'primary'"
-                              hide-details
-                              :label="item[itemTitle]"
-                              :class="getCheckboxClasses(item)"
-                              :readonly="isMandatoryItem(item) || isProtected(item[itemValue]) || readonly"
-                            >
-                              <template v-slot:label="labelScope">
-                                <span :style="{fontSize: labelFontSize}" v-bind="labelScope.props">{{ labelScope.label }}</span>
-                              </template>
-                            </v-checkbox>
+                            <div :class="getCheckboxContainerClasses(item)">
+                              <v-checkbox-btn
+                                data-test="checkbox"
+                                :model-value="input"
+                                :value="item[itemValue]"
+                                :disabled="isItemDisabled(item)"
+                                :color="checkboxColor ?? color ?? 'primary'"
+                                :label="item[itemTitle]"
+                                :class="getCheckboxClasses(item)"
+                                :readonly="isMandatoryItem(item) || isProtected(item[itemValue]) || readonly"
+                                @update:model-value="onSelectionChange"
+                              >
+                                <template v-slot:label="{ label: itemLabel, props: labelProps }">
+                                  <span :style="{ fontSize: labelFontSize }" v-bind="labelProps">{{ itemLabel }}</span>
+                                </template>
+                              </v-checkbox-btn>
+                            </div>
+                          </v-col>
+                        </v-row>
+                      </v-list-item>
 
-                          </div>
-                        </v-col>
-                      </v-row>
-                    </v-list-item>
-
-                    <v-list-item v-else
-                      v-for="(item, i) in group.items"
-                      :key="`checkbox-${i}`"
-                      class="pl-0"
-                    >
-                      <v-checkbox
-                        class="ue-checklist-checkbox"
-                        v-model="input"
-                        :label="item[`${itemTitle}`]"
-                        :value="item[`${itemValue}`]"
-                        :disabled="!canSelectMore() && !input.includes(item[itemValue])"
-                        color="success"
-                        hide-details
-                        density="compact"
-                        :readonly="isMandatoryItem(item) || readonly"
+                      <v-list-item
+                        v-for="item in group.items"
+                        v-else
+                        :key="`checkbox-${item.id}`"
+                        class="pl-0"
                       >
-                        <template v-slot:label="labelScope">
-                          <span :style="{fontSize: labelFontSize}" v-bind="labelScope.props">{{ labelScope.label }}</span>
-                        </template>
-                      </v-checkbox>
-                    </v-list-item>
-
+                        <v-checkbox-btn
+                          data-test="checkbox"
+                          class="ue-checklist-checkbox"
+                          :model-value="input"
+                          :label="item.name"
+                          :value="item.id"
+                          :disabled="isItemDisabled(item)"
+                          color="success"
+                          density="compact"
+                          :readonly="isMandatoryItem(item) || readonly"
+                          @update:model-value="onSelectionChange"
+                        >
+                          <template v-slot:label="{ label: itemLabel, props: labelProps }">
+                            <span :style="{ fontSize: labelFontSize }" v-bind="labelProps">{{ itemLabel }}</span>
+                          </template>
+                        </v-checkbox-btn>
+                      </v-list-item>
+                    </template>
                   </v-list-group>
                 </template>
 
                 <!-- single item -->
                 <template v-else>
-                  <v-list-item
-                    class="pl-0"
-                    >
-                    <v-checkbox
-                      v-model="input"
-                      :label="group[`${itemTitle}`]"
-                      :value="group[`${itemValue}`]"
-                      :disabled="!canSelectMore() && !input.includes(group[itemValue])"
+                  <v-list-item class="pl-0">
+                    <v-checkbox-btn
+                      :model-value="input"
+                      :label="group[itemTitle]"
+                      :value="group[itemValue]"
+                      :disabled="isItemDisabled(group)"
                       :readonly="isMandatoryItem(group) || isProtected(group[itemValue]) || readonly"
                       color="success"
-                      hide-details
                       density="compact"
+                      @update:model-value="onSelectionChange"
                     >
-                      <template v-slot:label="labelScope">
-                        <span :style="{fontSize: labelFontSize}" v-bind="labelScope.props">{{ labelScope.label }}</span>
+                      <template v-slot:label="{ label: itemLabel, props: labelProps }">
+                        <span :style="{ fontSize: labelFontSize }" v-bind="labelProps">{{ itemLabel }}</span>
                       </template>
-                    </v-checkbox>
+                    </v-checkbox-btn>
                   </v-list-item>
-
                 </template>
-
               </template>
-
             </v-list>
           </v-col>
         </v-row>
 
         <!-- standard checkbox list -->
-        <v-row v-else
+        <v-row
+          v-else
           :style="getRowStyles()"
           :no-gutters="$vuetify.display.xs"
           class="align-stretch"
         >
-          <template v-for="(item, index) in flattenedItems"
-              :key="`checkbox-${index}`">
-              <v-col
-                cols="12"
-                sm="6"
-                md="4"
-                lg="3"
-                v-bind="checkboxCol"
-                class=""
-                >
-                <v-input-checkbox-card v-if="isCard"
-                  v-model="input"
-                  :value="item[itemValue]"
-                  :class="[getCheckboxClasses(item), 'h-100']"
-                  :color="checkboxColor ?? color ?? 'primary'"
-                  :title="item[itemTitle]"
-                  :description="item.description"
-                  :disabled="($attrs.disabled ?? false) || (!canSelectMore() && !input.includes(item[itemValue]))"
-                  :readonly="isMandatoryItem(item) || isProtected(item[itemValue]) || readonly"
-                  :checkboxOnRight="checkboxOnRight"
-                  :stats="getCardStats(item)"
-                  :activeTitleColor="activeTextColor"
-                />
-                <div v-else
-                  :class="getCheckboxContainerClasses(item)"
-                >
-                  <v-checkbox
-                    data-test="checkbox"
-                    v-model="input"
-                    :value="item[itemValue]"
-                    :disabled="($attrs.disabled ?? false) || (!canSelectMore() && !input.includes(item[itemValue]))"
-                    :color="checkboxColor ?? color ?? 'primary'"
-                    hide-details
-                    :label="item[itemTitle]"
-                    :class="getCheckboxClasses(item)"
-                    :readonly="isMandatoryItem(item) || isProtected(item[itemValue]) || readonly"
-                  >
-                    <template v-slot:label="labelScope">
-                      <span :style="{fontSize: labelFontSize}" v-bind="labelScope.props">{{ labelScope.label }}</span>
-                    </template>
-                  </v-checkbox>
-                </div>
-              </v-col>
-              <!-- <v-spacer></v-spacer> -->
-              <!-- <v-responsive v-if="index % 4 == 3" width="100%"></v-responsive> -->
-          </template>
+          <v-col
+            v-for="item in flattenedItems"
+            :key="`checkbox-${item[itemValue]}`"
+            cols="12"
+            sm="6"
+            md="4"
+            lg="3"
+            v-bind="checkboxCol"
+          >
+            <v-input-checkbox-card
+              v-if="isCard"
+              :model-value="input"
+              :value="item[itemValue]"
+              :class="[getCheckboxClasses(item), 'h-100']"
+              :color="checkboxColor ?? color ?? 'primary'"
+              :title="item[itemTitle]"
+              :description="item.description"
+              :disabled="($attrs.disabled ?? false) || isItemDisabled(item)"
+              :readonly="isMandatoryItem(item) || isProtected(item[itemValue]) || readonly"
+              :checkbox-on-right="checkboxOnRight"
+              :stats="getCardStats(item)"
+              :active-title-color="activeTextColor"
+              @update:model-value="onSelectionChange"
+            />
+            <div
+              v-else
+              :class="getCheckboxContainerClasses(item)"
+            >
+              <v-checkbox-btn
+                data-test="checkbox"
+                :model-value="input"
+                :value="item[itemValue]"
+                :disabled="($attrs.disabled ?? false) || isItemDisabled(item)"
+                :color="checkboxColor ?? color ?? 'primary'"
+                :label="item[itemTitle]"
+                :class="getCheckboxClasses(item)"
+                :readonly="isMandatoryItem(item) || isProtected(item[itemValue]) || readonly"
+                @update:model-value="onSelectionChange"
+              >
+                <template v-slot:label="{ label: itemLabel, props: labelProps }">
+                  <span :style="{ fontSize: labelFontSize }" v-bind="labelProps">{{ itemLabel }}</span>
+                </template>
+              </v-checkbox-btn>
+            </div>
+          </v-col>
         </v-row>
-
-      </div>
+      </checklist-form-isolation>
     </template>
   </v-input>
 </template>
 
 <script>
-  import { computed, ref, toRef } from 'vue'
+  import { computed, defineComponent, h, provide, ref, toRef, watch } from 'vue'
+  import { FormKey } from 'vuetify/lib/composables/form.js'
   import { useInput, makeInputProps, makeInputEmits } from '@/hooks'
-  import { cloneDeep } from 'lodash-es'
+
+  /**
+   * Prevent nested VInput/VCheckbox from registering with the parent VForm.
+   * Outer Checklist v-input remains the sole form participant.
+   */
+  const ChecklistFormIsolation = defineComponent({
+    name: 'ChecklistFormIsolation',
+    setup (_, { slots, attrs }) {
+      provide(FormKey, null)
+
+      return () => h('div', attrs, slots.default?.())
+    }
+  })
+
   export default {
     name: 'v-input-checklist',
+    components: {
+      ChecklistFormIsolation
+    },
     emits: [...makeInputEmits],
     props: {
       ...makeInputProps(),
@@ -426,9 +430,9 @@
       const maxSelectable = computed(() => {
         let max = props.max
 
-        if(window.__isString(max)){
+        if (window.__isString(max)) {
           max = parseInt(max)
-        } else if(!max && window.__isString(props.rawRules)){
+        } else if (!max && window.__isString(props.rawRules)) {
           max = props.rawRules.match(/max:\d+/)?.[0].split(':')[1]
         }
         return max ?? 999
@@ -440,48 +444,42 @@
         return protectedValues.value.includes(id)
       }
 
-      const initializeInput = (input) => {
-        let forceUpdate = false
+      /**
+       * Pure constraint helper — must not emit. Called from the input getter
+       * on every read, so keep it cheap and reference-stable when unchanged.
+       */
+      const constrainInput = (rawInput) => {
+        let input = Array.isArray(rawInput) ? rawInput : []
         let mandatoryItems = null
+        let changed = false
 
-        if(props.mandatory){
+        if (props.mandatory) {
           mandatoryItems = props.items.filter((item) => __data_get(item, props.mandatory, false))
 
-          if(props.max){
-            let max = parseInt(props.max)
-            if(mandatoryItems.length > max){
+          if (props.max) {
+            const max = parseInt(props.max)
+            if (mandatoryItems.length > max) {
               mandatoryItems = mandatoryItems.slice(0, max)
             }
           }
 
-          if(mandatoryItems.length > 0){
-            // Check if mandatory items were not in previous input
-            const previous = cloneDeep(input)
-            const previousInput = Array.isArray(previous) ? previous : []
+          if (mandatoryItems.length > 0) {
+            const previousInput = Array.isArray(rawInput) ? rawInput : []
             const mandatoryItemsIds = mandatoryItems.map(item => item[props.itemValue])
             const missingMandatoryItems = mandatoryItemsIds.filter(id => !previousInput.includes(id))
-            input = [
-              ...new Set([
-                ...(Array.isArray(input) ? input : []),
-                ...mandatoryItemsIds
-              ])
-            ]
 
             if (missingMandatoryItems.length > 0) {
-              forceUpdate = true
+              input = [...new Set([...previousInput, ...mandatoryItemsIds])]
+              changed = true
             }
-
           }
         }
 
-        if(maxSelectable.value > 1 && input.length > maxSelectable.value){
-          if(mandatoryItems && mandatoryItems.length > 0){
-            // Separate mandatory and non-mandatory items
+        if (maxSelectable.value > 1 && input.length > maxSelectable.value) {
+          if (mandatoryItems && mandatoryItems.length > 0) {
             const mandatoryItemsIds = mandatoryItems.map(item => item[props.itemValue])
             const mandatorySelectedItems = input.filter(id => mandatoryItemsIds.includes(id))
             const nonMandatorySelectedItems = input.filter(id => !mandatoryItemsIds.includes(id))
-
-            // Keep all mandatory items and fill remaining slots with non-mandatory items
             const remainingSlots = maxSelectable.value - mandatorySelectedItems.length
             const limitedNonMandatoryItems = remainingSlots > 0
               ? nonMandatorySelectedItems.slice(0, remainingSlots)
@@ -489,37 +487,33 @@
 
             input = [...mandatorySelectedItems, ...limitedNonMandatoryItems]
           } else {
-            input = input.sort((a, b) => a - b).slice(0, maxSelectable.value)
+            input = [...input].sort((a, b) => a - b).slice(0, maxSelectable.value)
           }
-          forceUpdate = true
-
-          // context.emit('update:modelValue', input)
+          changed = true
         }
 
-        if(forceUpdate){
-          context.emit('update:modelValue', input)
-        }
+        return { input, changed }
+      }
 
-        return input
+      const initializeInput = (rawInput) => {
+        return constrainInput(rawInput).input
       }
 
       const openedGroups = ref([])
+      const groupsInitialized = ref(false)
 
       const flattenedItems = computed(() => {
-        let items = props.items
+        const items = Array.isArray(props.items) ? [...props.items] : []
 
-        if(props.orderBy){
+        if (props.orderBy) {
           items.sort((a, b) => {
-            if(props.orderByDirection === 'asc'){
-              try {
+            try {
+              if (props.orderByDirection === 'asc') {
                 return a[props.orderBy].localeCompare(b[props.orderBy])
-              } catch (error) {
-                console.log(props.orderBy, a, b)
-                return 0
               }
-              return a[props.orderBy].localeCompare(b[props.orderBy])
-            } else {
               return b[props.orderBy].localeCompare(a[props.orderBy])
+            } catch (error) {
+              return 0
             }
           })
         }
@@ -527,111 +521,177 @@
         return items
       })
 
+      const inputApi = useInput(props, {
+        ...context,
+        initializeInput
+      })
+
+      const selectedSet = computed(() => {
+        const value = inputApi.input.value
+        return new Set(Array.isArray(value) ? value : [])
+      })
+
+      const canSelectMore = computed(() => {
+        return !props.disabled && (
+          !maxSelectable.value ||
+          (Array.isArray(inputApi.input.value) && inputApi.input.value.length < maxSelectable.value)
+        )
+      })
+
+      const onSelectionChange = (value) => {
+        inputApi.input.value = value
+      }
+
+      // Sync mandatory / max constraints to parent once when they actually change
+      watch(
+        () => [props.modelValue, props.items, props.mandatory, maxSelectable.value],
+        () => {
+          const { input, changed } = constrainInput(props.modelValue ?? props.default ?? [])
+          if (changed) {
+            context.emit('update:modelValue', input)
+          }
+        },
+        { immediate: true, deep: false }
+      )
+
       return {
-        ...useInput(props, {
-          ...context,
-          initializeInput
-        }),
+        ...inputApi,
         openedGroups: toRef(openedGroups),
+        groupsInitialized,
         maxSelectable,
         isProtected,
-        flattenedItems
+        flattenedItems,
+        selectedSet,
+        canSelectMoreComputed: canSelectMore,
+        onSelectionChange
       }
     },
 
     methods: {
+      isGroupOpened (name) {
+        return this.openedGroups.includes(name)
+      },
+      isSelectedValue (value) {
+        return this.selectedSet.has(value)
+      },
       isAllSelected (group) {
         const ids = group.items.map((item) => item.id)
-
-        return ids.every(v => this.input.includes(v))
+        return ids.length > 0 && ids.every(v => this.selectedSet.has(v))
       },
       isIndeterminateGroup (group) {
         const ids = group.items.map((item) => item.id)
-
-        return !ids.every(v => this.input.includes(v)) && ids.some(v => this.input.includes(v))
+        const some = ids.some(v => this.selectedSet.has(v))
+        return some && !ids.every(v => this.selectedSet.has(v))
       },
       updatedParent (value, group) {
         const ids = group.items.map((item) => item.id)
+        const current = Array.isArray(this.input) ? [...this.input] : []
 
         if (!value) {
-          this.input = this.input.filter(function (id) {
-            return !ids.includes(id)
-          })
-        } else {
-          // Check if adding all items would exceed the limit
-          if (this.maxSelectable) {
-            const newItemsCount = ids.filter(id => !this.input.includes(id)).length;
-            if (this.input.length + newItemsCount > this.maxSelectable) {
-              return; // Don't add if it would exceed the limit
-            }
+          this.input = current.filter((id) => !ids.includes(id))
+          return
+        }
+
+        if (this.maxSelectable) {
+          const newItemsCount = ids.filter(id => !current.includes(id)).length
+          if (current.length + newItemsCount > this.maxSelectable) {
+            return
           }
-
-          ids.forEach((id) => {
-            if (!this.input.includes(id)) {
-              this.input.push(id)
-            }
-          })
         }
+
+        const next = new Set(current)
+        ids.forEach((id) => next.add(id))
+        this.input = [...next]
       },
-      getRowStyles() {
-        const baseStyle = 'flex: 1 1;';
+      getRowStyles () {
+        const baseStyle = 'flex: 1 1;'
         if (this.flexColumn && this.$vuetify.display.mdAndUp) {
-          return `${baseStyle} flex: 1 1 60%;`;
+          return `${baseStyle} flex: 1 1 60%;`
         }
-        return baseStyle;
+        return baseStyle
       },
-      getCheckboxContainerClasses(item) {
-        const isSelected = Array.isArray(this.input) && this.input.includes(item[this.itemValue]);
+      getCheckboxContainerClasses (item) {
+        const isSelected = this.isSelectedValue(item[this.itemValue])
         return [
-          // Base classes for all screen sizes
           'd-flex align-center rounded-sm',
-          // Responsive padding
           this.checkboxOnRight ? 'pl-2' : '',
-          // Selection state
           this.checkboxOnRight && isSelected ? 'checked' : '',
-          // Highlighted state with responsive background
           this.checkboxHighlighted && isSelected ? `bg-${this.checkboxHighlightedColor}` : '',
-        ];
+        ]
       },
-
-      isSelectedItem(item) {
-        return Array.isArray(this.input) && this.input.includes(item[this.itemValue]);
+      isSelectedItem (item) {
+        return this.isSelectedValue(item[this.itemValue])
       },
-      getCheckboxClasses(item) {
-        const isSelected = Array.isArray(this.input) && this.input.includes(item[this.itemValue]);
+      getCheckboxClasses (item) {
+        const isSelected = this.isSelectedItem(item)
 
         return [
           'flex-shrink-0 flex-grow-0',
-          this.isSelectedItem(item) ? `v-input-checklist__checkbox--selected ${this.activeTextColor ? `text-${this.activeTextColor}` : ''}` : '',
-
+          isSelected ? `v-input-checklist__checkbox--selected ${this.activeTextColor ? `text-${this.activeTextColor}` : ''}` : '',
           this.truncateItemLabel ? 'v-input-checklist__checkbox--truncate' : '',
           this.checkboxOnLeft ? 'rounded-sm' : 'v-input-checklist__checkbox--right',
           this.checkboxOnLeft && isSelected ? 'checked' : '',
-          // this.checkboxHighlighted && isSelected ? 'font-weight-bold' : '',
-        ];
+        ]
       },
-      canSelectMore() {
-        return !this.disabled && (!this.maxSelectable || (Array.isArray(this.input) && this.input.length < this.maxSelectable));
+      canSelectMore () {
+        return this.canSelectMoreComputed
       },
-      isMandatoryItem(item) {
+      isItemDisabled (item) {
+        return !this.canSelectMoreComputed && !this.isSelectedValue(item[this.itemValue])
+      },
+      isMandatoryItem (item) {
         return Boolean(__data_get(item, this.mandatory, false))
       },
-      isGroupOpen(index) {
-        if(this.openAllGroups){
+      isGroupOpen (index) {
+        if (this.openAllGroups) {
           return true
-        } else if(this.closeAllGroups){
-          return false
-        } else {
-          return index === 0
         }
+        if (this.closeAllGroups) {
+          return false
+        }
+        return index === 0
       },
-      getCardStats(item) {
-        return this.cardStats.map((stat) => {
-          return {
-            ...stat,
-            value: item[stat.key]
+      getCardStats (item) {
+        return this.cardStats.map((stat) => ({
+          ...stat,
+          value: item[stat.key]
+        }))
+      },
+      syncOpenedGroups (groups) {
+        if (this.closeAllGroups) {
+          this.openedGroups = []
+          return
+        }
+        if (groups.length === 0) {
+          this.openedGroups = []
+          return
+        }
+        if (this.openAllGroups) {
+          this.openedGroups = groups.map((group) => group.name)
+          return
+        }
+
+        // Prefer groups that already have selections (edit role), but cap how many
+        // mount at once so large permission catalogs stay responsive.
+        const selected = this.selectedSet
+        if (selected.size > 0) {
+          const withSelection = groups
+            .filter((group) => Array.isArray(group.items) && group.items.some((item) => selected.has(item.id)))
+            .map((group) => group.name)
+
+          if (withSelection.length > 0) {
+            this.openedGroups = withSelection.slice(0, 3)
+            return
           }
-        })
+        }
+
+        // Large catalogs: headers only until the user expands a group.
+        if (Array.isArray(this.items) && this.items.length > 80) {
+          this.openedGroups = []
+          return
+        }
+
+        this.openedGroups = [groups[0].name]
       }
     },
 
@@ -649,50 +709,47 @@
           return []
         }
 
-        for (const i in this.items) {
+        for (let i = 0; i < this.items.length; i++) {
+          const source = this.items[i]
 
-          if(this.chunkField){
-            const groupName = this.items[i][this.chunkField]
-            const checklistTitle = this.items[i][this.chunkTitleKey]
-            const item = this.items[i]
+          if (this.chunkField) {
+            const groupName = source[this.chunkField]
+            const checklistTitle = source[this.chunkTitleKey]
 
             if (Object.prototype.hasOwnProperty.call(groups, groupName)) {
-              // if (__isset(groups[groupName].id)) delete groups[groupName].id
-              groups[groupName].items.unshift({
-                id: item.id,
+              groups[groupName].items.push({
+                id: source[this.itemValue] ?? source.id,
                 name: checklistTitle
               })
-            }else{
+            } else {
               groups[groupName] = {
                 name: this.$lodash.startCase(this.$lodash.camelCase(groupName)),
                 title: groupName,
                 items: [{
-                  id: item.id,
-                  // name: this.$lodash.startCase(this.$lodash.camelCase(checklistTitle))
+                  id: source[this.itemValue] ?? source.id,
                   name: checklistTitle
                 }]
               }
             }
-          } else{
-            const splitted = this.items[i][this.chunkTitleKey].split(this.chunkCharacter)
+          } else {
+            const splitted = String(source[this.chunkTitleKey] ?? '').split(this.chunkCharacter)
 
             if (splitted.length > 1) {
               const groupName = splitted[0]
-              const checklistTitle = splitted[1]
+              const checklistTitle = splitted.slice(1).join(this.chunkCharacter)
               if (Object.prototype.hasOwnProperty.call(groups, groupName)) {
                 if (__isset(groups[groupName].id)) delete groups[groupName].id
 
-                groups[groupName].items.unshift({
-                  id: this.items[i].id,
+                groups[groupName].items.push({
+                  id: source[this.itemValue] ?? source.id,
                   name: this.$lodash.startCase(this.$lodash.camelCase(checklistTitle))
                 })
               } else {
-
                 groups[groupName] = {
                   name: this.$lodash.startCase(this.$lodash.camelCase(groupName)),
                   title: groupName,
                   items: [{
-                    id: this.items[i].id,
+                    id: source[this.itemValue] ?? source.id,
                     name: this.$lodash.startCase(this.$lodash.camelCase(checklistTitle))
                   }]
                 }
@@ -701,24 +758,19 @@
               const groupName = 'alpha'
               if (Object.prototype.hasOwnProperty.call(groups, groupName)) {
                 if (__isset(groups[groupName].id)) delete groups[groupName].id
-                groups[groupName].items.unshift({
-                  id: this.items[i].id,
-                  name: this.$lodash.startCase(this.$lodash.camelCase(this.items[i][this.chunkTitleKey]))
+                groups[groupName].items.push({
+                  id: source[this.itemValue] ?? source.id,
+                  name: this.$lodash.startCase(this.$lodash.camelCase(source[this.chunkTitleKey]))
                 })
               } else {
                 groups[groupName] = {
                   name: this.$t('General'),
                   items: [{
-                    id: this.items[i].id,
-                    name: this.$lodash.startCase(this.$lodash.camelCase(this.items[i][this.chunkTitleKey]))
+                    id: source[this.itemValue] ?? source.id,
+                    name: this.$lodash.startCase(this.$lodash.camelCase(source[this.chunkTitleKey]))
                   }]
                 }
               }
-
-              // groups[this.items[i].name] = {
-              //   id: this.items[i].id,
-              //   name: this.$lodash.startCase(this.$lodash.camelCase(this.items[i].name))
-              // }
             }
           }
         }
@@ -729,33 +781,27 @@
           return left.hasOwnProperty('items') ? 1 : (right.hasOwnProperty('items') ? -1 : 0)
         })
 
-        if(this.closeAllGroups){
-          this.openedGroups = []
-        } else if (array.length > 0) {
-          this.openedGroups = !this.openAllGroups ? [array[0].name] : array.map((group) => group.name)
-        }
-
-        if(this.orderBy){
-          for(const i in array){
+        if (this.orderBy) {
+          for (let i = 0; i < array.length; i++) {
+            if (!array[i].items) continue
             array[i].items.sort((a, b) => {
-              if(this.orderByDirection === 'asc'){
+              if (this.orderByDirection === 'asc') {
                 return a[this.orderBy].localeCompare(b[this.orderBy])
-              } else {
-                return b[this.orderBy].localeCompare(a[this.orderBy])
               }
+              return b[this.orderBy].localeCompare(a[this.orderBy])
             })
           }
         }
 
         return array
       },
-      disabledCheckbox() {
-        return this.$attrs.disabled || (!this.canSelectMore() && !Array.isArray(this.input));
+      disabledCheckbox () {
+        return this.$attrs.disabled || (!this.canSelectMore() && !Array.isArray(this.input))
       },
-      hasMandatoryItems() {
+      hasMandatoryItems () {
         return this.items.some((item) => __data_get(item, this.mandatory, false))
       },
-      treeviewCols() {
+      treeviewCols () {
         return !this.chunkField ? {
           lg: 6,
           md: 8,
@@ -766,14 +812,48 @@
       }
     },
 
-    created () {
+    watch: {
+      groupedItems: {
+        immediate: true,
+        handler (groups) {
+          if (this.closeAllGroups) {
+            this.openedGroups = []
+            this.groupsInitialized = true
+            return
+          }
+
+          if (this.openAllGroups) {
+            this.syncOpenedGroups(groups)
+            this.groupsInitialized = true
+            return
+          }
+
+          // Seed defaults when first groups arrive (e.g. async items), but do not
+          // reset expansions the user already toggled.
+          if (!this.groupsInitialized || (groups.length > 0 && this.openedGroups.length === 0)) {
+            this.syncOpenedGroups(groups)
+            this.groupsInitialized = true
+          }
+        }
+      },
+      openAllGroups (value) {
+        if (value) {
+          this.syncOpenedGroups(this.groupedItems)
+        }
+      },
+      closeAllGroups (value) {
+        if (value) {
+          this.openedGroups = []
+        }
+      }
     }
   }
 </script>
 
 <style lang="sass">
   .v-input-checklist
-    .v-checkbox
+    .v-checkbox,
+    .v-checkbox-btn
       max-width: 100%
       .v-input__control
         max-width: 100%
@@ -784,21 +864,30 @@
             flex: 1 0
             width: calc(100% - 40px)
 
+    .v-checkbox-btn
+      max-width: 100%
+      flex: 1 1 100%
+      > label
+        flex: 1 0
+        width: calc(100% - 40px)
+
     &__checkbox
       &--right
         width: 100%
+        &.v-checkbox-btn,
         .v-checkbox-btn
           flex-direction: row-reverse
           flex: 1 1 100%
 
       &--selected
+        &.v-checkbox-btn,
         .v-checkbox-btn
           > label
             font-weight: 600
 
       &--truncate
+        &.v-checkbox-btn,
         .v-checkbox-btn
-          // max-width: 75%
           > label
             white-space: nowrap !important
             overflow: hidden !important

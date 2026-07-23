@@ -199,6 +199,10 @@ abstract class AbstractSingularSettingsService
             $snapshot['smtp']['password'] = $this->decryptSecret($snapshot['smtp']['password']);
         }
 
+        if (isset($snapshot['down_presets']['secret']) && is_string($snapshot['down_presets']['secret']) && $snapshot['down_presets']['secret'] !== '') {
+            $snapshot['down_presets']['secret'] = $this->decryptSecret($snapshot['down_presets']['secret']);
+        }
+
         return $snapshot;
     }
 

@@ -149,8 +149,43 @@ return [
             'confirmation-confirmText' => 'Queue warm',
             'confirmation-cancelText' => 'Cancel',
         ],
+        'warm-toast' => [
+            'module-route' => [
+                'title' => 'Cache warm',
+                'started' => 'Warming caches for this route…',
+                'progress' => 'Warmed :processed records…',
+                'completed' => 'Warmed :processed records.',
+                'completed-skipped' => 'Skipped: :reason',
+                'failed' => 'Warm failed: :message',
+            ],
+            'presentation-item' => [
+                'title' => 'Presentation cache',
+                'started' => 'Warming presentation item…',
+                'completed' => 'Presentation item warmed.',
+                'completed-skipped' => 'Skipped: :reason',
+                'failed' => 'Warm failed: :message',
+            ],
+            'reason' => [
+                'cache_disabled' => 'cache is disabled for this route',
+                'module_or_route_missing' => 'module or route was not found',
+            ],
+        ],
         'validation' => [
             'types-required' => 'Select at least one cache type.',
+        ],
+    ],
+
+    'chatable' => [
+        'form-action' => [
+            'label' => 'Chat Messages',
+            'tooltip' => 'Open chat',
+            'input' => [
+                'label' => 'Chat',
+                'subtitle' => '',
+            ],
+        ],
+        'input' => [
+            'label' => 'Chat Messages',
         ],
     ],
 ];

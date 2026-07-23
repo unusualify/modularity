@@ -172,4 +172,24 @@ return [
             'description' => 'Do you need to add repeater feature on this module route?',
         ],
     ],
+    'addChatable' => [
+        'model' => 'Chatable',
+        'repository' => null,
+        'question' => 'Do you need to add chatable feature on this module route?',
+        'command_option' => [
+            'shortcut' => null,
+            'input_type' => InputOption::VALUE_NONE,
+            'description' => 'Do you need to add chatable feature on this module route?',
+        ],
+    ],
+    'addAssignable' => [
+        'model' => 'Assignable',
+        'repository' => 'AssignmentTrait',
+        'question' => 'Do you need to add assignable feature on this module route?',
+        'command_option' => [
+            'shortcut' => null,
+            'input_type' => InputOption::VALUE_NONE,
+            'description' => 'Do you need to add assignable feature on this module route?',
+        ],
+    ],
 ];

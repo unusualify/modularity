@@ -157,6 +157,78 @@ StateableUpdatedNotification::createDatabaseFeatureFields(
 
 ---
 
+## Retainable tray & `retainGroup`
+
+Developer guide (when to use broadcast vs domain events, chat walkthrough): [Feature Notification Broadcasts](/guide/broadcasting/notifications).
+
+Broadcast notifications can opt into a **bottom-right tray** (instead of only the ephemeral top toast stack).
+
+### Opt-in
+
+Override `isRetainable()` (default `false`) and optionally `getRetainGroup()` on a concrete class:
+
+```php
+class OrderReadyNotification extends FeatureNotification
+{
+    public function isRetainable(): bool
+    {
+        return true;
+    }
+
+    public function getRetainGroup(): ?string
+    {
+        return 'order:'.$this->model->getKey(); // or chat:{id}
+    }
+}
+```
+
+Dismiss from the UI with Vuex `DISMISS_BY_GROUP` / `dismissByGroup('order:123')`. See `ChatableMessageBroadcastNotification` for a built-in consumer.
+
+When retainable, `toBroadcast()` includes:
+
+| Field | Meaning |
+|-------|---------|
+| `retainable` | `true` |
+| `retainUntil` | ISO-8601 expiry (`getRetainHours()`, default 6) |
+| `retainGroup` | Stable tray slot key from `getRetainGroup()` (nullable) |
+
+### Tray vs ephemeral toast
+
+| Path | UI | Lifetime |
+|------|-----|----------|
+| Ephemeral (`retainable: false`) | Top toast stack | Auto-dismiss timeout |
+| Retainable (`retainable: true`) | Bottom-right tray | Until Close / Look / TTL / `DISMISS_BY_GROUP` |
+
+### `retainGroup` — one tray slot per logical entity
+
+`getRetainGroup()` defaults to `null`. When set, the frontend **upserts by group** so multiple broadcasts for the same entity replace a single tray item.
+
+Consume on the client with Vuex `DISMISS_BY_GROUP` (or `useRetainableNotifications().dismissByGroup`):
+
+```js
+store.commit(RETAINABLE_NOTIFICATION.DISMISS_BY_GROUP, 'chat:42')
+```
+
+### `token` ≠ `retainGroup`
+
+| Field | Role |
+|-------|------|
+| `token` | Unique per notification instance — DB row / mail redirect lookup |
+| `retainGroup` | Stable tray key — e.g. one slot per chat |
+
+### Chat example
+
+`ChatableMessageBroadcastNotification` returns `'chat:'.$chat->id`. Opening `Chat.vue` for that chat dismisses the group so the tray clears when the user is already reading the thread.
+
+```php
+public function getRetainGroup(): ?string
+{
+    return 'chat:'.$this->chat->getKey();
+}
+```
+
+---
+
 ## Model Title Resolution
 
 `getModelTitleField()` resolves the model's display title in this order:

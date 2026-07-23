@@ -4,14 +4,16 @@ namespace Modules\SystemNotification\Events;
 
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use Modules\SystemPayment\Entities\Payment;
+use Unusualify\Modularous\Events\Traits\GatesBroadcastAvailability;
 
-class PaymentFailed implements ShouldDispatchAfterCommit
+class PaymentFailed implements ShouldBroadcast, ShouldDispatchAfterCommit
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use Dispatchable, InteractsWithSockets, SerializesModels, GatesBroadcastAvailability;
 
     /**
      * The name of the queue connection to use when broadcasting the event.
@@ -41,6 +43,24 @@ class PaymentFailed implements ShouldDispatchAfterCommit
     {
         return [
             new Channel('payment'),
+        ];
+    }
+
+    public function broadcastAs(): string
+    {
+        return 'modularous.payment.failed';
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function broadcastWith(): array
+    {
+        return [
+            'id' => $this->model->id,
+            'model_type' => Payment::class,
+            'model_id' => $this->model->id,
+            'status' => $this->model->status ?? null,
         ];
     }
 }

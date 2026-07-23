@@ -40,10 +40,6 @@ use Unusualify\Modularous\Services\FilepondManager;
 use Unusualify\Modularous\Services\MigrationBackup;
 use Unusualify\Modularous\Services\ModularousCacheService;
 use Unusualify\Modularous\Services\RedirectService;
-use Unusualify\Modularous\Services\RemoteApi\RemoteApiConnectorFactory;
-use Unusualify\Modularous\Services\RemoteApi\RemoteApiConnectorResolver;
-use Unusualify\Modularous\Services\RemoteApi\RemoteApiRateLimiter;
-use Unusualify\Modularous\Services\RemoteApi\RemoteApiSynchronizer;
 use Unusualify\Modularous\Services\UtmParameters;
 use Unusualify\Modularous\Services\View\ModularousNavigation;
 use Unusualify\Modularous\Support\CommandDiscovery;
@@ -165,7 +161,8 @@ class BaseServiceProvider extends ServiceProvider
 
             return new Modularous($app, $path);
         });
-        $this->app->alias(Modularous::class, 'modularous');
+        $this->app->alias(RepositoryInterface::class, Modularous::class);
+        $this->app->alias(RepositoryInterface::class, 'modularous');
 
         // $this->app->singleton(FileActivator::class, function ($app) {
         // $this->app->singleton('modularous.activator', function (Application $app) {
@@ -173,11 +170,6 @@ class BaseServiceProvider extends ServiceProvider
         // });
 
         $this->app->singleton('modularous.navigation', ModularousNavigation::class);
-
-        $this->app->singleton(RemoteApiConnectorResolver::class);
-        $this->app->singleton(RemoteApiRateLimiter::class);
-        $this->app->singleton(RemoteApiConnectorFactory::class);
-        $this->app->singleton(RemoteApiSynchronizer::class);
 
         $this->app->singleton('model.relation.namespace', function () {
             return "Illuminate\Database\Eloquent\Relations";
@@ -478,10 +470,9 @@ class BaseServiceProvider extends ServiceProvider
      */
     private function bootBaseMigrations()
     {
-        // LOAD BASE MIGRATIONS
+        // Avoid Modularous facade here: package:discover may run before Nwidart binds ActivatorInterface.
         $this->loadMigrationsFrom(
-            // get_modularous_vendor_path('database/migrations/default')
-            \Unusualify\Modularous\Facades\Modularous::getVendorPath('database/migrations/default')
+            __DIR__ . '/../../database/migrations/default'
         );
     }
 
@@ -658,13 +649,6 @@ class BaseServiceProvider extends ServiceProvider
             'level' => env('MODULAROUS_NOTIFICATION_FAILURE_LOG_LEVEL', 'error'),
             'days' => 14,
         ]);
-        $this->app['config']->set('logging.channels.modularous-remote-api', [
-            'driver' => 'daily',
-            'path' => storage_path('logs/modularous-remote-api.log'),
-            'level' => env('MODULAROUS_REMOTE_API_LOG_LEVEL', 'info'),
-            'days' => env('LOG_DAILY_DAYS', 14),
-            'replace_placeholders' => true,
-        ]);
 
         if (! config('logging.channels.modularous-resource-cache')) {
             $this->app['config']->set('logging.channels.modularous-resource-cache', [
@@ -672,6 +656,15 @@ class BaseServiceProvider extends ServiceProvider
                 'path' => storage_path('logs/modularous-resource-cache.log'),
                 'level' => env('LOG_LEVEL', 'info'),
                 'days' => env('LOG_DAILY_DAYS', 10),
+                'replace_placeholders' => true,
+            ]);
+        }
+
+        if (! config('logging.channels.scheduler')) {
+            $this->app['config']->set('logging.channels.scheduler', [
+                'driver' => 'single',
+                'path' => storage_path('logs/scheduler.log'),
+                'level' => env('LOG_LEVEL', 'info'),
                 'replace_placeholders' => true,
             ]);
         }

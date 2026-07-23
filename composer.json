@@ -43,7 +43,7 @@
         "haydenpierce/class-finder": "^0.5.3",
         "imgix/imgix-php": "^4.1",
         "inertiajs/inertia-laravel": "^3.0",
-        "laravel/horizon": "5.46",
+        "laravel/horizon": "^5.46",
         "laravel/socialite": "^5.27",
         "laravel/sanctum": "^4.0",
         "laravel/telescope": "^5.20",
@@ -68,17 +68,21 @@
         "wikimedia/composer-merge-plugin": "^2.1"
     },
     "suggest": {
-        "scssphp/scssphp": "Optional SCSS compilation for CMS stylesheets when modularous.cms_stylesheets.scssphp.enabled is true."
+        "scssphp/scssphp": "Optional SCSS compilation for CMS stylesheets when modularous.cms_stylesheets.scssphp.enabled is true.",
+        "pusher/pusher-php-server": "Required when BROADCAST_CONNECTION is pusher or reverb (Laravel Reverb uses the Pusher PHP SDK under the hood).",
+        "laravel/reverb": "Required to run the Reverb WebSocket server when BROADCAST_CONNECTION=reverb."
     },
     "require-dev": {
         "brianium/paratest": "^7.4",
         "doctrine/dbal": "^3.9",
         "fakerphp/faker": "^1.9.1",
-        "laravel/framework": "^12.0",
         "larastan/larastan": "^2.0||^3.0",
+        "laravel/framework": "^12.0",
         "laravel/pint": "^1.18||^1.24",
+        "laravel/reverb": "^1.10",
         "orchestra/testbench": "^7.0|^8.23.4|^9.0|^10.0",
-        "phpunit/phpunit": "^9.0|^10.0.7|^11.0"
+        "phpunit/phpunit": "^9.0|^10.0.7|^11.0",
+        "pusher/pusher-php-server": "^7.2"
     },
     "extra": {
         "laravel": {

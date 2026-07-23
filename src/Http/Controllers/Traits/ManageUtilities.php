@@ -166,6 +166,9 @@ trait ManageUtilities
                 'modelValue' => $formItem,
                 'title' => $title,
                 'isEditing' => $isEditing,
+                'editPresenceModelType' => $isEditing && $item
+                    ? \Unusualify\Modularous\Services\BroadcastManager::encodeModelType(get_class($item))
+                    : null,
                 'actions' => $this->getFormActions($isEditing ? 'edit' : 'create'),
                 // ...(($formAttributes['async'] ?? true) ? [] : ['actionUrl' => $this->getFormUrl($itemId)]),
                 'actionUrl' => $this->getFormUrl($itemId),

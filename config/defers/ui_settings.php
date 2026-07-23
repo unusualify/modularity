@@ -52,7 +52,43 @@ return [
     ],
     'dashboard' => [
         'blocks' => [
+            'system-console' => [
+                'widget' => 'SystemConsoleWidget',
+                'widgetCol' => [
+                    'cols' => 12,
+                    'lg' => 6,
+                ],
+                'widgetAttributes' => [
+                    'class' => 'h-50',
+                    'style' => 'min-height: 160px',
+                ],
+                'allowedRoles' => ['superadmin'],
+                'attributes' => [
+                    'class' => 'h-100',
+                    'title' => 'System Console',
+                    'subtitle' => 'Maintenance mode and cache / optimize commands.',
+                    'elevation' => 2,
+                ],
+            ],
+            'artisan-runner' => [
+                'widget' => 'ArtisanRunnerWidget',
+                'widgetCol' => [
+                    'cols' => 12,
+                    'lg' => 6,
+                ],
+                'widgetAttributes' => [
+                    'class' => 'h-50',
+                    'style' => 'min-height: 160px',
+                ],
+                'allowedRoles' => ['superadmin'],
+                'attributes' => [
+                    'class' => 'h-100',
+                    'title' => 'Artisan Runner',
+                    'subtitle' => 'Select a command to configure and run.',
+                    'elevation' => 2,
+                ],
+            ],
 
         ],
-    ],
+    ]
 ];
