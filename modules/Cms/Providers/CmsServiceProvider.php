@@ -24,10 +24,6 @@ use Modules\Cms\Contracts\LeadDeliveryInterface;
 use Modules\Cms\Contracts\PublicUrlRegistryContract;
 use Modules\Cms\Contracts\RedirectValidationServiceInterface;
 use Modules\Cms\Entities\ParentSegment;
-use Modules\Cms\Http\Controllers\CmsSignedPublicPreviewController;
-use Modules\Cms\Http\Controllers\Front\PublicSitemapController;
-use Modules\Cms\Http\Controllers\Front\RobotsTxtController;
-use Modules\Cms\Http\Controllers\PublicStyleSheetAssetController;
 use Modules\Cms\Http\Middleware\CanonicalLocaleMiddleware;
 use Modules\Cms\Http\Middleware\FallbackLocaleSluglessCanonicalMiddleware;
 use Modules\Cms\Http\Middleware\LayoutBuilderMiddleware;
@@ -40,6 +36,7 @@ use Modules\Cms\Localization\NullCmsLocalizationOverrideProvider;
 use Modules\Cms\Localization\TranslatableCmsLocalizationAdapter;
 use Modules\Cms\Observers\ParentSegmentUrlRouteObserver;
 use Modules\Cms\Routing\CmsFrontRouteRegistrar;
+use Modules\Cms\Routing\CmsPublicSystemRouteRegistrar;
 use Modules\Cms\Services\CanonicalUrlResolver;
 use Modules\Cms\Services\CmsAdminWarnings;
 use Modules\Cms\Services\CmsPageLayoutResolver;
@@ -181,20 +178,12 @@ class CmsServiceProvider extends ServiceProvider
             $this->registerUrlStaleServeMiddleware();
         }
 
-        if (modularousConfig('cms_seo.robots.route_enabled', true)) {
-            Route::middleware('web')->get('/robots.txt', RobotsTxtController::class)->name('cms.robots_txt');
-        }
-
-        if ((bool) modularousConfig('cms_sitemap.route_enabled', true)) {
-            Route::middleware('web')->get('/sitemap.xml', PublicSitemapController::class)->name('cms.sitemap');
-        }
+        CmsPublicSystemRouteRegistrar::registerAll();
 
         if ((bool) modularousConfig('cms_routing.resync_registry_after_parent_segments_change', true)) {
             ParentSegment::observe(ParentSegmentUrlRouteObserver::class);
         }
 
-        $this->registerCmsSignedPreviewRoutes();
-        $this->registerCmsPublicStylesheetRoutes();
         $this->registerCmsPublishSchedule();
 
         try {
@@ -239,66 +228,6 @@ class CmsServiceProvider extends ServiceProvider
 
             CmsFrontRouteRegistrar::syncUrlStaleServeMiddlewareOnRegisteredPublicFrontRoutes();
         });
-    }
-
-    private function registerCmsSignedPreviewRoutes(): void
-    {
-        if (! modularousConfig('cms_routing.signed_preview.enabled', true)) {
-            return;
-        }
-
-        $prefix = trim((string) modularousConfig('cms_routing.signed_preview.path_prefix', 'cms/preview'), '/');
-        if ($prefix === '') {
-            return;
-        }
-
-        $max = (int) modularousConfig('cms_routing.signed_preview.throttle_max_attempts', 120);
-        $decay = (int) modularousConfig('cms_routing.signed_preview.throttle_decay_minutes', 1);
-        $throttle = 'throttle:' . max(1, $max) . ',' . max(1, $decay);
-
-        $definition = static function () use ($prefix, $throttle): void {
-            Route::middleware(['web', 'signed', $throttle])
-                ->get($prefix . '/{module}/{route}/{id}/{locale?}', CmsSignedPublicPreviewController::class)
-                ->where([
-                    'module' => '[A-Za-z][A-Za-z0-9]*',
-                    'route' => '[A-Za-z][A-Za-z0-9]*',
-                    'id' => '[0-9]+',
-                ])
-                ->name('cms.signed_preview.show');
-        };
-
-        $domain = CmsFrontRouteRegistrar::resolvePublicFrontRouteDomain();
-        if ($domain !== null && $domain !== '') {
-            Route::domain($domain)->group($definition);
-        } else {
-            $definition();
-        }
-    }
-
-    private function registerCmsPublicStylesheetRoutes(): void
-    {
-        if (! (bool) modularousConfig('cms_stylesheets.public_route.enabled', true)) {
-            return;
-        }
-
-        $prefix = trim((string) modularousConfig('cms_stylesheets.public_route.path_prefix', 'cms/stylesheets'), '/');
-        if ($prefix === '') {
-            return;
-        }
-
-        $definition = static function () use ($prefix): void {
-            Route::middleware('web')
-                ->get($prefix . '/{slug}.css', [PublicStyleSheetAssetController::class, 'show'])
-                ->where('slug', '[A-Za-z0-9_-]+')
-                ->name('cms.public.stylesheet');
-        };
-
-        $domain = CmsFrontRouteRegistrar::resolvePublicFrontRouteDomain();
-        if ($domain !== null && $domain !== '') {
-            Route::domain($domain)->group($definition);
-        } else {
-            $definition();
-        }
     }
 
     private function registerCmsPublishSchedule(): void

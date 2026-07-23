@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\Route;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 use Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRoutes;
 use Modules\Cms\Entities\Concerns\HasParentSegment;
-use Modules\Cms\Http\Controllers\CmsSignedPublicPreviewController;
 use Modules\Cms\Http\Controllers\Front\CmsController;
 use Modules\Cms\Http\Controllers\Front\CmsPublicFrontController;
 use Modules\Cms\Providers\CmsRouteServiceProvider;
@@ -27,13 +26,15 @@ use Unusualify\Modularous\Module;
  * **Mcamara docs vs this stack:** mcamara often shows LaravelLocalization::setLocale() plus per-route
  * transRoute() keys backed by per-locale routes.php under resources/lang — one named route per translated URL shape.
  * Here we register GET catch-all(s); with {@see CmsFrontRouteLocalizationBinding} the route may use a real
- * locale segment plus path. The `{path}` wildcard intentionally **does not** match {@see modularousConfig('cms_routing.signed_preview.path_prefix')}
- * (and optional {@see modularousConfig('cms_routing.public_front_catch_all_exclude_path_prefixes')}) so signed preview URLs resolve to
- * {@see CmsSignedPublicPreviewController} instead of being eaten by the CMS page resolver. Resolution runs in {@see CmsPublicModelResolver} against
+ * locale segment plus path. The `{path}` wildcard intentionally **does not** match reserved prefixes from
+ * {@see CmsPublicSystemRoutes::reservedPathPrefixes()} (built-in system routes + optional
+ * {@see modularousConfig('cms_routing.public_front_catch_all_exclude_path_prefixes')}) so those URLs resolve to
+ * their own controllers instead of being eaten by the CMS page resolver. Resolution runs in {@see CmsPublicModelResolver} against
  * {@see UrlRoute} (per-locale normalized_path) and optional {@see ParentSegment}
  * prefixes. Translated segments and slug binding live in the CMS data model, not duplicated Route definitions or lang route files.
  *
- * Auto-registration: {@see registerAutoForQualifiedModules()} — {@see CmsRouteServiceProvider}.
+ * Auto-registration: {@see registerAutoForQualifiedModules()} — {@see CmsRouteServiceProvider} (on {@code booted},
+ * after host {@code routes/web.php}).
  * With {@see modularousConfig('cms_routing.universal_cms_public_front')} (default), one host-level catch-all
  * ({@see CmsPublicFrontController}) resolves all {@see UrlRoute} lines via {@see CmsPublicModelResolver}.
  * Legacy mode registers per-module catch-alls when {@code universal_cms_public_front} is false.
@@ -319,34 +320,16 @@ final class CmsFrontRouteRegistrar
     }
 
     /**
-     * {@code {path}} constraint so reserved top-level segments (signed public preview, etc.) reach their own routes.
+     * {@code {path}} constraint so reserved top-level segments reach their own routes.
+     *
+     * @see CmsPublicSystemRoutes::reservedPathPrefixes()
      */
     private static function catchAllPathParameterPattern(): string
     {
         $blocked = [];
 
-        if (modularousConfig('cms_routing.signed_preview.enabled', true)) {
-            $preview = trim((string) modularousConfig('cms_routing.signed_preview.path_prefix', 'cms/preview'), '/');
-            if ($preview !== '') {
-                $blocked[] = preg_quote($preview, '/');
-            }
-        }
-
-        foreach ((array) modularousConfig('cms_routing.public_front_catch_all_exclude_path_prefixes', []) as $raw) {
-            if (! is_string($raw)) {
-                continue;
-            }
-            $p = trim($raw, '/');
-            if ($p !== '') {
-                $blocked[] = preg_quote($p, '/');
-            }
-        }
-
-        if ((bool) modularousConfig('cms_stylesheets.public_route.enabled', true)) {
-            $ss = trim((string) modularousConfig('cms_stylesheets.public_route.path_prefix', 'cms/stylesheets'), '/');
-            if ($ss !== '') {
-                $blocked[] = preg_quote($ss, '/');
-            }
+        foreach (CmsPublicSystemRoutes::reservedPathPrefixes() as $prefix) {
+            $blocked[] = preg_quote($prefix, '/');
         }
 
         $blocked = array_values(array_unique($blocked));

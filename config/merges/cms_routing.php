@@ -232,12 +232,14 @@ return [
     'parent_segment_change_resync_chunk_size' => max(1, (int) env('MODULAROUS_CMS_PARENT_SEGMENT_RESYNC_CHUNK', 100)),
 
     /**
-     * Additional slash-trimmed path prefixes the CMS public catch-all `{path}` must ignore so other {@code Route::get}
-     * endpoints can answer (beyond {@see signed_preview.path_prefix}, which is always excluded when previews are enabled).
+     * Additional slash-trimmed path prefixes the CMS public catch-all `{path}` must ignore (merged with
+     * enabled built-ins from {@see \Modules\Cms\Routing\CmsPublicSystemRoutes}). Use for host-app paths
+     * when a package registers routes before the late catch-all and registration order alone is not enough.
      *
      * @var list<string>
      *
-     * @see CmsFrontRouteRegistrar::catchAllPathParameterPattern()
+     * @see \Modules\Cms\Routing\CmsPublicSystemRoutes::reservedPathPrefixes()
+     * @see \Modules\Cms\Routing\CmsFrontRouteRegistrar::catchAllPathParameterPattern()
      */
     'public_front_catch_all_exclude_path_prefixes' => [],
 
