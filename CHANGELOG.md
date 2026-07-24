@@ -2,6 +2,66 @@
 
 All notable changes to `modularous` will be documented in this file
 
+## v12.6.0 - 2026-07-24
+
+### :rocket: Features
+
+- add down_presets section with encryption for maintenance settings by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/43a8444c9a97fd56f7976b95cae74ec981dcc56f
+- implement Artisan Runner feature with UI integration and command execution capabilities by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/e1d0a7252a502869f429bf8aa6058f230b1a5f35
+- add whileFrontend method to SiteSettingsService for console context handling and update warmup context to utilize it by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/764586109ae4133c5185eefd00666c2e68d89d4a
+- add methods to retrieve all models and repositories used in module routes by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/0cc903b539a0d205655648b2c69957a0ab8f8abf
+- add methods to retrieve permission prefix and name for models by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/11247e1a86b9a5cb6ba965a581b6e6e3acf72bf0
+- update getFormActions methods to accept User parameter for enhanced permission handling by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/70f6ba91854aa8f302b47c143a5fcc62bd00a3ba
+- add CACHING permission to enum and update related tests by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/854fcba6550bb58d1d71e237bf2f6b164aaa4472
+- enhance command to create permissions for module routes with options for specific modules and routes, including a dry-run feature by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/a7b6d0a70a74cce8ceb6f4ae42066dcf9c207d8a
+- implement broadcasting capabilities for various events, enhance notification channels, and add cache warming progress events with user context by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/acdb7ef55572db6bea374364138cdf7367b41017
+- add chatable and assignable features to module routes with corresponding command options by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/cf0964e911aa242aa017e66dd26e1453a531c53d
+- implement chatable functionality with localization support and new ChatableTrait for form handling by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/5e263256a643b9a636a99e5842f45953be516bb3
+- implement retainable notification tray with Vuex integration, enhance broadcast payload handling, and add redirector support for notifications by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/7479c9b3a6942160cabf46a924e2da85312a2fae
+- introduce ChatableMessageSynced event for real-time chat message synchronization, add ChatableMessageBroadcastNotification for immediate notifications, and enhance chat channel authorization in Vue components. by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/a2762187f8c04b93be782cc59e8be409c7be81c8
+- add scheduler log channel configuration with default settings if not already defined by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/1505629c54a388367391b4c9516a49900c7c2e2b
+- implement sitemap and XSLT support with public routes by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/79d7211c6aac7fc5239eccf80ed6dfe1aa33a03e
+
+### :wrench: Bug Fixes
+
+- add 'closeAllGroups' option to permissions checklist for improved user experience in large permission catalogs by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/db39a261b554a782e01d15f5484ab750b50ee21c
+- update notification channel configuration to use fallback defaults when environment variables are blank by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/016435a94f02addfedc600442b01372a16c23da9
+- update general permissions label for clarity by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/bd8902e357e17fae92161038daddae3777fc2b09
+- correct route name prefix in ManageBulkSheetTest to include trailing dot by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/625eb62b9bcd399844a5ef4ee56c39ae81146c49
+
+### :recycle: Refactors
+
+- remove site SEO save route and associated middleware by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/f612c7939584a190225d990e140331d15ae322ed
+- introduce RemoteApiServiceProvider for managing Remote API services by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/bf9eca9b6ee784127c5828ea43ebf04565c95115
+- improve structure and isolate form controls to enhance performance and maintainability; add tests for treeview functionality by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/d8821b0080218ddb30b9561750319a68c07326eb
+- replace Modularous facade with direct path references and update service aliases for improved clarity and reliability by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/a9049848ef201eaf3713ed46c1eca9074fd4df81
+- update getFormActions methods to accept nullable User parameter for improved null handling by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/642496d4b1a99e63c46481843fe70100b8463835
+- streamline action handling logic by consolidating conditions for modal and publish actions, improve readability, and enhance null safety for action URLs by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/3763e60c08442ea5efbad26c47f996a995de833d
+- comment out site SEO route and middleware for future implementation by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/aa54360771e8f0d1a4561582eb67607b95dbb01b
+- remove unnecessary dot from route name prefixes by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/5a9e1f05e402275774c6865b4cb855d35399e417
+
+### :memo: Documentation
+
+- update feature service provider guidelines and documentation structure by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/e4bf47d9eef09b9c8fb441e53193b5ec0abb675d
+- clarify feature provider registration and update trait implementation guidelines by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/00b6ca73fb947f908953f5e9011444ca1ff79203
+- add comprehensive guide for broadcasting user-targeted notifications, including retainable tray implementation, payload structure, and usage examples; update overview and related documentation for clarity and organization. by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/cb8c4945bcb18e5858517e52b019ffe52619bfed
+- add comprehensive guides for CMS configuration, layout builders, page layouts, public routing, redirects, sitemap, and SEO by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/3bd3efb7df0d8622485fd322a1ffad129a71144c
+- add reference to CMS guide for routing, layouts, and stylesheets by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/9368deff1f1c8a2f715be76349148d34887a1350
+- expand overview section to include CMS features and detailed routing, layout, and SEO guides by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/f570e690c9bf8ed6df4666fda2f4d29abd2a9379
+- update CMS public stack and stylesheet layout builder documentation by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/ee0941cb7db9222a70f96dacc62da80eb51ecf73
+
+### :lipstick: Styling
+
+- lint coding styles for v12.6.0 by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/3a2202cf87cb1d8d9038f9887bdd8ac5462a75ca
+
+### :white_check_mark: Testing
+
+- enhance permission handling by integrating user context into resource cache actions and form actions methods by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/f81b232828cb463c99a03ad707ac010de7f8214c
+
+### :package: Build
+
+- update build artifacts for v12.6.0 by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/b8825f13313aef19673d290062154fce7e99e3b1
+
 ## v12.5.1 - 2026-07-17
 
 ### :wrench: Bug Fixes
