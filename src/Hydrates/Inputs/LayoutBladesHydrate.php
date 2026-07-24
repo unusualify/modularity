@@ -79,7 +79,7 @@ class LayoutBladesHydrate extends InputHydrate
         $module = $this->module;
 
         if ($module !== null && \is_object($module) && method_exists($module, 'panelRouteNamePrefix')) {
-            $names[] = $module->panelRouteNamePrefix() . '.layout_builder.shell_draft_preview';
+            $names[] = $module->panelRouteNamePrefix() . 'layout_builder.shell_draft_preview';
         }
 
         $names[] = 'layout_builder.shell_draft_preview';

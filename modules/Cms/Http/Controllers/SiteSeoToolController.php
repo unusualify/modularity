@@ -72,7 +72,7 @@ class SiteSeoToolController extends BaseController
     {
         $navigation = get_modularous_navigation_config();
 
-        $pageIndexRoute = $this->module->panelRouteNamePrefix() . '.page.index';
+        $pageIndexRoute = $this->module->panelRouteNamePrefix() . 'page.index';
         $cmsCrumb = [
             'title' => __('CMS'),
             'disabled' => true,

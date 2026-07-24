@@ -40,7 +40,7 @@ class SitemapToolController extends BaseController
 
         $this->shareInertiaStoreVariables();
 
-        $prefix = $this->module->panelRouteNamePrefix() . '.';
+        $prefix = $this->module->panelRouteNamePrefix();
 
         $publicSitemap = Route::has('cms.sitemap') ? route('cms.sitemap') : null;
 
@@ -63,7 +63,7 @@ class SitemapToolController extends BaseController
     {
         $navigation = get_modularous_navigation_config();
 
-        $pageIndexRoute = $this->module->panelRouteNamePrefix() . '.page.index';
+        $pageIndexRoute = $this->module->panelRouteNamePrefix() . 'page.index';
         $cmsCrumb = [
             'title' => __('CMS'),
             'disabled' => true,

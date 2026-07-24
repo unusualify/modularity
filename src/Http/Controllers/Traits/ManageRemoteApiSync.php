@@ -37,7 +37,7 @@ trait ManageRemoteApiSync
             return;
         }
 
-        $routePrefix = $this->module->panelRouteNamePrefix() . '.' . Str::snake($this->routeName) . '.';
+        $routePrefix = $this->module->panelRouteNamePrefix() . Str::snake($this->routeName) . '.';
         $existing = is_array($this->tableActions ?? null) ? $this->tableActions : [];
         $actions = [];
 

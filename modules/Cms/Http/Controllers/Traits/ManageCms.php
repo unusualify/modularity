@@ -104,7 +104,7 @@ trait ManageCms
             return null;
         }
 
-        $mintRouteKey = $cmsModule->panelRouteNamePrefix() . '.signed_public_preview.mint';
+        $mintRouteKey = $cmsModule->panelRouteNamePrefix() . 'signed_public_preview.mint';
         if (! Route::has($mintRouteKey)) {
             return null;
         }

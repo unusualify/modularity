@@ -207,7 +207,7 @@ class RouteServiceProvider extends ServiceProvider
             foreach (Modularous::allEnabled() as $module) {
                 $_groupOptions = [
                     'prefix' => $module->fullPrefix(),
-                    'as' => $module->panelRouteNamePrefix() . '.',
+                    'as' => $module->panelRouteNamePrefix(),
                 ];
 
                 ModularousRoutes::registerRoutes(

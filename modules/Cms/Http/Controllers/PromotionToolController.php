@@ -68,7 +68,7 @@ class PromotionToolController extends BaseController
      */
     protected function promotionSessionEndpoints(): array
     {
-        $prefix = $this->module->panelRouteNamePrefix() . '.';
+        $prefix = $this->module->panelRouteNamePrefix();
 
         return [
             'dryRun' => route($prefix . 'promotion.dryRun.web'),
@@ -85,7 +85,7 @@ class PromotionToolController extends BaseController
     {
         $navigation = get_modularous_navigation_config();
 
-        $pageIndexRoute = $this->module->panelRouteNamePrefix() . '.page.index';
+        $pageIndexRoute = $this->module->panelRouteNamePrefix() . 'page.index';
         $cmsCrumb = [
             'title' => __('CMS'),
             'disabled' => true,

@@ -266,7 +266,7 @@ trait RemoteApiSourceTrait
             return null;
         }
 
-        return $module->panelRouteNamePrefix() . '.' . $this->resolveRemoteApiRouteName() . '.';
+        return $module->panelRouteNamePrefix() . $this->resolveRemoteApiRouteName() . '.';
     }
 
     /**

@@ -209,7 +209,7 @@ trait ManageBulkSheet
             return [];
         }
 
-        $prefix = $this->module->panelRouteNamePrefix() . '.';
+        $prefix = $this->module->panelRouteNamePrefix();
         $cfg = $this->bulkSheetRouteConfig();
         $names = $this->bulkSheetWebRouteNames();
         $label = $cfg['toolbar_label'] ?? null;
@@ -325,7 +325,7 @@ trait ManageBulkSheet
 
         $this->shareInertiaStoreVariables();
 
-        $prefix = $this->module->panelRouteNamePrefix() . '.' . Str::snake($this->routeName) . '.';
+        $prefix = $this->module->panelRouteNamePrefix() . Str::snake($this->routeName) . '.';
         $names = $this->bulkSheetWebRouteNames();
         $toolKey = $this->bulkSheetToolKey();
 
@@ -437,8 +437,8 @@ trait ManageBulkSheet
      */
     protected function bulkSheetBreadcrumbsItems(): array
     {
-        $parentRouteName = $this->module->panelRouteNamePrefix() . '.index';
-        $routeName = $this->module->panelRouteNamePrefix() . '.' . snakeCase($this->routeName) . '.index';
+        $parentRouteName = $this->module->panelRouteNamePrefix() . 'index';
+        $routeName = $this->module->panelRouteNamePrefix() . snakeCase($this->routeName) . '.index';
 
         return [
             [

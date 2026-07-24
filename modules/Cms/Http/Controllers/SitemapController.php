@@ -28,7 +28,7 @@ class SitemapController extends BaseController
         if (! $repo instanceof SitemapRepository) {
             return [];
         }
-        $prefix = $this->module->panelRouteNamePrefix() . '.';
+        $prefix = $this->module->panelRouteNamePrefix();
 
         $breadcrumbs = [
             [
