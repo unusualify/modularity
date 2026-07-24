@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Models\Model;
+use Unusualify\Modularous\Services\BroadcastManager;
 use Unusualify\Modularous\Services\View\UWrapper;
 
 trait ManageUtilities
@@ -167,7 +168,7 @@ trait ManageUtilities
                 'title' => $title,
                 'isEditing' => $isEditing,
                 'editPresenceModelType' => $isEditing && $item
-                    ? \Unusualify\Modularous\Services\BroadcastManager::encodeModelType(get_class($item))
+                    ? BroadcastManager::encodeModelType(get_class($item))
                     : null,
                 'actions' => $this->getFormActions($isEditing ? 'edit' : 'create'),
                 // ...(($formAttributes['async'] ?? true) ? [] : ['actionUrl' => $this->getFormUrl($itemId)]),

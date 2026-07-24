@@ -11,7 +11,9 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use Illuminate\View\View;
 use Mockery;
+use Spatie\Permission\Models\Role;
 use TestModules\TestModule\Controllers\ItemController;
+use Unusualify\Modularous\Entities\User;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Http\Controllers\BaseController;
 use Unusualify\Modularous\Repositories\Repository;
@@ -212,8 +214,8 @@ class BaseControllerTest extends TestModulesCase
     public function test_preload_sets_up_form_schema_and_withs(): void
     {
         $guardName = Modularous::getAuthGuardName();
-        $adminRole = \Spatie\Permission\Models\Role::create(['name' => 'admin', 'guard_name' => $guardName]);
-        $admin = \Unusualify\Modularous\Entities\User::create(['name' => 'Admin', 'email' => 'admin@example.com']);
+        $adminRole = Role::create(['name' => 'admin', 'guard_name' => $guardName]);
+        $admin = User::create(['name' => 'Admin', 'email' => 'admin@example.com']);
         $admin->assignRole($adminRole);
         $this->actingAs($admin, $guardName);
 
@@ -399,8 +401,8 @@ class BaseControllerTest extends TestModulesCase
     public function test_duplicate_returns_success_when_repository_duplicates_item(): void
     {
         $guardName = Modularous::getAuthGuardName();
-        $adminRole = \Spatie\Permission\Models\Role::create(['name' => 'admin', 'guard_name' => $guardName]);
-        $admin = \Unusualify\Modularous\Entities\User::create(['name' => 'Admin', 'email' => 'admin-duplicate@example.com']);
+        $adminRole = Role::create(['name' => 'admin', 'guard_name' => $guardName]);
+        $admin = User::create(['name' => 'Admin', 'email' => 'admin-duplicate@example.com']);
         $admin->assignRole($adminRole);
         $this->actingAs($admin, $guardName);
 

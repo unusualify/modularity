@@ -8,7 +8,6 @@ use Unusualify\Modularous\Console\BaseCommand;
 use Unusualify\Modularous\Entities\Enums\Permission as PermissionEnum;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Repositories\Repository;
-use Unusualify\Modularous\Support\Decomposers\ValidatorParser;
 
 class MakeRoutePermissionsCommand extends BaseCommand
 {
@@ -45,45 +44,49 @@ class MakeRoutePermissionsCommand extends BaseCommand
         $permissions = PermissionEnum::cases();
         $guardName = Modularous::getAuthGuardName();
 
-        if( $this->option('module')) {
+        if ($this->option('module')) {
             $module = $this->option('module');
             $module = Modularous::find($module);
 
-            if(! $module) {
+            if (! $module) {
                 $this->error("Module {$module} not found!");
+
                 return 1;
             }
 
             $hasModule = true;
         }
 
-        if( $hasModule && $this->option('route')) {
+        if ($hasModule && $this->option('route')) {
             $route = $this->option('route');
             $hasRoute = true;
 
-            if(! $module->hasRoute($route)) {
+            if (! $module->hasRoute($route)) {
                 $this->error("Route {$route} not found!");
+
                 return 1;
             }
         }
 
-        if($hasRoute) {
+        if ($hasRoute) {
             $repository = $module->getRepository($route);
 
-            if(! $repository) {
+            if (! $repository) {
                 $this->error("Repository for route {$route} not found!");
+
                 return 1;
             }
 
             $this->createPermissions($repository, $permissions, $guardName, $module->getName(), $route, $dryRun);
         }
 
-        if($hasModule) {
-            foreach($module->getRoutes() as $route) {
+        if ($hasModule) {
+            foreach ($module->getRoutes() as $route) {
                 $repository = $module->getRepository($route);
 
-                if(! $repository) {
+                if (! $repository) {
                     $this->error("Repository for route {$route} not found!");
+
                     return 1;
                 }
 
@@ -93,12 +96,13 @@ class MakeRoutePermissionsCommand extends BaseCommand
         } else {
             $modules = Modularous::allEnabled();
 
-            foreach($modules as $module) {
-                foreach($module->getRoutes() as $route) {
+            foreach ($modules as $module) {
+                foreach ($module->getRoutes() as $route) {
                     $repository = $module->getRepository($route);
 
-                    if(! $repository) {
+                    if (! $repository) {
                         $this->error("Repository for route {$route} not found!");
+
                         return 1;
                     }
 
@@ -111,7 +115,7 @@ class MakeRoutePermissionsCommand extends BaseCommand
 
         // $routeGenerator->createRoutePermissions();
 
-        if($dryRun) {
+        if ($dryRun) {
             return 0;
         }
 
@@ -119,7 +123,6 @@ class MakeRoutePermissionsCommand extends BaseCommand
 
         return 0;
     }
-
 
     private function createPermissions(Repository $repository, array $permissions, string $guardName, string $moduleName, string $routeName, bool $dryRun): void
     {

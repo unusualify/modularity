@@ -512,7 +512,7 @@ class FeatureNotificationBroadcastTest extends TestCase
 
             public function getRetainGroup(): ?string
             {
-                return 'entity:'.$this->model->id;
+                return 'entity:' . $this->model->id;
             }
 
             public function getNotificationSubject(object $notifiable, $model): string

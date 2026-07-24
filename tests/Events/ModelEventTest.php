@@ -5,6 +5,7 @@ namespace Unusualify\Modularous\Tests\Events;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithBroadcasting;
 use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -266,7 +267,7 @@ class ModelEventTest extends ModelTestCase
         // Test broadcast name
         $this->assertEquals('modularous.test.broadcasting.model', $event->broadcastAs());
 
-        $this->assertInstanceOf(\Illuminate\Contracts\Broadcasting\ShouldBroadcast::class, $event);
+        $this->assertInstanceOf(ShouldBroadcast::class, $event);
         $this->assertSame([
             'id' => 1,
             'model_type' => TestModel::class,

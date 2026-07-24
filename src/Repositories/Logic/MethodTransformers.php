@@ -378,7 +378,6 @@ trait MethodTransformers
     }
 
     /**
-     * @param array $scope
      * @return array
      */
     public function getFormActions(?User $user, array $scope = [])

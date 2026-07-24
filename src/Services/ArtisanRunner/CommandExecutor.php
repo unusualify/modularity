@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Unusualify\Modularous\Services\ArtisanRunner;
 
+use Illuminate\Console\Application;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
+use Illuminate\Support\Facades\Artisan;
 use ReflectionMethod;
 use ReflectionProperty;
 use Symfony\Component\Console\Helper\HelperSet;
@@ -33,7 +35,7 @@ final class CommandExecutor
      */
     public function shouldExecuteViaSubprocess(string $commandName): bool
     {
-        $mode = strtolower((string) modularousConfig('artisan_runner.execution', 'auto'));
+        $mode = mb_strtolower((string) modularousConfig('artisan_runner.execution', 'auto'));
 
         return match ($mode) {
             'subprocess' => true,
@@ -48,9 +50,9 @@ final class CommandExecutor
     }
 
     /**
-     * @param  array<string, mixed>  $arguments
-     * @param  array<string, mixed>  $options
-     * @param  callable(string $event, array<string, mixed> $payload): void  $emit
+     * @param array<string, mixed> $arguments
+     * @param array<string, mixed> $options
+     * @param callable(string $event, array<string, mixed> $payload): void $emit
      */
     public function execute(
         string $commandName,
@@ -90,9 +92,9 @@ final class CommandExecutor
     }
 
     /**
-     * @param  array<string, mixed>  $arguments
-     * @param  array<string, mixed>  $options
-     * @param  callable(string $event, array<string, mixed> $payload): void  $emit
+     * @param array<string, mixed> $arguments
+     * @param array<string, mixed> $options
+     * @param callable(string $event, array<string, mixed> $payload): void $emit
      */
     private function executeInProcess(
         string $commandName,
@@ -133,9 +135,9 @@ final class CommandExecutor
     /**
      * Spawn `php artisan {command}` so PHP_SAPI is cli — true route/config cache parity.
      *
-     * @param  array<string, mixed>  $arguments
-     * @param  array<string, mixed>  $options
-     * @param  callable(string $event, array<string, mixed> $payload): void  $emit
+     * @param array<string, mixed> $arguments
+     * @param array<string, mixed> $options
+     * @param callable(string $event, array<string, mixed> $payload): void $emit
      */
     private function executeViaSubprocess(
         string $commandName,
@@ -159,11 +161,11 @@ final class CommandExecutor
         $bytesWritten = 0;
 
         $process->run(function (string $type, string $buffer) use ($emit, $maxOutputBytes, &$bytesWritten): void {
-            $length = strlen($buffer);
+            $length = mb_strlen($buffer);
             if ($bytesWritten + $length > $maxOutputBytes) {
                 $remaining = max(0, $maxOutputBytes - $bytesWritten);
                 if ($remaining > 0) {
-                    $emit('output', ['chunk' => substr($buffer, 0, $remaining)]);
+                    $emit('output', ['chunk' => mb_substr($buffer, 0, $remaining)]);
                     $bytesWritten += $remaining;
                 }
 
@@ -178,7 +180,7 @@ final class CommandExecutor
     }
 
     /**
-     * @param  array<string, mixed>  $parameters  ArrayInput-style parameters from buildParameters()
+     * @param array<string, mixed> $parameters ArrayInput-style parameters from buildParameters()
      * @return list<string>
      */
     public function buildSubprocessCommandLine(array $parameters): array
@@ -218,13 +220,13 @@ final class CommandExecutor
 
                 if (is_array($value)) {
                     foreach ($value as $item) {
-                        $line[] = $key.'='.(string) $item;
+                        $line[] = $key . '=' . (string) $item;
                     }
 
                     continue;
                 }
 
-                $line[] = $key.'='.(string) $value;
+                $line[] = $key . '=' . (string) $value;
 
                 continue;
             }
@@ -247,16 +249,17 @@ final class CommandExecutor
     }
 
     /**
-     * @param  array<string, mixed>  $arguments
-     * @param  array<string, mixed>  $options
+     * @param array<string, mixed> $arguments
+     * @param array<string, mixed> $options
      * @return array<string, mixed>
      */
     public function buildParameters(string $commandName, array $arguments, array $options): array
     {
         $command = null;
-        foreach (\Illuminate\Support\Facades\Artisan::all() as $name => $cmd) {
+        foreach (Artisan::all() as $name => $cmd) {
             if ($name === $commandName) {
                 $command = $cmd;
+
                 break;
             }
         }
@@ -305,7 +308,7 @@ final class CommandExecutor
             }
 
             $raw = $options[$name];
-            $key = '--'.$name;
+            $key = '--' . $name;
 
             if (! $option->acceptValue()) {
                 if (filter_var($raw, FILTER_VALIDATE_BOOLEAN)) {
@@ -350,12 +353,12 @@ final class CommandExecutor
         $helperSet->set($helper);
     }
 
-    private function resolveArtisanApplication(): \Illuminate\Console\Application
+    private function resolveArtisanApplication(): Application
     {
         $method = new ReflectionMethod($this->kernel, 'getArtisan');
         $method->setAccessible(true);
 
-        /** @var \Illuminate\Console\Application $artisan */
+        /** @var Application $artisan */
         $artisan = $method->invoke($this->kernel);
 
         return $artisan;

@@ -69,8 +69,6 @@ trait Moduleable
 
     /**
      * Get the permission prefix for the model.
-     *
-     * @return string
      */
     public function getPermissionPrefix(): string
     {
@@ -81,7 +79,7 @@ trait Moduleable
      * Get the permission name for the model.
      *
      * @param string $suffix
-     * @return string
+     *
      * @throws \InvalidArgumentException
      */
     public function getPermissionName($suffix): string

@@ -259,8 +259,6 @@ class Finder
 
     /**
      * Get all models that are used in all module routes.
-     *
-     * @return Collection
      */
     public function getAllModuleRouteModels(): Collection
     {
@@ -274,8 +272,6 @@ class Finder
 
     /**
      * Get all repositories that are used in all module routes.
-     *
-     * @return Collection
      */
     public function getAllModuleRouteRepositories(): Collection
     {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Unusualify\Modularous\Http\Controllers\ArtisanRunner;
 
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -117,7 +118,7 @@ final class ArtisanRunnerController extends Controller
         return response()->json(['ok' => true]);
     }
 
-    private function authorizeUser(Request $request): \Illuminate\Contracts\Auth\Authenticatable
+    private function authorizeUser(Request $request): Authenticatable
     {
         $user = $request->user();
         abort_unless($user !== null, 401);

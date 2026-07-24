@@ -25,7 +25,7 @@ class ChatableMessageSynced implements ShouldBroadcast
     public const ACTION_DELETED = 'deleted';
 
     /**
-     * @param  array<string, mixed>|null  $message  Serialized ChatMessage (or snapshot before delete)
+     * @param array<string, mixed>|null $message Serialized ChatMessage (or snapshot before delete)
      */
     public function __construct(
         public string $action,

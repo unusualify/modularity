@@ -87,7 +87,7 @@ class GeneralRepository extends Repository
     }
 
     /**
-     * @param  array<string, mixed>  $fields
+     * @param array<string, mixed> $fields
      * @return array<string, mixed>
      */
     protected function encryptDownPresetSecret(array $fields, mixed $object = null): array

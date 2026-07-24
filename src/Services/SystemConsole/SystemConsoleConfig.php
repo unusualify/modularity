@@ -120,7 +120,7 @@ final class SystemConsoleConfig
     /**
      * Drop null/empty option values so ArtisanRunner omits unused flags.
      *
-     * @param  array<string, mixed>  $options
+     * @param array<string, mixed> $options
      * @return array<string, scalar>
      */
     public static function normalizeOptions(array $options): array
@@ -179,8 +179,8 @@ final class SystemConsoleConfig
     }
 
     /**
-     * @param  array<string, scalar>  $base
-     * @param  array<string, scalar>  $overrides
+     * @param array<string, scalar> $base
+     * @param array<string, scalar> $overrides
      * @return array<string, scalar>
      */
     private static function mergeDownOptions(array $base, array $overrides): array

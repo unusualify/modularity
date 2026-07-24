@@ -119,7 +119,7 @@ class WarmPresentationItemJobTest extends TestCase
                 && is_array($toast)
                 && ($toast['title'] ?? null) === __('messages.resource-cache.warm-toast.presentation-item.title')
                 && ($toast['description'] ?? null) === __('messages.resource-cache.warm-toast.presentation-item.completed')
-                && ($toast['detail'] ?? null) === 'Blog:Post:'.$model->getKey()
+                && ($toast['detail'] ?? null) === 'Blog:Post:' . $model->getKey()
                 && ($toast['variant'] ?? null) === 'success';
         });
     }
@@ -152,7 +152,7 @@ class WarmPresentationItemJobTest extends TestCase
                 && ($payload['reason'] ?? null) === 'cache_disabled'
                 && is_array($toast)
                 && ($toast['variant'] ?? null) === 'warning'
-                && ($toast['detail'] ?? null) === 'Blog:Post:'.$model->getKey();
+                && ($toast['detail'] ?? null) === 'Blog:Post:' . $model->getKey();
         });
     }
 }

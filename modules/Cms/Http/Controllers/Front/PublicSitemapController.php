@@ -34,9 +34,9 @@ final class PublicSitemapController
         }
 
         if (preg_match('/<\?xml[^?]*\?>/', $xml, $m, PREG_OFFSET_CAPTURE) === 1) {
-            $end = $m[0][1] + strlen($m[0][0]);
+            $end = $m[0][1] + mb_strlen($m[0][0]);
 
-            return substr($xml, 0, $end) . "\n" . self::STYLESHEET_PI . substr($xml, $end);
+            return mb_substr($xml, 0, $end) . "\n" . self::STYLESHEET_PI . mb_substr($xml, $end);
         }
 
         return self::STYLESHEET_PI . "\n" . $xml;

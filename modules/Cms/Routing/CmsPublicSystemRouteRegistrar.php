@@ -3,11 +3,12 @@
 namespace Modules\Cms\Routing;
 
 use Illuminate\Support\Facades\Route;
+use Modules\Cms\Providers\CmsServiceProvider;
 
 /**
  * Registers built-in CMS public system routes from {@see CmsPublicSystemRoutes}.
  *
- * Runs during {@see \Modules\Cms\Providers\CmsServiceProvider::boot()} so these endpoints are in the
+ * Runs during {@see CmsServiceProvider::boot()} so these endpoints are in the
  * route collection before host {@code routes/web.php} and before the late CMS catch-all.
  */
 final class CmsPublicSystemRouteRegistrar

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Unusualify\Modularous\Support;
 
+use Pusher\Pusher;
+
 /**
  * Central gate for Modularous broadcasting.
  *
@@ -68,7 +70,7 @@ final class BroadcastAvailability
             return self::$pusherSdkAvailableOverride;
         }
 
-        return class_exists(\Pusher\Pusher::class);
+        return class_exists(Pusher::class);
     }
 
     /**

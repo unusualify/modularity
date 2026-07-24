@@ -48,7 +48,7 @@ trait ChatableTrait
 
     public function getFormActionsChatableTrait(?User $user, $scope = null): array
     {
-        if( !$this->shouldUseDefaultChatableFormAction ) {
+        if (! $this->shouldUseDefaultChatableFormAction) {
             return [];
         }
 
@@ -97,7 +97,7 @@ trait ChatableTrait
 
     public function getAppendFormSchemaChatableTrait($scope = null): array
     {
-        if( !$this->shouldUseDefaultChatableInput ) {
+        if (! $this->shouldUseDefaultChatableInput) {
             return [];
         }
 

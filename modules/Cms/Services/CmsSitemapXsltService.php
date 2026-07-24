@@ -4,11 +4,12 @@ namespace Modules\Cms\Services;
 
 use DOMDocument;
 use Illuminate\Support\Facades\Log;
+use Modules\Cms\Http\Controllers\Front\PublicSitemapXslController;
 use XSLTProcessor;
 
 /**
  * Applies the package sitemap XSLT for human-readable HTML (panel dry-run).
- * Public browsers load the same file via {@see \Modules\Cms\Http\Controllers\Front\PublicSitemapXslController}.
+ * Public browsers load the same file via {@see PublicSitemapXslController}.
  */
 final class CmsSitemapXsltService
 {

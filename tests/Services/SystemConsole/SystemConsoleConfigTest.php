@@ -213,7 +213,7 @@ class SystemConsoleConfigTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $snapshot
+     * @param array<string, mixed> $snapshot
      */
     private function bindSystemSettings(array $snapshot): void
     {

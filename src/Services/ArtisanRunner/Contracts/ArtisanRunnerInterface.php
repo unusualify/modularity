@@ -24,9 +24,9 @@ interface ArtisanRunnerInterface
     public function definitionForUser(Authenticatable $user, string $command): array;
 
     /**
-     * @param  array<string, mixed>  $arguments
-     * @param  array<string, mixed>  $options
-     * @param  callable(string $event, array<string, mixed> $payload): void  $emit
+     * @param array<string, mixed> $arguments
+     * @param array<string, mixed> $options
+     * @param callable(string $event, array<string, mixed> $payload): void $emit
      */
     public function run(
         Authenticatable $user,

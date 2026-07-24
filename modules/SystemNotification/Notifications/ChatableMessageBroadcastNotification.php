@@ -51,7 +51,7 @@ class ChatableMessageBroadcastNotification extends FeatureNotification implement
      */
     public function getRetainGroup(): ?string
     {
-        return 'chat:'.$this->chat->getKey();
+        return 'chat:' . $this->chat->getKey();
     }
 
     public function toArray($notifiable): array

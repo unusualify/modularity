@@ -922,7 +922,7 @@ class ChatableTest extends ModelTestCase
 
         Notification::fake();
         config([
-            'modularous.notifications.'.ChatableMessageBroadcastNotification::class.'.channels' => 'broadcast',
+            'modularous.notifications.' . ChatableMessageBroadcastNotification::class . '.channels' => 'broadcast',
         ]);
 
         $chatableModel->notifyChatableMessageBroadcast($message);

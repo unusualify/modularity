@@ -259,7 +259,7 @@ class ArtisanRunnerServiceTest extends TestCase
                 }
 
                 $env = (string) $this->ask('Target environment?', 'production');
-                $this->line('multi-ok:'.$env);
+                $this->line('multi-ok:' . $env);
 
                 return self::SUCCESS;
             }

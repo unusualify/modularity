@@ -18,6 +18,7 @@ class BroadcastManagerTest extends TestCase
 
         parent::tearDown();
     }
+
     public function test_get_broadcast_configuration_groups_events_by_channel(): void
     {
         $model = (object) ['id' => 7];

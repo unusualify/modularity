@@ -11,6 +11,7 @@ use Modules\Cms\Http\Middleware\VisitorRedirectMiddleware;
 use Modules\Cms\Providers\CmsRouteServiceProvider;
 use Modules\Cms\Routing\CmsFrontRouteLocalizationBinding;
 use Modules\Cms\Routing\CmsFrontRouteRegistrar;
+use Modules\Cms\Routing\CmsPublicSystemRoutes;
 use Modules\Cms\Services\CmsPublicModelResolver;
 use Modules\Cms\Services\CmsSignedPreviewUrlGenerator;
 use Modules\Cms\Services\CmsSlugInputValidationService;
@@ -233,13 +234,13 @@ return [
 
     /**
      * Additional slash-trimmed path prefixes the CMS public catch-all `{path}` must ignore (merged with
-     * enabled built-ins from {@see \Modules\Cms\Routing\CmsPublicSystemRoutes}). Use for host-app paths
+     * enabled built-ins from {@see CmsPublicSystemRoutes}). Use for host-app paths
      * when a package registers routes before the late catch-all and registration order alone is not enough.
      *
      * @var list<string>
      *
-     * @see \Modules\Cms\Routing\CmsPublicSystemRoutes::reservedPathPrefixes()
-     * @see \Modules\Cms\Routing\CmsFrontRouteRegistrar::catchAllPathParameterPattern()
+     * @see CmsPublicSystemRoutes::reservedPathPrefixes()
+     * @see CmsFrontRouteRegistrar::catchAllPathParameterPattern()
      */
     'public_front_catch_all_exclude_path_prefixes' => [],
 

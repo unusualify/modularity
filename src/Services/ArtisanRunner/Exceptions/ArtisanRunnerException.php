@@ -6,6 +6,4 @@ namespace Unusualify\Modularous\Services\ArtisanRunner\Exceptions;
 
 use RuntimeException;
 
-class ArtisanRunnerException extends RuntimeException
-{
-}
+class ArtisanRunnerException extends RuntimeException {}

@@ -26,7 +26,7 @@ final class BridgedQuestionHelper extends SymfonyQuestionHelper
     private $emit;
 
     /**
-     * @param  EmitCallable  $emit
+     * @param EmitCallable $emit
      */
     public function __construct(
         private readonly string $runId,

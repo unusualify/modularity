@@ -7,7 +7,7 @@ namespace Unusualify\Modularous\Services\ArtisanRunner\Support;
 final class AllowlistMatcher
 {
     /**
-     * @param  list<string>  $patterns
+     * @param list<string> $patterns
      */
     public function matches(string $command, array $patterns): bool
     {

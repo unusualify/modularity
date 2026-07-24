@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Validation\ValidationException;
 use Mockery;
+use Mockery\MockInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Unusualify\Modularous\Facades\ModularousCache;
@@ -359,7 +360,7 @@ class ManageResourceCacheTest extends TestCase
         $this->controller->user = $user;
     }
 
-    protected function makeRepositoryWithCachingPermission(): \Mockery\MockInterface
+    protected function makeRepositoryWithCachingPermission(): MockInterface
     {
         $repository = Mockery::mock();
         $repository->shouldReceive('getPermissionName')->andReturn('test_route_caching');

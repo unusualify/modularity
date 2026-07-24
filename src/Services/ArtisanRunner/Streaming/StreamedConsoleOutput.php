@@ -20,7 +20,7 @@ final class StreamedConsoleOutput extends Output
     private int $bytesWritten = 0;
 
     /**
-     * @param  EmitCallable  $emit
+     * @param EmitCallable $emit
      */
     public function __construct(
         callable $emit,
@@ -35,12 +35,12 @@ final class StreamedConsoleOutput extends Output
     protected function doWrite(string $message, bool $newline): void
     {
         $chunk = $newline ? $message . PHP_EOL : $message;
-        $length = strlen($chunk);
+        $length = mb_strlen($chunk);
 
         if ($this->bytesWritten + $length > $this->maxOutputBytes) {
             $remaining = max(0, $this->maxOutputBytes - $this->bytesWritten);
             if ($remaining > 0) {
-                $chunk = substr($chunk, 0, $remaining);
+                $chunk = mb_substr($chunk, 0, $remaining);
                 ($this->emit)('output', ['chunk' => $chunk]);
                 $this->bytesWritten += $remaining;
             }

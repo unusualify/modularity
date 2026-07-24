@@ -65,6 +65,7 @@ class LaravelServiceProviderTest extends TestCase
         foreach (array_keys($publishes) as $source) {
             if ((realpath($source) ?: $source) === $expectedSource) {
                 $matchedSource = $source;
+
                 break;
             }
         }
