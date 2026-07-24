@@ -187,7 +187,7 @@ class ManageBulkSheetTest extends TestCase
     protected function makeModuleMock(): Module
     {
         $module = Mockery::mock(Module::class);
-        $module->shouldReceive('panelRouteNamePrefix')->andReturn('admin.blog');
+        $module->shouldReceive('panelRouteNamePrefix')->andReturn('admin.blog.');
         $module->shouldReceive('getRawRouteConfig')->andReturn([]);
 
         return $module;
