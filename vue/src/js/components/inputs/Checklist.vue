@@ -764,7 +764,7 @@
                 })
               } else {
                 groups[groupName] = {
-                  name: this.$t('General'),
+                  name: this.$t('General Permissions'),
                   items: [{
                     id: source[this.itemValue] ?? source.id,
                     name: this.$lodash.startCase(this.$lodash.camelCase(source[this.chunkTitleKey]))
