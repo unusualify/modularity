@@ -10,6 +10,9 @@ use Unusualify\Modularous\Services\RemoteApi\Contracts\RemoteApiConnectorInterfa
 
 abstract class AbstractRemoteApiConnector implements DefinesRemoteApiConfiguration, RemoteApiConnectorInterface
 {
+    /** @var array<int, int> */
+    protected array $allowedStatuses = [];
+
     /**
      * @return array<string, mixed>
      */
@@ -20,7 +23,11 @@ abstract class AbstractRemoteApiConnector implements DefinesRemoteApiConfigurati
         protected readonly RemoteApiClient $client,
         protected readonly RemoteApiCache $cache,
         protected readonly RemoteApiAdapterInterface $adapter,
-    ) {}
+    ) {
+        if (filled($this->allowedStatuses)) {
+            $this->client->setAllowedStatuses($this->allowedStatuses);
+        }
+    }
 
     public function configuration(): RemoteApiConfiguration
     {

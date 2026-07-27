@@ -9,6 +9,9 @@ use Unusualify\Modularous\Services\RemoteApi\Exceptions\RemoteApiSyncException;
 
 class RemoteApiClient
 {
+    /** @var array<int, int> */
+    private array $allowedStatuses = [];
+
     private readonly RemoteApiLogger $logger;
 
     public function __construct(
@@ -18,6 +21,11 @@ class RemoteApiClient
         ?RemoteApiLogger $logger = null,
     ) {
         $this->logger = $logger ?? new RemoteApiLogger($configuration);
+    }
+
+    public function setAllowedStatuses(array $allowedStatuses): void
+    {
+        $this->allowedStatuses = $allowedStatuses;
     }
 
     public function requestTracker(): RemoteApiRequestTracker
@@ -195,7 +203,7 @@ class RemoteApiClient
     /**
      * @return array<string, mixed>
      */
-    public function post(string $endpoint, array $data = [], array $query = []): array
+    public function post(string $endpoint, array $data = [], array $query = [], array $allowedStatuses = []): array
     {
         $url = $this->buildUrl($endpoint);
         $query = $this->sanitizeQuery($this->mergeDefaultQuery($query));
@@ -203,6 +211,8 @@ class RemoteApiClient
         $startedAt = microtime(true);
 
         $this->rateLimiter->assertCanRequest($url);
+
+        $allowedStatuses = array_merge($this->allowedStatuses, $allowedStatuses);
 
         try {
             $pendingRequest = Http::timeout($this->configuration->timeout())
@@ -236,7 +246,7 @@ class RemoteApiClient
                 throw RemoteApiSyncException::rateLimitExceeded($url, $retryAfter);
             }
 
-            if ($response->failed()) {
+            if ($response->failed() && ! in_array($status, $allowedStatuses)) {
                 $this->logger->logHttpRequest(
                     $trackedUrl,
                     'POST',
@@ -258,7 +268,10 @@ class RemoteApiClient
                 $this->rateLimiter,
             );
 
-            return (array) $response->json();
+            return (array) [
+                'status_code' => $status,
+                ...(array) $response->json(),
+            ];
         } catch (RemoteApiSyncException $exception) {
             throw $exception;
         } catch (\Throwable $exception) {
