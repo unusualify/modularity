@@ -35,6 +35,26 @@ class CmsPublicSeoTest extends TestCase
         $this->assertSame('index, follow', $out['robotsMeta']);
     }
 
+    public function test_seo_index_false_maps_to_noindex_when_robots_index_unset(): void
+    {
+        $request = Request::create('https://example.test/blog/post', 'GET');
+
+        $item = new class extends \Illuminate\Database\Eloquent\Model
+        {
+            protected $guarded = [];
+
+            public $timestamps = false;
+        };
+        $item->forceFill([
+            'seo_index' => false,
+        ]);
+
+        $canonical = new CanonicalUrlResolver;
+        $out = CmsPublicSeo::build($request, $item, $canonical);
+
+        $this->assertSame('noindex, follow', $out['robotsMeta']);
+    }
+
     public function test_staging_force_noindex_overrides_page_robots(): void
     {
         config(['modularous.cms_seo.staging.force_noindex' => true]);

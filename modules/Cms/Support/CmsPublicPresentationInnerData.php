@@ -14,7 +14,7 @@ use Modules\Cms\Contracts\CanonicalUrlResolverInterface;
 final class CmsPublicPresentationInnerData
 {
     /**
-     * @return array{item: Model, seoTitle: string, seoDescription: ?string, canonicalUrl: string, robotsMeta: string}
+     * @return array{item: Model, seoTitle: string, seoDescription: ?string, canonicalUrl: string, robotsMeta: string, hreflangAlternates: list<array{hreflang: string, href: string}>}
      */
     public static function build(
         Request $request,
@@ -31,7 +31,7 @@ final class CmsPublicPresentationInnerData
     /**
      * Cache / warmup entry point — explicit locale and UrlRoute registry path; no {@see Request}.
      *
-     * @return array{item: Model, seoTitle: string, seoDescription: ?string, canonicalUrl: string, robotsMeta: string}
+     * @return array{item: Model, seoTitle: string, seoDescription: ?string, canonicalUrl: string, robotsMeta: string, hreflangAlternates: list<array{hreflang: string, href: string}>}
      */
     public static function buildForCache(
         string $locale,
@@ -46,7 +46,7 @@ final class CmsPublicPresentationInnerData
 
     /**
      * @param array{title: string, description: ?string, canonicalUrl: string, robotsMeta: string} $seo
-     * @return array{item: Model, seoTitle: string, seoDescription: ?string, canonicalUrl: string, robotsMeta: string}
+     * @return array{item: Model, seoTitle: string, seoDescription: ?string, canonicalUrl: string, robotsMeta: string, hreflangAlternates: list<array{hreflang: string, href: string}>}
      */
     private static function fromSeo(Model $item, array $seo): array
     {
@@ -56,6 +56,68 @@ final class CmsPublicPresentationInnerData
             'seoDescription' => $seo['description'],
             'canonicalUrl' => $seo['canonicalUrl'],
             'robotsMeta' => $seo['robotsMeta'],
+            'hreflangAlternates' => self::hreflangAlternates($item),
         ];
+    }
+
+    /**
+     * Head {@code link rel="alternate" hreflang} rows (x-default + available locales).
+     *
+     * @return list<array{hreflang: string, href: string}>
+     */
+    public static function hreflangAlternates(Model $item): array
+    {
+        if (! method_exists($item, 'localizedUrlAlternates')) {
+            return [];
+        }
+
+        /** @var list<array{locale?: string, url?: string, available?: bool, is_fallback?: bool}> $rows */
+        $rows = $item->localizedUrlAlternates();
+        if (! is_array($rows) || $rows === []) {
+            return [];
+        }
+
+        $alternates = [];
+        $xDefaultHref = null;
+
+        foreach ($rows as $row) {
+            if (! is_array($row)) {
+                continue;
+            }
+
+            if (($row['is_fallback'] ?? false) === true) {
+                continue;
+            }
+
+            if (($row['available'] ?? true) !== true) {
+                continue;
+            }
+
+            $locale = trim((string) ($row['locale'] ?? ''));
+            $href = trim((string) ($row['url'] ?? ''));
+            if ($locale === '' || $href === '' || $href === '#') {
+                continue;
+            }
+
+            $alternates[] = [
+                'hreflang' => $locale,
+                'href' => $href,
+            ];
+
+            if ($locale === 'en' || $xDefaultHref === null) {
+                $xDefaultHref = $href;
+            }
+        }
+
+        if ($alternates === [] || $xDefaultHref === null) {
+            return [];
+        }
+
+        array_unshift($alternates, [
+            'hreflang' => 'x-default',
+            'href' => $xDefaultHref,
+        ]);
+
+        return $alternates;
     }
 }

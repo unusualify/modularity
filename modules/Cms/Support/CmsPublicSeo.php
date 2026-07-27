@@ -79,11 +79,18 @@ final class CmsPublicSeo
         $robotsIndex = $isTranslatable ? optional($translation)->robots_index : $item->robots_index;
         $robotsFollow = $isTranslatable ? optional($translation)->robots_follow : $item->robots_follow;
         if (is_array($robotsIndex) && array_key_exists($locale, $robotsIndex)) {
-            $robotsIndex = (string) $robotsIndex[$locale] ?? null;
+            $robotsIndex = $robotsIndex[$locale] ?? null;
         }
         if (is_array($robotsFollow) && array_key_exists($locale, $robotsFollow)) {
-            $robotsFollow = (string) $robotsFollow[$locale] ?? null;
+            $robotsFollow = $robotsFollow[$locale] ?? null;
         }
+
+        // Legacy blog posts store indexability on the model (`seo_index`) rather than
+        // HasTranslatableMetadata robots_index — fall back when robots_index is unset.
+        if ($robotsIndex === null && array_key_exists('seo_index', $item->getAttributes())) {
+            $robotsIndex = (bool) $item->getAttribute('seo_index');
+        }
+
         $robotsMeta = self::resolveRobotsMeta(self::robotsDirective($robotsIndex, $robotsFollow));
 
         return [
