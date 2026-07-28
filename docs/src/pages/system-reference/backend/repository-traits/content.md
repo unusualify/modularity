@@ -5,7 +5,7 @@ sidebarTitle: Content Traits
 
 # Content Repository Traits
 
-These traits handle slug persistence, JSON spread attributes, tagging, and multi-locale translations at the repository level. They pair with the corresponding Entity Traits (`HasSlug`, `HasSpreadable`, `IsTranslatable`, `HasTranslation`).
+These traits handle slug persistence, JSON spread attributes, tagging, multi-locale translations, and translatable SEO/metadata at the repository level. They pair with the corresponding Entity Traits (`HasSlug`, `HasSpreadable`, `IsTranslatable`, `HasTranslation`, `HasTranslatableMetadata`).
 
 ---
 
@@ -228,4 +228,37 @@ class ArticleRepository extends Repository
 
 // Translated fields are automatically restructured before save
 // and hydrated back into form fields on edit.
+```
+
+---
+
+## TranslatableMetadataTrait
+
+**Namespace**: `Unusualify\Modularous\Repositories\Traits\TranslatableMetadataTrait`
+
+**Pairs with**: [`HasTranslatableMetadata`](../entity-traits/translation/overview#repository-companion-trait)
+
+Appends default SEO / robots / sitemap form inputs when the model uses `HasTranslatableMetadata`. Some metadata features flow through this repository hook — **do not** add the entity trait without this companion.
+
+### Convention
+
+- Always add this trait when the entity uses `HasTranslatableMetadata`.
+- On translated models, use `TranslationsTrait` **before** `TranslatableMetadataTrait` so translation save / form pipelines run in the expected order.
+
+### Lifecycle Hooks
+
+| Hook | Description |
+|------|-------------|
+| `appendFormSchemaTranslatableMetadataTrait` | Returns `TranslatableMetadata::defaultFormInputs()` when the model has `HasTranslatableMetadata`; otherwise `[]` |
+
+### Usage
+
+```php
+use Unusualify\Modularous\Repositories\Traits\TranslatableMetadataTrait;
+use Unusualify\Modularous\Repositories\Traits\TranslationsTrait;
+
+class ArticleRepository extends Repository
+{
+    use TranslationsTrait, TranslatableMetadataTrait;
+}
 ```
