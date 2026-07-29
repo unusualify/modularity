@@ -259,7 +259,32 @@ return [
     | ],
     |
     */
-    'modules' => [],
+    'modules' => [
+        /*
+        | ErrorPage has no public UrlRoute — presentation HTML is model-scoped
+        | (error_code + locale) via ErrorPagePresentationCache / StaleFileCache.
+        | Disable with cms_features.error_pages_cache_enabled or types.presentationItem=false.
+        */
+        'ErrorPage' => [
+            'enabled' => true,
+            'routes' => [
+                'ErrorPage' => [
+                    'admin_cache_actions' => true,
+                    'manual_purge' => true,
+                    'enabled' => true,
+                    'rewarmItem' => false,
+                    'types' => [
+                        'presentationItem' => true,
+                        'counts' => false,
+                        'index' => false,
+                        'record' => false,
+                        'formItem' => false,
+                        'formattedItem' => false,
+                    ],
+                ],
+            ],
+        ],
+    ],
 
     /*
     |--------------------------------------------------------------------------

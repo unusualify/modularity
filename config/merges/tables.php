@@ -50,4 +50,5 @@ return [
     'cms_style_sheets' => 'um_cms_style_sheets',
     'cms_layout_builders' => 'um_cms_layout_builders',
     'cms_page_layouts' => 'um_cms_page_layouts',
+    'cms_error_pages' => 'um_cms_error_pages',
 ];

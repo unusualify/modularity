@@ -630,6 +630,62 @@ class CacheInvalidationTest extends TestCase
     }
 
     /** @test */
+    public function it_clears_stale_file_cache_when_invalidating_presentation_item_with_url_store(): void
+    {
+        $service = new ConcreteCacheInvalidation;
+        $service->setPresentationCacheStore('url');
+
+        $cacheKey = 'modularous:TestModule:TestRoute:presentationItem:45:' . md5(serialize(['locale' => 'en']));
+        $relations = [TestModel::class => 45];
+        $service->staleFileCache()->put($cacheKey, '<html>url-store</html>', 3600, $relations);
+
+        $service->invalidatePresentationItemCache('TestModule', 'TestRoute', 45, TestModel::class);
+
+        $this->assertNull($service->staleFileCache()->get($cacheKey, null, $relations));
+        $this->assertEquals([45], $service->invalidatedPresentationItemIds);
+    }
+
+    /** @test */
+    public function it_purges_stale_file_cache_for_model_even_when_presentation_store_is_url(): void
+    {
+        $service = new ConcreteCacheInvalidationWithFilesystemTracking;
+        $service->setPresentationCacheStore('url');
+
+        $model = new TestModel;
+        $model->id = 46;
+        $model->exists = true;
+
+        $cacheKey = 'modularous:TestModule:TestRoute:presentationItem:46:' . md5(serialize(['locale' => 'en']));
+        $relations = [TestModel::class => 46];
+        $service->staleFileCache()->put($cacheKey, '<html>purge-url</html>', 3600, $relations);
+
+        $deleted = $service->purgePresentationItemForModel($model, 'TestModule', 'TestRoute');
+
+        $this->assertGreaterThanOrEqual(1, $deleted);
+        $this->assertTrue($service->purgedRelation);
+        $this->assertNull($service->staleFileCache()->get($cacheKey, null, $relations));
+    }
+
+    /** @test */
+    public function it_forgets_presentation_stale_for_model_store_agnostically(): void
+    {
+        $service = new ConcreteCacheInvalidation;
+        $service->setPresentationCacheStore('url');
+
+        $model = new TestModel;
+        $model->id = 47;
+        $model->exists = true;
+
+        $cacheKey = 'modularous:TestModule:TestRoute:presentationItem:47:' . md5(serialize(['locale' => 'en']));
+        $relations = [TestModel::class => 47];
+        $service->staleFileCache()->put($cacheKey, '<html>forget-me</html>', 3600, $relations);
+
+        $service->forgetPresentationStaleForModelPublic($model);
+
+        $this->assertNull($service->staleFileCache()->get($cacheKey, null, $relations));
+    }
+
+    /** @test */
     public function it_invalidates_record_cache_per_id_without_tags(): void
     {
         $this->cacheService->invalidateRecordCache('TestModule', 'TestRoute', 55);
@@ -675,7 +731,9 @@ class CacheInvalidationTest extends TestCase
 
 class ConcreteCacheInvalidation
 {
-    use CacheInvalidation;
+    use CacheInvalidation {
+        forgetPresentationStaleForModel as public forgetPresentationStaleForModelPublic;
+    }
 
     protected $store;
 
@@ -721,6 +779,11 @@ class ConcreteCacheInvalidation
     }
 
     protected function getStaleFileCache(): StaleFileCache
+    {
+        return $this->staleFileCache;
+    }
+
+    public function staleFileCache(): StaleFileCache
     {
         return $this->staleFileCache;
     }
@@ -800,9 +863,26 @@ class ConcreteCacheInvalidation
         $this->invalidatedFormattedItemIds[] = $id;
     }
 
-    public function invalidatePresentationItemCache(string $moduleName, string $moduleRouteName, $id): void
+    public function invalidatePresentationItemCache(string $moduleName, string $moduleRouteName, $id, ?string $modelClass = null): void
     {
         $this->invalidatedPresentationItemIds[] = $id;
+
+        // Delegate to trait so store-agnostic StaleFileCache clears stay covered.
+        $moduleName = \Illuminate\Support\Str::studly($moduleName);
+        $moduleRouteName = \Illuminate\Support\Str::studly($moduleRouteName);
+
+        if ($modelClass !== null && $id !== null) {
+            $this->getStaleFileCache()->forgetByRelation($modelClass, $id);
+            if ($this->getPresentationCacheStore() === 'url') {
+                $this->forgetUrlStaleForModel($modelClass, $id);
+            }
+        } elseif ($id !== null) {
+            $this->forgetStaleFilesByModuleRouteId($moduleName, $moduleRouteName, $id);
+        }
+
+        if ($id !== null) {
+            $this->forgetStaleFilesByModuleRouteId($moduleName, $moduleRouteName, $id);
+        }
     }
 
     public function invalidateRecordCache(string $moduleName, string $moduleRouteName, $id): void

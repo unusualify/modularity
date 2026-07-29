@@ -1,0 +1,9 @@
+{
+    "name": "ErrorPage",
+    "alias": "errorpage",
+    "description": "HTTP error page CMS records (404/403/500) rendered through LayoutBuilder shells.",
+    "keywords": [],
+    "priority": 0,
+    "providers": [],
+    "files": []
+}
