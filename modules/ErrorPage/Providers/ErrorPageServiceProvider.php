@@ -9,6 +9,7 @@ use Illuminate\Support\ServiceProvider;
 use Modules\ErrorPage\Console\CreateErrorPageDefaultsCommand;
 use Modules\ErrorPage\Support\ErrorPageRenderer;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Unusualify\Modularous\Facades\Modularous;
 
 class ErrorPageServiceProvider extends ServiceProvider
 {
@@ -36,6 +37,10 @@ class ErrorPageServiceProvider extends ServiceProvider
             }
 
             $handler->renderable(function (HttpExceptionInterface $e, $request) {
+                if (Modularous::isPanelUrl($request->fullUrl())) {
+                    return null;
+                }
+
                 if (! modularousConfig('cms_features.error_pages_enabled', true)) {
                     return null;
                 }

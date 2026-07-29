@@ -11,7 +11,7 @@ The **ErrorPage** module manages HTTP **403 / 404 / 500** responses. CMS records
 
 Unlike CMR content, error pages have **no public URL**, no ParentSegment, and no slug — they are never resolved through the CMS catch-all.
 
-Runtime rendering is handled by `Modules\ErrorPage\Support\ErrorPageRenderer`, registered from `ErrorPageServiceProvider` for `HttpExceptionInterface` status codes `403`, `404`, and `500`.
+Runtime rendering is handled by `Modules\ErrorPage\Support\ErrorPageRenderer`, registered from `ErrorPageServiceProvider` for `HttpExceptionInterface` status codes `403`, `404`, and `500`. Panel requests (`Modularous::isPanelUrl`) are excluded so the admin panel keeps Laravel’s default error handling.
 
 ## Feature flags
 

@@ -2,10 +2,10 @@
 
 return [
     'name' => 'ErrorPage',
-    'system_prefix' => false,
+    'system_prefix' => true,
     'headline' => 'Error Pages',
     'icon' => 'mdi-alert-circle-outline',
-
+    'group' => 'system',
     'routes' => [
         'error_page' => [
             'parent' => true,
