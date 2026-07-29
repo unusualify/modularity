@@ -86,7 +86,7 @@ Layout: `error_page::error_page.standalone` (`@yield('content')` + ModularousVit
 
 ## Runtime
 
-`ErrorPageServiceProvider` registers a `renderable` callback on the exception handler for `HttpExceptionInterface` status codes `403`, `404`, and `500`. Implementation: `Modules\ErrorPage\Support\ErrorPageRenderer`.
+`ErrorPageServiceProvider` registers a `renderable` callback on the exception handler for `HttpExceptionInterface` status codes `403`, `404`, and `500`. Implementation: `Modules\ErrorPage\Support\ErrorPageRenderer`. Panel requests (`Modularous::isPanelUrl`) are excluded — Laravel / the admin panel handle those errors.
 
 ## Panel
 

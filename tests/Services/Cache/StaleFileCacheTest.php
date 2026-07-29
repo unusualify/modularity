@@ -29,6 +29,12 @@ class StaleFileCacheTest extends TestCase
     }
 
     /** @test */
+    public function it_exposes_base_path(): void
+    {
+        $this->assertSame($this->basePath, $this->cache->basePath());
+    }
+
+    /** @test */
     public function it_stores_and_reads_stale_html_by_cache_key(): void
     {
         $key = 'modularous:PrimaryPage:Home:presentationItem:42:' . md5(serialize(['locale' => 'en']));

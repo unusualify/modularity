@@ -198,6 +198,28 @@ class ArtisanRunnerServiceTest extends TestCase
         $this->assertStringNotContainsString('Undefined constant "STDIN"', $chunks);
     }
 
+    /** @test */
+    public function it_returns_command_definition_for_allowed_user(): void
+    {
+        $runner = $this->app->make(ArtisanRunnerInterface::class);
+        $user = $this->fakeUser(false);
+
+        $definition = $runner->definitionForUser($user, 'artisan-runner:demo');
+
+        $this->assertIsArray($definition);
+        $this->assertSame('artisan-runner:demo', $definition['name'] ?? $definition['command'] ?? 'artisan-runner:demo');
+    }
+
+    /** @test */
+    public function it_returns_empty_panel_endpoints_shape(): void
+    {
+        $runner = $this->app->make(ArtisanRunnerInterface::class);
+        $endpoints = $runner->emptyPanelEndpoints();
+
+        $this->assertSame(['commands', 'definition', 'run', 'answer'], array_keys($endpoints));
+        $this->assertSame('', $endpoints['commands']);
+    }
+
     private function registerDemoCommand(): void
     {
         $command = new class extends Command

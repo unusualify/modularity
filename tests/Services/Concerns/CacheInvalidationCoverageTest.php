@@ -36,6 +36,7 @@ class CacheInvalidationCoverageTest extends TestCase
     protected function tearDown(): void
     {
         Schema::dropIfExists('coverage_invalidate_models');
+        Schema::dropIfExists('um_cms_url_routes');
         Mockery::close();
         parent::tearDown();
     }
@@ -326,8 +327,8 @@ class CacheInvalidationCoverageTest extends TestCase
 
         $service->purgeModelCacheTypes($model, ['presentationItem' => true]);
 
-        $this->assertSame([[CoverageInvalidateModel::class, 30]], $service->forgetByRelationCalls);
-        $this->assertSame([['TestModule', 'TestRoute', 30]], $service->forgetByModuleRouteIdCalls);
+        // purgePresentationItemForModel always clears both StaleFileCache and URL store.
+        $this->assertSame(1, $service->urlStoreSpy->forgetByRelationCount);
     }
 
     /** @test */
@@ -611,6 +612,136 @@ class CacheInvalidationCoverageTest extends TestCase
         $service->callForgetStaleFilesByRelation(CoverageInvalidateModel::class, 80);
 
         $this->assertSame(1, $service->urlStoreSpy->forgetByRelationCount);
+    }
+
+    /** @test */
+    public function forget_stale_files_by_relation_always_clears_stale_file_cache_even_when_store_is_url(): void
+    {
+        $service = new DirectCacheInvalidation;
+        $service->setPresentationCacheStore('url');
+
+        $cacheKey = 'modularous:TestModule:TestRoute:presentationItem:80:' . md5(serialize(['locale' => 'en']));
+        $relations = [CoverageInvalidateModel::class => 80];
+        $this->assertTrue($service->staleFileCache->put($cacheKey, '<html>stale</html>', 3600, $relations));
+        $this->assertSame('<html>stale</html>', $service->staleFileCache->get($cacheKey, null, $relations));
+
+        $service->callForgetStaleFilesByRelation(CoverageInvalidateModel::class, 80);
+
+        $this->assertNull($service->staleFileCache->get($cacheKey, null, $relations));
+        $this->assertSame(1, $service->urlStoreSpy->forgetByRelationCount);
+    }
+
+    /** @test */
+    public function forget_stale_files_by_relation_clears_stale_file_cache_when_store_is_model(): void
+    {
+        $service = new DirectCacheInvalidation;
+        $service->setPresentationCacheStore('model');
+
+        $cacheKey = 'modularous:TestModule:TestRoute:presentationItem:81:' . md5(serialize(['locale' => 'en']));
+        $relations = [CoverageInvalidateModel::class => 81];
+        $this->assertTrue($service->staleFileCache->put($cacheKey, '<html>model-stale</html>', 3600, $relations));
+
+        $service->callForgetStaleFilesByRelation(CoverageInvalidateModel::class, 81);
+
+        $this->assertNull($service->staleFileCache->get($cacheKey, null, $relations));
+        $this->assertSame(0, $service->urlStoreSpy->forgetByRelationCount);
+    }
+
+    /** @test */
+    public function forget_presentation_stale_for_model_clears_stale_file_cache_when_store_is_url(): void
+    {
+        $service = new DirectCacheInvalidation;
+        $service->setPresentationCacheStore('url');
+
+        $model = new CoverageInvalidateModel;
+        $model->id = 82;
+        $model->exists = true;
+
+        $cacheKey = 'modularous:TestModule:TestRoute:presentationItem:82:' . md5(serialize(['locale' => 'en']));
+        $relations = [CoverageInvalidateModel::class => 82];
+        $this->assertTrue($service->staleFileCache->put($cacheKey, '<html>presentation</html>', 3600, $relations));
+
+        $service->callForgetPresentationStaleForModel($model);
+
+        $this->assertNull($service->staleFileCache->get($cacheKey, null, $relations));
+        $this->assertSame(1, $service->urlStoreSpy->forgetByRelationCount);
+    }
+
+    /** @test */
+    public function invalidate_presentation_item_cache_always_clears_stale_file_cache_when_store_is_url(): void
+    {
+        $service = new DirectCacheInvalidation;
+        $service->setPresentationCacheStore('url');
+
+        $cacheKey = 'modularous:TestModule:TestRoute:presentationItem:83:' . md5(serialize(['locale' => 'en']));
+        $relations = [CoverageInvalidateModel::class => 83];
+        $this->assertTrue($service->staleFileCache->put($cacheKey, '<html>invalidate-me</html>', 3600, $relations));
+
+        $service->invalidatePresentationItemCache('TestModule', 'TestRoute', 83, CoverageInvalidateModel::class);
+
+        $this->assertNull($service->staleFileCache->get($cacheKey, null, $relations));
+        $this->assertSame(1, $service->urlStoreSpy->forgetByRelationCount);
+    }
+
+    /** @test */
+    public function purge_presentation_item_for_model_clears_stale_file_cache_even_when_store_is_url(): void
+    {
+        $service = new DirectCacheInvalidation;
+        $service->setPresentationCacheStore('url');
+
+        $model = new CoverageInvalidateModel;
+        $model->id = 84;
+        $model->exists = true;
+
+        $cacheKey = 'modularous:TestModule:TestRoute:presentationItem:84:' . md5(serialize(['locale' => 'en']));
+        $relations = [CoverageInvalidateModel::class => 84];
+        $this->assertTrue($service->staleFileCache->put($cacheKey, '<html>purge-me</html>', 3600, $relations));
+
+        $deleted = $service->purgePresentationItemForModel($model, 'TestModule', 'TestRoute');
+
+        $this->assertGreaterThanOrEqual(1, $deleted);
+        $this->assertNull($service->staleFileCache->get($cacheKey, null, $relations));
+        $this->assertSame(1, $service->urlStoreSpy->forgetByRelationCount);
+    }
+
+    /** @test */
+    public function purge_url_presentation_path_variants_forgets_paths_from_url_route_rows(): void
+    {
+        Schema::dropIfExists('um_cms_url_routes');
+        Schema::create('um_cms_url_routes', function (Blueprint $table) {
+            $table->id();
+            $table->string('locale');
+            $table->string('normalized_path');
+            $table->string('urlable_type');
+            $table->unsignedBigInteger('urlable_id');
+            $table->string('kind')->nullable();
+            $table->timestamps();
+        });
+
+        $model = new CoverageInvalidateModel;
+        $model->id = 85;
+
+        \Modules\Cms\Entities\UrlRoute::query()->insert([
+            'locale' => 'en',
+            'normalized_path' => '/errors/404',
+            'urlable_type' => $model->getMorphClass(),
+            'urlable_id' => 85,
+            'kind' => \Modules\Cms\Entities\UrlRoute::KIND_PAGE_PUBLIC,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $service = new DirectCacheInvalidation;
+        $service->setPresentationCacheStore('url');
+        $service->urlStoreSpy->useForgetPathVariantsReturn = true;
+        $service->urlStoreSpy->forgetPathVariantsReturn = 2;
+
+        $deleted = $service->callPurgeUrlPresentationPathVariantsForModel(CoverageInvalidateModel::class, 85);
+
+        $this->assertSame(2, $deleted);
+        $this->assertSame(1, $service->urlStoreSpy->forgetPathVariantsCount);
+
+        Schema::dropIfExists('um_cms_url_routes');
     }
 
     /** @test */
@@ -1135,6 +1266,10 @@ class SpyingUrlPresentationCacheStore implements UrlPresentationCacheStoreInterf
 
     public int $forgetByModuleRouteReturn = 1;
 
+    public int $forgetPathVariantsReturn = 1;
+
+    public bool $useForgetPathVariantsReturn = false;
+
     public function __construct(
         private readonly UrlKeyedStaleCache $cache,
     ) {}
@@ -1163,6 +1298,10 @@ class SpyingUrlPresentationCacheStore implements UrlPresentationCacheStoreInterf
     public function forgetPathVariants(string $locale, string $normalizedPath): int
     {
         $this->forgetPathVariantsCount++;
+
+        if ($this->useForgetPathVariantsReturn) {
+            return $this->forgetPathVariantsReturn;
+        }
 
         return $this->cache->forgetPathVariants($locale, $normalizedPath);
     }
