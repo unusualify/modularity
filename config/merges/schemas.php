@@ -29,15 +29,7 @@ return [
             'name' => 'name',
             'label' => 'Name',
             'type' => 'text',
-        ],
-        [
-            'name' => 'published',
-            'label' => 'Published',
-            'isEvent' => true,
-            'type' => 'switch',
-            'class' => 'mt-n2',
-            'density' => 'compact',
-        ],
+        ]
     ],
     'default_pre_headers' => [
         [

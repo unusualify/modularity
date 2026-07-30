@@ -10,11 +10,14 @@ trait PublishableTrait
 {
     public function prependFormSchemaPublishableTrait($scope = []): array
     {
-        if (! classHasTrait($this->getModel(), Publishable::class)) {
+        $model = $this->getModel();
+        if (! classHasTrait($model, Publishable::class)) {
             return [];
         }
 
-        return PublishableMetadata::defaultFormInputs($this->translatedPublishableAttributes());
+        $hasPublishDates = $model->hasPublishDates();
+
+        return PublishableMetadata::defaultFormInputs($this->translatedPublishableAttributes(), $hasPublishDates);
     }
 
     /**

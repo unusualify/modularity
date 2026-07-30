@@ -6,10 +6,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Modules\SystemUser\Entities\Company;
 use Unusualify\Modularous\Entities\Model;
 use Unusualify\Modularous\Entities\Traits\HasTranslation;
+use Unusualify\Modularous\Entities\Traits\Publishable;
 
 class Country extends Model
 {
-    use HasTranslation;
+    use HasTranslation, Publishable;
 
     /**
      * The attributes that are mass assignable.
@@ -17,7 +18,6 @@ class Country extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'published',
         'code',
         'phone_code',
     ];

@@ -17,7 +17,7 @@ trait Publishable
         ]);
     }
 
-    protected function hasPublishDates(): bool
+    public function hasPublishDates(): bool
     {
         return $this->usePublishDates ?? false;
     }

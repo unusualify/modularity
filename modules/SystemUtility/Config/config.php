@@ -137,14 +137,6 @@ return [
                     'type' => 'text',
                 ],
                 [
-                    'name' => 'published',
-                    'label' => 'Published',
-                    'isEvent' => true,
-                    'type' => 'switch',
-                    'class' => 'mt-n2',
-                    'density' => 'compact',
-                ],
-                [
                     'type' => 'text',
                     'name' => 'code',
                     'label' => 'Code',

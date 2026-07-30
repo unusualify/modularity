@@ -5,17 +5,17 @@ namespace Modules\SystemUser\Entities;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Modules\SystemUser\Entities\Traits\FlushesSecurityCache;
 use Unusualify\Modularous\Entities\Model;
+use Unusualify\Modularous\Entities\Traits\Publishable;
 
 class Capability extends Model
 {
-    use FlushesSecurityCache;
+    use FlushesSecurityCache, Publishable;
 
     protected $fillable = [
         'name',
         'title',
         'strict_route_binding',
-        'requires_step_up',
-        'published',
+        'requires_step_up'
     ];
 
     // protected $casts = [
