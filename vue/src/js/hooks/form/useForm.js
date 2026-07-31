@@ -258,6 +258,8 @@ export default function useForm(props, context) {
     props.modelValue,
   ))
 
+  const initialModel = ref(cloneDeep(model.value))
+
   const schemaUpdating = ref(false)
 
   const setSchemaUpdating = (value) => {
@@ -321,6 +323,49 @@ export default function useForm(props, context) {
   const currentRevisions = ref(props.revisions || [])
   const restoringRevisionId = ref(null)
 
+  // the authorized user select or the status (stateable) event in the
+  // header, both of which are only persisted on Submit.
+  const dirtyWatchKeys = computed(() => {
+    const keys = []
+
+    const collect = (input) => {
+      if (['wrap', 'group'].includes(input.type)) {
+        Object.values(input.schema ?? {}).forEach(collect)
+        return
+      }
+
+      if ((checkSubmittable(input) || input.dirtyCheck === true) && input.name) {
+        keys.push(input.name)
+      }
+    }
+
+    Object.values(inputSchema.value).forEach(collect)
+
+    Object.values(formEventSchema.value).forEach((event) => {
+      if (event && event.dirtyCheck === true && event.name) {
+        keys.push(event.name)
+      }
+    })
+
+    return keys
+  })
+
+  const isEmptyValue = (v) => v === null || v === undefined || v === ''
+
+  const isDirty = computed(() =>
+    dirtyWatchKeys.value.some((key) => {
+      const current = model.value[key]
+      const initial = initialModel.value[key]
+
+      if (isEmptyValue(current) && isEmptyValue(initial)) {
+        return false
+      }
+
+      return !isEqual(current, initial)
+    })
+  )
+
+
   const hasAdditionalSection = computed(() => context.slots.right
     || context.slots['right.top']
     || context.slots['right.bottom']
@@ -344,6 +389,7 @@ export default function useForm(props, context) {
 
     schemaUpdating,
     formActionsActive: computed(() => !schemaUpdating.value && props.isEditing),
+    isDirty,
     chunkedRawSchema,
     inputSchema,
     formEventSchema,
@@ -700,6 +746,10 @@ export default function useForm(props, context) {
       if(isEqual(newVal, oldVal) && isEqual(newModelValue, model.value)) return
 
       model.value = getModel(rawSchema.value, newVal, store.state)
+      // Re-baseline the dirty snapshot to the freshly saved data (e.g. after a
+      // refreshOnSaved partial reload)
+      initialModel.value = cloneDeep(model.value)
+
     }
   })
 
