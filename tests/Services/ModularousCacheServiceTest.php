@@ -436,7 +436,7 @@ class ModularousCacheServiceTest extends TestCase
         $service = new ModularousCacheService;
 
         $this->assertTrue($service->isEnabled('Blog', 'BlogLanding', 'presentationItem'));
-        $this->assertTrue($service->isEnabled('Blog', 'BlogLanding', 'missing-type'));
+        $this->assertFalse($service->isEnabled('Blog', 'BlogLanding', 'missing-type'));
     }
 
     /** @test */
