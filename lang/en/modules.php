@@ -34,6 +34,11 @@ return [
             'name' => 'Site Setting | Site Settings | {n} Site Setting',
         ],
     ],
+    'error_page' => [
+        'error_page' => [
+            'name' => 'Error Page | Error Pages | {n} Error Page',
+        ],
+    ],
     'system_notification' => [
         'my_notification' => [
             'name' => 'My Notification | My Notifications | {n} My Notification',

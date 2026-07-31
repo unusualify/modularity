@@ -24,7 +24,8 @@
     <env name="MODULAROUS_CACHE_OBSERVER_QUEUE" value="false"/>
     <!-- APP_KEY required for Passport client -->
     <env name="APP_KEY" value="base64:W99w+5JYz8SVGf5sx17gmPR6uoNCtWiEVc+9qu8iGEg="/>
-    <ini name="memory_limit" value="1G"/>
+    <!-- Coverage merge (ParaTest) needs more than 1G; -d flags are overridden by this ini. -->
+    <ini name="memory_limit" value="-1"/>
   </php>
   <source>
     <include>

@@ -1,5 +1,5 @@
 ---
-sidebarPos: 8
+sidebarPos: 9
 sidebarTitle: Sitemap & SEO
 sidebarGroupTitle: Cms
 outline: deep

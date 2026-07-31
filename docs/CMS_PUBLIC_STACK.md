@@ -22,6 +22,10 @@ Bu belge, ön yüz CMS URL’lerinin **parent segment + UrlRoute + çözümleyic
    View’a giden başlık/açıklama/canonical: `CmsPublicSeo` + `CanonicalUrlResolver(Interface)`.  
    Config: `cms_routing.canonical_host`, `redirect_to_canonical`, `hide_default_locale_segment`, slugless ayarları.
 
+6. **HTTP error pages (ErrorPage module)**  
+   URL stack’inin dışında: `HttpException` 403/404/500 → published `ErrorPage` by `error_code` → LayoutBuilder body wrap.  
+   Ayrıntı: [`ERROR_PAGE.md`](./ERROR_PAGE.md). ParentSegment / UrlRoute **yok**.
+
 ---
 
 ## Katmanlı akış (diyagram)

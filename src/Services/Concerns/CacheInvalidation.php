@@ -265,14 +265,14 @@ trait CacheInvalidation
     {
         $store = $this->getPresentationCacheStore();
 
+        // Always clear model-scoped StaleFileCache. Some modules (e.g. ErrorPage) write
+        // presentation HTML there even when presentationItem.store=url (no UrlRoute).
         if ($modelClass !== null && $id !== null) {
-            if ($store === 'model') {
-                $this->getStaleFileCache()->forgetByRelation($modelClass, $id);
-            }
+            $this->getStaleFileCache()->forgetByRelation($modelClass, $id);
             if ($store === 'url') {
                 $this->forgetUrlStaleForModel($modelClass, $id);
             }
-        } elseif ($id !== null && $store === 'model') {
+        } elseif ($id !== null) {
             $this->forgetStaleFilesByModuleRouteId($moduleName, $moduleRouteName, $id);
         }
 
@@ -286,7 +286,7 @@ trait CacheInvalidation
         $moduleRouteName = Str::studly($moduleRouteName);
 
         $this->invalidateByPattern("{$this->getPrefix()}:{$moduleName}:{$moduleRouteName}:presentationItem:{$id}:*");
-        if ($store === 'model' && $id !== null) {
+        if ($id !== null) {
             $this->forgetStaleFilesByModuleRouteId($moduleName, $moduleRouteName, $id);
         }
     }
@@ -457,13 +457,8 @@ trait CacheInvalidation
             $this->invalidateModuleRoute($moduleName, $moduleRouteName);
 
             if (($types['presentationItem'] ?? false) && $id !== null) {
-                if ($this->getPresentationCacheStore() === 'model') {
-                    $this->forgetStaleFilesByRelation($model::class, $id);
-                    $this->forgetStaleFilesByModuleRouteId($moduleName, $moduleRouteName, $id);
-                }
-                if ($this->getPresentationCacheStore() === 'url') {
-                    $this->forgetUrlStaleForModel($model::class, $id);
-                }
+                // Store-agnostic: clears StaleFileCache + URL store (see purgePresentationItemForModel).
+                $this->purgePresentationItemForModel($model, $moduleName, $moduleRouteName);
             }
 
             return;
@@ -472,6 +467,12 @@ trait CacheInvalidation
         $this->invalidateRouteLevelCaches($moduleName, $moduleRouteName, $types);
 
         if ($id !== null) {
+            if (($types['presentationItem'] ?? false)) {
+                // Clear filesystem presentation caches before Redis/pattern invalidation so
+                // store=url still drops model-scoped StaleFileCache (e.g. ErrorPage).
+                $this->purgePresentationItemForModel($model, $moduleName, $moduleRouteName);
+            }
+
             $this->invalidatePerIdCachesForRoute($moduleName, $moduleRouteName, $id, $types, $model);
         }
     }
@@ -808,27 +809,23 @@ trait CacheInvalidation
             return;
         }
 
-        $store = $this->getPresentationCacheStore();
-
-        if ($store === 'model') {
-            $this->getStaleFileCache()->forgetByRelation($model::class, $model->getKey());
-            $moduleName = $this->getModuleNameFromModel($model);
-            $moduleRouteName = $this->getModuleRouteNameFromModel($model);
-            if ($moduleName && $moduleRouteName) {
-                $this->forgetStaleFilesByModuleRouteId($moduleName, $moduleRouteName, $model->getKey());
-            }
+        // Always clear StaleFileCache — modules like ErrorPage write model-scoped HTML
+        // there even when presentationItem.store=url.
+        $this->getStaleFileCache()->forgetByRelation($model::class, $model->getKey());
+        $moduleName = $this->getModuleNameFromModel($model);
+        $moduleRouteName = $this->getModuleRouteNameFromModel($model);
+        if ($moduleName && $moduleRouteName) {
+            $this->forgetStaleFilesByModuleRouteId($moduleName, $moduleRouteName, $model->getKey());
         }
 
-        if ($store === 'url') {
+        if ($this->getPresentationCacheStore() === 'url') {
             $this->forgetUrlStaleForModel($model::class, $model->getKey());
         }
     }
 
     protected function forgetStaleFilesByRelation(string $modelClass, int|string $id): void
     {
-        if ($this->getPresentationCacheStore() === 'model') {
-            $this->getStaleFileCache()->forgetByRelation($modelClass, $id);
-        }
+        $this->getStaleFileCache()->forgetByRelation($modelClass, $id);
 
         if ($this->getPresentationCacheStore() === 'url') {
             $this->forgetUrlStaleForModel($modelClass, $id);

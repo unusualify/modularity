@@ -53,6 +53,7 @@ Commands that **create runtime records** (DB entries, users).
 | modularous:make:* | Make*Command |
 | modularous:create:superadmin | CreateSuperAdminCommand |
 | modularous:create:database | CreateDatabaseCommand |
+| modularous:create:error-page-defaults | CreateErrorPageDefaultsCommand (ErrorPage module) |
 | modularous:install | InstallCommand |
 | modularous:setup:development | SetupModularousDevelopmentCommand |
 | modularous:cache:list | CacheListCommand |

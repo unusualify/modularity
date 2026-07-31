@@ -70,5 +70,6 @@ flowchart TB
 | Document shell + Blade sources | [Layout builders](./layout-builders) |
 | Per-model presentation binding | [Page layouts](./page-layouts) |
 | Visitor redirects | [Redirects](./redirects) |
+| HTTP 403 / 404 / 500 CMS records | [Error pages](./error-pages) |
 | `/sitemap.xml` + robots | [Sitemap & SEO](./sitemap-and-seo) |
 | `modularous.cms_*` keys | [Configuration](./configuration) |

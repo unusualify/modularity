@@ -58,6 +58,43 @@ class ModuleHelpersTest extends TestCase
         $this->assertTrue(is_null($result) || is_string($result) || is_array($result));
     }
 
+    /** @test */
+    public function test_curt_module_name_from_explicit_path(): void
+    {
+        $this->assertSame('Blog', curtModuleName('/var/www/Modules/Blog/Entities/Post.php'));
+        $this->assertSame('Cms', curtModuleName('packages/app/modules/Cms/Support/Helper.php'));
+    }
+
+    /** @test */
+    public function test_backtrace_formatter_and_benchmark_paths(): void
+    {
+        $formatted = backtrace_formatter([], [
+            'file' => __FILE__,
+            'line' => 10,
+            'function' => 'demo',
+        ]);
+        $this->assertSame(10, $formatted[__FILE__]['line']);
+
+        $this->assertIsArray(backtrace_formatted());
+
+        config(['modularous.benchmark_enabled' => false]);
+        $this->assertSame(5, benchmark(static fn () => 5, 'label'));
+
+        config(['modularous.benchmark_enabled' => true, 'benchmark_emergency_time' => 0, 'benchmark_log_level' => 'debug']);
+        $elapsed = null;
+        $this->assertSame(1, benchmark(static fn () => 1, 'fast', false, 'milliseconds', $elapsed));
+        $this->assertNotNull($elapsed);
+
+        $this->expectException(\Unusualify\Modularous\Exceptions\ModularousException::class);
+        benchmark(static fn () => null, 'die', true);
+    }
+
+    /** @test */
+    public function test_exceptional_running_in_console(): void
+    {
+        $this->assertIsBool(exceptionalRunningInConsole());
+    }
+
     protected function tearDown(): void
     {
         \Mockery::close();
