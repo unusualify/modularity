@@ -52,7 +52,8 @@ final class CmsPublicPresentationInnerData
     {
         return [
             'item' => $item,
-            'seoTitle' => $seo['title'],
+            'title' => $seo['title'],
+            'seoTitle' => $seo['seoTitle'],
             'seoDescription' => $seo['description'],
             'canonicalUrl' => $seo['canonicalUrl'],
             'robotsMeta' => $seo['robotsMeta'],

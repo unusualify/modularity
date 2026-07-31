@@ -298,6 +298,7 @@ final class ErrorPageRenderer
         $data = [
             'errorCode' => $errorCode,
             'homeUrl' => url('/'),
+            'title' => $this->metaTitle($errorCode),
             'seoTitle' => $this->metaTitle($errorCode),
             'seoDescription' => $this->metaDescription($errorCode),
             'robotsMeta' => CmsPublicSeo::ROBOTS_NOINDEX_NOFOLLOW,

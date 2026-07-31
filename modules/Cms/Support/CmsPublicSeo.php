@@ -61,13 +61,20 @@ final class CmsPublicSeo
     {
         $isTranslatable = @classHasTrait($item, HasTranslation::class);
         $translation = $isTranslatable ? $item->translate($locale) : $item;
-        $title = optional($translation)->seo_title ?? null;
+        $seoTitle = optional($translation)->seo_title ?? null;
+        $title = optional($translation)->title ?? null;
 
         // #TODO: add default title and description for the page if not set
+        if (is_array($seoTitle) && array_key_exists($locale, $seoTitle)) {
+            $seoTitle = (string) $seoTitle[$locale] ?? $item->title ?? 'Page';
+        }
+
         if (is_array($title) && array_key_exists($locale, $title)) {
-            $title = (string) $title[$locale] ?? $item->title ?? 'Page';
-        } elseif ($title !== null) {
             $title = (string) (optional($translation)->title ?? 'Page');
+        }
+
+        if ($title == null) {
+            $title = $seoTitle;
         }
 
         $description = optional($translation)->seo_description;
@@ -95,6 +102,7 @@ final class CmsPublicSeo
 
         return [
             'title' => $title,
+            'seoTitle' => $seoTitle,
             'description' => $description,
             'canonicalUrl' => $canonicalUrl,
             'robotsMeta' => $robotsMeta,
