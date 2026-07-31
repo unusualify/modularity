@@ -184,6 +184,142 @@ final class StaleFileCache
         return $deleted;
     }
 
+    /**
+     * Non-destructive status peek for presentationItem files under a module/route/id.
+     *
+     * Does not delete expired files (unlike {@see get()} / {@see readPathIfFresh()}).
+     *
+     * @return array{freshness: string, expires_at: int, meta: array<string, mixed>}|null
+     */
+    public function inspectByModuleRouteId(string $moduleName, string $moduleRouteName, int|string $id): ?array
+    {
+        $byLocale = $this->inspectLocalesByModuleRouteId($moduleName, $moduleRouteName, $id);
+        if ($byLocale === []) {
+            return null;
+        }
+
+        $best = null;
+        foreach ($byLocale as $candidate) {
+            if ($best === null) {
+                $best = $candidate;
+
+                continue;
+            }
+
+            if ($best['freshness'] !== 'HIT' && $candidate['freshness'] === 'HIT') {
+                $best = $candidate;
+
+                continue;
+            }
+
+            if ($best['freshness'] === $candidate['freshness'] && $candidate['expires_at'] > $best['expires_at']) {
+                $best = $candidate;
+            }
+        }
+
+        return $best;
+    }
+
+    /**
+     * Non-destructive per-locale status peek for presentationItem files under a module/route/id.
+     *
+     * @return array<string, array{freshness: string, expires_at: int, meta: array<string, mixed>, locale: string}>
+     */
+    public function inspectLocalesByModuleRouteId(string $moduleName, string $moduleRouteName, int|string $id): array
+    {
+        $module = Str::studly($moduleName);
+        $route = Str::studly($moduleRouteName);
+        $id = (string) $id;
+        $now = time();
+        $byLocale = [];
+
+        $patterns = [
+            $this->basePath . '/' . $module . '/' . $route . '/' . $id . '/*.meta',
+            $this->basePath . '/' . $module . '/' . $route . '/' . $id . '/*/*.meta',
+            $this->basePath . '/' . $module . '/' . $route . '/*/' . $id . '/*.meta',
+            $this->basePath . '/' . $module . '/' . $route . '/*/' . $id . '/*/*.meta',
+        ];
+
+        foreach ($patterns as $pattern) {
+            foreach (glob($pattern) ?: [] as $metaPath) {
+                if (! is_file($metaPath)) {
+                    continue;
+                }
+
+                $decoded = json_decode((string) file_get_contents($metaPath), true);
+                if (! is_array($decoded)) {
+                    continue;
+                }
+
+                $locale = $this->localeFromMetaPath($metaPath, $decoded);
+                if ($locale === '') {
+                    $locale = '_';
+                }
+
+                $expiresAt = (int) ($decoded['expires_at'] ?? 0);
+                $freshness = ($expiresAt > 0 && $now <= $expiresAt)
+                    ? 'HIT'
+                    : 'STALE';
+
+                $candidate = [
+                    'freshness' => $freshness,
+                    'expires_at' => $expiresAt,
+                    'meta' => $decoded,
+                    'locale' => $locale,
+                ];
+
+                $existing = $byLocale[$locale] ?? null;
+                if ($existing === null) {
+                    $byLocale[$locale] = $candidate;
+
+                    continue;
+                }
+
+                if ($existing['freshness'] !== 'HIT' && $freshness === 'HIT') {
+                    $byLocale[$locale] = $candidate;
+
+                    continue;
+                }
+
+                if ($existing['freshness'] === $freshness && $expiresAt > $existing['expires_at']) {
+                    $byLocale[$locale] = $candidate;
+                }
+            }
+        }
+
+        return $byLocale;
+    }
+
+    /**
+     * @param  array<string, mixed>  $meta
+     */
+    protected function localeFromMetaPath(string $metaPath, array $meta): string
+    {
+        $fromMeta = isset($meta['locale']) ? $this->normalizeCacheLocale((string) $meta['locale']) : '';
+        if ($fromMeta !== '') {
+            return $fromMeta;
+        }
+
+        // …/{id}/{locale}/{hash}.html.meta or …/{id}/{hash}.html.meta
+        $parts = explode('/', str_replace('\\', '/', $metaPath));
+        $file = $parts[array_key_last($parts)] ?? '';
+        if (! str_ends_with($file, '.html.meta')) {
+            return '';
+        }
+
+        $parent = $parts[count($parts) - 2] ?? '';
+        if ($parent === '' || preg_match('/^[a-f0-9]{32}$/', $parent) === 1) {
+            return '';
+        }
+
+        // Parent looks like a locale segment (en, tr, …), not the record id.
+        if (preg_match('/^[a-z]{2}([_-][a-zA-Z]+)?$/', $parent) === 1) {
+            return $this->normalizeCacheLocale($parent);
+        }
+
+        return '';
+    }
+
     public function resolvePath(string $cacheKey, array $relations = []): ?string
     {
         if (preg_match(

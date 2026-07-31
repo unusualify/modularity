@@ -40,6 +40,7 @@ trait ResourceCacheActionsTrait
                 'icon' => 'mdi-delete-sweep',
                 'color' => 'warning',
                 'params' => ['types' => $defaultTypes],
+                'reloadOnSuccess' => true,
             ],
             [
                 'name' => 'cacheWarm',
@@ -134,6 +135,7 @@ trait ResourceCacheActionsTrait
                 ? $def['name']
                 : 'resourceCache';
 
+            $action['disableOnDirty'] = true;
             $actions[$key] = $action;
         }
 
@@ -148,6 +150,81 @@ trait ResourceCacheActionsTrait
         return $moduleName !== null
             && $routeName !== null
             && ModularousCache::hasAdminCacheActions($moduleName, $routeName);
+    }
+
+    /**
+     * @param  array<int, mixed>  $scope
+     * @return array<int, array<string, mixed>>
+     */
+    public function appendTableHeaderResourceCacheActionsTrait($scope = []): array
+    {
+        if (! $this->presentationItemTableHeaderEnabled()) {
+            return [];
+        }
+
+        return [
+            [
+                'title' => __('messages.resource-cache.presentation-item-column.label'),
+                'key' => 'presentation_item_cache_formatted',
+                'formatter' => ['dynamic'],
+                'sortable' => false,
+            ],
+        ];
+    }
+
+    /**
+     * Informative secondary form field: same presentationItem chip group as the table column.
+     *
+     * @param  array<int, mixed>  $scope
+     * @return array<int, array<string, mixed>>
+     */
+    public function prependFormSchemaResourceCacheActionsTrait($scope = []): array
+    {
+        if (! $this->presentationItemTableHeaderEnabled()) {
+            return [];
+        }
+
+        return [
+            [
+                'type' => 'dynamic-component',
+                'name' => 'presentation_item_cache_formatted',
+                'label' => __('messages.resource-cache.presentation-item-column.label'),
+                'isSecondary' => true,
+                'noSubmit' => true,
+                'creatable' => false,
+            ],
+        ];
+    }
+
+    protected function presentationItemTableHeaderEnabled(): bool
+    {
+        $moduleName = $this->getModuleName();
+        $routeName = $this->getRouteName();
+
+        if ($moduleName === null || $routeName === null || $moduleName === '' || $routeName === '') {
+            return false;
+        }
+
+        return self::isPresentationItemCacheEnabledForRoute($moduleName, $routeName);
+    }
+
+    public static function isPresentationItemCacheEnabledForRoute(string $moduleName, string $routeName): bool
+    {
+        if (! ModularousCache::isPresentationCacheEnabled()) {
+            return false;
+        }
+
+        $store = ModularousCache::getPresentationCacheStore();
+
+        if ($store === 'url') {
+            return ModularousCache::isCacheTypeConfigured($moduleName, $routeName, 'presentationItem');
+        }
+
+        if ($store === 'model') {
+            return ModularousCache::isEnabled($moduleName, $routeName, 'presentationItem');
+        }
+
+        return false;
     }
 
     /**

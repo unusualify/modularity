@@ -122,6 +122,76 @@ class ResourceCacheActionsTraitTest extends TestCase
             'reloadOnSuccess' => true,
         ], $action);
     }
+
+    public function test_append_table_header_returns_empty_when_presentation_item_disabled(): void
+    {
+        $repository = new RepositoryUsingResourceCacheActions;
+
+        ModularousCache::shouldReceive('isPresentationCacheEnabled')
+            ->once()
+            ->andReturn(false);
+
+        $this->assertSame([], $repository->appendTableHeaderResourceCacheActionsTrait());
+    }
+
+    public function test_append_table_header_returns_column_when_presentation_item_enabled_for_url_store(): void
+    {
+        $repository = new RepositoryUsingResourceCacheActions;
+
+        ModularousCache::shouldReceive('isPresentationCacheEnabled')
+            ->once()
+            ->andReturn(true);
+        ModularousCache::shouldReceive('getPresentationCacheStore')
+            ->once()
+            ->andReturn('url');
+        ModularousCache::shouldReceive('isCacheTypeConfigured')
+            ->once()
+            ->with('TestModule', 'TestRoute', 'presentationItem')
+            ->andReturn(true);
+
+        $headers = $repository->appendTableHeaderResourceCacheActionsTrait();
+
+        $this->assertCount(1, $headers);
+        $this->assertSame('presentation_item_cache_formatted', $headers[0]['key']);
+        $this->assertSame(['dynamic'], $headers[0]['formatter']);
+        $this->assertFalse($headers[0]['sortable']);
+    }
+
+    public function test_prepend_form_schema_returns_empty_when_presentation_item_disabled(): void
+    {
+        $repository = new RepositoryUsingResourceCacheActions;
+
+        ModularousCache::shouldReceive('isPresentationCacheEnabled')
+            ->once()
+            ->andReturn(false);
+
+        $this->assertSame([], $repository->prependFormSchemaResourceCacheActionsTrait());
+    }
+
+    public function test_prepend_form_schema_returns_dynamic_component_when_enabled(): void
+    {
+        $repository = new RepositoryUsingResourceCacheActions;
+
+        ModularousCache::shouldReceive('isPresentationCacheEnabled')
+            ->once()
+            ->andReturn(true);
+        ModularousCache::shouldReceive('getPresentationCacheStore')
+            ->once()
+            ->andReturn('url');
+        ModularousCache::shouldReceive('isCacheTypeConfigured')
+            ->once()
+            ->with('TestModule', 'TestRoute', 'presentationItem')
+            ->andReturn(true);
+
+        $inputs = $repository->prependFormSchemaResourceCacheActionsTrait();
+
+        $this->assertCount(1, $inputs);
+        $this->assertSame('dynamic-component', $inputs[0]['type']);
+        $this->assertSame('presentation_item_cache_formatted', $inputs[0]['name']);
+        $this->assertTrue($inputs[0]['isSecondary']);
+        $this->assertTrue($inputs[0]['noSubmit']);
+        $this->assertFalse($inputs[0]['creatable']);
+    }
 }
 
 final class RepositoryUsingResourceCacheActions

@@ -69,6 +69,41 @@ trait ManageResourceCache
     }
 
     /**
+     * @return array<int, string>
+     */
+    public function addFormAppendsManageResourceCache(): array
+    {
+        return $this->presentationItemCacheAppends();
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public function addIndexAppendsManageResourceCache(): array
+    {
+        return $this->presentationItemCacheAppends();
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    protected function presentationItemCacheAppends(): array
+    {
+        $moduleName = $this->getModuleName();
+        $routeName = $this->getRouteName();
+
+        if (
+            ! is_string($moduleName) || $moduleName === ''
+            || ! is_string($routeName) || $routeName === ''
+            || ! ResourceCacheActionsTrait::isPresentationItemCacheEnabledForRoute($moduleName, $routeName)
+        ) {
+            return [];
+        }
+
+        return ['presentation_item_cache_formatted'];
+    }
+
+    /**
      * Check if the repository uses the ResourceCacheActionsTrait.
      */
     protected function repositoryUsesResourceCacheActions(): bool

@@ -173,6 +173,16 @@ return [
         'validation' => [
             'types-required' => 'Select at least one cache type.',
         ],
+        'presentation-item-column' => [
+            'label' => 'Presentation cache',
+            'fresh' => 'Valid until :expires',
+            'fresh-no-expiry' => 'Cached',
+            'stale' => 'Stale until :expires',
+            'stale-no-expiry' => 'Stale',
+            'expired' => 'Expired :expires',
+            'expired-no-expiry' => 'Expired',
+            'missing' => 'Not cached',
+        ],
     ],
 
     'chatable' => [

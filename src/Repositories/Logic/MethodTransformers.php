@@ -422,6 +422,36 @@ trait MethodTransformers
     }
 
     /**
+     * @param array $scope
+     * @return array
+     */
+    public function appendTableHeader($scope = [])
+    {
+        $headers = [];
+
+        foreach ($this->traitsMethods(__FUNCTION__) as $method) {
+            $headers = array_merge($headers, $this->$method($scope));
+        }
+
+        return $headers;
+    }
+
+    /**
+     * @param array $scope
+     * @return array
+     */
+    public function prependTableHeader($scope = [])
+    {
+        $headers = [];
+
+        foreach ($this->traitsMethods(__FUNCTION__) as $method) {
+            $headers = array_merge($headers, $this->$method($scope));
+        }
+
+        return $headers;
+    }
+
+    /**
      * @param Builder $query
      * @return Builder
      */
