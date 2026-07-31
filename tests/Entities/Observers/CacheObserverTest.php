@@ -148,7 +148,7 @@ class CacheObserverTest extends TestCase
         $this->assertCount(1, $dependents);
         $this->assertTrue($dependents[0]['types']['presentationItem']);
         $this->assertFalse($dependents[0]['types']['counts']);
-        $this->assertTrue($dependents[0]['types']['formItem']);
+        $this->assertFalse($dependents[0]['types']['formItem']);
     }
 
     public function test_dependent_with_should_warm_false_skips_warmup(): void

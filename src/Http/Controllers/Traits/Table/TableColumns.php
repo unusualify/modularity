@@ -40,6 +40,29 @@ trait TableColumns
                 ? $this->tableHeaders($headers)
                 : $headers;
 
+            if (is_array($headers)) {
+                $headers = Collection::make($headers);
+            }
+
+            $headerItems = $headers->values()->all();
+
+            if ($this->module && $this->repository && !is_null($headerItems)) {
+                if (method_exists($this->repository, 'appendTableHeader')) {
+                    $appended = $this->normalizeTableHeaderItems(
+                        $this->repository->appendTableHeader($headerItems)
+                    );
+                    $headerItems = $this->mergeTableHeadersBeforeActions($headerItems, $appended);
+                }
+                if (method_exists($this->repository, 'prependTableHeader')) {
+                    $prepended = $this->normalizeTableHeaderItems(
+                        $this->repository->prependTableHeader($headerItems)
+                    );
+                    $headerItems = array_merge($prepended, $headerItems);
+                }
+            }
+
+            $headers = Collection::make($headerItems);
+
             if (isset(static::$tableHeadersCallbacks[static::class]) && is_callable(static::$tableHeadersCallbacks[static::class])) {
                 $headers = call_user_func(static::$tableHeadersCallbacks[static::class], $headers->toArray());
             }
@@ -49,6 +72,7 @@ trait TableColumns
             }
 
             $headers = $headers->reduce(function ($carry, $item) {
+                $item = (object) [...(array) $item, 'visible' => ((array) $item)['visible'] ?? true];
                 $header = $this->getHeader((array) $item);
 
                 if (isset($item->key)) {
@@ -61,6 +85,54 @@ trait TableColumns
             return $this->indexTableColumns = $headers;
         }
 
+    }
+
+    /**
+     * @param  array<int, mixed>  $headers
+     * @return array<int, object>
+     */
+    protected function normalizeTableHeaderItems(array $headers): array
+    {
+        return array_map(
+            fn ($item) => (object) [...(array) $item, 'visible' => ((array) $item)['visible'] ?? true],
+            $headers,
+        );
+    }
+
+    /**
+     * Insert appended headers before the actions column when present; otherwise append.
+     *
+     * @param  array<int, mixed>  $headers
+     * @param  array<int, mixed>  $appended
+     * @return array<int, mixed>
+     */
+    protected function mergeTableHeadersBeforeActions(array $headers, array $appended): array
+    {
+        if ($appended === []) {
+            return $headers;
+        }
+
+        $actionsIndex = null;
+        foreach ($headers as $index => $header) {
+            $key = is_array($header)
+                ? ($header['key'] ?? null)
+                : (is_object($header) ? ($header->key ?? null) : null);
+
+            if ($key === 'actions') {
+                $actionsIndex = $index;
+                break;
+            }
+        }
+
+        if ($actionsIndex === null) {
+            return array_merge($headers, $appended);
+        }
+
+        return array_merge(
+            array_slice($headers, 0, $actionsIndex),
+            $appended,
+            array_slice($headers, $actionsIndex),
+        );
     }
 
     /**

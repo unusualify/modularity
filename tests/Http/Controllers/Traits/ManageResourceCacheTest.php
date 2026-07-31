@@ -267,6 +267,28 @@ class ManageResourceCacheTest extends TestCase
         $this->controller->invokeAuthorizeResourceCacheAction();
     }
 
+    public function test_add_form_appends_returns_presentation_item_attribute_when_enabled(): void
+    {
+        ModularousCache::shouldReceive('isPresentationCacheEnabled')->once()->andReturn(true);
+        ModularousCache::shouldReceive('getPresentationCacheStore')->once()->andReturn('url');
+        ModularousCache::shouldReceive('isCacheTypeConfigured')
+            ->once()
+            ->with('TestModule', 'TestRoute', 'presentationItem')
+            ->andReturn(true);
+
+        $this->assertSame(
+            ['presentation_item_cache_formatted'],
+            $this->controller->invokeAddFormAppendsManageResourceCache(),
+        );
+    }
+
+    public function test_add_index_appends_returns_empty_when_presentation_item_disabled(): void
+    {
+        ModularousCache::shouldReceive('isPresentationCacheEnabled')->once()->andReturn(false);
+
+        $this->assertSame([], $this->controller->invokeAddIndexAppendsManageResourceCache());
+    }
+
     public function test_authorize_resource_cache_action_aborts_with_403_when_user_lacks_permission(): void
     {
         ModularousCache::shouldReceive('hasAdminCacheActions')

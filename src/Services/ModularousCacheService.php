@@ -373,8 +373,8 @@ class ModularousCacheService
                     return false;
                 }
 
-                if ($type !== null && isset($moduleRouteConfig['types'][$type])) {
-                    return $moduleRouteConfig['types'][$type] ?? $defaultTypeBehavior;
+                if ($type !== null) {
+                    return $moduleRouteConfig['types'][$type] ?? false;
                 }
 
                 return $moduleRouteEnabled;

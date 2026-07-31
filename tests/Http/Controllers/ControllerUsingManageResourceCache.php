@@ -77,6 +77,22 @@ class ControllerUsingManageResourceCache extends Controller
     }
 
     /**
+     * @return array<int, string>
+     */
+    public function invokeAddFormAppendsManageResourceCache(): array
+    {
+        return $this->addFormAppendsManageResourceCache();
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public function invokeAddIndexAppendsManageResourceCache(): array
+    {
+        return $this->addIndexAppendsManageResourceCache();
+    }
+
+    /**
      * @return array<string, bool>
      */
     public function invokeResolveResourceCacheTypes(Request $request): array

@@ -167,6 +167,16 @@ return [
         'validation' => [
             'types-required' => 'En az bir önbellek türü seçilmelidir.',
         ],
+        'presentation-item-column' => [
+            'label' => 'Sunum önbelleği',
+            'fresh' => ':expires tarihine kadar geçerli',
+            'fresh-no-expiry' => 'Önbellekte',
+            'stale' => ':expires tarihine kadar stale',
+            'stale-no-expiry' => 'Stale',
+            'expired' => 'Süresi dolmuş :expires',
+            'expired-no-expiry' => 'Süresi dolmuş',
+            'missing' => 'Önbellekte değil',
+        ],
     ],
 
     'chatable' => [
