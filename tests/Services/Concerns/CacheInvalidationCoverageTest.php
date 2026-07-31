@@ -388,8 +388,9 @@ class CacheInvalidationCoverageTest extends TestCase
         $service = new DirectCacheInvalidation;
         $service->warmModuleRouteCaches('TestModule', 'TestRoute', []);
 
-        $this->assertCount(1, $service->warmupControllerCountsCalls);
-        $this->assertCount(2, $service->warmupPresentationItemCalls);
+
+        $this->assertCount(0, $service->warmupControllerCountsCalls);
+        $this->assertCount(0, $service->warmupPresentationItemCalls);
     }
 
     /** @test */

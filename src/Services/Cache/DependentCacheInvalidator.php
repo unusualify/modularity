@@ -82,8 +82,8 @@ class DependentCacheInvalidator
             'counts' => false,
             'index' => false,
             'record' => false,
-            'formItem' => true,
-            'formattedItem' => true,
+            'formItem' => false,
+            'formattedItem' => false,
             'presentationItem' => false,
         ];
         $selfModelClass = get_class($model);
@@ -357,11 +357,11 @@ class DependentCacheInvalidator
             $isSelf = false;
             $shouldWarm = true;
             $types = [
-                'counts' => true,
-                'index' => true,
-                'record' => true,
-                'formItem' => true,
-                'formattedItem' => true,
+                'counts' => false,
+                'index' => false,
+                'record' => false,
+                'formItem' => false,
+                'formattedItem' => false,
                 'presentationItem' => false,
             ];
 

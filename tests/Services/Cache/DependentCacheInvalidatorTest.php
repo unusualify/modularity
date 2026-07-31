@@ -95,7 +95,7 @@ class DependentCacheInvalidatorTest extends TestCase
 
         $this->assertSame('Cms', $dependents[0]['moduleName']);
         $this->assertSame('StyleSheet', $dependents[0]['moduleRouteName']);
-        $this->assertTrue($dependents[0]['types']['counts']);
+        $this->assertFalse($dependents[0]['types']['counts']);
     }
 
     /** @test */

@@ -98,12 +98,12 @@ final class InvalidateModelCacheJob implements ShouldQueue
     protected function resolveTypes(string $moduleName, string $moduleRouteName): array
     {
         $defaults = [
-            'counts' => true,
-            'index' => true,
-            'record' => true,
-            'formItem' => true,
-            'formattedItem' => true,
-            'presentationItem' => true,
+            'counts' => false,
+            'index' => false,
+            'record' => false,
+            'formItem' => false,
+            'formattedItem' => false,
+            'presentationItem' => false,
         ];
 
         $types = $this->types !== [] ? $this->types : $defaults;

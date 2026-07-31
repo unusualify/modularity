@@ -345,13 +345,13 @@ trait CacheInvalidation
                     $this->invalidateIndexCaches($moduleName, $moduleRouteName, onlyRoute: false);
                 }
 
-                if (((isset($types['formattedItem']) ? $types['formattedItem'] : true)) && $this->isEnabled($moduleName, $moduleRouteName, 'formattedItem')) {
+                if (((isset($types['formattedItem']) ? $types['formattedItem'] : false)) && $this->isEnabled($moduleName, $moduleRouteName, 'formattedItem')) {
                     if (! $newlyCreated) {
                         $this->invalidateFormattedItemCache($moduleName, $moduleRouteName, $model->getKey());
                     }
                 }
 
-                if (((isset($types['formItem']) ? $types['formItem'] : true)) && $this->isEnabled($moduleName, $moduleRouteName, 'formItem')) {
+                if (((isset($types['formItem']) ? $types['formItem'] : false)) && $this->isEnabled($moduleName, $moduleRouteName, 'formItem')) {
                     if (! $newlyCreated) {
                         $this->invalidateFormItemCache($moduleName, $moduleRouteName, $model->getKey());
                     }
@@ -494,10 +494,10 @@ trait CacheInvalidation
 
         if ($types === []) {
             $types = [
-                'counts' => true,
-                'formItem' => true,
-                'formattedItem' => true,
-                'presentationItem' => true,
+                'counts' => false,
+                'formItem' => false,
+                'formattedItem' => false,
+                'presentationItem' => false,
             ];
         }
 
@@ -542,10 +542,10 @@ trait CacheInvalidation
             return;
         }
 
-        $warmCounts = ($types['counts'] ?? true) && $this->isEnabled($moduleName, $moduleRouteName, 'counts');
-        $warmFormItem = ($types['formItem'] ?? true) && $this->isEnabled($moduleName, $moduleRouteName, 'formItem');
-        $warmFormattedItem = ($types['formattedItem'] ?? true) && $this->isEnabled($moduleName, $moduleRouteName, 'formattedItem');
-        $warmPresentationItem = ($types['presentationItem'] ?? true) && $this->isEnabled($moduleName, $moduleRouteName, 'presentationItem');
+        $warmCounts = ($types['counts'] ?? false) && $this->isEnabled($moduleName, $moduleRouteName, 'counts');
+        $warmFormItem = ($types['formItem'] ?? false) && $this->isEnabled($moduleName, $moduleRouteName, 'formItem');
+        $warmFormattedItem = ($types['formattedItem'] ?? false) && $this->isEnabled($moduleName, $moduleRouteName, 'formattedItem');
+        $warmPresentationItem = ($types['presentationItem'] ?? false) && $this->isEnabled($moduleName, $moduleRouteName, 'presentationItem');
 
         if (! $warmCounts && ! $warmFormItem && ! $warmFormattedItem && ! $warmPresentationItem) {
             return;

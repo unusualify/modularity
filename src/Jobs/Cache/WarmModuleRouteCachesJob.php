@@ -273,9 +273,9 @@ final class WarmModuleRouteCachesJob implements ShouldQueue
             'counts' => false,
             'index' => false,
             'record' => false,
-            'formItem' => true,
-            'formattedItem' => true,
-            'presentationItem' => true,
+            'formItem' => false,
+            'formattedItem' => false,
+            'presentationItem' => false,
         ];
 
         $types = $this->types !== [] ? $this->types : $defaults;
