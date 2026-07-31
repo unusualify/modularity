@@ -183,6 +183,7 @@ export default function useItemActions(props, context) {
               }
             })
           } else {
+            showAlert();
             setTimeout(() => {
               window.location.reload()
             }, action.reloadDelay || 1000); // 1 second delay to show the success message
