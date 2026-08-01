@@ -50,7 +50,7 @@ class RemoteApiSynchronizerTest extends TestCase
 
         $connector = Mockery::mock(RemoteApiConnectorInterface::class);
         $connector->shouldReceive('configuration')->andReturn($configuration);
-        $connector->shouldReceive('fetchOne')->with(42)->andReturn([
+        $connector->shouldReceive('fetchOne')->with(42, [], true)->andReturn([
             'id' => 42,
             'name' => 'Premium API',
             'is_featured' => false,
@@ -217,15 +217,21 @@ class RemoteApiSynchronizerTest extends TestCase
         $connector = Mockery::mock(RemoteApiConnectorInterface::class);
         $connector->shouldReceive('configuration')->andReturn($configuration);
         $connector->shouldReceive('resetRequestStats')->once();
+        $connector->shouldReceive('clearCache')->once()->withNoArgs();
         $connector->shouldReceive('flushRequestStats')->once()->andReturn([
             'total' => 1,
-            'by_url' => ['http://app.b2press.test/api/v1/packages/42' => 1],
+            'by_url' => ['http://app.b2press.test/api/v1/packages' => 1],
         ]);
-        $connector->shouldNotReceive('fetchList');
-        $connector->shouldReceive('fetchOne')->once()->with(42)->andReturn([
-            'id' => 42,
-            'name' => 'Premium API',
-        ]);
+        $connector->shouldNotReceive('fetchOne');
+        $connector->shouldReceive('eachListPage')
+            ->once()
+            ->with(Mockery::type('Closure'), [], true)
+            ->andReturnUsing(function (callable $callback): void {
+                $callback([
+                    ['id' => 42, 'name' => 'Premium API'],
+                    ['id' => 99, 'name' => 'Unlinked Remote'],
+                ], 1, 1, 2);
+            });
         $connector->shouldReceive('mapRow')->andReturnUsing(
             fn (array $row, array $existing = []) => $adapter->mapToAttributes($row, $existing)
         );
@@ -303,19 +309,20 @@ class RemoteApiSynchronizerTest extends TestCase
         $connector = Mockery::mock(RemoteApiConnectorInterface::class);
         $connector->shouldReceive('configuration')->andReturn($configuration);
         $connector->shouldReceive('resetRequestStats')->once();
+        $connector->shouldReceive('clearCache')->once()->withNoArgs();
         $connector->shouldReceive('flushRequestStats')->once()->andReturn([
-            'total' => 2,
-            'by_url' => [
-                'http://app.b2press.test/api/v1/packages/42' => 1,
-                'http://app.b2press.test/api/v1/packages/274' => 1,
-            ],
+            'total' => 1,
+            'by_url' => ['http://app.b2press.test/api/v1/packages' => 1],
         ]);
-        $connector->shouldNotReceive('fetchList');
-        $connector->shouldReceive('fetchOne')->with(42)->andReturn([
-            'id' => 42,
-            'name' => 'Premium API',
-        ]);
-        $connector->shouldReceive('fetchOne')->with(274)->andReturn(null);
+        $connector->shouldNotReceive('fetchOne');
+        $connector->shouldReceive('eachListPage')
+            ->once()
+            ->with(Mockery::type('Closure'), [], true)
+            ->andReturnUsing(function (callable $callback): void {
+                $callback([
+                    ['id' => 42, 'name' => 'Premium API'],
+                ], 1, 1, 1);
+            });
         $connector->shouldReceive('mapRow')->andReturnUsing(
             fn (array $row, array $existing = []) => $adapter->mapToAttributes($row, $existing)
         );
@@ -402,13 +409,19 @@ class RemoteApiSynchronizerTest extends TestCase
         $connector = Mockery::mock(RemoteApiConnectorInterface::class);
         $connector->shouldReceive('configuration')->andReturn($configuration);
         $connector->shouldReceive('resetRequestStats')->once();
+        $connector->shouldReceive('clearCache')->once()->withNoArgs();
         $connector->shouldReceive('flushRequestStats')->once()->andReturn([
             'total' => 0,
             'by_url' => [],
         ]);
-        $connector->shouldReceive('fetchList')->once()->andReturn([
-            ['id' => 99, 'name' => 'New Package'],
-        ]);
+        $connector->shouldReceive('eachListPage')
+            ->once()
+            ->with(Mockery::type('Closure'), [], true)
+            ->andReturnUsing(function (callable $callback): void {
+                $callback([
+                    ['id' => 99, 'name' => 'New Package'],
+                ], 1, 1, 1);
+            });
         $connector->shouldReceive('mapRow')->andReturnUsing(
             fn (array $row, array $existing = []) => $adapter->mapToAttributes($row, $existing)
         );
@@ -468,7 +481,7 @@ class RemoteApiSynchronizerTest extends TestCase
 
         $connector = Mockery::mock(RemoteApiConnectorInterface::class);
         $connector->shouldReceive('configuration')->andReturn($configuration);
-        $connector->shouldReceive('fetchOne')->with(274)->andReturn(null);
+        $connector->shouldReceive('fetchOne')->with(274, [], true)->andReturn(null);
 
         $repository = Mockery::mock(Repository::class);
 

@@ -55,11 +55,40 @@ class RemoteApiClient
     public function fetchPaginatedListResult(string $endpoint, array $query = [], ?string $listPath = null): array
     {
         $items = [];
+        $expectedTotal = 0;
+
+        $this->eachPaginatedListPage(
+            $endpoint,
+            function (array $chunk, int $page, int $lastPage, int $total) use (&$items, &$expectedTotal): void {
+                $items = array_merge($items, $chunk);
+                $expectedTotal = max($expectedTotal, $total);
+            },
+            $query,
+            $listPath,
+        );
+
+        return [
+            'items' => $items,
+            'expected_total' => $expectedTotal > 0 ? $expectedTotal : count($items),
+        ];
+    }
+
+    /**
+     * Stream paginated list pages without accumulating the full result set.
+     *
+     * @param  callable(array<int, array<string, mixed>> $pageItems, int $page, int $lastPage, int $expectedTotal): void  $callback
+     */
+    public function eachPaginatedListPage(
+        string $endpoint,
+        callable $callback,
+        array $query = [],
+        ?string $listPath = null,
+    ): void {
         $page = 1;
         $lastPage = 1;
         $expectedTotal = 0;
+        $collectedCount = 0;
         $listPath ??= $this->configuration->listPath();
-
         $fetchedPages = 0;
 
         do {
@@ -67,14 +96,14 @@ class RemoteApiClient
 
             if ($fetchedPages > 100) {
                 throw RemoteApiSyncException::incompletePaginatedList(
-                    max($expectedTotal, count($items)),
-                    count($items),
+                    max($expectedTotal, $collectedCount),
+                    $collectedCount,
                 );
             }
 
             $response = $this->get($endpoint, array_merge($query, ['page' => $page]));
             $chunk = $this->extractList($response, $listPath);
-            $items = array_merge($items, $chunk);
+            $collectedCount += count($chunk);
 
             $meta = data_get($response, $this->configuration->metaPath(), []);
             if (! is_array($meta)) {
@@ -85,20 +114,18 @@ class RemoteApiClient
             $lastPage = max($lastPage, (int) data_get($meta, 'last_page', $currentPage));
             $expectedTotal = max($expectedTotal, (int) data_get($meta, 'total', 0));
             $nextPageUrl = data_get($meta, 'next_page_url');
+
+            $callback($chunk, $currentPage, $lastPage, $expectedTotal);
+
             $page = $currentPage + 1;
         } while (
             $currentPage < $lastPage
-            || (filled($nextPageUrl) && ($expectedTotal === 0 || count($items) < $expectedTotal))
+            || (filled($nextPageUrl) && ($expectedTotal === 0 || $collectedCount < $expectedTotal))
         );
 
-        if ($expectedTotal > 0 && count($items) < $expectedTotal) {
-            throw RemoteApiSyncException::incompletePaginatedList($expectedTotal, count($items));
+        if ($expectedTotal > 0 && $collectedCount < $expectedTotal) {
+            throw RemoteApiSyncException::incompletePaginatedList($expectedTotal, $collectedCount);
         }
-
-        return [
-            'items' => $items,
-            'expected_total' => $expectedTotal > 0 ? $expectedTotal : count($items),
-        ];
     }
 
     /**

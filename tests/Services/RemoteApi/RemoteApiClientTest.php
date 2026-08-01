@@ -192,6 +192,45 @@ class RemoteApiClientTest extends TestCase
         $client->get('packages/274');
     }
 
+    public function test_each_paginated_list_page_invokes_callback_per_page(): void
+    {
+        config(['modularous.remote_api.base_url' => 'http://app.b2press.test/api/v1']);
+
+        Http::fake([
+            'http://app.b2press.test/api/v1/packages*' => Http::sequence()
+                ->push($this->paginatedResponse(1, 2, 3, [['id' => 1], ['id' => 2]], hasNext: true))
+                ->push($this->paginatedResponse(2, 2, 3, [['id' => 3]], hasNext: false)),
+        ]);
+
+        $client = new RemoteApiClient($this->makeConfiguration());
+        $pages = [];
+
+        $client->eachPaginatedListPage('packages', function (array $chunk, int $page, int $lastPage, int $expectedTotal) use (&$pages): void {
+            $pages[] = [
+                'ids' => array_column($chunk, 'id'),
+                'page' => $page,
+                'last_page' => $lastPage,
+                'expected_total' => $expectedTotal,
+            ];
+        }, ['per_page' => 100]);
+
+        $this->assertSame([
+            [
+                'ids' => [1, 2],
+                'page' => 1,
+                'last_page' => 2,
+                'expected_total' => 3,
+            ],
+            [
+                'ids' => [3],
+                'page' => 2,
+                'last_page' => 2,
+                'expected_total' => 3,
+            ],
+        ], $pages);
+        Http::assertSentCount(2);
+    }
+
     /**
      * @param list<array<string, int>> $records
      * @return array<string, mixed>

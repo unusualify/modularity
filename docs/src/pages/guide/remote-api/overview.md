@@ -93,14 +93,15 @@ flowchart TB
 
 ## List-First Batch Sync
 
-`syncAll()` uses a **list-first** strategy:
+`syncAll()` uses a **list-page streaming** strategy:
 
-1. Fetch and index the full remote paginated list (one catalog pass, cached).
-2. Update every **locally linked** record whose `remote_id` appears in that list.
+1. Stream the remote paginated list page-by-page (`eachListPage` + `forceRefresh`; typically `per_page` 50–100) without loading the full payload into memory.
+2. Update every **locally linked** record whose `remote_id` appears in those pages.
 3. Optionally **import new** remote rows not yet linked (`sync.import_new_from_list`, default `true`).
 4. Skip linked locals whose `remote_id` is missing from the remote list (stale link).
+5. Clear the connector HTTP cache after the batch so preview/catalog are not left stale.
 
-Single-record sync (`syncRecord`) always performs `GET …/{id}` for one row.
+Single-record sync (`syncRecord`) always performs a fresh `GET …/{id}` (`forceRefresh`). Preview/catalog may still use TTL-cached responses.
 
 ## Virtual Attributes
 

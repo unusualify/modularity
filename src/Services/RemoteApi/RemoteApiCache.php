@@ -35,14 +35,24 @@ class RemoteApiCache
     /**
      * @return mixed
      */
-    public function remember(string $key, callable $callback)
+    public function remember(string $key, callable $callback, bool $forceRefresh = false)
     {
         if (! $this->configuration->cacheEnabled()) {
             return $callback();
         }
 
-        return $this->store()->remember(
-            $this->prefixKey($key),
+        $prefixedKey = $this->prefixKey($key);
+        $store = $this->store();
+
+        if ($forceRefresh) {
+            $result = $callback();
+            $store->put($prefixedKey, $result, $this->configuration->cacheTtl());
+
+            return $result;
+        }
+
+        return $store->remember(
+            $prefixedKey,
             $this->configuration->cacheTtl(),
             $callback
         );
@@ -128,17 +138,17 @@ class RemoteApiCache
         );
     }
 
-    public function rememberPaginatedCatalog(string $key, callable $callback): array
+    public function rememberPaginatedCatalog(string $key, callable $callback, bool $forceRefresh = false): array
     {
         if (! $this->configuration->cacheEnabled()) {
             /** @var array<int, array<string, mixed>> */
-            return $callback();
+            return $this->normalizePaginatedCatalogCallbackResult($callback());
         }
 
         $prefixedKey = $this->prefixKey($key);
         $store = $this->store();
 
-        if ($store->has($prefixedKey)) {
+        if (! $forceRefresh && $store->has($prefixedKey)) {
             $cached = $store->get($prefixedKey);
 
             if ($this->isValidPaginatedCatalogCache($cached)) {
@@ -151,7 +161,7 @@ class RemoteApiCache
             $store->forget($prefixedKey);
         }
 
-        $this->logger->logCacheAccess($key, 'miss');
+        $this->logger->logCacheAccess($key, $forceRefresh ? 'force_refresh' : 'miss');
 
         /** @var array{items: array<int, array<string, mixed>>, expected_total: int}|array<int, array<string, mixed>> $result */
         $result = $callback();
@@ -182,6 +192,19 @@ class RemoteApiCache
         ], $this->configuration->cacheTtl());
 
         return $items;
+    }
+
+    /**
+     * @param array{items: array<int, array<string, mixed>>, expected_total: int}|array<int, array<string, mixed>>|mixed $result
+     * @return array<int, array<string, mixed>>
+     */
+    private function normalizePaginatedCatalogCallbackResult(mixed $result): array
+    {
+        if (is_array($result) && isset($result['items']) && is_array($result['items'])) {
+            return $result['items'];
+        }
+
+        return is_array($result) ? $result : [];
     }
 
     private function isValidPaginatedCatalogCache(mixed $cached): bool

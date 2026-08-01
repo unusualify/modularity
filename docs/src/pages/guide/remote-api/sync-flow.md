@@ -27,7 +27,7 @@ sequenceDiagram
     participant DB as Database
 
     R->>S: syncRecord(connector, repository, remoteId)
-    S->>C: fetchOne(remoteId)
+    S->>C: fetchOne(remoteId, forceRefresh)
     C->>API: GET …/entities/{id}
     API-->>C: JSON row
     C-->>S: mapped row
@@ -42,7 +42,7 @@ sequenceDiagram
     S-->>R: { model, created: bool }
 ```
 
-1. **`fetchOne`** — Cached `GET` to `show_endpoint` (default `{endpoint}/{id}`).
+1. **`fetchOne(..., forceRefresh: true)`** — Fresh `GET` to `show_endpoint` (default `{endpoint}/{id}`); bypasses HTTP response cache read, then write-through.
 2. **`mapRow`** — Adapter + field mapper produce flat attributes.
 3. **`partition`** — Split local fillable vs remote side-table fields.
 4. **Update path** — Strip virtual attrs, `repository->update`, sync `RemoteApiSource`.
@@ -61,12 +61,15 @@ Throws `RemoteApiSyncException::recordNotFound` when the remote row is missing.
 **Algorithm:**
 
 1. Reset HTTP request tracker on the connector.
-2. **`indexRemoteList`** — One paginated `fetchList()` pass; build `[remoteId => row]` map (uses cache).
-3. **Linked locals** — For each local record with a `remote_id`:
-   - If id **in** remote list → `syncRecordFromRow` (update, no extra HTTP per row).
-   - If id **not in** list → skip with `not_in_remote_list` reason (stale/deleted remote).
-4. **Import new** (when `sync.import_new_from_list` is true) — For each remote list id not processed in step 3 → create or update local record.
-5. Return summary:
+2. Load locally linked remote IDs (DB `chunkById(100)`).
+3. **`eachListPage(..., forceRefresh: true)`** — Stream the remote paginated list page-by-page (`http.query.per_page`, typically 50–100) without accumulating the full list in memory and without reading the list cache.
+4. For each row on each page:
+   - If remote id is **linked locally** → `syncRecordFromRow` (update).
+   - Else if `sync.import_new_from_list` is true → `syncRecordFromRow` (create/update).
+   - Else → ignore (linked-only mode).
+5. Linked ids never seen in any page → skip with `not_in_remote_list` (stale/deleted remote).
+6. **`clearCache()`** — Invalidate connector HTTP cache so subsequent preview/catalog reads are not stale.
+7. Return summary:
 
 ```php
 [
@@ -81,11 +84,11 @@ Throws `RemoteApiSyncException::recordNotFound` when the remote row is missing.
 ]
 ```
 
-List-first batch sync minimizes HTTP: typically one paginated list request plus optional per-id fetches only when using `syncRecord`, not during `syncAll`.
+List-page streaming minimizes HTTP and memory: a few list page requests instead of N show requests. `import_new_from_list` only controls whether unlinked remote rows are imported — sync always uses the list endpoint, never N× `fetchOne`.
 
 ## Preview (Dry Run)
 
-Preview methods inspect local state and connector configuration **without HTTP or database writes**.
+Preview methods inspect local state and connector configuration **without HTTP or database writes** (except `previewRemote`, which may use cached `fetchOne`).
 
 | Method | Used by | Returns |
 |--------|---------|---------|
@@ -115,7 +118,7 @@ php artisan modularous:sync-remote-api ModuleName entity_name --id=99 --dry-run
 | `null` | Flush entire connector cache tag (or bump version key) |
 | Specific id | Forget `record:{id}` and `preview:{id}` keys only |
 
-Clear cache after remote data changes outside Modularous, or when debugging stale list/record responses. Sync itself does not auto-clear cache before fetch; cached lists are reused within TTL.
+Sync **bypasses cache reads** via `forceRefresh`. After `syncAll`, the connector cache is cleared so list/catalog keys are not left stale. Preview and catalog may still use TTL-cached responses.
 
 ## Error Handling in HTTP Layer
 
