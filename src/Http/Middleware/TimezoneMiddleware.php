@@ -48,7 +48,6 @@ class TimezoneMiddleware
             }
         }
 
-        dd($candidates);
         return null;
     }
 }
