@@ -3,7 +3,7 @@ import { ref, computed, watch, toRefs, reactive, nextTick, onMounted, provide } 
 import { router } from '@inertiajs/vue3'
 import { useStore } from 'vuex'
 import { useI18n } from 'vue-i18n'
-import { cloneDeep, isEqual, find, reduce, set, get, isArray } from 'lodash-es'
+import { cloneDeep, isEqual, find, reduce, set, get, isArray, isObject } from 'lodash-es'
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
 
 import { useConfig, useInputHandlers, useValidation, useLocale, useItemActions, useAuthorization, useUser, useEditPresence } from '@/hooks'
@@ -361,7 +361,18 @@ export default function useForm(props, context) {
         return false
       }
 
-      return !isEqual(current, initial)
+      const isDifferent = !isEqual(current, initial)
+
+      if (isDifferent) {
+        const differingKeys = (isObject(current) && isObject(initial))
+          ? [...new Set([...Object.keys(current), ...Object.keys(initial)])]
+              .filter((k) => !isEqual(current[k], initial[k]))
+          : []
+
+        console.warn(`${key} is different`, differingKeys, { current, initial })
+      }
+
+      return isDifferent
     })
   )
 
