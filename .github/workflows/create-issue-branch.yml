@@ -126,7 +126,7 @@ jobs:
         id: prefix
         run: |
           # Use workflow input for dev branch if available, otherwise default to 'dev'
-          DEV_BRANCH="${{ inputs.dev_branch || '11.x-dev' }}"
+          DEV_BRANCH="${{ inputs.dev_branch || 'dev' }}"
 
           # Determine source branch based on version label
           if [[ "${{ steps.version_detection.outputs.has_version }}" == "true" ]] && [[ "${{ steps.version_branch.outputs.exists }}" == "true" ]]; then
