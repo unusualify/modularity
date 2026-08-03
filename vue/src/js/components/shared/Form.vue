@@ -62,6 +62,7 @@
                   :modelValue="formItem"
                   :actions="actions"
                   :is-editing="isEditing"
+                  :form-dirty="isDirty"
                   @action-complete="$emit('actionComplete', $event)"
                 >
                   <template #prepend>
@@ -82,6 +83,7 @@
                   :modelValue="formItem"
                   :actions="actions"
                   :is-editing="isEditing"
+                  :form-dirty="isDirty"
                   @action-complete="$emit('actionComplete', $event)"
                 >
                   <template #prepend="actionsScope">
@@ -146,6 +148,7 @@
               :modelValue="formItem"
               :actions="actions"
               :is-editing="isEditing"
+              :form-dirty="isDirty"
               @action-complete="$emit('actionComplete', $event)"
             >
               <template #prepend="actionsScope">
@@ -163,6 +166,7 @@
               :modelValue="formItem"
               :actions="actions"
               :is-editing="isEditing"
+              :form-dirty="isDirty"
               @action-complete="$emit('actionComplete', $event)"
             >
               <template #prepend="actionsScope">
@@ -258,6 +262,7 @@
               :modelValue="formItem"
               :actions="actions"
               :is-editing="isEditing"
+              :form-dirty="isDirty"
               @action-complete="$emit('actionComplete', $event)"
             >
               <template #prepend="actionsScope">
@@ -290,24 +295,25 @@
                 v-model="model"
                 :form-item="formItem"
               />
-              <slot name="right" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema}">
+              <slot name="right" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema, isDirty}">
                 <AdditionalSectionContent
                   v-if="hasRightSlotContent"
                   :actions-position="actionsPosition"
                   :form-item="formItem"
                   :actions="actions"
                   :form-actions-active="formActionsActive"
+                  :form-actions-dirty="isDirty"
                   @action-complete="$emit('actionComplete', $event)"
                 >
 
                   <template #right-top>
-                    <slot name="right.top" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
+                    <slot name="right.top" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema, isDirty}"></slot>
                   </template>
                   <template #right-middle>
-                    <slot name="right.middle" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
+                    <slot name="right.middle" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema, isDirty}"></slot>
                   </template>
                   <template #right-bottom>
-                    <slot name="right.bottom" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
+                    <slot name="right.bottom" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema, isDirty}"></slot>
                   </template>
                 </AdditionalSectionContent>
               </slot>
@@ -339,16 +345,18 @@
                     :is-editing="isEditing"
                     :form-item="formItem"
                     :actions="actions"
+                    :form-actions-active="formActionsActive"
+                    :form-actions-dirty="isDirty"
                     @action-complete="$emit('actionComplete', $event)"
                   >
                     <template #right-top>
-                      <slot name="right.top" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
+                      <slot name="right.top" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema, isDirty}"></slot>
                     </template>
                     <template #right-middle>
-                      <slot name="right.middle" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
+                      <slot name="right.middle" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema, isDirty}"></slot>
                     </template>
                     <template #right-bottom>
-                      <slot name="right.bottom" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema}"></slot>
+                      <slot name="right.bottom" v-bind="{isEditing, item: formItem, schema: inputSchema, chunkedRawSchema, isDirty}"></slot>
                     </template>
                   </AdditionalSectionContent>
                 </slot>
@@ -423,7 +431,7 @@
 </template>
 
 <script>
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, watch } from 'vue'
 import { useStore } from 'vuex'
 import { useI18n } from 'vue-i18n'
 import { useForm, makeFormProps } from '@/hooks/form'
@@ -440,7 +448,8 @@ const AdditionalSectionContent = {
     actionsPosition: String,
     formItem: Object,
     actions: [Array, Object],
-    formActionsActive: Boolean
+    formActionsActive: Boolean,
+    formActionsDirty: { type: Boolean, default: false }
   },
   emits: ['action-complete'],
   template: `
@@ -450,6 +459,7 @@ const AdditionalSectionContent = {
         :modelValue="formItem"
         :actions="actions"
         :is-editing="isEditing"
+        :form-dirty="formActionsDirty"
         @action-complete="$emit('actionComplete', $event)"
       >
         <template #prepend="actionsScope">
@@ -467,6 +477,7 @@ const AdditionalSectionContent = {
         :modelValue="formItem"
         :actions="actions"
         :is-editing="isEditing"
+        :form-dirty="formActionsDirty"
         @action-complete="$emit('actionComplete', $event)"
       >
         <template #prepend="actionsScope">
@@ -484,6 +495,7 @@ const AdditionalSectionContent = {
         :modelValue="formItem"
         :actions="actions"
         :is-editing="isEditing"
+        :form-dirty="formActionsDirty"
         @action-complete="$emit('actionComplete', $event)"
       >
         <template #prepend="actionsScope">
