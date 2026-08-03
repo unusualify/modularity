@@ -16,10 +16,9 @@ class TimezoneMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         $timezone = $this->resolveTimezone($request);
-
         if ($timezone !== null) {
             date_default_timezone_set($timezone);
-            session()->put('timezone', $timezone);
+            session()->put('modularous_timezone', $timezone);
         }
 
         return $next($request);
@@ -31,11 +30,12 @@ class TimezoneMiddleware
     protected function resolveTimezone(Request $request): ?string
     {
         $candidates = [
+            session('modularous_timezone'),
+            session('timezone'),
             $request->header('X-Timezone'),
             $request->input('_timezone'),
             // JS-set cookie is not Laravel-encrypted; read raw $_COOKIE.
             isset($_COOKIE['timezone']) ? urldecode((string) $_COOKIE['timezone']) : null,
-            session('timezone'),
         ];
 
         foreach ($candidates as $candidate) {
@@ -48,6 +48,7 @@ class TimezoneMiddleware
             }
         }
 
+        dd($candidates);
         return null;
     }
 }

@@ -128,7 +128,7 @@ trait AssignableScopes
         $modelTable = $this->getTable();
         $modelClass = get_class($this);
 
-        $userTimezone = session('timezone') ?? 'Europe/London';
+        $userTimezone = session('modularous_timezone') ?? session('timezone') ?? 'Europe/London';
 
         return $query->whereExists(function ($subQuery) use ($assignmentTable, $modelTable, $modelClass, $status, $dateColumn, $dateRange, $userTimezone) {
             // Create a SQL string for the subquery

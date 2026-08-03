@@ -19,7 +19,7 @@ class TimezoneMiddlewareTest extends TestCase
         $middleware->handle($request, fn () => response('ok'));
 
         $this->assertSame('Europe/Istanbul', date_default_timezone_get());
-        $this->assertSame('Europe/Istanbul', session('timezone'));
+        $this->assertSame('Europe/Istanbul', session('modularous_timezone'));
     }
 
     public function test_sets_timezone_from_browser_cookie(): void
@@ -32,7 +32,7 @@ class TimezoneMiddlewareTest extends TestCase
             $middleware->handle($request, fn () => response('ok'));
 
             $this->assertSame('America/New_York', date_default_timezone_get());
-            $this->assertSame('America/New_York', session('timezone'));
+            $this->assertSame('America/New_York', session('modularous_timezone'));
         } finally {
             unset($_COOKIE['timezone']);
         }
@@ -49,12 +49,12 @@ class TimezoneMiddlewareTest extends TestCase
         $middleware->handle($request, fn () => response('ok'));
 
         $this->assertSame($previous, date_default_timezone_get());
-        $this->assertNull(session('timezone'));
+        $this->assertNull(session('modularous_timezone'));
     }
 
     public function test_falls_back_to_session_timezone(): void
     {
-        session()->put('timezone', 'Europe/Berlin');
+        session()->put('modularous_timezone', 'Europe/Berlin');
 
         $request = Request::create('/dashboard', 'GET');
         $middleware = new TimezoneMiddleware;
