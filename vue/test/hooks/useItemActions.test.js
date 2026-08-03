@@ -400,7 +400,19 @@ describe('useItemActions', () => {
       reloadOnSuccess: true
     })
 
-    expect(mockRouterReload).toHaveBeenCalledWith({ only: ['formAttributes'] })
+    expect(mockRouterReload).toHaveBeenCalledWith(expect.objectContaining({
+      only: ['formAttributes']
+    }))
+
+    // the alert is deferred until the Inertia reload finishes
+    expect(store.commit).not.toHaveBeenCalledWith('__setAlert', expect.anything())
+
+    mockRouterReload.mock.calls[0][0].onFinish()
+
+    expect(store.commit).toHaveBeenCalledWith('__setAlert', {
+      message: 'Done',
+      variant: 'success'
+    })
   })
 
   test('handleAction type request emits actionComplete on success', async () => {
