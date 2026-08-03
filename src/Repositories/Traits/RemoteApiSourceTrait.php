@@ -254,6 +254,55 @@ trait RemoteApiSourceTrait
         }
     }
 
+    /**
+     * @param  array<int, mixed>  $scope
+     * @return array<int, array<string, mixed>>
+     */
+    public function appendTableHeaderRemoteApiSourceTrait($scope = []): array
+    {
+        if (! $this->remoteApiLastSyncColumnEnabled()) {
+            return [];
+        }
+
+        return [
+            [
+                'title' => __('messages.remote-api.last-sync.label'),
+                'key' => 'remote_api_last_sync',
+                'formatter' => ['dynamic'],
+                'sortable' => false,
+            ],
+        ];
+    }
+
+    /**
+     * Informative secondary form field: last remote sync chip (same as table column).
+     *
+     * @param  array<int, mixed>  $scope
+     * @return array<int, array<string, mixed>>
+     */
+    public function prependFormSchemaRemoteApiSourceTrait($scope = []): array
+    {
+        if (! $this->remoteApiLastSyncColumnEnabled()) {
+            return [];
+        }
+
+        return [
+            [
+                'type' => 'dynamic-component',
+                'name' => 'remote_api_last_sync',
+                'label' => __('messages.remote-api.last-sync.label'),
+                'isEvent' => true,
+                'noSubmit' => true,
+                'creatable' => false,
+            ],
+        ];
+    }
+
+    protected function remoteApiLastSyncColumnEnabled(): bool
+    {
+        return $this->remoteApiConnectorIsEnabled();
+    }
+
     protected function resolveRemoteApiFormActionRoutePrefix(): ?string
     {
         try {

@@ -121,6 +121,12 @@ return [
             'close' => 'Close',
             'not-found' => 'Remote record not found.',
         ],
+        'last-sync' => [
+            'label' => 'Last sync',
+            'synced' => 'Last synced at :at',
+            'never' => 'Never synced from API',
+            'never-label' => 'Never',
+        ],
         'rate-limit-exceeded' => 'Remote API rate limit exceeded. Please wait and try again.',
     ],
 

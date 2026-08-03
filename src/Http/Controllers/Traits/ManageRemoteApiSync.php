@@ -15,10 +15,14 @@ use Unusualify\Modularous\Services\RemoteApi\Exceptions\RemoteApiConfigurationEx
 use Unusualify\Modularous\Services\RemoteApi\Exceptions\RemoteApiSyncException;
 
 /**
- * Remote API sync controller endpoints and index table toolbar actions.
+ * Remote API sync controller endpoints, index table toolbar actions,
+ * eager-loads, and last-sync appends for admin UI.
  *
  * {@see TableActions::setTableActions()} invokes
  * {@see setTableActionsManageRemoteApiSync()} when this trait is used.
+ * {@see ManageWiths::addWiths()} invokes {@see addWithsManageRemoteApiSync()}.
+ * {@see ManageAppends} merges {@see addIndexAppendsManageRemoteApiSync()} /
+ * {@see addFormAppendsManageRemoteApiSync()}.
  */
 trait ManageRemoteApiSync
 {
@@ -59,8 +63,52 @@ trait ManageRemoteApiSync
         $this->tableActions = array_values(array_merge($existing, $actions));
     }
 
+    /**
+     * @return array<int, string>
+     */
+    protected function addWithsManageRemoteApiSync(): array
+    {
+        if (! $this->repositoryUsesRemoteApiSource() || ! $this->remoteApiConnectorIsEnabled()) {
+            return [];
+        }
+
+        return ['remoteApiSource'];
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public function addFormAppendsManageRemoteApiSync(): array
+    {
+        return $this->remoteApiLastSyncAppends();
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public function addIndexAppendsManageRemoteApiSync(): array
+    {
+        return $this->remoteApiLastSyncAppends();
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    protected function remoteApiLastSyncAppends(): array
+    {
+        if (! $this->repositoryUsesRemoteApiSource() || ! $this->remoteApiConnectorIsEnabled()) {
+            return [];
+        }
+
+        return ['remote_api_last_sync'];
+    }
+
     protected function repositoryUsesRemoteApiSource(): bool
     {
+        if (! $this->repository) {
+            return false;
+        }
+
         return in_array(
             RemoteApiSourceTrait::class,
             class_uses_recursive($this->repository),

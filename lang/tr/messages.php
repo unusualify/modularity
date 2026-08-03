@@ -116,6 +116,12 @@ return [
             'close' => 'Kapat',
             'not-found' => 'Uzak kayıt bulunamadı.',
         ],
+        'last-sync' => [
+            'label' => 'Son senkron',
+            'synced' => 'Son senkron: :at',
+            'never' => 'API\'den hiç senkronize edilmedi',
+            'never-label' => 'Yok',
+        ],
     ],
 
     'resource-cache' => [
