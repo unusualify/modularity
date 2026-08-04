@@ -2,6 +2,16 @@
 
 All notable changes to `modularous` will be documented in this file
 
+## v12.7.1 - 2026-08-04
+
+### :wrench: Bug Fixes
+
+- handle cache clear command failure gracefully by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/84384dcfb186e2113cda99d43d17e0c59e4fd023
+
+### :green_heart: Workflow
+
+- update release workflow to handle remote merges and lint/build processes by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/bf10fdaed9c0ccb6181f5bc13f6504f6de3cf171
+
 ## v12.7.0 - 2026-08-04
 
 ### :rocket: Features
