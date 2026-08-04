@@ -30,7 +30,13 @@ class RefreshCommand extends BaseCommand
         File::deleteDirectory(public_path('vendor/modularous'));
 
         $this->publishAssets();
-        $this->call('cache:clear');
+
+        try {
+            $this->call('cache:clear');
+        } catch (\Throwable $e) {
+            $this->warn('cache:clear failed (assets were published): '.$e->getMessage());
+        }
+
         $this->call('view:clear');
 
         return 0;
