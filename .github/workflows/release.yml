@@ -18,65 +18,98 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Extract tag name
         run: echo "TAG_NAME=${GITHUB_REF#refs/heads/release/}" >> $GITHUB_ENV
-      # - name: Setup PHP
-      #   uses: shivammathur/setup-php@v2
-      #   with:
-      #     php-version: 8.3
-      #     extensions: json, dom, curl, libxml, mbstring
-      #     coverage: none
 
-      # - name: Install Pint
-      #   run: composer global require laravel/pint
+      - name: Detect push source
+        id: source
+        env:
+          COMMITTER_NAME: ${{ github.event.head_commit.committer.name }}
+          COMMITTER_EMAIL: ${{ github.event.head_commit.committer.email }}
+          HEAD_MSG: ${{ github.event.head_commit.message }}
+        run: |
+          echo "committer=${COMMITTER_NAME} <${COMMITTER_EMAIL}>"
+          echo "message=${HEAD_MSG}"
 
-      # - name: Run Pint
-      #   run: pint
+          # Web/remote merge: GitHub as committer, or classic merge commit message
+          if [[ "${COMMITTER_NAME}" == "GitHub" ]] \
+            || [[ "${COMMITTER_EMAIL}" == "noreply@github.com" ]] \
+            || [[ "${HEAD_MSG}" == Merge\ pull\ request* ]]; then
+            echo "kind=remote_merge" >> "$GITHUB_OUTPUT"
+          else
+            echo "kind=local_push" >> "$GITHUB_OUTPUT"
+          fi
 
-      # - name: Check for Vue changes
-      #   id: check-vue-changes
-      #   run: |
-      #     # git diff --quiet HEAD^ HEAD vue/src/ vue/public/ || echo "vue_changed=true" >> $GITHUB_OUTPUT
-      #     git diff --quiet HEAD^ HEAD vue/ || echo "vue_changed=true" >> $GITHUB_OUTPUT
+      - name: Setup PHP
+        if: steps.source.outputs.kind == 'remote_merge'
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          tools: pint
+          coverage: none
 
-      # - name: Setup Node.js
-      #   if: steps.check-vue-changes.outputs.vue_changed == 'true'
-      #   uses: actions/setup-node@v4
-      #   with:
-      #     node-version: '18'
+      - name: Setup Node.js
+        if: steps.source.outputs.kind == 'remote_merge'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
 
-      # - name: Install Vue dependencies
-      #   if: steps.check-vue-changes.outputs.vue_changed == 'true'
-      #   working-directory: vue
-      #   run: npm install
+      - name: Lint, build and commit (remote merge only)
+        if: steps.source.outputs.kind == 'remote_merge'
+        run: |
+          set -euo pipefail
 
-      # - name: Build Vue
-      #   if: steps.check-vue-changes.outputs.vue_changed == 'true'
-      #   working-directory: vue
-      #   run: npm run build
+          BASE_REF="origin/12.x"
+          git fetch origin 12.x --depth=1 || true
+          T=$(git merge-base "$BASE_REF" HEAD 2>/dev/null || true)
 
-      # - name: Stage changes, commit and tag it
-      #   run: |
-      #     git config user.name github-actions
-      #     git config user.email github-actions@github.com
-      #     # Check if vue/dist has changes and commit if necessary
-      #     if [ -d "vue/dist" ] && git status vue/dist --porcelain | grep .; then
-      #       git add vue/dist
-      #       git commit -m "build(vue): update build artifacts for ${{ env.TAG_NAME }}"
-      #     fi
-      #     # Continue with other changes
-      #     git add .
-      #     git diff --quiet && git diff --staged --quiet || git commit -m "style(laravel): lint coding styles for ${{ env.TAG_NAME }}"
-      #     git push
-      #     git checkout main
-      #     git merge --no-ff ${{ github.ref }}
-      #     git tag ${{ env.TAG_NAME }}
+          if [ -z "$T" ]; then
+            echo "merge-base not found; falling back to HEAD^"
+            T=$(git rev-parse HEAD^)
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # PHP — same paths as .git/hooks/pre-push-release.sh
+          if ! git diff --quiet "$T" HEAD -- src/ config/ database/ routes/ tests/ modules/ operations/ lang/; then
+            echo "📝 PHP changes detected"
+            echo "🔨 Running Pint..."
+            pint
+            git add .
+            git diff --quiet && git diff --staged --quiet \
+              || git commit -m "style(laravel): lint coding styles for ${TAG_NAME} [skip ci]"
+          fi
+
+          # Vue — same as pre-push hook
+          if ! git diff --quiet "$T" HEAD -- vue/; then
+            echo "📝 Vue changes detected"
+            echo "🔨 Building Vue..."
+            (cd vue && npm install --legacy-peer-deps && npm run build)
+
+            if [ -d "vue/dist" ] && git status vue/dist --porcelain | grep -q .; then
+              git add vue/dist
+              git commit -m "build(vue): update build artifacts for ${TAG_NAME} [skip ci]"
+            fi
+          fi
+
+      - name: Push lint/build commits back to release branch
+        if: steps.source.outputs.kind == 'remote_merge'
+        run: |
+          if [ "$(git rev-parse HEAD)" != "${{ github.sha }}" ]; then
+            git push origin "HEAD:${{ github.ref_name }}"
+          else
+            echo "No new commits to push"
+          fi
 
       - name: Push changes
         uses: ad-m/github-push-action@master
         with:
           branch: ${{ github.event.repository.default_branch }}
           force: true
+
       - uses: oobook/autonomous-tag@v1
         id: tag-generation
         with:
