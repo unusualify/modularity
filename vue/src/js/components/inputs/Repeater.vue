@@ -50,7 +50,7 @@
               <Draggable
                 class="v-input-repeater__content"
                 v-model="repeaterModels"
-                item-key="id"
+                :item-key="draggableItemKey"
                 v-bind="collapsibleDragOptions"
               >
                 <template #item="itemSlot">
@@ -118,7 +118,7 @@
               <Draggable
                 class="v-input-repeater__content"
                 v-model="repeaterModels"
-                item-key="id"
+                :item-key="draggableItemKey"
                 v-bind="dragOptions"
                 >
                 <template #item="itemSlot">
@@ -193,7 +193,7 @@
             >
               <v-expansion-panel
                 v-for="(item, index) in repeaterModels"
-                :key="item.id"
+                :key="getRepeaterDomKey(item, index)"
                 :value="getPanelValue(item, index)"
                 class="v-input-repeater__panel"
               >
@@ -242,7 +242,7 @@
 
             <!-- Static -->
             <v-row v-else class="v-input-repeater__block" v-bind="rowAttribute">
-              <v-col v-for="(item, index) in repeaterModels" :key="item.id" v-bind="$lodash.pick(formCol, ['cols', 'xs', 'sm', 'md', 'lg', 'xl'])">
+              <v-col v-for="(item, index) in repeaterModels" :key="getRepeaterDomKey(item, index)" v-bind="$lodash.pick(formCol, ['cols', 'xs', 'sm', 'md', 'lg', 'xl'])">
                 <v-hover>
                   <template v-slot:default="{ isHovering, props }">
                     <div :class="['v-input-repeater__item', isHovering ? 'active' :'', draggable ? 'draggable': '']" v-bind="props">

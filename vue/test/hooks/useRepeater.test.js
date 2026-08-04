@@ -25,10 +25,11 @@ vi.mock('@/hooks/useValidation.js', () => ({
 
 beforeEach(() => {
   vi.clearAllMocks()
-  mockGetModel.mockImplementation((schema) => {
+  mockGetModel.mockImplementation((schema, item = null) => {
     const keys = Object.keys(schema || {})
     return keys.reduce((acc, k) => {
-      acc[k] = schema[k]?.default ?? ''
+      const name = schema[k]?.name ?? k
+      acc[name] = item?.[name] ?? schema[k]?.default ?? ''
       return acc
     }, {})
   })
@@ -59,6 +60,8 @@ const TestComponent = defineComponent({
   props: {
     modelValue: { type: Array, default: () => [] },
     schema: { type: Object, default: () => ({}) },
+    draggable: { type: Boolean, default: false },
+    orderKey: { type: String, default: 'position' },
     ...makeRepeaterProps()
   },
   emits: ['update:modelValue'],
@@ -207,7 +210,8 @@ describe('useRepeater', () => {
     const id = wrapper.vm.id
     const value = { [`repeater${id}[0][name]`]: 'updated' }
     wrapper.vm.onUpdateRepeaterModel(value, 0)
-    expect(wrapper.vm.repeaterModels[0]).toEqual(value)
+    expect(wrapper.vm.repeaterModels[0][`repeater${id}[0][name]`]).toBe('updated')
+    expect(wrapper.vm.repeaterModels[0].id).toBe(0)
   })
 
   test('repeaterSchemas generated for each model', async () => {
@@ -218,5 +222,79 @@ describe('useRepeater', () => {
     })
     expect(wrapper.vm.repeaterSchemas).toBeDefined()
     expect(wrapper.vm.repeaterSchemas.length).toBe(wrapper.vm.totalRepeats)
+  })
+
+  test('does not emit update when draggable payload only differs by missing id/undefined', async () => {
+    const store = createStoreStub()
+    const zigzagSchema = {
+      title: { name: 'title', type: 'text', label: 'Title' },
+      description: { name: 'description', type: 'textarea', label: 'Description' },
+      image_position: { name: 'image_position', type: 'select', label: 'Image Position', default: 'right' }
+    }
+    const modelValue = [
+      {
+        title: 'Announce Company News',
+        description: '<p>Sharing corporate news</p>',
+        image_position: 'right',
+        order: '0',
+        position: 0
+      },
+      {
+        title: 'Key Press Release',
+        description: '<p>B2Press delivers</p>',
+        image_position: 'right',
+        order: '1',
+        position: 1
+      }
+    ]
+
+    const wrapper = await factory(store, {
+      schema: zigzagSchema,
+      modelValue,
+      draggable: true,
+      orderKey: 'position',
+      autoIdGenerator: false
+    })
+
+    await wrapper.vm.$nextTick()
+
+    const emitted = wrapper.emitted('update:modelValue') ?? []
+    for (const [payload] of emitted) {
+      expect(payload).toEqual(modelValue)
+      payload.forEach((item) => {
+        expect(Object.prototype.hasOwnProperty.call(item, 'id')).toBe(false)
+        expect(item.position).not.toBeUndefined()
+        expect(Object.prototype.hasOwnProperty.call(item, 'order')).toBe(true)
+      })
+    }
+
+    // Mutating a schema field should keep passthrough order/position
+    const id = wrapper.vm.id
+    wrapper.vm.onUpdateRepeaterModel({
+      [`repeater${id}[0][title]`]: 'Updated title',
+      [`repeater${id}[0][description]`]: modelValue[0].description,
+      [`repeater${id}[0][image_position]`]: modelValue[0].image_position
+    }, 0)
+
+    await wrapper.vm.$nextTick()
+
+    const lastPayload = wrapper.emitted('update:modelValue')?.at(-1)?.[0]
+    expect(lastPayload[0].title).toBe('Updated title')
+    expect(lastPayload[0].position).toBe(0)
+    expect(lastPayload[0].order).toBe('0')
+    expect(Object.prototype.hasOwnProperty.call(lastPayload[0], 'id')).toBe(false)
+  })
+
+  test('exposes stable dom key when autoIdGenerator is false', async () => {
+    const store = createStoreStub()
+    const wrapper = await factory(store, {
+      schema: simpleSchema,
+      modelValue: [{ name: 'a', email: 'a@x.com' }],
+      autoIdGenerator: false
+    })
+
+    expect(wrapper.vm.getRepeaterDomKey(wrapper.vm.repeaterModels[0], 0)).toEqual(expect.any(String))
+    expect(typeof wrapper.vm.draggableItemKey).toBe('function')
+    expect(wrapper.vm.draggableItemKey(wrapper.vm.repeaterModels[0])).toEqual(expect.any(String))
   })
 })

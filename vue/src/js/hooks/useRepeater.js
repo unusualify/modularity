@@ -254,12 +254,118 @@ export default function useRepeater (props, context) {
     return values
   }
 
+  const REPEATER_UID_KEY = '_repeaterUid'
+
+  function getSchemaFieldNames () {
+    return new Set(
+      Object.values(processedSchema.value ?? {})
+        .map((input) => input?.name)
+        .filter(Boolean)
+    )
+  }
+
+  function getOrderBase (items) {
+    if (!props.orderKey || !isArray(items) || items.length === 0) {
+      return 1
+    }
+
+    const nums = items
+      .map((item) => Number(item?.[props.orderKey]))
+      .filter((n) => !Number.isNaN(n))
+
+    return nums.includes(0) ? 0 : 1
+  }
+
+  function sanitizeRepeaterItem (item) {
+    if (!isObject(item) || isArray(item)) {
+      return item
+    }
+
+    const omitKeys = [REPEATER_UID_KEY]
+
+    if (props.autoIdGenerator || item.id === undefined || item.id === null) {
+      omitKeys.push('id')
+    }
+
+    return omit(item, omitKeys)
+  }
+
+  function collectPassthroughFields (item) {
+    if (!isObject(item) || isArray(item)) {
+      return {}
+    }
+
+    const schemaFieldNames = getSchemaFieldNames()
+    const passthrough = {}
+
+    Object.keys(item).forEach((key) => {
+      if (schemaFieldNames.has(key)) {
+        return
+      }
+
+      if (key === REPEATER_UID_KEY) {
+        passthrough[key] = item[key]
+        return
+      }
+
+      if (key === 'id') {
+        if (!props.autoIdGenerator && item[key] !== undefined) {
+          passthrough[key] = item[key]
+        }
+        return
+      }
+
+      if (item[key] === undefined) {
+        return
+      }
+
+      passthrough[key] = item[key]
+    })
+
+    return passthrough
+  }
+
+  function itemContentFingerprint (item) {
+    return omit(sanitizeRepeaterItem(item), props.orderKey ? [props.orderKey] : [])
+  }
+
+  function isReorderPermutation (parsedItems, currentItems) {
+    if (!isArray(parsedItems) || !isArray(currentItems) || parsedItems.length !== currentItems.length || parsedItems.length === 0) {
+      return false
+    }
+
+    const parsedFingerprints = parsedItems.map(itemContentFingerprint)
+    const currentFingerprints = currentItems.map(itemContentFingerprint)
+
+    if (isEqual(parsedFingerprints, currentFingerprints)) {
+      return false
+    }
+
+    const sortKey = (value) => JSON.stringify(value)
+
+    return isEqual(
+      [...parsedFingerprints].sort((a, b) => sortKey(a).localeCompare(sortKey(b))),
+      [...currentFingerprints].sort((a, b) => sortKey(a).localeCompare(sortKey(b)))
+    )
+  }
+
   function hydrateRepeaterModel (item, index) {
     const model = getModel(processedSchema.value, item)
+    const passthrough = collectPassthroughFields(item)
     const extraFields = {}
 
-    if (props.draggable && !model[props.orderKey]) {
-      extraFields[props.orderKey] = index + 1
+    if (props.draggable && props.orderKey) {
+      const existingOrder = passthrough[props.orderKey] ?? item?.[props.orderKey] ?? model[props.orderKey]
+
+      if (existingOrder === undefined || existingOrder === null || existingOrder === '') {
+        extraFields[props.orderKey] = index + 1
+      } else if (passthrough[props.orderKey] === undefined) {
+        extraFields[props.orderKey] = existingOrder
+      }
+    }
+
+    if (!props.autoIdGenerator && !passthrough[REPEATER_UID_KEY]) {
+      extraFields[REPEATER_UID_KEY] = `repeater-${inputHook.id.value}-${index}`
     }
 
     return {
@@ -267,6 +373,7 @@ export default function useRepeater (props, context) {
       ...transform(omit(model, []), (o, v, k) => {
         o[namingRepeaterField(index, k)] = v
       }),
+      ...passthrough,
       ...extraFields
     }
   }
@@ -318,22 +425,36 @@ export default function useRepeater (props, context) {
     // let pattern = /repeater${this.id}[(\w+)]/
     const pattern = /\[(.*?)\]/gi
 
-    const extraFields = {}
+    const parsed = transform(object ?? {}, (o, v, k) => {
+      const matches = typeof k === 'string' ? k.match(pattern) : null
 
-    if (props.draggable) {
-      extraFields[props.orderKey] = i + 1
+      if (matches) {
+        const keys = matches.map(match => match.replace(pattern, '$1'))
+        o[keys.pop()] = v
+        return
+      }
+
+      // Preserve bare passthrough keys (order, position, real id, uid, …)
+      if (k === 'id' && (props.autoIdGenerator || v === undefined)) {
+        return
+      }
+
+      if (v === undefined) {
+        return
+      }
+
+      o[k] = v
+    })
+
+    if (props.draggable && props.orderKey) {
+      const existingOrder = parsed[props.orderKey]
+
+      if (existingOrder === undefined || existingOrder === null || existingOrder === '') {
+        parsed[props.orderKey] = i + 1
+      }
     }
 
-    return {
-      ...transform(object, (o, v, k) => {
-        const matches = k.match(pattern)
-        if (matches) {
-          const keys = matches.map(match => match.replace(pattern, '$1'))
-          o[keys.pop()] = v
-        }
-      }),
-      ...extraFields
-    }
+    return sanitizeRepeaterItem(parsed)
   }
 
   function parseRepeaterModels (model) {
@@ -357,13 +478,10 @@ export default function useRepeater (props, context) {
     }
 
     if (initialRepeats.length > 0) {
-      const parsedInitialRepeats = parseRepeaterModels(initialRepeats).map(item => {
-        const omitKeys = props.autoIdGenerator ? ['id'] : []
-        return omit(item, omitKeys)
-      })
+      const parsedInitialRepeats = parseRepeaterModels(initialRepeats).map(sanitizeRepeaterItem)
 
-      if (JSON.stringify(initialValue) !== JSON.stringify(parsedInitialRepeats)) {
-        inputHook.updateModelValue.value(parsedInitialRepeats)
+      if (!isEqual(initialValue, parsedInitialRepeats)) {
+        inputHook.updateModelValue.value(roughenModel(parsedInitialRepeats))
       }
     }
 
@@ -400,8 +518,24 @@ export default function useRepeater (props, context) {
   const openedPanels = ref([])
 
   function getPanelValue (model, index) {
-    return props.autoIdGenerator ? (model?.id ?? index) : index
+    return props.autoIdGenerator ? (model?.id ?? index) : (model?.[REPEATER_UID_KEY] ?? index)
   }
+
+  function getRepeaterDomKey (model, index) {
+    if (props.autoIdGenerator) {
+      return model?.id ?? index
+    }
+
+    return model?.[REPEATER_UID_KEY] ?? index
+  }
+
+  const draggableItemKey = computed(() => {
+    if (props.autoIdGenerator) {
+      return 'id'
+    }
+
+    return (item) => item?.[REPEATER_UID_KEY]
+  })
 
   function syncOpenedPanels (models) {
     if (!props.collapsible) {
@@ -465,7 +599,7 @@ export default function useRepeater (props, context) {
   syncOpenedPanels(repeaterModels.value)
 
   watch(() => modelValue.value, (newVal, oldVal) => {
-    if(JSON.stringify(newVal) !== JSON.stringify(oldVal)) {
+    if (!isEqual(newVal, oldVal)) {
       repeaterModels.value = getInitialRepeaterModels()
       syncOpenedPanels(repeaterModels.value)
     }
@@ -473,17 +607,29 @@ export default function useRepeater (props, context) {
     deep: true
   })
 
-  watch(() => repeaterModels.value, (newVal, oldVal) => {
-    let parsedItems = parseRepeaterModels(newVal)
+  watch(() => repeaterModels.value, (newVal) => {
+    let parsedItems = parseRepeaterModels(newVal).map(sanitizeRepeaterItem)
+    const currentItems = flattenModel(modelValue.value)
 
-    if(props.draggable) {
-      // reorder the items based on the order key
-      parsedItems = parsedItems.map((item, index) => {
-        return {
+    if (props.draggable && props.orderKey) {
+      if (isReorderPermutation(parsedItems, currentItems)) {
+        const base = getOrderBase(currentItems)
+        parsedItems = parsedItems.map((item, index) => ({
           ...item,
-          [props.orderKey]: index + 1
-        }
-      })
+          [props.orderKey]: index + base
+        }))
+      } else {
+        parsedItems = parsedItems.map((item, index) => {
+          if (item[props.orderKey] === undefined || item[props.orderKey] === null || item[props.orderKey] === '') {
+            return {
+              ...item,
+              [props.orderKey]: currentItems[index]?.[props.orderKey] ?? (index + getOrderBase(currentItems))
+            }
+          }
+
+          return item
+        })
+      }
     }
 
     if (isUnique) {
@@ -514,7 +660,11 @@ export default function useRepeater (props, context) {
       }, [])
     }
 
-    inputHook.updateModelValue.value(roughenModel(parsedItems))
+    const nextValue = roughenModel(parsedItems)
+
+    if (!isEqual(nextValue, modelValue.value)) {
+      inputHook.updateModelValue.value(nextValue)
+    }
   }, {
     deep: true
   })
@@ -577,16 +727,44 @@ export default function useRepeater (props, context) {
 
   const methods = reactive({
     onUpdateRepeaterModel (value, index) {
-      const newVal = parseRepeaterModel(value, index)
+      const prev = state.repeaterModels[index] ?? {}
+      const bracketPattern = /\[[^\]]+\]/
+      const preserved = {}
+
+      Object.keys(prev).forEach((key) => {
+        if (bracketPattern.test(key)) {
+          return
+        }
+
+        if (key === 'id' && props.autoIdGenerator) {
+          preserved[key] = prev[key]
+          return
+        }
+
+        if (prev[key] === undefined) {
+          return
+        }
+
+        preserved[key] = prev[key]
+      })
+
+      const merged = {
+        ...preserved,
+        ...value,
+        ...(props.autoIdGenerator ? { id: prev.id ?? index } : {})
+      }
+
+      const newVal = parseRepeaterModel(merged, index)
       const flattenedModel = flattenModel(modelValue.value)
 
-      if(flattenedModel[index] && JSON.stringify(flattenedModel[index]) !== JSON.stringify(newVal)) {
+      if(flattenedModel[index] && !isEqual(sanitizeRepeaterItem(flattenedModel[index]), newVal)) {
         if(props.idResetter && flattenedModel[index][props.idResetter] && flattenedModel[index][props.idResetter] !== newVal[props.idResetter]) {
-          delete newVal['id']
+          delete merged.id
+          delete newVal.id
         }
       }
 
-      state.repeaterModels[index] = value
+      state.repeaterModels[index] = merged
     },
     onUpdateRepeaterSchema (value, index) {
       const newSchema = parseRepeaterModel(value, index)
@@ -647,6 +825,8 @@ export default function useRepeater (props, context) {
     ...toRefs(state),
     openedPanels,
     getPanelValue,
+    getRepeaterDomKey,
+    draggableItemKey,
     getRepeaterItemTitle,
     togglePanel,
     invokeRuleGenerator,
