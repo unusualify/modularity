@@ -63,8 +63,8 @@ Included on `BaseController`. Registers table toolbar actions when the repositor
 
 Orchestrates create/update logic:
 
-- **`syncRecord($connector, $repository, $remoteId)`** — `fetchOne` → map → partition → repository create/update → sync `RemoteApiSource`.
-- **`syncAll($connector, $repository)`** — Index remote list → update linked locals → optionally import new remote ids → return stats + skipped stale links + HTTP request counts.
+- **`syncRecord($connector, $repository, $remoteId)`** — `fetchOne(..., forceRefresh: true)` → map → partition → repository create/update → sync `RemoteApiSource`.
+- **`syncAll($connector, $repository)`** — Stream remote list pages (`eachListPage` + forceRefresh) → update linked locals → optionally import new remote ids → `clearCache()` → return stats + skipped stale links + HTTP request counts.
 - **`previewSyncRecord` / `previewSyncAll`** — Configuration summary without HTTP or DB writes.
 
 Throws `RemoteApiSyncException` when a single-record fetch returns null.
@@ -74,7 +74,8 @@ Throws `RemoteApiSyncException` when a single-record fetch returns null.
 Low-level HTTP via Laravel `Http` facade:
 
 - **`get($endpoint, $query, $allowNotFound)`** — Asserts rate limit, records request, handles 404/429.
-- **`fetchPaginatedListResult`** — Walks pages using `meta_path` (`current_page`, `last_page`, `total`, `next_page_url`); validates complete fetch; max 100 pages safety cap.
+- **`eachPaginatedListPage`** — Streams pages via callback (no full-list accumulation); validates complete fetch; max 100 pages safety cap.
+- **`fetchPaginatedListResult`** — Collects all pages from `eachPaginatedListPage` into `{ items, expected_total }`.
 - **`getItem`** — Extracts single item via `item_path`.
 - Merges `http.includes` as `include=` query param unless `_skip_sync_includes` is set (catalog fetches).
 
@@ -149,8 +150,9 @@ Default fetch/cache pipeline:
 
 | Method | Cache key | Notes |
 |--------|-----------|-------|
-| `fetchList()` | `list:v2:{md5(query)}` | Paginated catalog via `rememberPaginatedCatalog` |
-| `fetchOne($id)` | `record:{id}` | Single item |
+| `fetchList($query, $forceRefresh)` | `list:v2:{md5(query)}` | Paginated list via `rememberPaginatedCatalog` |
+| `eachListPage($callback, $query, $forceRefresh)` | — | Streams pages; forceRefresh skips list cache |
+| `fetchOne($id, $query, $forceRefresh)` | `record:{id}` | Single item; forceRefresh bypasses cache read |
 | `listCatalog($key)` | `catalog:v2:…` | Default list or named catalog endpoint |
 | `clearCache($id)` | — | Delegates to `RemoteApiCache::flush` |
 

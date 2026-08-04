@@ -284,6 +284,39 @@ class SourcesHelpersTest extends TestCase
         $this->assertTrue(true, 'Cache::forget() was called once with correct key');
     }
 
+    /** @test */
+    public function test_modularous_authorization_localization_and_ui_preferences_for_guest(): void
+    {
+        $auth = get_modularous_authorization_config();
+        $this->assertFalse($auth['isSuperAdmin']);
+        $this->assertSame([], $auth['roles']);
+
+        $localization = get_modularous_localization_config();
+        $this->assertArrayHasKey('locale', $localization);
+        $this->assertArrayHasKey('lang', $localization);
+
+        $prefs = get_modularous_ui_preferences();
+        $this->assertArrayHasKey('sidebar', $prefs);
+        $this->assertArrayHasKey('topbar', $prefs);
+
+        $head = get_modularous_head_layout_config(['pageTitle' => 'Dash', '_headLayoutData' => ['meta' => 'x']]);
+        $this->assertSame('Dash', $head['pageTitle']);
+        $this->assertSame('x', $head['meta']);
+    }
+
+    /** @test */
+    public function test_modularous_navigation_config_for_guest(): void
+    {
+        Config::set('modularous.navigation.sidebar.guest', []);
+        Config::set('modularous.navigation.profileMenu.guest', []);
+        Config::set('modularous.navigation.sidebarBottom.guest', []);
+
+        $navigation = get_modularous_navigation_config();
+        $this->assertArrayHasKey('sidebar', $navigation);
+        $this->assertArrayHasKey('profileMenu', $navigation);
+        $this->assertArrayHasKey('sidebarBottom', $navigation);
+    }
+
     protected function tearDown(): void
     {
         \Mockery::close();

@@ -145,7 +145,11 @@ class LoginController extends Controller
             $body['redirector'] = redirect()->intended($this->redirectTo)->getTargetUrl();
         }
 
-        if ($request->has('_timezone')) {
+        if ($request->has('modularous_timezone')) {
+            session()->put('modularous_timezone', $request->get('modularous_timezone'));
+            session()->put('timezone', $request->get('modularous_timezone'));
+        } elseif ($request->has('_timezone')) {
+            session()->put('modularous_timezone', $request->get('_timezone'));
             session()->put('timezone', $request->get('_timezone'));
         }
 

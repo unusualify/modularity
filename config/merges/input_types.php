@@ -101,6 +101,8 @@ return [
         'label' => 'Status',
         'default' => true,
         'density' => 'compact',
+        'trueValue' => true,
+        'falseValue' => false,
     ],
     '_timezone' => [
         'type' => 'hidden',

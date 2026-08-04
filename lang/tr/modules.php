@@ -34,6 +34,11 @@ return [
             'name' => 'Site Ayarı | Site Ayarları | {n} Site Ayarı',
         ],
     ],
+    'error_page' => [
+        'error_page' => [
+            'name' => 'Error Sayfası | Error Sayfaları | {n} Error Sayfası',
+        ],
+    ],
     'system_notification' => [
         'my_notification' => [
             'name' => 'Bildirimim | Bildirimlerim | {n} Bildirimim',

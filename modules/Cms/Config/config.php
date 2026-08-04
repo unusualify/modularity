@@ -636,9 +636,6 @@ return [
                 ['title' => 'Actions', 'key' => 'actions', 'sortable' => false],
             ],
             'inputs' => [
-                // ['type' => 'switch', 'name' => 'published', 'label' => 'Published', 'trueValue' => true, 'falseValue' => false, 'isEvent' => true],
-                // ['name' => 'publish_start_date', 'label' => 'Publish from', 'type' => 'date', 'isSecondary' => true],
-                // ['name' => 'publish_end_date', 'label' => 'Publish until', 'type' => 'date', 'isSecondary' => true],
                 ['type' => 'switch', 'name' => 'active', 'label' => 'Active', 'translated' => true, 'trueValue' => true, 'falseValue' => false, 'isSecondary' => true],
                 ['type' => 'revision', 'maxHeight' => '150px'],
                 ['type' => 'text', 'name' => 'title', 'label' => 'Title', 'translated' => true, 'rules' => 'required', 'ext' => 'update:slugs:slugSourceValue:modelValue'],

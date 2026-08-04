@@ -240,6 +240,78 @@ class RemoteApiCacheTest extends TestCase
         });
     }
 
+    public function test_remember_force_refresh_bypasses_cache_hit_and_writes_through(): void
+    {
+        config(['cache.default' => 'array']);
+
+        $configuration = new RemoteApiConfiguration($this->makeModule(), 'package', [
+            'enabled' => true,
+            'endpoint' => 'packages',
+        ]);
+
+        $cache = new RemoteApiCache($configuration);
+        $calls = 0;
+
+        $cache->remember('record:1', function () use (&$calls) {
+            $calls++;
+
+            return ['id' => 1, 'name' => 'Stale'];
+        });
+
+        $fresh = $cache->remember('record:1', function () use (&$calls) {
+            $calls++;
+
+            return ['id' => 1, 'name' => 'Fresh'];
+        }, true);
+
+        $cached = $cache->remember('record:1', function () use (&$calls) {
+            $calls++;
+
+            return ['id' => 1, 'name' => 'Should not run'];
+        });
+
+        $this->assertSame(['id' => 1, 'name' => 'Fresh'], $fresh);
+        $this->assertSame(['id' => 1, 'name' => 'Fresh'], $cached);
+        $this->assertSame(2, $calls);
+    }
+
+    public function test_remember_paginated_catalog_force_refresh_bypasses_hit(): void
+    {
+        config(['cache.default' => 'array']);
+
+        $logger = Mockery::mock(RemoteApiLogger::class);
+        $logger->shouldReceive('logCacheAccess')
+            ->once()
+            ->with('list:v2:test', 'miss');
+        $logger->shouldReceive('logCacheAccess')
+            ->once()
+            ->with('list:v2:test', 'force_refresh');
+
+        $configuration = new RemoteApiConfiguration($this->makeModule(), 'package', [
+            'enabled' => true,
+            'endpoint' => 'packages',
+        ]);
+
+        $cache = new RemoteApiCache($configuration, $logger);
+        $key = 'list:v2:test';
+
+        $cache->rememberPaginatedCatalog($key, function () {
+            return [
+                'expected_total' => 1,
+                'items' => [['id' => 1, 'name' => 'Stale']],
+            ];
+        });
+
+        $items = $cache->rememberPaginatedCatalog($key, function () {
+            return [
+                'expected_total' => 1,
+                'items' => [['id' => 1, 'name' => 'Fresh']],
+            ];
+        }, true);
+
+        $this->assertSame([['id' => 1, 'name' => 'Fresh']], $items);
+    }
+
     private function makeModule(): Module
     {
         $module = Mockery::mock(Module::class);

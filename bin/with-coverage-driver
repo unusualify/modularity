@@ -18,6 +18,10 @@ pcov_available() {
 }
 
 MEMORY_LIMIT="${COVERAGE_MEMORY_LIMIT:--1}"
+# Bare positive integers are megabytes (PHP treats bare numbers as bytes).
+if [[ "${MEMORY_LIMIT}" =~ ^[0-9]+$ ]]; then
+    MEMORY_LIMIT="${MEMORY_LIMIT}M"
+fi
 MEMORY_FLAGS=(-d "memory_limit=${MEMORY_LIMIT}")
 
 if coverage_driver_loaded; then

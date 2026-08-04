@@ -45,16 +45,18 @@ final class PublishableMetadata
      * @param list<string>|bool $translatedFields Field names with {@code translated => true}, or legacy bool for all three.
      * @return list<array<string, mixed>>
      */
-    public static function defaultFormInputs(array|bool $translatedFields = false): array
+    public static function defaultFormInputs(array|bool $translatedFields = false, $usePublishDates = false): array
     {
         $translated = self::normalizeTranslatedFields($translatedFields);
         $translatedPublished = in_array('published', $translated, true);
         $publishedExtraConfig = $translatedPublished ? ['isSecondary' => true] : ['isEvent' => true];
 
         return [
-            ['type' => 'switch', 'name' => 'published', 'label' => 'Published', 'trueValue' => true, 'falseValue' => false, ...$publishedExtraConfig, 'translated' => $translatedPublished],
-            ['name' => 'publish_start_date', 'label' => 'Publish from', 'type' => 'date', 'isSecondary' => true, 'translated' => in_array('publish_start_date', $translated, true)],
-            ['name' => 'publish_end_date', 'label' => 'Publish until', 'type' => 'date', 'isSecondary' => true, 'translated' => in_array('publish_end_date', $translated, true)],
+            ['type' => 'switch', 'name' => 'published', 'label' => 'Published', 'default' => true, 'trueValue' => true, 'falseValue' => false, ...$publishedExtraConfig, 'translated' => $translatedPublished],
+            ...($usePublishDates ? [
+                ['name' => 'publish_start_date', 'label' => 'Publish from', 'type' => 'date', 'isSecondary' => true, 'translated' => in_array('publish_start_date', $translated, true)],
+                ['name' => 'publish_end_date', 'label' => 'Publish until', 'type' => 'date', 'isSecondary' => true, 'translated' => in_array('publish_end_date', $translated, true)],
+            ] : []),
         ];
     }
 

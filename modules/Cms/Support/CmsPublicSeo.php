@@ -61,13 +61,20 @@ final class CmsPublicSeo
     {
         $isTranslatable = @classHasTrait($item, HasTranslation::class);
         $translation = $isTranslatable ? $item->translate($locale) : $item;
-        $title = optional($translation)->seo_title ?? null;
+        $seoTitle = optional($translation)->seo_title ?? null;
+        $title = optional($translation)->title ?? null;
 
         // #TODO: add default title and description for the page if not set
+        if (is_array($seoTitle) && array_key_exists($locale, $seoTitle)) {
+            $seoTitle = (string) $seoTitle[$locale] ?? $item->title ?? 'Page';
+        }
+
         if (is_array($title) && array_key_exists($locale, $title)) {
-            $title = (string) $title[$locale] ?? $item->title ?? 'Page';
-        } elseif ($title !== null) {
             $title = (string) (optional($translation)->title ?? 'Page');
+        }
+
+        if ($title == null) {
+            $title = $seoTitle;
         }
 
         $description = optional($translation)->seo_description;
@@ -79,15 +86,23 @@ final class CmsPublicSeo
         $robotsIndex = $isTranslatable ? optional($translation)->robots_index : $item->robots_index;
         $robotsFollow = $isTranslatable ? optional($translation)->robots_follow : $item->robots_follow;
         if (is_array($robotsIndex) && array_key_exists($locale, $robotsIndex)) {
-            $robotsIndex = (string) $robotsIndex[$locale] ?? null;
+            $robotsIndex = $robotsIndex[$locale] ?? null;
         }
         if (is_array($robotsFollow) && array_key_exists($locale, $robotsFollow)) {
-            $robotsFollow = (string) $robotsFollow[$locale] ?? null;
+            $robotsFollow = $robotsFollow[$locale] ?? null;
         }
+
+        // Legacy blog posts store indexability on the model (`seo_index`) rather than
+        // HasTranslatableMetadata robots_index — fall back when robots_index is unset.
+        if ($robotsIndex === null && array_key_exists('seo_index', $item->getAttributes())) {
+            $robotsIndex = (bool) $item->getAttribute('seo_index');
+        }
+
         $robotsMeta = self::resolveRobotsMeta(self::robotsDirective($robotsIndex, $robotsFollow));
 
         return [
             'title' => $title,
+            'seoTitle' => $seoTitle,
             'description' => $description,
             'canonicalUrl' => $canonicalUrl,
             'robotsMeta' => $robotsMeta,

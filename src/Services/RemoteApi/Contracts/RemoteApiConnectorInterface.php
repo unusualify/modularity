@@ -13,12 +13,19 @@ interface RemoteApiConnectorInterface
     /**
      * @return array<int, array<string, mixed>>
      */
-    public function fetchList(array $query = []): array;
+    public function fetchList(array $query = [], bool $forceRefresh = false): array;
+
+    /**
+     * Stream list pages without accumulating the full remote list in memory.
+     *
+     * @param  callable(array<int, array<string, mixed>> $pageItems, int $page, int $lastPage, int $expectedTotal): void  $callback
+     */
+    public function eachListPage(callable $callback, array $query = [], bool $forceRefresh = false): void;
 
     /**
      * @return array<string, mixed>|null
      */
-    public function fetchOne(int|string $remoteId, array $query = []): ?array;
+    public function fetchOne(int|string $remoteId, array $query = [], bool $forceRefresh = false): ?array;
 
     /**
      * @return array<int, array<string, mixed>>

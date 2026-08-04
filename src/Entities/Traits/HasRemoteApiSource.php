@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Unusualify\Modularous\Entities\Traits;
 
+use DateTimeInterface;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Support\Carbon;
 use Unusualify\Modularous\Entities\RemoteApiSource;
 use Unusualify\Modularous\Observers\RemoteApiSourceableObserver;
 
@@ -88,6 +91,93 @@ trait HasRemoteApiSource
     public function getRemoteApiIdColumn(): string
     {
         return 'remote_id';
+    }
+
+    /**
+     * Admin table/form chip for last remote API sync time (user/browser timezone).
+     */
+    protected function remoteApiLastSync(): Attribute
+    {
+        return new Attribute(
+            get: function () {
+                return $this->formatRemoteApiLastSyncChip(
+                    $this->resolveRemoteApiLastSyncedAt(),
+                );
+            },
+        );
+    }
+
+    protected function resolveRemoteApiLastSyncedAt(): ?Carbon
+    {
+        if (array_key_exists('remote_synced_at', $this->remoteApiVirtualKeys)) {
+            $value = $this->attributes['remote_synced_at'] ?? null;
+        } else {
+            $value = $this->remoteApiSource?->remote_synced_at;
+        }
+
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        if ($value instanceof Carbon) {
+            return $value->copy();
+        }
+
+        if ($value instanceof DateTimeInterface) {
+            return Carbon::instance($value);
+        }
+
+        try {
+            return Carbon::parse($value);
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    protected function formatRemoteApiLastSyncChip(?Carbon $syncedAt): string
+    {
+        if ($syncedAt === null) {
+            $tooltip = e(__('messages.remote-api.last-sync.never'));
+            $label = e(__('messages.remote-api.last-sync.never-label'));
+
+            return "<v-tooltip text=\"{$tooltip}\" location=\"top\">"
+                . "<v-chip color=\"secondary\" prepend-icon=\"mdi-sync-off\" variant=\"text\">{$label}</v-chip>"
+                . '</v-tooltip>';
+        }
+
+        $formatted = $syncedAt
+            ->timezone($this->resolveRemoteApiDisplayTimezone())
+            ->format('Y-m-d H:i');
+
+        $tooltip = e(__('messages.remote-api.last-sync.synced', ['at' => $formatted]));
+        $label = e($formatted);
+
+        return "<v-tooltip text=\"{$tooltip}\" location=\"top\">"
+            . "<v-chip color=\"success\" prepend-icon=\"mdi-sync\" variant=\"text\">{$label}</v-chip>"
+            . '</v-tooltip>';
+    }
+
+    /**
+     * Prefer browser timezone from login session, then user profile, then app config.
+     */
+    protected function resolveRemoteApiDisplayTimezone(): string
+    {
+        $timezone = session('modularous_timezone')
+            ?? auth()->user()?->timezone
+            ?? modularousConfig('timezone')
+            ?? config('app.timezone', 'UTC');
+
+        if (! is_string($timezone) || $timezone === '') {
+            return 'UTC';
+        }
+
+        try {
+            new \DateTimeZone($timezone);
+
+            return $timezone;
+        } catch (\Throwable) {
+            return 'UTC';
+        }
     }
 
     /**

@@ -25,6 +25,15 @@ Implementation: `RemoteApiCache` + `RemoteApiConfiguration` cache settings.
 
 When `cache.enabled` is false, all `remember*` methods call through without storing.
 
+### Sync vs Preview
+
+| Call site | Cache behavior |
+|-----------|----------------|
+| `syncRecord` / `syncAll` | `forceRefresh=true` — bypass cache **read**, write-through (single) or `clearCache()` after batch |
+| `previewRemote` / `listCatalog` / hydrate | Default cached reads within TTL |
+
+`remember($key, $callback, $forceRefresh = false)` and `rememberPaginatedCatalog(..., $forceRefresh = false)` skip hits when forced, then persist the fresh result.
+
 ### Cache Keys
 
 Prefixed keys isolate module, route, and invalidation generation:
@@ -173,8 +182,9 @@ Rate limit messages include window, limit, and retry seconds — same path for o
 | Scenario | Recommendation |
 |----------|----------------|
 | Large catalog, slow remote API | Increase `cache.ttl`; use `catalog_http.query.per_page` |
-| Sync job hits minute cap | Raise `MODULAROUS_REMOTE_API_RATE_LIMITING_PER_MINUTE` or run off-peak |
-| Stale list after remote bulk change | Run **Clear Remote Cache** or `clearRemoteApiCache()` before `syncAll` |
+| Sync job hits minute cap | Prefer list-page sync (`http.query.per_page` 50–100); raise `MODULAROUS_REMOTE_API_RATE_LIMITING_PER_MINUTE` if still needed |
+| Stale preview after remote change | Sync already force-refreshes; or run **Clear Remote Cache** |
+| Memory pressure on large lists | `syncAll` streams via `eachListPage` — keep `per_page` reasonable (50–100) |
 | Paginated list incomplete | Fix `response.meta_path` / `list_path`; client throws `incompletePaginatedList` |
 | Redis available | Prefer tagged cache store for clean full flush |
 
@@ -222,6 +232,6 @@ Structured context (JSON) includes: `event`, `method`, `url`, `status`, `duratio
 
 ### Cache Access Logs
 
-When `log_cache` is true, `rememberPaginatedCatalog()` logs `remote_api.cache` events with `result: hit|miss` and the logical cache key.
+When `log_cache` is true, `rememberPaginatedCatalog()` logs `remote_api.cache` events with `result: hit|miss|force_refresh` and the logical cache key.
 
 Disable all Remote API logging: `MODULAROUS_REMOTE_API_LOGGING_ENABLED=false`.

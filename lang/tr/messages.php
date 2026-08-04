@@ -116,6 +116,12 @@ return [
             'close' => 'Kapat',
             'not-found' => 'Uzak kayıt bulunamadı.',
         ],
+        'last-sync' => [
+            'label' => 'Son senkron',
+            'synced' => 'Son senkron: :at',
+            'never' => 'API\'den hiç senkronize edilmedi',
+            'never-label' => 'Yok',
+        ],
     ],
 
     'resource-cache' => [
@@ -166,6 +172,16 @@ return [
         ],
         'validation' => [
             'types-required' => 'En az bir önbellek türü seçilmelidir.',
+        ],
+        'presentation-item-column' => [
+            'label' => 'Sunum önbelleği',
+            'fresh' => ':expires tarihine kadar geçerli',
+            'fresh-no-expiry' => 'Önbellekte',
+            'stale' => ':expires tarihine kadar stale',
+            'stale-no-expiry' => 'Stale',
+            'expired' => 'Süresi dolmuş :expires',
+            'expired-no-expiry' => 'Süresi dolmuş',
+            'missing' => 'Önbellekte değil',
         ],
     ],
 

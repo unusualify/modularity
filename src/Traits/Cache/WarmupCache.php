@@ -222,6 +222,26 @@ trait WarmupCache
      */
     public function warmupPresentationItem(string $moduleName, string $routeName, Model $item, ?string $locale = null): bool
     {
+        // ErrorPage has no UrlRoute — HTML lives in model-scoped StaleFileCache via
+        // ErrorPagePresentationCache, not CmsPublicPresentationItemCache URL/path keys.
+        if (
+            class_exists(\Modules\ErrorPage\Entities\ErrorPage::class)
+            && $item instanceof \Modules\ErrorPage\Entities\ErrorPage
+            && class_exists(\Modules\ErrorPage\Support\ErrorPagePresentationCache::class)
+        ) {
+            try {
+                $resolved = $this->resolvePresentationWarmupModel($item);
+            } catch (\Throwable) {
+                $resolved = $item;
+            }
+
+            if (! $resolved instanceof \Modules\ErrorPage\Entities\ErrorPage || $resolved->getKey() === null) {
+                return false;
+            }
+
+            return \Modules\ErrorPage\Support\ErrorPagePresentationCache::warm($resolved, $locale);
+        }
+
         [$moduleName, $routeName] = $this->resolvePresentationItemWarmupContext($moduleName, $routeName, $item);
 
         if ($moduleName === null || $moduleName === '' || $routeName === null || $routeName === '') {

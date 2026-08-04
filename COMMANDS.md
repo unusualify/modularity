@@ -45,6 +45,13 @@
 
 ```
 
+### ERROR PAGE DEFAULTS
+```
+    php artisan modularous:create:error-page-defaults
+    php artisan modularous:create:error-page-defaults --layout-slug=your-theme --force
+```
+Layout slug falls back to `cms_layout_builder.default_layout_slug` / `CmsPageLayoutResolver::defaultLayoutBuilder()`. See `docs/ERROR_PAGE.md`.
+
 ### OPERATIONS COMMANDS
 ```
     php artisan operations:make AdminUserTableOperation

@@ -13,8 +13,6 @@ class PublishableMetadataTest extends TestCase
 
         $this->assertSame([
             'published' => false,
-            'publish_start_date' => false,
-            'publish_end_date' => false,
         ], $this->translatedFlagsByName($inputs));
     }
 
@@ -24,14 +22,12 @@ class PublishableMetadataTest extends TestCase
 
         $this->assertSame([
             'published' => true,
-            'publish_start_date' => true,
-            'publish_end_date' => true,
         ], $this->translatedFlagsByName($inputs));
     }
 
     public function test_default_form_inputs_with_per_field_translated_flags(): void
     {
-        $inputs = PublishableMetadata::defaultFormInputs(['published', 'publish_end_date']);
+        $inputs = PublishableMetadata::defaultFormInputs(['published', 'publish_end_date'], true);
 
         $this->assertSame([
             'published' => true,

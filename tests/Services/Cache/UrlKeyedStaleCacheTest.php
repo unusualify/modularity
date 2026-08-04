@@ -28,6 +28,12 @@ class UrlKeyedStaleCacheTest extends TestCase
     }
 
     /** @test */
+    public function it_exposes_base_path(): void
+    {
+        $this->assertSame($this->basePath, $this->cache->basePath());
+    }
+
+    /** @test */
     public function it_stores_and_reads_html_by_locale_and_path(): void
     {
         $html = '<!DOCTYPE html><html><body>url-hit</body></html>';

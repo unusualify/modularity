@@ -1517,19 +1517,7 @@ return [
                         'md' => 4,
                         'lg' => 3,
                     ],
-                ],
-                [
-                    'type' => 'switch',
-                    'name' => 'published',
-                    'label' => 'Active',
-                    'default' => true,
-                    'col' => [
-                        'cols' => 12,
-                        'sm' => 6,
-                        'md' => 4,
-                        'lg' => 3,
-                    ],
-                ],
+                ]
             ],
         ],
         'capability_route' => [

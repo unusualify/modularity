@@ -2,7 +2,8 @@
 // Should output : '<span class="icon icon--${id}"><svg><title>id</title><use xlink:href="#icon--${id}"></use></svg></span>';
 // <svg class="icon icon--${id}"><title>id</title><use xlink:href="#icon--${id}"></use></svg> if node is already a svg
 import { isString } from 'lodash-es'
-import { useConfig, useLocale } from '@/hooks'
+import { useConfig } from '@/hooks'
+import store from '@/store'
 
 export function addSvg (el, binding, vnode) {
   const classNames = ['icon']
@@ -92,8 +93,8 @@ export function getSymbol(symbols) {
 
 export function getLocaleSymbol(symbol, fallback) {
   let fallbacks = Array.isArray(fallback) ? fallback : (isString(fallback) ? [fallback] : [])
-  const { currentLocale } = useLocale()
-  const locale = currentLocale?.value?.value ?? 'en'
+  // Store-direct: safe outside setup(); do not call useLocale()/inject here.
+  const locale = store?.state?.language?.active?.value ?? 'en'
 
   return getSymbol([`${symbol}-${locale}`, symbol, ...fallbacks])
 }

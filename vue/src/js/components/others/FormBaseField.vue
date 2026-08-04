@@ -13,7 +13,7 @@
   <!-- DYNAMIC COMPONENT -->
   <ue-dynamic-component-renderer
     v-else-if="obj.schema.type === 'dynamic-component'"
-    :subject="obj.schema.subject"
+    :subject="obj.schema.subject ?? ctx.setValue(obj)"
   />
 
   <!-- TITLE -->

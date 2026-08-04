@@ -3,7 +3,7 @@ import { ref, computed, watch, toRefs, reactive, nextTick, onMounted, provide } 
 import { router } from '@inertiajs/vue3'
 import { useStore } from 'vuex'
 import { useI18n } from 'vue-i18n'
-import { cloneDeep, isEqual, find, reduce, set, get, isArray } from 'lodash-es'
+import { cloneDeep, isEqual, find, reduce, set, get, isArray, isPlainObject } from 'lodash-es'
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
 
 import { useConfig, useInputHandlers, useValidation, useLocale, useItemActions, useAuthorization, useUser, useEditPresence } from '@/hooks'
@@ -258,6 +258,8 @@ export default function useForm(props, context) {
     props.modelValue,
   ))
 
+  const initialModel = ref(cloneDeep(model.value))
+
   const schemaUpdating = ref(false)
 
   const setSchemaUpdating = (value) => {
@@ -321,6 +323,98 @@ export default function useForm(props, context) {
   const currentRevisions = ref(props.revisions || [])
   const restoringRevisionId = ref(null)
 
+  // the authorized user select or the status (stateable) event in the
+  // header, both of which are only persisted on Submit.
+  const dirtyWatchKeys = computed(() => {
+    const keys = []
+
+    const collect = (input) => {
+      if (['wrap', 'group'].includes(input.type)) {
+        Object.values(input.schema ?? {}).forEach(collect)
+        return
+      }
+
+      if ((checkSubmittable(input) || input.dirtyCheck === true) && input.name) {
+        keys.push(input.name)
+      }
+    }
+
+    Object.values(inputSchema.value).forEach(collect)
+
+    Object.values(formEventSchema.value).forEach((event) => {
+      if (event && event.dirtyCheck === true && event.name) {
+        keys.push(event.name)
+      }
+    })
+
+    return keys
+  })
+
+  const isEmptyValue = (v) => v === null || v === undefined || v === ''
+
+  /**
+   * Deep-equal for dirty checks: treat null / undefined / '' as the same
+   * empty scalar so getModel defaults ('' for text) do not false-dirty
+   * against API/DB nulls or missing keys nested in repeaters
+   * (e.g. icon: null → '', link: '' vs absent).
+   *
+   * Vue Proxy vs plain Array is fine for lodash isEqual — not a mismatch source.
+   * Empty object keys are omitted so `{ link: '' }` equals `{}` without link.
+   */
+  const normalizeEmptyDeep = (value) => {
+    if (isEmptyValue(value)) {
+      return null
+    }
+
+    if (isArray(value)) {
+      return value.map(normalizeEmptyDeep)
+    }
+
+    if (isPlainObject(value)) {
+      return Object.keys(value).reduce((acc, key) => {
+        const normalized = normalizeEmptyDeep(value[key])
+
+        if (normalized !== null) {
+          acc[key] = normalized
+        }
+
+        return acc
+      }, {})
+    }
+
+    return value
+  }
+
+  const isDirtyValue = (current, initial) => {
+    if (isEmptyValue(current) && isEmptyValue(initial)) {
+      return false
+    }
+
+    return !isEqual(normalizeEmptyDeep(current), normalizeEmptyDeep(initial))
+  }
+
+  const isDirty = computed(() =>
+    dirtyWatchKeys.value.some((key) => {
+      const current = model.value[key]
+      const initial = initialModel.value[key]
+      const isDifferent = isDirtyValue(current, initial)
+
+      if (isDifferent) {
+        const normalizedCurrent = normalizeEmptyDeep(current)
+        const normalizedInitial = normalizeEmptyDeep(initial)
+        const differingKeys = (isPlainObject(normalizedCurrent) && isPlainObject(normalizedInitial))
+          ? [...new Set([...Object.keys(normalizedCurrent), ...Object.keys(normalizedInitial)])]
+              .filter((k) => !isEqual(normalizedCurrent[k], normalizedInitial[k]))
+          : []
+
+        console.warn(`${key} is different`, differingKeys, { current, initial })
+      }
+
+      return isDifferent
+    })
+  )
+
+
   const hasAdditionalSection = computed(() => context.slots.right
     || context.slots['right.top']
     || context.slots['right.bottom']
@@ -344,6 +438,7 @@ export default function useForm(props, context) {
 
     schemaUpdating,
     formActionsActive: computed(() => !schemaUpdating.value && props.isEditing),
+    isDirty,
     chunkedRawSchema,
     inputSchema,
     formEventSchema,
@@ -700,6 +795,10 @@ export default function useForm(props, context) {
       if(isEqual(newVal, oldVal) && isEqual(newModelValue, model.value)) return
 
       model.value = getModel(rawSchema.value, newVal, store.state)
+      // Re-baseline the dirty snapshot to the freshly saved data (e.g. after a
+      // refreshOnSaved partial reload)
+      initialModel.value = cloneDeep(model.value)
+
     }
   })
 

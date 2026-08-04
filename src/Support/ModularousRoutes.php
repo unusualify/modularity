@@ -21,6 +21,7 @@ use Unusualify\Modularous\Http\Middleware\LogMiddleware;
 use Unusualify\Modularous\Http\Middleware\NavigationMiddleware;
 use Unusualify\Modularous\Http\Middleware\RedirectIfAuthenticatedMiddleware;
 use Unusualify\Modularous\Http\Middleware\RedirectorMiddleware;
+use Unusualify\Modularous\Http\Middleware\TimezoneMiddleware;
 use Unusualify\Modularous\Http\Middleware\UtmMiddleware;
 use Unusualify\Modularous\Http\Middleware\VerifyModularousCacheWebhook;
 use Unusualify\Modularous\Module;
@@ -172,6 +173,7 @@ class ModularousRoutes
         Route::aliasMiddleware('modularous.log', LogMiddleware::class);
 
         Route::aliasMiddleware('modularous.language', LanguageMiddleware::class);
+        Route::aliasMiddleware('modularous.timezone', TimezoneMiddleware::class);
         Route::aliasMiddleware('modularous.impersonate', ImpersonateMiddleware::class);
         Route::aliasMiddleware('modularous.loadLocalizedConfig', LoadLocalizedConfig::class);
         Route::aliasMiddleware('modularous.navigation', NavigationMiddleware::class);
@@ -182,6 +184,7 @@ class ModularousRoutes
             'modularous.loadLocalizedConfig',
             'modularous.navigation',
             'inertia.middleware',
+            'modularous.timezone',
         ]);
 
         Route::aliasMiddleware('authorization', AuthorizationMiddleware::class);

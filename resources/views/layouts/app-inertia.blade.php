@@ -16,6 +16,23 @@
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
         <script>
+            (function () {
+                try {
+                    var timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                    if (!timezone) {
+                        return;
+                    }
+
+                    var secure = location.protocol === 'https:' ? ';Secure' : '';
+                    document.cookie = 'timezone=' + encodeURIComponent(timezone)
+                        + ';path=/;max-age=31536000;SameSite=Lax' + secure;
+
+                    window.__MODULAROUS_BROWSER_TIMEZONE__ = timezone;
+                } catch (e) {}
+            })();
+        </script>
+
+        <script>
             const TRANSLATIONS = @json(get_translations());
             // const URLS = @json($urls);
         </script>
@@ -63,7 +80,7 @@
         <script>
             @include("{$MODULAROUS_VIEW_NAMESPACE}::partials.default-store")
 
-            window['{{ modularousConfig('js_namespace') }}'].TIMEZONE = '{{ modularousConfig('timezone') }}';
+            window['{{ modularousConfig('js_namespace') }}'].TIMEZONE = window.__MODULAROUS_BROWSER_TIMEZONE__ || '{{ modularousConfig('timezone') }}';
             window['{{ modularousConfig('js_namespace') }}'].AUTHORIZATION = @json($authorization ?? []);
 
             window['{{ modularousConfig('js_namespace') }}'].ENDPOINTS = {!! json_encode($endpoints ?? new StdClass()) !!}

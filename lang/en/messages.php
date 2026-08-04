@@ -121,6 +121,12 @@ return [
             'close' => 'Close',
             'not-found' => 'Remote record not found.',
         ],
+        'last-sync' => [
+            'label' => 'Last sync',
+            'synced' => 'Last synced at :at',
+            'never' => 'Never synced from API',
+            'never-label' => 'Never',
+        ],
         'rate-limit-exceeded' => 'Remote API rate limit exceeded. Please wait and try again.',
     ],
 
@@ -172,6 +178,16 @@ return [
         ],
         'validation' => [
             'types-required' => 'Select at least one cache type.',
+        ],
+        'presentation-item-column' => [
+            'label' => 'Presentation cache',
+            'fresh' => 'Valid until :expires',
+            'fresh-no-expiry' => 'Cached',
+            'stale' => 'Stale until :expires',
+            'stale-no-expiry' => 'Stale',
+            'expired' => 'Expired :expires',
+            'expired-no-expiry' => 'Expired',
+            'missing' => 'Not cached',
         ],
     ],
 

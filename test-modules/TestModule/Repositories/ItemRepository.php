@@ -11,4 +11,12 @@ class ItemRepository extends Repository
     {
         $this->model = $model;
     }
+
+    /**
+     * Minimal connector stub for dashboard metric widgets.
+     */
+    public function metricValue(): int
+    {
+        return (int) $this->model->newQuery()->count();
+    }
 }

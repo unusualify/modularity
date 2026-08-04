@@ -10,6 +10,9 @@ use Unusualify\Modularous\Services\RemoteApi\Contracts\RemoteApiConnectorInterfa
 
 abstract class AbstractRemoteApiConnector implements DefinesRemoteApiConfiguration, RemoteApiConnectorInterface
 {
+    /** @var array<int, int> */
+    protected array $allowedStatuses = [];
+
     /**
      * @return array<string, mixed>
      */
@@ -20,7 +23,11 @@ abstract class AbstractRemoteApiConnector implements DefinesRemoteApiConfigurati
         protected readonly RemoteApiClient $client,
         protected readonly RemoteApiCache $cache,
         protected readonly RemoteApiAdapterInterface $adapter,
-    ) {}
+    ) {
+        if (filled($this->allowedStatuses)) {
+            $this->client->setAllowedStatuses($this->allowedStatuses);
+        }
+    }
 
     public function configuration(): RemoteApiConfiguration
     {
@@ -30,7 +37,7 @@ abstract class AbstractRemoteApiConnector implements DefinesRemoteApiConfigurati
     /**
      * @return array<int, array<string, mixed>>
      */
-    public function fetchList(array $query = []): array
+    public function fetchList(array $query = [], bool $forceRefresh = false): array
     {
         $query = $this->beforeFetch($query);
 
@@ -47,7 +54,8 @@ abstract class AbstractRemoteApiConnector implements DefinesRemoteApiConfigurati
                     'expected_total' => $result['expected_total'],
                     'items' => $this->afterFetch($result['items'], $query),
                 ];
-            }
+            },
+            $forceRefresh,
         );
 
         $this->warmDefaultCatalogCacheFromList($items);
@@ -56,9 +64,42 @@ abstract class AbstractRemoteApiConnector implements DefinesRemoteApiConfigurati
     }
 
     /**
+     * @param  callable(array<int, array<string, mixed>> $pageItems, int $page, int $lastPage, int $expectedTotal): void  $callback
+     */
+    public function eachListPage(callable $callback, array $query = [], bool $forceRefresh = false): void
+    {
+        $query = $this->beforeFetch($query);
+        $cacheKey = 'list:v2:' . $this->hashQuery($query);
+
+        if (! $forceRefresh) {
+            $cachedItems = $this->cache->getPaginatedCatalogIfValid($cacheKey);
+
+            if ($cachedItems !== null) {
+                $callback($cachedItems, 1, 1, count($cachedItems));
+
+                return;
+            }
+        }
+
+        $this->client->eachPaginatedListPage(
+            $this->configuration->endpoint(),
+            function (array $pageItems, int $page, int $lastPage, int $expectedTotal) use ($callback, $query): void {
+                $callback(
+                    $this->afterFetch($pageItems, $query),
+                    $page,
+                    $lastPage,
+                    $expectedTotal,
+                );
+            },
+            $query,
+            $this->configuration->listPath(),
+        );
+    }
+
+    /**
      * @return array<string, mixed>|null
      */
-    public function fetchOne(int|string $remoteId, array $query = []): ?array
+    public function fetchOne(int|string $remoteId, array $query = [], bool $forceRefresh = false): ?array
     {
         $query = $this->beforeFetch($query);
 
@@ -74,7 +115,7 @@ abstract class AbstractRemoteApiConnector implements DefinesRemoteApiConfigurati
             }
 
             return $this->afterFetchOne($item, $remoteId, $query);
-        });
+        }, $forceRefresh);
     }
 
     /**

@@ -85,11 +85,73 @@ class AbstractRemoteApiConnectorCacheTest extends TestCase
         Http::assertNothingSent();
     }
 
+    public function test_fetch_one_force_refresh_bypasses_cached_record(): void
+    {
+        config([
+            'cache.default' => 'array',
+            'modularous.remote_api.base_url' => 'http://app.b2press.test/api/v1',
+            'modularous.remote_api.logging.enabled' => false,
+        ]);
+
+        Http::fake([
+            'http://app.b2press.test/api/v1/packages/1*' => Http::sequence()
+                ->push(['data' => ['id' => 1, 'name' => 'Stale']])
+                ->push(['data' => ['id' => 1, 'name' => 'Fresh']]),
+        ]);
+
+        $connector = $this->makeConnector();
+
+        $this->assertSame('Stale', $connector->fetchOne(1)['name']);
+        $this->assertSame('Stale', $connector->fetchOne(1)['name']);
+        $this->assertSame('Fresh', $connector->fetchOne(1, [], true)['name']);
+        $this->assertSame('Fresh', $connector->fetchOne(1)['name']);
+        Http::assertSentCount(2);
+    }
+
+    public function test_each_list_page_force_refresh_streams_without_using_list_cache(): void
+    {
+        config([
+            'cache.default' => 'array',
+            'modularous.remote_api.base_url' => 'http://app.b2press.test/api/v1',
+            'modularous.remote_api.logging.enabled' => false,
+        ]);
+
+        $connector = $this->makeConnector();
+        $cache = new RemoteApiCache($connector->configuration());
+        $cache->putPaginatedCatalog('list:v2:' . RemoteApiCache::queryHash([]), 1, [
+            ['id' => 1, 'name' => 'Cached'],
+        ]);
+
+        Http::fake([
+            'http://app.b2press.test/api/v1/packages*' => Http::response([
+                'data' => [
+                    'current_page' => 1,
+                    'last_page' => 1,
+                    'total' => 1,
+                    'per_page' => 100,
+                    'next_page_url' => null,
+                    'data' => [
+                        ['id' => 1, 'name' => 'Live'],
+                    ],
+                ],
+            ]),
+        ]);
+
+        $seen = [];
+        $connector->eachListPage(function (array $page) use (&$seen): void {
+            $seen = $page;
+        }, [], true);
+
+        $this->assertSame([['id' => 1, 'name' => 'Live']], $seen);
+        Http::assertSentCount(1);
+    }
+
     private function makeConnector(): AbstractRemoteApiConnector
     {
         $configuration = new RemoteApiConfiguration($this->makeModule(), 'package', [
             'enabled' => true,
             'endpoint' => 'packages',
+            'show_endpoint' => 'packages/{id}',
             'catalog_http' => [
                 'query' => [
                     'per_page' => 100,

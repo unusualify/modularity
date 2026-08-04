@@ -118,106 +118,66 @@ class RemoteApiSynchronizer
     {
         $connector->resetRequestStats();
 
-        if (! $connector->configuration()->importNewFromRemoteList()) {
-            return $this->syncAllLinkedOnly($connector, $repository);
-        }
-
-        return $this->syncAllFromRemoteList($connector, $repository);
-    }
-
-    /**
-     * @return array{
-     *     created: int,
-     *     updated: int,
-     *     skipped: int,
-     *     total: int,
-     *     skipped_records: list<array{remote_id: int|string, reason: string, message: string}>,
-     *     http_requests: array{total: int, by_url: array<string, int>}
-     * }
-     */
-    private function syncAllLinkedOnly(RemoteApiConnectorInterface $connector, Repository $repository): array
-    {
         $created = 0;
         $updated = 0;
         $skippedRecords = [];
+        $importNew = $connector->configuration()->importNewFromRemoteList();
+        $linkedRemoteIds = $this->linkedRemoteIds($connector, $repository);
+        $linkedSet = [];
 
-        foreach ($this->linkedRemoteIds($connector, $repository) as $remoteId) {
-            $row = $connector->fetchOne($remoteId);
-
-            if ($row === null) {
-                $skippedRecords[] = [
-                    'remote_id' => $remoteId,
-                    'reason' => 'not_in_remote_list',
-                    'message' => sprintf(
-                        'Linked remote record [%s] was not returned by the remote API; skipped (stale link or deleted remote record).',
-                        $remoteId,
-                    ),
-                ];
-
-                continue;
-            }
-
-            $result = $this->syncRecordFromRow($connector, $repository, $remoteId, $row);
-            $result['created'] ? $created++ : $updated++;
+        foreach ($linkedRemoteIds as $remoteId) {
+            $linkedSet[(string) $remoteId] = $remoteId;
         }
 
-        return [
-            'created' => $created,
-            'updated' => $updated,
-            'skipped' => count($skippedRecords),
-            'total' => $created + $updated,
-            'skipped_records' => $skippedRecords,
-            'http_requests' => $connector->flushRequestStats(),
-        ];
-    }
+        $remainingLinked = $linkedSet;
 
-    /**
-     * @return array{
-     *     created: int,
-     *     updated: int,
-     *     skipped: int,
-     *     total: int,
-     *     skipped_records: list<array{remote_id: int|string, reason: string, message: string}>,
-     *     http_requests: array{total: int, by_url: array<string, int>}
-     * }
-     */
-    private function syncAllFromRemoteList(RemoteApiConnectorInterface $connector, Repository $repository): array
-    {
-        $created = 0;
-        $updated = 0;
-        $skippedRecords = [];
-        $processedRemoteIds = [];
-        $remoteRowsById = $this->indexRemoteList($connector);
+        $connector->eachListPage(function (array $pageItems) use (
+            $connector,
+            $repository,
+            $linkedSet,
+            $importNew,
+            &$remainingLinked,
+            &$created,
+            &$updated,
+        ): void {
+            foreach ($pageItems as $row) {
+                $remoteId = $this->resolveRemoteIdFromRow($connector, $row);
 
-        foreach ($this->linkedRemoteIds($connector, $repository) as $remoteId) {
-            $row = $remoteRowsById[(string) $remoteId] ?? null;
+                if ($remoteId === null || $remoteId === '') {
+                    continue;
+                }
 
-            if ($row === null) {
-                $skippedRecords[] = [
-                    'remote_id' => $remoteId,
-                    'reason' => 'not_in_remote_list',
-                    'message' => sprintf(
-                        'Linked remote record [%s] was not returned by the remote list; skipped (stale link or deleted remote record).',
-                        $remoteId,
-                    ),
-                ];
+                $key = (string) $remoteId;
 
-                continue;
+                if (isset($linkedSet[$key])) {
+                    $result = $this->syncRecordFromRow($connector, $repository, $remoteId, $row);
+                    $result['created'] ? $created++ : $updated++;
+                    unset($remainingLinked[$key]);
+
+                    continue;
+                }
+
+                if (! $importNew) {
+                    continue;
+                }
+
+                $result = $this->syncRecordFromRow($connector, $repository, $remoteId, $row);
+                $result['created'] ? $created++ : $updated++;
             }
+        }, [], true);
 
-            $result = $this->syncRecordFromRow($connector, $repository, $remoteId, $row);
-            $processedRemoteIds[(string) $remoteId] = true;
-            $result['created'] ? $created++ : $updated++;
+        foreach ($remainingLinked as $remoteId) {
+            $skippedRecords[] = [
+                'remote_id' => $remoteId,
+                'reason' => 'not_in_remote_list',
+                'message' => sprintf(
+                    'Linked remote record [%s] was not returned by the remote list; skipped (stale link or deleted remote record).',
+                    $remoteId,
+                ),
+            ];
         }
 
-        foreach ($remoteRowsById as $remoteId => $row) {
-            if (isset($processedRemoteIds[$remoteId])) {
-                continue;
-            }
-
-            $result = $this->syncRecordFromRow($connector, $repository, $remoteId, $row);
-            $result['created'] ? $created++ : $updated++;
-        }
+        $connector->clearCache();
 
         return [
             'created' => $created,
@@ -266,23 +226,24 @@ class RemoteApiSynchronizer
     }
 
     /**
-     * @return array<string, array<string, mixed>>
+     * @param  array<string, mixed>  $row
      */
-    private function indexRemoteList(RemoteApiConnectorInterface $connector): array
+    private function resolveRemoteIdFromRow(RemoteApiConnectorInterface $connector, array $row): int|string|null
     {
-        $indexed = [];
+        $mapping = $connector->configuration()->mapping();
+        $source = $mapping['remote_id'] ?? 'id';
 
-        foreach ($connector->fetchList() as $row) {
-            $remoteId = data_get($row, 'id');
-
-            if ($remoteId === null || $remoteId === '') {
-                continue;
-            }
-
-            $indexed[(string) $remoteId] = $row;
+        if (! is_string($source) || $source === '' || str_starts_with($source, '@')) {
+            $source = 'id';
         }
 
-        return $indexed;
+        $remoteId = data_get($row, $source);
+
+        if ($remoteId === null || $remoteId === '') {
+            return null;
+        }
+
+        return is_int($remoteId) || is_string($remoteId) ? $remoteId : (string) $remoteId;
     }
 
     /**
@@ -293,7 +254,7 @@ class RemoteApiSynchronizer
         Repository $repository,
         int|string $remoteId,
     ): array {
-        $row = $connector->fetchOne($remoteId);
+        $row = $connector->fetchOne($remoteId, [], true);
 
         if ($row === null) {
             throw RemoteApiSyncException::recordNotFound($remoteId);

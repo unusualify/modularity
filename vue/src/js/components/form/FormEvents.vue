@@ -68,7 +68,7 @@ defineOptions({
           :modelValue="input[event.name] ?? event.default ?? false"
           @update:modelValue="updateValue(event.name, $event)"
           density="compact"
-          class="mx-1"
+          class="mx-1 my-n2"
           :center-affix="false"
           :indent-details="false"
           direction="horizontal"
@@ -80,6 +80,10 @@ defineOptions({
             ...input,
             ...formItem
           }"
+          v-bind="tooltipActivatorScope.props"
+        />
+        <ue-dynamic-component-renderer v-else-if="event?.type === 'dynamic-component'"
+          :subject="input[event.name] ?? event.default ?? '<v-chip>Empty</v-chip>'"
           v-bind="tooltipActivatorScope.props"
         />
         <component v-else-if="event.component"

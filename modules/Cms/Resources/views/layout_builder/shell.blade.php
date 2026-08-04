@@ -7,12 +7,14 @@
 
     @php
         $resolvedSiteName = SiteSettings::get('site.name', config('app.name'));
-        $resolvedMetaTitle = filled($seoTitle ?? null) ? $seoTitle : SiteSettings::get('seo.default_meta_title', $resolvedSiteName);
+        $resolvedTitle = filled($title ?? null) ? $title : null;
+        $resolvedMetaTitle = filled($seoTitle ?? null) ? $seoTitle : (filled($resolvedTitle) ? $resolvedTitle : SiteSettings::get('seo.default_meta_title', $resolvedSiteName));
+        $resolvedTitle = filled($resolvedTitle) ? $resolvedTitle : $resolvedMetaTitle;
         $resolvedMetaDescription = filled($seoDescription ?? null) ? $seoDescription : SiteSettings::get('seo.default_meta_description', '');
         $resolvedFavicon = SiteSettings::value('site.favicon.original') ?: asset('favicon.ico');
     @endphp
 
-    <title>{{ $resolvedMetaTitle }}</title>
+    <title>{{ $resolvedTitle }}</title>
 
     <link rel="icon" href="{{ $resolvedFavicon }}" type="image/x-icon">
     <link rel="shortcut icon" href="{{ $resolvedFavicon }}" type="image/x-icon">
@@ -30,6 +32,12 @@
 
     <base href="{{ rtrim($siteAddress ?? url('/'), '/') }}/">
     <link rel="canonical" href="{{ $canonicalUrl ?? url()->current() }}">
+
+    @foreach ($hreflangAlternates ?? [] as $alternate)
+        @if (! empty($alternate['hreflang']) && ! empty($alternate['href']))
+            <link rel="alternate" hreflang="{{ $alternate['hreflang'] }}" href="{{ $alternate['href'] }}">
+        @endif
+    @endforeach
 
     @foreach ($stylesheetHrefs ?? [] as $href)
         <link rel="stylesheet" href="{{ $href }}">

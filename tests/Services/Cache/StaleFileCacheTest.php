@@ -29,6 +29,12 @@ class StaleFileCacheTest extends TestCase
     }
 
     /** @test */
+    public function it_exposes_base_path(): void
+    {
+        $this->assertSame($this->basePath, $this->cache->basePath());
+    }
+
+    /** @test */
     public function it_stores_and_reads_stale_html_by_cache_key(): void
     {
         $key = 'modularous:PrimaryPage:Home:presentationItem:42:' . md5(serialize(['locale' => 'en']));
@@ -161,6 +167,43 @@ class StaleFileCacheTest extends TestCase
         file_put_contents($legacyPath, '<html>legacy</html>');
 
         $this->assertSame('<html>legacy</html>', $this->cache->get($key, null, ['Page' => 99]));
+    }
+
+    /** @test */
+    public function it_inspects_fresh_meta_by_module_route_id_without_deleting(): void
+    {
+        $key = 'modularous:PrimaryPage:Home:presentationItem:21:' . md5(serialize(['locale' => 'en']));
+        $this->cache->put($key, '<html>inspect</html>', 3600, ['Page' => 21]);
+
+        $inspected = $this->cache->inspectByModuleRouteId('PrimaryPage', 'Home', 21);
+
+        $this->assertNotNull($inspected);
+        $this->assertSame('HIT', $inspected['freshness']);
+        $this->assertGreaterThan(time(), $inspected['expires_at']);
+        $this->assertSame('<html>inspect</html>', $this->cache->get($key, null, ['Page' => 21]));
+    }
+
+    /** @test */
+    public function it_inspects_expired_meta_by_module_route_id_without_deleting(): void
+    {
+        $hash = md5(serialize(['locale' => 'en']));
+        $htmlPath = $this->basePath . '/PrimaryPage/Home/Page/22/en/' . $hash . '.html';
+        $this->ensureDirectory(dirname($htmlPath));
+        file_put_contents($htmlPath, '<html>expired</html>');
+        file_put_contents($htmlPath . '.meta', (string) json_encode(['expires_at' => time() - 10]));
+
+        $inspected = $this->cache->inspectByModuleRouteId('PrimaryPage', 'Home', 22);
+
+        $this->assertNotNull($inspected);
+        $this->assertSame('STALE', $inspected['freshness']);
+        $this->assertFileExists($htmlPath);
+        $this->assertFileExists($htmlPath . '.meta');
+    }
+
+    /** @test */
+    public function it_returns_null_when_inspect_finds_no_meta(): void
+    {
+        $this->assertNull($this->cache->inspectByModuleRouteId('PrimaryPage', 'Home', 999));
     }
 
     private function ensureDirectory(string $directory): void

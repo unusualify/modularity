@@ -31,6 +31,23 @@ vue/src/                 # Frontend source
 5. **Type Hints**: Always use PHP 8.1+ type hints
 6. **Config-Driven**: Use config('modularous.xxx') (under merges folder)
 
+## ENTITY ↔ REPOSITORY TRAIT COMPANIONS (CRITICAL)
+
+Many SEO/admin/form features flow through the **repository** layer, not only the entity. Entity traits and repository traits must be added **together**.
+
+| Entity trait | Repository companion trait |
+|--------------|----------------------------|
+| `HasTranslatableMetadata` | `TranslatableMetadataTrait` |
+| `HasTranslation` | `TranslationsTrait` |
+| `HasImages` | `ImagesTrait` |
+| `HasFiles` | `FilesTrait` |
+| `HasRepeaters` | `RepeatersTrait` |
+| `HasSlug` | `SlugsTrait` |
+| `HasStateable` | `StateableTrait` |
+| `Publishable` | `PublishableTrait` |
+
+**`HasTranslatableMetadata` rule:** When adding `Unusualify\Modularous\Entities\Traits\HasTranslatableMetadata` to an entity (or content concern), **also** add `Unusualify\Modularous\Repositories\Traits\TranslatableMetadataTrait` to that entity's repository. Forgetting the repo trait breaks admin form SEO/metadata inputs (`appendFormSchemaTranslatableMetadataTrait`). On translated models, put `TranslationsTrait` **before** `TranslatableMetadataTrait` on the repository.
+
 ## EXAMPLE REQUESTS
 "Add versioning to entities" → Create src/Entities/Traits/HasVersioning.php
 "Improve DataTable component" → Edit vue/src/components/Table/DataTable.vue

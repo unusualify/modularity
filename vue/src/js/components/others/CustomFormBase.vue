@@ -54,7 +54,7 @@
 
                 <!-- DYNAMIC COMPONENT -->
                 <ue-dynamic-component-renderer v-else-if="obj.schema.type === 'dynamic-component'"
-                  :subject="obj.schema.subject"
+                  :subject="obj.schema.subject ?? setValue(obj)"
                 />
 
                 <!-- TITLE (via registry -> InputTitle) -->

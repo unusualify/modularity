@@ -67,6 +67,8 @@ class BaseControllerTest extends TestModulesCase
         $repository->shouldReceive('getShowFields')->andReturn([]);
         $repository->shouldReceive('appendFormSchema')->andReturn([]);
         $repository->shouldReceive('prependFormSchema')->andReturn([]);
+        $repository->shouldReceive('appendTableHeader')->andReturn([]);
+        $repository->shouldReceive('prependTableHeader')->andReturn([]);
 
         return $repository;
     }
