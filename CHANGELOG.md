@@ -2,6 +2,59 @@
 
 All notable changes to `modularous` will be documented in this file
 
+## v12.7.0 - 2026-08-04
+
+### :rocket: Features
+
+- enhance allowed status handling in API client by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/848ecf0fc74f6729b5e1aa46ae782a94e706c6cc
+- add hreflang support for SEO optimization by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/98cd7239a969a0651b4f4f78fdd4d354c709241c
+- introduce ErrorPage module for handling HTTP error responses by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/d3374f890b74f6eb3a87e14fe543373164366300
+- add language support for error page module by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/05b436fe948a75d7f2d4b13dd81203bf3776c768
+- implement publishable trait across various modules and update form configurations by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/bd5737d1d7f1600bd16c39d4cb317055ee2228f6
+- enhance dynamic component parsing and rendering by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/bace51e37d0207c701505ee3e7f6819e4b07c971
+- implement presentation item cache status handling by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/1f1411d51c25b4b616e10413cec2d5dc5082db46
+- add loading overlay and spinner functionality by @celikerde in https://github.com/unusualify/modularous/commit/5e9b8fec375d9f8689799e2ab1f7b50381aed0f0
+- add form dirty state tracking and enhance action handling by @celikerde in https://github.com/unusualify/modularous/commit/46cab6b431052bb0760fc14a99937b4211c72ed8
+- add alert display on successful action completion by @celikerde in https://github.com/unusualify/modularous/commit/abd4122b286304bf3871c01b440661c6b570e007
+- enhance caching and synchronization mechanisms by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/05299d4de3818fe105ecf30c2ae36aa137a300ab
+- add PublishableMakeTranslatedCommand for managing publishable columns in translations by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/4aef6f75cafb8c2ec8200fe1cdef723f2c5e81cc
+- implement timezone handling middleware and client-side cookie management by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/95e97bd4ffb539ed045cc6e6f0cbdae0755068d6
+- adjust component styling and add dynamic component rendering by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/7b7e82e49bfc5791b2a31dd3aca2450cc406f16e
+- enhance dirty state tracking with detailed key differences by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/c5c212d37437d6ae31ddfa29f463005fcef111bf
+- add last sync functionality and UI components by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/ec54c67571a547e863e389c85d9a9290d76a961e
+- enhance draggable functionality and key management by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/a08fa633b24796dfb6386c130d6a7fc1971c4bac
+
+### :wrench: Bug Fixes
+
+- update dynamic component subject binding to handle null values by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/57df09f63700f0741eedf6f3fbd08e0b95ab5814
+- remove debug statement from TimezoneMiddleware by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/aa229e387772e8669c5858326867be0e668b63d5
+
+### :recycle: Refactors
+
+- update default cache types to false for improved cache management by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/79487c9c23f91c8821851bd762d99e1f8267bad7
+- simplify default form inputs in PublishableMetadataTest by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/09a3536afd44066b65cb9860e73f44a2b62ee024
+- refactor SEO title handling in CMS by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/4eb32d085f14565721b08eeeac748cbafedf9815
+- unify timezone session handling across middleware and authentication by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/fb78d74cfb9ce4c3c282ebcf2f2c4848b3440ca9
+- improve dirty state detection with enhanced normalization by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/0180acdfc0a3654776a5c44ac623ba69d7c0e0c7
+- streamline language retrieval by removing useLocale dependency by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/2e9a0dce5935d6488b2bb58a91d205120825f0c3
+
+### :memo: Documentation
+
+- enhance entity and repository trait documentation for translatable metadata by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/51666d3c0e5345bab46618ecb1d84e51b4ddb55a
+- clarify error page rendering behavior in documentation by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/aa5f0dbf834a5490a047d76237d00c4c221602e4
+
+### :lipstick: Styling
+
+- lint coding styles for v12.7.0 by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/ba68b67d893f743aff41e6657cc23f6a4e143ae5
+
+### :package: Build
+
+- update build artifacts for v12.7.0 by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/14a6e753ccee9f8b592f786cd4fadfb82c539a20
+
+### :green_heart: Workflow
+
+- change default dev branch from '11.x-dev' to 'dev' by @web-flow in https://github.com/unusualify/modularous/commit/7a775be9182119c532f0bb6898a047a84a792fa4
+
 ## v12.6.0 - 2026-07-24
 
 ### :rocket: Features
