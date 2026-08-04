@@ -1,6 +1,5 @@
 import { map } from 'lodash-es'
 
-import { useLocale } from '@/hooks'
 import store from '@/store'
 
 /**
@@ -14,27 +13,32 @@ export function getActiveContentLocale (storeInstance = store) {
   return storeInstance?.state?.language?.active?.value
 }
 
-export const getTranslationLanguages = (input) => {
-  try {
-    const Locale = useLocale()
+/**
+ * Language codes for translated form fields.
+ * Reads Vuex directly — safe outside setup() (e.g. getModel from a watch).
+ * Do not call useLocale()/useStore() here; inject() only works in setup.
+ *
+ * @returns {string[]}
+ */
+export const getTranslationLanguages = () => {
+  const languages = store?.state?.language?.all
+    ?? window[import.meta.env.VUE_APP_NAME]?.STORE?.languages?.all
+    ?? []
 
-    return map(Locale.languages.value ?? window[import.meta.env.VUE_APP_NAME].STORE.languages.all, 'value')
-  } catch (error) {
-    return map(store?.state?.language?.all ?? window[import.meta.env.VUE_APP_NAME].STORE.languages.all, 'value')
-  }
+  return map(languages, 'value')
 }
 
+/**
+ * Full language locale objects for translated form fields.
+ * Same store-direct rule as {@link getTranslationLanguages}.
+ *
+ * @returns {object[]}
+ */
 export const getTranslationLocales = () => {
-  try {
-    const Locale = useLocale()
-
-    return Locale.languages.value ?? window[import.meta.env.VUE_APP_NAME].STORE.languages.all
-  } catch (error) {
-    return store?.state?.language?.all ?? window[import.meta.env.VUE_APP_NAME].STORE.languages.all
-  }
+  return store?.state?.language?.all
+    ?? window[import.meta.env.VUE_APP_NAME]?.STORE?.languages?.all
+    ?? []
 }
-
-
 
 export function getCurrentLocale () {
   return window[import.meta.env.VUE_APP_NAME].LOCALE
