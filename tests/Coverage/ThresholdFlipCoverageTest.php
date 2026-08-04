@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Unusualify\Modularous\Tests\Coverage;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\View;
@@ -191,7 +193,7 @@ class ThresholdFlipCoverageTest extends TestCase
         };
         $this->assertSame('/via-method', $redirectorMethod->redirectPath());
 
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsTo::class, (new Profile)->user());
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\MorphTo::class, (new RelatedItem)->subject());
+        $this->assertInstanceOf(BelongsTo::class, (new Profile)->user());
+        $this->assertInstanceOf(MorphTo::class, (new RelatedItem)->subject());
     }
 }

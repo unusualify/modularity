@@ -113,8 +113,8 @@ class CreateErrorPageDefaultsCommand extends Command
                 $id = (int) $defaultBuilder->getKey();
                 $this->line(
                     'Using CmsPageLayoutResolver::defaultLayoutBuilder()'
-                    .($layoutSlug !== '' ? " [{$layoutSlug}]" : " #{$id}")
-                    .'.'
+                    . ($layoutSlug !== '' ? " [{$layoutSlug}]" : " #{$id}")
+                    . '.'
                 );
 
                 return [$layoutSlug, $id];
@@ -122,7 +122,7 @@ class CreateErrorPageDefaultsCommand extends Command
 
             $this->warn(
                 'No --layout-slug, cms_layout_builder.default_layout_slug, or default LayoutBuilder — '
-                .'PageLayout will be created without layout_builder_id.'
+                . 'PageLayout will be created without layout_builder_id.'
             );
 
             return ['', null];

@@ -281,7 +281,7 @@ class FormatHelpersTest extends TestCase
     /** @test */
     public function test_method_string_and_attribute_string()
     {
-        $method = method_string('demo', "return true;", 'public', 'Demo method', ['string $foo'], 'bool');
+        $method = method_string('demo', 'return true;', 'public', 'Demo method', ['string $foo'], 'bool');
         $this->assertStringContainsString('function demo(string $foo): bool', $method);
         $this->assertStringContainsString('return true;', $method);
 

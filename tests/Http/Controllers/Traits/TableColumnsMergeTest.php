@@ -16,8 +16,8 @@ class TableColumnsMergeTest extends TestCase
             use TableColumns;
 
             /**
-             * @param  array<int, mixed>  $headers
-             * @param  array<int, mixed>  $appended
+             * @param array<int, mixed> $headers
+             * @param array<int, mixed> $appended
              * @return array<int, mixed>
              */
             public function merge(array $headers, array $appended): array
@@ -49,8 +49,8 @@ class TableColumnsMergeTest extends TestCase
             use TableColumns;
 
             /**
-             * @param  array<int, mixed>  $headers
-             * @param  array<int, mixed>  $appended
+             * @param array<int, mixed> $headers
+             * @param array<int, mixed> $appended
              * @return array<int, mixed>
              */
             public function merge(array $headers, array $appended): array

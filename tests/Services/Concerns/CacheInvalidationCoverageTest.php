@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Schema;
 use Mockery;
+use Modules\Cms\Entities\UrlRoute;
 use Unusualify\Modularous\Contracts\Cache\UrlPresentationCacheStoreInterface;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Module;
@@ -389,7 +390,6 @@ class CacheInvalidationCoverageTest extends TestCase
         $service = new DirectCacheInvalidation;
         $service->warmModuleRouteCaches('TestModule', 'TestRoute', []);
 
-
         $this->assertCount(0, $service->warmupControllerCountsCalls);
         $this->assertCount(0, $service->warmupPresentationItemCalls);
     }
@@ -722,12 +722,12 @@ class CacheInvalidationCoverageTest extends TestCase
         $model = new CoverageInvalidateModel;
         $model->id = 85;
 
-        \Modules\Cms\Entities\UrlRoute::query()->insert([
+        UrlRoute::query()->insert([
             'locale' => 'en',
             'normalized_path' => '/errors/404',
             'urlable_type' => $model->getMorphClass(),
             'urlable_id' => 85,
-            'kind' => \Modules\Cms\Entities\UrlRoute::KIND_PAGE_PUBLIC,
+            'kind' => UrlRoute::KIND_PAGE_PUBLIC,
             'created_at' => now(),
             'updated_at' => now(),
         ]);

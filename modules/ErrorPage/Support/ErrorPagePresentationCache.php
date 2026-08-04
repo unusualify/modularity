@@ -9,12 +9,13 @@ use Modules\Cms\Support\CmsPublicPresentationItemCache;
 use Modules\Cms\Support\CmsPublicPresentationWarmupContext;
 use Modules\ErrorPage\Entities\ErrorPage;
 use Unusualify\Modularous\Facades\ModularousCache;
+use Unusualify\Modularous\Services\Cache\StaleFileCache;
 use Unusualify\Modularous\Support\ModularousCacheLogger;
 
 /**
  * Model-scoped presentationItem HTML for published {@see ErrorPage} rows.
  *
- * Uses {@see \Unusualify\Modularous\Services\Cache\StaleFileCache} keyed by model id + locale
+ * Uses {@see StaleFileCache} keyed by model id + locale
  * (not visitor URL). Independent of {@code presentationItem.store=url} — ErrorPage has no UrlRoute.
  */
 final class ErrorPagePresentationCache
@@ -41,7 +42,7 @@ final class ErrorPagePresentationCache
     }
 
     /**
-     * @param  callable(): (?string)  $render
+     * @param callable(): (?string) $render
      */
     public static function remember(ErrorPage $item, string $locale, callable $render): ?string
     {

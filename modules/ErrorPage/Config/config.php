@@ -76,7 +76,7 @@ return [
                         ['value' => '403', 'title' => '403 — Forbidden'],
                         ['value' => '500', 'title' => '500 — Server Error'],
                     ],
-                ]
+                ],
             ],
         ],
     ],

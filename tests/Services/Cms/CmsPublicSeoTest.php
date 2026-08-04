@@ -2,6 +2,7 @@
 
 namespace Unusualify\Modularous\Tests\Services\Cms;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Modules\Cms\Entities\Page;
 use Modules\Cms\Services\CanonicalUrlResolver;
@@ -39,7 +40,7 @@ class CmsPublicSeoTest extends TestCase
     {
         $request = Request::create('https://example.test/blog/post', 'GET');
 
-        $item = new class extends \Illuminate\Database\Eloquent\Model
+        $item = new class extends Model
         {
             protected $guarded = [];
 

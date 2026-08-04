@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Unusualify\Modularous\Tests\Hydrates;
 
+use Illuminate\Support\Facades\Route;
 use Mockery;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Hydrates\Inputs\LayoutBladesHydrate;
@@ -41,8 +42,8 @@ class LayoutBladesAndSlugHydrateCoverageTest extends TestCase
             'modularous.cms_page_layouts.layout_appends_modal_preview_enabled' => false,
         ]);
 
-        \Illuminate\Support\Facades\Route::get('/preview', fn () => 'ok')->name('layout_builder.shell_draft_preview');
-        \Illuminate\Support\Facades\Route::getRoutes()->refreshNameLookups();
+        Route::get('/preview', fn () => 'ok')->name('layout_builder.shell_draft_preview');
+        Route::getRoutes()->refreshNameLookups();
 
         $result = (new LayoutBladesHydrate([], null, null, true))->render();
 
@@ -62,9 +63,9 @@ class LayoutBladesAndSlugHydrateCoverageTest extends TestCase
         $module = Mockery::mock(Module::class);
         $module->shouldReceive('panelRouteNamePrefix')->andReturn('admin.');
 
-        \Illuminate\Support\Facades\Route::get('/admin-preview', fn () => 'ok')
+        Route::get('/admin-preview', fn () => 'ok')
             ->name('admin.layout_builder.shell_draft_preview');
-        \Illuminate\Support\Facades\Route::getRoutes()->refreshNameLookups();
+        Route::getRoutes()->refreshNameLookups();
 
         $result = (new LayoutBladesHydrate([
             'shellPreviewMode' => 'page_layout_appends',

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Unusualify\Modularous\Tests\Entities;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Unusualify\Modularous\Entities\Block;
 use Unusualify\Modularous\Tests\TestCase;
 
@@ -42,8 +44,8 @@ class BlockTest extends TestCase
         $this->assertFalse((bool) $block->checkbox('missing'));
         $this->assertSame('custom_blocks', $block->getTable());
         $this->assertNull($block->getPresenterAttribute());
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\MorphTo::class, $block->blockable());
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\HasMany::class, $block->children());
+        $this->assertInstanceOf(MorphTo::class, $block->blockable());
+        $this->assertInstanceOf(HasMany::class, $block->children());
 
         config(['modularous.block_editor.block_presenter_path' => 'App\\Presenters\\BlockPresenter']);
         $this->assertSame('App\\Presenters\\BlockPresenter', $block->getPresenterAttribute());

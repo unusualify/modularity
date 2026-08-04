@@ -2,6 +2,7 @@
 
 namespace Unusualify\Modularous\Entities\Traits;
 
+use Unusualify\Modularous\Repositories\Traits\TranslatableMetadataTrait;
 use Unusualify\Modularous\Support\TranslatableMetadata;
 
 /**
@@ -12,7 +13,7 @@ use Unusualify\Modularous\Support\TranslatableMetadata;
  *
  * Migrations: {@see createTranslatableMetadataFields()}.
  *
- * **Repository companion:** also add {@see \Unusualify\Modularous\Repositories\Traits\TranslatableMetadataTrait}
+ * **Repository companion:** also add {@see TranslatableMetadataTrait}
  * on the model's repository — admin SEO/metadata form inputs are appended there.
  */
 trait HasTranslatableMetadata

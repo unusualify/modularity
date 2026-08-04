@@ -6,6 +6,7 @@ namespace Unusualify\Modularous\Tests\Modules\ErrorPage;
 
 use Illuminate\Http\Request;
 use Modules\Cms\Services\CmsPageLayoutResolver;
+use Modules\ErrorPage\Entities\ErrorPage;
 use Modules\ErrorPage\Support\ErrorPageDefaults;
 use Modules\ErrorPage\Support\ErrorPageRenderer;
 use ReflectionClass;
@@ -45,7 +46,7 @@ final class ErrorPageRendererTest extends TestCase
 
     public function test_defaults_have_no_hardcoded_layout_slug(): void
     {
-        $this->assertFalse(defined(ErrorPageDefaults::class.'::LAYOUT_BUILDER_SLUG'));
+        $this->assertFalse(defined(ErrorPageDefaults::class . '::LAYOUT_BUILDER_SLUG'));
 
         config(['modularous.cms_layout_builder.default_layout_slug' => '']);
 
@@ -73,7 +74,7 @@ final class ErrorPageRendererTest extends TestCase
 
     public function test_render_published_html_returns_null_when_unpublished(): void
     {
-        $page = new \Modules\ErrorPage\Entities\ErrorPage([
+        $page = new ErrorPage([
             'name' => 'Error 404',
             'error_code' => '404',
             'published' => false,
@@ -109,7 +110,7 @@ final class ErrorPageRendererTest extends TestCase
     public function test_builtin_standalone_bootstraps_store_for_core_free_mount(): void
     {
         $standalone = file_get_contents(
-            realpath(__DIR__.'/../../../modules/ErrorPage/Resources/views/error_page/standalone.blade.php')
+            realpath(__DIR__ . '/../../../modules/ErrorPage/Resources/views/error_page/standalone.blade.php')
         );
 
         $this->assertIsString($standalone);
@@ -120,8 +121,8 @@ final class ErrorPageRendererTest extends TestCase
         $this->assertStringNotContainsString('languages: [],', $standalone);
         // STORE must be defined before ModularousVite tags so deferred core-free can read it.
         $this->assertLessThan(
-            strpos($standalone, 'withEntryPoints'),
-            strpos($standalone, "window['{{ \$jsNamespace }}']")
+            mb_strpos($standalone, 'withEntryPoints'),
+            mb_strpos($standalone, "window['{{ \$jsNamespace }}']")
         );
     }
 

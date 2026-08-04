@@ -20,7 +20,7 @@ final class ErrorPagePresentationCacheTest extends TestCase
     {
         parent::setUp();
 
-        $this->stalePath = sys_get_temp_dir().'/modularous-error-page-stale-'.uniqid('', true);
+        $this->stalePath = sys_get_temp_dir() . '/modularous-error-page-stale-' . uniqid('', true);
         mkdir($this->stalePath, 0777, true);
 
         config([
@@ -292,7 +292,7 @@ final class ErrorPagePresentationCacheTest extends TestCase
                     return null;
                 }
 
-                return '<html>WARM-BODY-'.(string) $item->error_code.'</html>';
+                return '<html>WARM-BODY-' . (string) $item->error_code . '</html>';
             }
         });
     }
@@ -300,7 +300,7 @@ final class ErrorPagePresentationCacheTest extends TestCase
     private function page(int $id, string $errorCode): ErrorPage
     {
         $page = new ErrorPage([
-            'name' => 'Error '.$errorCode,
+            'name' => 'Error ' . $errorCode,
             'error_code' => $errorCode,
             'published' => true,
         ]);
@@ -325,7 +325,7 @@ final class ErrorPagePresentationCacheTest extends TestCase
             if ($item === '.' || $item === '..') {
                 continue;
             }
-            $path = $dir.DIRECTORY_SEPARATOR.$item;
+            $path = $dir . DIRECTORY_SEPARATOR . $item;
             if (is_dir($path)) {
                 $this->removeDirectory($path);
             } else {

@@ -64,7 +64,7 @@ abstract class AbstractRemoteApiConnector implements DefinesRemoteApiConfigurati
     }
 
     /**
-     * @param  callable(array<int, array<string, mixed>> $pageItems, int $page, int $lastPage, int $expectedTotal): void  $callback
+     * @param callable(array<int, array<string, mixed>> $pageItems, int $page, int $lastPage, int $expectedTotal): void $callback
      */
     public function eachListPage(callable $callback, array $query = [], bool $forceRefresh = false): void
     {

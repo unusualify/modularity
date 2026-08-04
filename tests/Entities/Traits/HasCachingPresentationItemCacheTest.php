@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Unusualify\Modularous\Tests\Entities\Traits;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
 use Mockery;
 use Unusualify\Modularous\Contracts\Cache\UrlPresentationCacheStoreInterface;
@@ -50,7 +51,7 @@ class HasCachingPresentationItemCacheTest extends TestCase
         $this->assertStringContainsString('>TR</v-chip>', $html);
         $this->assertStringContainsString('text="Not cached"', $html);
         $this->assertStringNotContainsString('EN ·', $html);
-        $this->assertSame(2, substr_count($html, 'mdi-close-circle-outline'));
+        $this->assertSame(2, mb_substr_count($html, 'mdi-close-circle-outline'));
     }
 
     public function test_presentation_item_cache_formatted_shows_fresh_for_model_store_hit(): void
@@ -70,11 +71,11 @@ class HasCachingPresentationItemCacheTest extends TestCase
         $model = $this->makeModel(5);
         $html = $model->presentation_item_cache_formatted;
 
-        $labelDay = \Illuminate\Support\Carbon::createFromTimestamp(time() + 604800)
+        $labelDay = Carbon::createFromTimestamp(time() + 604800)
             ->timezone(config('app.timezone', 'UTC'))
             ->format('Y-m-d');
 
-        $this->assertStringContainsString("color=\"success\"", $html);
+        $this->assertStringContainsString('color="success"', $html);
         $this->assertStringContainsString('>EN</v-chip>', $html);
         $this->assertStringContainsString('>TR</v-chip>', $html);
         $this->assertStringContainsString('mdi-check-circle', $html);
@@ -110,12 +111,12 @@ class HasCachingPresentationItemCacheTest extends TestCase
         $html = $model->presentation_item_cache_formatted;
 
         $staleUntil = ($expiresAt - 900) + 604800;
-        $validLabel = \Illuminate\Support\Carbon::createFromTimestamp($staleUntil)
+        $validLabel = Carbon::createFromTimestamp($staleUntil)
             ->timezone(config('app.timezone', 'UTC'))
             ->format('Y-m-d H:i');
 
         $this->assertStringContainsString('>EN</v-chip>', $html);
-        $this->assertStringContainsString("color=\"success\"", $html);
+        $this->assertStringContainsString('color="success"', $html);
         $this->assertStringContainsString('mdi-check-circle', $html);
         $this->assertStringContainsString('text="Valid until ' . $validLabel . '"', $html);
         $this->assertStringNotContainsString('Stale until', $html);
@@ -183,16 +184,16 @@ class HasCachingPresentationItemCacheTest extends TestCase
 
         $html = $model->presentation_item_cache_formatted;
 
-        $enLabel = \Illuminate\Support\Carbon::createFromTimestamp($enExpires)
+        $enLabel = Carbon::createFromTimestamp($enExpires)
             ->timezone(config('app.timezone', 'UTC'))
             ->format('Y-m-d H:i');
-        $trLabel = \Illuminate\Support\Carbon::createFromTimestamp($trExpires)
+        $trLabel = Carbon::createFromTimestamp($trExpires)
             ->timezone(config('app.timezone', 'UTC'))
             ->format('Y-m-d H:i');
 
         $this->assertStringContainsString('>EN</v-chip>', $html);
         $this->assertStringContainsString('>TR</v-chip>', $html);
-        $this->assertSame(2, substr_count($html, 'mdi-check-circle'));
+        $this->assertSame(2, mb_substr_count($html, 'mdi-check-circle'));
         $this->assertStringNotContainsString('mdi-clock-alert-outline', $html);
         $this->assertStringContainsString('text="Valid until ' . $enLabel . '"', $html);
         $this->assertStringContainsString('text="Valid until ' . $trLabel . '"', $html);

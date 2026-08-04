@@ -10,6 +10,8 @@ use Modules\Cms\Support\CmsPublicFrontViewName;
 use Modules\Cms\Support\CmsPublicPresentationInnerData;
 use Modules\Cms\Support\CmsPublicPresentationItemCache;
 use Modules\Cms\Support\CmsPublicPresentationWarmupContext;
+use Modules\ErrorPage\Entities\ErrorPage;
+use Modules\ErrorPage\Support\ErrorPagePresentationCache;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Facades\ModularousCache;
 use Unusualify\Modularous\Http\Controllers\BaseController;
@@ -225,9 +227,9 @@ trait WarmupCache
         // ErrorPage has no UrlRoute — HTML lives in model-scoped StaleFileCache via
         // ErrorPagePresentationCache, not CmsPublicPresentationItemCache URL/path keys.
         if (
-            class_exists(\Modules\ErrorPage\Entities\ErrorPage::class)
-            && $item instanceof \Modules\ErrorPage\Entities\ErrorPage
-            && class_exists(\Modules\ErrorPage\Support\ErrorPagePresentationCache::class)
+            class_exists(ErrorPage::class)
+            && $item instanceof ErrorPage
+            && class_exists(ErrorPagePresentationCache::class)
         ) {
             try {
                 $resolved = $this->resolvePresentationWarmupModel($item);
@@ -235,11 +237,11 @@ trait WarmupCache
                 $resolved = $item;
             }
 
-            if (! $resolved instanceof \Modules\ErrorPage\Entities\ErrorPage || $resolved->getKey() === null) {
+            if (! $resolved instanceof ErrorPage || $resolved->getKey() === null) {
                 return false;
             }
 
-            return \Modules\ErrorPage\Support\ErrorPagePresentationCache::warm($resolved, $locale);
+            return ErrorPagePresentationCache::warm($resolved, $locale);
         }
 
         [$moduleName, $routeName] = $this->resolvePresentationItemWarmupContext($moduleName, $routeName, $item);

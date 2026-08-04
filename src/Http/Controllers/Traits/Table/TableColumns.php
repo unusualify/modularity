@@ -46,7 +46,7 @@ trait TableColumns
 
             $headerItems = $headers->values()->all();
 
-            if ($this->module && $this->repository && !is_null($headerItems)) {
+            if ($this->module && $this->repository && ! is_null($headerItems)) {
                 if (method_exists($this->repository, 'appendTableHeader')) {
                     $appended = $this->normalizeTableHeaderItems(
                         $this->repository->appendTableHeader($headerItems)
@@ -88,7 +88,7 @@ trait TableColumns
     }
 
     /**
-     * @param  array<int, mixed>  $headers
+     * @param array<int, mixed> $headers
      * @return array<int, object>
      */
     protected function normalizeTableHeaderItems(array $headers): array
@@ -102,8 +102,8 @@ trait TableColumns
     /**
      * Insert appended headers before the actions column when present; otherwise append.
      *
-     * @param  array<int, mixed>  $headers
-     * @param  array<int, mixed>  $appended
+     * @param array<int, mixed> $headers
+     * @param array<int, mixed> $appended
      * @return array<int, mixed>
      */
     protected function mergeTableHeadersBeforeActions(array $headers, array $appended): array
@@ -120,6 +120,7 @@ trait TableColumns
 
             if ($key === 'actions') {
                 $actionsIndex = $index;
+
                 break;
             }
         }

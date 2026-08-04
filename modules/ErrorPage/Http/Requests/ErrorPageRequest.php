@@ -12,9 +12,10 @@ class ErrorPageRequest extends Request
     public function rulesForAll()
     {
         $table = modularousConfig('tables.cms_error_pages', 'um_cms_error_pages');
+
         return [
             'name' => 'sometimes|required|string|max:255',
-            'error_code' => 'sometimes|required|string|in:403,404,500|unique:'.$table.',error_code',
+            'error_code' => 'sometimes|required|string|in:403,404,500|unique:' . $table . ',error_code',
             'published' => 'sometimes|nullable|boolean',
         ];
     }
@@ -40,7 +41,7 @@ class ErrorPageRequest extends Request
         $table = modularousConfig('tables.cms_error_pages', 'um_cms_error_pages');
 
         return [
-            'error_code' => 'sometimes|required|string|in:403,404,500|unique:'.$table.',error_code,'.$id,
+            'error_code' => 'sometimes|required|string|in:403,404,500|unique:' . $table . ',error_code,' . $id,
         ];
     }
 }

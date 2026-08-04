@@ -76,7 +76,7 @@ class RemoteApiClient
     /**
      * Stream paginated list pages without accumulating the full result set.
      *
-     * @param  callable(array<int, array<string, mixed>> $pageItems, int $page, int $lastPage, int $expectedTotal): void  $callback
+     * @param callable(array<int, array<string, mixed>> $pageItems, int $page, int $lastPage, int $expectedTotal): void $callback
      */
     public function eachPaginatedListPage(
         string $endpoint,

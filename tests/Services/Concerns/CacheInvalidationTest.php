@@ -9,6 +9,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 use Unusualify\Modularous\Contracts\Cache\UrlPresentationCacheStoreInterface;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Module;
@@ -868,8 +869,8 @@ class ConcreteCacheInvalidation
         $this->invalidatedPresentationItemIds[] = $id;
 
         // Delegate to trait so store-agnostic StaleFileCache clears stay covered.
-        $moduleName = \Illuminate\Support\Str::studly($moduleName);
-        $moduleRouteName = \Illuminate\Support\Str::studly($moduleRouteName);
+        $moduleName = Str::studly($moduleName);
+        $moduleRouteName = Str::studly($moduleRouteName);
 
         if ($modelClass !== null && $id !== null) {
             $this->getStaleFileCache()->forgetByRelation($modelClass, $id);

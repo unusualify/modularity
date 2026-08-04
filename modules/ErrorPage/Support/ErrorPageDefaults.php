@@ -34,12 +34,12 @@ final class ErrorPageDefaults
      */
     public static function builtinViewName(string $errorCode): string
     {
-        return 'error_page::error_page.'.$errorCode;
+        return 'error_page::error_page.' . $errorCode;
     }
 
     public static function layoutBuilderBodyOverrideViewName(string $layoutSlug, string $errorCode): string
     {
-        return 'cms.layout_builder.'.$layoutSlug.'.'.$errorCode;
+        return 'cms.layout_builder.' . $layoutSlug . '.' . $errorCode;
     }
 
     /**

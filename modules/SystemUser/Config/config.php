@@ -1517,7 +1517,7 @@ return [
                         'md' => 4,
                         'lg' => 3,
                     ],
-                ]
+                ],
             ],
         ],
         'capability_route' => [

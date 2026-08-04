@@ -6,13 +6,14 @@ namespace Modules\ErrorPage\Entities;
 
 use Modules\Cms\Entities\Concerns\HasPageLayout;
 use Modules\ErrorPage\Support\ErrorPagePresentationCache;
+use Modules\ErrorPage\Support\ErrorPageRenderer;
 use Unusualify\Modularous\Entities\Model;
 use Unusualify\Modularous\Entities\Traits\Core\HasScopes;
 use Unusualify\Modularous\Entities\Traits\Publishable;
 
 /**
  * HTTP error presentation rows (404 / 403 / 500, …). No public URL / ParentSegment —
- * resolved by {@see \Modules\ErrorPage\Support\ErrorPageRenderer} from the exception status code.
+ * resolved by {@see ErrorPageRenderer} from the exception status code.
  */
 class ErrorPage extends Model
 {

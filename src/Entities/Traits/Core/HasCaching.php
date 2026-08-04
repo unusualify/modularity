@@ -4,7 +4,9 @@ namespace Unusualify\Modularous\Entities\Traits\Core;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
+use Modules\Cms\Entities\UrlRoute;
 use Unusualify\Modularous\Entities\Observers\CacheObserver;
 use Unusualify\Modularous\Facades\ModularousCache;
 use Unusualify\Modularous\Traits\Cache\Cacheable;
@@ -222,7 +224,7 @@ trait HasCaching
     }
 
     /**
-     * @param  list<string>  $extraLocales
+     * @param list<string> $extraLocales
      * @return list<string>
      */
     protected function resolvePresentationItemLocales(array $extraLocales = []): array
@@ -273,7 +275,7 @@ trait HasCaching
     }
 
     /**
-     * @param  list<string>  $locales
+     * @param list<string> $locales
      * @return list<array{locale: string, freshness: string, expires_at: int|null, stale_expires_at: int|null}>
      */
     protected function presentationItemMissStatusesForLocales(array $locales): array
@@ -303,20 +305,20 @@ trait HasCaching
             return [];
         }
 
-        if (! class_exists(\Modules\Cms\Entities\UrlRoute::class)) {
+        if (! class_exists(UrlRoute::class)) {
             return [];
         }
 
         try {
-            $table = (new \Modules\Cms\Entities\UrlRoute)->getTable();
+            $table = (new UrlRoute)->getTable();
             if (! Schema::hasTable($table)) {
                 return [];
             }
 
-            $rows = \Modules\Cms\Entities\UrlRoute::query()
+            $rows = UrlRoute::query()
                 ->where('urlable_type', $this->getMorphClass())
                 ->where('urlable_id', $this->getKey())
-                ->where('kind', \Modules\Cms\Entities\UrlRoute::KIND_PAGE_PUBLIC)
+                ->where('kind', UrlRoute::KIND_PAGE_PUBLIC)
                 ->get(['locale', 'normalized_path']);
         } catch (\Throwable) {
             return [];
@@ -357,7 +359,7 @@ trait HasCaching
      * Chip "until" uses hard retention {@see stale_expires_at}
      * (= warmed_at + MODULAROUS_PRESENTATION_CACHE_STALE_TTL), not fresh {@see expires_at}.
      *
-     * @param  list<array{locale: string, freshness: string, expires_at: int|null, stale_expires_at?: int|null}>  $statuses
+     * @param list<array{locale: string, freshness: string, expires_at: int|null, stale_expires_at?: int|null}> $statuses
      */
     protected function formatPresentationItemCacheChips(array $statuses): string
     {
@@ -379,11 +381,11 @@ trait HasCaching
     }
 
     /**
-     * @param  array{locale?: string, freshness: string, expires_at: int|null, stale_expires_at?: int|null}  $status
+     * @param array{locale?: string, freshness: string, expires_at: int|null, stale_expires_at?: int|null} $status
      */
     protected function formatPresentationItemCacheChip(array $status): string
     {
-        $locale = strtoupper((string) ($status['locale'] ?? ''));
+        $locale = mb_strtoupper((string) ($status['locale'] ?? ''));
         $freshness = $status['freshness'] ?? 'MISS';
         $expiresAt = $status['expires_at'] ?? null;
         $staleExpiresAt = $status['stale_expires_at'] ?? null;
@@ -426,7 +428,7 @@ trait HasCaching
             return null;
         }
 
-        return \Illuminate\Support\Carbon::createFromTimestamp($timestamp)
+        return Carbon::createFromTimestamp($timestamp)
             ->timezone(config('app.timezone', 'UTC'))
             ->format('Y-m-d H:i');
     }

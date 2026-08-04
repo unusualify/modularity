@@ -2,12 +2,10 @@
 
 namespace Modules\ErrorPage\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Unusualify\Modularous\Http\Controllers\BaseController;
 
 class ErrorPageController extends BaseController
 {
-
     /**
      * @var string
      */
@@ -17,5 +15,4 @@ class ErrorPageController extends BaseController
      * @var string
      */
     protected $routeName = 'ErrorPage';
-
 }

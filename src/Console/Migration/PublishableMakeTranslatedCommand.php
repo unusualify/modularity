@@ -105,7 +105,7 @@ class PublishableMakeTranslatedCommand extends Command
         $translationsTable = $translationModel->getTable();
         $foreignKey = property_exists($model, 'translationForeignKey')
             ? (string) $model->translationForeignKey
-            : Str::snake(class_basename($modelClass)).'_id';
+            : Str::snake(class_basename($modelClass)) . '_id';
 
         $this->table(['Key', 'Value'], [
             ['Module', $module->getStudlyName()],
@@ -120,7 +120,7 @@ class PublishableMakeTranslatedCommand extends Command
         $operationPath = $this->operationPath($module->getStudlyName(), $routeName);
 
         if ($dryRun) {
-            $this->info('[dry-run] Would write operation: '.$operationPath);
+            $this->info('[dry-run] Would write operation: ' . $operationPath);
             $this->line($this->buildOperationContents(
                 $modelClass,
                 $mainTable,
@@ -148,14 +148,14 @@ class PublishableMakeTranslatedCommand extends Command
             $module->getStudlyName(),
             $routeName,
         ));
-        $this->info('Operation written: '.$operationPath);
+        $this->info('Operation written: ' . $operationPath);
 
         if ($writeCode) {
             $this->patchCodeFiles($module->getPath(), $routeName, $fields);
         } else {
             $this->newLine();
             $this->comment('Code checklist (or re-run with --write-code):');
-            $this->line('  1. Add '.implode(', ', $fields).' to *Inputs::TRANSLATED_ATTRIBUTES (or spread PublishableMetadata::PUBLISHABLE_ATTRIBUTES)');
+            $this->line('  1. Add ' . implode(', ', $fields) . ' to *Inputs::TRANSLATED_ATTRIBUTES (or spread PublishableMetadata::PUBLISHABLE_ATTRIBUTES)');
             $this->line('  2. Remove those fields from *Inputs::FILLABLE');
             $this->line('  3. Cast published/datetime on the Translation model');
             $this->line('  4. Update create migration: published:false on main, PublishableMetadata::addColumns on translations');
@@ -169,7 +169,7 @@ class PublishableMakeTranslatedCommand extends Command
     }
 
     /**
-     * @param  list<string>  $fields
+     * @param list<string> $fields
      */
     private function buildOperationContents(
         string $modelClass,
@@ -333,22 +333,22 @@ PHP;
         $directory = base_path(config('one-time-operations.directory', 'operations'));
         $slug = Str::snake("move_{$moduleStudly}_{$routeName}_publishable_to_translations");
 
-        return $directory.DIRECTORY_SEPARATOR.$this->getDatePrefix().'_'.$slug.'_operation.php';
+        return $directory . DIRECTORY_SEPARATOR . $this->getDatePrefix() . '_' . $slug . '_operation.php';
     }
 
     /**
      * Short-array PHP literal for generated operation stubs (single line).
      *
-     * @param  list<string>  $values
+     * @param list<string> $values
      */
     private function exportStringList(array $values): string
     {
         $quoted = array_map(
-            static fn (string $value): string => "'".str_replace("'", "\\'", $value)."'",
+            static fn (string $value): string => "'" . str_replace("'", "\\'", $value) . "'",
             $values,
         );
 
-        return '['.implode(', ', $quoted).']';
+        return '[' . implode(', ', $quoted) . ']';
     }
 
     private function getDatePrefix(): string
@@ -357,14 +357,14 @@ PHP;
     }
 
     /**
-     * @param  list<string>  $fields
+     * @param list<string> $fields
      */
     private function patchCodeFiles(string $modulePath, string $routeName, array $fields): void
     {
         $studly = Str::studly($routeName);
-        $inputsPath = $modulePath.'/Support/'.$studly.'Inputs.php';
+        $inputsPath = $modulePath . '/Support/' . $studly . 'Inputs.php';
         if (! File::exists($inputsPath)) {
-            $inputsPath = $modulePath.'/Support/'.Str::studly((string) $this->argument('module')).'Inputs.php';
+            $inputsPath = $modulePath . '/Support/' . Str::studly((string) $this->argument('module')) . 'Inputs.php';
         }
 
         if (File::exists($inputsPath)) {
@@ -399,7 +399,7 @@ PHP;
                 $fillable = $match[0];
                 foreach ($fields as $field) {
                     $fillable = preg_replace(
-                        "/\n\s*'".preg_quote($field, '/')."',/",
+                        "/\n\s*'" . preg_quote($field, '/') . "',/",
                         "\n",
                         $fillable,
                     ) ?? $fillable;
@@ -408,12 +408,12 @@ PHP;
             }
 
             File::put($inputsPath, $contents);
-            $this->info('Patched Inputs: '.$inputsPath);
+            $this->info('Patched Inputs: ' . $inputsPath);
         } else {
             $this->warn('Inputs file not found; skipped code patch for Inputs.');
         }
 
-        $translationPath = $modulePath.'/Entities/Translations/'.$studly.'Translation.php';
+        $translationPath = $modulePath . '/Entities/Translations/' . $studly . 'Translation.php';
         if (File::exists($translationPath)) {
             $contents = File::get($translationPath);
             if (! str_contains($contents, "'published' => 'boolean'")) {
@@ -424,7 +424,7 @@ PHP;
                     1,
                 ) ?? $contents;
                 File::put($translationPath, $contents);
-                $this->info('Patched Translation casts: '.$translationPath);
+                $this->info('Patched Translation casts: ' . $translationPath);
             }
         } else {
             $this->warn('Translation model not found; skipped casts patch.');

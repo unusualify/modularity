@@ -10,35 +10,29 @@ use Modules\ErrorPage\Transformers\ErrorPageResource;
 
 class ErrorPageController extends Controller
 {
-
     /**
      * This resource repository
      */
     private $repository;
 
-
-    /**
-     * @param ErrorPageRepository $repository
-     */
     public function __construct(ErrorPageRepository $repository)
     {
         $this->repository = $repository;
     }
 
-
     /**
      * Display a listing of the resource.
+     *
      * @return Renderable
      */
     public function index(Request $request)
     {
-        return new ErrorPageResource( $this->repository->paginate($request) );
+        return new ErrorPageResource($this->repository->paginate($request));
     }
-
 
     /**
      * Store a newly created resource in storage.
-     * @param Request $request
+     *
      * @return Renderable
      */
     public function store(Request $request)
@@ -46,21 +40,17 @@ class ErrorPageController extends Controller
         //
     }
 
-
     /**
      * Show the specified resource.
+     *
      * @param int $id
      * @return Renderable
      */
-    public function show($id)
-    {
-
-    }
-
+    public function show($id) {}
 
     /**
      * Update the specified resource in storage.
-     * @param Request $request
+     *
      * @param int $id
      * @return Renderable
      */
@@ -71,6 +61,7 @@ class ErrorPageController extends Controller
 
     /**
      * Remove the specified resource from storage.
+     *
      * @param int $id
      * @return Renderable
      */

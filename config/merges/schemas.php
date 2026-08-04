@@ -29,7 +29,7 @@ return [
             'name' => 'name',
             'label' => 'Name',
             'type' => 'text',
-        ]
+        ],
     ],
     'default_pre_headers' => [
         [

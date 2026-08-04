@@ -255,7 +255,7 @@ trait RemoteApiSourceTrait
     }
 
     /**
-     * @param  array<int, mixed>  $scope
+     * @param array<int, mixed> $scope
      * @return array<int, array<string, mixed>>
      */
     public function appendTableHeaderRemoteApiSourceTrait($scope = []): array
@@ -277,7 +277,7 @@ trait RemoteApiSourceTrait
     /**
      * Informative secondary form field: last remote sync chip (same as table column).
      *
-     * @param  array<int, mixed>  $scope
+     * @param array<int, mixed> $scope
      * @return array<int, array<string, mixed>>
      */
     public function prependFormSchemaRemoteApiSourceTrait($scope = []): array

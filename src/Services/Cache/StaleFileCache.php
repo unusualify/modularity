@@ -291,7 +291,7 @@ final class StaleFileCache
     }
 
     /**
-     * @param  array<string, mixed>  $meta
+     * @param array<string, mixed> $meta
      */
     protected function localeFromMetaPath(string $metaPath, array $meta): string
     {

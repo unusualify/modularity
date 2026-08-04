@@ -226,7 +226,7 @@ class RemoteApiSynchronizer
     }
 
     /**
-     * @param  array<string, mixed>  $row
+     * @param array<string, mixed> $row
      */
     private function resolveRemoteIdFromRow(RemoteApiConnectorInterface $connector, array $row): int|string|null
     {

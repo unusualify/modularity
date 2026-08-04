@@ -124,8 +124,8 @@ final class ErrorPageRenderer
     /**
      * Map DB presence / publish state to a render strategy.
      *
-     * @param  bool|null  $published  {@code null} = no row; {@code true}/{@code false} = row state
-     * @return self::STRATEGY_CMS|self::STRATEGY_BUILTIN|null  {@code null} → Laravel default
+     * @param bool|null $published {@code null} = no row; {@code true}/{@code false} = row state
+     * @return self::STRATEGY_CMS|self::STRATEGY_BUILTIN|null {@code null} → Laravel default
      */
     public function resolveStrategy(?bool $published): ?string
     {
@@ -218,12 +218,12 @@ final class ErrorPageRenderer
 
         return [
             ErrorPageDefaults::layoutBuilderBodyOverrideViewName($slug, $errorCode),
-            'cms::layout_builder.'.$slug.'.'.$errorCode,
+            'cms::layout_builder.' . $slug . '.' . $errorCode,
         ];
     }
 
     /**
-     * @param  array<string, mixed>  $viewData
+     * @param array<string, mixed> $viewData
      */
     public function resolveBodyHtml(string $errorCode, ?ErrorPage $item, array $viewData, ?string $layoutSlug = null): ?string
     {
@@ -236,7 +236,7 @@ final class ErrorPageRenderer
     }
 
     /**
-     * @param  array<string, mixed>  $viewData
+     * @param array<string, mixed> $viewData
      */
     public function resolveOverrideBodyHtml(string $errorCode, array $viewData, ?string $layoutSlug = null): ?string
     {
@@ -314,7 +314,7 @@ final class ErrorPageRenderer
     }
 
     /**
-     * @param  array<string, mixed>  $viewData
+     * @param array<string, mixed> $viewData
      */
     private function plainDocument(string $bodyHtml, array $viewData): string
     {
@@ -324,7 +324,7 @@ final class ErrorPageRenderer
     }
 
     /**
-     * @param  array<string, mixed>  $viewData
+     * @param array<string, mixed> $viewData
      */
     private function builtinStandaloneDocument(string $errorCode, array $viewData): ?string
     {
@@ -352,8 +352,8 @@ final class ErrorPageRenderer
     }
 
     /**
-     * @param  list<string>  $viewNames
-     * @param  array<string, mixed>  $viewData
+     * @param list<string> $viewNames
+     * @param array<string, mixed> $viewData
      */
     private function resolveFirstExistingView(
         array $viewNames,
@@ -395,14 +395,14 @@ final class ErrorPageRenderer
 
     private function metaTitle(string $errorCode): string
     {
-        $key = 'error_page::messages.'.$errorCode.'.meta_title';
+        $key = 'error_page::messages.' . $errorCode . '.meta_title';
 
-        return trans()->has($key) ? __($key) : ('Error '.$errorCode);
+        return trans()->has($key) ? __($key) : ('Error ' . $errorCode);
     }
 
     private function metaDescription(string $errorCode): string
     {
-        $key = 'error_page::messages.'.$errorCode.'.description';
+        $key = 'error_page::messages.' . $errorCode . '.description';
 
         return trans()->has($key) ? __($key) : '';
     }

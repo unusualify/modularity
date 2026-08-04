@@ -3,6 +3,7 @@
 namespace Unusualify\Modularous\Tests\Helpers;
 
 use Illuminate\Database\Eloquent\Concerns\HasAttributes;
+use Unusualify\Modularous\Exceptions\ModularousException;
 use Unusualify\Modularous\Tests\TestCase;
 
 class ModuleHelpersTest extends TestCase
@@ -85,7 +86,7 @@ class ModuleHelpersTest extends TestCase
         $this->assertSame(1, benchmark(static fn () => 1, 'fast', false, 'milliseconds', $elapsed));
         $this->assertNotNull($elapsed);
 
-        $this->expectException(\Unusualify\Modularous\Exceptions\ModularousException::class);
+        $this->expectException(ModularousException::class);
         benchmark(static fn () => null, 'die', true);
     }
 

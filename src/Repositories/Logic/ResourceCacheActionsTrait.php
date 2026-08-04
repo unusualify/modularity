@@ -153,7 +153,7 @@ trait ResourceCacheActionsTrait
     }
 
     /**
-     * @param  array<int, mixed>  $scope
+     * @param array<int, mixed> $scope
      * @return array<int, array<string, mixed>>
      */
     public function appendTableHeaderResourceCacheActionsTrait($scope = []): array
@@ -175,7 +175,7 @@ trait ResourceCacheActionsTrait
     /**
      * Informative secondary form field: same presentationItem chip group as the table column.
      *
-     * @param  array<int, mixed>  $scope
+     * @param array<int, mixed> $scope
      * @return array<int, array<string, mixed>>
      */
     public function prependFormSchemaResourceCacheActionsTrait($scope = []): array

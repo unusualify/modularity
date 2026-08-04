@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Unusualify\Modularous\Facades\ModularousRoutes;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,8 +14,4 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware(['api.auth', ...\Unusualify\Modularous\Facades\ModularousRoutes::defaultMiddlewares()])->group(function(){
-
-});
-
-
+Route::middleware(['api.auth', ...ModularousRoutes::defaultMiddlewares()])->group(function () {});

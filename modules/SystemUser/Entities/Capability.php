@@ -15,7 +15,7 @@ class Capability extends Model
         'name',
         'title',
         'strict_route_binding',
-        'requires_step_up'
+        'requires_step_up',
     ];
 
     // protected $casts = [
