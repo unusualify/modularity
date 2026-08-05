@@ -6,6 +6,24 @@
 - `themes/{name}/sass` → `sass/themes/customs/{name}`
 - `js/Pages/` → `Pages/customs/`
 
+## Frontend hard rules
+
+- Vue 3 **Composition API** only (no Options API)
+- Vuetify 3 components (not plain HTML)
+- Helpers: `import { isObject, dataGet } from '@/utils/helpers'` — no new `window.__*` usage
+- Tests colocated under package Vue test conventions when touching components
+
+## Form inputs (Hydrate contract)
+
+New form input requires matching PHP Hydrate (`src/Hydrates/AGENTS.md`).
+
+1. Create `vue/src/js/components/inputs/{Studly}.vue`
+2. Use `useInput`, `makeInputProps`, `makeInputEmits` from `@/hooks`
+3. Component registers as `VInput{Studly}` via inputs glob
+4. Schema `type` is usually `input-{kebab}`; map via `mapTypeToComponent` / optional `hydrateTypeMap` in `registry.js`
+
+Docs: `docs/src/pages/guide/form-inputs/`, `docs/src/pages/system-reference/hydrates.md`, `docs/src/pages/system-reference/frontend/`
+
 ---
 
 ## Auth Component Architecture

@@ -4,36 +4,56 @@ You are an expert in Modularous package development. This is the unusualify/modu
 
 ## CRITICAL DISTINCTION
 - ❌ DO NOT: Explain how to create modules (that's for users)
-- ✅ DO: Develop the Modularous package itself (src/ directory)
+- ✅ DO: Develop the Modularous package itself (`src/`, `vue/src/`, `modules/`, `tests/`)
 
 ## PACKAGE STRUCTURE
 
+```
 src/                      # Package source code (work here)
 ├── Console               # Artisan commands
 ├── Hydrates/             # Schema hydrators (InputHydrator → *Hydrate)
 │   └── Inputs/           # Input-specific hydrates (type → schema)
 ├── Http/Controllers/     # Controllers
-├── Providers/           # Service providers
-├── Repositories/        # Repository pattern
-├── Services/            # Business logic
-├── Traits/              # Reusable traits
-└── Entities/            # Models
-vue/src/                 # Frontend source
-├── js/components/       # Vuetify components
-├── js/hooks/            # Vue composables
-├── js/utils/            # Utilities (helpers, schema, etc.)
-└── js/store/            # Vuex store
+├── Providers/            # Service providers
+├── Repositories/         # Repository pattern
+├── Services/             # Business logic (+ Services/Cache)
+├── Traits/               # Reusable traits
+└── Entities/             # Models
+modules/                  # Built-in package modules (Cms, System*, …)
+vue/src/                  # Frontend source
+├── js/components/        # Vuetify components
+├── js/hooks/             # Vue composables
+├── js/utils/             # Utilities (helpers, schema, etc.)
+└── js/store/             # Vuex store
+```
+
+Before editing a folder, read its local `AGENTS.md` when present (`src/`, `Console/`, `Entities/`, `Repositories/`, `Http/`, `Hydrates/`, `Services/Cache/`, `modules/Cms/`, `vue/src/js/`).
+
+## DOCS MAP (agents)
+
+| Topic | Docs path |
+|-------|-----------|
+| Admin + public cache | `docs/src/pages/guide/module-route-cache/` |
+| CMS public routing/layouts | `docs/src/pages/guide/cms/` |
+| Entity traits | `docs/src/pages/system-reference/backend/entity-traits/` |
+| Repository traits | `docs/src/pages/system-reference/backend/repository-traits/` |
+| Hydrates / forms | `docs/src/pages/system-reference/hydrates.md`, `guide/form-inputs/` |
+| Console commands | `docs/src/pages/guide/console/` |
+| Controllers / HTTP | `docs/src/pages/system-reference/backend/http/` |
+| Frontend composables | `docs/src/pages/system-reference/frontend/` |
+
+Prefer docs for architecture/env tables; keep AGENTS for hard rules only.
 
 ## PATTERNS TO ALWAYS USE
-2. **Use Traits**: ManageMedias, HasMedias, MediasTrait etc.
-3. **Feature ServiceProvider**: New feature singletons/bindings go in a dedicated `src/Providers/{Feature}ServiceProvider.php` (e.g. `RemoteApiServiceProvider`, `ArtisanRunnerServiceProvider`, `CoverageServiceProvider`) — register it from `ModularousProvider::$providers`. Do **not** dump feature bindings into `BaseServiceProvider`.
-4. **Write Tests**: tests/$FOLDERNAME
-5. **Type Hints**: Always use PHP 8.1+ type hints
-6. **Config-Driven**: Use config('modularous.xxx') (under merges folder)
+1. **Use Traits**: ManageMedias, HasMedias, MediasTrait etc.
+2. **Feature ServiceProvider**: New feature singletons/bindings go in a dedicated `src/Providers/{Feature}ServiceProvider.php` (e.g. `RemoteApiServiceProvider`, `ArtisanRunnerServiceProvider`, `CoverageServiceProvider`) — register it from `ModularousProvider::$providers`. Do **not** dump feature bindings into `BaseServiceProvider`.
+3. **Write Tests**: `tests/$FOLDERNAME`
+4. **Type Hints**: Always use PHP 8.1+ type hints
+5. **Config-Driven**: Use `config('modularous.xxx')` (under merges folder)
 
 ## ENTITY ↔ REPOSITORY TRAIT COMPANIONS (CRITICAL)
 
-Many SEO/admin/form features flow through the **repository** layer, not only the entity. Entity traits and repository traits must be added **together**.
+Entity traits and repository traits must be added **together**.
 
 | Entity trait | Repository companion trait |
 |--------------|----------------------------|
@@ -41,17 +61,30 @@ Many SEO/admin/form features flow through the **repository** layer, not only the
 | `HasTranslation` | `TranslationsTrait` |
 | `HasImages` | `ImagesTrait` |
 | `HasFiles` | `FilesTrait` |
+| `HasFileponds` | `FilepondsTrait` |
 | `HasRepeaters` | `RepeatersTrait` |
 | `HasSlug` | `SlugsTrait` |
+| `HasSpreadable` | `SpreadableTrait` |
 | `HasStateable` | `StateableTrait` |
 | `Publishable` | `PublishableTrait` |
+| `Assignable` | `AssignmentTrait` |
+| `HasAuthorizable` | `AuthorizableTrait` |
+| `HasCreator` | `CreatorTrait` |
+| `HasPayment` | `PaymentTrait` |
+| `HasPriceable` | `PricesTrait` |
+| `Processable` / `HasProcesses` | `ProcessableTrait` |
+| `HasPosition` | `PositionTrait` |
+| `HasRevisions` | `RevisionsTrait` |
+| `Chatable` | `ChatableTrait` |
+| `HasRemoteApiSource` | `RemoteApiSourceTrait` |
+| `Core\HasCaching` | Logic `CacheableTrait` (+ enable route types in config) |
 
-**`HasTranslatableMetadata` rule:** When adding `Unusualify\Modularous\Entities\Traits\HasTranslatableMetadata` to an entity (or content concern), **also** add `Unusualify\Modularous\Repositories\Traits\TranslatableMetadataTrait` to that entity's repository. Forgetting the repo trait breaks admin form SEO/metadata inputs (`appendFormSchemaTranslatableMetadataTrait`). On translated models, put `TranslationsTrait` **before** `TranslatableMetadataTrait` on the repository.
+**`HasTranslatableMetadata` rule:** Also add `TranslatableMetadataTrait` on the repository. On translated models, put `TranslationsTrait` **before** `TranslatableMetadataTrait`.
 
 ## EXAMPLE REQUESTS
-"Add versioning to entities" → Create src/Entities/Traits/HasVersioning.php
-"Improve DataTable component" → Edit vue/src/components/Table/DataTable.vue
-"Add --with-media flag to make:entity" → Edit src/Console/EntityMakeCommand.php
+"Add versioning to entities" → Create `src/Entities/Traits/HasVersioning.php`
+"Improve DataTable component" → Edit `vue/src/js/components/Table/DataTable.vue`
+"Add --with-media flag to make:entity" → Edit `src/Console/...` make command
 
 ## CODE GENERATION RULES
 - Always use Repository pattern (never direct model access)
@@ -66,7 +99,7 @@ Many SEO/admin/form features flow through the **repository** layer, not only the
 2. Create `src/Providers/{Feature}ServiceProvider.php` for that feature’s singletons, aliases, log channels, and feature-specific boot logic
 3. Register the provider in `ModularousProvider::$providers`
 4. Write unit + feature tests
-5. Update documentation
+5. Update documentation under `docs/src/pages/`
 
 ## FEATURE SERVICE PROVIDERS
 
@@ -81,196 +114,39 @@ Many SEO/admin/form features flow through the **repository** layer, not only the
 
 ## FORBIDDEN
 - ❌ Business logic in controllers
-- ❌ new keyword (use DI)
+- ❌ `new` keyword (use DI)
 - ❌ Hard-coded paths (use config)
 - ❌ Options API in Vue (use Composition API)
 - ❌ Plain HTML (use Vuetify components)
-- ❌ window.__* helpers in new code (use import from @/utils/helpers)
+- ❌ `window.__*` helpers in new code (use import from `@/utils/helpers`)
 
 ## HELPERS
 - Prefer `import { isObject, dataGet } from '@/utils/helpers'` over `window.__isObject`, `window.__data_get`
-- window.__* is deprecated; kept for backward compatibility during migration
+- `window.__*` is deprecated; kept for backward compatibility during migration
 
 ---
 
-## HYDRATE ↔ INPUT ADAPTER
+## HYDRATE ↔ INPUT (summary)
 
-The backend (PHP Hydrates) and frontend (Vue Inputs) communicate via a **schema contract**. Hydrates produce schema; Input components consume it.
+New form input = PHP Hydrate **and** Vue input **together**. Resolve: `studly(type) + 'Hydrate'` → schema `type: input-{kebab}` → `VInput{Studly}`.
 
-### Data Flow
+Details: `src/Hydrates/AGENTS.md`, `vue/src/js/AGENTS.md`, docs `system-reference/hydrates.md`.
 
-```
-Module config (type: 'checklist') → InputHydrator → ChecklistHydrate → schema { type: 'input-checklist', ... }
-                                                                              ↓
-FormBase/FormBaseField → mapTypeToComponent('input-checklist') → VInputChecklist (Checklist.vue)
-```
+---
 
-### Naming Convention
+## PUBLIC PRESENTATION CACHE (hard rules)
 
-| Hydrate class      | Config type | Output type (schema) | Vue component   | File              |
-|--------------------|-------------|----------------------|-----------------|-------------------|
-| ChecklistHydrate  | checklist   | input-checklist      | VInputChecklist | Checklist.vue     |
-| TaggerHydrate      | tagger      | input-tagger         | VInputTagger    | Tagger.vue        |
-| SelectHydrate      | select      | select (or input-select-scroll) | v-select | (Vuetify) |
-| FileHydrate        | file        | input-file           | VInputFile      | File.vue          |
-| ImageHydrate       | image       | input-image          | VInputImage     | Image.vue         |
-| ...                | ...         | input-{kebab}        | VInput{Studly}  | {Studly}.vue      |
+Admin Redis types (`counts`, `index`, `record`, `formItem`, `formattedItem`) ≠ public `presentationItem` store (`url` \| `model` \| `none`).
 
-- **Hydrate**: `studlyName($input['type']) . 'Hydrate'` → e.g. `checklist` → `ChecklistHydrate`
-- **Output type**: Hydrate sets `$input['type'] = 'input-{kebab}'` (e.g. `input-checklist`)
-- **Vue component**: `registerComponents(..., 'inputs', 'VInput')` → `Checklist.vue` → `VInputChecklist`
-- **Resolution**: `mapTypeToComponent('input-checklist')` → `v-input-checklist` (kebab of VInputChecklist)
+| Rule | Detail |
+|------|--------|
+| Store access | Middleware/controller use `ModularousCache::getUrlPresentationCacheStore()`, not `UrlKeyedStaleCache` directly |
+| Warm | Public site URL (`CmsPublicSiteUrl`) + `CmsPublicPresentationWarmupContext` per locale — never admin host/locale |
+| Purge | Clear all query path variants on purge/unpublish/path change |
+| Driver | Implement `UrlPresentationCacheStoreInterface`; register in `ModularousCacheService::resolveUrlPresentationCacheStore()` |
 
-### When Adding a New Input
+Details: `src/Services/Cache/AGENTS.md`, `modules/Cms/AGENTS.md`.
 
-1. **PHP**: Create `src/Hydrates/Inputs/{Studly}Hydrate.php` extending `InputHydrate`
-   - Set `$input['type'] = 'input-{kebab}'` in `hydrate()`
-   - Define `$requirements` for default schema keys
-2. **Vue**: Create `vue/src/js/components/inputs/{Studly}.vue`
-   - Use `useInput`, `makeInputProps`, `makeInputEmits` from `@/hooks`
-   - Component registers as `VInput{Studly}` via `includeFormInputs` glob
-3. **Registry** (optional): Add to `hydrateTypeMap` in `registry.js` for explicit mapping
-
-### Schema Contract
-
-Vue inputs expect schema props via `obj.schema` or `boundProps`:
-
-- **Common**: `name`, `label`, `default`, `rules`, `items`, `itemValue`, `itemTitle`
-- **Selectable**: `cascadeKey`, `cascades`, `repository`, `endpoint`
-- **Files**: `accept`, `maxFileSize`, `translated`, `max`
-- **Hydrate-only** (stripped before frontend): `route`, `model`, `repository`, `cascades`, `connector`
-
-### Hydrate Types → Vue Components
-
-See `vue/src/js/components/inputs/registry.js` → `hydrateTypeMap` for the full mapping.
+Docs: `docs/src/pages/guide/module-route-cache/`, especially `url-stale-resilience.md`, `cms-public-pages.md`, `guide/console/cache/`.
 
 Always ask for clarification if the request is ambiguous.
-
----
-
-## Public presentation cache (agents reference)
-
-When working on CMS public pages, URL stale resilience, or `presentationItem` cache:
-
-### Store types
-
-| `MODULAROUS_PRESENTATION_CACHE_STORE` | Behavior |
-|---------------------------------------|----------|
-| `url` (default) | File-primary HTML at `modularous-stale-by-url` via `UrlPresentationCacheStoreInterface` |
-| `model` | Id-based `StaleFileCache` at `modularous-stale` |
-| `none` | Always render; no presentation cache |
-
-Admin types (`record`, `index`, `formItem`, `formattedItem`, `counts`) stay on Redis — independent of public store.
-
-### Key env vars
-
-| Env | Config key | Default | Notes |
-|-----|------------|---------|-------|
-| `MODULAROUS_PRESENTATION_CACHE_STORE` | `presentationItem.store` | `url` | `url` \| `model` \| `none` |
-| `MODULAROUS_PRESENTATION_CACHE_SWR` | `presentationItem.swr` | `false` | Stale window + warm in controller |
-| `MODULAROUS_PRESENTATION_CACHE_SERVE_FIRST` | `presentationItem.serve_first` | `true` | Middleware before controller (`url` only) |
-| `MODULAROUS_PRESENTATION_CACHE_STALE_TTL` | `presentationItem.stale_ttl` | `604800` | `stale_expires_at` in `.meta` |
-| `MODULAROUS_PRESENTATION_CACHE_URL_DRIVER` | `presentationItem.url.driver` | `file` | `shared_file` = EFS/NFS at `base_path` |
-| `MODULAROUS_CACHE_URL_STALE_PATH` | `presentationItem.url.base_path` | `…/modularous-stale-by-url` | URL store directory |
-| `MODULAROUS_RESOURCE_CACHE_SWR_STALE_PATH` | `presentationItem.model.stale_path` | `…/modularous-stale` | Model store (`store=model`) |
-| `MODULAROUS_RESOURCE_CACHE_SWR_WARM_COOLDOWN` | `presentationItem.warm_dispatch_cooldown` | `600` | Warm job dedup lock TTL |
-| `MODULAROUS_RESOURCE_CACHE_TTL_PRESENTATION_ITEM` | `ttl.presentationItem` | `900` | Fresh TTL → `expires_at` |
-
-**Legacy (when new vars unset):** `MODULAROUS_CACHE_URL_STALE_ENABLED` → store; `MODULAROUS_RESOURCE_CACHE_SWR_ENABLED` → swr; `MODULAROUS_CACHE_URL_STALE_SERVE_FIRST` → serve_first; `MODULAROUS_CACHE_URL_STALE_TTL` / `MODULAROUS_RESOURCE_CACHE_SWR_STALE_TTL` → stale_ttl.
-
-**Layer order:** global `enabled` → `store` → route `types.presentationItem` → store driver → `serve_first` → `swr` → query strategy → fresh/stale TTL.
-
-**Toggle notes:**
-- `store=url`: path files; no Redis for reads; middleware serves stale regardless of SWR
-- `store=model`: id files; writes only when `swr=true`; requires Redis for `isEnabled()`
-- `store=none`: always render
-- `swr=false` + `serve_first=true`: middleware may still return `URL_STALE` past fresh TTL
-
-### Middleware order
-
-1. `ServeUrlKeyedStaleMiddleware` (global HTTP when `serve_first=true`) — before route match
-2. CMS front route stack → `CmsController` → `CmsPublicPresentationItemCache`
-
-Middleware and controller both use `ModularousCache::getUrlPresentationCacheStore()`, not `UrlKeyedStaleCache` directly.
-
-### Query param caching
-
-Per route: `presentation_cache_key` + `presentation_cache_query` in module cache config.
-
-| Strategy | Behavior |
-|----------|----------|
-| `path_only` | Ignore query params |
-| `path_and_query_allowlist` | Only allowlisted params in key; unknown params bypass cache |
-| `path_and_query` | All query params sorted into key |
-
-Middleware-only paths: `presentationItem.url.path_query` map.
-
-### Purge / invalidation
-
-On model purge, unpublish, or path change, `CacheInvalidation` clears **all query variants** for affected locale + path:
-
-- `forgetByRelation(modelClass, id)`
-- `forgetByModuleRoute(module, route)`
-- `forgetPathVariants(locale, normalizedPath)` — scans meta files
-
-Also forgets via `UrlRoute` rows when CMS module is present.
-
-### DB-down resilience
-
-URL store serves HTML from disk using `.meta` publication snapshot (`StalePublicationGate`). No Redis or DB required on HIT when `store=url` and file exists + visible.
-
-### Admin warm must use public URL
-
-Warmup jobs must render via public site URL (`CmsPublicSiteUrl`) so cached HTML matches visitor-facing host/path. Do not warm from admin hostname.
-
-Each locale iteration must also run inside `CmsPublicPresentationWarmupContext` so `app()->getLocale()`, `trans()`, and locale-dependent Blade/helpers match the visitor locale (`tr`, `nl`, etc.) — not the admin session default.
-
-### Deployment warm command
-
-```bash
-# All presentationItem routes (queued by default; Horizon on modularous-cache)
-php artisan modularous:cache:warm-presentation
-
-# Force synchronous warm
-php artisan modularous:cache:warm-presentation --sync
-
-# Filtered
-php artisan modularous:cache:warm-presentation --module=Blog --route=BlogLanding --locale=en
-
-# Preview without dispatching (dry run)
-php artisan modularous:cache:warm-presentation --dry-run
-```
-
-Docs: `docs/src/pages/guide/console/cache/cache-warm-presentation.md`
-
-### Deployment purge command
-
-```bash
-# All presentationItem filesystem caches (queued by default)
-php artisan modularous:cache:purge-presentation
-
-# Force synchronous purge
-php artisan modularous:cache:purge-presentation --sync
-
-# Filtered
-php artisan modularous:cache:purge-presentation --module=Blog --route=BlogLanding --locale=en
-
-# Preview without purging (dry run)
-php artisan modularous:cache:purge-presentation --dry-run
-```
-
-Docs: `docs/src/pages/guide/console/cache/cache-purge-presentation.md`
-
-### Multi-node extension point
-
-| Piece | Path |
-|-------|------|
-| Interface | `src/Contracts/Cache/UrlPresentationCacheStoreInterface.php` |
-| Default driver | `src/Services/Cache/FileUrlPresentationCacheDriver.php` |
-| Resolution | `ModularousCacheService::resolveUrlPresentationCacheStore()` |
-| Config | `modularous.cache.presentationItem.url.driver` |
-| Container | `UrlPresentationCacheStoreInterface::class` singleton |
-
-To add a driver: implement the interface, register in `resolveUrlPresentationCacheStore()`, preserve key helpers and variant purge semantics.
-
-Docs: `docs/src/pages/guide/module-route-cache/url-stale-resilience.md`

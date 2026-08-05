@@ -122,6 +122,17 @@ protected $aliases = [
 ];
 ```
 
+## Cache commands
+
+`Console/Cache/*` → signatures `modularous:cache:*` (clear, warm, graph, stats, warm-presentation, purge-presentation, …).
+
+Presentation warm/purge rules (public URL, locale context): see `src/Services/Cache/AGENTS.md`.
+
+Docs:
+- `docs/src/pages/guide/console/cache/`
+- `docs/src/pages/guide/module-route-cache/console-commands.md`
+
 ## Reference
 
 Full command mapping: see `docs/src/pages/system-reference/console-conventions.md` (VitePress).
+Guide index: `docs/src/pages/guide/console/overview.md`.

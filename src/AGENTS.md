@@ -15,6 +15,22 @@ Keep prompts short and concrete — avoid high-level product requests. Always in
 
 **Feature providers:** New Modularous features that need container bindings must use a dedicated `{Feature}ServiceProvider` (see `RemoteApiServiceProvider`, `ArtisanRunnerServiceProvider`, `CoverageServiceProvider`) registered from `ModularousProvider`. Keep `BaseServiceProvider` for package-wide core only.
 
+## Folder AGENTS (read before edit)
+
+| Area | AGENTS |
+|------|--------|
+| Entities / model traits | `src/Entities/AGENTS.md` |
+| Repositories / MethodTransformers | `src/Repositories/AGENTS.md` |
+| Http controllers / middleware | `src/Http/AGENTS.md` |
+| Console commands | `src/Console/AGENTS.md` |
+| Hydrates (form schema) | `src/Hydrates/AGENTS.md` |
+| Cache services | `src/Services/Cache/AGENTS.md` |
+| CMS module | `modules/Cms/AGENTS.md` |
+| Vue / inputs | `vue/src/js/AGENTS.md` |
+| Package root / docs map | `AGENTS.md` (package root) |
+
+Docs map: see package root `AGENTS.md` → **DOCS MAP**.
+
 Core classes (short):
 - `Modularous.php` | Module manager extending Nwidart FileRepository. Handles scanning, caching, vendor/app paths, auth names, and helpers (e.g. `scan()`, `allEnabled()`, `getVendorPath()`).
 - `Module.php` | Represents a single module. Loads config/providers/commands, exposes route names, middleware aliases, paths and helpers (e.g. `getConfig()`, `getRouteNames()`, `getDirectoryPath()`).
