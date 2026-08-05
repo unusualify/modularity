@@ -111,4 +111,22 @@ class SiteSettingsServiceTest extends ModelTestCase
         $this->assertTrue($usesCms);
         $this->assertFalse(SiteSettings::usesCmsLayer());
     }
+
+    public function test_while_frontend_prefers_cms_logo_over_system_in_non_cms_default_context(): void
+    {
+        SystemSettings::set('site.logo.frontend', 'https://system.example/logo.svg');
+        CmsSettings::set('site.logo.frontend', 'https://cms.example/logo.svg');
+
+        $this->assertFalse(SiteSettings::usesCmsLayer());
+        $this->assertSame(
+            'https://system.example/logo.svg',
+            SiteSettings::value('site.logo.frontend'),
+        );
+
+        $logo = SiteSettings::whileFrontend(
+            fn (): mixed => SiteSettings::value('site.logo.frontend'),
+        );
+
+        $this->assertSame('https://cms.example/logo.svg', $logo);
+    }
 }

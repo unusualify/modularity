@@ -14,7 +14,8 @@ use Unusualify\Modularous\Facades\Modularous;
  * - Backend / panel / console → {@see SystemSettingsService}
  *
  * Force a layer with {@see forFrontend()} / {@see forBackend()} / {@see forCms()} / {@see forSystem()},
- * or temporarily with {@see whileFrontend()} (used by public presentation warmup under queue/console).
+ * or temporarily with {@see whileFrontend()} (public presentation warmup under queue/console, and
+ * admin/revision preview under panel URLs via {@see \Unusualify\Modularous\Http\Controllers\Traits\ManagePreview}).
  */
 class SiteSettingsService
 {
@@ -33,7 +34,7 @@ class SiteSettingsService
 
     /**
      * Temporarily treat SiteSettings as frontend (CMS layer + SystemSettings fallback),
-     * including under console / queue workers.
+     * including under console / queue workers and panel-URL admin preview.
      *
      * @template T
      *

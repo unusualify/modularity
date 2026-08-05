@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
 use Modules\Cms\Http\Controllers\Traits\ResolvesPublicPresentationView;
 use Modules\Cms\Support\CmsPageLayoutPresentationWrapper;
+use Unusualify\Modularous\Facades\SiteSettings;
 use Unusualify\Modularous\Services\MessageStage;
 
 trait ManagePreview
@@ -69,21 +70,31 @@ trait ManagePreview
             'item' => $item,
         ], $this->previewData($item));
 
-        // Prefer PageLayout / filesystem page_layout shell from the CMR model; fall back to .custom.
-        $wrapped = $item instanceof Model
-            ? CmsPageLayoutPresentationWrapper::documentOrNull($item, $previewView, $innerData)
-            : null;
-        if ($wrapped !== null) {
-            return view('cms::layout_builder.inline_document', ['document' => $wrapped]);
+        $render = function () use ($item, $previewView, $innerData) {
+            // Prefer PageLayout / filesystem page_layout shell from the CMR model; fall back to .custom.
+            $wrapped = $item instanceof Model
+                ? CmsPageLayoutPresentationWrapper::documentOrNull($item, $previewView, $innerData)
+                : null;
+            if ($wrapped !== null) {
+                return view('cms::layout_builder.inline_document', ['document' => $wrapped]);
+            }
+
+            if (! View::exists($previewView)) {
+                return View::make('twill::errors.preview', [
+                    'moduleName' => Str::singular($this->moduleName),
+                ]);
+            }
+
+            return View::make($previewView, $innerData);
+        };
+
+        // Panel URL → SiteSettings uses SystemSettings only. Force CMS layer so chrome
+        // (e.g. site.logo.frontend) matches public pages / cache warm.
+        if (app()->bound('site.settings')) {
+            return SiteSettings::whileFrontend($render);
         }
 
-        if (! View::exists($previewView)) {
-            return View::make('twill::errors.preview', [
-                'moduleName' => Str::singular($this->moduleName),
-            ]);
-        }
-
-        return View::make($previewView, $innerData);
+        return $render();
     }
 
     public function listRevisions($id)
