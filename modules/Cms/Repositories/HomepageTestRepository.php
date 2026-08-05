@@ -7,6 +7,7 @@ use Modules\Cms\Repositories\Traits\CmrTrait;
 use Unusualify\Modularous\Repositories\Repository;
 use Unusualify\Modularous\Repositories\Traits\FilepondsTrait;
 use Unusualify\Modularous\Repositories\Traits\PublishableTrait;
+use Unusualify\Modularous\Repositories\Traits\RevisionsTrait;
 use Unusualify\Modularous\Repositories\Traits\TranslatableMetadataTrait;
 
 class HomepageTestRepository extends Repository
@@ -14,7 +15,8 @@ class HomepageTestRepository extends Repository
     use FilepondsTrait,
         CmrTrait,
         TranslatableMetadataTrait,
-        PublishableTrait;
+        PublishableTrait,
+        RevisionsTrait;
 
     public function __construct(HomepageTest $model)
     {

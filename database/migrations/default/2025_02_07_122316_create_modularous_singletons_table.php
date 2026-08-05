@@ -10,9 +10,10 @@ return new class extends Migration
 {
     public function up()
     {
-        $table = Modularous::config('tables.singletons', 'modularous_singletons');
+        $singletonsTable = Modularous::config('tables.singletons', 'modularous_singletons');
+        $revisionsTable = Modularous::config('tables.singleton_revisions', 'modularous_singleton_revisions');
 
-        Schema::create($table, function (Blueprint $table) {
+        Schema::create($singletonsTable, function (Blueprint $table) {
             // this will create an id, name field
             createDefaultTableFields($table);
             $table->string('singleton_type');
@@ -22,11 +23,17 @@ return new class extends Migration
             createDefaultExtraTableFields($table, published: false);
         });
 
+        Schema::create($revisionsTable, function (Blueprint $table) use ($singletonsTable) {
+            createDefaultRevisionsTableFields($table, 'singleton', $singletonsTable);
+        });
     }
 
     public function down()
     {
-        $table = Modularous::config('tables.singletons', 'modularous_singletons');
-        Schema::dropIfExists($table);
+        $singletonsTable = Modularous::config('tables.singletons', 'modularous_singletons');
+        $revisionsTable = Modularous::config('tables.singleton_revisions', 'modularous_singleton_revisions');
+
+        Schema::dropIfExists($revisionsTable);
+        Schema::dropIfExists($singletonsTable);
     }
 };

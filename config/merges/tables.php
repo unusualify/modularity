@@ -23,6 +23,7 @@ return [
     'spreads' => 'um_spreads',
     'remote_api_sources' => 'um_remote_api_sources',
     'singletons' => 'um_singletons',
+    'singleton_revisions' => 'um_singleton_revisions',
     'authorizations' => 'um_authorizations',
     'processes' => 'um_processes',
     'process_histories' => 'um_process_histories',

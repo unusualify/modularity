@@ -47,11 +47,7 @@ trait RevisionsTrait
         $this->setSchema($schema);
         $this->setColumns($schema ?? $this->chunkInputs(all: true));
 
-        if (classHasTrait($this->model, 'Unusualify\Modularous\Entities\Traits\IsSingular')) {
-            $object = $this->model->single();
-        } else {
-            $object = $this->model->findOrFail($id);
-        }
+        $object = $this->resolveRevisionSubject($id);
 
         if ($this->shouldQueuePendingRevisionOnly($object, $fields)) {
             $this->beforeSave($object, $fields);
@@ -67,6 +63,20 @@ trait RevisionsTrait
         }
 
         return parent::update($id, $fields, $schema, $options);
+    }
+
+    /**
+     * Resolve the subject row for revision operations (IsSingular → {@see single()}).
+     *
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    protected function resolveRevisionSubject(int $id)
+    {
+        if (classHasTrait($this->model, 'Unusualify\Modularous\Entities\Traits\IsSingular')) {
+            return $this->model->single();
+        }
+
+        return $this->model->findOrFail($id);
     }
 
     public function beforeSaveRevisionsTrait($object, $fields): void
@@ -144,7 +154,7 @@ trait RevisionsTrait
 
     public function preview(int $id, array $fields)
     {
-        $object = $this->model->findOrFail($id);
+        $object = $this->resolveRevisionSubject($id);
 
         return $this->hydrateObject($object, $fields);
     }
@@ -154,16 +164,17 @@ trait RevisionsTrait
         $this->setSchema($schema);
         $this->setColumns($schema ?? $this->chunkInputs(all: true));
 
-        $object = $this->model->findOrFail($id);
+        $object = $this->resolveRevisionSubject($id);
         $revision = $object->revisions()->where('id', $revisionId)->firstOrFail();
         $fields = json_decode($revision->payload, true) ?: [];
+        $subjectId = (int) $object->getKey();
 
-        return $this->hydrateObject($this->model->newInstance()->setAttribute('id', $id), $fields);
+        return $this->hydrateObject($this->model->newInstance()->setAttribute('id', $subjectId), $fields);
     }
 
     public function restoreRevision(int $id, int $revisionId)
     {
-        $object = $this->model->findOrFail($id);
+        $object = $this->resolveRevisionSubject($id);
         $revision = $object->revisions()->where('id', $revisionId)->firstOrFail();
 
         if ($this->revisionTableHasStatusColumn($object) && ($revision->status ?? RevisionStatus::Approved->value) === RevisionStatus::Rejected->value) {
@@ -191,6 +202,7 @@ trait RevisionsTrait
         }
 
         $fields = json_decode($revision->payload, true) ?: [];
+        $subjectId = (int) $object->getKey();
 
         if ($this->shouldRestoreAsPendingOnly($object)) {
             return $this->restoreRevisionAsPendingOnly($object, $fields, $revisionId);
@@ -199,7 +211,7 @@ trait RevisionsTrait
         // Skip auto-revision creation during update so we can force-create one below,
         // ensuring a restore is always recorded even when content is identical to the latest revision.
         $this->skipRevisionCreation = true;
-        $this->update($id, $fields);
+        $this->update($subjectId, $fields);
         $this->skipRevisionCreation = false;
 
         $userId = Auth::guard(Modularous::getAuthGuardName())->id() ?? Auth::id();
@@ -214,7 +226,7 @@ trait RevisionsTrait
 
         $object->revisions()->create($restoreAttributes);
 
-        return $this->model->findOrFail($id);
+        return $this->resolveRevisionSubject($subjectId);
     }
 
     /**
@@ -277,7 +289,7 @@ trait RevisionsTrait
             $this->skipRevisionCreation = false;
         }
 
-        return $this->model->findOrFail($object->id);
+        return $this->resolveRevisionSubject((int) $object->getKey());
     }
 
     /**
@@ -334,7 +346,7 @@ trait RevisionsTrait
      */
     public function approveRevision(int $id, int $revisionId)
     {
-        $object = $this->model->findOrFail($id);
+        $object = $this->resolveRevisionSubject($id);
         $revision = $object->revisions()->where('id', $revisionId)->firstOrFail();
 
         if (! method_exists($object, 'usesRevisionWorkflow') || ! $object->usesRevisionWorkflow()) {
@@ -356,12 +368,13 @@ trait RevisionsTrait
         }
 
         $fields = json_decode($revision->payload, true) ?: [];
+        $subjectId = (int) $object->getKey();
 
         $this->workflowBypassPendingGuard = true;
         $this->skipRevisionCreation = true;
 
         try {
-            $this->update($id, $fields);
+            $this->update($subjectId, $fields);
 
             if ($this->revisionTableHasStatusColumn($object)) {
                 $revision->refresh();
@@ -376,7 +389,7 @@ trait RevisionsTrait
             $this->skipRevisionCreation = false;
         }
 
-        return $this->model->findOrFail($id);
+        return $this->resolveRevisionSubject($subjectId);
     }
 
     /**
@@ -386,7 +399,7 @@ trait RevisionsTrait
      */
     public function rejectRevision(int $id, int $revisionId)
     {
-        $object = $this->model->findOrFail($id);
+        $object = $this->resolveRevisionSubject($id);
         $revision = $object->revisions()->where('id', $revisionId)->firstOrFail();
 
         if (! method_exists($object, 'usesRevisionWorkflow') || ! $object->usesRevisionWorkflow()) {
@@ -415,12 +428,12 @@ trait RevisionsTrait
             ]);
         }
 
-        return $this->model->findOrFail($id);
+        return $this->resolveRevisionSubject((int) $object->getKey());
     }
 
     public function getRevisionPayload(int $id, int $revisionId): array
     {
-        $object = $this->model->findOrFail($id);
+        $object = $this->resolveRevisionSubject($id);
         $revision = $object->revisions()->where('id', $revisionId)->firstOrFail();
 
         return json_decode($revision->payload, true) ?: [];
@@ -452,12 +465,15 @@ trait RevisionsTrait
 
     public function getRevisions(int $id)
     {
-        $revisionModel = $this->model->getRevisionModel();
-        $revisions = $revisionModel::where($this->model->getForeignKey(), $id)
+        $object = $this->resolveRevisionSubject($id);
+        $revisionModel = $object->getRevisionModel();
+        $foreignKey = method_exists($object, 'getRevisionForeignKey')
+            ? $object->getRevisionForeignKey()
+            : $object->getForeignKey();
+
+        return $revisionModel::where($foreignKey, $object->getKey())
             ->orderBy('created_at', 'desc')
             ->get();
-
-        return $revisions;
     }
 
     protected function shouldQueuePendingRevisionOnly($object, array $fields): bool
@@ -597,5 +613,19 @@ trait RevisionsTrait
         $revision = $query->first();
 
         return json_decode($revision->payload ?? '{}', true) ?: [];
+    }
+
+    /**
+     * @param array<string, mixed> $scope
+     * @return list<array<string, mixed>>
+     */
+    public function appendFormSchemaRevisionsTrait($scope = []): array
+    {
+        return [
+            [
+                'type' => 'revision',
+                'maxHeight' => '150px',
+            ],
+        ];
     }
 }

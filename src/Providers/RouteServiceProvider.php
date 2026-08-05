@@ -386,7 +386,6 @@ class RouteServiceProvider extends ServiceProvider
                     // 'feature',
                     // 'preview',
                     // 'bulkFeature',
-                    'showView',
                     'restore',
                     'bulkRestore',
                     'forceDelete',
@@ -395,6 +394,7 @@ class RouteServiceProvider extends ServiceProvider
                     'duplicate',
                 ] : []),
 
+                'showView',
                 'listRevisions',
                 'restoreRevision',
                 'approveRevision',

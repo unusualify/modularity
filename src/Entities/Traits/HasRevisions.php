@@ -11,11 +11,33 @@ use Illuminate\Support\Facades\Schema;
 use RuntimeException;
 use Unusualify\Modularous\Entities\Enums\Permission;
 use Unusualify\Modularous\Entities\Enums\RevisionStatus;
+use Unusualify\Modularous\Entities\Revisions\SingletonRevision;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Module;
 
 trait HasRevisions
 {
+    /**
+     * Foreign key on the revisions table pointing at this model.
+     * IsSingular models share {@see SingletonRevision} with column {@code singleton_id}.
+     */
+    public function getRevisionForeignKey(): string
+    {
+        if ($this->usesBuiltinSingletonRevisions()) {
+            return 'singleton_id';
+        }
+
+        return $this->getForeignKey();
+    }
+
+    /**
+     * True when this model stores revisions on the shared singleton revisions table.
+     */
+    public function usesBuiltinSingletonRevisions(): bool
+    {
+        return classHasTrait($this, IsSingular::class);
+    }
+
     /**
      * Override and return true together with {@see revisionPermissionPrefix()} to enable approval workflow.
      * This property is used to check if the revision workflow is enabled for the model.
@@ -48,7 +70,7 @@ trait HasRevisions
      */
     public function revisions()
     {
-        return $this->hasMany($this->getRevisionModel())
+        return $this->hasMany($this->getRevisionModel(), $this->getRevisionForeignKey())
             ->orderBy('created_at', 'desc')
             ->with(['user', 'source']);
     }
@@ -58,7 +80,7 @@ trait HasRevisions
      */
     public function latestRevision(): HasOne
     {
-        return $this->hasOne($this->getRevisionModel())->latestOfMany('id');
+        return $this->hasOne($this->getRevisionModel(), $this->getRevisionForeignKey())->latestOfMany('id');
     }
 
     public function usesRevisionWorkflow(): bool
@@ -230,6 +252,10 @@ trait HasRevisions
     {
         if (property_exists($this, 'revisionModel') && is_string($this->revisionModel) && @class_exists($this->revisionModel)) {
             return $this->revisionModel;
+        }
+
+        if ($this->usesBuiltinSingletonRevisions()) {
+            return SingletonRevision::class;
         }
 
         $modelClass = get_class($this);
