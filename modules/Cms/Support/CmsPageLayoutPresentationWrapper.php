@@ -14,6 +14,11 @@ use Modules\Cms\Services\CmsPageLayoutResolver;
  * Wraps submodule {@code *.custom} (or mapped) presentation HTML in a {@see PageLayout} {@see LayoutBladeResolver} shell
  * when a binding exists for the model class — shared by panel preview ({@see ManagePreview})
  * and public CMS ({@see CmsController}).
+ *
+ * Resolution order for CMR models ({@see HasPageLayout} via {@see \Modules\Cms\Entities\Concerns\IsCmr}):
+ * 1. Enabled {@see PageLayout} row for the model FQCN (+ optional {@see LayoutBuilder})
+ * 2. Module filesystem {@code {route}/page_layout/{head,body,footer}} (even without a DB row / default LayoutBuilder)
+ * 3. Caller falls back to plain {@code module::route.custom} when this returns {@code null}
  */
 final class CmsPageLayoutPresentationWrapper
 {
@@ -152,16 +157,25 @@ final class CmsPageLayoutPresentationWrapper
 
         $layoutBuilder = $resolver->layoutBuilderShellForModelClass($class);
         if ($layoutBuilder === null) {
-            if ($pageLayout === null) {
-                return null;
+            if ($pageLayout !== null) {
+                $layout = self::layoutFromPageLayout($pageLayout);
+                if ($layout === null) {
+                    return null;
+                }
+
+                return LayoutBladeResolver::renderHtml($layout, $merge, $presentationViewName);
             }
 
-            $layout = self::layoutFromPageLayout($pageLayout);
-            if ($layout === null) {
-                return null;
+            // CMR filesystem page_layout/{head,body,footer} without a DB PageLayout or default LayoutBuilder.
+            if ($hasStaticSegments) {
+                return LayoutBladeResolver::renderHtml(
+                    self::layoutFromFilesystemPageLayoutSegments(),
+                    $merge,
+                    $presentationViewName,
+                );
             }
 
-            return LayoutBladeResolver::renderHtml($layout, $merge, $presentationViewName);
+            return null;
         }
 
         return LayoutBladeResolver::renderHtmlWithShellAppends(
@@ -317,6 +331,22 @@ final class CmsPageLayoutPresentationWrapper
                 $layout->blade_view_name = $viewName;
             }
         }
+
+        return $layout;
+    }
+
+    /**
+     * Synthetic shell so module {@code {route}/page_layout/*} blades can render without a DB PageLayout row
+     * or configured default {@see LayoutBuilder}.
+     */
+    private static function layoutFromFilesystemPageLayoutSegments(): LayoutBuilder
+    {
+        $layout = new LayoutBuilder;
+        $layout->blade_source = 'filesystem';
+        $layout->definition = null;
+        $layout->style_sheet_id = null;
+        $layout->style_sheet_slugs = [];
+        $layout->setRelation('styleSheet', null);
 
         return $layout;
     }

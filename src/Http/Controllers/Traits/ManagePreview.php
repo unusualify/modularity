@@ -65,21 +65,22 @@ trait ManagePreview
 
         $previewView = $this->presentationViewName();
 
-        if (! View::exists($previewView)) {
-            return View::make('twill::errors.preview', [
-                'moduleName' => Str::singular($this->moduleName),
-            ]);
-        }
-
         $innerData = array_replace([
             'item' => $item,
         ], $this->previewData($item));
 
+        // Prefer PageLayout / filesystem page_layout shell from the CMR model; fall back to .custom.
         $wrapped = $item instanceof Model
             ? CmsPageLayoutPresentationWrapper::documentOrNull($item, $previewView, $innerData)
             : null;
         if ($wrapped !== null) {
             return view('cms::layout_builder.inline_document', ['document' => $wrapped]);
+        }
+
+        if (! View::exists($previewView)) {
+            return View::make('twill::errors.preview', [
+                'moduleName' => Str::singular($this->moduleName),
+            ]);
         }
 
         return View::make($previewView, $innerData);
