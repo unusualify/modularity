@@ -803,10 +803,16 @@ class RouteGenerator extends Generator
 
         // add controller front
         if ($this->generatorConfig('route-controller-front')->generate()) {
-            $this->console->call('modularous:make:controller:front', [
+            $frontArgs = [
                 'module' => $this->module->getStudlyName(),
                 'name' => $this->getName(),
-            ]);
+            ];
+
+            if ($this->traits->get('addCmr')) {
+                $frontArgs['--addCmr'] = true;
+            }
+
+            $this->console->call('modularous:make:controller:front', $frontArgs);
         }
 
         $console_traits = $this->traits->mapWithKeys(function ($item, $key) {

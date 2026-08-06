@@ -596,6 +596,7 @@ class BaseServiceProvider extends ServiceProvider
             __DIR__ . '/../Console/Operations/*.php',
             __DIR__ . '/../Console/Flush/*.php',
             __DIR__ . '/../Console/Update/*.php',
+            __DIR__ . '/../Console/Remake/*.php',
             __DIR__ . '/../Console/Docs/*.php',
             __DIR__ . '/../Schedulers/*.php',
         ];

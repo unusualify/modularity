@@ -24,7 +24,7 @@ class MakeControllerFrontCommand extends BaseCommand
      *
      * @var string
      */
-    protected $description = 'Create Front Controller with repository for specified module.';
+    protected $description = 'Create Front Controller for the specified module route.';
 
     protected $argumentName = 'name';
 
@@ -48,7 +48,6 @@ class MakeControllerFrontCommand extends BaseCommand
         return [
             ['module', InputArgument::REQUIRED, 'The name of module will be used.'],
             ['name', InputArgument::REQUIRED, 'The name of the controller class.'],
-
         ];
     }
 
@@ -60,7 +59,9 @@ class MakeControllerFrontCommand extends BaseCommand
     protected function getOptions()
     {
         return [
-            ['example', null, InputOption::VALUE_OPTIONAL, 'An example option.', null],
+            ['addCmr', null, InputOption::VALUE_NONE, 'Extend CmsController (CMR / signed public preview).'],
+            ['force', 'f', InputOption::VALUE_NONE, 'Overwrite the file if it already exists.'],
+            ['test', null, InputOption::VALUE_NONE, 'Print stub contents without writing.'],
         ];
     }
 
@@ -137,6 +138,10 @@ class MakeControllerFrontCommand extends BaseCommand
 
     protected function getStubName(): string
     {
+        if ($this->hasOption('addCmr') && $this->option('addCmr')) {
+            return '/route-controller-front-cms.stub';
+        }
+
         return '/route-controller-front.stub';
     }
 }
