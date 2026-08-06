@@ -30,6 +30,7 @@ flowchart TB
         operations[Console/Operations/*.php]
         flush[Console/Flush/*.php]
         update[Console/Update/*.php]
+        remake[Console/Remake/*.php]
         docs[Console/Docs/*.php]
         schedulers[Schedulers/*.php]
     end
@@ -59,6 +60,7 @@ Commands are **auto-discovered** via `CommandDiscovery::discover()` in `BaseServ
 | `Console/Operations/` | Process, publish one-time operations | `*Command` |
 | `Console/Flush/` | Flush, flush sessions, flush filepond | `Flush*Command` |
 | `Console/Update/` | Update Laravel configs | `Update*Command` |
+| `Console/Remake/` | Re-align existing module artifacts to a feature contract | `Remake*Command` |
 | `Console/Docs/` | Generate command docs | `Generate*Command` |
 | `Schedulers/` | Scheduler commands (package root) | `*Command` |
 | `Console/Coverage/` | Coverage (CoverageServiceProvider only) | `Coverage*Command` |
@@ -81,6 +83,7 @@ Commands are **auto-discovered** via `CommandDiscovery::discover()` in `BaseServ
 | Namespace | Meaning | Example |
 |-----------|---------|---------|
 | `modularous:make:*` | Scaffold/generate files | `make:module`, `make:controller` |
+| `modularous:remake:*` | Re-align existing artifacts to a feature | `remake:cmr` |
 | `modularous:create:*` | Create runtime records (DB, users) | `create:superadmin`, `create:database` |
 | `modularous:cache:*` | Cache operations | `cache:clear`, `cache:warm` |
 | `modularous:migrate:*` | Migration operations | `migrate`, `migrate:refresh` |
