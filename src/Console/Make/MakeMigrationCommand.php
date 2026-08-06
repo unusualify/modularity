@@ -260,6 +260,12 @@ class MakeMigrationCommand extends BaseCommand
                 . "\t\t});\n\n";
         }
 
+        if ($this->option('addRevisions') && ! $this->option('addSingular')) {
+            $schemas .= "\t\t\tSchema::create('{$singular_table}_revisions', function(Blueprint \$table) {\n"
+                . "\t\t\tcreateDefaultRevisionsTableFields(\$table, '{$singular_table}');\n"
+                . "\t\t});\n\n";
+        }
+
         return $schemas;
     }
 
@@ -270,6 +276,10 @@ class MakeMigrationCommand extends BaseCommand
         $table = (new NameParser($this->argument('name')))->getTableName();
 
         $singular_table = Str::singular($table);
+
+        if ($this->option('addRevisions') && ! $this->option('addSingular')) {
+            $schemas .= "\t\t\tSchema::dropIfExists('{$singular_table}_revisions');\n";
+        }
 
         if ($this->option('addTranslation')) {
             // $results = "\t\t\t" . '$table';

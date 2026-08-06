@@ -25,6 +25,7 @@ class MakeOperationCommand extends BaseCommand
         {--t|tag= : The tag of the operation}
         {--async : The operation will be processed asynchronously}
         {--queue=default : The queue that the job will be dispatched to}
+        {--dry-run : The operation will not be created, only the content will be displayed in the console}
     ';
 
     protected $aliases = [
@@ -96,6 +97,15 @@ class MakeOperationCommand extends BaseCommand
         ];
 
         $content = (new Stub('/operation.stub', $replacements))->render();
+
+        if ($this->option('dry-run')) {
+            $this->info("Dry run mode is enabled. The operation will not be created, only the content will be displayed in the console.");
+            $this->info($content);
+            $this->info("Path: {$path}");
+            $this->info("File name: {$fileName}");
+
+            return 0;
+        }
 
         $path = concatenate_path($path, $fileName);
 

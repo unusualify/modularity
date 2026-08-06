@@ -192,4 +192,14 @@ return [
             'description' => 'Do you need to add assignable feature on this module route?',
         ],
     ],
+    'addRevisions' => [
+        'model' => 'HasRevisions',
+        'repository' => 'RevisionsTrait',
+        'question' => 'Do you need to add revisions feature on this module route?',
+        'command_option' => [
+            'shortcut' => null,
+            'input_type' => InputOption::VALUE_NONE,
+            'description' => 'Do you need to add revisions feature on this module route?',
+        ],
+    ],
 ];

@@ -1,0 +1,29 @@
+<?php
+
+namespace $NAMESPACE$;
+
+use $PARENT_MODEL$;
+use Unusualify\Modularous\Entities\Revision;
+
+class $CLASS$ extends Revision
+{
+    protected $fillable = [
+        '$FOREIGN_KEY$',
+        'payload',
+        'user_id',
+        'source_id',
+        'status',
+        'approved_at',
+        'approved_by',
+    ];
+
+    public function $RELATION$()
+    {
+        return $this->belongsTo($PARENT_CLASS$::class);
+    }
+
+    public function getTable(): string
+    {
+        return '$TABLE$';
+    }
+}

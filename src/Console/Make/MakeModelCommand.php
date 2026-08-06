@@ -155,11 +155,12 @@ class MakeModelCommand extends BaseCommand
             $namespace = Modularous::getVendorNamespace($modelGeneratorPath->getNamespace());
         }
 
-        $class_namespaces = implode("\n", [
+        $class_namespaces = implode("\n", array_filter([
             $this->getExtendModelNamespace(),
             $this->getInterfaceNamespaces(),
             $this->getTraitNamespaces(),
-        ]);
+            $this->getRevisionModelImport($namespace),
+        ]));
 
         return (new Stub($this->getStubName(), [
             // 'BASE_MODEL'            => $this->baseConfig('base_model'),
@@ -173,6 +174,7 @@ class MakeModelCommand extends BaseCommand
             'CLASS' => $this->getClass(),
             'INTERFACES' => $this->getInterfaces(),
             'TRAITS' => $this->getTraits(),
+            'REVISION_MODEL' => ltrim($this->getRevisionModelProperty()),
             'FILLABLE' => ltrim($this->getFillable()),
             'TRANSLATED_ATTRIBUTES' => ltrim($this->getTranslatedAttributes()),
             // 'CASTS'                 => ltrim($this->getCasts()),
@@ -422,6 +424,31 @@ class MakeModelCommand extends BaseCommand
         }
 
         return $attributes;
+    }
+
+    private function shouldGenerateRevisionEntity(): bool
+    {
+        return $this->getTraitResponse('addRevisions') && ! $this->getTraitResponse('addSingular');
+    }
+
+    private function getRevisionModelImport(string $modelNamespace): string
+    {
+        if (! $this->shouldGenerateRevisionEntity()) {
+            return '';
+        }
+
+        return 'use ' . $modelNamespace . '\\Revisions\\' . $this->getModelName() . 'Revision;';
+    }
+
+    private function getRevisionModelProperty(): string
+    {
+        if (! $this->shouldGenerateRevisionEntity()) {
+            return '';
+        }
+
+        $revisionClass = $this->getModelName() . 'Revision';
+
+        return "\tprotected string \$revisionModel = {$revisionClass}::class;\n";
     }
 
     /**
@@ -721,7 +748,40 @@ class MakeModelCommand extends BaseCommand
 
             $fullPath = $path . $modelPath->getPath() . '/Slugs' . '/' . $this->getModelName() . 'Slug.php';
 
-            $runnable = (! $this->option('test') || confirm(label: 'Do you want to see the content of translation model in the test mode?', default: false));
+            $runnable = (! $this->option('test') || confirm(label: 'Do you want to see the content of slug model in the test mode?', default: false));
+
+            if ($runnable) {
+
+                if ($this->option('test')) {
+                    $this->info($content);
+                } else {
+                    if (! $this->laravel['files']->isDirectory($dir = dirname($fullPath))) {
+                        $this->laravel['files']->makeDirectory($dir, 0777, true);
+                    }
+
+                    (new FileGenerator($fullPath, $content))->withFileOverwrite($overwriteFile)->generate();
+                }
+            }
+        }
+
+        if ($this->shouldGenerateRevisionEntity()) {
+            $parentStudly = $this->getModelName();
+            $singular = Str::snake(Str::singular($parentStudly));
+            $parentModelFqcn = $this->getClassNamespace($module) . '\\' . $parentStudly;
+
+            $content = (new Stub('/models/revision_model.stub', [
+                'NAMESPACE' => $this->getClassNamespace($module) . '\\Revisions',
+                'CLASS' => $parentStudly . 'Revision',
+                'PARENT_MODEL' => $parentModelFqcn,
+                'PARENT_CLASS' => $parentStudly,
+                'FOREIGN_KEY' => $singular . '_id',
+                'RELATION' => Str::camel($singular),
+                'TABLE' => $singular . '_revisions',
+            ]))->render();
+
+            $fullPath = $path . $modelPath->getPath() . '/Revisions' . '/' . $parentStudly . 'Revision.php';
+
+            $runnable = (! $this->option('test') || confirm(label: 'Do you want to see the content of revision model in the test mode?', default: false));
 
             if ($runnable) {
 

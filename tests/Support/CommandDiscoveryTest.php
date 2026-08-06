@@ -73,6 +73,19 @@ class CommandDiscoveryTest extends TestCase
     }
 
     /** @test */
+    public function it_discovers_commands_from_remake_folder(): void
+    {
+        $basePath = realpath(__DIR__ . '/../../src/Console');
+        $paths = [$basePath . '/Remake/*.php'];
+
+        $commands = CommandDiscovery::discover($paths);
+
+        $this->assertNotEmpty($commands);
+        $this->assertContains('Unusualify\Modularous\Console\Remake\RemakeCmrCommand', $commands);
+        $this->assertContains('Unusualify\Modularous\Console\Remake\RemakeRevisionsCommand', $commands);
+    }
+
+    /** @test */
     public function it_discovers_root_level_commands(): void
     {
         $basePath = realpath(__DIR__ . '/../../src/Console');
