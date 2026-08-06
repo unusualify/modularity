@@ -60,7 +60,7 @@ Commands are **auto-discovered** via `CommandDiscovery::discover()` in `BaseServ
 | `Console/Operations/` | Process, publish one-time operations | `*Command` |
 | `Console/Flush/` | Flush, flush sessions, flush filepond | `Flush*Command` |
 | `Console/Update/` | Update Laravel configs | `Update*Command` |
-| `Console/Remake/` | Re-align existing module artifacts to a feature contract | `Remake*Command` |
+| `Console/Remake/` | Re-align existing module artifacts to a feature contract (`remake:cmr`, `remake:revisions`, …) | `Remake*Command` |
 | `Console/Docs/` | Generate command docs | `Generate*Command` |
 | `Schedulers/` | Scheduler commands (package root) | `*Command` |
 | `Console/Coverage/` | Coverage (CoverageServiceProvider only) | `Coverage*Command` |
@@ -83,7 +83,7 @@ Commands are **auto-discovered** via `CommandDiscovery::discover()` in `BaseServ
 | Namespace | Meaning | Example |
 |-----------|---------|---------|
 | `modularous:make:*` | Scaffold/generate files | `make:module`, `make:controller` |
-| `modularous:remake:*` | Re-align existing artifacts to a feature | `remake:cmr` |
+| `modularous:remake:*` | Re-align existing artifacts to a feature | `remake:cmr`, `remake:revisions` |
 | `modularous:create:*` | Create runtime records (DB, users) | `create:superadmin`, `create:database` |
 | `modularous:cache:*` | Cache operations | `cache:clear`, `cache:warm` |
 | `modularous:migrate:*` | Migration operations | `migrate`, `migrate:refresh` |
@@ -114,6 +114,23 @@ All command classes MUST end with `Command` (e.g. `InstallCommand`, not `Install
 - **Location:** `src/Console/BaseCommand.php`
 - **Use:** For commands that need Modularous-specific behavior (trait options, config, etc.).
 - **Alternative:** Use `Illuminate\Console\Command` for simple commands.
+
+## Stubs — generated file bodies (HARD RULE)
+
+**Never** embed generated file body content as heredocs, nowdocs, or concatenated PHP/string templates inside Command classes.
+
+**Always** create or reuse a stub under `src/Console/stubs/` and render it via `Nwidart\Modules\Support\Stub` (`new Stub('/path.stub', [...])->render()` or `Stub::create(...)`).
+
+| Rule | Detail |
+|------|--------|
+| Stub location | `src/Console/stubs/` (BaseCommand / Make / Remake set `Stub::setBasePath` here) |
+| Placeholder style | `$PLACEHOLDER$` (e.g. `$NAMESPACE$`, `$TABLE$`) matching existing Make/Remake stubs |
+| Command role | Orchestrate paths, options, and placeholder values only — zero large template strings |
+| Applies to | **Make** and **Remake** commands equally |
+
+Examples: `MakeMigrationCommand` → `/migration/create.stub`; `MakeCmsControllerCommand` → `/cms-controller.stub`; `RemakeRevisionsCommand` → `/models/revision_model.stub`, `/remake/revisions-migration.stub`, `/remake/revisions-operation.stub`; `RemakeCmrCommand` → `/route-controller-front-cms.stub`.
+
+Docs: `docs/src/pages/guide/console/make/stubs.md` (Make stubs command + note that Remake shares `src/Console/stubs/`).
 
 ## Backward Compatibility
 

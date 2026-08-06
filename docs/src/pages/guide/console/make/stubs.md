@@ -69,6 +69,7 @@ php artisan modularous:make:stubs Blog Post --except=migration
 
 - Stub type names match the generator config keys (e.g. `model`, `controller`, `repository`, `request`, `migration`).
 - Use `make:module --just-stubs` to regenerate stubs across all routes of a module at once.
+- Template files live under `src/Console/stubs/`. **Remake** commands (`remake:cmr`, `remake:revisions`, …) use the same directory and `Nwidart\Modules\Support\Stub` rendering — never inline file bodies in Command classes (see `src/Console/AGENTS.md`).
 
 ---
 
