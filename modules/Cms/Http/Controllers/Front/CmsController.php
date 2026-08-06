@@ -3,9 +3,9 @@
 namespace Modules\Cms\Http\Controllers\Front;
 
 use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Modules\Cms\Contracts\CanonicalUrlResolverInterface;
 use Modules\Cms\Entities\UrlRoute;
 use Modules\Cms\Http\Controllers\CmsSignedPublicPreviewController;
@@ -154,7 +154,7 @@ abstract class CmsController extends CoreController
         Request $request,
         CanonicalUrlResolverInterface $canonical,
         Model $item,
-    ): View {
+    ): Response {
         return $this->renderPublicCmsPresentation($request, $item, $canonical, forcePreviewRobotsNoIndex: true);
     }
 
