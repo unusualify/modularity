@@ -41,6 +41,7 @@ Before editing a folder, read its local `AGENTS.md` when present (`src/`, `Conso
 | Console commands | `docs/src/pages/guide/console/` |
 | Controllers / HTTP | `docs/src/pages/system-reference/backend/http/` |
 | Frontend composables | `docs/src/pages/system-reference/frontend/` |
+| Vue directives | `docs/src/pages/guide/directives/` |
 
 Prefer docs for architecture/env tables; keep AGENTS for hard rules only.
 
@@ -109,6 +110,7 @@ Entity traits and repository traits must be added **together**.
 | Security | `SecurityServiceProvider` |
 | RemoteApi | `RemoteApiServiceProvider` |
 | ArtisanRunner | `ArtisanRunnerServiceProvider` |
+| ModuleRouteInspect | `ModuleRouteInspectServiceProvider` |
 
 `BaseServiceProvider` stays for package-wide core bindings only (Modularous, navigation, cache, filepond, etc.).
 

@@ -37,6 +37,18 @@ This section covers UI components, forms, tables, and CMS public-site features i
 | [Tabs](/guide/components/shared/tabs) | Tab component |
 | [Stepper Form](/guide/components/shared/stepper-form) | Stepper form component |
 
+## Directives
+
+| Page | Description |
+|------|-------------|
+| [Directives overview](/guide/directives/overview) | Registration + active directive index |
+| [v-viewport-fit](/guide/directives/viewport-fit) | Fill leftover viewport below chrome (tables) |
+| [v-column](/guide/directives/column) | Vuetify column classes |
+| [v-fit-grid](/guide/directives/fit-grid) | Flex + stretch first child |
+| [v-scrollable](/guide/directives/scrollable) | Scroll region / fixed height |
+| [v-svg](/guide/directives/svg) | SVG sprite injection |
+| [v-transition](/guide/directives/transition) | `d-none`-driven transitions |
+
 ## Architecture Reference
 
 For system internals (Hydrates, Repositories, schema flow), see [System Reference](/system-reference/overview).
