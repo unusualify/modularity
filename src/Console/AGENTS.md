@@ -20,6 +20,7 @@ flowchart TB
     subgraph Paths [Discovery Paths]
         root[Console/*.php]
         make[Console/Make/*.php]
+        blueprint[Console/Blueprint/*.php]
         cache[Console/Cache/*.php]
         migration[Console/Migration/*.php]
         module[Console/Module/*.php]
@@ -50,6 +51,7 @@ Commands are **auto-discovered** via `CommandDiscovery::discover()` in `BaseServ
 |--------|---------|----------------|
 | `Console/` (root) | Build, refresh, pint, dev, replace:regex, composer, etc. | `*Command` |
 | `Console/Make/` | Artifact generators (scaffolding) | `Make*Command` |
+| `Console/Blueprint/` | ModuleRoute Blueprint provider scaffolding | `MakeBlueprint*Command` |
 | `Console/Cache/` | Cache operations | `Cache*Command` |
 | `Console/Migration/` | Migration operations | `Migrate*Command` |
 | `Console/Module/` | Route enable/disable, fix module, remove module | `*Command` |
@@ -88,7 +90,7 @@ Commands are **auto-discovered** via `CommandDiscovery::discover()` in `BaseServ
 | `modularous:cache:*` | Cache operations | `cache:clear`, `cache:warm` |
 | `modularous:migrate:*` | Migration operations | `migrate`, `migrate:refresh` |
 | `modularous:flush:*` | Flush/clear runtime data | `flush:sessions` |
-| `modularous:route:*` | Route enable/disable | `route:disable` |
+| `modularous:route:*` | Route enable/disable/inspect | `route:disable`, `route:inspect` |
 | `modularous:sync:*` | Sync data | `sync:translations` |
 
 ### Rule 3: Command Suffix

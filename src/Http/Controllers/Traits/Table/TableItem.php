@@ -447,8 +447,8 @@ trait TableItem
                 (($this->tableAttributes['editOnModal'] ?? true) ? $this->repository->getShowFields($item, $schema) : []),
                 (($this->tableAttributes['editOnModal'] ?? true) ? $this->repository->getFormFields($item, $schema) : []),
                 // + ($this->getIndexOption('editInModal') ? [
-                //     'editInModal' => $this->getModuleRoute($itemId, 'edit'),
-                //     'updateUrl' => $this->getModuleRoute($itemId, 'update'),
+                //     'editInModal' => $this->getModuleRouteUrl($itemId, 'edit'),
+                //     'updateUrl' => $this->getModuleRouteUrl($itemId, 'update'),
                 // ] : [])
                 // + ($this->getIndexOption('publish') && ($item->canPublish ?? true) ? [
                 //     'published' => $item->published,

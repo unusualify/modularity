@@ -65,6 +65,7 @@ export { default as useRandKey } from './useRandKey'
 
 export { default as useStepUpAwareJsonPost } from './useStepUpAwareJsonPost'
 export { default as useArtisanRunner } from './useArtisanRunner'
+export { default as useModuleRouteInspect } from './useModuleRouteInspect'
 export { useSignedPublicPreview } from './useSignedPublicPreview'
 
 export { default as useEditPresence } from './useEditPresence'

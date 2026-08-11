@@ -236,7 +236,7 @@ class PanelControllerTest extends TestModulesCase
         putenv('PERMISSION_GATES_DEACTIVATE=1');
 
         $controller = new PanelControllerStub($this->app, Request::create('/'));
-        $controller->module = $controller->getModule();
+        $controller->setModule($controller->getModule());
         $controller->preload();
 
         $url = $controller->exposeGetModuleRoute(5, 'edit');
@@ -260,7 +260,7 @@ class PanelControllerTest extends TestModulesCase
     public function test_is_parent_route_defaults_to_module_route_config(): void
     {
         $controller = new PanelControllerStub($this->app, Request::create('/'));
-        $controller->module = $controller->getModule();
+        $controller->setModule($controller->getModule());
 
         $this->assertIsBool($controller->exposeIsParentRoute());
     }

@@ -547,37 +547,6 @@ abstract class PanelController extends CoreController implements CacheableInterf
         return '';
     }
 
-    protected function generateRoutePrefix($noNested = false)
-    {
-        $routePrefixes = [];
-
-        $admin_route_prefix = adminRouteNamePrefix();
-
-        if ($admin_route_prefix) {
-            $routePrefixes[] = $admin_route_prefix;
-        }
-
-        if (isset($this->config->system_prefix)) {
-            if ($this->config->system_prefix) {
-                $routePrefixes[] = systemRouteNamePrefix();
-            }
-
-        } elseif (isset($this->config->base_prefix) && $this->config->base_prefix) {
-            $routePrefixes[] = systemRouteNamePrefix();
-        }
-
-        if (! $this->isParent || ($this->isNested && ! $noNested)) {
-            $routePrefixes[] = Str::snake($this->moduleName);
-        }
-
-        if ($this->isNested && ! $noNested) {
-            $routePrefixes[] = $this->nestedParentName;
-            $routePrefixes[] = 'nested';
-        }
-
-        return implode('.', $routePrefixes);
-    }
-
     /**
      * @return string
      */
@@ -650,9 +619,14 @@ abstract class PanelController extends CoreController implements CacheableInterf
      * @param string $action
      * @return string
      */
-    protected function getModuleRoute($id, $action, $singleton = false)
+    protected function getModuleRouteUrl($id, $action, $singleton = false)
     {
-        $parameters = $singleton ? [] : [snakeCase($this->routeName) => $id];
+        // Do not force ModuleRouteRegistry here — hot-path ADR. Use already-resolved
+        // ModuleRoute when present; otherwise fall back to controller routeName.
+        $routeName = $this->moduleRoute?->name()
+            ?? $this->moduleRouteName
+            ?? $this->routeName;
+        $parameters = $singleton ? [] : [snakeCase((string) $routeName) => $id];
 
         if ($this->isNested) {
             $parameters[$this->nestedParentName] ??= $this->nestedParentId;
@@ -664,7 +638,7 @@ abstract class PanelController extends CoreController implements CacheableInterf
             $prefix = $this->generateRoutePrefix(noNested: true);
         }
 
-        return moduleRoute($this->routeName, $prefix, $action, $parameters, singleton: $singleton);
+        return moduleRoute($routeName, $prefix, $action, $parameters, singleton: $singleton);
     }
 
     /**

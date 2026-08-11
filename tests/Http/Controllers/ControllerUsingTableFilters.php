@@ -53,6 +53,8 @@ class ControllerUsingTableFilters extends Controller
     public function setRawFiltersConfig(array $filters): void
     {
         $this->configFieldsByRouteRaw['filters'] = $filters;
+        // Production path uses getConfigFieldsByRoute('filters') (nested / Blueprint / flat).
+        $this->configFieldsByRoute['filters'] = $filters;
     }
 
     protected function getConfigFieldsByRoute($fieldName, $default = null)

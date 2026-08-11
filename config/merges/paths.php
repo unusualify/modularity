@@ -30,6 +30,10 @@ return [
             'path' => 'Http/Requests',
             'generate' => true,
         ],
+        'route-presentation' => [
+            'path' => 'Blueprint/$STUDLY_NAME$',
+            'generate' => false,
+        ],
         // 'view' => ['path' => 'Resources/views/$SNAKE_NAME$', 'generate' => true],
 
     ],

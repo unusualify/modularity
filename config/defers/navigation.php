@@ -55,6 +55,11 @@ return [
                 'icon' => 'mdi-console',
                 'route_name' => 'admin.artisan-runner',
             ],
+            '_module_route_inspect' => [
+                'name' => 'Module Route Inspect',
+                'icon' => 'mdi-routes',
+                'route_name' => 'admin.module-route-inspect',
+            ],
             'media_library' => [
                 'name' => 'Media Library',
                 'icon' => '$media',

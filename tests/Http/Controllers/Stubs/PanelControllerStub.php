@@ -129,7 +129,7 @@ class PanelControllerStub extends PanelController
 
     public function exposeGetModuleRoute(int $id, string $action, bool $singleton = false): string
     {
-        return $this->getModuleRoute($id, $action, $singleton);
+        return $this->getModuleRouteUrl($id, $action, $singleton);
     }
 
     public function exposeTitleIsTranslatable(): bool

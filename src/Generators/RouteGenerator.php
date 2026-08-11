@@ -166,6 +166,13 @@ class RouteGenerator extends Generator
     protected $fix = false;
 
     /**
+     * Presentation driver for scaffolded route config: config (default) | class.
+     *
+     * @var string
+     */
+    protected $presentation = 'config';
+
+    /**
      * modelRelationParser
      *
      * @var Unusualify\Modularous\Support\Decomposers\ModelRelationParser::class
@@ -489,6 +496,25 @@ class RouteGenerator extends Generator
     }
 
     /**
+     * @param  string  $presentation  config|class
+     * @return $this
+     */
+    public function setPresentation($presentation)
+    {
+        $presentation = strtolower((string) $presentation);
+        $this->presentation = in_array($presentation, ['config', 'class'], true)
+            ? $presentation
+            : 'config';
+
+        return $this;
+    }
+
+    public function getPresentation(): string
+    {
+        return $this->presentation;
+    }
+
+    /**
      * Set schema.
      *
      * @param bool|int $force
@@ -679,6 +705,8 @@ class RouteGenerator extends Generator
                 $this->generateFolders();
 
                 $this->generateResources();
+
+                $this->generatePresentationClasses();
 
                 $this->generateFiles();
 
@@ -918,6 +946,23 @@ class RouteGenerator extends Generator
     }
 
     /**
+     * Scaffold ModuleRoute Blueprint classes when presentation=class.
+     */
+    public function generatePresentationClasses(): void
+    {
+        if ($this->getPresentation() !== 'class') {
+            return;
+        }
+
+        $this->console->call('modularous:make:blueprint', [
+            'module' => $this->module->getStudlyName(),
+            'route' => $this->getName(),
+            '--from-config' => true,
+            '--force' => (bool) $this->force,
+        ]);
+    }
+
+    /**
      * updateRoutesStatuses
      *
      * @return void
@@ -974,7 +1019,7 @@ class RouteGenerator extends Generator
 
             $titleColumnKey = count($filtered = array_values(array_filter($headers, fn ($i) => $i['key'] === 'name' || $i['key'] === 'title'))) > 0
                 ? $filtered[0]['key']
-                : $headers[0]['key'];
+                : ($headers[0]['key'] ?? 'name');
 
             $route_array = ($this->getModule()->getName() === $this->getName() ? ['parent' => true] : []) + [
                 'name' => $studlyName,
@@ -984,9 +1029,30 @@ class RouteGenerator extends Generator
                 'icon' => '$submodule', // '$modules',
                 'title_column_key' => $titleColumnKey,
                 'table_options' => static::$defaultTableOptions,
-                'headers' => $headers, // in Unusualify\Modularous\Support\Migrations\SchemaParser::class
-                'inputs' => $inputs, // in Unusualify\Modularous\Support\Migrations\SchemaParser::class
             ];
+
+            if ($this->getPresentation() === 'class') {
+                $folder = (string) modularousConfig('module_route_presentation.path', 'Blueprint');
+                $folderNs = str_replace('/', '\\', trim($folder, '/\\'));
+                $baseNs = $this->module->getBaseNamespace() . '\\' . $folderNs . '\\' . $studlyName;
+
+                $route_array['blueprint'] = [
+                    'inputs' => [
+                        'driver' => 'class',
+                        'class' => $baseNs . '\\Form\\' . $studlyName . 'FormInputs',
+                    ],
+                    'headers' => [
+                        'driver' => 'class',
+                        'class' => $baseNs . '\\Index\\' . $studlyName . 'IndexColumns',
+                    ],
+                ];
+                // Keep inline arrays as fallback until classes are loaded / for inspect.
+                $route_array['headers'] = $headers;
+                $route_array['inputs'] = $inputs;
+            } else {
+                $route_array['headers'] = $headers;
+                $route_array['inputs'] = $inputs;
+            }
 
             if ($runnable && $this->getTest()) {
                 dump($route_array);

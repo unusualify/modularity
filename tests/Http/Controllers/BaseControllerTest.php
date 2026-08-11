@@ -98,7 +98,7 @@ class BaseControllerTest extends TestModulesCase
 
         $request = $this->requestWithRoute(['item' => 4]);
         $controller = new BaseControllerStub($this->app, $request, $repository);
-        $controller->module = $controller->getModule();
+        $controller->setModule($controller->getModule());
 
         $response = $controller->destroy(4);
 
@@ -115,7 +115,7 @@ class BaseControllerTest extends TestModulesCase
 
         $request = $this->requestWithRoute(['item' => 5]);
         $controller = new BaseControllerStub($this->app, $request, $repository);
-        $controller->module = $controller->getModule();
+        $controller->setModule($controller->getModule());
 
         $response = $controller->destroy(5);
 
@@ -158,7 +158,7 @@ class BaseControllerTest extends TestModulesCase
             }
         };
 
-        $controller->module = $controller->getModule();
+        $controller->setModule($controller->getModule());
         $response = $controller->store();
 
         $this->assertSame(200, $response->getStatusCode());
@@ -172,7 +172,7 @@ class BaseControllerTest extends TestModulesCase
 
         $request = Request::create('/admin/test-module/items/bulk-delete', 'POST', ['ids' => [1, 2]]);
         $controller = new BaseControllerStub($this->app, $request, $repository);
-        $controller->module = $controller->getModule();
+        $controller->setModule($controller->getModule());
 
         $this->assertSame(200, $controller->bulkDelete()->getStatusCode());
     }
@@ -193,7 +193,7 @@ class BaseControllerTest extends TestModulesCase
 
         $request = Request::create('/admin/test-module/items/restore', 'POST', ['id' => 9]);
         $controller = new BaseControllerStub($this->app, $request, $repository);
-        $controller->module = $controller->getModule();
+        $controller->setModule($controller->getModule());
 
         $this->assertSame(200, $controller->restore()->getStatusCode());
     }
@@ -208,7 +208,7 @@ class BaseControllerTest extends TestModulesCase
 
         $request = Request::create('/admin/test-module/items/reorder', 'POST', ['ids' => [3, 2, 1]]);
         $controller = new BaseControllerStub($this->app, $request, $repository);
-        $controller->module = $controller->getModule();
+        $controller->setModule($controller->getModule());
 
         $this->assertSame(200, $controller->reorder()->getStatusCode());
     }
@@ -222,7 +222,7 @@ class BaseControllerTest extends TestModulesCase
         $this->actingAs($admin, $guardName);
 
         $controller = new BaseControllerStub($this->app, Request::create('/admin/test-module/items'));
-        $controller->module = $controller->getModule();
+        $controller->setModule($controller->getModule());
         $controller->exposePreloadBase();
 
         $this->addToAssertionCount(1);
@@ -231,7 +231,7 @@ class BaseControllerTest extends TestModulesCase
     public function test_index_returns_rendered_index_data(): void
     {
         $controller = new BaseControllerStub($this->app, Request::create('/admin/test-module/items'));
-        $controller->module = $controller->getModule();
+        $controller->setModule($controller->getModule());
 
         $response = $controller->index();
 
@@ -243,7 +243,7 @@ class BaseControllerTest extends TestModulesCase
     {
         $request = Request::create('/admin/test-module/items', 'GET', ['openCreate' => true]);
         $controller = new BaseControllerStub($this->app, $request);
-        $controller->module = $controller->getModule();
+        $controller->setModule($controller->getModule());
 
         $controller->index();
 
@@ -260,7 +260,7 @@ class BaseControllerTest extends TestModulesCase
         ]);
 
         $controller = new BaseControllerStub($this->app, $request, $repository);
-        $controller->module = $controller->getModule();
+        $controller->setModule($controller->getModule());
 
         $response = $controller->index();
 
@@ -272,7 +272,7 @@ class BaseControllerTest extends TestModulesCase
         putenv('PERMISSION_GATES_DEACTIVATE=1');
 
         $controller = new BaseControllerStub($this->app, Request::create('/admin/test-module/items/create'));
-        $controller->module = $controller->getModule();
+        $controller->setModule($controller->getModule());
 
         $response = $controller->create();
 
@@ -288,7 +288,7 @@ class BaseControllerTest extends TestModulesCase
 
         $request = $this->requestWithRoute(['item' => 12], 'GET');
         $controller = new BaseControllerStub($this->app, $request);
-        $controller->module = $controller->getModule();
+        $controller->setModule($controller->getModule());
         $controller->setIndexOptions(['editInModal' => false]);
 
         $response = $controller->edit(12);
@@ -320,7 +320,7 @@ class BaseControllerTest extends TestModulesCase
 
         $request = $this->requestWithRoute(['item' => 7], 'GET', true);
         $controller = new BaseControllerStub($this->app, $request, $repository);
-        $controller->module = $controller->getModule();
+        $controller->setModule($controller->getModule());
 
         $response = $controller->show(7);
 
@@ -343,7 +343,7 @@ class BaseControllerTest extends TestModulesCase
 
         $request = $this->requestWithRoute(['item' => 3], 'PUT', false, ['cmsSaveType' => 'cancel']);
         $controller = new BaseControllerStub($this->app, $request, $repository);
-        $controller->module = $controller->getModule();
+        $controller->setModule($controller->getModule());
 
         $response = $controller->update(3);
 
@@ -367,7 +367,7 @@ class BaseControllerTest extends TestModulesCase
 
         $request = $this->requestWithRoute(['item' => 8], 'PUT', true, ['name' => 'Updated']);
         $controller = new BaseControllerStub($this->app, $request, $repository);
-        $controller->module = $controller->getModule();
+        $controller->setModule($controller->getModule());
 
         $response = $controller->update(8);
 
@@ -393,7 +393,7 @@ class BaseControllerTest extends TestModulesCase
         ]);
 
         $controller = new BaseControllerStub($this->app, $request, $repository);
-        $controller->module = $controller->getModule();
+        $controller->setModule($controller->getModule());
 
         $response = $controller->store();
 
@@ -429,7 +429,7 @@ class BaseControllerTest extends TestModulesCase
 
         $request = $this->requestWithRoute(['item' => 2], 'POST');
         $controller = new BaseControllerStub($this->app, $request, $repository);
-        $controller->module = $controller->getModule();
+        $controller->setModule($controller->getModule());
         // duplicate() calls preload(); user must be set as PanelController middleware would.
         $controller->exposePreloadBase();
 
@@ -449,7 +449,7 @@ class BaseControllerTest extends TestModulesCase
 
         $request = Request::create('/admin/test-module/items/force-delete', 'POST', ['id' => 6]);
         $controller = new BaseControllerStub($this->app, $request, $repository);
-        $controller->module = $controller->getModule();
+        $controller->setModule($controller->getModule());
 
         $this->assertSame(200, $controller->forceDelete()->getStatusCode());
     }
@@ -461,16 +461,16 @@ class BaseControllerTest extends TestModulesCase
         $repository->shouldReceive('bulkRestore')->with(['6', '7'])->andReturn(true);
 
         $controller = new BaseControllerStub($this->app, Request::create('/'), $repository);
-        $controller->module = $controller->getModule();
+        $controller->setModule($controller->getModule());
 
         $forceDeleteRequest = Request::create('/bulk-force-delete', 'POST', ['ids' => [4, 5]]);
         $forceDeleteController = new BaseControllerStub($this->app, $forceDeleteRequest, $repository);
-        $forceDeleteController->module = $forceDeleteController->getModule();
+        $forceDeleteController->setModule($forceDeleteController->getModule());
         $this->assertSame(200, $forceDeleteController->bulkForceDelete()->getStatusCode());
 
         $restoreRequest = Request::create('/bulk-restore', 'POST', ['ids' => '6,7']);
         $restoreController = new BaseControllerStub($this->app, $restoreRequest, $repository);
-        $restoreController->module = $restoreController->getModule();
+        $restoreController->setModule($restoreController->getModule());
         $this->assertSame(200, $restoreController->bulkRestore()->getStatusCode());
     }
 

@@ -22,6 +22,7 @@ return [
     'chat_messages' => 'um_chat_messages',
     'spreads' => 'um_spreads',
     'remote_api_sources' => 'um_remote_api_sources',
+    'module_route_statuses' => 'um_module_route_statuses',
     'singletons' => 'um_singletons',
     'singleton_revisions' => 'um_singleton_revisions',
     'authorizations' => 'um_authorizations',

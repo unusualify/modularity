@@ -760,6 +760,30 @@ class ModuleTest extends TestCase
         $this->assertSame('link', $actions[1]['name'] ?? null);
     }
 
+    public function test_get_navigation_actions_prefers_nested_index_row_actions(): void
+    {
+        $config = $this->module->getRawConfig();
+        $config['routes']['item']['table_row_actions'] = [
+            [
+                'name' => 'legacy',
+                'url' => '/legacy',
+            ],
+        ];
+        $config['routes']['item']['index']['row_actions'] = [
+            [
+                'name' => 'nested',
+                'url' => '/nested-action',
+            ],
+        ];
+        $this->replaceModuleConfig($config);
+
+        $actions = $this->module->getNavigationActions('Item');
+
+        $this->assertNotEmpty($actions);
+        $this->assertSame('nested', $actions[0]['name']);
+        $this->assertSame('/nested-action', $actions[0]['url']);
+    }
+
     public function test_get_module_urls_includes_parent_route_name_pattern(): void
     {
         $config = $this->module->getRawConfig();
