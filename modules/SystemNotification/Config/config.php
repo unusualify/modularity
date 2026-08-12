@@ -87,10 +87,13 @@ return [
             'route_name' => 'my_notification',
             'icon' => '$submodule',
             'title_column_key' => 'created_at',
+            'no_default_table_row_actions' => true,
+            'default_filter_status' => 'my-notification',
             'scopes' => [
                 'myNotification' => true,
                 // 'companyNotification' => true
             ],
+
             'table_options' => [
                 'subtitle' => __('You can easily monitor the entire process by following the notifications.'),
 
@@ -99,7 +102,6 @@ return [
                 'isRowEditing' => false,
                 'rowActionsType' => 'inline',
             ],
-            'no_default_table_row_actions' => true,
             'table_row_actions' => [
                 'read' => [
                     'is' => 'v-btn',
@@ -234,7 +236,6 @@ return [
                     'target' => '_self',
                 ],
             ],
-            'default_filter_status' => 'my-notification',
             'table_filters' => [
                 // 'my-notification' => [
                 //     'name' => 'Mine',
