@@ -131,4 +131,21 @@ class RespondsWithJsonOrRedirectTest extends TestCase
         $data = json_decode($response->getContent(), true);
         $this->assertArrayHasKey('errors', $data);
     }
+
+    /** @test */
+    public function it_returns_redirect_validation_failed_response_when_request_does_not_want_json(): void
+    {
+        $request = Request::create('/test', 'POST', ['email' => '']);
+        $request->headers->set('Accept', 'text/html');
+
+        $validator = Validator::make(
+            ['email' => ''],
+            ['email' => 'required']
+        );
+
+        $response = $this->controller->callSendValidationFailedResponse($request, $validator);
+
+        $this->assertInstanceOf(RedirectResponse::class, $response);
+        $this->assertTrue($response->isRedirection());
+    }
 }

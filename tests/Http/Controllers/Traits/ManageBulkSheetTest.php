@@ -184,6 +184,32 @@ class ManageBulkSheetTest extends TestCase
         $this->assertSame(['created' => 1, 'updated' => 0], $response->getData(true));
     }
 
+    public function test_bulk_sheet_browser_title_and_breadcrumbs_cover_config_paths(): void
+    {
+        Route::shouldReceive('has')->andReturn(false);
+
+        $this->controller->bulkSheetUiStrings = ['browser_title' => 'CSV Tool'];
+        $this->assertSame('CSV Tool', $this->controller->bulkSheetToolBrowserTitle());
+
+        $this->controller->bulkSheetUiStrings = [];
+        $this->controller->bulkSheetRouteConfig = ['browser_title' => 'messages.bulk.browser'];
+        $this->assertNotSame('', $this->controller->bulkSheetToolBrowserTitle());
+
+        $this->controller->bulkSheetRouteConfig = [];
+        $this->assertNotSame('', $this->controller->bulkSheetToolBrowserTitle());
+
+        $crumbs = new \ReflectionMethod($this->controller, 'bulkSheetBreadcrumbsItems');
+        $crumbs->setAccessible(true);
+        $items = $crumbs->invoke($this->controller);
+        $this->assertCount(3, $items);
+        $this->assertTrue($items[2]['disabled'] ?? false);
+
+        $nav = new \ReflectionMethod($this->controller, 'bulkSheetNavigationWithBreadcrumbs');
+        $nav->setAccessible(true);
+        $navigation = $nav->invoke($this->controller);
+        $this->assertArrayHasKey('breadcrumbs', $navigation);
+    }
+
     protected function makeModuleMock(): Module
     {
         $module = Mockery::mock(Module::class);

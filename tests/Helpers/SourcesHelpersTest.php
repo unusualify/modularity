@@ -317,6 +317,34 @@ class SourcesHelpersTest extends TestCase
         $this->assertArrayHasKey('sidebarBottom', $navigation);
     }
 
+    /** @test */
+    public function test_guest_currency_helpers_and_form_draft_preserve_flag(): void
+    {
+        Config::set('auth.guards.modularous', [
+            'driver' => 'session',
+            'provider' => 'users',
+        ]);
+        Config::set('auth.providers.users', [
+            'driver' => 'eloquent',
+            'model' => \Unusualify\Modularous\Entities\User::class,
+        ]);
+
+        $this->assertCount(0, get_user_currency_vat_rates());
+        $this->assertCount(0, get_user_payment_country_currencies());
+
+        Config::set('modularous.form_drafts.replace_form', [
+            'a' => ['type' => 'text', 'name' => 'a'],
+            'b' => ['type' => 'text', 'name' => 'b'],
+        ]);
+
+        $replaced = getFormDraft('replace_form', [
+            'a' => ['type' => 'number', 'name' => 'a'],
+        ], [], false);
+
+        $this->assertSame('number', $replaced['a']['type']);
+        $this->assertArrayHasKey('b', $replaced);
+    }
+
     protected function tearDown(): void
     {
         \Mockery::close();

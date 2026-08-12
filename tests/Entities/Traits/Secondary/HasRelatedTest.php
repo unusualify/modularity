@@ -57,6 +57,11 @@ class HasRelatedTest extends TestCase
         $this->assertCount(1, $loaded);
         $this->assertSame($related->id, $loaded->first()->id);
 
+        // Second call should hit the in-memory related cache path.
+        $cached = $fresh->getRelated('pages');
+        $this->assertCount(1, $cached);
+        $this->assertSame($related->id, $cached->first()->id);
+
         $subject->clearRelated('pages');
         $this->assertCount(0, $subject->fresh()->relatedItems);
 
