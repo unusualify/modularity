@@ -10,57 +10,64 @@ return [
     'base_prefix' => false,
     'routes' => [
         'notification' => [
+            'index' => [
+                'options' => \Modules\SystemNotification\Blueprint\Notification\Index\NotificationIndexOptions::class,
+                'columns' => \Modules\SystemNotification\Blueprint\Notification\Index\NotificationIndexColumns::class,
+            ],
+            'form' => [
+                'inputs' => \Modules\SystemNotification\Blueprint\Notification\Form\NotificationFormInputs::class,
+            ],
             'name' => 'Notification',
             'headline' => 'All Notifications',
             'url' => 'all-notifications',
             'route_name' => 'notification',
             'icon' => '$submodule',
             'title_column_key' => 'id',
-            'table_options' => [
-                'createOnModal' => true,
-                'editOnModal' => true,
-                'isRowEditing' => false,
-                'rowActionsType' => 'inline',
-            ],
-            'headers' => [
-                [
-                    'title' => 'Message',
-                    'key' => 'data.message',
-                    'searchable' => true,
-                    'formatter' => [
-                        'shorten',
-                        10,
-                    ],
-                ],
-                [
-                    'title' => 'Read',
-                    'key' => 'is_read',
-                    'formatter' => [
-                        'status',
-                    ],
-                ],
-                [
-                    'title' => 'Created Time',
-                    'key' => 'created_at',
-                    'formatter' => [
-                        'date',
-                        'medium',
-                    ],
-                    'searchable' => true,
-                ],
-                [
-                    'title' => 'Actions',
-                    'key' => 'actions',
-                    'sortable' => false,
-                ],
-            ],
-            'inputs' => [
-                [
-                    'name' => 'data->message',
-                    'label' => 'Message',
-                    'type' => 'text',
-                ],
-            ],
+            // 'table_options' => [
+            //     'createOnModal' => true,
+            //     'editOnModal' => true,
+            //     'isRowEditing' => false,
+            //     'rowActionsType' => 'inline',
+            // ],
+            // 'headers' => [
+            //     [
+            //         'title' => 'Message',
+            //         'key' => 'data.message',
+            //         'searchable' => true,
+            //         'formatter' => [
+            //             'shorten',
+            //             10,
+            //         ],
+            //     ],
+            //     [
+            //         'title' => 'Read',
+            //         'key' => 'is_read',
+            //         'formatter' => [
+            //             'status',
+            //         ],
+            //     ],
+            //     [
+            //         'title' => 'Created Time',
+            //         'key' => 'created_at',
+            //         'formatter' => [
+            //             'date',
+            //             'medium',
+            //         ],
+            //         'searchable' => true,
+            //     ],
+            //     [
+            //         'title' => 'Actions',
+            //         'key' => 'actions',
+            //         'sortable' => false,
+            //     ],
+            // ],
+            // 'inputs' => [
+            //     [
+            //         'name' => 'data->message',
+            //         'label' => 'Message',
+            //         'type' => 'text',
+            //     ],
+            // ],
             /** TODO: Add multiple routes for my-notification and company-notification, sample clone routing configuration */
             // 'multiple' => [
             //     'my-notification' => [
