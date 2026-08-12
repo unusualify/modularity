@@ -88,6 +88,16 @@ return [
             // ]
         ],
         'my_notification' => [
+            'form' => [
+                'inputs' => \Modules\SystemNotification\Blueprint\MyNotification\Form\MyNotificationFormInputs::class,
+            ],
+            'index' => [
+                'options' => \Modules\SystemNotification\Blueprint\MyNotification\Index\MyNotificationIndexOptions::class,
+                'columns' => \Modules\SystemNotification\Blueprint\MyNotification\Index\MyNotificationIndexColumns::class,
+                'filters' => \Modules\SystemNotification\Blueprint\MyNotification\Index\MyNotificationIndexFilters::class,
+                'actions' => \Modules\SystemNotification\Blueprint\MyNotification\Index\MyNotificationIndexActions::class,
+                'row_actions' => \Modules\SystemNotification\Blueprint\MyNotification\Index\MyNotificationIndexRowActions::class,
+            ],
             'name' => 'MyNotification',
             'headline' => 'Notifications',
             'url' => 'notifications',
@@ -101,256 +111,256 @@ return [
                 // 'companyNotification' => true
             ],
 
-            'table_options' => [
-                'subtitle' => __('You can easily monitor the entire process by following the notifications.'),
+            // 'table_options' => [
+            //     'subtitle' => __('You can easily monitor the entire process by following the notifications.'),
 
-                'createOnModal' => false,
-                'editOnModal' => true,
-                'isRowEditing' => false,
-                'rowActionsType' => 'inline',
-            ],
-            'table_row_actions' => [
-                'read' => [
-                    'is' => 'v-btn',
-                    'label' => __('Open'),
-                    'icon' => 'mdi-bell-check',
-                    'color' => 'info',
-                    'iconColor' => 'white',
-                    'variant' => 'flat',
-                    'componentProps' => [
-                        'variant' => 'elevated',
-                        'density' => 'compact',
-                    ],
-                    // 'href' => 'notification.read',
-                    // 'target' => '_blank',
-                    'conditions' => [
-                        ['is_read', '=', true],
-                    ],
-                    'modalService' => [
-                        'modalProps' => [
-                            'title' => '$subject',
-                            // 'hasCloseButton' => true,
-                            'persistent' => false,
-                            'noActions' => true,
-                            'titleJustify' => 'center',
-                        ],
-                        'component' => 'ue-recursive-stuff',
-                        'props' => [
-                            'configuration' => Component::makeDiv()
-                                ->setElements([
-                                    Component::makeDiv()
-                                        ->setAttributes([
-                                            'class' => 'd-flex flex-column align-center justify-center',
-                                        ])
-                                        ->setDirectives([
-                                            'html' => '${html_message}$',
-                                        ]),
-                                    Component::makeDiv()
-                                        ->setAttributes([
-                                            'class' => 'd-flex justify-center my-4',
-                                        ])
-                                        ->setElements([
-                                            Component::makeVBtn()
-                                                ->setAttributes([
-                                                    'variant' => 'elevated',
-                                                    'href' => '${redirector}$',
-                                                    'target' => '_blank',
-                                                ])
-                                                ->setElements('${redirector_text}$'),
-                                        ]),
-                                ]),
-                        ],
-                    ],
-                ],
-                'unread' => [
-                    'is' => 'v-btn',
-                    'label' => __('Open'),
-                    'icon' => 'mdi-bell-alert',
-                    'color' => 'orange-darken-1',
-                    'iconColor' => 'white',
-                    'variant' => 'flat',
-                    'componentProps' => [
-                        'variant' => 'elevated',
-                        'density' => 'compact',
-                    ],
-                    'conditions' => [
-                        ['is_read', '!=', true],
-                    ],
-                    'modalService' => [
-                        'modalProps' => [
-                            'title' => '$subject',
-                            // 'hasCloseButton' => true,
-                            'persistent' => false,
-                            'noActions' => true,
-                            'titleJustify' => 'center',
-                        ],
-                        'component' => 'ue-recursive-stuff',
-                        'props' => [
-                            'configuration' => Component::makeDiv()
-                                ->setElements([
-                                    Component::makeDiv()
-                                        ->setAttributes([
-                                            'class' => 'd-flex flex-column align-center justify-center',
-                                        ])
-                                        ->setDirectives([
-                                            'html' => '${html_message}$',
-                                        ]),
-                                    Component::makeDiv()
-                                        ->setAttributes([
-                                            'class' => 'd-flex justify-center my-4',
-                                        ])
-                                        ->setElements([
-                                            Component::makeVBtn()
-                                                ->setAttributes([
-                                                    'variant' => 'elevated',
-                                                    'href' => '${redirector}$',
-                                                    'target' => '_blank',
-                                                ])
-                                                ->setElements('${redirector_text}$'),
-                                        ]),
-                                ]),
-                        ],
-                    ],
-                    'preProcesses' => [
-                        [
-                            'type' => 'put',
-                            'payload' => [
-                                'read_at' => '$(new Date())$',
-                            ],
-                            'conditions' => [
-                                ['is_mine', '=', true],
-                            ],
-                        ],
-                    ],
-                ],
-                // 'delete' => [
-                //     'name' => 'delete',
-                //     'label' => 'Delete',
-                //     'icon' => 'mdi-delete',
-                //     'color' => 'error',
-                //     'variant' => 'outlined',
-                // ]
-            ],
-            'table_actions' => [
-                'bulk-mark-read' => [
-                    'label' => __('Mark All as Read'),
-                    'forceLabel' => true,
-                    'icon' => 'mdi-check',
-                    'color' => 'success',
-                    'variant' => 'outlined',
-                    'density' => 'comfortable',
-                    'href' => 'admin.system.system_notification.my_notification.bulkMarkRead',
-                    'target' => '_self',
-                ],
-            ],
-            'table_filters' => [
-                // 'my-notification' => [
-                //     'name' => 'Mine',
-                //     'slug' => 'my-notification',
-                //     'scope' => 'myNotification',
-                // ],
-                'read' => [
-                    'name' => __('Read'),
-                    'slug' => 'read',
-                    'scope' => 'read',
-                ],
-                'unread' => [
-                    'name' => __('Unread'),
-                    'slug' => 'unread',
-                    'scope' => 'unread',
-                ],
-            ],
-            'headers' => [
-                [
-                    'title' => 'Subject',
-                    'key' => 'subject',
-                    'formatter' => [
-                        'shorten',
-                        30,
-                    ],
-                    'searchKey' => 'data->subject',
-                    'searchable' => true,
-                ],
-                // [
-                //     'title' => 'Message',
-                //     'key' => 'message',
-                //     'formatter' => [
-                //         'shorten',
-                //         30,
-                //     ],
-                //     'searchKey' => 'data->message',
-                //     'searchable' => true,
-                // ],
-                [
-                    'title' => 'Read',
-                    'key' => 'is_read',
-                    'formatter' => [
-                        'status',
-                    ],
-                ],
-                [
-                    'title' => 'Created Time',
-                    'key' => 'created_at',
-                    'formatter' => [
-                        'date',
-                        'long',
-                    ],
-                    'searchable' => true,
-                ],
-                [
-                    'title' => 'Actions',
-                    'key' => 'actions',
-                    'sortable' => false,
-                ],
-            ],
-            'inputs' => [
-                [
-                    'type' => 'text',
-                    'name' => 'message',
-                    'label' => 'Message',
-                    'editable' => 'hidden',
-                    'noSubmit' => true,
-                ],
-                [
-                    'type' => 'preview',
-                    'name' => 'messagePreview',
-                    'previewKey' => 'message',
-                    'creatable' => 'hidden',
-                    'noSubmit' => true,
-                    'default' => null,
-                    'col' => ['cols' => 12],
-                    'configuration' => [
-                        'tag' => 'v-card',
-                        'attributes' => [
-                            'class' => 'py-4 mb-4',
-                            'elevation' => 2,
-                        ],
-                        'slots' => [
-                            'title' => [
-                                'tag' => 'div',
-                                'attributes' => [
-                                    'class' => 'text-body-1',
-                                ],
-                                'elements' => __('Message'),
-                            ],
-                            'prepend' => [
-                                'tag' => 'v-icon',
-                                'attributes' => [
-                                    'icon' => 'mdi-file-document-outline',
-                                    'color' => 'primary',
-                                ],
-                            ],
-                            'text' => [
-                                'tag' => 'div',
-                                'attributes' => [
-                                    'class' => 'font-weight-bold text-wrap pt-2 text-primary',
-                                ],
-                                'elements' => '$messagePreview',
-                            ],
-                        ],
-                    ],
-                ],
-            ],
+            //     'createOnModal' => false,
+            //     'editOnModal' => true,
+            //     'isRowEditing' => false,
+            //     'rowActionsType' => 'inline',
+            // ],
+            // 'table_row_actions' => [
+            //     'read' => [
+            //         'is' => 'v-btn',
+            //         'label' => __('Open'),
+            //         'icon' => 'mdi-bell-check',
+            //         'color' => 'info',
+            //         'iconColor' => 'white',
+            //         'variant' => 'flat',
+            //         'componentProps' => [
+            //             'variant' => 'elevated',
+            //             'density' => 'compact',
+            //         ],
+            // 'href' => 'notification.read',
+            // 'target' => '_blank',
+            //         'conditions' => [
+            //             ['is_read', '=', true],
+            //         ],
+            //         'modalService' => [
+            //             'modalProps' => [
+            //                 'title' => '$subject',
+            //                 //   'hasCloseButton' => true,
+            //                 'persistent' => false,
+            //                 'noActions' => true,
+            //                 'titleJustify' => 'center',
+            //             ],
+            //             'component' => 'ue-recursive-stuff',
+            //             'props' => [
+            //                 'configuration' => Component::makeDiv()
+            //                     ->setElements([
+            //                         Component::makeDiv()
+            //                             ->setAttributes([
+            //                                 'class' => 'd-flex flex-column align-center justify-center',
+            //                             ])
+            //                             ->setDirectives([
+            //                                 'html' => '${html_message}$',
+            //                             ]),
+            //                         Component::makeDiv()
+            //                             ->setAttributes([
+            //                                 'class' => 'd-flex justify-center my-4',
+            //                             ])
+            //                             ->setElements([
+            //                                 Component::makeVBtn()
+            //                                     ->setAttributes([
+            //                                         'variant' => 'elevated',
+            //                                         'href' => '${redirector}$',
+            //                                         'target' => '_blank',
+            //                                     ])
+            //                                     ->setElements('${redirector_text}$'),
+            //                             ]),
+            //                     ]),
+            //             ],
+            //         ],
+            //     ],
+            //     'unread' => [
+            //         'is' => 'v-btn',
+            //         'label' => __('Open'),
+            //         'icon' => 'mdi-bell-alert',
+            //         'color' => 'orange-darken-1',
+            //         'iconColor' => 'white',
+            //         'variant' => 'flat',
+            //         'componentProps' => [
+            //             'variant' => 'elevated',
+            //             'density' => 'compact',
+            //         ],
+            //         'conditions' => [
+            //             ['is_read', '!=', true],
+            //         ],
+            //         'modalService' => [
+            //             'modalProps' => [
+            //                 'title' => '$subject',
+            //                 //   'hasCloseButton' => true,
+            //                 'persistent' => false,
+            //                 'noActions' => true,
+            //                 'titleJustify' => 'center',
+            //             ],
+            //             'component' => 'ue-recursive-stuff',
+            //             'props' => [
+            //                 'configuration' => Component::makeDiv()
+            //                     ->setElements([
+            //                         Component::makeDiv()
+            //                             ->setAttributes([
+            //                                 'class' => 'd-flex flex-column align-center justify-center',
+            //                             ])
+            //                             ->setDirectives([
+            //                                 'html' => '${html_message}$',
+            //                             ]),
+            //                         Component::makeDiv()
+            //                             ->setAttributes([
+            //                                 'class' => 'd-flex justify-center my-4',
+            //                             ])
+            //                             ->setElements([
+            //                                 Component::makeVBtn()
+            //                                     ->setAttributes([
+            //                                         'variant' => 'elevated',
+            //                                         'href' => '${redirector}$',
+            //                                         'target' => '_blank',
+            //                                     ])
+            //                                     ->setElements('${redirector_text}$'),
+            //                             ]),
+            //                     ]),
+            //             ],
+            //         ],
+            //         'preProcesses' => [
+            //             [
+            //                 'type' => 'put',
+            //                 'payload' => [
+            //                     'read_at' => '$(new Date())$',
+            //                 ],
+            //                 'conditions' => [
+            //                     ['is_mine', '=', true],
+            //                 ],
+            //             ],
+            //         ],
+            //     ],
+            // 'delete' => [
+            //     'name' => 'delete',
+            //     'label' => 'Delete',
+            //     'icon' => 'mdi-delete',
+            //     'color' => 'error',
+            //     'variant' => 'outlined',
+            // ]
+            // ],
+            // 'table_actions' => [
+            //     'bulk-mark-read' => [
+            //         'label' => __('Mark All as Read'),
+            //         'forceLabel' => true,
+            //         'icon' => 'mdi-check',
+            //         'color' => 'success',
+            //         'variant' => 'outlined',
+            //         'density' => 'comfortable',
+            //         'href' => 'admin.system.system_notification.my_notification.bulkMarkRead',
+            //         'target' => '_self',
+            //     ],
+            // ],
+            // 'table_filters' => [
+            // 'my-notification' => [
+            //     'name' => 'Mine',
+            //     'slug' => 'my-notification',
+            //     'scope' => 'myNotification',
+            // ],
+            //     'read' => [
+            //         'name' => __('Read'),
+            //         'slug' => 'read',
+            //         'scope' => 'read',
+            //     ],
+            //     'unread' => [
+            //         'name' => __('Unread'),
+            //         'slug' => 'unread',
+            //         'scope' => 'unread',
+            //     ],
+            // ],
+            // 'headers' => [
+            //     [
+            //         'title' => 'Subject',
+            //         'key' => 'subject',
+            //         'formatter' => [
+            //             'shorten',
+            //             30,
+            //         ],
+            //         'searchKey' => 'data->subject',
+            //         'searchable' => true,
+            //     ],
+            // [
+            //     'title' => 'Message',
+            //     'key' => 'message',
+            //     'formatter' => [
+            //         'shorten',
+            //         30,
+            //     ],
+            //     'searchKey' => 'data->message',
+            //     'searchable' => true,
+            // ],
+            //     [
+            //         'title' => 'Read',
+            //         'key' => 'is_read',
+            //         'formatter' => [
+            //             'status',
+            //         ],
+            //     ],
+            //     [
+            //         'title' => 'Created Time',
+            //         'key' => 'created_at',
+            //         'formatter' => [
+            //             'date',
+            //             'long',
+            //         ],
+            //         'searchable' => true,
+            //     ],
+            //     [
+            //         'title' => 'Actions',
+            //         'key' => 'actions',
+            //         'sortable' => false,
+            //     ],
+            // ],
+            // 'inputs' => [
+            //     [
+            //         'type' => 'text',
+            //         'name' => 'message',
+            //         'label' => 'Message',
+            //         'editable' => 'hidden',
+            //         'noSubmit' => true,
+            //     ],
+            //     [
+            //         'type' => 'preview',
+            //         'name' => 'messagePreview',
+            //         'previewKey' => 'message',
+            //         'creatable' => 'hidden',
+            //         'noSubmit' => true,
+            //         'default' => null,
+            //         'col' => ['cols' => 12],
+            //         'configuration' => [
+            //             'tag' => 'v-card',
+            //             'attributes' => [
+            //                 'class' => 'py-4 mb-4',
+            //                 'elevation' => 2,
+            //             ],
+            //             'slots' => [
+            //                 'title' => [
+            //                     'tag' => 'div',
+            //                     'attributes' => [
+            //                         'class' => 'text-body-1',
+            //                     ],
+            //                     'elements' => __('Message'),
+            //                 ],
+            //                 'prepend' => [
+            //                     'tag' => 'v-icon',
+            //                     'attributes' => [
+            //                         'icon' => 'mdi-file-document-outline',
+            //                         'color' => 'primary',
+            //                     ],
+            //                 ],
+            //                 'text' => [
+            //                     'tag' => 'div',
+            //                     'attributes' => [
+            //                         'class' => 'font-weight-bold text-wrap pt-2 text-primary',
+            //                     ],
+            //                     'elements' => '$messagePreview',
+            //                 ],
+            //             ],
+            //         ],
+            //     ],
+            // ],
         ],
     ],
 ];
