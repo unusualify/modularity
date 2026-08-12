@@ -61,7 +61,7 @@ return [
                     'type' => 'text',
                 ],
             ],
-        /** TODO: Add multiple routes for my-notification and company-notification, sample clone routing configuration */
+            /** TODO: Add multiple routes for my-notification and company-notification, sample clone routing configuration */
             // 'multiple' => [
             //     'my-notification' => [
             //         'url' => 'my-notifications',
