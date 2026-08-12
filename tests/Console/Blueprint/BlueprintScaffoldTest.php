@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace Unusualify\Modularous\Tests\Console\Blueprint;
 
+use Illuminate\Console\Command as Console;
 use Illuminate\Filesystem\Filesystem;
+use Mockery;
 use Unusualify\Modularous\Console\Blueprint\BlueprintClassWriter;
 use Unusualify\Modularous\Console\Blueprint\BlueprintConfigPersister;
 use Unusualify\Modularous\Console\Blueprint\BlueprintConfigSourceExtractor;
 use Unusualify\Modularous\Console\Blueprint\BlueprintFieldCatalog;
 use Unusualify\Modularous\Console\Blueprint\BlueprintPhpArrayFormatter;
 use Unusualify\Modularous\Facades\Modularous;
+use Unusualify\Modularous\Generators\RouteGenerator;
 use Unusualify\Modularous\Module;
 use Unusualify\Modularous\Tests\Support\IsolatedTestModules;
 use Unusualify\Modularous\Tests\TestModulesCase;
@@ -291,5 +294,184 @@ PHP);
             ->assertExitCode(0);
 
         $this->assertFileDoesNotExist($target);
+    }
+
+    /** @test */
+    public function it_skips_blueprint_driver_meta_when_extracting_payload_source(): void
+    {
+        $tmp = sys_get_temp_dir() . '/modularous-blueprint-meta-skip-' . uniqid() . '.php';
+        file_put_contents($tmp, <<<'PHP'
+<?php
+
+return [
+    'routes' => [
+        'test' => [
+            'blueprint' => [
+                'inputs' => [
+                    'driver' => 'class',
+                    'class' => 'Modules\\Test\\Blueprint\\Test\\Form\\TestFormInputs',
+                ],
+                'headers' => [
+                    'driver' => 'class',
+                    'class' => 'Modules\\Test\\Blueprint\\Test\\Index\\TestIndexColumns',
+                ],
+            ],
+            'headers' => [
+                ['title' => 'Name', 'key' => 'name'],
+            ],
+            'inputs' => [
+                ['type' => 'text', 'name' => 'name'],
+            ],
+        ],
+    ],
+];
+PHP);
+
+        try {
+            $extractor = new BlueprintConfigSourceExtractor;
+            $inputs = $extractor->extract($tmp, 'test', 'inputs', 'form.inputs');
+            $headers = $extractor->extract($tmp, 'test', 'headers', 'index.columns');
+
+            $this->assertNotNull($inputs);
+            $this->assertStringContainsString("'name' => 'name'", (string) $inputs);
+            $this->assertStringNotContainsString("'driver'", (string) $inputs);
+
+            $this->assertNotNull($headers);
+            $this->assertStringContainsString("'key' => 'name'", (string) $headers);
+            $this->assertStringNotContainsString("'driver'", (string) $headers);
+        } finally {
+            @unlink($tmp);
+        }
+    }
+
+    /** @test */
+    public function route_generator_scaffolds_blueprint_payloads_and_nested_class_leaves(): void
+    {
+        /** @var Module $module */
+        $module = Modularous::findOrFail('TestModule');
+        $configPath = $module->getConfigPath();
+        $backup = (string) file_get_contents($configPath);
+
+        $console = Mockery::mock(Console::class);
+        $console->shouldReceive('info')->zeroOrMoreTimes();
+        $console->shouldReceive('warn')->zeroOrMoreTimes();
+        $console->shouldReceive('line')->zeroOrMoreTimes();
+
+        $filesystem = new Filesystem;
+        $writer = new BlueprintClassWriter($filesystem);
+
+        $paths = [
+            $writer->path($module, 'Item', 'inputs'),
+            $writer->path($module, 'Item', 'columns'),
+            $writer->path($module, 'Item', 'options'),
+        ];
+
+        foreach ($paths as $path) {
+            if (is_file($path)) {
+                unlink($path);
+            }
+        }
+
+        try {
+            $generator = with(new RouteGenerator('Item'))
+                ->setFilesystem($filesystem)
+                ->setConfig($this->app['config'])
+                ->setConsole($console)
+                ->setModule('TestModule')
+                ->setSchema('name:string')
+                ->setUseDefaults(false)
+                ->setPresentation('class')
+                ->setForce(true);
+
+            $generator->generatePresentationClasses();
+
+            foreach ($paths as $path) {
+                $this->assertFileExists($path);
+                $body = (string) file_get_contents($path);
+                $this->assertStringNotContainsString("'driver'", $body);
+                $this->assertStringNotContainsString("'class' =>", $body);
+            }
+
+            $inputsBody = (string) file_get_contents($paths[0]);
+            $this->assertStringContainsString("'name'", $inputsBody);
+
+            $columnsBody = (string) file_get_contents($paths[1]);
+            $this->assertStringContainsString("'key'", $columnsBody);
+
+            $optionsBody = (string) file_get_contents($paths[2]);
+            $this->assertStringContainsString("'createOnModal'", $optionsBody);
+
+            $config = (string) file_get_contents($configPath);
+            $this->assertStringContainsString('ItemIndexColumns::class', $config);
+            $this->assertStringContainsString('ItemIndexOptions::class', $config);
+            $this->assertStringContainsString('ItemFormInputs::class', $config);
+            $this->assertStringContainsString("'index' => [", $config);
+            $this->assertStringContainsString("'form' => [", $config);
+            $this->assertStringNotContainsString("'blueprint' =>", $config);
+        } finally {
+            file_put_contents($configPath, $backup);
+            foreach ($paths as $path) {
+                if (is_file($path)) {
+                    unlink($path);
+                }
+            }
+        }
+    }
+
+    /** @test */
+    public function route_generator_update_config_wires_nested_fqcn_without_legacy_blueprint_meta(): void
+    {
+        /** @var Module $module */
+        $module = Modularous::findOrFail('TestModule');
+        $configPath = $module->getConfigPath();
+        $backup = (string) file_get_contents($configPath);
+
+        // Start from a config without the target route so updateConfigFile appends it.
+        file_put_contents($configPath, <<<'PHP'
+<?php
+
+return [
+    'name' => 'TestModule',
+    'system_prefix' => false,
+    'group' => 'test',
+    'headline' => 'Test Module',
+    'routes' => [
+    ],
+];
+PHP);
+
+        $console = Mockery::mock(Console::class);
+        $console->shouldReceive('info')->zeroOrMoreTimes();
+        $console->shouldReceive('warn')->zeroOrMoreTimes();
+        $console->shouldReceive('line')->zeroOrMoreTimes();
+
+        try {
+            $generator = with(new RouteGenerator('Widget'))
+                ->setFilesystem(new Filesystem)
+                ->setConfig($this->app['config'])
+                ->setConsole($console)
+                ->setModule('TestModule')
+                ->setSchema('name:string')
+                ->setUseDefaults(false)
+                ->setPresentation('class');
+
+            $this->assertTrue((bool) $generator->updateConfigFile());
+
+            $config = (string) file_get_contents($configPath);
+            $this->assertStringContainsString("'widget'", $config);
+            $this->assertStringContainsString("'index'", $config);
+            $this->assertStringContainsString("'form'", $config);
+            $this->assertStringContainsString('WidgetIndexColumns', $config);
+            $this->assertStringContainsString('WidgetFormInputs', $config);
+            $this->assertStringContainsString('WidgetIndexOptions', $config);
+            $this->assertStringNotContainsString("'blueprint'", $config);
+            $this->assertStringNotContainsString("'driver'", $config);
+            // Flats are not the primary wiring for class presentation scaffolds.
+            $this->assertStringNotContainsString("'headers' =>", $config);
+            $this->assertStringNotContainsString("'inputs' => [", $config);
+            $this->assertStringNotContainsString("'table_options' =>", $config);
+        } finally {
+            file_put_contents($configPath, $backup);
+        }
     }
 }

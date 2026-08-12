@@ -16,6 +16,9 @@ use Nwidart\Modules\FileRepository;
 use Nwidart\Modules\Support\Config\GenerateConfigReader;
 use Nwidart\Modules\Support\Config\GeneratorPath;
 use Nwidart\Modules\Support\Stub;
+use Unusualify\Modularous\Console\Blueprint\BlueprintClassWriter;
+use Unusualify\Modularous\Console\Blueprint\BlueprintConfigPersister;
+use Unusualify\Modularous\Console\Blueprint\BlueprintFieldCatalog;
 use Unusualify\Modularous\Entities\Enums\Permission;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\LaravelServiceProvider;
@@ -947,6 +950,9 @@ class RouteGenerator extends Generator
 
     /**
      * Scaffold ModuleRoute Blueprint classes when presentation=class.
+     *
+     * Writes FormInputs / IndexColumns / IndexOptions with real payload arrays
+     * (never driver meta), then persists canonical nested `index` / `form` class leaves.
      */
     public function generatePresentationClasses(): void
     {
@@ -954,12 +960,58 @@ class RouteGenerator extends Generator
             return;
         }
 
-        $this->console->call('modularous:make:blueprint', [
-            'module' => $this->module->getStudlyName(),
-            'route' => $this->getName(),
-            '--from-config' => true,
-            '--force' => (bool) $this->force,
-        ]);
+        $studly = $this->getStudlyNameReplacement();
+        $force = (bool) $this->force;
+        $writer = new BlueprintClassWriter($this->filesystem);
+
+        $seeds = [
+            'inputs' => $this->getInputs(),
+            'columns' => $this->getHeaders(),
+            'options' => static::$defaultTableOptions,
+        ];
+
+        $wires = [];
+        foreach ($seeds as $field => $items) {
+            $path = $writer->write($this->module, $studly, $field, $items, $force);
+            if ($path !== null) {
+                $this->console->info("Created Blueprint: {$path}");
+            } else {
+                $this->console->warn(
+                    "Skipped existing {$studly}" . BlueprintFieldCatalog::get($field)['class_suffix']
+                );
+            }
+
+            $def = BlueprintFieldCatalog::get($field);
+            $wires[] = [
+                'nested' => $def['nested_key'],
+                'fqcn' => $writer->fqcn($this->module, $studly, $field),
+                'legacy' => $def['legacy_config_key'],
+            ];
+        }
+
+        $configPath = $this->module->getConfigPath();
+        if (! $this->filesystem->exists($configPath)) {
+            return;
+        }
+
+        $result = (new BlueprintConfigPersister)->persist(
+            $configPath,
+            $this->getSnakeCase($this->getName()),
+            $wires,
+            commentLegacyFlats: true,
+        );
+
+        if (! $result['ok']) {
+            $this->console->warn($result['message']);
+
+            return;
+        }
+
+        if ($result['content'] !== '' && $result['commented_flats'] !== []) {
+            $this->console->line(
+                'Commented legacy flats: ' . implode(', ', $result['commented_flats'])
+            );
+        }
     }
 
     /**
@@ -1028,28 +1080,21 @@ class RouteGenerator extends Generator
                 'route_name' => $snakeCase,
                 'icon' => '$submodule', // '$modules',
                 'title_column_key' => $titleColumnKey,
-                'table_options' => static::$defaultTableOptions,
             ];
 
             if ($this->getPresentation() === 'class') {
-                $folder = (string) modularousConfig('module_route_presentation.path', 'Blueprint');
-                $folderNs = str_replace('/', '\\', trim($folder, '/\\'));
-                $baseNs = $this->module->getBaseNamespace() . '\\' . $folderNs . '\\' . $studlyName;
-
-                $route_array['blueprint'] = [
-                    'inputs' => [
-                        'driver' => 'class',
-                        'class' => $baseNs . '\\Form\\' . $studlyName . 'FormInputs',
-                    ],
-                    'headers' => [
-                        'driver' => 'class',
-                        'class' => $baseNs . '\\Index\\' . $studlyName . 'IndexColumns',
-                    ],
+                // Canonical nested class leaves (ADR). Payloads live in Blueprint classes;
+                // generatePresentationClasses() writes those classes + upgrades to ::class syntax.
+                $writer = new BlueprintClassWriter($this->filesystem);
+                $route_array['index'] = [
+                    'columns' => $writer->fqcn($this->module, $studlyName, 'columns'),
+                    'options' => $writer->fqcn($this->module, $studlyName, 'options'),
                 ];
-                // Keep inline arrays as fallback until classes are loaded / for inspect.
-                $route_array['headers'] = $headers;
-                $route_array['inputs'] = $inputs;
+                $route_array['form'] = [
+                    'inputs' => $writer->fqcn($this->module, $studlyName, 'inputs'),
+                ];
             } else {
+                $route_array['table_options'] = static::$defaultTableOptions;
                 $route_array['headers'] = $headers;
                 $route_array['inputs'] = $inputs;
             }

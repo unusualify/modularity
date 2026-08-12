@@ -36,15 +36,67 @@ final class BlueprintConfigSourceExtractor
             $surfaceHit = $this->locateKeyedArray($routeLiteral, $surface);
             if ($surfaceHit !== null) {
                 $nestedHit = $this->locateKeyedArray($surfaceHit['literal'], $leaf);
-                if ($nestedHit !== null) {
+                // Nested class / driver meta is wiring, not a seedable payload.
+                if ($nestedHit !== null && ! $this->literalLooksLikeProviderMeta($nestedHit['literal'])) {
                     return $this->normalizeLiteral($nestedHit['literal']);
                 }
             }
         }
 
-        $flat = $this->locateKeyedArray($routeLiteral, $legacyKey);
+        // Prefer a real payload array. Skip legacy `blueprint.inputs` / `blueprint.headers`
+        // driver-meta blocks that appear before flat `inputs` / `headers` in source order.
+        $flat = $this->locateKeyedPayloadArray($routeLiteral, $legacyKey);
 
-        return $flat !== null ? $this->normalizeLiteral($flat['literal']) : null;
+        return $flat !== null ? $this->normalizeLiteral($flat) : null;
+    }
+
+    /**
+     * Find `'key' => [ … ]` that is a field payload, not `{ driver, class }` meta.
+     */
+    public function locateKeyedPayloadArray(string $haystack, string $key): ?string
+    {
+        $pattern = '/[\'"]' . preg_quote($key, '/') . '[\'"]\s*=>\s*/';
+        $offset = 0;
+
+        while (preg_match($pattern, $haystack, $match, PREG_OFFSET_CAPTURE, $offset) === 1) {
+            $matchStart = $match[0][1];
+            $matchLen = strlen($match[0][0]);
+
+            if ($this->isInLineComment($haystack, $matchStart)) {
+                $offset = $matchStart + $matchLen;
+
+                continue;
+            }
+
+            $valueStart = $matchStart + $matchLen;
+            $literal = $this->readArrayLiteral($haystack, $valueStart);
+            if ($literal !== null && ! $this->literalLooksLikeProviderMeta($literal)) {
+                return $literal;
+            }
+
+            $offset = $matchStart + $matchLen;
+        }
+
+        return null;
+    }
+
+    /**
+     * True when a value literal is provider/driver meta, not a field payload array.
+     */
+    private function literalLooksLikeProviderMeta(string $literal): bool
+    {
+        $trimmed = trim($literal);
+
+        if (str_ends_with($trimmed, '::class')) {
+            return true;
+        }
+
+        // `{ 'driver' => …, 'class' => … }` (order of keys may vary).
+        if (preg_match('/^\s*\[\s*[\'"](?:driver|class)[\'"]\s*=>/s', $trimmed) === 1) {
+            return true;
+        }
+
+        return preg_match('/^\s*array\s*\(\s*[\'"](?:driver|class)[\'"]\s*=>/s', $trimmed) === 1;
     }
 
     /**

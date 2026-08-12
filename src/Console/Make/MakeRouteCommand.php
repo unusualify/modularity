@@ -31,7 +31,7 @@ class MakeRouteCommand extends BaseCommand
         {--fix : Fixes the model config errors}
         {--table-name= : Sets table name for custom model}
         {--no-migration : Don\'t create migration file}
-        {--presentation=config : Route presentation source (config|class)}
+        {--presentation=class : Route presentation source (config|class)}
         {--test : Test the Route Generator}';
 
     /**
@@ -114,7 +114,7 @@ class MakeRouteCommand extends BaseCommand
             ->setFix($this->option('fix'))
             ->setTest($this->option('test'))
             ->setTableName($this->option('table-name'))
-            ->setPresentation($this->option('presentation') ?? 'config')
+            ->setPresentation($this->option('presentation') ?? 'class')
             ->generate();
 
         if ($code === E_ERROR) {
