@@ -68,7 +68,7 @@ Blueprint/{Route}/Index/{Route}IndexOptions.php
 
 ### PressRelease (app extract)
 
-`modules/PressRelease/Blueprint/{Route}/{Index|Form}/*` holds extracted providers (`__()` preserved). Config wires nested class leaves **and** keeps legacy flat arrays until the host app runs Modularous with ModuleRoute presentation (then flat keys can be deleted).
+`modules/PressRelease/Blueprint/{Route}/{Index|Form}/*` holds extracted providers (`__()` preserved). Config wires nested class leaves **and** keeps legacy flat arrays until the host app runs Modularous with ModuleRoute presentation (then flat keys can be deleted). Covers inputs/columns/options/filters/actions/row_actions/with/form with/appends/actions for PressRelease (+ package/addon/payment subsets).
 
 ```php
 'press_release' => [

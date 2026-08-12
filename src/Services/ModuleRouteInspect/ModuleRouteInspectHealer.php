@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Unusualify\Modularous\Services\ModuleRouteInspect;
 
 use Illuminate\Support\Facades\Artisan;
+use Unusualify\Modularous\Services\ModuleRouteInspect\Contracts\ModuleRouteInspectSource;
 
 /**
  * Runs allowlisted remake commands for inspect findings (opt-in heal path only).
@@ -13,9 +14,13 @@ use Illuminate\Support\Facades\Artisan;
  */
 final class ModuleRouteInspectHealer
 {
+    /**
+     * @param  (callable(string, array<string, mixed>): array{0: int, 1: string})|null  $artisanRunner
+     */
     public function __construct(
         private readonly ModuleRouteInspectRemedyMapper $mapper,
-        private readonly ModuleRouteInspector $inspector,
+        private readonly ModuleRouteInspectSource $inspector,
+        private $artisanRunner = null,
     ) {
     }
 
@@ -86,8 +91,13 @@ final class ModuleRouteInspectHealer
         // Drop numeric keys if named present
         unset($parameters['0'], $parameters['1']);
 
-        $exitCode = Artisan::call($remedy->command, $parameters);
-        $output = Artisan::output();
+        $runner = $this->artisanRunner ?? static function (string $command, array $parameters): array {
+            $exitCode = Artisan::call($command, $parameters);
+
+            return [$exitCode, Artisan::output()];
+        };
+
+        [$exitCode, $output] = $runner($remedy->command, $parameters);
 
         return [
             'ok' => $exitCode === 0,

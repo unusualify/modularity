@@ -8,13 +8,14 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Module;
 use Unusualify\Modularous\ModuleRoute;
+use Unusualify\Modularous\Services\ModuleRouteInspect\Contracts\ModuleRouteInspectSource;
 
 /**
  * Inspects module routes for enable/disable status and feature trait wiring.
  *
  * Findings are produced here; route data comes from {@see ModuleRoute}.
  */
-final class ModuleRouteInspector
+final class ModuleRouteInspector implements ModuleRouteInspectSource
 {
     public function __construct(
         private readonly FeatureDetector $featureDetector,

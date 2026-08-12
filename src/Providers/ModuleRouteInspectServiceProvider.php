@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Unusualify\Modularous\Providers;
 
+use Unusualify\Modularous\Services\ModuleRouteInspect\Contracts\ModuleRouteInspectSource;
 use Unusualify\Modularous\Services\ModuleRouteInspect\Contracts\ModuleRouteStatusStoreInterface;
 use Unusualify\Modularous\Services\ModuleRouteInspect\FeatureDetector;
 use Unusualify\Modularous\Services\ModuleRouteInspect\ModuleRouteInspectHealer;
@@ -33,6 +34,7 @@ class ModuleRouteInspectServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(ModuleRouteInspector::class);
+        $this->app->alias(ModuleRouteInspector::class, ModuleRouteInspectSource::class);
     }
 
     /**
@@ -46,6 +48,7 @@ class ModuleRouteInspectServiceProvider extends ServiceProvider
             ModuleRouteInspectHealer::class,
             ModuleRouteStatusStoreInterface::class,
             ModuleRouteInspector::class,
+            ModuleRouteInspectSource::class,
         ];
     }
 }
