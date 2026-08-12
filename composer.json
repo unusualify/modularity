@@ -201,7 +201,7 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "config": {
-        "process-timeout": 300,
+        "process-timeout": 900,
         "sort-packages": true,
         "preferred-install": "dist",
         "optimize-autoloader": true,
