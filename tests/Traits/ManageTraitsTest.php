@@ -99,4 +99,23 @@ class ManageTraitsTest extends TestCase
 
         $this->assertEquals('TestModel', $this->target->model());
     }
+
+    /** @test */
+    public function it_resolves_inputs_via_blueprint_when_flat_inputs_absent()
+    {
+        $module = Mockery::mock(Module::class);
+        $module->shouldReceive('resolveRouteBlueprintField')
+            ->once()
+            ->with('TestRoute', 'inputs')
+            ->andReturn([
+                ['name' => 'from_blueprint', 'type' => 'text'],
+            ]);
+
+        Modularous::shouldReceive('find')->with('TestModule')->once()->andReturn($module);
+
+        $inputs = $this->target->inputs();
+
+        $this->assertArrayHasKey('from_blueprint', $inputs);
+        $this->assertEquals('text', $inputs['from_blueprint']['type']);
+    }
 }

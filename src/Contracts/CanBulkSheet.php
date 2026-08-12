@@ -8,6 +8,9 @@ use Unusualify\Modularous\Http\Controllers\Traits\ManageBulkSheet;
  * Panel controller contract: CSV bulk sheet UI/routes ({@see ManageBulkSheet})
  * plus import/export column schema, validation, persistence, and streaming export.
  *
+ * Declarative sheet options may live in route config `bulk_sheet` (inline array or
+ * Blueprint class `{Route}BulkSheet`). {@see ManageBulkSheet::bulkSheetRouteConfig()}.
+ *
  * {@see ManageBulkSheet::bulkSheetToolKey()} defaults from module/route
  * names unless `tool_key` is set in the route `bulk_sheet` config.
  */
@@ -15,6 +18,7 @@ interface CanBulkSheet
 {
     /**
      * Human-readable columns for admin “sheet” / tool UI and export headers.
+     * Prefer `bulk_sheet.fields` from Blueprint/config when present.
      *
      * @return list<array{key: string, label: string, required?: bool, aliases?: list<string>}>
      */

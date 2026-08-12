@@ -8,17 +8,20 @@ use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Unusualify\Modularous\Console\BaseCommand;
+use Unusualify\Modularous\Console\Blueprint\Concerns\ReportsBlueprintPlan;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Module;
 
 /**
  * Create one ModuleRoute Blueprint provider class.
  *
- * @example php artisan modularous:make:blueprint:field Cms StyleSheet columns
+ * @example php artisan modularous:make:blueprint:field Cms StyleSheet columns --dry-run
  * @example php artisan modularous:make:blueprint:field PressRelease PressRelease form_actions --from-config
  */
 class MakeBlueprintFieldCommand extends BaseCommand
 {
+    use ReportsBlueprintPlan;
+
     protected $name = 'modularous:make:blueprint:field';
 
     protected $aliases = [
@@ -48,6 +51,7 @@ class MakeBlueprintFieldCommand extends BaseCommand
         $fieldArg = (string) $this->argument('field');
         $force = (bool) $this->option('force');
         $fromConfig = (bool) $this->option('from-config');
+        $dryRun = (bool) $this->option('dry-run');
 
         try {
             $def = BlueprintFieldCatalog::get($fieldArg);
@@ -58,16 +62,49 @@ class MakeBlueprintFieldCommand extends BaseCommand
             return E_ERROR;
         }
 
-        $items = [];
-        if ($fromConfig) {
-            $route = $module->route($routeStudly);
-            $config = $route?->config() ?? $module->getRouteConfig($routeStudly);
-            $raw = is_array($config) ? ($config[$def['legacy_config_key']] ?? []) : [];
-            $items = is_array($raw) ? $raw : [];
-        }
+        /** @var string $fieldKey */
+        $route = $module->route($routeStudly);
+        $config = $route?->config() ?? $module->getRouteConfig($routeStudly);
+        $items = $this->resolveBlueprintSeed(
+            $module,
+            $routeStudly,
+            $fieldKey,
+            is_array($config) ? $config : [],
+            $fromConfig
+        );
 
         $writer = new BlueprintClassWriter($this->filesystem);
-        $path = $writer->write($module, $routeStudly, (string) $fieldKey, $items, $force);
+        $row = $this->blueprintPlanRow(
+            $writer,
+            $module,
+            $routeStudly,
+            $fieldKey,
+            $items,
+            $force,
+            $fromConfig
+        );
+
+        $this->printBlueprintPlan([$row], $dryRun);
+
+        if ($dryRun) {
+            if ($row['action'] === 'skip') {
+                $this->warn('Nothing to write (already exist? use --force).');
+
+                return E_ERROR;
+            }
+
+            $this->info('[dry-run] 1 file would be written.');
+
+            return 0;
+        }
+
+        if ($row['action'] === 'skip') {
+            $this->warn('Skipped existing ' . $routeStudly . $def['class_suffix'] . ' (use --force).');
+
+            return E_ERROR;
+        }
+
+        $path = $writer->write($module, $routeStudly, $fieldKey, $items, $force);
 
         if ($path === null) {
             $this->warn('Skipped existing ' . $routeStudly . $def['class_suffix'] . ' (use --force).');
@@ -76,7 +113,7 @@ class MakeBlueprintFieldCommand extends BaseCommand
         }
 
         $this->info("Created: {$path}");
-        $this->line('FQCN: ' . $writer->fqcn($module, $routeStudly, (string) $fieldKey));
+        $this->line('FQCN: ' . $row['fqcn']);
 
         return 0;
     }
@@ -95,6 +132,7 @@ class MakeBlueprintFieldCommand extends BaseCommand
         return [
             ['force', 'f', InputOption::VALUE_NONE, 'Overwrite an existing Blueprint class.'],
             ['from-config', null, InputOption::VALUE_NONE, 'Seed class body from legacy config array.'],
+            ['dry-run', null, InputOption::VALUE_NONE, 'Show planned Blueprint write without creating the file.'],
         ];
     }
 }

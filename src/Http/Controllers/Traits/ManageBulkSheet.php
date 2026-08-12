@@ -92,23 +92,18 @@ trait ManageBulkSheet
     }
 
     /**
-     * `bulk_sheet` block from the current submodule route config.
+     * `bulk_sheet` block from the current submodule route config (inline array or Blueprint class).
      *
      * <pre>
      * 'bulk_sheet' => [
      *     'export_download_filename' => 'redirects-export.csv',
      *     'step_up_ability' => 'redirect.bulk_import',
-     *     'preview_table_columns' => [
-     *         ['title' => 'Line', 'key' => 'line', 'width' => '72px'],
-     *         ['title' => 'OK', 'key' => 'valid', 'sortable' => false],
-     *         ['title' => 'Action', 'key' => 'action'],
-     *         ['title' => 'Locale', 'key' => 'locale'],
-     *         ['title' => 'From', 'key' => 'from_path'],
-     *         ['title' => 'To', 'key' => 'to_path'],
-     *         ['title' => 'Errors', 'key' => 'errors', 'sortable' => false],
-     *         ['title' => 'Warnings', 'key' => 'warnings', 'sortable' => false],
-     *     ],
+     *     'preview_table_columns' => [ ... ],
+     *     'fields' => [ ... ], // optional; used by {@see bulkSheetFields()} when present
      * ]
+     *
+     * // or Blueprint:
+     * 'bulk_sheet' => \Modules\Cms\Blueprint\Redirect\BulkSheet\RedirectBulkSheet::class,
      * </pre>
      *
      * @return array<string, mixed>
@@ -119,7 +114,7 @@ trait ManageBulkSheet
             return [];
         }
 
-        return (array) ($this->module->getRawRouteConfig($this->routeName)['bulk_sheet'] ?? []);
+        return $this->module->resolveRouteBlueprintField((string) $this->routeName, 'bulk_sheet');
     }
 
     /**

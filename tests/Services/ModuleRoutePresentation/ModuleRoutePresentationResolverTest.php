@@ -361,4 +361,57 @@ PHP);
 
         $this->assertSame([], $route->headers());
     }
+
+    /** @test */
+    public function mis_nested_blueprint_form_inputs_class_still_resolves(): void
+    {
+        /** @var Module $module */
+        $module = Modularous::findOrFail('TestModule');
+
+        $formDir = $module->getDirectoryPath('Blueprint/Item/Form');
+        if (! is_dir($formDir)) {
+            mkdir($formDir, 0755, true);
+        }
+
+        $inputsFqcn = 'TestModules\\TestModule\\Blueprint\\Item\\Form\\ItemFormInputsMisNested';
+        file_put_contents($formDir . '/ItemFormInputsMisNested.php', <<<'PHP'
+<?php
+namespace TestModules\TestModule\Blueprint\Item\Form;
+use Unusualify\Modularous\Contracts\ModuleRoute\ModuleRouteInputsProvider;
+use Unusualify\Modularous\ModuleRoute;
+final class ItemFormInputsMisNested implements ModuleRouteInputsProvider {
+    public function __invoke(ModuleRoute $route): array {
+        return [['name' => 'from_blueprint_form', 'type' => 'text', 'label' => 'Compat']];
+    }
+}
+PHP);
+        require_once $formDir . '/ItemFormInputsMisNested.php';
+
+        $existing = $module->getRouteConfig('Item');
+        $module->setConfig(array_merge(is_array($existing) ? $existing : [], [
+            // Intentionally wrong ADR shape (compat path): blueprint.form.inputs
+            'blueprint' => [
+                'form' => [
+                    'inputs' => $inputsFqcn,
+                ],
+            ],
+        ]), 'routes.item');
+        // Ensure flat / canonical leaves are absent for this case.
+        $module->setConfig(null, 'routes.item.inputs');
+        $module->setConfig(null, 'routes.item.form');
+
+        $route = new ModuleRoute(
+            $module,
+            'Item',
+            app(ModuleRouteStatusStoreInterface::class),
+            app(FeatureDetector::class),
+        );
+
+        $this->assertSame('class', $route->presentationDriver('inputs'));
+        $this->assertSame('from_blueprint_form', $route->inputs()[0]['name'] ?? null);
+        $this->assertSame(
+            $inputsFqcn,
+            app(ModuleRoutePresentationResolver::class)->resolveClass($route, 'inputs')
+        );
+    }
 }

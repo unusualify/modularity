@@ -160,34 +160,49 @@ trait ManageModuleRoute
     public function getRouteInputs(): array
     {
         if ($this->moduleRoute instanceof ModuleRoute) {
-            $inputs = $this->moduleRoute->rawConfig('inputs', []);
-
-            return is_array($inputs) ? $inputs : [];
+            return $this->moduleRoute->inputs();
         }
 
-        return ! empty($conf = $this->getRouteConfig()) ? ($conf['inputs'] ?? []) : [];
+        $module = $this->getModule();
+        $routeName = $this->getRouteName();
+
+        if ($module && is_string($routeName) && $routeName !== '') {
+            return $module->resolveRouteBlueprintField($routeName, 'inputs');
+        }
+
+        return [];
     }
 
     public function getRouteHeaders(): array
     {
         if ($this->moduleRoute instanceof ModuleRoute) {
-            $headers = $this->moduleRoute->rawConfig('headers', []);
-
-            return is_array($headers) ? $headers : [];
+            return $this->moduleRoute->headers();
         }
 
-        return ! empty($conf = $this->getRouteConfig()) ? ($conf['headers'] ?? []) : [];
+        $module = $this->getModule();
+        $routeName = $this->getRouteName();
+
+        if ($module && is_string($routeName) && $routeName !== '') {
+            return $module->resolveRouteBlueprintField($routeName, 'headers');
+        }
+
+        return [];
     }
 
     public function getRouteTableOptions(): array
     {
         if ($this->moduleRoute instanceof ModuleRoute) {
-            $options = $this->moduleRoute->rawConfig('table_options', []);
-
-            return is_array($options) ? $options : [];
+            return $this->moduleRoute->tableOptions();
         }
 
-        return ! empty($conf = $this->getRouteConfig()) ? ($conf['table_options'] ?? []) : [];
+        $module = $this->getModule();
+        $routeName = $this->getRouteName();
+
+        if ($module && is_string($routeName) && $routeName !== '') {
+            return $module->resolveRouteBlueprintField($routeName, 'table_options');
+        }
+
+        return [];
     }
 
     /**

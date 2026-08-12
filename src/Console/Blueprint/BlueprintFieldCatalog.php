@@ -161,6 +161,16 @@ final class BlueprintFieldCatalog
                 'default' => false,
                 'return_doc' => 'array<string, mixed>|list<array<string, mixed>>',
             ],
+            'bulk_sheet' => [
+                'surface' => 'BulkSheet',
+                'class_suffix' => 'BulkSheet',
+                'stub' => 'blueprint-provider',
+                'interface' => ModuleRouteBlueprintProvider::class,
+                'legacy_config_key' => 'bulk_sheet',
+                'nested_key' => 'bulk_sheet',
+                'default' => false,
+                'return_doc' => 'array<string, mixed>',
+            ],
         ];
     }
 
@@ -210,6 +220,9 @@ final class BlueprintFieldCatalog
             'form.appends' => 'form_appends',
             'form_actions' => 'form_actions',
             'form.actions' => 'form_actions',
+            'bulk_sheet' => 'bulk_sheet',
+            'bulksheet' => 'bulk_sheet',
+            'bulk' => 'bulk_sheet',
         ];
 
         return $aliases[$field] ?? (isset(self::definitions()[$field]) ? $field : null);

@@ -87,12 +87,25 @@ Blueprint/{Route}/Index/{Route}IndexOptions.php
 ## Scaffold
 
 ```bash
+# Preview planned writes (no files created)
+php artisan modularous:make:blueprint SystemNotification MyNotification \
+  --only=options,columns,filters,actions,row_actions,inputs \
+  --from-config --write-config --dry-run
+
+php artisan modularous:make:blueprint:field SystemNotification MyNotification row_actions \
+  --from-config --dry-run
+
+# Apply
 php artisan modularous:make:blueprint Cms StyleSheet --from-config --write-config
 php artisan modularous:make:blueprint Cms StyleSheet --options --force
 php artisan modularous:make:blueprint PressRelease PressRelease --all --from-config
-php artisan modularous:make:blueprint:field PressRelease PressRelease form_actions --from-config
+php artisan modularous:make:blueprint:field Cms Redirect bulk_sheet --from-config --write-config
 php artisan modularous:make:route Blog Post --presentation=class
 ```
+
+`--dry-run` prints an action table (`create` / `overwrite` / `skip`), target paths, FQCNs, and seed summary (`from-config: source (N bytes)`, `from-config: N items`, or `empty stub`). With `--write-config`, it **persists** nested `index` / `form` (and route-root `bulk_sheet`) `::class` leaves into `Config/config.php` (and comments legacy flat keys unless `--keep-flats`). Dry-run previews the config patch without writing.
+
+`--from-config` prefers the **raw** `Config/config.php` array literal (keeps `__()` / `Component::` / short `[]` style). If source extraction fails, it falls back to an evaluated payload formatted via `array_export` (still short-array, but translations are already resolved).
 
 Stubs: `src/Console/stubs/blueprint-form-inputs.stub`, `blueprint-index-columns.stub`, `blueprint-index-options.stub`, `blueprint-provider.stub`.
 

@@ -48,6 +48,8 @@ final class ModuleRoutePresentationResolver
 
     public const FIELD_FORM_ACTIONS = 'form_actions';
 
+    public const FIELD_BULK_SHEET = 'bulk_sheet';
+
     /**
      * Legacy config key => [surface folder, class suffix after {Route}].
      *
@@ -67,6 +69,7 @@ final class ModuleRoutePresentationResolver
         self::FIELD_FORM_WITH => ['Form', 'FormWith'],
         self::FIELD_FORM_APPENDS => ['Form', 'FormAppends'],
         self::FIELD_FORM_ACTIONS => ['Form', 'FormActions'],
+        self::FIELD_BULK_SHEET => ['BulkSheet', 'BulkSheet'],
     ];
 
     /**
@@ -88,6 +91,7 @@ final class ModuleRoutePresentationResolver
         self::FIELD_FORM_WITH => 'form.with',
         self::FIELD_FORM_APPENDS => 'form.appends',
         self::FIELD_FORM_ACTIONS => 'form.actions',
+        self::FIELD_BULK_SHEET => 'bulk_sheet',
     ];
 
     private const FIELD_INTERFACE = [
@@ -104,6 +108,7 @@ final class ModuleRoutePresentationResolver
         self::FIELD_FORM_WITH => ModuleRouteBlueprintProvider::class,
         self::FIELD_FORM_APPENDS => ModuleRouteBlueprintProvider::class,
         self::FIELD_FORM_ACTIONS => ModuleRouteBlueprintProvider::class,
+        self::FIELD_BULK_SHEET => ModuleRouteBlueprintProvider::class,
     ];
 
     /**
@@ -287,6 +292,7 @@ final class ModuleRoutePresentationResolver
      * Precedence:
      * 1. Nested leaf (`index.columns` / `form.inputs`) when it is a class string or driver meta array
      * 2. `blueprint` / `presentation` keyed by legacy flat field name
+     * 3. Compat: nested surfaces under `blueprint` / `presentation` (`blueprint.form.inputs`, …)
      *
      * @return array<string, mixed>|string|null
      */
@@ -307,10 +313,17 @@ final class ModuleRoutePresentationResolver
             return null;
         }
 
+        // ADR: blueprint / presentation keyed by legacy field name (inputs, headers, …).
         $meta = $root[$field] ?? null;
 
         if (is_string($meta) || is_array($meta)) {
             return $meta;
+        }
+
+        // Compat: mis-nested surfaces under blueprint (blueprint.form.inputs, blueprint.index.columns).
+        $nestedUnderRoot = data_get($root, $nestedKey);
+        if (self::looksLikeProviderMeta($nestedUnderRoot)) {
+            return $nestedUnderRoot;
         }
 
         return null;

@@ -47,9 +47,15 @@ Route name appears in **both** the path and the class name on purpose:
 
 ### Config surfaces
 
-Nest under **`index`** | **`form`**. Drop `table_*` / `form_*` / `index_*` prefixes on child keys.
+Nest under **`index`** | **`form`**, plus route-root **`bulk_sheet`** for CSV bulk tooling.
 
 `scopes` stay at **route root** (shared query scopes for index and form; not a Blueprint class).
+
+Folder for bulk sheet:
+
+```text
+Modules/{Module}/Blueprint/{RouteStudly}/BulkSheet/{RouteStudly}BulkSheet.php
+```
 
 ### Canonical field map
 
@@ -68,6 +74,9 @@ Nest under **`index`** | **`form`**. Drop `table_*` / `form_*` / `index_*` prefi
 | `form_appends` | `form.appends` | `{Route}FormAppends` |
 | `inputs` | `form.inputs` | `{Route}FormInputs` |
 | `form_actions` | `form.actions` | `{Route}FormActions` |
+| `bulk_sheet` | `bulk_sheet` (route root) | `{Route}BulkSheet` |
+
+`scopes` stay at **route root** (shared query scopes; not a Blueprint class). `bulk_sheet` is also route-root but **may** be a Blueprint class (CSV import/export options + optional `fields` schema). Imperative validate/commit/export stay on the controller (`CanBulkSheet`).
 
 ### Drivers
 
@@ -126,7 +135,7 @@ With `module_route_presentation.path = Blueprint`:
 
 ## Consequences
 
-- Make/scaffold commands live under `src/Console/Blueprint/` (`modularous:make:blueprint`, `modularous:make:blueprint:field`).
+- Make/scaffold commands live under `src/Console/Blueprint/` (`modularous:make:blueprint`, `modularous:make:blueprint:field`) with `--dry-run` plan output.
 - Stubs: `blueprint-form-inputs`, `blueprint-index-columns`, `blueprint-index-options`, `blueprint-provider`.
 - HTTP `Routes/web.php` (etc.) remain HTTP-only.
 - Nested `index`/`form` config reading is shipped; flat keys remain readable as fallback.

@@ -103,7 +103,8 @@ All command classes MUST end with `Command` (e.g. `InstallCommand`, not `Install
 2. **Name the class** according to the signature (e.g. `modularous:my:action` → `MyActionCommand`).
 3. **Extend** `BaseCommand` (or `Illuminate\Console\Command` if BaseCommand is not needed).
 4. **Place the file** in the appropriate folder — discovery will pick it up automatically.
-5. **Add tests** in `tests/Support/CommandDiscoveryTest.php` if it should be explicitly asserted.
+5. **If the command creates or deletes files**, add `--dry-run` (see [Dry-run](#dry-run--file-create--delete-hard-rule)).
+6. **Add tests** in `tests/Support/CommandDiscoveryTest.php` if it should be explicitly asserted.
 
 ## CommandDiscovery
 
@@ -133,6 +134,27 @@ All command classes MUST end with `Command` (e.g. `InstallCommand`, not `Install
 Examples: `MakeMigrationCommand` → `/migration/create.stub`; `MakeCmsControllerCommand` → `/cms-controller.stub`; `RemakeRevisionsCommand` → `/models/revision_model.stub`, `/remake/revisions-migration.stub`, `/remake/revisions-operation.stub`; `RemakeCmrCommand` → `/route-controller-front-cms.stub`.
 
 Docs: `docs/src/pages/guide/console/make/stubs.md` (Make stubs command + note that Remake shares `src/Console/stubs/`).
+
+## Dry-run — file create / delete (HARD RULE)
+
+**Agents and humans MUST add `--dry-run` whenever a console command creates, overwrites, moves, or deletes files** (Make, Remake, Blueprint, Module remove/fix, Flush-to-disk, Ops that rewrite stubs, etc.).
+
+Inspect-only commands (list, stats, inspect without heal apply) do not need `--dry-run`.
+
+| Rule | Detail |
+|------|--------|
+| Option | `--dry-run` — preview planned work; **never** write/delete files when set |
+| Output | Show each planned action (`create` / `overwrite` / `skip` / `delete` / …), target path, and enough context (FQCN, field, seed summary, …) |
+| Default | Mutating run stays the default; dry-run is opt-in |
+| Exit | Prefer success when there is something to do; warn + non-zero when everything would be skipped (same as live skip-all), unless the command already documents otherwise |
+| Docs | Mention `--dry-run` in the command’s guide / `@example` when the command mutates files |
+
+Reference implementations:
+
+- Remake: `RemakeCmrCommand`, `RemakeRevisionsCommand` (`[dry-run] … → path`)
+- Blueprint: `MakeBlueprintCommand`, `MakeBlueprintFieldCommand` + `Concerns/ReportsBlueprintPlan` (action table + paths + optional `--write-config` suggestion)
+
+When extending or reviewing file-mutating commands, **always** add or keep dry-run — do not ship create/delete without a preview mode.
 
 ## Backward Compatibility
 

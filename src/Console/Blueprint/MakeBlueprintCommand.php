@@ -8,9 +8,9 @@ use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Unusualify\Modularous\Console\BaseCommand;
+use Unusualify\Modularous\Console\Blueprint\Concerns\ReportsBlueprintPlan;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Module;
-use Unusualify\Modularous\Services\ModuleRoutePresentation\ModuleRoutePresentationResolver;
 
 /**
  * Scaffold ModuleRoute Blueprint classes for a route.
@@ -19,10 +19,13 @@ use Unusualify\Modularous\Services\ModuleRoutePresentation\ModuleRoutePresentati
  * --table-options / --options also creates IndexOptions.
  * --all creates every ADR field.
  *
+ * @example php artisan modularous:make:blueprint Cms StyleSheet --dry-run --from-config --write-config
  * @example php artisan modularous:make:blueprint Cms StyleSheet --from-config --write-config
  */
 class MakeBlueprintCommand extends BaseCommand
 {
+    use ReportsBlueprintPlan;
+
     protected $name = 'modularous:make:blueprint';
 
     protected $aliases = [
@@ -56,6 +59,8 @@ class MakeBlueprintCommand extends BaseCommand
         $force = (bool) $this->option('force');
         $fromConfig = (bool) $this->option('from-config');
         $writeConfig = (bool) $this->option('write-config');
+        $dryRun = (bool) $this->option('dry-run');
+        $commentFlats = ! (bool) $this->option('keep-flats');
         $all = (bool) $this->option('all');
         $withOptions = (bool) $this->option('table-options') || (bool) $this->option('options');
 
@@ -89,27 +94,68 @@ class MakeBlueprintCommand extends BaseCommand
         }
 
         $writer = new BlueprintClassWriter($this->filesystem);
-        $written = [];
-        $fqcns = [];
+        $plan = [];
+        $seedByField = [];
 
         foreach ($fields as $fieldKey) {
-            $def = BlueprintFieldCatalog::get($fieldKey);
-            $items = [];
-            if ($fromConfig) {
-                $legacy = $def['legacy_config_key'];
-                $items = ModuleRoutePresentationResolver::readConfigPayloadFromArray(
-                    is_array($config) ? $config : [],
-                    $legacy
-                );
+            $items = $this->resolveBlueprintSeed(
+                $module,
+                $routeStudly,
+                $fieldKey,
+                $config,
+                $fromConfig
+            );
+            $seedByField[$fieldKey] = $items;
+            $plan[] = $this->blueprintPlanRow(
+                $writer,
+                $module,
+                $routeStudly,
+                $fieldKey,
+                $items,
+                $force,
+                $fromConfig
+            );
+        }
+
+        $this->printBlueprintPlan($plan, $dryRun);
+
+        $configWritten = false;
+        if ($writeConfig) {
+            $configWritten = $this->persistRouteConfig($module, $routeStudly, $plan, $dryRun, $commentFlats);
+        }
+
+        if ($dryRun) {
+            $writable = array_filter($plan, static fn (array $row): bool => $row['action'] !== 'skip');
+            if ($writable === [] && ! $writeConfig) {
+                $this->warn('Nothing to write (already exist? use --force).');
+
+                return E_ERROR;
             }
 
-            $path = $writer->write($module, $routeStudly, $fieldKey, $items, $force);
-            $fqcn = $writer->fqcn($module, $routeStudly, $fieldKey);
-            $fqcns[$fieldKey] = $fqcn;
+            if ($writable !== []) {
+                $this->info(sprintf('[dry-run] %d Blueprint file(s) would be written.', count($writable)));
+            }
+
+            return 0;
+        }
+
+        $written = [];
+        foreach ($plan as $row) {
+            if ($row['action'] === 'skip') {
+                $this->warn("Skipped existing {$routeStudly}" . BlueprintFieldCatalog::get($row['field'])['class_suffix']);
+
+                continue;
+            }
+
+            $path = $writer->write(
+                $module,
+                $routeStudly,
+                $row['field'],
+                $seedByField[$row['field']] ?? [],
+                $force
+            );
 
             if ($path === null) {
-                $this->warn("Skipped existing {$routeStudly}{$def['class_suffix']}");
-
                 continue;
             }
 
@@ -117,55 +163,97 @@ class MakeBlueprintCommand extends BaseCommand
             $this->info("Created: {$path}");
         }
 
-        if ($written === []) {
+        if ($written === [] && ! $configWritten) {
             $this->warn('No Blueprint files were written (already exist? use --force).');
 
             return E_ERROR;
-        }
-
-        if ($writeConfig) {
-            $this->patchRouteConfig($module, $routeStudly, $fqcns, $fields);
-        }
-
-        $this->line('Convention FQCNs:');
-        foreach ($fields as $fieldKey) {
-            $this->line("  {$fieldKey}: " . ($fqcns[$fieldKey] ?? ''));
         }
 
         return 0;
     }
 
     /**
-     * @param  array<string, string>  $fqcns
-     * @param  list<string>  $fields
+     * Persist nested index/form class leaves into Config/config.php (or preview with dry-run).
+     *
+     * @param  list<array{
+     *     action: string,
+     *     field: string,
+     *     nested: string,
+     *     legacy: string,
+     *     path: string,
+     *     fqcn: string,
+     *     seed: string
+     * }>  $plan
      */
-    private function patchRouteConfig(Module $module, string $routeStudly, array $fqcns, array $fields): void
-    {
+    private function persistRouteConfig(
+        Module $module,
+        string $routeStudly,
+        array $plan,
+        bool $dryRun,
+        bool $commentLegacyFlats,
+    ): bool {
         $configPath = $module->getConfigPath();
         if (! $this->filesystem->exists($configPath)) {
             $this->warn('Config file not found; skipped --write-config.');
 
-            return;
+            return false;
         }
 
-        $blueprint = [];
-        foreach ($fields as $fieldKey) {
-            $def = BlueprintFieldCatalog::get($fieldKey);
-            $legacy = $def['legacy_config_key'];
-            $blueprint[$legacy] = [
-                'driver' => 'class',
-                'class' => $fqcns[$fieldKey],
+        $wires = [];
+        foreach ($plan as $row) {
+            $wires[] = [
+                'nested' => $row['nested'],
+                'fqcn' => $row['fqcn'],
+                'legacy' => $row['legacy'],
             ];
         }
 
         $snake = snakeCase($routeStudly);
+        $persister = new BlueprintConfigPersister;
+        $original = (string) $this->filesystem->get($configPath);
+        $result = $persister->build($original, $snake, $wires, $commentLegacyFlats);
+
+        $this->printBlueprintWriteConfigPlan($plan, $snake, $dryRun);
+
+        if (! $result['ok']) {
+            $this->error($result['message']);
+
+            return false;
+        }
+
+        if ($result['content'] === $original) {
+            $this->comment("Config already up to date: {$configPath}");
+
+            return true;
+        }
+
+        if ($dryRun) {
+            $this->info("[dry-run] would update {$configPath}");
+            if ($result['commented_flats'] !== []) {
+                $this->line('[dry-run] would comment legacy flats: ' . implode(', ', $result['commented_flats']));
+            }
+
+            return true;
+        }
+
+        $this->filesystem->put($configPath, $result['content']);
+        $this->info("Updated config: {$configPath}");
+        if ($result['commented_flats'] !== []) {
+            $this->line('Commented legacy flats: ' . implode(', ', $result['commented_flats']));
+        }
+
+        // Keep runtime in sync for the current process.
+        $blueprint = [];
+        foreach ($plan as $row) {
+            $blueprint[$row['legacy']] = [
+                'driver' => 'class',
+                'class' => $row['fqcn'],
+            ];
+        }
         $key = $module->getSnakeName() . '.routes.' . $snake . '.blueprint';
         config([$key => $blueprint]);
 
-        $this->comment(
-            "Runtime config set for [{$key}]. Persist by adding 'blueprint' under routes.{$snake} in Config/config.php."
-        );
-        $this->line(var_export(['blueprint' => $blueprint], true));
+        return true;
     }
 
     protected function getArguments(): array
@@ -185,7 +273,9 @@ class MakeBlueprintCommand extends BaseCommand
             ['options', null, InputOption::VALUE_NONE, 'Also generate IndexOptions.'],
             ['all', null, InputOption::VALUE_NONE, 'Generate all ADR Blueprint fields.'],
             ['only', null, InputOption::VALUE_REQUIRED, 'Comma-separated field list (inputs,columns,filters,…).'],
-            ['write-config', null, InputOption::VALUE_NONE, 'Print/set blueprint driver wiring for config.'],
+            ['write-config', null, InputOption::VALUE_NONE, 'Persist nested index/form class leaves into Config/config.php.'],
+            ['keep-flats', null, InputOption::VALUE_NONE, 'With --write-config, do not comment out legacy flat keys.'],
+            ['dry-run', null, InputOption::VALUE_NONE, 'Show planned Blueprint/config writes without creating files.'],
         ];
     }
 }

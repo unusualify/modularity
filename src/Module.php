@@ -642,7 +642,7 @@ class Module extends NwidartModule
      */
     public function getRouteInputs($route_name, $input_name = null): array
     {
-        return $this->getRouteConfig($route_name)['inputs'];
+        return $this->resolveRouteBlueprintField($route_name, 'inputs');
     }
 
     /**
