@@ -2,6 +2,16 @@
 
 All notable changes to `modularous` will be documented in this file
 
+## v12.7.2 - 2026-08-13
+
+### :wrench: Bug Fixes
+
+- enhance form input collection and response handling by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/f9e51228d1cb73ce2e24a675fac6233a23684b28
+
+### :package: Build
+
+- update build artifacts for v12.7.2 by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/f3c4d151bf58c54e5f2acbe74cf21d2f23e8fa25
+
 ## v12.7.1 - 2026-08-04
 
 ### :wrench: Bug Fixes
