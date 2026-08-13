@@ -340,12 +340,14 @@ export default function useForm(props, context) {
     }
 
     Object.values(inputSchema.value).forEach(collect)
+    Object.values(secondaryInputs.value).forEach(collect)
+    Object.values(formEventSchema.value).forEach(collect)
 
-    Object.values(formEventSchema.value).forEach((event) => {
-      if (event && event.dirtyCheck === true && event.name) {
-        keys.push(event.name)
-      }
-    })
+    // Object.values(formEventSchema.value).forEach((event) => {
+    //   if (event && event.dirtyCheck === true && event.name) {
+    //     keys.push(event.name)
+    //   }
+    // })
 
     return keys
   })
@@ -504,6 +506,14 @@ export default function useForm(props, context) {
             router,
             redirector,
           })
+
+          const persisted = response?.status !== 428 &&
+            !Object.prototype.hasOwnProperty.call(response?.data ?? {}, "errors") &&
+            (!Object.prototype.hasOwnProperty.call(response?.data ?? {}, "variant") || response?.data?.variant === "success");
+
+          if (persisted) {
+            initialModel.value = cloneDeep(model.value);
+          }
         },
         (response) => {
           handleErrorResponse({
