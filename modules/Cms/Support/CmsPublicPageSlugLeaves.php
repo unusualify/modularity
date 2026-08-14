@@ -6,6 +6,7 @@ namespace Modules\Cms\Support;
 
 use Illuminate\Database\Eloquent\Model;
 use Modules\Cms\Entities\Concerns\HasParentSegment;
+use Modules\Cms\Entities\UrlRoute;
 use Unusualify\Modularous\Entities\Traits\HasSlug;
 use Unusualify\Modularous\Entities\Traits\IsSingular;
 
@@ -13,7 +14,7 @@ use Unusualify\Modularous\Entities\Traits\IsSingular;
  * Editorial URL leaf strings per locale from a resolved public CMS {@see Model}.
  *
  * Used for presentation view data (CSS page bundles keyed by EN/fallback leaf). Does not join
- * parent prefixes or read {@see \Modules\Cms\Entities\UrlRoute} rows.
+ * parent prefixes or read {@see UrlRoute} rows.
  */
 final class CmsPublicPageSlugLeaves
 {

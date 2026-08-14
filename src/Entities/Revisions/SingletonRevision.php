@@ -7,10 +7,11 @@ namespace Unusualify\Modularous\Entities\Revisions;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Unusualify\Modularous\Entities\Revision;
 use Unusualify\Modularous\Entities\Singleton;
+use Unusualify\Modularous\Entities\Traits\IsSingular;
 use Unusualify\Modularous\Facades\Modularous;
 
 /**
- * Shared revision rows for all {@see \Unusualify\Modularous\Entities\Traits\IsSingular} models
+ * Shared revision rows for all {@see IsSingular} models
  * (parent table {@see Modularous::config} keys {@code tables.singletons} / {@code tables.singleton_revisions}).
  */
 class SingletonRevision extends Revision

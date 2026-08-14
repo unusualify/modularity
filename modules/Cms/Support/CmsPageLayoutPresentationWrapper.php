@@ -6,6 +6,7 @@ namespace Modules\Cms\Support;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\View;
+use Modules\Cms\Entities\Concerns\IsCmr;
 use Modules\Cms\Entities\LayoutBuilder;
 use Modules\Cms\Entities\PageLayout;
 use Modules\Cms\Services\CmsPageLayoutResolver;
@@ -15,7 +16,7 @@ use Modules\Cms\Services\CmsPageLayoutResolver;
  * when a binding exists for the model class — shared by panel preview ({@see ManagePreview})
  * and public CMS ({@see CmsController}).
  *
- * Resolution order for CMR models ({@see HasPageLayout} via {@see \Modules\Cms\Entities\Concerns\IsCmr}):
+ * Resolution order for CMR models ({@see HasPageLayout} via {@see IsCmr}):
  * 1. Enabled {@see PageLayout} row for the model FQCN (+ optional {@see LayoutBuilder})
  * 2. Module filesystem {@code {route}/page_layout/{head,body,footer}} (even without a DB row / default LayoutBuilder)
  * 3. Caller falls back to plain {@code module::route.custom} when this returns {@code null}

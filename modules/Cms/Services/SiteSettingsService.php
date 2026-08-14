@@ -6,6 +6,7 @@ namespace Modules\Cms\Services;
 
 use Modules\SystemSetting\Services\SystemSettingsService;
 use Unusualify\Modularous\Facades\Modularous;
+use Unusualify\Modularous\Http\Controllers\Traits\ManagePreview;
 
 /**
  * Context-aware settings router.
@@ -15,7 +16,7 @@ use Unusualify\Modularous\Facades\Modularous;
  *
  * Force a layer with {@see forFrontend()} / {@see forBackend()} / {@see forCms()} / {@see forSystem()},
  * or temporarily with {@see whileFrontend()} (public presentation warmup under queue/console, and
- * admin/revision preview under panel URLs via {@see \Unusualify\Modularous\Http\Controllers\Traits\ManagePreview}).
+ * admin/revision preview under panel URLs via {@see ManagePreview}).
  */
 class SiteSettingsService
 {

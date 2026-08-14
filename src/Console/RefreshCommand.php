@@ -34,7 +34,7 @@ class RefreshCommand extends BaseCommand
         try {
             $this->call('cache:clear');
         } catch (\Throwable $e) {
-            $this->warn('cache:clear failed (assets were published): '.$e->getMessage());
+            $this->warn('cache:clear failed (assets were published): ' . $e->getMessage());
         }
 
         $this->call('view:clear');

@@ -217,8 +217,8 @@ class RemakeRevisionsCommand extends Command
     }
 
     /**
-     * @param  class-string  $modelClass
-     * @param  class-string  $revisionFqcn
+     * @param class-string $modelClass
+     * @param class-string $revisionFqcn
      */
     private function ensureRevisionModelProperty(string $modelClass, string $revisionFqcn, bool $dryRun): bool
     {
@@ -251,15 +251,15 @@ class RemakeRevisionsCommand extends Command
             return false;
         }
 
-        $classBodyStart = $classMatch[0][1] + strlen($classMatch[0][0]);
-        $slice = substr($contents, $classBodyStart);
+        $classBodyStart = $classMatch[0][1] + mb_strlen($classMatch[0][0]);
+        $slice = mb_substr($contents, $classBodyStart);
         $property = "\n    protected string \$revisionModel = {$short}::class;\n";
 
         if (preg_match('/^(\s*)use\s+[^;]+;/m', $slice, $inner, PREG_OFFSET_CAPTURE)) {
-            $afterUse = $classBodyStart + $inner[0][1] + strlen($inner[0][0]);
-            $contents = substr($contents, 0, $afterUse) . $property . substr($contents, $afterUse);
+            $afterUse = $classBodyStart + $inner[0][1] + mb_strlen($inner[0][0]);
+            $contents = mb_substr($contents, 0, $afterUse) . $property . mb_substr($contents, $afterUse);
         } else {
-            $contents = substr($contents, 0, $classBodyStart) . $property . substr($contents, $classBodyStart);
+            $contents = mb_substr($contents, 0, $classBodyStart) . $property . mb_substr($contents, $classBodyStart);
         }
 
         $this->info(($dryRun ? '[dry-run] ' : '') . "Add \$revisionModel → {$modelClass}");

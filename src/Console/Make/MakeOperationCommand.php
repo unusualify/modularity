@@ -99,7 +99,7 @@ class MakeOperationCommand extends BaseCommand
         $content = (new Stub('/operation.stub', $replacements))->render();
 
         if ($this->option('dry-run')) {
-            $this->info("Dry run mode is enabled. The operation will not be created, only the content will be displayed in the console.");
+            $this->info('Dry run mode is enabled. The operation will not be created, only the content will be displayed in the console.');
             $this->info($content);
             $this->info("Path: {$path}");
             $this->info("File name: {$fileName}");

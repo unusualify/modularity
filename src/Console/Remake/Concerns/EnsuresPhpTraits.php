@@ -11,8 +11,8 @@ use ReflectionClass;
 trait EnsuresPhpTraits
 {
     /**
-     * @param  class-string  $class
-     * @param  class-string  $trait
+     * @param class-string $class
+     * @param class-string $trait
      */
     protected function ensureTraitOnClass(string $class, string $trait, bool $dryRun): bool
     {
@@ -55,10 +55,10 @@ trait EnsuresPhpTraits
 
         if (! preg_match('/\buse\s+' . preg_quote($traitFqcn, '/') . '\s*;/', $contents)) {
             if (preg_match('/^namespace\s+[^;]+;\s*\n/m', $contents, $m, PREG_OFFSET_CAPTURE)) {
-                $insertAt = $m[0][1] + strlen($m[0][0]);
-                $contents = substr($contents, 0, $insertAt)
+                $insertAt = $m[0][1] + mb_strlen($m[0][0]);
+                $contents = mb_substr($contents, 0, $insertAt)
                     . "\nuse {$traitFqcn};\n"
-                    . substr($contents, $insertAt);
+                    . mb_substr($contents, $insertAt);
             }
         }
 
@@ -66,8 +66,8 @@ trait EnsuresPhpTraits
             return $contents;
         }
 
-        $classBodyStart = $classMatch[0][1] + strlen($classMatch[0][0]);
-        $slice = substr($contents, $classBodyStart);
+        $classBodyStart = $classMatch[0][1] + mb_strlen($classMatch[0][0]);
+        $slice = mb_substr($contents, $classBodyStart);
 
         if (preg_match('/^(\s*)use\s+([^;]+);/m', $slice, $inner, PREG_OFFSET_CAPTURE)) {
             $traitsList = $inner[2][0];
@@ -80,14 +80,14 @@ trait EnsuresPhpTraits
             $replacement = $inner[1][0] . 'use ' . $newList . ';';
             $absolute = $classBodyStart + $inner[0][1];
 
-            return substr($contents, 0, $absolute)
+            return mb_substr($contents, 0, $absolute)
                 . $replacement
-                . substr($contents, $absolute + strlen($inner[0][0]));
+                . mb_substr($contents, $absolute + mb_strlen($inner[0][0]));
         }
 
-        return substr($contents, 0, $classBodyStart)
+        return mb_substr($contents, 0, $classBodyStart)
             . "\n    use {$short};\n"
-            . substr($contents, $classBodyStart);
+            . mb_substr($contents, $classBodyStart);
     }
 
     /**
@@ -103,10 +103,10 @@ trait EnsuresPhpTraits
             return $contents;
         }
 
-        $insertAt = $m[0][1] + strlen($m[0][0]);
+        $insertAt = $m[0][1] + mb_strlen($m[0][0]);
 
-        return substr($contents, 0, $insertAt)
+        return mb_substr($contents, 0, $insertAt)
             . "\nuse {$fqcn};\n"
-            . substr($contents, $insertAt);
+            . mb_substr($contents, $insertAt);
     }
 }

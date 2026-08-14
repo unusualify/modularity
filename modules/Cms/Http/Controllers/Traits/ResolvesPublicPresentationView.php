@@ -4,6 +4,8 @@ namespace Modules\Cms\Http\Controllers\Traits;
 
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
+use Modules\Cms\Entities\Concerns\IsCmr;
+use Modules\Cms\Support\CmsPageLayoutPresentationWrapper;
 use Modules\Cms\Support\CmsPublicFrontViewName;
 use Unusualify\Modularous\Http\Controllers\BaseController;
 use Unusualify\Modularous\Http\Controllers\PanelController;
@@ -12,8 +14,8 @@ use Unusualify\Modularous\Http\Controllers\PanelController;
  * Single place to resolve the Blade used for admin preview and public front when they must match
  * ({@code module::route.custom} → static {@code page_layout/*} → fallbacks, or legacy site.{singular module}).
  *
- * PageLayout shell wrapping for CMR models ({@see \Modules\Cms\Entities\Concerns\IsCmr}) is handled by
- * {@see \Modules\Cms\Support\CmsPageLayoutPresentationWrapper} after this name is resolved.
+ * PageLayout shell wrapping for CMR models ({@see IsCmr}) is handled by
+ * {@see CmsPageLayoutPresentationWrapper} after this name is resolved.
  */
 trait ResolvesPublicPresentationView
 {
