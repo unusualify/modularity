@@ -33,16 +33,19 @@
     <base href="{{ rtrim($siteAddress ?? url('/'), '/') }}/">
     <link rel="canonical" href="{{ $canonicalUrl ?? url()->current() }}">
 
+    <!-- Shell hreflang alternates -->
     @foreach ($hreflangAlternates ?? [] as $alternate)
         @if (! empty($alternate['hreflang']) && ! empty($alternate['href']))
             <link rel="alternate" hreflang="{{ $alternate['hreflang'] }}" href="{{ $alternate['href'] }}">
         @endif
     @endforeach
 
+    <!-- Shell stylesheets -->
     @foreach ($stylesheetHrefs ?? [] as $href)
         <link rel="stylesheet" href="{{ $href }}">
     @endforeach
 
+    <!-- Shell append head HTML -->
     {!! $headHtml ?? '' !!}
     @if (! empty($cmsLayoutUseInjectionMarkers))
         {!! $cmsLayoutMarkerHeadAppend ?? '' !!}
