@@ -14,7 +14,17 @@ use Modules\Cms\Contracts\CanonicalUrlResolverInterface;
 final class CmsPublicPresentationInnerData
 {
     /**
-     * @return array{item: Model, seoTitle: string, seoDescription: ?string, canonicalUrl: string, robotsMeta: string, hreflangAlternates: list<array{hreflang: string, href: string}>}
+     * @return array{
+     *   item: Model,
+     *   seoTitle: string,
+     *   seoDescription: ?string,
+     *   canonicalUrl: string,
+     *   robotsMeta: string,
+     *   hreflangAlternates: list<array{hreflang: string, href: string}>,
+     *   pageSlug: string,
+     *   pageFallbackSlug: string,
+     *   pageSlugs: array<string, string>
+     * }
      */
     public static function build(
         Request $request,
@@ -31,7 +41,17 @@ final class CmsPublicPresentationInnerData
     /**
      * Cache / warmup entry point — explicit locale and UrlRoute registry path; no {@see Request}.
      *
-     * @return array{item: Model, seoTitle: string, seoDescription: ?string, canonicalUrl: string, robotsMeta: string, hreflangAlternates: list<array{hreflang: string, href: string}>}
+     * @return array{
+     *   item: Model,
+     *   seoTitle: string,
+     *   seoDescription: ?string,
+     *   canonicalUrl: string,
+     *   robotsMeta: string,
+     *   hreflangAlternates: list<array{hreflang: string, href: string}>,
+     *   pageSlug: string,
+     *   pageFallbackSlug: string,
+     *   pageSlugs: array<string, string>
+     * }
      */
     public static function buildForCache(
         string $locale,
@@ -46,10 +66,22 @@ final class CmsPublicPresentationInnerData
 
     /**
      * @param array{title: string, description: ?string, canonicalUrl: string, robotsMeta: string} $seo
-     * @return array{item: Model, seoTitle: string, seoDescription: ?string, canonicalUrl: string, robotsMeta: string, hreflangAlternates: list<array{hreflang: string, href: string}>}
+     * @return array{
+     *   item: Model,
+     *   seoTitle: string,
+     *   seoDescription: ?string,
+     *   canonicalUrl: string,
+     *   robotsMeta: string,
+     *   hreflangAlternates: list<array{hreflang: string, href: string}>,
+     *   pageSlug: string,
+     *   pageFallbackSlug: string,
+     *   pageSlugs: array<string, string>
+     * }
      */
     private static function fromSeo(Model $item, array $seo): array
     {
+        $slugLeaves = CmsPublicPageSlugLeaves::forItem($item);
+
         return [
             'item' => $item,
             'title' => $seo['title'],
@@ -58,6 +90,9 @@ final class CmsPublicPresentationInnerData
             'canonicalUrl' => $seo['canonicalUrl'],
             'robotsMeta' => $seo['robotsMeta'],
             'hreflangAlternates' => self::hreflangAlternates($item),
+            'pageSlug' => $slugLeaves['pageSlug'],
+            'pageFallbackSlug' => $slugLeaves['pageFallbackSlug'],
+            'pageSlugs' => $slugLeaves['pageSlugs'],
         ];
     }
 
