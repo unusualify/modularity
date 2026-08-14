@@ -648,6 +648,8 @@ trait FormSchema
 
             if ($connector->isLinkTarget()) {
                 $connector->run($input, 'endpoint');
+            } else {
+                $connector->run($input, 'items');
             }
         } elseif (isset($input['connector'])) {
             // 'moduleName:routeName|uri:edit'
