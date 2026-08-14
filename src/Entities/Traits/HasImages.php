@@ -87,7 +87,7 @@ trait HasImages
         return $this->morphToMany(
             Media::class,
             'mediable',
-            modularousConfig('tables.mediables', 'twill_mediables')
+            modularousConfig('tables.mediables', 'um_mediables')
         )->withPivot(array_merge([
             'crop',
             'role',
@@ -99,7 +99,7 @@ trait HasImages
             'ratio',
             'metadatas',
         ], modularousConfig('media_library.translated_form_fields', false) ? ['locale'] : []))
-            ->withTimestamps()->orderBy(modularousConfig('tables.mediables', 'twill_mediables') . '.id', 'asc');
+            ->withTimestamps()->orderBy(modularousConfig('tables.mediables', 'um_mediables') . '.id', 'asc');
     }
 
     private function findMedia($role, $crop = 'default', $locale = null)
