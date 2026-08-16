@@ -2,6 +2,46 @@
 
 All notable changes to `modularous` will be documented in this file
 
+## v12.8.0 - 2026-08-16
+
+### :rocket: Features
+
+- add singleton revisions support and related functionality by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/4f87bdc51fca87c7a97e37946e97c36a01172336
+- introduce RemakeCmrCommand and related enhancements by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/49e57a3bcd37e404ddfd6d64c150cb7c01992321
+- add revisions feature support and related commands by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/c73ed8c153b1c846643c04aad8faac4a86967fa1
+- introduce CmsPublicPageSlugLeaves for locale-based URL slugs by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/6cabc3f1172592c693e321f5c65087b8b7a16c59
+- enhance connector input handling for items targets by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/0905cf1991c8ca5ff0ea57e86b22b1a6b52aa8ae
+
+### :wrench: Bug Fixes
+
+- enhance public presentation view resolution and add filesystem support by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/5ad50431ab6bb84de16b5935400d1bbda6699f54
+- update renderSignedPublicPreview method to return Response by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/b06c129de489e33e8cb926300d9bd0eda00b4724
+
+### :recycle: Refactors
+
+- enhance SiteSettingsService and ManagePreview for improved admin preview handling by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/4527e4275f74cb97777b6afb3a61cb81b794ad84
+
+### :memo: Documentation
+
+- update AGENTS.md files for improved clarity and structure by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/11ae4b3f0981a1ad3b1674b379e9662a7282f261
+- update AGENTS.md to include Remake command details by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/54e9015cc7ff156cc27adc72bc57f1fc037a3b02
+- enhance stubs documentation and clarify usage rules by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/84ae9a54bea18e75be88601576fd42b7259df213
+- add Vue directives documentation and implementation by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/16c4fe01e3a4401e7938ce525e89b7c02f21c312
+
+### :lipstick: Styling
+
+- lint coding styles for v12.8.0 by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/9937b69b05f2670242a642a54c5bc864d7fe4470
+
+### :package: Build
+
+- update docs build artifacts for v12.8.0 by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/6a849373964823635977c8d4b6ae67d873176ed5
+- update build artifacts for v12.8.0 by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/f5fe3abb8172b1b66681d14162d87aac0ff1c6c0
+
+### :beers: Other Stuff
+
+- update mediables table name in media relationship by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/d1db679c8b1d7edb8b3f15d6c49708f63c244049
+- add hreflang support and stylesheet management in layout shell by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/0241869748d9bf2193e3be83dad43648347a1da5
+
 ## v12.7.2 - 2026-08-13
 
 ### :wrench: Bug Fixes
