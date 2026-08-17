@@ -353,18 +353,22 @@ function fixDatabaseRecords(PDO $pdo, array $env): void
 
 function dbReplace(PDO $pdo, string $table, string $column, string $from, string $to): void
 {
-    $count = (int) $pdo
-        ->query("SELECT COUNT(*) FROM `{$table}` WHERE `{$column}` LIKE " . $pdo->quote('%' . $from . '%'))
-        ->fetchColumn();
+    // Use LOCATE instead of LIKE: MySQL treats "\" as an escape in LIKE patterns,
+    // so namespaces like Unusualify\Modularity never match and morph rows are skipped.
+    $countStmt = $pdo->prepare(
+        "SELECT COUNT(*) FROM `{$table}` WHERE LOCATE(?, `{$column}`) > 0"
+    );
+    $countStmt->execute([$from]);
+    $count = (int) $countStmt->fetchColumn();
 
     if ($count === 0) {
         return;
     }
 
     $stmt = $pdo->prepare(
-        "UPDATE `{$table}` SET `{$column}` = REPLACE(`{$column}`, ?, ?) WHERE `{$column}` LIKE ?"
+        "UPDATE `{$table}` SET `{$column}` = REPLACE(`{$column}`, ?, ?) WHERE LOCATE(?, `{$column}`) > 0"
     );
-    $stmt->execute([$from, $to, '%' . $from . '%']);
+    $stmt->execute([$from, $to, $from]);
 
     $display = mb_strlen($from) > 45 ? mb_substr($from, 0, 42) . '…' : $from;
     ok(sprintf('%s.%s — %d row(s)  [%s → …]', $table, $column, $count, $display));
