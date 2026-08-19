@@ -2,6 +2,12 @@
 
 All notable changes to `modularous` will be documented in this file
 
+## v12.8.1 - 2026-08-19
+
+### :wrench: Bug Fixes
+
+- set default value for 'active' attribute to false if null by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/a76822b6bcbb4c9d18127637660c12a517bdc4c3
+
 ## v12.8.0 - 2026-08-16
 
 ### :rocket: Features
