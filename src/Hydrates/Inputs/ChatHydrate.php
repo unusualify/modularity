@@ -42,14 +42,16 @@ class ChatHydrate extends InputHydrate
             'pinnedMessage' => route('admin.chatable.pinned-message', ['chat' => ':id']),
         ];
 
-        if (isset($input['acceptedExtensions']) && is_array($input['acceptedExtensions'])) {
-            $input['accepted-file-types'] = $this->getAcceptedFileTypes($input['acceptedExtensions']);
+        $acceptedExtensions = isset($input['acceptedExtensions']) && is_array($input['acceptedExtensions'])
+            ? $input['acceptedExtensions']
+            : null;
+
+        if ($acceptedExtensions !== null) {
+            $input['accepted-file-types'] = $this->getAcceptedFileTypes($acceptedExtensions);
             unset($input['acceptedExtensions']);
         }
 
-        $filepondAcceptedFileTypes = isset($input['acceptedExtensions']) && is_array($input['acceptedExtensions'])
-            ? $input['acceptedExtensions']
-            : ['pdf', 'doc', 'docx', 'pages'];
+        $filepondAcceptedFileTypes = $acceptedExtensions ?? ['pdf', 'doc', 'docx', 'pages'];
 
         $acceptedFileTypes = $input['accepted-file-types']
             ?? $this->getAcceptedFileTypes($filepondAcceptedFileTypes);

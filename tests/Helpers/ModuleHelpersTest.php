@@ -96,6 +96,62 @@ class ModuleHelpersTest extends TestCase
         $this->assertIsBool(exceptionalRunningInConsole());
     }
 
+    /** @test */
+    public function test_find_parent_route_and_permission_helpers(): void
+    {
+        $parent = findParentRoute([
+            'routes' => [
+                ['name' => 'child'],
+                ['name' => 'parent', 'parent' => true],
+            ],
+        ]);
+        $this->assertSame('parent', $parent['name']);
+        $this->assertSame([], findParentRoute(['routes' => [['name' => 'only']]]));
+
+        $this->assertSame('item_create', formatPermissionName('Item', 'CREATE'));
+        $this->assertSame(
+            ['name' => 'item_view', 'guard_name' => 'modularous'],
+            formatPermissionRecord('Item', 'VIEW', 'modularous')
+        );
+
+        $records = routePermissionRecords('Item', 'modularous', [
+            \Unusualify\Modularous\Entities\Enums\Permission::CREATE,
+            \Unusualify\Modularous\Entities\Enums\Permission::VIEW,
+        ]);
+        $this->assertCount(2, $records);
+        $this->assertSame('item_create', $records[0]['name']);
+
+        $fromRoutes = permissionRecordsFromRoutes(['Post'], 'web');
+        $this->assertNotEmpty($fromRoutes);
+        $this->assertSame('web', $fromRoutes[0]['guard_name']);
+    }
+
+    /** @test */
+    public function test_ifdd_noop_when_condition_false_and_active_traits(): void
+    {
+        ifdd(false, 'should-not-dump');
+        $this->assertTrue(true);
+
+        config(['modularous.traits' => [
+            'soft_delete' => ['command_option' => ['description' => 'Soft deletes']],
+            'revisions' => ['command_option' => ['description' => 'Revisions']],
+        ]]);
+
+        $this->assertSame(['soft_delete', 'revisions'], getModularousTraits());
+
+        $active = activeModularousTraits([
+            'soft_delete' => true,
+            'revisions' => false,
+            'unrelated' => true,
+        ]);
+        $this->assertTrue($active->has('soft_delete'));
+        $this->assertFalse($active->has('revisions'));
+
+        $options = modularousTraitOptions();
+        $this->assertIsArray($options);
+        $this->assertNotEmpty($options);
+    }
+
     protected function tearDown(): void
     {
         \Mockery::close();

@@ -16,9 +16,10 @@ class RelationshipsHydrateTest extends TestCase
 
         $h = new RelationshipsHydrate($input, null, null, true);
 
-        // RelationshipsHydrate has dd() in hydrate() - incomplete implementation
-        // Verify object can be created
         $this->assertInstanceOf(RelationshipsHydrate::class, $h);
+        $result = $h->render();
+        $this->assertSame('relationships', $result['type']);
+        $this->assertSame('grey', $result['color']);
     }
 
     public function test_relationships_hydrate_has_requirements()

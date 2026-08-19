@@ -26,11 +26,6 @@ class RelationshipsHydrate extends InputHydrate
     {
         $input = $this->input;
 
-        dd(
-            $this->getModule(),
-            $this->getRouteName(),
-        );
-
         return $input;
     }
 }
