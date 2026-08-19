@@ -87,7 +87,7 @@ class ProfileController extends BaseController
         $personalForm = $personalForm->setAttributes([
             'class' => 'd-flex flex-column flex-grow-1 min-height-0',
             'pushButtonToBottom' => true,
-            'formClass' => 'elevation-2 rounded d-flex flex-column flex-grow-1',
+            'formClass' => 'rounded d-flex flex-column flex-grow-1',
 
             'title' => [
                 'text' => __('User Profile'),
@@ -103,6 +103,7 @@ class ProfileController extends BaseController
 
             'buttonText' => 'Update',
             'hasSubmit' => true,
+            'previewable' => true,
             'stickyButton' => false,
             'modelValue' => $userFields,
             'refreshOnSaved' => true,
@@ -138,7 +139,7 @@ class ProfileController extends BaseController
                     ->setAttributes([
                         'class' => 'd-flex flex-column flex-grow-1 min-height-0',
                         'pushButtonToBottom' => true,
-                        'formClass' => 'elevation-2 rounded d-flex flex-column flex-grow-1',
+                        'formClass' => 'rounded d-flex flex-column flex-grow-1',
                         'clearOnSaved' => true,
 
                         'title' => [
@@ -156,6 +157,7 @@ class ProfileController extends BaseController
 
                         'buttonText' => 'Update',
                         'hasSubmit' => true,
+                        'previewable' => true,
                         'stickyButton' => false,
 
                         'schema' => $userPasswordSchema,
@@ -192,7 +194,7 @@ class ProfileController extends BaseController
                         ->setAttributes([
                             'class' => 'd-flex flex-column flex-grow-1 min-height-0',
                             'pushButtonToBottom' => true,
-                            'formClass' => 'elevation-2 rounded d-flex flex-column flex-grow-1',
+                            'formClass' => 'rounded d-flex flex-column flex-grow-1',
                             'title' => [
                                 'text' => __('Billing Profile'),
                                 'type' => 'h6',
@@ -206,6 +208,7 @@ class ProfileController extends BaseController
                             // 'editable' => true,
                             'buttonText' => 'Update',
                             'hasSubmit' => ! $lockCompanyEdit,
+                            'previewable' => true,
                             'stickyButton' => false,
 
                             'modelValue' => $companyFields,
