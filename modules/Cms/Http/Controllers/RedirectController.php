@@ -137,6 +137,12 @@ class RedirectController extends BaseController implements CanBulkSheet
      */
     public function bulkSheetFields(): array
     {
+        $fields = $this->bulkSheetRouteConfig()['fields'] ?? null;
+        if (is_array($fields) && $fields !== []) {
+            /** @var list<array{key: string, label: string, required?: bool, aliases?: list<string>}> $fields */
+            return $fields;
+        }
+
         return [
             ['key' => 'locale', 'label' => 'Locale', 'required' => true, 'aliases' => ['locale']],
             ['key' => 'from_path', 'label' => 'From path', 'required' => true, 'aliases' => ['from', 'source']],

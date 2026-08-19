@@ -76,6 +76,9 @@ trait TableFilters
         $customMainFilters = $this->getConfigFieldsByRoute('table_filters', []);
 
         foreach ($customMainFilters as $filter) {
+            // Raw config path yields objects; ModuleRoute presentation yields arrays.
+            $filter = is_array($filter) ? (object) $filter : $filter;
+
             $statusFilters[] = [
                 'name' => $filter->name,
                 'slug' => $filter->slug,
@@ -174,16 +177,28 @@ trait TableFilters
     /**
      * Get the advanced filters for the table
      *
+     * Uses {@see getConfigFieldsByRoute} so nested `index.advanced_filters`, Blueprint
+     * class drivers, and legacy flat `filters` all resolve. Query `filters.fixed` stays
+     * on PanelController Raw preload and is stripped here when present on the flat key.
+     *
      * @return array
      */
     protected function getTableAdvancedFilters()
     {
         $advancedFilters = [];
 
-        $filterConfig = $this->getConfigFieldsByRouteRaw('filters', []);
+        $filterConfig = $this->getConfigFieldsByRoute('filters', []);
+        if (! is_array($filterConfig)) {
+            $filterConfig = object_to_array($filterConfig) ?: [];
+        }
+
+        // PanelController owns fixed query scopes via Raw `filters.fixed` — not a category.
+        unset($filterConfig['fixed']);
 
         // Process each filter category
         foreach ($filterConfig as $category => $filters) {
+            $filters = is_array($filters) ? $filters : (array) $filters;
+
             // Apply category-specific configuration
             if (method_exists(__TRAIT__, $method = $category . 'FilterConfiguration')) {
                 $filters = array_map([$this, $method], $filters);

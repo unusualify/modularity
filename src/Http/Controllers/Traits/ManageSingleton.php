@@ -11,16 +11,19 @@ trait ManageSingleton
 
     protected function __afterConstructManageSingleton($app, $request)
     {
+        $routeName = $this->routeName ?? $this->moduleRouteName ?? $this->getRouteName();
 
-        if ($this->module) {
-            $this->isSingleton = $this->module->isSingleton($this->routeName);
+        // Prefer Module::isSingleton on construct (no ModuleRoute required).
+        // ModuleRoute is resolved later in preload — same shared memo when available.
+        if ($this->module && is_string($routeName) && $routeName !== '') {
+            $this->isSingleton = $this->module->isSingleton($routeName);
+        } elseif ($this->moduleRoute) {
+            $this->isSingleton = $this->moduleRoute->isSingleton();
         }
-
     }
 
     public function _edit($id = null)
     {
-        dd($this);
         $model = "App\\Models\\{$this->getModelName()}";
 
         // if (!class_exists($model)) {

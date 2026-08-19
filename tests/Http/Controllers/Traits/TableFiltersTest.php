@@ -146,6 +146,22 @@ class TableFiltersTest extends TestCase
         $this->assertSame('locale', $advanced['columns'][0]['slug']);
     }
 
+    public function test_get_table_advanced_filters_strips_fixed_query_scopes(): void
+    {
+        $this->controller->setRawFiltersConfig([
+            'fixed' => ['company_id' => 1],
+            'columns' => [
+                ['slug' => 'locale', 'type' => 'select'],
+            ],
+        ]);
+        $this->controller->repository = $this->makeRepositoryMock(hasColumn: ['locale' => true]);
+
+        $advanced = $this->controller->invokeGetTableAdvancedFilters();
+
+        $this->assertArrayNotHasKey('fixed', $advanced);
+        $this->assertArrayHasKey('columns', $advanced);
+    }
+
     public function test_columns_filter_configuration_throws_for_missing_column(): void
     {
         $this->controller->repository = $this->makeRepositoryMock(hasColumn: ['locale' => false]);

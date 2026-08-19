@@ -14,6 +14,7 @@ use Unusualify\Modularous\Entities\Traits\HasRevisions;
 use Unusualify\Modularous\Repositories\Repository;
 use Unusualify\Modularous\Repositories\Traits\RevisionsTrait;
 use Unusualify\Modularous\Tests\ModelTestCase;
+use Unusualify\Modularous\Traits\Traitify;
 
 class RevisionsTraitTest extends ModelTestCase
 {
@@ -181,6 +182,150 @@ class RevisionsTraitTest extends ModelTestCase
         $this->assertSame('Original', $object->fresh()->title);
     }
 
+    public function test_before_save_revisions_trait_returns_when_workflow_disabled(): void
+    {
+        $object = RevisionsTraitTestModel::create(['title' => 'Item']);
+        $this->repository->beforeSaveRevisionsTrait($object, ['title' => 'X']);
+        $this->assertTrue(true);
+    }
+
+    public function test_before_save_revisions_trait_throws_when_workflow_locked(): void
+    {
+        $object = new RevisionsWorkflowLockedModel(['title' => 'Locked']);
+        $this->expectException(\Unusualify\Modularous\Exceptions\ValidationException::class);
+        $this->repository->beforeSaveRevisionsTrait($object, ['title' => 'X']);
+    }
+
+    public function test_create_revision_if_needed_skips_when_flag_set(): void
+    {
+        $object = RevisionsTraitTestModel::create(['title' => 'Item']);
+        $this->repository->setSkipRevisionCreation(true);
+        $this->repository->createRevisionIfNeeded($object, ['title' => 'Changed']);
+        $this->assertSame(0, $object->revisions()->count());
+        $this->repository->setSkipRevisionCreation(false);
+    }
+
+    public function test_preview_for_revision_hydrates_snapshot(): void
+    {
+        $object = RevisionsTraitTestModel::create(['title' => 'Live']);
+        $revision = $object->revisions()->create([
+            'payload' => json_encode(['title' => 'Snapshot']),
+            'user_id' => null,
+        ]);
+
+        $preview = $this->repository->previewForRevision($object->id, $revision->id);
+        $this->assertSame('Snapshot', $preview->title);
+        $this->assertSame('Live', $object->fresh()->title);
+    }
+
+    public function test_reject_revision_marks_latest_pending(): void
+    {
+        $repository = new RepositoryUsingRevisionsTrait(new RevisionsWorkflowTestModel);
+        $object = RevisionsWorkflowTestModel::create(['title' => 'Item']);
+        $revision = $object->revisions()->create([
+            'payload' => json_encode(['title' => 'Pending']),
+            'user_id' => null,
+            'status' => 'pending',
+        ]);
+
+        $repository->rejectRevision($object->id, $revision->id);
+
+        $this->assertSame('rejected', $revision->fresh()->status);
+    }
+
+    public function test_bypass_and_reset_pass_after_saves_toggle_flags(): void
+    {
+        $this->repository->pendingBypassRevisionFilesTrait = true;
+        $this->repository->invokeBypassAfterSaves();
+        $this->assertTrue($this->repository->passesAfterSaveFilesTrait());
+
+        $this->repository->invokeResetPassAfterSaves();
+        $this->assertFalse($this->repository->passesAfterSaveFilesTrait());
+    }
+
+    public function test_get_count_by_status_slug_mine_uses_filter_path(): void
+    {
+        RevisionsTraitTestModel::create(['title' => 'Mine']);
+        $count = $this->repository->getCountByStatusSlugRevisionsTrait('mine');
+        $this->assertIsInt($count);
+        $this->assertGreaterThanOrEqual(0, $count);
+    }
+
+    public function test_should_queue_pending_revision_only_for_workflow_without_approve(): void
+    {
+        $object = new RevisionsWorkflowNoApproveModel(['title' => 'Item']);
+        $this->assertTrue($this->repository->invokeShouldQueuePendingRevisionOnly($object, ['title' => 'X']));
+    }
+
+    public function test_approve_revision_applies_payload_and_marks_approved(): void
+    {
+        $repository = new RepositoryUsingRevisionsTrait(new RevisionsWorkflowTestModel);
+        $object = RevisionsWorkflowTestModel::create(['title' => 'Live']);
+        $revision = $object->revisions()->create([
+            'payload' => json_encode(['title' => 'Approved Title']),
+            'user_id' => null,
+            'status' => 'pending',
+        ]);
+
+        $repository->approveRevision($object->id, $revision->id);
+
+        $this->assertSame('Approved Title', $object->fresh()->title);
+        $this->assertSame('approved', $revision->fresh()->status);
+    }
+
+    public function test_process_pending_revision_submission_queues_without_mutating_subject(): void
+    {
+        $repository = new RepositoryUsingRevisionsTrait(new RevisionsWorkflowNoApproveModel);
+        $object = RevisionsWorkflowNoApproveModel::create(['title' => 'Original']);
+
+        $method = new \ReflectionMethod($repository, 'processPendingRevisionSubmission');
+        $method->setAccessible(true);
+        $queued = $method->invoke($repository, $object, ['title' => 'Queued']);
+
+        $this->assertTrue($queued);
+        $this->assertSame('Original', $object->fresh()->title);
+        $pending = $object->revisions()->where('status', 'pending')->first();
+        $this->assertNotNull($pending);
+        $this->assertSame('Queued', json_decode((string) $pending->payload, true)['title'] ?? null);
+    }
+
+    public function test_after_save_revisions_trait_creates_revision(): void
+    {
+        $object = RevisionsTraitTestModel::create(['title' => 'Base']);
+        $this->repository->afterSaveRevisionsTrait($object, ['title' => 'After']);
+        $this->assertSame(1, $object->revisions()->count());
+    }
+
+    public function test_restore_revision_as_pending_only_path(): void
+    {
+        $repository = new RepositoryUsingRevisionsTrait(new RevisionsWorkflowNoApproveModel);
+        $object = RevisionsWorkflowNoApproveModel::create(['title' => 'Current']);
+        $revision = $object->revisions()->create([
+            'payload' => json_encode(['title' => 'Pending Restore']),
+            'user_id' => null,
+            'status' => 'approved',
+        ]);
+
+        $method = new \ReflectionMethod($repository, 'restoreRevisionAsPendingOnly');
+        $method->setAccessible(true);
+        $method->invoke($repository, $object, ['title' => 'Pending Restore'], (int) $revision->id);
+
+        $this->assertSame('Current', $object->fresh()->title);
+        $this->assertGreaterThanOrEqual(1, $object->revisions()->where('status', 'pending')->count());
+    }
+
+    public function test_should_restore_as_pending_only_helpers(): void
+    {
+        $repository = new RepositoryUsingRevisionsTrait(new RevisionsWorkflowNoApproveModel);
+        $object = RevisionsWorkflowNoApproveModel::create(['title' => 'Item']);
+        $method = new \ReflectionMethod($repository, 'shouldRestoreAsPendingOnly');
+        $method->setAccessible(true);
+        $this->assertTrue($method->invoke($repository, $object));
+
+        $plain = RevisionsTraitTestModel::create(['title' => 'Plain']);
+        $this->assertFalse($method->invoke($this->repository, $plain));
+    }
+
     protected function createRevisionTables(): void
     {
         Schema::create('revisions_trait_test_models', function (Blueprint $table) {
@@ -235,11 +380,48 @@ class RevisionsWorkflowTestModel extends RevisionsTraitTestModel
     {
         return 'revisions_trait_test_model';
     }
+
+    public function userCanApproveRevisions(): bool
+    {
+        return true;
+    }
+}
+
+class RevisionsWorkflowLockedModel extends RevisionsWorkflowTestModel
+{
+    public function usesRevisionWorkflow(): bool
+    {
+        return true;
+    }
+
+    public function isRevisionWorkflowLocked(): bool
+    {
+        return true;
+    }
+}
+
+class RevisionsWorkflowNoApproveModel extends RevisionsWorkflowTestModel
+{
+    public function usesRevisionWorkflow(): bool
+    {
+        return true;
+    }
+
+    public function userCanApproveRevisions(): bool
+    {
+        return false;
+    }
+}
+
+trait FilesTrait
+{
 }
 
 class RepositoryUsingRevisionsTrait extends Repository
 {
     use RevisionsTrait;
+    use Traitify;
+    use FilesTrait;
 
     public bool $pendingBypassRevisionFilesTrait = false;
 
@@ -283,10 +465,35 @@ class RepositoryUsingRevisionsTrait extends Repository
         $this->applyApprovedRevisionAttributes($attributes, $userId);
     }
 
+    public function invokeShouldQueuePendingRevisionOnly($object, array $fields): bool
+    {
+        return $this->shouldQueuePendingRevisionOnly($object, $fields);
+    }
+
+    public function setSkipRevisionCreation(bool $value): void
+    {
+        $this->skipRevisionCreation = $value;
+    }
+
     public function filter($query, $scopes = [])
     {
-        return $query;
+        return new class($query)
+        {
+            public function __construct(private $query) {}
+
+            public function mine()
+            {
+                return $this->query;
+            }
+
+            public function count(): int
+            {
+                return $this->query->count();
+            }
+        };
     }
+
+    public function afterSave($object, $fields): void {}
 
     public function update($id, $fields, $schema = null, $options = [])
     {

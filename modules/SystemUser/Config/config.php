@@ -9,6 +9,15 @@ return [
     'headline' => 'User Management',
     'routes' => [
         'user' => [
+            'index' => [
+                'columns' => \Modules\SystemUser\Blueprint\User\Index\UserIndexColumns::class,
+                'options' => \Modules\SystemUser\Blueprint\User\Index\UserIndexOptions::class,
+                'advanced_filters' => \Modules\SystemUser\Blueprint\User\Index\UserIndexAdvancedFilters::class,
+                'with' => \Modules\SystemUser\Blueprint\User\Index\UserIndexWith::class,
+            ],
+            'form' => [
+                'inputs' => \Modules\SystemUser\Blueprint\User\Form\UserFormInputs::class,
+            ],
             'parent' => true,
             'name' => 'User',
             'headline' => 'Users',
@@ -18,283 +27,290 @@ return [
             'has_api_routes' => true,
             // 'public_api_routes' => ['index', 'show'],
             // 'api_routes' => ['store', 'update', 'destroy'],
-            'table_options' => [
-                'createOnModal' => true,
-                'editOnModal' => true,
-                'isRowEditing' => true,
-                'rowActionsType' => 'inline',
-            ],
-            'filters' => [
-                'relations' => [
-                    [
-                        'type' => 'select',
-                        'slug' => 'company',
-                        'componentOptions' => [
-                            'multiple' => true,
-                            'clearable' => true,
-                            'variant' => 'solo',
-                            'label' => 'Company',
-                        ],
-                        'repository' => 'Modules\\SystemUser\\Repositories\\CompanyRepository',
-                    ],
-                ],
-            ],
-            'index_with' => [
-                'company',
-                'roles',
-            ],
-            'headers' => [
-                [
-                    'title' => 'Name',
-                    'key' => 'name',
-                    'sortable' => true,
-                    'searchable' => true,
-                ],
-                [
-                    'title' => 'Surname',
-                    'key' => 'surname',
-                    'sortable' => true,
-                    'searchable' => true,
-                ],
-                [
-                    'title' => 'Email',
-                    'key' => 'email',
-                    'align' => 'start',
-                    'sortable' => false,
-                    'searchable' => true,
-                ],
-                [
-                    'title' => 'Company',
-                    'key' => 'company',
-                ],
-                [
-                    'title' => 'Roles',
-                    'key' => 'roles',
-                    'itemTitle' => 'title',
-                ],
-                [
-                    'title' => 'Status',
-                    'key' => 'published',
-                    'formatter' => [
-                        'switch',
-                    ],
-                ],
-                [
-                    'title' => 'Actions',
-                    'key' => 'actions',
-                    'sortable' => false,
-                ],
-            ],
-            'inputs' => [
-                [
-                    'type' => 'filepond-avatar',
-                    // 'label' => 'Profile Avatar',
-                    'name' => 'avatar',
-                    'allow-image-preview' => true,
-                    'label-idle' => 'Drop files here...',
-                    // 'rules' => 'sometimes|required:array',
-                    'disabled' => true,
-                    'noSubmit' => true,
-                    'creatable' => 'hidden',
-                    'editable' => false,
-                ],
-                [
-                    'type' => 'text',
-                    'label' => 'Email',
-                    'name' => 'email',
-                    'rules' => 'sometimes|required',
-                    'col' => [
-                        'cols' => 12,
-                        'sm' => 8,
-                        'md' => 6,
-                    ],
-                    // 'prepend-icon' => 'mdi-card-text-outline',
-                    'dense',
-                ],
-                [
-                    'label' => 'Name',
-                    'name' => 'name',
-                    'type' => 'text',
-                    'rules' => 'sometimes|required',
-                    'editable' => false,
-                    'col' => [
-                        'cols' => 12,
-                        'sm' => 8,
-                        'md' => 6,
-                    ],
-                    // 'prepend-icon' => 'mdi-card-text-outline',
-                    'dense',
-                ],
-                [
-                    'label' => 'Surname',
-                    'name' => 'surname',
-                    'type' => 'text',
-                    'editable' => false,
-                    'col' => [
-                        'cols' => 12,
-                        'sm' => 8,
-                        'md' => 6,
-                    ],
-                    // 'prepend-icon' => 'mdi-card-text-outline',
-                    'dense',
-                ],
-                [
-                    'name' => 'company_id',
-                    'label' => 'Company',
-                    'type' => 'select',
-                    'col' => [
-                        'cols' => 12,
-                        'sm' => 8,
-                        'md' => 6,
-                    ],
-                    'repository' => 'Modules\\SystemUser\\Repositories\\CompanyRepository',
-                ],
-                [
-                    'name' => 'company_name',
-                    'label' => 'Company Name',
-                    'placeholder' => 'If you want to create user with a new company, please enter the name here.',
-                    'hint' => 'If you select a company on the company field, this field will be ignored.',
-                    'editable' => 'hidden',
-                    'type' => 'text',
-                    'col' => [
-                        'cols' => 12,
-                        'sm' => 8,
-                        'md' => 6,
-                    ],
-                    'conditions' => [
-                        ['id', 'not exists'],
-                    ],
-                ],
-                [
-                    'type' => 'combobox',
-                    'label' => 'Roles',
-                    'name' => 'roles',
-                    'chips' => true,
-                    'itemTitle' => 'title',
-                    'col' => [
-                        'cols' => 12,
-                        'sm' => 8,
-                        'md' => 6,
-                    ],
-                    'allowedRoles' => ['superadmin', 'admin'],
-                    'rules' => 'required',
-                    // 'editable' => false,
-                    'connector' => 'SystemUser:Role|repository:list:column=title',
+            // 'table_options' => [
+            //     'createOnModal' => true,
+            //     'editOnModal' => true,
+            //     'isRowEditing' => true,
+            //     'rowActionsType' => 'inline',
+            // ],
+            // 'filters' => [
+            //     'relations' => [
+            //         [
+            //             'type' => 'select',
+            //             'slug' => 'company',
+            //             'componentOptions' => [
+            //                 'multiple' => true,
+            //                 'clearable' => true,
+            //                 'variant' => 'solo',
+            //                 'label' => 'Company',
+            //             ],
+            //             'repository' => 'Modules\\SystemUser\\Repositories\\CompanyRepository',
+            //         ],
+            //     ],
+            // ],
+            // 'index_with' => [
+            //     'company',
+            //     'roles',
+            // ],
+            // 'headers' => [
+            //     [
+            //         'title' => 'Name',
+            //         'key' => 'name',
+            //         'sortable' => true,
+            //         'searchable' => true,
+            //     ],
+            //     [
+            //         'title' => 'Surname',
+            //         'key' => 'surname',
+            //         'sortable' => true,
+            //         'searchable' => true,
+            //     ],
+            //     [
+            //         'title' => 'Email',
+            //         'key' => 'email',
+            //         'align' => 'start',
+            //         'sortable' => false,
+            //         'searchable' => true,
+            //     ],
+            //     [
+            //         'title' => 'Company',
+            //         'key' => 'company',
+            //     ],
+            //     [
+            //         'title' => 'Roles',
+            //         'key' => 'roles',
+            //         'itemTitle' => 'title',
+            //     ],
+            //     [
+            //         'title' => 'Status',
+            //         'key' => 'published',
+            //         'formatter' => [
+            //             'switch',
+            //         ],
+            //     ],
+            //     [
+            //         'title' => 'Actions',
+            //         'key' => 'actions',
+            //         'sortable' => false,
+            //     ],
+            // ],
+            // 'inputs' => [
+            //     [
+            //         'type' => 'filepond-avatar',
+            // 'label' => 'Profile Avatar',
+            //         'name' => 'avatar',
+            //         'allow-image-preview' => true,
+            //         'label-idle' => 'Drop files here...',
+            // 'rules' => 'sometimes|required:array',
+            //         'disabled' => true,
+            //         'noSubmit' => true,
+            //         'creatable' => 'hidden',
+            //         'editable' => false,
+            //     ],
+            //     [
+            //         'type' => 'text',
+            //         'label' => 'Email',
+            //         'name' => 'email',
+            //         'rules' => 'sometimes|required',
+            //         'col' => [
+            //             'cols' => 12,
+            //             'sm' => 8,
+            //             'md' => 6,
+            //         ],
+            // 'prepend-icon' => 'mdi-card-text-outline',
+            //         'dense',
+            //     ],
+            //     [
+            //         'label' => 'Name',
+            //         'name' => 'name',
+            //         'type' => 'text',
+            //         'rules' => 'sometimes|required',
+            //         'editable' => false,
+            //         'col' => [
+            //             'cols' => 12,
+            //             'sm' => 8,
+            //             'md' => 6,
+            //         ],
+            // 'prepend-icon' => 'mdi-card-text-outline',
+            //         'dense',
+            //     ],
+            //     [
+            //         'label' => 'Surname',
+            //         'name' => 'surname',
+            //         'type' => 'text',
+            //         'editable' => false,
+            //         'col' => [
+            //             'cols' => 12,
+            //             'sm' => 8,
+            //             'md' => 6,
+            //         ],
+            // 'prepend-icon' => 'mdi-card-text-outline',
+            //         'dense',
+            //     ],
+            //     [
+            //         'name' => 'company_id',
+            //         'label' => 'Company',
+            //         'type' => 'select',
+            //         'col' => [
+            //             'cols' => 12,
+            //             'sm' => 8,
+            //             'md' => 6,
+            //         ],
+            //         'repository' => 'Modules\\SystemUser\\Repositories\\CompanyRepository',
+            //     ],
+            //     [
+            //         'name' => 'company_name',
+            //         'label' => 'Company Name',
+            //         'placeholder' => 'If you want to create user with a new company, please enter the name here.',
+            //         'hint' => 'If you select a company on the company field, this field will be ignored.',
+            //         'editable' => 'hidden',
+            //         'type' => 'text',
+            //         'col' => [
+            //             'cols' => 12,
+            //             'sm' => 8,
+            //             'md' => 6,
+            //         ],
+            //         'conditions' => [
+            //             ['id', 'not exists'],
+            //         ],
+            //     ],
+            //     [
+            //         'type' => 'combobox',
+            //         'label' => 'Roles',
+            //         'name' => 'roles',
+            //         'chips' => true,
+            //         'itemTitle' => 'title',
+            //         'col' => [
+            //             'cols' => 12,
+            //             'sm' => 8,
+            //             'md' => 6,
+            //         ],
+            //         'allowedRoles' => ['superadmin', 'admin'],
+            //         'rules' => 'required',
+            // 'editable' => false,
+            //         'connector' => 'SystemUser:Role|repository:list:column=title',
 
-                    // 'type' => 'select-scroll',
-                    // 'page' => 1,
-                    // 'endpoint' => [
-                    //     'admin.system.system_user.role.index',
-                    // ],
-                ],
-            ],
+            // 'type' => 'select-scroll',
+            // 'page' => 1,
+            // 'endpoint' => [
+            //     'admin.system.system_user.role.index',
+            // ],
+            //     ],
+            // ],
         ],
         'role' => [
+            'index' => [
+                'columns' => \Modules\SystemUser\Blueprint\Role\Index\RoleIndexColumns::class,
+                'options' => \Modules\SystemUser\Blueprint\Role\Index\RoleIndexOptions::class,
+            ],
+            'form' => [
+                'inputs' => \Modules\SystemUser\Blueprint\Role\Form\RoleFormInputs::class,
+            ],
             'name' => 'Role',
             'headline' => 'Roles',
             'url' => 'roles',
             'route_name' => 'role',
             'icon' => '$role',
-            'table_options' => [
-                'createOnModal' => false,
-                'editOnModal' => true,
-                'isRowEditing' => true,
-                'rowActionsType' => 'inline',
-            ],
+            // 'table_options' => [
+            //     'createOnModal' => false,
+            //     'editOnModal' => true,
+            //     'isRowEditing' => true,
+            //     'rowActionsType' => 'inline',
+            // ],
             'title_column_name' => 'title',
-            'headers' => [
-                [
-                    'title' => 'Title',
-                    'key' => 'title',
-                    'align' => 'start',
-                    'sortable' => false,
-                    'filterable' => false,
-                    'groupable' => false,
-                    'divider' => false,
-                    'class' => '', // || []
-                    'cellClass' => '', // || []
-                    // 'width' => '', // || int
-                    // vuetify datatable header fields end
+            // 'headers' => [
+            //     [
+            //         'title' => 'Title',
+            //         'key' => 'title',
+            //         'align' => 'start',
+            //         'sortable' => false,
+            //         'filterable' => false,
+            //         'groupable' => false,
+            //         'divider' => false,
+            //         'class' => '', // || []
+            //         'cellClass' => '', // || []
+            // 'width' => '', // || int
+            // vuetify datatable header fields end
 
-                    // custom fields for ue-datatable start
-                    'searchable' => true,
-                    'isRowEditable' => false,
-                    'isColumnEditable' => false,
-                    'formatter' => [
-                        0 => 'edit',
-                    ],
-                    // custom fields for ue-datatable end
-                ],
-                [
-                    'title' => 'Name',
-                    'key' => 'name',
-                    'align' => 'start',
-                    'sortable' => false,
-                    'filterable' => false,
-                    'groupable' => false,
-                    'divider' => false,
-                    'class' => '', // || []
-                    'cellClass' => '', // || []
-                    // 'width' => '', // || int
-                    // vuetify datatable header fields end
+            // custom fields for ue-datatable start
+            //         'searchable' => true,
+            //         'isRowEditable' => false,
+            //         'isColumnEditable' => false,
+            //         'formatter' => [
+            //             0 => 'edit',
+            //         ],
+            // custom fields for ue-datatable end
+            //     ],
+            //     [
+            //         'title' => 'Name',
+            //         'key' => 'name',
+            //         'align' => 'start',
+            //         'sortable' => false,
+            //         'filterable' => false,
+            //         'groupable' => false,
+            //         'divider' => false,
+            //         'class' => '', // || []
+            //         'cellClass' => '', // || []
+            // 'width' => '', // || int
+            // vuetify datatable header fields end
 
-                    // custom fields for ue-datatable start
-                    'searchable' => true,
-                    'isRowEditable' => false,
-                    'isColumnEditable' => false,
-                    'formatter' => [
-                        0 => 'edit',
-                    ],
-                    // custom fields for ue-datatable end
-                ],
-                [
-                    // vuetify datatable header fields start
-                    'title' => 'Guard Name',
-                    'key' => 'guard_name',
-                    'align' => 'start',
-                    'sortable' => false,
-                    'filterable' => false,
-                    'groupable' => false,
-                    'divider' => false,
-                    'class' => '', // || []
-                    'cellClass' => '', // || []
-                    // 'width' => '', // || int
-                    // vuetify datatable header fields end
+            // custom fields for ue-datatable start
+            //         'searchable' => true,
+            //         'isRowEditable' => false,
+            //         'isColumnEditable' => false,
+            //         'formatter' => [
+            //             0 => 'edit',
+            //         ],
+            // custom fields for ue-datatable end
+            //     ],
+            //     [
+            // vuetify datatable header fields start
+            //         'title' => 'Guard Name',
+            //         'key' => 'guard_name',
+            //         'align' => 'start',
+            //         'sortable' => false,
+            //         'filterable' => false,
+            //         'groupable' => false,
+            //         'divider' => false,
+            //         'class' => '', // || []
+            //         'cellClass' => '', // || []
+            // 'width' => '', // || int
+            // vuetify datatable header fields end
 
-                    // custom fields for ue-datatable start
-                    'searchable' => true,
-                    'isRowEditable' => false,
-                    'isColumnEditable' => false,
-                    'removable' => true,
-                    'formatter' => [],
-                    // custom fields for ue-datatable end
-                ],
-                // [
-                //     'title' => 'Created Time',
-                //     'key' => 'created_at',
-                //     'sortable' => true,
-                //     'filterable' => true,
-                //     'groupable' => false,
-                //     'divider' => false,
-                //     'class' => '', // || []
-                //     'cellClass' => '', // || []
-                //     'width' => '', // || int
-                //     // vuetify datatable header fields end
+            // custom fields for ue-datatable start
+            //         'searchable' => true,
+            //         'isRowEditable' => false,
+            //         'isColumnEditable' => false,
+            //         'removable' => true,
+            //         'formatter' => [],
+            // custom fields for ue-datatable end
+            //     ],
+            // [
+            //     'title' => 'Created Time',
+            //     'key' => 'created_at',
+            //     'sortable' => true,
+            //     'filterable' => true,
+            //     'groupable' => false,
+            //     'divider' => false,
+            //     'class' => '', // || []
+            //     'cellClass' => '', // || []
+            //     'width' => '', // || int
+            //     // vuetify datatable header fields end
 
-                //     // custom fields for ue-datatable start
-                //     'searchable' => true,
-                //     'isRowEditable' => false,
-                //     'isColumnEditable' => false,
-                //     'formatter' => ['date', 'long'],
-                //     // custom fields for ue-datatable end
-                // ],
-                [
-                    'title' => 'Actions',
-                    'key' => 'actions',
-                    'width' => 50,
-                    'sortable' => false,
-                ],
-            ],
+            //     // custom fields for ue-datatable start
+            //     'searchable' => true,
+            //     'isRowEditable' => false,
+            //     'isColumnEditable' => false,
+            //     'formatter' => ['date', 'long'],
+            //     // custom fields for ue-datatable end
+            // ],
+            //     [
+            //         'title' => 'Actions',
+            //         'key' => 'actions',
+            //         'width' => 50,
+            //         'sortable' => false,
+            //     ],
+            // ],
             'inputs_old' => [
                 [
                     'title' => 'Name',
@@ -1005,84 +1021,84 @@ return [
                 ],
             ],
 
-            'inputs' => [
-                [
-                    'type' => 'text',
-                    'name' => 'title',
-                    'label' => 'Title',
-                    // 'tooltip' => 'Enter a usual name',
-                    'col' => [
-                        'cols' => 10,
-                        'sm' => 10,
-                        'md' => 6,
-                        'lg' => 6,
-                        'xl' => 6,
-                    ],
-                    'rules' => 'sometimes|required|min:3',
-                    // 'prepend-icon' => 'mdi-card-text-outline',
-                ],
-                [
-                    'type' => 'text',
-                    'name' => 'name',
-                    'label' => 'Name',
-                    'hint' => '',
-                    'placeholder' => '',
-                    'default' => '',
-                    // 'tooltip' => 'Enter a usual name',
-                    'col' => [
-                        'cols' => 10,
-                        'sm' => 10,
-                        'md' => 6,
-                        'lg' => 6,
-                        'xl' => 6,
-                    ],
-                    'editable' => false,
-                    'rules' => 'sometimes|required|min:3',
-                    // 'prepend-icon' => 'mdi-card-text-outline',
-                ],
+            // 'inputs' => [
+            //     [
+            //         'type' => 'text',
+            //         'name' => 'title',
+            //         'label' => 'Title',
+            // 'tooltip' => 'Enter a usual name',
+            //         'col' => [
+            //             'cols' => 10,
+            //             'sm' => 10,
+            //             'md' => 6,
+            //             'lg' => 6,
+            //             'xl' => 6,
+            //         ],
+            //         'rules' => 'sometimes|required|min:3',
+            // 'prepend-icon' => 'mdi-card-text-outline',
+            //     ],
+            //     [
+            //         'type' => 'text',
+            //         'name' => 'name',
+            //         'label' => 'Name',
+            //         'hint' => '',
+            //         'placeholder' => '',
+            //         'default' => '',
+            // 'tooltip' => 'Enter a usual name',
+            //         'col' => [
+            //             'cols' => 10,
+            //             'sm' => 10,
+            //             'md' => 6,
+            //             'lg' => 6,
+            //             'xl' => 6,
+            //         ],
+            //         'editable' => false,
+            //         'rules' => 'sometimes|required|min:3',
+            // 'prepend-icon' => 'mdi-card-text-outline',
+            //     ],
 
-                [
-                    'type' => 'text',
-                    'name' => 'guard_name',
-                    'label' => 'Guard Name',
-                    'placeholder' => 'modularous',
-                    '_tooltip' => 'Enter the guard name',
-                    'default' => 'modularous',
-                    'col' => [
-                        'cols' => 10,
-                        'sm' => 10,
-                        'md' => 6,
-                        'lg' => 6,
-                        'xl' => 6,
-                    ],
-                    // 'prepend-icon' => 'mdi-account-child',
-                    'readonly',
-                    'disabled',
-                    'flat',
-                    // 'full-width',
-                    'hide-spin-buttons',
+            //     [
+            //         'type' => 'text',
+            //         'name' => 'guard_name',
+            //         'label' => 'Guard Name',
+            //         'placeholder' => 'modularous',
+            //         '_tooltip' => 'Enter the guard name',
+            //         'default' => 'modularous',
+            //         'col' => [
+            //             'cols' => 10,
+            //             'sm' => 10,
+            //             'md' => 6,
+            //             'lg' => 6,
+            //             'xl' => 6,
+            //         ],
+            // 'prepend-icon' => 'mdi-account-child',
+            //         'readonly',
+            //         'disabled',
+            //         'flat',
+            // 'full-width',
+            //         'hide-spin-buttons',
 
-                ],
-                [
-                    'type' => 'checklist',
-                    'isTreeview' => true,
-                    // Large permission catalogs: mount group headers only until expanded.
-                    'closeAllGroups' => true,
-                    'name' => 'permissions',
-                    'label' => 'Permissions of the role',
-                    'col' => [
-                        'cols' => 12,
-                        'sm' => 12,
-                        'md' => 12,
-                        'lg' => 12,
-                        'xl' => 12,
-                    ],
-                    'connector' => 'SystemUser:Permission|repository',
-                    'allowedRoles' => ['superadmin', 'admin'],
-                    // 'route' => 'permission',
-                    // 'model' => Spatie\Permission\Models\Permission::class,
-                ],
-            ],
+            //     ],
+            //     [
+            //         'type' => 'checklist',
+            //         'isTreeview' => true,
+            // Large permission catalogs: mount group headers only until expanded.
+            //         'closeAllGroups' => true,
+            //         'name' => 'permissions',
+            //         'label' => 'Permissions of the role',
+            //         'col' => [
+            //             'cols' => 12,
+            //             'sm' => 12,
+            //             'md' => 12,
+            //             'lg' => 12,
+            //             'xl' => 12,
+            //         ],
+            //         'connector' => 'SystemUser:Permission|repository',
+            //         'allowedRoles' => ['superadmin', 'admin'],
+            // 'route' => 'permission',
+            // 'model' => Spatie\Permission\Models\Permission::class,
+            //     ],
+            // ],
             'rules' => [
                 'view' => [],
                 'store' => [],
@@ -1091,289 +1107,296 @@ return [
             ],
         ],
         'permission' => [
+            'index' => [
+                'columns' => \Modules\SystemUser\Blueprint\Permission\Index\PermissionIndexColumns::class,
+                'options' => \Modules\SystemUser\Blueprint\Permission\Index\PermissionIndexOptions::class,
+            ],
+            'form' => [
+                'inputs' => \Modules\SystemUser\Blueprint\Permission\Form\PermissionFormInputs::class,
+            ],
             'name' => 'Permission',
             'headline' => 'Permissions',
             'url' => 'permissions',
             'route_name' => 'permission',
             'icon' => '$permission',
             // 'model' => \Spatie\Permission\Models\Permission::class,
-            'table_options' => [
-                'createOnModal' => true,
-                'editOnModal' => true,
-                'isRowEditing' => true,
-                'rowActionsType' => 'inline',
-            ],
-            'headers' => [
-                [
-                    'title' => 'Name',
-                    'key' => 'name',
-                    'align' => 'start',
-                    'sortable' => false,
-                    'searchable' => true,
-                    'formatter' => [
-                        0 => 'edit',
-                    ],
-                ],
-                [
-                    'title' => 'Guard Name',
-                    'key' => 'guard_name',
-                    'searchable' => true,
-                ],
-                [
-                    'title' => 'Actions',
-                    'key' => 'actions',
-                    'sortable' => false,
-                ],
-            ],
-            'inputs' => [
-                [
-                    'type' => 'text',
-                    'title' => 'Name',
-                    'name' => 'name',
-                    'label' => 'Permission Name',
-                    'placeholder' => '',
-                    'default' => '',
-                    'col' => [
-                        'cols' => 12,
-                        'sm' => 8,
-                        'md' => 6,
-                    ],
-                    'rules' => 'sometimes|required|min:3',
-                    // 'prepend-icon' => 'mdi-card-text-outline',
-                ],
-                [
-                    'type' => 'text',
-                    'title' => 'Guard Name',
-                    'name' => 'guard_name',
-                    'label' => 'Guard Name',
-                    'placeholder' => 'web',
-                    'default' => 'modularous',
-                    'col' => [
-                        'cols' => 12,
-                        'sm' => 8,
-                        'md' => 6,
-                    ],
-                    // 'prepend-icon' => 'mdi-account-child',
-                    'readonly',
-                    'disabled',
-                    'flat',
-                    'hide-spin-buttons',
-                    // 'full-width',
-                ],
-                // [
-                //     'title' => 'Permission',
-                //     'name' => 'permissions',
-                //     // 'type' => 'radio',
-                //     'type' => 'select',
-                //     'default' => 0,
-                //     'items' => [
-                //         [
-                //             'text' => 'Edit Role',
-                //             'value' => 0,
-                //             'disabled' => false,
-                //         ],
-                //         [
-                //             'text' => 'Create Role',
-                //             'value' => 1
-                //         ],
-                //         [
-                //             'text' => 'Delete Role',
-                //             'value' => 2
-                //         ],
-                //     ],
-                //     'cols' => 12,
-                //     'md' => 12,
-                //     'sm' => 12,
-                //     'props' => [
-                //         'color' => 'success',
-                //         'mandatory',
-                //         'row',
-                //         'outlined',
-                //         'dense',
-                //         'menu-props' => [
-                //             'closeOnClick' => true,
-                //             'closeOnContentClick' => false,
-                //             'disableKeys' => true,
-                //             'openOnClick' => false,
-                //             'maxHeight' => 304
-                //         ]
-                //     ],
-                // ],
+            // 'table_options' => [
+            //     'createOnModal' => true,
+            //     'editOnModal' => true,
+            //     'isRowEditing' => true,
+            //     'rowActionsType' => 'inline',
+            // ],
+            // 'headers' => [
+            //     [
+            //         'title' => 'Name',
+            //         'key' => 'name',
+            //         'align' => 'start',
+            //         'sortable' => false,
+            //         'searchable' => true,
+            //         'formatter' => [
+            //             0 => 'edit',
+            //         ],
+            //     ],
+            //     [
+            //         'title' => 'Guard Name',
+            //         'key' => 'guard_name',
+            //         'searchable' => true,
+            //     ],
+            //     [
+            //         'title' => 'Actions',
+            //         'key' => 'actions',
+            //         'sortable' => false,
+            //     ],
+            // ],
+            // 'inputs' => [
+            //     [
+            //         'type' => 'text',
+            //         'title' => 'Name',
+            //         'name' => 'name',
+            //         'label' => 'Permission Name',
+            //         'placeholder' => '',
+            //         'default' => '',
+            //         'col' => [
+            //             'cols' => 12,
+            //             'sm' => 8,
+            //             'md' => 6,
+            //         ],
+            //         'rules' => 'sometimes|required|min:3',
+            // 'prepend-icon' => 'mdi-card-text-outline',
+            //     ],
+            //     [
+            //         'type' => 'text',
+            //         'title' => 'Guard Name',
+            //         'name' => 'guard_name',
+            //         'label' => 'Guard Name',
+            //         'placeholder' => 'web',
+            //         'default' => 'modularous',
+            //         'col' => [
+            //             'cols' => 12,
+            //             'sm' => 8,
+            //             'md' => 6,
+            //         ],
+            // 'prepend-icon' => 'mdi-account-child',
+            //         'readonly',
+            //         'disabled',
+            //         'flat',
+            //         'hide-spin-buttons',
+            // 'full-width',
+            //     ],
+            // [
+            //     'title' => 'Permission',
+            //     'name' => 'permissions',
+            //     // 'type' => 'radio',
+            //     'type' => 'select',
+            //     'default' => 0,
+            //     'items' => [
+            //         [
+            //             'text' => 'Edit Role',
+            //             'value' => 0,
+            //             'disabled' => false,
+            //         ],
+            //         [
+            //             'text' => 'Create Role',
+            //             'value' => 1
+            //         ],
+            //         [
+            //             'text' => 'Delete Role',
+            //             'value' => 2
+            //         ],
+            //     ],
+            //     'cols' => 12,
+            //     'md' => 12,
+            //     'sm' => 12,
+            //     'props' => [
+            //         'color' => 'success',
+            //         'mandatory',
+            //         'row',
+            //         'outlined',
+            //         'dense',
+            //         'menu-props' => [
+            //             'closeOnClick' => true,
+            //             'closeOnContentClick' => false,
+            //             'disableKeys' => true,
+            //             'openOnClick' => false,
+            //             'maxHeight' => 304
+            //         ]
+            //     ],
+            // ],
 
-                // [
-                //     'title' => 'Activity of Permission',
-                //     'name' => 'is_active',
-                //     'type' => 'checkbox',
-                //     // 'type' => 'switch',
-                //     'default' => true,
-                //     'cols' => 6,
-                //     'md' => 9,
-                //     'sm' => 12,
-                //     'props' => [
-                //         'color' => 'success',
-                //         // 'readonly',
-                //         'dense',
-                //         // 'disabled',
-                //         // 'error',
-                //         'flat',
-                //         'full-width',
-                //         'hide-spin-buttons',
-                //         // 'false-value' => false,
+            // [
+            //     'title' => 'Activity of Permission',
+            //     'name' => 'is_active',
+            //     'type' => 'checkbox',
+            //     // 'type' => 'switch',
+            //     'default' => true,
+            //     'cols' => 6,
+            //     'md' => 9,
+            //     'sm' => 12,
+            //     'props' => [
+            //         'color' => 'success',
+            //         // 'readonly',
+            //         'dense',
+            //         // 'disabled',
+            //         // 'error',
+            //         'flat',
+            //         'full-width',
+            //         'hide-spin-buttons',
+            //         // 'false-value' => false,
 
-                //         // 'false-value' => true,
-                //         // 'true-value' => false,
-                //         // 'appendIcon' => 'mdi-dropbox',
-                //         // 'prependIcon' => 'mdi-radioactive',
-                //         // 'offIcon' => 'mdi-inactive',
-                //         // 'onIcon' => 'mdi-radioactive',
-                //     ],
-                // ],
-                // [
-                //     'title' => 'Status',
-                //     'name' => 'status',
-                //     // 'type' => 'radio',
-                //     'type' => 'radio',
-                //     'options' => [
-                //         [
-                //             'label' => 'WAITING',
-                //             'value' => 0
-                //         ],
-                //         [
-                //             'label' => 'FAILURE',
-                //             'value' => 1
-                //         ],
-                //         [
-                //             'label' => 'COMPLETED',
-                //             'value' => 2
-                //         ],
-                //     ],
-                //     'default' => 0,
-                //     'cols' => 12,
-                //     'md' => 12,
-                //     'sm' => 12,
-                //     'props' => [
-                //         'activeClass' => '',
-                //         'color' => 'success',
+            //         // 'false-value' => true,
+            //         // 'true-value' => false,
+            //         // 'appendIcon' => 'mdi-dropbox',
+            //         // 'prependIcon' => 'mdi-radioactive',
+            //         // 'offIcon' => 'mdi-inactive',
+            //         // 'onIcon' => 'mdi-radioactive',
+            //     ],
+            // ],
+            // [
+            //     'title' => 'Status',
+            //     'name' => 'status',
+            //     // 'type' => 'radio',
+            //     'type' => 'radio',
+            //     'options' => [
+            //         [
+            //             'label' => 'WAITING',
+            //             'value' => 0
+            //         ],
+            //         [
+            //             'label' => 'FAILURE',
+            //             'value' => 1
+            //         ],
+            //         [
+            //             'label' => 'COMPLETED',
+            //             'value' => 2
+            //         ],
+            //     ],
+            //     'default' => 0,
+            //     'cols' => 12,
+            //     'md' => 12,
+            //     'sm' => 12,
+            //     'props' => [
+            //         'activeClass' => '',
+            //         'color' => 'success',
 
-                //         'mandatory',
-                //         'row',
+            //         'mandatory',
+            //         'row',
 
-                //         'props' => [
-                //             'color' => 'error',
-                //             'on-icon' => '$radioOn',
-                //             'off-icon' => '$radioOff'
-                //         ]
+            //         'props' => [
+            //             'color' => 'error',
+            //             'on-icon' => '$radioOn',
+            //             'off-icon' => '$radioOff'
+            //         ]
 
-                //         // 'appendIcon' => 'mdi-dropbox',
-                //         // 'prependIcon' => 'mdi-radioactive',
-                //         // 'offIcon' => 'mdi-inactive',
-                //         // 'onIcon' => 'mdi-radioactive',
-                //     ],
-                // ],
-                // [
-                //     'title' => 'Report',
-                //     'name' => 'report',
-                //     'type' => 'file',
-                //     // 'accept' => "image/*,.doc,.docx,.pdf",
-                //     'cols' => 12,
-                //     'md' => 12,
-                //     'sm' => 12,
-                //     'props' => [
-                //         'small-chips',
-                //         'prependIcon' => '',
-                //         'prependInnerIcon' => 'mdi-camera'
+            //         // 'appendIcon' => 'mdi-dropbox',
+            //         // 'prependIcon' => 'mdi-radioactive',
+            //         // 'offIcon' => 'mdi-inactive',
+            //         // 'onIcon' => 'mdi-radioactive',
+            //     ],
+            // ],
+            // [
+            //     'title' => 'Report',
+            //     'name' => 'report',
+            //     'type' => 'file',
+            //     // 'accept' => "image/*,.doc,.docx,.pdf",
+            //     'cols' => 12,
+            //     'md' => 12,
+            //     'sm' => 12,
+            //     'props' => [
+            //         'small-chips',
+            //         'prependIcon' => '',
+            //         'prependInnerIcon' => 'mdi-camera'
 
-                //     ]
-                // ],
-                // [
-                //     'title' => 'Day Interval',
-                //     'name' => 'day_interval',
-                //     'type' => 'range',
-                //     'default' => [0,100],
-                //     'cols' => 12,
-                //     'md' => 12,
-                //     'sm' => 12,
-                //     'props' => [
-                //         'max' => 100,
-                //         'min' => 0,
-                //         'tick-size' => 1,
-                //         // 'background-color' => 'success',
-                //         'hint' => '',
+            //     ]
+            // ],
+            // [
+            //     'title' => 'Day Interval',
+            //     'name' => 'day_interval',
+            //     'type' => 'range',
+            //     'default' => [0,100],
+            //     'cols' => 12,
+            //     'md' => 12,
+            //     'sm' => 12,
+            //     'props' => [
+            //         'max' => 100,
+            //         'min' => 0,
+            //         'tick-size' => 1,
+            //         // 'background-color' => 'success',
+            //         'hint' => '',
 
-                //         // 'vertical',
-                //     ]
-                // ],
-                // [
-                //     'title' => 'Color',
-                //     'name' => 'color',
-                //     'type' => 'color',
-                //     'default' => '#32010121',
-                //     'cols' => 12,
-                //     'sm' => 12,
-                //     'md' => 12,
+            //         // 'vertical',
+            //     ]
+            // ],
+            // [
+            //     'title' => 'Color',
+            //     'name' => 'color',
+            //     'type' => 'color',
+            //     'default' => '#32010121',
+            //     'cols' => 12,
+            //     'sm' => 12,
+            //     'md' => 12,
 
-                //     'props' => [
-                //         'placeholder' => '#FFDD11FF',
-                //         // 'dotSize' => 'rgba',
-                //         'prepend-icon' => 'mdi-palette',
-                //         'props' => [
-                //             'dotSize' => 25,
-                //             'maxHeight' => 200,
-                //         ]
+            //     'props' => [
+            //         'placeholder' => '#FFDD11FF',
+            //         // 'dotSize' => 'rgba',
+            //         'prepend-icon' => 'mdi-palette',
+            //         'props' => [
+            //             'dotSize' => 25,
+            //             'maxHeight' => 200,
+            //         ]
 
-                //     ]
-                // ],
-                // [
-                //     'title' => 'Start Date',
-                //     'name' => 'start_date',
-                //     'type' => 'date',
-                //     'default' => '',
-                //     'cols' => 12,
-                //     'sm' => 12,
-                //     'md' => 12,
-                //     'props' => [
-                //         'color' => "red lighten-1",
-                //         'prepend-icon' => 'mdi-calendar',
-                //         // 'prepend-inner-icon' => 'mdi-calendar',
-                //         'dense',
-                //         'outlined'
-                //     ],
-                //     'picker_props' => [
-                //         'color' => 'success',
-                //         'header-color' => 'info',
-                //         'min' => "2016-06-15",
-                //         'max' => "2018-03-20",
-                //         // 'type' => "month",
-                //         // 'range',
+            //     ]
+            // ],
+            // [
+            //     'title' => 'Start Date',
+            //     'name' => 'start_date',
+            //     'type' => 'date',
+            //     'default' => '',
+            //     'cols' => 12,
+            //     'sm' => 12,
+            //     'md' => 12,
+            //     'props' => [
+            //         'color' => "red lighten-1",
+            //         'prepend-icon' => 'mdi-calendar',
+            //         // 'prepend-inner-icon' => 'mdi-calendar',
+            //         'dense',
+            //         'outlined'
+            //     ],
+            //     'picker_props' => [
+            //         'color' => 'success',
+            //         'header-color' => 'info',
+            //         'min' => "2016-06-15",
+            //         'max' => "2018-03-20",
+            //         // 'type' => "month",
+            //         // 'range',
 
-                //         // 'show-adjacent-months',
-                //     ]
-                // ],
-                // [
-                //     'title' => 'Start Time',
-                //     'name' => 'start_time',
-                //     'type' => 'time',
-                //     'default' => '',
-                //     'cols' => 12,
-                //     'sm' => 12,
-                //     'md' => 12,
-                //     'props' => [
-                //         'color' => "red lighten-1",
-                //         'prepend-icon' => 'mdi-calendar',
-                //         // 'prepend-inner-icon' => 'mdi-calendar',
-                //         'dense',
-                //         'outlined'
-                //     ],
-                //     'picker_props' => [
-                //         'color' => 'success',
-                //         'header-color' => 'info',
-                //         // 'type' => "month",
-                //         // 'range',
+            //         // 'show-adjacent-months',
+            //     ]
+            // ],
+            // [
+            //     'title' => 'Start Time',
+            //     'name' => 'start_time',
+            //     'type' => 'time',
+            //     'default' => '',
+            //     'cols' => 12,
+            //     'sm' => 12,
+            //     'md' => 12,
+            //     'props' => [
+            //         'color' => "red lighten-1",
+            //         'prepend-icon' => 'mdi-calendar',
+            //         // 'prepend-inner-icon' => 'mdi-calendar',
+            //         'dense',
+            //         'outlined'
+            //     ],
+            //     'picker_props' => [
+            //         'color' => 'success',
+            //         'header-color' => 'info',
+            //         // 'type' => "month",
+            //         // 'range',
 
-                //         // 'show-adjacent-months',
-                //     ]
-                // ],
-            ],
+            //         // 'show-adjacent-months',
+            //     ]
+            // ],
+            // ],
             'rules' => [
                 'view' => [],
                 'store' => [],
@@ -1382,463 +1405,486 @@ return [
             ],
         ],
         'capability' => [
+            'index' => [
+                'columns' => \Modules\SystemUser\Blueprint\Capability\Index\CapabilityIndexColumns::class,
+                'options' => \Modules\SystemUser\Blueprint\Capability\Index\CapabilityIndexOptions::class,
+                'with' => \Modules\SystemUser\Blueprint\Capability\Index\CapabilityIndexWith::class,
+            ],
+            'form' => [
+                'inputs' => \Modules\SystemUser\Blueprint\Capability\Form\CapabilityFormInputs::class,
+            ],
             'name' => 'Capability',
             'headline' => 'Capabilities',
             'url' => 'capabilities',
             'route_name' => 'capability',
             'icon' => 'mdi-shield-lock-outline',
-            'index_with' => [
-                'roles',
-                'routes',
-            ],
-            'table_options' => [
-                'createOnModal' => true,
-                'editOnModal' => true,
-                'isRowEditing' => true,
-                'rowActionsType' => 'inline',
-            ],
-            'headers' => [
-                [
-                    'title' => 'Title',
-                    'key' => 'title',
-                    'sortable' => true,
-                    'searchable' => true,
-                ],
-                [
-                    'title' => 'Name',
-                    'key' => 'name',
-                    'sortable' => true,
-                    'searchable' => true,
-                ],
-                [
-                    'title' => 'Roles',
-                    'key' => 'roles',
-                    'itemTitle' => 'title',
-                ],
-                [
-                    'title' => 'Routes',
-                    'key' => 'routes',
-                    'itemTitle' => 'route_name',
-                ],
-                [
-                    'title' => 'Strict Route Binding',
-                    'key' => 'strict_route_binding',
-                    'formatter' => [
-                        'switch',
-                    ],
-                ],
-                [
-                    'title' => 'Step-Up',
-                    'key' => 'requires_step_up',
-                    'formatter' => [
-                        'switch',
-                    ],
-                ],
-                [
-                    'title' => 'Actions',
-                    'key' => 'actions',
-                    'sortable' => false,
-                ],
-            ],
-            'inputs' => [
-                [
-                    'type' => 'text',
-                    'name' => 'name',
-                    'label' => 'Capability Key',
-                    'placeholder' => 'promotion.execute',
-                    'rules' => 'required|min:3',
-                    'col' => [
-                        'cols' => 12,
-                        'sm' => 8,
-                        'md' => 6,
-                    ],
-                ],
-                [
-                    'type' => 'text',
-                    'name' => 'title',
-                    'label' => 'Title',
-                    'placeholder' => 'Promotion Execute',
-                    'col' => [
-                        'cols' => 12,
-                        'sm' => 8,
-                        'md' => 6,
-                    ],
-                ],
-                [
-                    'type' => 'select',
-                    'name' => 'roles',
-                    'multiple' => true,
-                    'itemValue' => 'id',
-                    'itemTitle' => 'title',
-                    'label' => 'Allowed Roles',
-                    'connector' => 'SystemUser:Role|repository:list:column=title',
-                    'col' => [
-                        'cols' => 12,
-                    ],
-                ],
-                [
-                    'type' => 'select-scroll',
-                    'componentType' => 'v-autocomplete',
-                    'name' => 'routes',
-                    'label' => 'Bound Routes',
-                    'multiple' => true,
-                    'chips' => true,
-                    'itemValue' => 'id',
-                    'itemTitle' => 'route_name',
-                    'itemsPerPage' => 100,
-                    'page' => 1,
-                    'endpoint' => 'admin.system.system_user.capability_route.index',
-                    'searchKeys' => ['route_name'],
-                    'col' => [
-                        'cols' => 12,
-                    ],
-                ],
-                [
-                    'type' => 'switch',
-                    'name' => 'strict_route_binding',
-                    'label' => 'Strict Route Binding',
-                    'default' => false,
-                    'hint' => 'When enabled, step-up runs only for bound route names.',
-                    'col' => [
-                        'cols' => 12,
-                        'sm' => 6,
-                        'md' => 4,
-                        'lg' => 3,
-                    ],
-                ],
-                [
-                    'type' => 'switch',
-                    'name' => 'requires_step_up',
-                    'label' => 'Require Step-Up',
-                    'default' => false,
-                    'col' => [
-                        'cols' => 12,
-                        'sm' => 6,
-                        'md' => 4,
-                        'lg' => 3,
-                    ],
-                ],
-            ],
+            // 'index_with' => [
+            //     'roles',
+            //     'routes',
+            // ],
+            // 'table_options' => [
+            //     'createOnModal' => true,
+            //     'editOnModal' => true,
+            //     'isRowEditing' => true,
+            //     'rowActionsType' => 'inline',
+            // ],
+            // 'headers' => [
+            //     [
+            //         'title' => 'Title',
+            //         'key' => 'title',
+            //         'sortable' => true,
+            //         'searchable' => true,
+            //     ],
+            //     [
+            //         'title' => 'Name',
+            //         'key' => 'name',
+            //         'sortable' => true,
+            //         'searchable' => true,
+            //     ],
+            //     [
+            //         'title' => 'Roles',
+            //         'key' => 'roles',
+            //         'itemTitle' => 'title',
+            //     ],
+            //     [
+            //         'title' => 'Routes',
+            //         'key' => 'routes',
+            //         'itemTitle' => 'route_name',
+            //     ],
+            //     [
+            //         'title' => 'Strict Route Binding',
+            //         'key' => 'strict_route_binding',
+            //         'formatter' => [
+            //             'switch',
+            //         ],
+            //     ],
+            //     [
+            //         'title' => 'Step-Up',
+            //         'key' => 'requires_step_up',
+            //         'formatter' => [
+            //             'switch',
+            //         ],
+            //     ],
+            //     [
+            //         'title' => 'Actions',
+            //         'key' => 'actions',
+            //         'sortable' => false,
+            //     ],
+            // ],
+            // 'inputs' => [
+            //     [
+            //         'type' => 'text',
+            //         'name' => 'name',
+            //         'label' => 'Capability Key',
+            //         'placeholder' => 'promotion.execute',
+            //         'rules' => 'required|min:3',
+            //         'col' => [
+            //             'cols' => 12,
+            //             'sm' => 8,
+            //             'md' => 6,
+            //         ],
+            //     ],
+            //     [
+            //         'type' => 'text',
+            //         'name' => 'title',
+            //         'label' => 'Title',
+            //         'placeholder' => 'Promotion Execute',
+            //         'col' => [
+            //             'cols' => 12,
+            //             'sm' => 8,
+            //             'md' => 6,
+            //         ],
+            //     ],
+            //     [
+            //         'type' => 'select',
+            //         'name' => 'roles',
+            //         'multiple' => true,
+            //         'itemValue' => 'id',
+            //         'itemTitle' => 'title',
+            //         'label' => 'Allowed Roles',
+            //         'connector' => 'SystemUser:Role|repository:list:column=title',
+            //         'col' => [
+            //             'cols' => 12,
+            //         ],
+            //     ],
+            //     [
+            //         'type' => 'select-scroll',
+            //         'componentType' => 'v-autocomplete',
+            //         'name' => 'routes',
+            //         'label' => 'Bound Routes',
+            //         'multiple' => true,
+            //         'chips' => true,
+            //         'itemValue' => 'id',
+            //         'itemTitle' => 'route_name',
+            //         'itemsPerPage' => 100,
+            //         'page' => 1,
+            //         'endpoint' => 'admin.system.system_user.capability_route.index',
+            //         'searchKeys' => ['route_name'],
+            //         'col' => [
+            //             'cols' => 12,
+            //         ],
+            //     ],
+            //     [
+            //         'type' => 'switch',
+            //         'name' => 'strict_route_binding',
+            //         'label' => 'Strict Route Binding',
+            //         'default' => false,
+            //         'hint' => 'When enabled, step-up runs only for bound route names.',
+            //         'col' => [
+            //             'cols' => 12,
+            //             'sm' => 6,
+            //             'md' => 4,
+            //             'lg' => 3,
+            //         ],
+            //     ],
+            //     [
+            //         'type' => 'switch',
+            //         'name' => 'requires_step_up',
+            //         'label' => 'Require Step-Up',
+            //         'default' => false,
+            //         'col' => [
+            //             'cols' => 12,
+            //             'sm' => 6,
+            //             'md' => 4,
+            //             'lg' => 3,
+            //         ],
+            //     ],
+            // ],
         ],
         'capability_route' => [
+            'index' => [
+                'columns' => \Modules\SystemUser\Blueprint\CapabilityRoute\Index\CapabilityRouteIndexColumns::class,
+                'options' => \Modules\SystemUser\Blueprint\CapabilityRoute\Index\CapabilityRouteIndexOptions::class,
+            ],
+            'form' => [
+                'inputs' => \Modules\SystemUser\Blueprint\CapabilityRoute\Form\CapabilityRouteFormInputs::class,
+            ],
             'name' => 'CapabilityRoute',
             'headline' => 'Capability Routes',
             'url' => 'capability-routes',
             'route_name' => 'capability_route',
             // 'belongs' => ['capability'],
             'icon' => 'mdi-security-network',
-            'table_options' => [
-                'createOnModal' => true,
-                'editOnModal' => true,
-                'isRowEditing' => true,
-                'rowActionsType' => 'inline',
-            ],
-            'headers' => [
-                [
-                    'title' => 'Route Name',
-                    'key' => 'route_name',
-                    'searchable' => true,
-                ],
-                [
-                    'title' => 'Active',
-                    'key' => 'is_active',
-                    'formatter' => [
-                        'switch',
-                    ],
-                ],
-                [
-                    'title' => 'Actions',
-                    'key' => 'actions',
-                    'sortable' => false,
-                ],
-            ],
-            'inputs' => [
-                [
-                    'type' => 'select-scroll',
-                    'componentType' => 'v-autocomplete',
-                    'name' => 'route_name',
-                    'label' => 'Route Name',
-                    'itemValue' => 'name',
-                    'itemTitle' => 'name_with_uri',
-                    'placeholder' => 'admin.system.cms.promotion.execute',
-                    'itemsPerPage' => 100,
-                    'page' => 1,
-                    'endpoint' => 'admin.system.system_user.capabilities.discover_routes',
-                    'searchKeys' => ['name', 'uri'],
-                    'col' => [
-                        'cols' => 12,
-                    ],
-                    'rules' => 'required|min:2',
-                ],
-                [
-                    'type' => 'switch',
-                    'name' => 'is_active',
-                    'label' => 'Active',
-                    'default' => true,
-                    'col' => [
-                        'cols' => 12,
-                        'sm' => 6,
-                        'md' => 4,
-                    ],
-                ],
-            ],
+            // 'table_options' => [
+            //     'createOnModal' => true,
+            //     'editOnModal' => true,
+            //     'isRowEditing' => true,
+            //     'rowActionsType' => 'inline',
+            // ],
+            // 'headers' => [
+            //     [
+            //         'title' => 'Route Name',
+            //         'key' => 'route_name',
+            //         'searchable' => true,
+            //     ],
+            //     [
+            //         'title' => 'Active',
+            //         'key' => 'is_active',
+            //         'formatter' => [
+            //             'switch',
+            //         ],
+            //     ],
+            //     [
+            //         'title' => 'Actions',
+            //         'key' => 'actions',
+            //         'sortable' => false,
+            //     ],
+            // ],
+            // 'inputs' => [
+            //     [
+            //         'type' => 'select-scroll',
+            //         'componentType' => 'v-autocomplete',
+            //         'name' => 'route_name',
+            //         'label' => 'Route Name',
+            //         'itemValue' => 'name',
+            //         'itemTitle' => 'name_with_uri',
+            //         'placeholder' => 'admin.system.cms.promotion.execute',
+            //         'itemsPerPage' => 100,
+            //         'page' => 1,
+            //         'endpoint' => 'admin.system.system_user.capabilities.discover_routes',
+            //         'searchKeys' => ['name', 'uri'],
+            //         'col' => [
+            //             'cols' => 12,
+            //         ],
+            //         'rules' => 'required|min:2',
+            //     ],
+            //     [
+            //         'type' => 'switch',
+            //         'name' => 'is_active',
+            //         'label' => 'Active',
+            //         'default' => true,
+            //         'col' => [
+            //             'cols' => 12,
+            //             'sm' => 6,
+            //             'md' => 4,
+            //         ],
+            //     ],
+            // ],
         ],
         'company' => [
+            'index' => [
+                'columns' => \Modules\SystemUser\Blueprint\Company\Index\CompanyIndexColumns::class,
+                'options' => \Modules\SystemUser\Blueprint\Company\Index\CompanyIndexOptions::class,
+                'with' => \Modules\SystemUser\Blueprint\Company\Index\CompanyIndexWith::class,
+            ],
+            'form' => [
+                'inputs' => \Modules\SystemUser\Blueprint\Company\Form\CompanyFormInputs::class,
+            ],
             'name' => 'Company',
             'headline' => 'Companies',
             'icon' => 'company',
             'url' => 'companies',
             'route_name' => 'company',
             'icon' => '$company',
-            'table_options' => [
-                'createOnModal' => true,
-                'editOnModal' => true,
-                'isRowEditing' => true,
-                'rowActionsType' => 'inline',
-            ],
-            'index_with' => [
-                'country',
-            ],
-            'headers' => [
-                [
-                    'title' => 'Name',
-                    'key' => 'name',
-                    'align' => 'start',
-                    'sortable' => true,
-                    'searchable' => true,
-                    'formatterName' => 'edit',
-                    'formatter' => [
-                        'shorten',
-                        20,
-                    ],
-                    'width' => 150,
-                ],
-                [
-                    'title' => 'Country',
-                    'key' => 'country_name',
-                    'align' => 'start',
-                    'groupable' => true,
-                    // 'sortable' => true,
-                    // 'searchable' => true,
-                ],
-                [
-                    'title' => 'Type',
-                    'key' => 'company_type',
-                    'align' => 'start',
-                    'groupable' => true,
-                ],
-                [
-                    'title' => 'Valid',
-                    'key' => 'is_valid_formatted',
-                    'align' => 'start',
-                    'groupable' => true,
-                    'formatter' => [
-                        'dynamic',
-                    ],
-                ],
-                [
-                    'title' => 'Users',
-                    'key' => 'users',
-                ],
-                [
-                    'title' => 'Actions',
-                    'key' => 'actions',
-                    'align' => 'center',
-                    'sortable' => false,
-                    'width' => '15%',
+            // 'table_options' => [
+            //     'createOnModal' => true,
+            //     'editOnModal' => true,
+            //     'isRowEditing' => true,
+            //     'rowActionsType' => 'inline',
+            // ],
+            // 'index_with' => [
+            //     'country',
+            // ],
+            // 'headers' => [
+            //     [
+            //         'title' => 'Name',
+            //         'key' => 'name',
+            //         'align' => 'start',
+            //         'sortable' => true,
+            //         'searchable' => true,
+            //         'formatterName' => 'edit',
+            //         'formatter' => [
+            //             'shorten',
+            //             20,
+            //         ],
+            //         'width' => 150,
+            //     ],
+            //     [
+            //         'title' => 'Country',
+            //         'key' => 'country_name',
+            //         'align' => 'start',
+            //         'groupable' => true,
+            // 'sortable' => true,
+            // 'searchable' => true,
+            //     ],
+            //     [
+            //         'title' => 'Type',
+            //         'key' => 'company_type',
+            //         'align' => 'start',
+            //         'groupable' => true,
+            //     ],
+            //     [
+            //         'title' => 'Valid',
+            //         'key' => 'is_valid_formatted',
+            //         'align' => 'start',
+            //         'groupable' => true,
+            //         'formatter' => [
+            //             'dynamic',
+            //         ],
+            //     ],
+            //     [
+            //         'title' => 'Users',
+            //         'key' => 'users',
+            //     ],
+            //     [
+            //         'title' => 'Actions',
+            //         'key' => 'actions',
+            //         'align' => 'center',
+            //         'sortable' => false,
+            //         'width' => '15%',
 
-                    'class' => 'actions-extra',
-                ],
-            ],
-            'inputs' => [
-                [
-                    'type' => 'radio-group',
-                    'name' => 'is_personal',
-                    'color' => 'primary',
-                    'col' => ['cols' => 12],
-                    'hideDetails' => false,
-                    'spreadable' => true,
-                    // 'ext' => [
-                    //     [
-                    //         'set',
-                    //         'name',
-                    //         'disabled',
-                    //         'disable_value.*.value',
-                    //     ],
-                    //     [
-                    //         'set',
-                    //         'tax_id',
-                    //         'disabled',
-                    //         'disable_value.*.value',
-                    //     ],
-                    //     [
-                    //         'set',
-                    //         'phone',
-                    //         'disabled',
-                    //         'disable_value.*.value',
-                    //     ],
-                    //     [
-                    //         'set',
-                    //         'email',
-                    //         'disabled',
-                    //         'disable_value.*.value',
-                    //     ],
-                    // ],
-                    'disable_value' => [
-                        [
-                            'id' => 0,
-                            'value' => 0,
-                        ],
-                        [
-                            'id' => 1,
-                            'value' => 1,
-                        ],
-                    ],
-                    'items' => [
-                        [
-                            'name' => 'Company',
-                            'id' => 0,
-                        ],
-                        [
-                            'name' => 'Personal',
-                            'id' => 1,
-                        ],
-                    ],
-                ],
-                [
-                    'type' => 'text',
-                    'title' => 'Name',
-                    'name' => 'name',
-                    'label' => ' Name',
-                    'placeholder' => '',
-                    'default' => '',
-                    'col' => [
-                        'cols' => 12,
-                        'sm' => 8,
-                        'md' => 6,
-                    ],
-                    'rules' => 'max:99',
-                    // 'rules' => 'sometimes|required|min:3',
-                ],
-                [
-                    'type' => 'text',
-                    'title' => 'Tax ID',
-                    'name' => 'tax_id',
-                    'label' => 'Tax ID',
-                    'placeholder' => '',
-                    'default' => '',
-                    'col' => [
-                        'cols' => 12,
-                        'sm' => 8,
-                        'md' => 6,
-                    ],
-                    'rules' => 'min:6|max:30',
-                    // 'rules' => 'sometimes|required|min:5',
-                ],
-                [
-                    'type' => 'text',
-                    'title' => 'Address',
-                    'name' => 'address',
-                    'label' => 'Address',
-                    'placeholder' => '',
-                    'default' => '',
-                    'col' => [
-                        'cols' => 12,
-                    ],
-                    'rules' => 'sometimes|required|min:5',
-                ],
-                [
-                    'type' => 'select',
-                    'title' => 'Country',
-                    'name' => 'country_id',
-                    'label' => 'Country',
-                    'placeholder' => '',
-                    'default' => '',
-                    'col' => [
-                        'cols' => 12,
-                        'sm' => 8,
-                        'md' => 6,
-                    ],
-                    'connector' => 'SystemUtility:Country|repository:list',
-                    'rules' => 'sometimes|required',
-                ],
-                [
-                    'type' => 'text',
-                    'title' => 'State',
-                    'name' => 'state',
-                    'label' => 'State/Province',
-                    'placeholder' => '',
-                    'default' => '',
-                    'col' => [
-                        'cols' => 12,
-                        'sm' => 8,
-                        'md' => 6,
-                    ],
-                    'rules' => 'sometimes|required|min:3|max:50',
-                ],
-                [
-                    'type' => 'text',
-                    'title' => 'City',
-                    'name' => 'city',
-                    'label' => 'City',
-                    'placeholder' => '',
-                    'default' => '',
-                    'col' => [
-                        'cols' => 12,
-                        'sm' => 8,
-                        'md' => 6,
-                    ],
-                    'rules' => 'sometimes|required|min:3|max:50',
-                ],
-                [
-                    'type' => 'text',
-                    'title' => 'Zip Code',
-                    'name' => 'zip_code',
-                    'label' => 'Zip Code',
-                    'placeholder' => '',
-                    'default' => '',
-                    'col' => [
-                        'cols' => 12,
-                        'sm' => 8,
-                        'md' => 6,
-                    ],
-                    'rules' => 'sometimes|required|min:5|max:30',
-                ],
-                [
-                    'type' => 'input-phone',
-                    'title' => 'Phone',
-                    'name' => 'phone',
-                    'label' => 'Phone',
-                    'col' => [
-                        'cols' => 12,
-                        'sm' => 8,
-                        'md' => 6,
-                    ],
-                ],
-                [
-                    'type' => 'text',
-                    'name' => 'email',
-                    'label' => 'Work E-mail',
-                    'default' => '',
-                    'col' => ['sm' => 6],
-                    'spreadable' => true,
-                ],
-                // [
-                //     'type' => 'text',
-                //     'title' => 'Vat Number',
-                //     'name' => 'vat_number',
-                //     'label' => 'Vat Number',
-                //     'placeholder' => '',
-                //     'default' => '',
-                //     'col' => [
-                //         'cols' => 12,
-                //         'sm' => 8,
-                //         'md' => 6,
-                //     ],
-                //     'rules' => 'sometimes|required|min:5',
-                // ],
+            //         'class' => 'actions-extra',
+            //     ],
+            // ],
+            // 'inputs' => [
+            //     [
+            //         'type' => 'radio-group',
+            //         'name' => 'is_personal',
+            //         'color' => 'primary',
+            //         'col' => ['cols' => 12],
+            //         'hideDetails' => false,
+            //         'spreadable' => true,
+            // 'ext' => [
+            //     [
+            //         'set',
+            //         'name',
+            //         'disabled',
+            //         'disable_value.*.value',
+            //     ],
+            //     [
+            //         'set',
+            //         'tax_id',
+            //         'disabled',
+            //         'disable_value.*.value',
+            //     ],
+            //     [
+            //         'set',
+            //         'phone',
+            //         'disabled',
+            //         'disable_value.*.value',
+            //     ],
+            //     [
+            //         'set',
+            //         'email',
+            //         'disabled',
+            //         'disable_value.*.value',
+            //     ],
+            // ],
+            //         'disable_value' => [
+            //             [
+            //                 'id' => 0,
+            //                 'value' => 0,
+            //             ],
+            //             [
+            //                 'id' => 1,
+            //                 'value' => 1,
+            //             ],
+            //         ],
+            //         'items' => [
+            //             [
+            //                 'name' => 'Company',
+            //                 'id' => 0,
+            //             ],
+            //             [
+            //                 'name' => 'Personal',
+            //                 'id' => 1,
+            //             ],
+            //         ],
+            //     ],
+            //     [
+            //         'type' => 'text',
+            //         'title' => 'Name',
+            //         'name' => 'name',
+            //         'label' => ' Name',
+            //         'placeholder' => '',
+            //         'default' => '',
+            //         'col' => [
+            //             'cols' => 12,
+            //             'sm' => 8,
+            //             'md' => 6,
+            //         ],
+            //         'rules' => 'max:99',
+            // 'rules' => 'sometimes|required|min:3',
+            //     ],
+            //     [
+            //         'type' => 'text',
+            //         'title' => 'Tax ID',
+            //         'name' => 'tax_id',
+            //         'label' => 'Tax ID',
+            //         'placeholder' => '',
+            //         'default' => '',
+            //         'col' => [
+            //             'cols' => 12,
+            //             'sm' => 8,
+            //             'md' => 6,
+            //         ],
+            //         'rules' => 'min:6|max:30',
+            // 'rules' => 'sometimes|required|min:5',
+            //     ],
+            //     [
+            //         'type' => 'text',
+            //         'title' => 'Address',
+            //         'name' => 'address',
+            //         'label' => 'Address',
+            //         'placeholder' => '',
+            //         'default' => '',
+            //         'col' => [
+            //             'cols' => 12,
+            //         ],
+            //         'rules' => 'sometimes|required|min:5',
+            //     ],
+            //     [
+            //         'type' => 'select',
+            //         'title' => 'Country',
+            //         'name' => 'country_id',
+            //         'label' => 'Country',
+            //         'placeholder' => '',
+            //         'default' => '',
+            //         'col' => [
+            //             'cols' => 12,
+            //             'sm' => 8,
+            //             'md' => 6,
+            //         ],
+            //         'connector' => 'SystemUtility:Country|repository:list',
+            //         'rules' => 'sometimes|required',
+            //     ],
+            //     [
+            //         'type' => 'text',
+            //         'title' => 'State',
+            //         'name' => 'state',
+            //         'label' => 'State/Province',
+            //         'placeholder' => '',
+            //         'default' => '',
+            //         'col' => [
+            //             'cols' => 12,
+            //             'sm' => 8,
+            //             'md' => 6,
+            //         ],
+            //         'rules' => 'sometimes|required|min:3|max:50',
+            //     ],
+            //     [
+            //         'type' => 'text',
+            //         'title' => 'City',
+            //         'name' => 'city',
+            //         'label' => 'City',
+            //         'placeholder' => '',
+            //         'default' => '',
+            //         'col' => [
+            //             'cols' => 12,
+            //             'sm' => 8,
+            //             'md' => 6,
+            //         ],
+            //         'rules' => 'sometimes|required|min:3|max:50',
+            //     ],
+            //     [
+            //         'type' => 'text',
+            //         'title' => 'Zip Code',
+            //         'name' => 'zip_code',
+            //         'label' => 'Zip Code',
+            //         'placeholder' => '',
+            //         'default' => '',
+            //         'col' => [
+            //             'cols' => 12,
+            //             'sm' => 8,
+            //             'md' => 6,
+            //         ],
+            //         'rules' => 'sometimes|required|min:5|max:30',
+            //     ],
+            //     [
+            //         'type' => 'input-phone',
+            //         'title' => 'Phone',
+            //         'name' => 'phone',
+            //         'label' => 'Phone',
+            //         'col' => [
+            //             'cols' => 12,
+            //             'sm' => 8,
+            //             'md' => 6,
+            //         ],
+            //     ],
+            //     [
+            //         'type' => 'text',
+            //         'name' => 'email',
+            //         'label' => 'Work E-mail',
+            //         'default' => '',
+            //         'col' => ['sm' => 6],
+            //         'spreadable' => true,
+            //     ],
+            // [
+            //     'type' => 'text',
+            //     'title' => 'Vat Number',
+            //     'name' => 'vat_number',
+            //     'label' => 'Vat Number',
+            //     'placeholder' => '',
+            //     'default' => '',
+            //     'col' => [
+            //         'cols' => 12,
+            //         'sm' => 8,
+            //         'md' => 6,
+            //     ],
+            //     'rules' => 'sometimes|required|min:5',
+            // ],
 
-            ],
+            // ],
         ],
     ],
 ];

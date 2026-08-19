@@ -110,6 +110,55 @@ class HasRemoteApiSourceTest extends TestCase
         $this->assertSame('Updated Name', $model->getAttribute('synced_name'));
         $this->assertArrayNotHasKey('synced_name', $model->getDirty());
     }
+
+    public function test_to_remote_api_array_merges_source_payload(): void
+    {
+        $source = new RemoteApiSource([
+            'remote_id' => 11,
+            'synced_attributes' => ['synced_name' => 'API'],
+            'remote_payload' => ['raw' => 1],
+            'remote_synced_at' => '2026-01-01 00:00:00',
+        ]);
+
+        $model = new RemoteApiSourceTestModel([
+            'id' => 1,
+            'name' => 'Local',
+        ]);
+        $model->setRelation('remoteApiSource', $source);
+
+        $array = $model->toRemoteApiArray();
+        $this->assertSame(11, $array['remote_id']);
+        $this->assertSame('API', $array['synced_name']);
+        $this->assertSame(['raw' => 1], $array['remote_payload']);
+        $this->assertEquals($array, $model->toRemoteApiPresentationArray());
+    }
+
+    public function test_remote_api_last_sync_chip_never_and_synced_paths(): void
+    {
+        $model = new RemoteApiSourceTestModel(['id' => 1, 'name' => 'Local']);
+        $model->setRelation('remoteApiSource', null);
+
+        $never = $model->exposeFormatRemoteApiLastSyncChip(null);
+        $this->assertStringContainsString('mdi-sync-off', $never);
+
+        $synced = $model->exposeFormatRemoteApiLastSyncChip(\Illuminate\Support\Carbon::parse('2026-06-21 12:00:00'));
+        $this->assertStringContainsString('mdi-sync', $synced);
+        $this->assertStringContainsString('2026-06-21', $synced);
+
+        session(['modularous_timezone' => 'Not/AZone']);
+        $this->assertSame('UTC', $model->exposeResolveRemoteApiDisplayTimezone());
+
+        session(['modularous_timezone' => 'Europe/Istanbul']);
+        $this->assertSame('Europe/Istanbul', $model->exposeResolveRemoteApiDisplayTimezone());
+    }
+
+    public function test_get_remote_api_id_prefers_virtual_then_relation(): void
+    {
+        $model = new RemoteApiSourceTestModel(['name' => 'Local']);
+        $model->fill(['remote_id' => 77]);
+        $this->assertSame(77, $model->getRemoteApiId());
+        $this->assertSame('remote_id', $model->getRemoteApiIdColumn());
+    }
 }
 
 class RecordingRemoteApiSource extends RemoteApiSource
@@ -143,5 +192,15 @@ class RemoteApiSourceTestModel extends Model
     public static function resolveRemoteApiSourceableObserverForTest(): string
     {
         return static::resolveRemoteApiSourceableObserver();
+    }
+
+    public function exposeFormatRemoteApiLastSyncChip(?\Illuminate\Support\Carbon $syncedAt): string
+    {
+        return $this->formatRemoteApiLastSyncChip($syncedAt);
+    }
+
+    public function exposeResolveRemoteApiDisplayTimezone(): string
+    {
+        return $this->resolveRemoteApiDisplayTimezone();
     }
 }

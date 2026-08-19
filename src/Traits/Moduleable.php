@@ -17,6 +17,11 @@ trait Moduleable
      */
     protected $routeName = null;
 
+    /**
+     * @var string|null
+     */
+    protected $moduleRouteName = null;
+
     public function getModuleName(): ?string
     {
         if ($this->moduleName) {
@@ -46,20 +51,57 @@ trait Moduleable
         return $this->moduleName;
     }
 
+    public function getModuleRouteName(): ?string
+    {
+        if ($this->moduleRouteName) {
+            return $this->moduleRouteName;
+        }
+
+        // Controllers historically only populate $routeName via setupRouteName().
+        if ($this->routeName) {
+            return $this->moduleRouteName = $this->routeName;
+        }
+
+        if (preg_match('/(\w+)(?=(Request|Repository|Controller))/', get_class_short_name($this), $matches)) {
+            $this->moduleRouteName = studlyName($matches[1]);
+            $this->routeName ??= $this->moduleRouteName;
+
+            return $this->moduleRouteName;
+        }
+
+        if (preg_match('/(\w+)\Entities/', get_class($this), $matches)) {
+            $this->moduleRouteName = studlyName(get_class_short_name($this));
+            $this->routeName ??= $this->moduleRouteName;
+
+            return $this->moduleRouteName;
+        }
+
+        return $this->moduleRouteName;
+    }
+
+    /**
+     * @deprecated Use getModuleRouteName instead
+     */
     public function getRouteName(): ?string
     {
         if ($this->routeName) {
             return $this->routeName;
         }
 
+        if ($this->moduleRouteName) {
+            return $this->routeName = $this->moduleRouteName;
+        }
+
         if (preg_match('/(\w+)(?=(Request|Repository|Controller))/', get_class_short_name($this), $matches)) {
             $this->routeName = studlyName($matches[1]);
+            $this->moduleRouteName ??= $this->routeName;
 
             return $this->routeName;
         }
 
         if (preg_match('/(\w+)\Entities/', get_class($this), $matches)) {
             $this->routeName = studlyName(get_class_short_name($this));
+            $this->moduleRouteName ??= $this->routeName;
 
             return $this->routeName;
         }
@@ -72,7 +114,7 @@ trait Moduleable
      */
     public function getPermissionPrefix(): string
     {
-        return kebabCase($this->getRouteName());
+        return kebabCase($this->getModuleRouteName());
     }
 
     /**
@@ -99,10 +141,23 @@ trait Moduleable
 
     /**
      * @return $this
+     * @deprecated Use setModuleRouteName instead
      */
     public function setRouteName(string $routeName): static
     {
         $this->routeName = $routeName;
+        $this->moduleRouteName = $routeName;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setModuleRouteName(string $moduleRouteName): static
+    {
+        $this->moduleRouteName = $moduleRouteName;
+        $this->routeName = $moduleRouteName;
 
         return $this;
     }

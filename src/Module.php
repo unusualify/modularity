@@ -30,6 +30,9 @@ use Unusualify\Modularous\Http\Controllers\Traits\ManageResourceCache;
 use Unusualify\Modularous\Repositories\Logic\ResourceCacheActionsTrait;
 use Unusualify\Modularous\Repositories\Repository;
 use Unusualify\Modularous\Repositories\Traits\RemoteApiSourceTrait;
+use Unusualify\Modularous\Services\ModuleRouteInspect\Contracts\ModuleRouteStatusStoreInterface;
+use Unusualify\Modularous\Services\ModuleRouteInspect\FeatureDetector;
+use Unusualify\Modularous\Services\ModuleRoutePresentation\ModuleRoutePresentationResolver;
 
 class Module extends NwidartModule
 {
@@ -45,6 +48,14 @@ class Module extends NwidartModule
 
     /** @var array<string, mixed>|null */
     private ?array $rawConfigCache = null;
+
+    private ?ModuleRouteRegistry $moduleRouteRegistryCache = null;
+
+    /** @var array<string, bool> */
+    private array $singletonMemo = [];
+
+    /** @var list<string>|null */
+    private ?array $routeNamesMemo = null;
 
     private static $routeActionLists = [
         'restore',
@@ -79,6 +90,14 @@ class Module extends NwidartModule
         'cachePurgeAll',
         'cacheWarmAll',
     ];
+
+    /**
+     * Regex alternation of known route action suffixes (for URL name matching).
+     */
+    public function routeActionPattern(): string
+    {
+        return '(' . implode('|', self::$routeActionLists) . ')';
+    }
 
     /**
      * The constructor.
@@ -203,39 +222,75 @@ class Module extends NwidartModule
     }
 
     /**
-     * Ensure the routes statuses file exists as an empty object.
+     * Ensure the routes statuses backing store exists for this module.
      */
     public function ensureRoutesStatusesFile(): void
     {
-        $this->moduleActivator->ensureFileExists();
+        if ($this->usesFilesystemRouteStatusDriver()) {
+            $this->moduleActivator->ensureFileExists();
+
+            return;
+        }
+
+        $this->moduleRouteStatusStore()->ensureExists($this->getStudlyName());
     }
 
     /**
      * Enable the current module route.
      */
-    public function enableRoute($route): void
+    public function enableModuleRoute($route): void
     {
+        $route = studlyName((string) $route);
+
         $this->fireModuleEvent('enabling', $route);
 
-        $this->moduleActivator->enable($route);
+        if ($this->usesFilesystemRouteStatusDriver()) {
+            $this->moduleActivator->enable($route);
+        } else {
+            $this->moduleRouteStatusStore()->setEnabled($this->getStudlyName(), $route, true);
+        }
 
+        $this->flushModuleRouteRegistry();
         $this->flushModuleCache();
 
         $this->fireModuleEvent('enabled', $route);
     }
 
     /**
+     * @deprecated Use {@see enableModuleRoute()} instead.
+     */
+    public function enableRoute($route): void
+    {
+        $this->enableModuleRoute($route);
+    }
+
+    /**
      * Disable the current module route.
      */
-    public function disableRoute($route): void
+    public function disableModuleRoute($route): void
     {
+        $route = studlyName((string) $route);
+
         $this->fireModuleEvent('disabling', $route);
 
-        $this->moduleActivator->disable($route);
+        if ($this->usesFilesystemRouteStatusDriver()) {
+            $this->moduleActivator->disable($route);
+        } else {
+            $this->moduleRouteStatusStore()->setEnabled($this->getStudlyName(), $route, false);
+        }
 
+        $this->flushModuleRouteRegistry();
         $this->flushModuleCache();
 
         $this->fireModuleEvent('disabled', $route);
+    }
+
+    /**
+     * @deprecated Use {@see disableModuleRoute()} instead.
+     */
+    public function disableRoute($route): void
+    {
+        $this->disableModuleRoute($route);
     }
 
     /**
@@ -249,19 +304,40 @@ class Module extends NwidartModule
     }
 
     /**
-     * Get all routes of the module.
+     * Studly route names from the status store (hot path — no ModuleRoute registry).
+     *
+     * Uses in-memory activator statuses when available; avoids ModuleRouteRegistry
+     * and avoids {@see \Unusualify\Modularous\Activators\ModuleActivator::getRoutes()}
+     * which re-reads JSON from disk on every call.
+     *
+     * @return list<string>
      */
     public function getRouteNames(): array
     {
-        return $this->moduleActivator->getRoutes();
+        if ($this->routeNamesMemo !== null) {
+            return $this->routeNamesMemo;
+        }
+
+        $statuses = $this->moduleActivator->getRoutesStatuses();
+        if (! is_array($statuses)) {
+            return $this->routeNamesMemo = [];
+        }
+
+        return $this->routeNamesMemo = array_values(array_map(
+            static fn (string|int $key): string => studlyName((string) $key),
+            array_keys($statuses)
+        ));
     }
 
     /**
-     * Check if a route exists in the module.
+     * Check if a route exists in the module (hot path — no ModuleRoute registry).
      */
     public function hasRoute(string $routeName): bool
     {
-        return in_array($routeName, $this->getRouteNames());
+        $wanted = studlyName($routeName);
+
+        return in_array($wanted, $this->getRouteNames(), true)
+            || in_array($routeName, $this->getRouteNames(), true);
     }
 
     /**
@@ -276,18 +352,185 @@ class Module extends NwidartModule
 
     /**
      * Determine whether the current module route activated.
+     *
+     * Filesystem driver (default): direct activator lookup — same cost as pre-ModuleRoute.
+     * Database driver: status store.
+     */
+    public function isEnabledModuleRoute(string $route): bool
+    {
+        $route = studlyName($route);
+
+        if ($this->usesFilesystemRouteStatusDriver()) {
+            return $this->moduleActivator->hasStatus($route, true);
+        }
+
+        return $this->moduleRouteStatusStore()->isEnabled($this->getStudlyName(), $route);
+    }
+
+    /**
+     * @deprecated Use {@see isEnabledModuleRoute()} instead.
      */
     public function isEnabledRoute(string $route): bool
     {
-        return $this->moduleActivator->hasStatus($route, true);
+        return $this->isEnabledModuleRoute($route);
     }
 
     /**
      *  Determine whether the current module route not disabled.
      */
+    public function isDisabledModuleRoute($route): bool
+    {
+        return ! $this->isEnabledModuleRoute((string) $route);
+    }
+
+    /**
+     * @deprecated Use {@see isDisabledModuleRoute()} instead.
+     */
     public function isDisabledRoute($route): bool
     {
-        return ! $this->isEnabledRoute($route);
+        return $this->isDisabledModuleRoute($route);
+    }
+
+    /**
+     * Default status driver is filesystem (activator JSON). Database uses the store adapter.
+     */
+    private function usesFilesystemRouteStatusDriver(): bool
+    {
+        $driver = strtolower((string) modularousConfig('module_route_inspect.driver', 'filesystem'));
+
+        return $driver === 'filesystem' || $driver === '';
+    }
+
+    /**
+     * Resolved route status persistence adapter (filesystem or database).
+     */
+    private function moduleRouteStatusStore(): ModuleRouteStatusStoreInterface
+    {
+        return $this->app->make(ModuleRouteStatusStoreInterface::class);
+    }
+
+    /**
+     * Registry of first-class {@see ModuleRoute} instances (config ∪ status keys).
+     * Cached per Module instance for the request lifetime.
+     */
+    public function moduleRouteRegistry(): ModuleRouteRegistry
+    {
+        return $this->moduleRouteRegistryCache ??= new ModuleRouteRegistry(
+            $this,
+            $this->moduleRouteStatusStore(),
+            $this->app->make(FeatureDetector::class),
+        );
+    }
+
+    /**
+     * Drop cached ModuleRoute registry (after enable/disable or config mutation).
+     */
+    public function flushModuleRouteRegistry(): void
+    {
+        $this->moduleRouteRegistryCache = null;
+        $this->singletonMemo = [];
+        $this->routeNamesMemo = null;
+    }
+
+    /**
+     * @return \Illuminate\Support\Collection<string, ModuleRoute>
+     */
+    public function moduleRoutes()
+    {
+        return $this->moduleRouteRegistry()->all();
+    }
+
+    /**
+     * ModuleRoute instances for config-listed routes (not status∪config union).
+     *
+     * Still builds {@see ModuleRouteRegistry} — do **not** use from admin sidebar
+     * hot path; use {@see getRawRouteConfigs()} + {@see isSingleton()} instead.
+     *
+     * @see docs/src/pages/system-reference/adr-module-route-hot-path.md
+     *
+     * @return \Illuminate\Support\Collection<string, ModuleRoute>
+     */
+    public function sidebarRoutes()
+    {
+        $routes = collect();
+
+        foreach ($this->getRawRouteConfigs(null, true) ?: [] as $key => $config) {
+            if (! is_array($config)) {
+                continue;
+            }
+
+            $name = $config['name'] ?? (is_string($key) ? $key : null);
+            if (! is_string($name) || $name === '') {
+                continue;
+            }
+
+            $route = $this->moduleRoute($name);
+            if ($route !== null) {
+                $routes->put($route->name(), $route);
+            }
+        }
+
+        return $routes;
+    }
+
+    /**
+     * Resolve a single module route by Studly or snake name.
+     */
+    public function moduleRoute(string $routeName): ?ModuleRoute
+    {
+        return $this->moduleRouteRegistry()->find($routeName);
+    }
+
+    /**
+     * @deprecated Use {@see moduleRoute()} instead.
+     */
+    public function route(string $routeName): ?ModuleRoute
+    {
+        return $this->moduleRoute($routeName);
+    }
+
+    /**
+     * Resolve a single module route by Studly or snake name.
+     */
+    public function find(string $routeName): ?ModuleRoute
+    {
+        return $this->moduleRouteRegistry()->find($routeName);
+    }
+
+    /**
+     * @return \Illuminate\Support\Collection<string, ModuleRoute>
+     */
+    public function enabledModuleRoutes()
+    {
+        return $this->moduleRouteRegistry()->enabled();
+    }
+
+    /**
+     * @deprecated Use {@see enabledModuleRoutes()} instead.
+     *
+     * @return \Illuminate\Support\Collection<string, ModuleRoute>
+     */
+    public function enabledRoutes()
+    {
+        return $this->enabledModuleRoutes();
+    }
+
+    /**
+     * @deprecated Use {@see moduleRouteRegistry()} instead.
+     */
+    public function routeRegistry(): ModuleRouteRegistry
+    {
+        return $this->moduleRouteRegistry();
+    }
+
+    /**
+     * @deprecated Use {@see moduleRoutes()} instead.
+     *
+     * @return \Illuminate\Support\Collection<string, ModuleRoute>
+     */
+    public function routes()
+    {
+        return $this->moduleRoutes();
     }
 
     /**
@@ -399,7 +642,7 @@ class Module extends NwidartModule
      */
     public function getRouteInputs($route_name, $input_name = null): array
     {
-        return $this->getRouteConfig($route_name)['inputs'];
+        return $this->resolveRouteBlueprintField($route_name, 'inputs');
     }
 
     /**
@@ -548,50 +791,100 @@ class Module extends NwidartModule
      */
     public function isParentRoute($routeName): bool
     {
-        return count(($pr = $this->getParentRoute())) > 0 && $pr['name'] == studlyName($routeName);
+        $parent = $this->getParentRoute();
+
+        return $parent !== [] && ($parent['name'] ?? null) === studlyName((string) $routeName);
     }
 
     /**
-     * isSingleton
+     * isSingleton — class-string trait check only (no ModuleRoute registry, no App::make).
+     *
+     * Hot path: route registration, sidebar, controllers. Memoized per Module instance.
      *
      * @param string $routeName
+     * @return bool
+     *
+     * @deprecated Prefer ModuleRoute::isSingleton() when you already have a ModuleRoute
      */
     public function isSingleton($routeName): bool
     {
-        $singularTrait = 'Unusualify\Modularous\Entities\Traits\IsSingular';
-        $repository = $this->getRouteClass($routeName, 'repository', true);
+        $key = studlyName((string) $routeName);
 
-        return classHasTrait(App::make($repository)->getModel(), $singularTrait);
+        if (array_key_exists($key, $this->singletonMemo)) {
+            return $this->singletonMemo[$key];
+        }
+
+        try {
+            $modelClass = $this->getRouteClass($key, 'model');
+            if (! is_string($modelClass) || $modelClass === '' || ! class_exists($modelClass)) {
+                return $this->singletonMemo[$key] = false;
+            }
+
+            return $this->singletonMemo[$key] = classHasTrait(
+                $modelClass,
+                'Unusualify\Modularous\Entities\Traits\IsSingular'
+            );
+        } catch (\Throwable) {
+            return $this->singletonMemo[$key] = false;
+        }
     }
 
     /**
-     * check if the route has remote api source
+     * check if the route has remote api source (class-string only — hot path safe)
      */
     public function hasRemoteApiSource(string $routeName): bool
     {
-        $repository = $this->getRepository($routeName, true);
-        $model = $repository->getModel();
+        try {
+            $repositoryClass = $this->getRouteClass($routeName, 'repository');
+            $modelClass = $this->getRouteClass($routeName, 'model');
+        } catch (\Throwable) {
+            return false;
+        }
 
-        return classHasTrait($repository, RemoteApiSourceTrait::class)
-            && classHasTrait($model, HasRemoteApiSource::class);
+        if (! is_string($repositoryClass) || ! is_string($modelClass)) {
+            return false;
+        }
+
+        if (! class_exists($repositoryClass) || ! class_exists($modelClass)) {
+            return false;
+        }
+
+        return classHasTrait($repositoryClass, RemoteApiSourceTrait::class)
+            && classHasTrait($modelClass, HasRemoteApiSource::class);
     }
 
     /**
-     * isResourceCacheEnabled
+     * isResourceCacheEnabled (class-string only — hot path safe)
      */
     public function isResourceCacheEnabled(string $routeName): bool
     {
-        $repository = $this->getRepository($routeName, true);
-        $controller = $this->getController($routeName, true);
-
-        if (! class_uses_recursive($repository) || ! in_array(ResourceCacheActionsTrait::class, class_uses_recursive($repository))) {
+        try {
+            $repositoryClass = $this->getRouteClass($routeName, 'repository');
+            $controllerClass = $this->getTargetClassNamespace(
+                'controller',
+                studlyName($routeName) . 'Controller'
+            );
+        } catch (\Throwable) {
             return false;
         }
-        if (! class_uses_recursive($controller) || ! in_array(ManageResourceCache::class, class_uses_recursive($controller))) {
+
+        if (! is_string($repositoryClass) || ! is_string($controllerClass)) {
             return false;
         }
 
-        return ModularousCache::hasAdminCacheActions($this->getName(), $routeName);
+        if (! class_exists($repositoryClass) || ! class_exists($controllerClass)) {
+            return false;
+        }
+
+        if (! in_array(ResourceCacheActionsTrait::class, class_uses_recursive($repositoryClass), true)) {
+            return false;
+        }
+
+        if (! in_array(ManageResourceCache::class, class_uses_recursive($controllerClass), true)) {
+            return false;
+        }
+
+        return ModularousCache::hasAdminCacheActions($this->getName(), studlyName($routeName));
     }
 
     /**
@@ -683,7 +976,7 @@ class Module extends NwidartModule
         }
 
         if (! $isParent) {
-            $prefixes[] = $this->routeNameprefix();
+            $prefixes[] = $this->routeNamePrefix();
         }
 
         return implode('.', $prefixes);
@@ -717,17 +1010,20 @@ class Module extends NwidartModule
      */
     public function routeHasTable($routeName = null, $notation = null): bool
     {
-        $repository = $this->getRepository($routeName ?? $this->getStudlyName(), true);
-        if (! $repository && $notation !== null) {
-            $repository = $this->getRepository($notation, true);
-        }
-        if (! $repository) {
-            return false;
-        }
-        $model = $repository->getModel();
-        $tableName = is_string($model) ? (new $model)->getTable() : $model->getTable();
+        $candidates = array_values(array_filter([
+            $routeName !== null ? (string) $routeName : null,
+            $notation !== null ? (string) $notation : null,
+            $this->getStudlyName(),
+        ], static fn ($value) => $value !== null && $value !== ''));
 
-        return Schema::hasTable($tableName);
+        foreach ($candidates as $candidate) {
+            $route = $this->route($candidate);
+            if ($route !== null) {
+                return $route->hasTable();
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -873,7 +1169,7 @@ class Module extends NwidartModule
 
         $mainQuote = implode('.', $mainQuoteParts);
 
-        $actionsQuote = '(' . implode('|', self::$routeActionLists) . ')';
+        $actionsQuote = $this->routeActionPattern();
 
         $quoteParts = [$mainQuote, $actionsQuote];
 
@@ -906,7 +1202,7 @@ class Module extends NwidartModule
 
         $mainQuote = implode('.', $mainQuoteParts);
 
-        $actionsQuote = '(' . implode('|', self::$routeActionLists) . ')';
+        $actionsQuote = $this->routeActionPattern();
 
         $quoteParts = [$mainQuote, $actionsQuote];
 
@@ -979,9 +1275,6 @@ class Module extends NwidartModule
         }
     }
 
-    /**
-     * getParentNamespace
-     */
     public function getParentNamespace(string $target): string
     {
         return $this->getBaseNamespace() . '\\' . GenerateConfigReader::read(kebabCase($target))->getNamespace();
@@ -1110,15 +1403,17 @@ class Module extends NwidartModule
 
     /**
      * getNavigationActions
+     *
+     * Custom row actions resolve nested-first (`index.row_actions`) / Blueprint when needed,
+     * then legacy flat `table_row_actions`. Belongs-to nested link actions are appended.
      */
     public function getNavigationActions(string $routeName): array
     {
         $routeName = snakeCase($routeName); // snake case
-        $routeConfig = $this->getRouteConfig($routeName);
 
         $navigationActions = [];
 
-        $customActions = $routeConfig['table_row_actions'] ?? [];
+        $customActions = $this->resolveRouteBlueprintField($routeName, 'table_row_actions');
 
         foreach ($customActions as $customAction) {
             $navigationActions[] = $customAction;
@@ -1148,6 +1443,63 @@ class Module extends NwidartModule
         }
 
         return $navigationActions;
+    }
+
+    /**
+     * Resolve a Blueprint presentation field for a route without forcing ModuleRoute
+     * unless class/meta (or non-config global driver) requires it.
+     *
+     * @return list<array<string, mixed>>|array<string, mixed>
+     */
+    public function resolveRouteBlueprintField(string $routeName, string $field): array
+    {
+        $snake = snakeCase($routeName);
+        $raw = $this->getRawRouteConfig($snake);
+
+        if ($raw === []) {
+            return [];
+        }
+
+        if ($this->routeBlueprintFieldNeedsModuleRoute($raw, $field)) {
+            $route = $this->moduleRoute(studlyName($routeName));
+            if ($route === null) {
+                return [];
+            }
+
+            return match ($field) {
+                'table_row_actions' => $route->tableRowActions(),
+                'filters' => $route->advancedFilters(),
+                'table_filters' => $route->tableFilters(),
+                'table_actions' => $route->tableActions(),
+                'form_actions' => $route->formActions(),
+                default => $route->presentation($field),
+            };
+        }
+
+        return ModuleRoutePresentationResolver::readConfigPayloadFromArray($raw, $field);
+    }
+
+    /**
+     * @param  array<string, mixed>  $raw
+     */
+    private function routeBlueprintFieldNeedsModuleRoute(array $raw, string $field): bool
+    {
+        $globalDriver = strtolower((string) modularousConfig('module_route_presentation.driver', 'config'));
+        if ($globalDriver !== 'config' && $globalDriver !== '') {
+            return true;
+        }
+
+        if (isset($raw['blueprint']) || isset($raw['presentation'])) {
+            return true;
+        }
+
+        try {
+            $nestedKey = ModuleRoutePresentationResolver::nestedConfigKey($field);
+        } catch (\InvalidArgumentException) {
+            return false;
+        }
+
+        return ModuleRoutePresentationResolver::looksLikeProviderMeta(data_get($raw, $nestedKey));
     }
 
     /**

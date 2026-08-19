@@ -34,6 +34,7 @@ class MakeModuleCommand extends BaseCommand
         {--just-stubs : Only stubs fix}
         {--stubs-only= : Get only stubs}
         {--stubs-except= : Get except stubs}
+        {--presentation=class : Route presentation source (config|class)}
         {--test : Test mode}';
 
     /**
@@ -72,7 +73,6 @@ class MakeModuleCommand extends BaseCommand
         if ($this->option('system')) {
             try {
                 Modularous::setSystemModulesPath();
-
             } catch (ModularousSystemPathException $e) {
                 $this->error('You cannot create system module because of modularous production');
 
@@ -96,7 +96,6 @@ class MakeModuleCommand extends BaseCommand
             }
 
             return 0;
-
         }
 
         $traits = activeModularousTraits($this->options());
@@ -115,22 +114,25 @@ class MakeModuleCommand extends BaseCommand
 
         $plain = $this->getPlainOption();
 
-        $this->call('modularous:make:route', [
-            'module' => $this->argument('module'),
-            'route' => $this->argument('module'),
-        ]
-            + ($this->hasOption('schema') ? ['--schema' => $this->option('schema')] : [])
-            + ($this->hasOption('rules') ? ['--rules' => $this->option('rules')] : [])
-            + ($this->hasOption('relationships') ? ['--relationships' => $this->option('rules')] : [])
-            + ($this->option('force') ? ['--force' => true] : [])
-            + ($this->option('no-migrate') ? ['--no-migrate' => true] : [])
-            + ($this->option('no-defaults') ? ['--no-defaults' => true] : [])
-            + ($this->option('no-migration') ? ['--no-migration' => true] : [])
-            + ($this->option('table-name') ? ['--table-name' => $this->option('table-name')] : [])
-            + (['-p' => $plain])
-            + $console_traits
-            + ['--notAsk' => true]
-            + ['--test' => $this->option('test')]
+        $this->call(
+            'modularous:make:route',
+            [
+                'module' => $this->argument('module'),
+                'route' => $this->argument('module'),
+            ]
+                + ($this->hasOption('schema') ? ['--schema' => $this->option('schema')] : [])
+                + ($this->hasOption('rules') ? ['--rules' => $this->option('rules')] : [])
+                + ($this->hasOption('relationships') ? ['--relationships' => $this->option('rules')] : [])
+                + ($this->option('force') ? ['--force' => true] : [])
+                + ($this->option('no-migrate') ? ['--no-migrate' => true] : [])
+                + ($this->option('no-defaults') ? ['--no-defaults' => true] : [])
+                + ($this->option('no-migration') ? ['--no-migration' => true] : [])
+                + ($this->option('table-name') ? ['--table-name' => $this->option('table-name')] : [])
+                + ($this->option('presentation') ? ['--presentation' => $this->option('presentation')] : [])
+                + (['-p' => $plain])
+                + $console_traits
+                + ['--notAsk' => true]
+                + ['--test' => $this->option('test')]
         );
 
         if ($plain) {

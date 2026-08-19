@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use Unusualify\Modularous\Http\Controllers\ArtisanRunner\ArtisanRunnerController;
 use Unusualify\Modularous\Http\Controllers\ArtisanRunner\ArtisanRunnerToolController;
+use Unusualify\Modularous\Http\Controllers\ModuleRouteInspect\ModuleRouteInspectController;
+use Unusualify\Modularous\Http\Controllers\ModuleRouteInspect\ModuleRouteInspectToolController;
 use Unusualify\Modularous\Http\Controllers\Utility\ChatController;
 use Unusualify\Modularous\Http\Controllers\Utility\ProcessController;
 use Unusualify\Modularous\Http\Controllers\Utility\TagController;
@@ -47,6 +49,7 @@ Route::put('profile/ui-preferences', 'Utility\UIPreferencesController@update')->
 Route::resource('', 'DashboardController', ['as' => 'dashboard', 'names' => ['index' => 'dashboard']])->only(['index']);
 
 Route::get('artisan-runner', ArtisanRunnerToolController::class)->name('artisan-runner');
+Route::get('module-route-inspect', ModuleRouteInspectToolController::class)->name('module-route-inspect');
 
 Route::get('users/impersonate/stop', 'Utility\ImpersonateController@stopImpersonate')->name('impersonate.stop');
 Route::get('users/impersonate/{id}', 'Utility\ImpersonateController@impersonate')->name('impersonate');
@@ -90,6 +93,14 @@ Route::prefix('api')->group(function () {
         Route::post('runs/{runId}/answer', 'answer')->name('runs.answer');
     });
     // ############# End of ArtisanRunner API routes ##############
+
+    // ############# Module Route Inspect API routes ##############
+    Route::group(['prefix' => 'module-route-inspect', 'as' => 'module-route-inspect.', 'controller' => ModuleRouteInspectController::class], function () {
+        Route::get('/', 'inspect')->name('inspect');
+        Route::patch('status', 'setStatus')->name('status');
+        Route::post('heal', 'heal')->name('heal');
+    });
+    // ############# End of Module Route Inspect API routes ##############
 
     Route::group(['prefix' => 'tag', 'as' => 'tag.', 'controller' => TagController::class], function () {
         Route::get('index', 'index')->name('index');

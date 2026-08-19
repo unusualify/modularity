@@ -307,6 +307,30 @@ class ChatTest extends ModelTestCase
         $this->assertEquals(get_class($user), $chat->chatable_type);
     }
 
+    public function test_chat_latest_message_relation()
+    {
+        $user = User::factory()->create();
+        $chat = Chat::create([
+            'chatable_id' => $user->id,
+            'chatable_type' => get_class($user),
+        ]);
+
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\HasOne::class, $chat->latestMessage());
+
+        $older = ChatMessage::create([
+            'chat_id' => $chat->id,
+            'content' => 'Older',
+        ]);
+        sleep(1);
+        $newer = ChatMessage::create([
+            'chat_id' => $chat->id,
+            'content' => 'Newer',
+        ]);
+
+        $this->assertSame($newer->id, $chat->latestMessage()->first()->id);
+        $this->assertNotSame($older->id, $chat->latestMessage()->first()->id);
+    }
+
     public function test_chat_messages_ordering()
     {
         $user = User::factory()->create();

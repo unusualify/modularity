@@ -73,6 +73,19 @@ class CommandDiscoveryTest extends TestCase
     }
 
     /** @test */
+    public function it_discovers_commands_from_blueprint_folder(): void
+    {
+        $basePath = realpath(__DIR__ . '/../../src/Console');
+        $paths = [$basePath . '/Blueprint/*.php'];
+
+        $commands = CommandDiscovery::discover($paths);
+
+        $this->assertNotEmpty($commands);
+        $this->assertContains('Unusualify\Modularous\Console\Blueprint\MakeBlueprintCommand', $commands);
+        $this->assertContains('Unusualify\Modularous\Console\Blueprint\MakeBlueprintFieldCommand', $commands);
+    }
+
+    /** @test */
     public function it_discovers_commands_from_remake_folder(): void
     {
         $basePath = realpath(__DIR__ . '/../../src/Console');
@@ -83,6 +96,19 @@ class CommandDiscoveryTest extends TestCase
         $this->assertNotEmpty($commands);
         $this->assertContains('Unusualify\Modularous\Console\Remake\RemakeCmrCommand', $commands);
         $this->assertContains('Unusualify\Modularous\Console\Remake\RemakeRevisionsCommand', $commands);
+    }
+
+    /** @test */
+    public function it_discovers_commands_from_module_folder(): void
+    {
+        $basePath = realpath(__DIR__ . '/../../src/Console');
+        $paths = [$basePath . '/Module/*.php'];
+
+        $commands = CommandDiscovery::discover($paths);
+
+        $this->assertNotEmpty($commands);
+        $this->assertContains('Unusualify\Modularous\Console\Module\RouteInspectCommand', $commands);
+        $this->assertContains('Unusualify\Modularous\Console\Module\RouteStatusCommand', $commands);
     }
 
     /** @test */

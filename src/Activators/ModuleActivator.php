@@ -57,39 +57,12 @@ class ModuleActivator extends FileActivator
         $this->cacheLifetime = 604800;
         $this->statusesFile = $statusesFile;
 
-        $this->routesStatuses = $this->getRoutesStatuses();
+        $this->routesStatuses = $this->readJson();
     }
 
     public function getCacheKey()
     {
         return $this->cacheKey;
-    }
-
-    // /**
-    //  * Reads a config parameter under the 'activators.file' key
-    //  *
-    //  * @return mixed
-    //  */
-    // private function config(string $key, $default = null)
-    // {
-    //     return $this->config->get(modularousBaseKey() . '.activators.file.' . $key, $default);
-    // }
-
-    /**
-     * Get modules statuses, either from the cache or from
-     * the json statuses file if the cache is disabled.
-     *
-     * @throws FileNotFoundException
-     */
-    public function getRoutesStatuses(): array
-    {
-        if (! $this->config->get('modules.cache.enabled')) {
-            return $this->readJson();
-        }
-
-        return $this->cache->remember($this->getCacheKey(), $this->cacheLifetime, function () {
-            return $this->readJson();
-        });
     }
 
     /**

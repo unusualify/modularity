@@ -178,10 +178,13 @@ trait ManageScopes
                     $customMainFilters = $this->getConfigFieldsByRoute('table_filters', []);
 
                     $customMainFilter = Collection::make($customMainFilters)->filter(function ($filter) use ($requestFilters) {
+                        $filter = is_array($filter) ? (object) $filter : $filter;
+
                         return isset($filter->slug) && $filter->slug == $requestFilters['status'];
                     })->first();
 
                     if ($customMainFilter) {
+                        $customMainFilter = is_array($customMainFilter) ? (object) $customMainFilter : $customMainFilter;
                         $scope[$customMainFilter->scope ?? $customMainFilter->slug] = true;
                     }
 

@@ -12,17 +12,16 @@ trait ManageTraits
     public function inputs($noGroupChunk = false)
     {
         $moduleName = $this->getModuleName();
-
-        $routeName = $this->getRouteName();
+        $routeName = $this->getModuleRouteName();
 
         if ($moduleName && $routeName) {
             $module = $this->getModule();
             if ($module) {
-                $routeConfig = $module->getRawRouteConfig($routeName);
+                // Nested / Blueprint / legacy flat — same raw-first path as CoreController.
+                $inputs = $module->resolveRouteBlueprintField($routeName, 'inputs');
 
-                return $this->chunkInputs($routeConfig['inputs'], noGroupChunk: $noGroupChunk);
+                return $this->chunkInputs($inputs, noGroupChunk: $noGroupChunk);
             }
-            // return $route_config['inputs'];
         }
 
         return [];
