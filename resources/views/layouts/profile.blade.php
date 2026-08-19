@@ -12,7 +12,7 @@
 
 
 @section('content')
-    <div class="profile pa-3 h-100">
+    <div class="profile d-flex flex-column flex-grow-1 min-height-0">
         @foreach ($elements as $i => $context)
             <ue-recursive-stuff
                 :configuration='@json($context)'

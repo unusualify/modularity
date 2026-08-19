@@ -27,12 +27,13 @@ vue/src/                  # Frontend source
 └── js/store/             # Vuex store
 ```
 
-Before editing a folder, read its local `AGENTS.md` when present (`src/`, `Console/`, `Entities/`, `Repositories/`, `Http/`, `Hydrates/`, `Services/Cache/`, `modules/Cms/`, `vue/src/js/`).
+Before editing a folder, read its local `AGENTS.md` when present (`src/`, `Console/`, `Entities/`, `Repositories/`, `Http/`, `Hydrates/`, `Services/Cache/`, `modules/Cms/`, `vue/src/js/`, `vue/src/sass/`).
 
 ## DOCS MAP (agents)
 
 | Topic | Docs path |
 |-------|-----------|
+| Vuetify 4 viewport / height | `vue/src/js/AGENTS.md` (pages, Form, Blocks); Sass layers: `vue/src/sass/AGENTS.md`; PHP grids: `src/Http/AGENTS.md` |
 | Admin + public cache | `docs/src/pages/guide/module-route-cache/` |
 | CMS public routing/layouts | `docs/src/pages/guide/cms/` |
 | Entity traits | `docs/src/pages/system-reference/backend/entity-traits/` |

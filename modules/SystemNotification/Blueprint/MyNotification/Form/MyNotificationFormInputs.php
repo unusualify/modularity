@@ -38,7 +38,7 @@ final class MyNotificationFormInputs implements ModuleRouteInputsProvider
                         'title' => [
                             'tag' => 'div',
                             'attributes' => [
-                                'class' => 'text-body-1',
+                                'class' => 'text-body-large',
                             ],
                             'elements' => __('Message'),
                         ],

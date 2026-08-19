@@ -85,11 +85,9 @@ class ProfileController extends BaseController
         }
 
         $personalForm = $personalForm->setAttributes([
-            'class' => '',
-            // 'style' => 'min-height: 480px',
-            // 'fillHeight' => true,
-            // 'pushButtonToBottom' => true,
-            'formClass' => 'elevation-2 rounded h-100',
+            'class' => 'd-flex flex-column flex-grow-1 min-height-0',
+            'pushButtonToBottom' => true,
+            'formClass' => 'elevation-2 rounded d-flex flex-column flex-grow-1',
 
             'title' => [
                 'text' => __('User Profile'),
@@ -138,10 +136,9 @@ class ProfileController extends BaseController
                 $personalForm,
                 UComponent::makeUeForm()
                     ->setAttributes([
-                        'class' => 'h-50',
-                        'fillHeight' => true,
+                        'class' => 'd-flex flex-column flex-grow-1 min-height-0',
                         'pushButtonToBottom' => true,
-                        'formClass' => 'elevation-2 rounded',
+                        'formClass' => 'elevation-2 rounded d-flex flex-column flex-grow-1',
                         'clearOnSaved' => true,
 
                         'title' => [
@@ -193,11 +190,9 @@ class ProfileController extends BaseController
                 'content' => [
                     UComponent::makeUeForm()
                         ->setAttributes([
-                            'class' => 'h-100',
-                            'fillHeight' => true,
+                            'class' => 'd-flex flex-column flex-grow-1 min-height-0',
                             'pushButtonToBottom' => true,
-
-                            'formClass' => 'elevation-2 rounded',
+                            'formClass' => 'elevation-2 rounded d-flex flex-column flex-grow-1',
                             'title' => [
                                 'text' => __('Billing Profile'),
                                 'type' => 'h6',
@@ -231,7 +226,7 @@ class ProfileController extends BaseController
         // dd($sectionFields);
 
         $elements = [
-            UWrapper::makeGridSection($sectionFields, rowAttributes: ['class' => 'h-100'], colAttributes: ['class' => 'd-flex flex-column ga-6']),
+            UWrapper::makeGridSection($sectionFields, rowAttributes: ['class' => 'flex-grow-1 min-height-0'], colAttributes: ['class' => 'd-flex flex-column ga-6']),
         ];
         // dd($data);
         $endpoints = $this->getUrls();

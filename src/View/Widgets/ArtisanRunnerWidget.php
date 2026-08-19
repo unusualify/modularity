@@ -19,7 +19,7 @@ class ArtisanRunnerWidget extends ModularousWidget
     ];
 
     public $attributes = [
-        'class' => 'h-100',
+        'class' => 'd-flex flex-column flex-grow-1 min-height-0',
         'title' => 'Artisan Runner',
         'elevation' => 2,
         'subtitle' => 'Select a command to configure and run.',

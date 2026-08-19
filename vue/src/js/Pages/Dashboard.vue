@@ -16,7 +16,15 @@ defineOptions({
 </script>
 
 <template>
-  <div class="dashboard pa-3 h-100">
+  <div class="dashboard pa-3 flex-grow-1 min-height-0 d-flex flex-column">
     <ue-blocks :items='blockItems' />
   </div>
 </template>
+
+<style lang="sass">
+.dashboard
+  flex: 1 1 auto
+  min-height: 0
+  display: flex
+  flex-direction: column
+</style>

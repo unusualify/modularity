@@ -90,7 +90,7 @@
             ref='main'
             v-bind='@json($_mainConfiguration)'
             >
-            <div id="ue-main-body" class="ue--main-container pa-3 h-100">
+            <div id="ue-main-body" class="ue--main-container pa-3 d-flex flex-column flex-grow-1 min-height-0">
 
                 @yield('content')
             </div>

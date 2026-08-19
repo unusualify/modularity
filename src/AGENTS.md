@@ -27,6 +27,7 @@ Keep prompts short and concrete — avoid high-level product requests. Always in
 | Cache services | `src/Services/Cache/AGENTS.md` |
 | CMS module | `modules/Cms/AGENTS.md` |
 | Vue / inputs | `vue/src/js/AGENTS.md` |
+| Vue Sass / theme tokens | `vue/src/sass/AGENTS.md` |
 | Package root / docs map | `AGENTS.md` (package root) |
 
 Docs map: see package root `AGENTS.md` → **DOCS MAP**.
@@ -36,3 +37,7 @@ Core classes (short):
 - `Module.php` | Represents a single module. Loads config/providers/commands, exposes route names, middleware aliases, paths and helpers (e.g. `getConfig()`, `getRouteNames()`, `getDirectoryPath()`).
 
 When asking agents to change module behavior, reference these classes and a test file (e.g. `tests/Services/ModularousBehaviorTest.php`).
+
+## Vuetify 4 — viewport / height
+
+PHP grids (`makeGridSection`, `widgetAttributes.class`) follow the same flex-fill rules as Vue pages/Form/Blocks. Canonical table: `vue/src/js/AGENTS.md`. Controller/widget class mapping: `src/Http/AGENTS.md`. There is no `src/View/AGENTS.md`.

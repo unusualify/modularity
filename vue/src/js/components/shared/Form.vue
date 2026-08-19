@@ -2,8 +2,8 @@
   <div
     :class="[
       'ue-form',
-    ]"
-    :style="{height: fillHeight ? ($vuetify.display.mdAndDown ? `calc(97vh - 64px)` : `calc(97vh)` ) : ''}">
+      fillHeight ? 'd-flex flex-column flex-grow-1 min-height-0' : '',
+    ]">
     <v-form
       :id="id"
       ref="VForm"
@@ -555,7 +555,7 @@ export default {
     const formClasses = computed(() => [
       props.noDefaultFormPadding ? '' : 'pa-4',
       props.noDefaultSurface ? '' : 'bg-surface',
-      props.fillHeight ? 'd-flex flex-column h-100' : '',
+      (props.fillHeight || props.pushButtonToBottom) ? 'd-flex flex-column flex-grow-1 min-height-0 h-100' : '',
       props.formClass,
     ])
 
