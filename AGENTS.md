@@ -39,6 +39,10 @@ Before editing a folder, read its local `AGENTS.md` when present (`src/`, `Conso
 | Repository traits | `docs/src/pages/system-reference/backend/repository-traits/` |
 | Hydrates / forms | `docs/src/pages/system-reference/hydrates.md`, `guide/form-inputs/` |
 | Console commands | `docs/src/pages/guide/console/` |
+| ModuleRoute domain | `docs/src/pages/guide/console/module/module-route.md` |
+| ModuleRoute Blueprint | `docs/src/pages/guide/console/module/module-route-blueprint.md` |
+| ModuleRoute Blueprint ADR | `docs/src/pages/system-reference/adr-module-route-blueprint.md` |
+| ModuleRoute Hot Path ADR | `docs/src/pages/system-reference/adr-module-route-hot-path.md` |
 | Controllers / HTTP | `docs/src/pages/system-reference/backend/http/` |
 | Frontend composables | `docs/src/pages/system-reference/frontend/` |
 | Vue directives | `docs/src/pages/guide/directives/` |

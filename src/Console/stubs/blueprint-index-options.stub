@@ -1,0 +1,17 @@
+<?php
+
+namespace $NAMESPACE$;
+
+use Unusualify\Modularous\Contracts\ModuleRoute\ModuleRouteTableOptionsProvider;
+use Unusualify\Modularous\ModuleRoute;
+
+final class $CLASS$ implements ModuleRouteTableOptionsProvider
+{
+    /**
+     * @return array<string, mixed>
+     */
+    public function __invoke(ModuleRoute $route): array
+    {
+        return $ITEMS$;
+    }
+}

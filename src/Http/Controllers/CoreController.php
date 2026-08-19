@@ -21,6 +21,7 @@ use Unusualify\Modularous\Facades\Filepond;
 use Unusualify\Modularous\Facades\HostRoutingRegistrar;
 use Unusualify\Modularous\Repositories\Repository;
 use Unusualify\Modularous\Services\MessageStage;
+use Unusualify\Modularous\Services\ModuleRoutePresentation\ModuleRoutePresentationResolver;
 use Unusualify\Modularous\Traits\ManageModuleRoute;
 use Unusualify\Modularous\Traits\ManageNames;
 use Unusualify\Modularous\Traits\ManageTraits;
@@ -79,10 +80,14 @@ abstract class CoreController extends LaravelController implements ModuleableInt
 
         $this->moduleName = $this->getModuleName();
         $this->module = $this->getModule();
-        // $this->config = $this->getModuleConfig();
+        // Lazy: resolve ModuleRoute only when presentation / helpers need it.
+        // Eager resolve here ran during route registration (additionalRoutes app()->make)
+        // for every controller and was a major request-time cost without route:cache.
+        // $this->moduleRoute = $this->getModuleRoute();
 
         $this->namespace = $this->getNamespace();
         $this->routeName = $this->setupRouteName();
+        $this->moduleRouteName = $this->routeName;
 
         $this->modelName = $this->getModelName();
         $this->repository = $this->getRepository();
@@ -236,20 +241,115 @@ abstract class CoreController extends LaravelController implements ModuleableInt
     protected function getConfigFieldsByRoute($fieldName, $default = null)
     {
         try {
+            // Historical fast path: preloaded raw config object (no ModuleRoute / presentation).
+            // Blueprint/class drivers only when route has blueprint|presentation meta or
+            // global presentation driver is not "config".
+            if ($this->shouldUseModuleRoutePresentation($fieldName)) {
+                $route = $this->moduleRoute;
+                if (
+                    $route === null
+                    && $this->module
+                    && is_string($this->routeName)
+                    && $this->routeName !== ''
+                ) {
+                    $route = $this->module->moduleRoute($this->routeName);
+                    $this->moduleRoute = $route;
+                }
+
+                if (
+                    $route !== null
+                    && in_array($fieldName, ModuleRoutePresentationResolver::routeConfigFields(), true)
+                ) {
+                    $value = match ($fieldName) {
+                        'inputs' => $route->inputs(),
+                        'headers' => $route->headers(),
+                        'table_options' => $route->tableOptions(),
+                        'table_filters' => $route->tableFilters(),
+                        'filters' => $route->advancedFilters(),
+                        'table_actions' => $route->tableActions(),
+                        'table_row_actions' => $route->tableRowActions(),
+                        'index_with' => $route->indexWith(),
+                        'index_appends' => $route->indexAppends(),
+                        'form_options' => $route->formOptions(),
+                        'form_with' => $route->formWith(),
+                        'form_appends' => $route->formAppends(),
+                        'form_actions' => $route->formActions(),
+                        default => $route->presentation($fieldName),
+                    };
+
+                    return $value !== [] ? $value : $default;
+                }
+            }
+
+            // Nested-first raw path (no ModuleRoute): index.* / form.* inline arrays, then flat.
+            if (in_array($fieldName, ModuleRoutePresentationResolver::routeConfigFields(), true)) {
+                $snake = $this->getSnakeCase($this->routeName);
+                $routeConfig = data_get($this->config, "routes.{$snake}");
+
+                if (is_object($routeConfig) || is_array($routeConfig)) {
+                    $nestedKey = ModuleRoutePresentationResolver::nestedConfigKey($fieldName);
+                    $nested = data_get($routeConfig, $nestedKey);
+
+                    if (
+                        $nested !== null
+                        && $nested !== []
+                        && ! ModuleRoutePresentationResolver::looksLikeProviderMeta($nested)
+                    ) {
+                        return $nested;
+                    }
+                }
+            }
+
             return data_get($this->config->routes->{$this->getSnakeCase($this->routeName)}, $fieldName) ?? $default;
         } catch (\Throwable $th) {
             return $default;
-            dd(
-                // $th,
-                $this,
-                debug_backtrace()
-            );
+        }
+    }
+
+    /**
+     * Whether Blueprint/presentation resolution is needed for this field.
+     */
+    protected function shouldUseModuleRoutePresentation(string $fieldName): bool
+    {
+        if (! in_array($fieldName, ModuleRoutePresentationResolver::routeConfigFields(), true)) {
+            return false;
         }
 
-        return $this->config->routes->{$this->getSnakeCase($this->routeName)}->{$field_name};
-        // return $this->isParentRoute()
-        //     ? $this->config->parent_route->{$field_name}
-        //     : $this->config->sub_routes->{$this->getSnakeCase($this->routeName)}->{$field_name};
+        $globalDriver = strtolower((string) modularousConfig('module_route_presentation.driver', 'config'));
+        if ($globalDriver !== 'config' && $globalDriver !== '') {
+            return true;
+        }
+
+        $snake = $this->getSnakeCase($this->routeName);
+        $routeConfig = data_get($this->config, "routes.{$snake}");
+
+        if (! is_object($routeConfig) && ! is_array($routeConfig)) {
+            return false;
+        }
+
+        $routeArray = is_object($routeConfig) ? (array) $routeConfig : $routeConfig;
+
+        if (isset($routeArray['blueprint']) || isset($routeArray['presentation'])) {
+            return true;
+        }
+
+        // Nested class / meta leaves (index.columns = FQCN, etc.)
+        foreach (['index', 'form'] as $surface) {
+            $surfaceConfig = $routeArray[$surface] ?? null;
+            if (! is_array($surfaceConfig) && ! is_object($surfaceConfig)) {
+                continue;
+            }
+            foreach ((array) $surfaceConfig as $leaf) {
+                if (is_string($leaf) && $leaf !== '') {
+                    return true;
+                }
+                if (is_array($leaf) && (isset($leaf['driver']) || isset($leaf['class']))) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     protected function getConfigFieldsByRouteRaw($fieldName, $default = null)

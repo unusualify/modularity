@@ -82,16 +82,13 @@ trait FormPageUtility
      */
     public function getFormUrl($itemId = null)
     {
-        try {
-            $url = $itemId
-                ? $this->getModuleRoute($itemId, 'update', $this->isSingleton)
-                : moduleRoute($this->routeName, $this->routePrefix, 'store', [$this->nestedParentId]);
-            // code...
-        } catch (\Throwable $th) {
-            dd($th, $this->routeName, $this->routePrefix, $this->nestedParentId, $this->isNested);
-        }
+        $routeName = $this->moduleRoute?->name()
+            ?? $this->moduleRouteName
+            ?? $this->routeName;
 
-        return $url;
+        return $itemId
+            ? $this->getModuleRouteUrl($itemId, 'update', $this->isSingleton)
+            : moduleRoute($routeName, $this->routePrefix, 'store', [$this->nestedParentId]);
     }
 
     /**

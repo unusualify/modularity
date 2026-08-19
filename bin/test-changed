@@ -1,0 +1,330 @@
+#!/usr/bin/env bash
+# Run PHPUnit only for tests related to git-changed files.
+#
+# Usage:
+#   bin/test-changed [--base=<ref>] [--dry-run] [--list] [--] [phpunit-args...]
+#   composer test:changed
+#   composer test:changed -- --base=origin/main
+#   composer test:changed -- --dry-run
+#
+# Default change set: working tree vs HEAD (staged + unstaged + untracked).
+# With --base=<ref>: also include commits since merge-base(ref, HEAD).
+
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT"
+
+BASE_REF=""
+DRY_RUN=0
+LIST_ONLY=0
+PHPUNIT_ARGS=()
+
+usage() {
+    cat <<'EOF'
+Usage: bin/test-changed [options] [--] [phpunit-args...]
+
+Options:
+  --base=<ref>   Include changes since merge-base with <ref> (e.g. origin/main)
+  --dry-run      Print resolved test paths; do not run PHPUnit
+  --list         Print changed source files and mapped tests; do not run PHPUnit
+  -h, --help     Show this help
+
+Examples:
+  bin/test-changed
+  bin/test-changed --base=origin/main
+  bin/test-changed --dry-run
+  bin/test-changed -- --filter=ModuleRoute
+EOF
+}
+
+SEEN_DOUBLE_DASH=0
+for arg in "$@"; do
+    if [[ "$SEEN_DOUBLE_DASH" -eq 1 ]]; then
+        PHPUNIT_ARGS+=("$arg")
+        continue
+    fi
+    case "$arg" in
+        --)
+            SEEN_DOUBLE_DASH=1
+            ;;
+        --base=*)
+            BASE_REF="${arg#--base=}"
+            ;;
+        --dry-run)
+            DRY_RUN=1
+            ;;
+        --list)
+            LIST_ONLY=1
+            ;;
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        *)
+            PHPUNIT_ARGS+=("$arg")
+            ;;
+    esac
+done
+
+if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    echo "error: not inside a git repository" >&2
+    exit 1
+fi
+
+if [[ ! -f vendor/bin/phpunit ]]; then
+    echo "error: vendor/bin/phpunit not found; run composer install first" >&2
+    exit 1
+fi
+
+normalize_path() {
+    local path="$1"
+    path="${path#./}"
+    # Collapse accidental tests/./Foo -> tests/Foo
+    path="${path//\/.\//\/}"
+    printf '%s' "$path"
+}
+
+collect_changed_files() {
+    local files=()
+    local line merge_base
+
+    while IFS= read -r line; do
+        [[ -n "$line" ]] && files+=("$line")
+    done < <(git diff --name-only --diff-filter=ACMRD HEAD 2>/dev/null || true)
+
+    while IFS= read -r line; do
+        [[ -n "$line" ]] && files+=("$line")
+    done < <(git ls-files --others --exclude-standard 2>/dev/null || true)
+
+    if [[ -n "$BASE_REF" ]]; then
+        if ! git rev-parse --verify "$BASE_REF" >/dev/null 2>&1; then
+            echo "error: unknown git ref: $BASE_REF" >&2
+            exit 1
+        fi
+        merge_base="$(git merge-base "$BASE_REF" HEAD)"
+        while IFS= read -r line; do
+            [[ -n "$line" ]] && files+=("$line")
+        done < <(git diff --name-only --diff-filter=ACMRD "$merge_base"...HEAD 2>/dev/null || true)
+    fi
+
+    if [[ ${#files[@]} -eq 0 ]]; then
+        return 0
+    fi
+    printf '%s\n' "${files[@]}" | awk 'NF' | sort -u
+}
+
+dir_has_tests() {
+    local dir="$1"
+    [[ -d "$dir" ]] || return 1
+    find "$dir" -type f -name '*Test.php' -print -quit 2>/dev/null | grep -q .
+}
+
+# Generic framework/layer folders — never run the whole suite for these.
+is_layer_dir() {
+    case "$1" in
+        Activators|API|Auth|Brokers|Console|Contracts|Controllers|Coverage|Database|Docs|Entities|Events|Exceptions|Facades|Factories|Front|Generators|Helpers|Http|Jobs|Listeners|Logging|Middleware|Migrations|Models|Providers|Repositories|Requests|Resources|Routes|Seeders|Services|Stores|Support|Table|Traits|Translations|Utilities|View)
+            return 0
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+}
+
+add_unique() {
+    local candidate
+    candidate="$(normalize_path "$1")"
+    [[ -n "$candidate" ]] || return 0
+
+    local existing
+    for existing in "${RESOLVED_TESTS[@]+"${RESOLVED_TESTS[@]}"}"; do
+        if [[ "$existing" == "$candidate" ]]; then
+            return 0
+        fi
+    done
+    RESOLVED_TESTS+=("$candidate")
+}
+
+resolve_tests_for_file() {
+    local file="$1"
+    local basename stem relative rel_dir mirror dir_mirror module_root found
+    local added_before=${#RESOLVED_TESTS[@]}
+
+    file="$(normalize_path "$file")"
+    [[ -e "$file" ]] || return 0
+
+    # Direct test file
+    if [[ "$file" =~ ^tests/.+Test\.php$ ]]; then
+        add_unique "$file"
+        return 0
+    fi
+
+    # Other files under tests/
+    if [[ "$file" == tests/* ]]; then
+        if [[ -d "$file" ]]; then
+            dir_has_tests "$file" && add_unique "$file"
+            return 0
+        fi
+        dir_mirror="$(dirname "$file")"
+        if [[ "$dir_mirror" != tests ]] && dir_has_tests "$dir_mirror"; then
+            add_unique "$dir_mirror"
+        fi
+        return 0
+    fi
+
+    [[ "$file" == *.php ]] || return 0
+
+    # Only map application/package PHP sources (skip config/routes/migrations noise)
+    case "$file" in
+        src/*|modules/*|test-modules/*) ;;
+        *) return 0 ;;
+    esac
+
+    basename="$(basename "$file")"
+    stem="${basename%.php}"
+
+    # Mirror: src/Foo/Bar.php -> tests/Foo/BarTest.php
+    if [[ "$file" == src/* ]]; then
+        relative="${file#src/}"
+        mirror="tests/${relative%.php}Test.php"
+        [[ -f "$mirror" ]] && add_unique "$mirror"
+
+        rel_dir="$(dirname "$relative")"
+        dir_mirror="tests/${rel_dir}"
+        if [[ "$rel_dir" != "." && -d "$dir_mirror" ]]; then
+            while IFS= read -r found; do
+                [[ -n "$found" ]] && add_unique "$found"
+            done < <(find "$dir_mirror" -type f -name "${stem}Test.php" 2>/dev/null || true)
+        fi
+    fi
+
+    # modules/Foo/... -> modules/Foo/tests/**/StemTest.php
+    if [[ "$file" == modules/* ]]; then
+        module_root="$(printf '%s\n' "$file" | awk -F/ '{print $1"/"$2}')"
+        if [[ -d "$module_root/tests" ]]; then
+            while IFS= read -r found; do
+                [[ -n "$found" ]] && add_unique "$found"
+            done < <(find "$module_root/tests" -type f -name "${stem}Test.php" 2>/dev/null || true)
+        fi
+    fi
+
+    # Basename fallback across tests/ (exact ClassNameTest.php only)
+    while IFS= read -r found; do
+        [[ -n "$found" ]] && add_unique "$found"
+    done < <(find tests -type f -name "${stem}Test.php" 2>/dev/null || true)
+
+    # Nested feature-dir fallback: src/Services/Foo/X.php -> tests/Services/Foo/
+    # Skip generic layer folders (Controllers, Traits, …). If leaf is a layer
+    # (e.g. Stores), walk up one level to the feature folder.
+    if [[ "$file" == src/* && ${#RESOLVED_TESTS[@]} -eq "$added_before" ]]; then
+        relative="${file#src/}"
+        rel_dir="$(dirname "$relative")"
+        while [[ "$rel_dir" == */* ]]; do
+            leaf="$(basename "$rel_dir")"
+            if is_layer_dir "$leaf"; then
+                rel_dir="$(dirname "$rel_dir")"
+                continue
+            fi
+            dir_mirror="tests/${rel_dir}"
+            if [[ -d "$dir_mirror" ]] && dir_has_tests "$dir_mirror"; then
+                add_unique "$dir_mirror"
+            fi
+            break
+        done
+    fi
+}
+
+CHANGED_FILES=()
+while IFS= read -r line; do
+    [[ -n "$line" ]] && CHANGED_FILES+=("$line")
+done < <(collect_changed_files)
+
+if [[ ${#CHANGED_FILES[@]} -eq 0 ]]; then
+    echo "No changed files detected."
+    exit 0
+fi
+
+RESOLVED_TESTS=()
+CHANGED_PHP=()
+
+for file in "${CHANGED_FILES[@]}"; do
+    case "$file" in
+        *.php|tests/*)
+            CHANGED_PHP+=("$file")
+            resolve_tests_for_file "$file"
+            ;;
+    esac
+done
+
+# Stable sort for readable output
+if [[ ${#RESOLVED_TESTS[@]} -gt 0 ]]; then
+    local_sorted=()
+    while IFS= read -r line; do
+        [[ -n "$line" ]] && local_sorted+=("$line")
+    done < <(printf '%s\n' "${RESOLVED_TESTS[@]}" | sort -u)
+    RESOLVED_TESTS=("${local_sorted[@]}")
+fi
+
+# Drop file paths already covered by an included directory
+if [[ ${#RESOLVED_TESTS[@]} -gt 0 ]]; then
+    pruned=()
+    for path in "${RESOLVED_TESTS[@]}"; do
+        covered=0
+        if [[ -f "$path" ]]; then
+            for other in "${RESOLVED_TESTS[@]}"; do
+                if [[ -d "$other" && "$path" == "$other"/* ]]; then
+                    covered=1
+                    break
+                fi
+            done
+        fi
+        [[ "$covered" -eq 0 ]] && pruned+=("$path")
+    done
+    RESOLVED_TESTS=("${pruned[@]}")
+fi
+
+if [[ "$LIST_ONLY" -eq 1 ]]; then
+    echo "Changed PHP-related files:"
+    if [[ ${#CHANGED_PHP[@]} -eq 0 ]]; then
+        echo "  (none)"
+    else
+        printf '  %s\n' "${CHANGED_PHP[@]}"
+    fi
+    echo
+    echo "Mapped tests:"
+    if [[ ${#RESOLVED_TESTS[@]} -eq 0 ]]; then
+        echo "  (none)"
+    else
+        printf '  %s\n' "${RESOLVED_TESTS[@]}"
+    fi
+    exit 0
+fi
+
+if [[ ${#RESOLVED_TESTS[@]} -eq 0 ]]; then
+    echo "Changed files found, but no matching PHPUnit tests."
+    echo "Changed PHP-related paths:"
+    if [[ ${#CHANGED_PHP[@]} -eq 0 ]]; then
+        echo "  (none — only non-PHP changes)"
+    else
+        printf '  %s\n' "${CHANGED_PHP[@]}"
+    fi
+    exit 0
+fi
+
+echo "Running PHPUnit for ${#RESOLVED_TESTS[@]} path(s):"
+printf '  %s\n' "${RESOLVED_TESTS[@]}"
+echo
+
+if [[ "$DRY_RUN" -eq 1 ]]; then
+    echo "Dry run — skipping PHPUnit."
+    printf 'Would run: vendor/bin/phpunit --stop-on-defect --no-coverage'
+    if [[ ${#PHPUNIT_ARGS[@]} -gt 0 ]]; then
+        printf ' %q' "${PHPUNIT_ARGS[@]}"
+    fi
+    printf ' %q' "${RESOLVED_TESTS[@]}"
+    printf '\n'
+    exit 0
+fi
+
+exec vendor/bin/phpunit --stop-on-defect --no-coverage ${PHPUNIT_ARGS[@]+"${PHPUNIT_ARGS[@]}"} "${RESOLVED_TESTS[@]}"

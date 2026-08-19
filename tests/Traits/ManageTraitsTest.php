@@ -3,6 +3,7 @@
 namespace Unusualify\Modularous\Tests\Traits;
 
 use Illuminate\Support\Facades\Hash;
+use Mockery;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Module;
 use Unusualify\Modularous\Tests\TestCase;
@@ -18,18 +19,17 @@ class ManageTraitsTest extends TestCase
         $this->target = new class
         {
             use ManageTraits;
-
-            // Mocking required methods from other traits/classes
-            public function getModuleName()
-            {
-                return 'TestModule';
-            }
-
-            public function getRouteName()
-            {
-                return 'TestRoute';
-            }
         };
+
+        $this->target->setModuleName('TestModule');
+        $this->target->setModuleRouteName('TestRoute');
+    }
+
+    protected function tearDown(): void
+    {
+        Mockery::close();
+
+        parent::tearDown();
     }
 
     /** @test */
@@ -94,9 +94,28 @@ class ManageTraitsTest extends TestCase
         $module->shouldReceive('hasRoute')->with('TestRoute')->andReturn(true);
         $module->shouldReceive('getModel')->with('TestRoute')->once()->andReturn('TestModel');
 
-        // isModuleRouteClass() and getModule() each call Modularous::find() with the same name.
-        Modularous::shouldReceive('find')->with('TestModule')->andReturn($module);
+        // isModuleRouteClass() and getModule() each resolve the module via Modularous::find().
+        Modularous::shouldReceive('find')->with('TestModule')->twice()->andReturn($module);
 
         $this->assertEquals('TestModel', $this->target->model());
+    }
+
+    /** @test */
+    public function it_resolves_inputs_via_blueprint_when_flat_inputs_absent()
+    {
+        $module = Mockery::mock(Module::class);
+        $module->shouldReceive('resolveRouteBlueprintField')
+            ->once()
+            ->with('TestRoute', 'inputs')
+            ->andReturn([
+                ['name' => 'from_blueprint', 'type' => 'text'],
+            ]);
+
+        Modularous::shouldReceive('find')->with('TestModule')->once()->andReturn($module);
+
+        $inputs = $this->target->inputs();
+
+        $this->assertArrayHasKey('from_blueprint', $inputs);
+        $this->assertEquals('text', $inputs['from_blueprint']['type']);
     }
 }

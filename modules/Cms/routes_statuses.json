@@ -2,6 +2,7 @@
     "Page": true,
     "Redirect": true,
     "ParentSegment": true,
+    "PageLayout": true,
     "SiteSetting": true,
     "Sitemap": true,
     "HomepageTest": true,

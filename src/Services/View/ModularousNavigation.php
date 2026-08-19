@@ -70,7 +70,6 @@ class ModularousNavigation
             if (! $result) {
                 return false;
             }
-
         }
 
         if (isset($array['items'])) {
@@ -147,14 +146,11 @@ class ModularousNavigation
         $arrays = [];
 
         foreach ($modules as $moduleName => $module) {
-            // $pr => parent route
-            // $sr => sub route
-
             $name = $module->getName();
             $config = $module->getRawConfig();
-            $pr_name = $module->getSnakeName();
+            $parentModuleRouteName = $module->getSnakeName();
 
-            $pr = $module->getParentRoute() ?: [
+            $parentModuleRoute = $module->getParentRoute() ?: [
                 'url' => pluralize(kebabCase($name)),
                 'route_name' => snakeCase($name),
             ]; //  parent_route array|object
@@ -163,68 +159,76 @@ class ModularousNavigation
             //     $pr['url'] = pluralize(kebabCase($config['name']));
             //     $pr['route_name'] = snakeCase($config['name']);
             // }
-            $routes = $module->getRawRouteConfigs(valid: true);
-            $number_route = count($routes);
+            // Hot-path ADR: raw config arrays only — never sidebarRoutes()/moduleRoute()
+            // (those build ModuleRouteRegistry + FeatureDetector and cost ~0.5–1s on admin docs).
+            $moduleRoutes = $module->getRawRouteConfigs(null, true) ?: [];
+            $numberOfRoutes = count($moduleRoutes);
             $array = [];
-            if ($number_route > 0) {
+            if ($numberOfRoutes > 0) {
                 $array = [
                     'name' => $config['headline'] ?? pluralize(headline($name)),
                     'icon' => $config['icon'] ?? '$modules',
                 ];
             }
 
-            $route_prefix = adminRouteNamePrefix() ? adminRouteNamePrefix() . '.' : '';
+            $routePrefix = adminRouteNamePrefix() ? adminRouteNamePrefix() . '.' : '';
 
-            $route_prefix .= $module->hasSystemPrefix()
+            $routePrefix .= $module->hasSystemPrefix()
                 ? systemRouteNamePrefix() . '.'
                 : '';
 
-            foreach ($routes as $_name => $item) {
-
-                // $sr sub route array|object
-                $isSingular = $module->isSingleton($_name);
-                $route_name = ($item['route_name'] ?? snakeCase($item['name']));
-
-                if ($isSingular) {
-                    $route_name = $route_name . '.edit';
-                } else {
-                    $route_name = $route_name . '.index';
+            foreach ($moduleRoutes as $key => $moduleRoute) {
+                $moduleRouteName = is_array($moduleRoute)
+                    ? ($moduleRoute['name'] ?? (is_string($key) ? $key : null))
+                    : null;
+                if (! is_string($moduleRouteName) || $moduleRouteName === '') {
+                    continue;
                 }
 
-                if (! (isset($item['parent']) && $item['parent'])) {
+                $isParentModuleRoute = (bool) ($moduleRoute['parent'] ?? false);
+                $isSingularModuleRoute = $module->isSingleton($moduleRouteName);
+                $routeName = snakeCase($moduleRouteName);
+
+                if ($isSingularModuleRoute) {
+                    $routeName = $routeName . '.edit';
+                } else {
+                    $routeName = $routeName . '.index';
+                }
+
+                if (! $isParentModuleRoute) {
                     try {
-                        $route_name = $pr_name . '.' . $route_name;
+                        $routeName = $parentModuleRouteName . '.' . $routeName;
                     } catch (\Throwable $th) {
                         dd(
-                            $pr,
+                            $parentModuleRoute,
                             $module->getRawConfig(),
                             $module->getParentRoute()
                         );
                     }
                 }
 
-                $route_name = $route_prefix . $route_name;
-                $headline = $item['headline'] ?? ($isSingular
-                    ? singularize(headline($item['name']))
-                    : (pluralize(headline($item['name']))));
+                $routeName = $routePrefix . $routeName;
+                $headline = $moduleRoute['headline']
+                    ?? $moduleRoute['label']
+                    ?? $moduleRoute['title']
+                    ?? pluralize(headline($moduleRouteName));
 
-                if (isset($item['parent']) && $item['parent']) {
+                if ($isParentModuleRoute) {
                     // only one link for module
-                    if ($number_route < 2 && Route::has($route_name)) {
-                        $array['route_name'] = $route_name;
+                    if ($numberOfRoutes < 2 && Route::has($routeName)) {
+                        $array['route_name'] = $routeName;
                     } else {
-
-                        $array['items'][$this->getSnakeCase($item['name'])] = [
+                        $array['items'][$this->getSnakeCase($moduleRouteName)] = [
                             'name' => $headline,
-                            'icon' => $item['icon'] ?? '$submodule',
-                            'route_name' => $route_name,
+                            'icon' => $moduleRoute['icon'] ?? '$submodule',
+                            'route_name' => $routeName,
                         ];
                     }
                 } else {
-                    $array['items'][$this->getSnakeCase($item['name'])] = [
+                    $array['items'][$this->getSnakeCase($moduleRouteName)] = [
                         'name' => $headline,
-                        'icon' => $item['icon'] ?? '$submodule',
-                        'route_name' => $route_name,
+                        'icon' => $moduleRoute['icon'] ?? '$submodule',
+                        'route_name' => $routeName,
                     ];
                 }
             }
@@ -232,11 +236,9 @@ class ModularousNavigation
             if (count($array) > 0) {
                 $arrays[$module->getSnakeName()] = $array;
             }
-
         }
 
         return $arrays;
-
     }
 
     public function formatSidebarMenus(&$array)

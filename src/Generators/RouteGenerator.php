@@ -16,6 +16,9 @@ use Nwidart\Modules\FileRepository;
 use Nwidart\Modules\Support\Config\GenerateConfigReader;
 use Nwidart\Modules\Support\Config\GeneratorPath;
 use Nwidart\Modules\Support\Stub;
+use Unusualify\Modularous\Console\Blueprint\BlueprintClassWriter;
+use Unusualify\Modularous\Console\Blueprint\BlueprintConfigPersister;
+use Unusualify\Modularous\Console\Blueprint\BlueprintFieldCatalog;
 use Unusualify\Modularous\Entities\Enums\Permission;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\LaravelServiceProvider;
@@ -164,6 +167,13 @@ class RouteGenerator extends Generator
     protected $api = true;
 
     protected $fix = false;
+
+    /**
+     * Presentation driver for scaffolded route config: config (default) | class.
+     *
+     * @var string
+     */
+    protected $presentation = 'config';
 
     /**
      * modelRelationParser
@@ -489,6 +499,25 @@ class RouteGenerator extends Generator
     }
 
     /**
+     * @param  string  $presentation  config|class
+     * @return $this
+     */
+    public function setPresentation($presentation)
+    {
+        $presentation = strtolower((string) $presentation);
+        $this->presentation = in_array($presentation, ['config', 'class'], true)
+            ? $presentation
+            : 'config';
+
+        return $this;
+    }
+
+    public function getPresentation(): string
+    {
+        return $this->presentation;
+    }
+
+    /**
      * Set schema.
      *
      * @param bool|int $force
@@ -679,6 +708,8 @@ class RouteGenerator extends Generator
                 $this->generateFolders();
 
                 $this->generateResources();
+
+                $this->generatePresentationClasses();
 
                 $this->generateFiles();
 
@@ -918,6 +949,72 @@ class RouteGenerator extends Generator
     }
 
     /**
+     * Scaffold ModuleRoute Blueprint classes when presentation=class.
+     *
+     * Writes FormInputs / IndexColumns / IndexOptions with real payload arrays
+     * (never driver meta), then persists canonical nested `index` / `form` class leaves.
+     */
+    public function generatePresentationClasses(): void
+    {
+        if ($this->getPresentation() !== 'class') {
+            return;
+        }
+
+        $studly = $this->getStudlyNameReplacement();
+        $force = (bool) $this->force;
+        $writer = new BlueprintClassWriter($this->filesystem);
+
+        $seeds = [
+            'inputs' => $this->getInputs(),
+            'columns' => $this->getHeaders(),
+            'options' => static::$defaultTableOptions,
+        ];
+
+        $wires = [];
+        foreach ($seeds as $field => $items) {
+            $path = $writer->write($this->module, $studly, $field, $items, $force);
+            if ($path !== null) {
+                $this->console->info("Created Blueprint: {$path}");
+            } else {
+                $this->console->warn(
+                    "Skipped existing {$studly}" . BlueprintFieldCatalog::get($field)['class_suffix']
+                );
+            }
+
+            $def = BlueprintFieldCatalog::get($field);
+            $wires[] = [
+                'nested' => $def['nested_key'],
+                'fqcn' => $writer->fqcn($this->module, $studly, $field),
+                'legacy' => $def['legacy_config_key'],
+            ];
+        }
+
+        $configPath = $this->module->getConfigPath();
+        if (! $this->filesystem->exists($configPath)) {
+            return;
+        }
+
+        $result = (new BlueprintConfigPersister)->persist(
+            $configPath,
+            $this->getSnakeCase($this->getName()),
+            $wires,
+            commentLegacyFlats: true,
+        );
+
+        if (! $result['ok']) {
+            $this->console->warn($result['message']);
+
+            return;
+        }
+
+        if ($result['content'] !== '' && $result['commented_flats'] !== []) {
+            $this->console->line(
+                'Commented legacy flats: ' . implode(', ', $result['commented_flats'])
+            );
+        }
+    }
+
+    /**
      * updateRoutesStatuses
      *
      * @return void
@@ -974,7 +1071,7 @@ class RouteGenerator extends Generator
 
             $titleColumnKey = count($filtered = array_values(array_filter($headers, fn ($i) => $i['key'] === 'name' || $i['key'] === 'title'))) > 0
                 ? $filtered[0]['key']
-                : $headers[0]['key'];
+                : ($headers[0]['key'] ?? 'name');
 
             $route_array = ($this->getModule()->getName() === $this->getName() ? ['parent' => true] : []) + [
                 'name' => $studlyName,
@@ -983,10 +1080,24 @@ class RouteGenerator extends Generator
                 'route_name' => $snakeCase,
                 'icon' => '$submodule', // '$modules',
                 'title_column_key' => $titleColumnKey,
-                'table_options' => static::$defaultTableOptions,
-                'headers' => $headers, // in Unusualify\Modularous\Support\Migrations\SchemaParser::class
-                'inputs' => $inputs, // in Unusualify\Modularous\Support\Migrations\SchemaParser::class
             ];
+
+            if ($this->getPresentation() === 'class') {
+                // Canonical nested class leaves (ADR). Payloads live in Blueprint classes;
+                // generatePresentationClasses() writes those classes + upgrades to ::class syntax.
+                $writer = new BlueprintClassWriter($this->filesystem);
+                $route_array['index'] = [
+                    'columns' => $writer->fqcn($this->module, $studlyName, 'columns'),
+                    'options' => $writer->fqcn($this->module, $studlyName, 'options'),
+                ];
+                $route_array['form'] = [
+                    'inputs' => $writer->fqcn($this->module, $studlyName, 'inputs'),
+                ];
+            } else {
+                $route_array['table_options'] = static::$defaultTableOptions;
+                $route_array['headers'] = $headers;
+                $route_array['inputs'] = $inputs;
+            }
 
             if ($runnable && $this->getTest()) {
                 dump($route_array);

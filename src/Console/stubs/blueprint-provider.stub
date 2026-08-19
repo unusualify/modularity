@@ -1,0 +1,17 @@
+<?php
+
+namespace $NAMESPACE$;
+
+use $INTERFACE$;
+use Unusualify\Modularous\ModuleRoute;
+
+final class $CLASS$ implements $INTERFACE_SHORT$
+{
+    /**
+     * @return $RETURN_DOC$
+     */
+    public function __invoke(ModuleRoute $route): array
+    {
+        return $ITEMS$;
+    }
+}

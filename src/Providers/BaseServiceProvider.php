@@ -588,6 +588,7 @@ class BaseServiceProvider extends ServiceProvider
         $paths = [
             __DIR__ . '/../Console/*.php',
             __DIR__ . '/../Console/Make/*.php',
+            __DIR__ . '/../Console/Blueprint/*.php',
             __DIR__ . '/../Console/Cache/*.php',
             __DIR__ . '/../Console/Migration/*.php',
             __DIR__ . '/../Console/Module/*.php',

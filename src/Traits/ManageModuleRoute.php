@@ -4,25 +4,28 @@ namespace Unusualify\Modularous\Traits;
 
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Module;
+use Unusualify\Modularous\ModuleRoute;
 
 trait ManageModuleRoute
 {
     use Moduleable;
 
-    // protected ?Module $module = null;
+    protected ?Module $module = null;
+
+    protected ?ModuleRoute $moduleRoute = null;
 
     protected ?array $routeConfig = [];
 
     public function isModuleRouteClass()
     {
         $moduleName = $this->getModuleName();
-        $routeName = $this->getRouteName();
+        $moduleRouteName = $this->getModuleRouteName();
 
-        if (! $moduleName || ! $routeName) {
+        if (! $moduleName || ! $moduleRouteName) {
             return false;
         }
 
-        if (! Modularous::find($moduleName)?->hasRoute($routeName)) {
+        if (! Modularous::find($moduleName)?->hasRoute($moduleRouteName)) {
             return false;
         }
 
@@ -40,13 +43,13 @@ trait ManageModuleRoute
     }
 
     /**
-     * @deprecated use Moduleable::getRouteName() instead
+     * @deprecated use Moduleable::getModuleRouteName() instead
      *
      * @return string|null
      */
     public function routeName()
     {
-        return $this->getRouteName();
+        return $this->getModuleRouteName();
     }
 
     /**
@@ -68,6 +71,63 @@ trait ManageModuleRoute
     }
 
     /**
+     * @return $this
+     */
+    public function setModuleRoute(ModuleRoute $moduleRoute): static
+    {
+        $this->moduleRoute = $moduleRoute;
+
+        return $this;
+    }
+
+    /**
+     * @return ModuleRoute|null
+     */
+    public function getModuleRoute()
+    {
+        return $this->ensureModuleRouteResolved();
+    }
+
+    /**
+     * Resolve ModuleRoute once per controller request (not in __construct — hot-path ADR).
+     */
+    protected function ensureModuleRouteResolved(): ?ModuleRoute
+    {
+        if ($this->moduleRoute instanceof ModuleRoute) {
+            return $this->moduleRoute;
+        }
+
+        if (! $this->module) {
+            return null;
+        }
+
+        if ($this->routeName && ! $this->moduleRouteName) {
+            $this->moduleRouteName = $this->routeName;
+        }
+
+        $name = $this->moduleRouteName ?? $this->routeName;
+        if (! is_string($name) || $name === '') {
+            return null;
+        }
+
+        $this->moduleRoute = $this->module->moduleRoute($name)
+            ?? $this->getModule()?->moduleRoute($name);
+
+        return $this->moduleRoute;
+    }
+
+    /**
+     * Called from CoreController::preload() via Traitify naming.
+     *
+     * Intentionally a no-op: resolving {@see ModuleRoute} here forces ModuleRouteRegistry
+     * on every panel request. Resolve lazily from getModuleRoute() / URL helpers only.
+     */
+    protected function preloadManageModuleRoute(): void
+    {
+        //
+    }
+
+    /**
      * @return array
      */
     public function getRouteConfig()
@@ -76,14 +136,17 @@ trait ManageModuleRoute
             return $this->routeConfig;
         }
 
-        $moduleName = $this->getModuleName();
+        // Prefer already-resolved ModuleRoute; do not force registry build for config reads.
+        if ($this->moduleRoute instanceof ModuleRoute) {
+            $this->routeConfig = $this->moduleRoute->rawConfig();
 
-        $routeName = $this->getRouteName();
+            return $this->routeConfig;
+        }
 
         $module = $this->getModule();
 
         if ($module) {
-            $this->routeConfig = $module->getRawRouteConfig($routeName);
+            $this->routeConfig = $module->getRawRouteConfig($this->getRouteName());
         }
 
         return $this->routeConfig;
@@ -96,18 +159,96 @@ trait ManageModuleRoute
 
     public function getRouteInputs(): array
     {
-        return ! empty($conf = $this->getRouteConfig()) ? ($conf['inputs'] ?? []) : [];
+        if ($this->moduleRoute instanceof ModuleRoute) {
+            return $this->moduleRoute->inputs();
+        }
+
+        $module = $this->getModule();
+        $routeName = $this->getRouteName();
+
+        if ($module && is_string($routeName) && $routeName !== '') {
+            return $module->resolveRouteBlueprintField($routeName, 'inputs');
+        }
+
+        return [];
     }
 
     public function getRouteHeaders(): array
     {
+        if ($this->moduleRoute instanceof ModuleRoute) {
+            return $this->moduleRoute->headers();
+        }
 
-        return ! empty($conf = $this->getRouteConfig()) ? ($conf['headers'] ?? []) : [];
+        $module = $this->getModule();
+        $routeName = $this->getRouteName();
+
+        if ($module && is_string($routeName) && $routeName !== '') {
+            return $module->resolveRouteBlueprintField($routeName, 'headers');
+        }
+
+        return [];
     }
 
     public function getRouteTableOptions(): array
     {
+        if ($this->moduleRoute instanceof ModuleRoute) {
+            return $this->moduleRoute->tableOptions();
+        }
 
-        return ! empty($conf = $this->getRouteConfig()) ? ($conf['table_options'] ?? []) : [];
+        $module = $this->getModule();
+        $routeName = $this->getRouteName();
+
+        if ($module && is_string($routeName) && $routeName !== '') {
+            return $module->resolveRouteBlueprintField($routeName, 'table_options');
+        }
+
+        return [];
+    }
+
+    /**
+     * Build the Laravel route-name prefix for panel URLs.
+     *
+     * Uses {@see ModuleRoute} only when already resolved — never forces registry build.
+     */
+    protected function generateRoutePrefix($noNested = false): string
+    {
+        if ($this->moduleRoute instanceof ModuleRoute) {
+            return $this->moduleRoute->generateRoutePrefix(
+                noNested: (bool) $noNested,
+                isNested: (bool) ($this->isNested ?? false),
+                nestedParentName: isset($this->nestedParentName) ? (string) $this->nestedParentName : null,
+                isParent: isset($this->isParent) ? (bool) $this->isParent : null,
+            );
+        }
+
+        $routePrefixes = [];
+
+        $adminRoutePrefix = adminRouteNamePrefix();
+
+        if ($adminRoutePrefix) {
+            $routePrefixes[] = $adminRoutePrefix;
+        }
+
+        if (isset($this->config->system_prefix)) {
+            if ($this->config->system_prefix) {
+                $routePrefixes[] = systemRouteNamePrefix();
+            }
+        } elseif (isset($this->config->base_prefix) && $this->config->base_prefix) {
+            $routePrefixes[] = systemRouteNamePrefix();
+        }
+
+        $isParent = (bool) ($this->isParent ?? false);
+        $isNested = (bool) ($this->isNested ?? false);
+
+        if (! $isParent || ($isNested && ! $noNested)) {
+            $routePrefixes[] = snakeCase((string) ($this->moduleName ?? ''));
+        }
+
+        if ($isNested && ! $noNested && filled($this->nestedParentName ?? null)) {
+            $routePrefixes[] = (string) $this->nestedParentName;
+            $routePrefixes[] = 'nested';
+        }
+
+        return implode('.', $routePrefixes);
     }
 }

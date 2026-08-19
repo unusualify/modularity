@@ -15,6 +15,7 @@ Manage the lifecycle of a module and the routes inside it. These commands corres
 | [route:enable](./route-enable) | `modularous:route:enable` | Re-enable a previously disabled route within a module |
 | [route:disable](./route-disable) | `modularous:route:disable` | Disable a single route without removing the module |
 | [route:status](./route-status) | `modularous:route:status` | List route enable/disable status per module |
+| [route:inspect](./route-inspect) | `modularous:route:inspect` | Inspect route features (translation, CMR, revisions, …) and consistency findings |
 
 ## Common Workflows
 
@@ -49,6 +50,9 @@ php artisan modularous:remove:module Blog
 
 ## Related
 
+- [ModuleRoute](./module-route) — first-class route object (config + status + features)
+- [ModuleRoute Blueprint](./module-route-blueprint) — index/form UI drivers (config|class|database)
+- [ADR — ModuleRoute Blueprint](/system-reference/adr-module-route-blueprint) — locked field map and class tree
 - [Generators](../generators/overview) — scaffold modules, models, routes, and traits
 - [Database commands](../migration/overview) — migrate / rollback used by `remove-module`
 - [System Reference → Modules](/system-reference/modules) — module system internals

@@ -115,7 +115,7 @@ class ProfileController extends BaseController
                 $carry[$key] = $item->default ?? '';
             })->toArray(),
 
-            'actionUrl' => $this->getModuleRoute(id: $userFields['id'], action: 'update', singleton: true),
+            'actionUrl' => $this->getModuleRouteUrl(id: $userFields['id'], action: 'update', singleton: true),
         ]);
 
         if (! $emailVerified) {
@@ -167,7 +167,7 @@ class ProfileController extends BaseController
                             return [$item['name'] => $item['default'] ?? ''];
                             $carry[$key] = $item->default ?? '';
                         })->toArray(),
-                        'actionUrl' => $this->getModuleRoute(id: $userPasswordFields['id'], action: 'update', singleton: true),
+                        'actionUrl' => $this->getModuleRouteUrl(id: $userPasswordFields['id'], action: 'update', singleton: true),
                     ]),
             ],
         ];

@@ -131,6 +131,7 @@
     },
     "scripts": {
         "test": "vendor/bin/phpunit  --stop-on-defect --no-coverage",
+        "test:changed": "bin/test-changed",
         "test-clean": [
             "@php -r \"foreach(glob('vendor/orchestra/testbench-core/laravel/bootstrap/cache/*.php') as \\$f) unlink(\\$f);\"",
             "echo 'Test cache cleared'"
