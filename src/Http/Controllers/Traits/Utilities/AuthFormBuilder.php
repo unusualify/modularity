@@ -297,6 +297,7 @@ trait AuthFormBuilder
         $buttonText = $pageConfig['buttonText'] ?? '';
 
         $formAttributes = $overrides['formAttributes'] ?? [];
+        $formAttributes['buttonDensity'] ??= 'default';
 
         if ($formDraft !== null) {
             $actionUrl = Route::has($actionRoute) ? route($actionRoute) : $actionRoute;
