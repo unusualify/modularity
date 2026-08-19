@@ -60,6 +60,13 @@ export const makeFormProps = propsFactory({
     type: Boolean,
     default: false
   },
+  buttonDensity: {
+    type: String,
+    default: 'compact',
+    validator (value) {
+      return ['default', 'comfortable', 'compact'].includes(value)
+    }
+  },
   stickyFrame: {
     type: Boolean,
     default: false
@@ -199,6 +206,23 @@ export const makeFormProps = propsFactory({
     type: Object,
     default: null,
   },
+  /**
+   * When true, the form starts in view (preview) mode: values are shown
+   * without inputs, and the title-right control toggles Edit → Update.
+   * Standard bottom submit is hidden. Does not reuse `isEditing`.
+   */
+  previewable: {
+    type: Boolean,
+    default: false,
+  },
+  /**
+   * When true (and `previewable` is on), show a Cancel control in edit
+   * mode that discards dirty values and returns to preview.
+   */
+  previewableCancel: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 export default function useForm(props, context) {
@@ -261,6 +285,7 @@ export default function useForm(props, context) {
   const initialModel = ref(cloneDeep(model.value))
 
   const schemaUpdating = ref(false)
+  const previewEditing = ref(false)
 
   const setSchemaUpdating = (value) => {
     if(value && props.noSchemaUpdatingProgressBar) {
@@ -474,6 +499,14 @@ export default function useForm(props, context) {
       return Object.values(schema).some(s => Object.prototype.hasOwnProperty.call(s, 'sourceLoading') && s.sourceLoading === true
         || (Object.prototype.hasOwnProperty.call(s, 'type') && (s.type === 'wrap' || s.type === 'group') && s.schema && Object.values(s.schema).some(nested => Object.prototype.hasOwnProperty.call(nested, 'sourceLoading') && nested.sourceLoading === true)))
     }),
+
+    previewEditing,
+    isPreviewView: computed(() => props.previewable && !previewEditing.value),
+    canPreviewEdit: computed(() =>
+      props.previewable
+      && isSubmittable.value
+      && !!props.actionUrl
+    ),
   })
   // Methods
 
@@ -512,7 +545,10 @@ export default function useForm(props, context) {
             (!Object.prototype.hasOwnProperty.call(response?.data ?? {}, "variant") || response?.data?.variant === "success");
 
           if (persisted) {
-            initialModel.value = cloneDeep(model.value);
+            initialModel.value = cloneDeep(model.value)
+            if (props.previewable) {
+              previewEditing.value = false
+            }
           }
         },
         (response) => {
@@ -741,6 +777,19 @@ export default function useForm(props, context) {
 
     },
     saveForm,
+    enterPreviewEdit: () => {
+      if (!states.canPreviewEdit) {
+        return
+      }
+      previewEditing.value = true
+    },
+    cancelPreviewEdit: () => {
+      if (!props.previewable || !props.previewableCancel) {
+        return
+      }
+      model.value = cloneDeep(initialModel.value)
+      previewEditing.value = false
+    },
     submit: (e, callback = null, errorCallback = null) => {
       if (props.noValidation || validations.validModel.value) {
         if (props.async) {
