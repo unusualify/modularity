@@ -6,13 +6,13 @@
     <v-expand-transition>
       <v-card
         v-show="panelOpen"
-        elevation="8"
+        elevation="4"
         rounded="lg"
         role="dialog"
         aria-label="Retained notifications"
         class="ue-retainable-notifications__panel d-flex flex-column overflow-hidden"
       >
-        <v-card-title class="d-flex align-center justify-space-between text-body-2 py-2 px-3">
+        <v-card-title class="d-flex align-center justify-space-between text-body-medium py-2 px-3">
           <span class="font-weight-medium">Notifications</span>
           <v-btn
             icon
@@ -41,13 +41,13 @@
           >
             <div
               v-if="item.title"
-              class="text-subtitle-2 font-weight-medium"
+              class="text-title-small font-weight-medium"
             >
               {{ item.title }}
             </div>
             <div
               v-if="item.description"
-              class="text-caption text-pre-line text-medium-emphasis"
+              class="text-body-small text-pre-line text-medium-emphasis"
             >
               {{ item.description }}
             </div>

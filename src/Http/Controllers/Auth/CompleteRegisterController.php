@@ -50,7 +50,6 @@ class CompleteRegisterController extends Controller
                     'buttonText' => __('Complete'),
                     'hasSubmit' => true,
                 ],
-                'formSlots' => $this->restartOptionSlot(),
             ]);
 
             return $this->viewFactory->make(modularousBaseKey() . '::auth.register')->with($viewData);

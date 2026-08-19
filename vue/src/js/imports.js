@@ -1,5 +1,4 @@
-// import { createApp } from '$vue'
-import { createApp } from '~/vue/dist/vue.esm-bundler.js'
+import { createApp } from 'vue'
 
 // Plugins
 import UEConfig from '@/plugins/UEConfig'

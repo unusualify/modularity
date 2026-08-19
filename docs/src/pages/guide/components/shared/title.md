@@ -19,7 +19,7 @@ The `ue-title` component is a flexible, polymorphic text element for headings an
 | `text` | `String` | — | Any string |
 | `subTitle` | `String` | — | Any string |
 | `tag` | `String` | `'div'` | `div`, `h1`–`h6` |
-| `type` | `String` | `'body-1'` | `h1`–`h6`, `subtitle-1`, `subtitle-2`, `body-1`, `body-2`, `button`, `caption`, `overline` |
+| `type` | `String` | `'body-1'` | 'display-large', 'display-medium', 'display-small', 'headline-large', 'headline-medium', 'headline-small', 'title-large', 'title-medium', 'title-small', 'body-large', 'body-medium', 'body-small', 'label-large', 'label-medium', 'label-small' |
 | `weight` | `String` | `'bold'` | `black`, `bold`, `medium`, `regular`, `light`, `thin` |
 | `transform` | `String` | `'uppercase'` | `none`, `capitalize`, `lowercase`, `uppercase` |
 | `color` | `String` | — | Vuetify color name or hex |

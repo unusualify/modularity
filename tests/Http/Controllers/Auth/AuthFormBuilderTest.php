@@ -207,4 +207,153 @@ class AuthFormBuilderTest extends TestCase
 
         $this->assertEquals('h2', $title['tag']);
     }
+
+    /** @test */
+    public function it_applies_form_title_overrides_from_page_config(): void
+    {
+        $pages = config('modularous.auth_pages.pages');
+        $pages['login']['formTitleOverrides'] = ['margin' => 'b-8'];
+        config(['modularous.auth_pages.pages' => $pages]);
+
+        $data = $this->controller->buildAuthViewData('login');
+
+        $this->assertEquals('b-8', $data['formAttributes']['title']['margin']);
+        $this->assertEquals('h1', $data['formAttributes']['title']['tag']);
+    }
+
+    /** @test */
+    public function it_resolves_form_slots_preset_login_forgot_below(): void
+    {
+        $pages = config('modularous.auth_pages.pages');
+        $pages['login']['formSlotsPreset'] = 'login_forgot_below';
+        config(['modularous.auth_pages.pages' => $pages]);
+
+        $data = $this->controller->buildAuthViewData('login');
+
+        $this->assertArrayNotHasKey('options', $data['formSlots']);
+        $this->assertArrayHasKey('bottom', $data['formSlots']);
+        $this->assertEquals('v-btn', $data['formSlots']['bottom']['tag']);
+        $this->assertTrue($data['formSlots']['bottom']['attributes']['block']);
+        $this->assertEquals('primary', $data['formSlots']['bottom']['attributes']['color']);
+    }
+
+    /** @test */
+    public function it_resolves_slots_preset_login_bottom_v2(): void
+    {
+        $pages = config('modularous.auth_pages.pages');
+        $pages['login']['slotsPreset'] = 'login_bottom_v2';
+        config(['modularous.auth_pages.pages' => $pages]);
+
+        $data = $this->controller->buildAuthViewData('login');
+
+        $this->assertArrayHasKey('bottom', $data['slots']);
+        $elements = $data['slots']['bottom']['elements'];
+        $this->assertCount(2, $elements);
+        $this->assertEquals('text', $elements[1]['attributes']['variant']);
+        $this->assertEquals('primary', $elements[1]['attributes']['color']);
+    }
+
+    /** @test */
+    public function it_resolves_form_slots_preset_register_have_account_below(): void
+    {
+        config([
+            'modularous.auth_pages.pages.register' => array_merge(
+                config('modularous.auth_pages.pages.register', []),
+                [
+                    'pageTitle' => 'authentication.register',
+                    'layoutPreset' => 'banner',
+                    'formDraft' => 'register_form',
+                    'actionRoute' => 'admin.register',
+                    'formTitle' => 'authentication.create-an-account',
+                    'buttonText' => 'authentication.register',
+                    'formSlotsPreset' => 'register_have_account_below',
+                    'slotsPreset' => 'register_bottom',
+                    'formTitleOverrides' => [
+                        'margin' => 'b-8',
+                        'transform' => 'uppercase',
+                    ],
+                ]
+            ),
+            'modularous.form_drafts.register_form' => [
+                ['name' => 'email', 'type' => 'text', 'label' => 'Email'],
+            ],
+        ]);
+
+        $data = $this->controller->buildAuthViewData('register');
+
+        $this->assertArrayNotHasKey('options', $data['formSlots']);
+        $this->assertArrayHasKey('bottom', $data['formSlots']);
+        $this->assertEquals('v-btn', $data['formSlots']['bottom']['tag']);
+        $this->assertEquals('primary', $data['formSlots']['bottom']['attributes']['color']);
+        $this->assertEquals('uppercase', $data['formAttributes']['title']['transform']);
+    }
+
+    /** @test */
+    public function it_resolves_form_slots_preset_complete_register_restart_below(): void
+    {
+        config([
+            'modularous.auth_pages.pages.complete_register' => array_merge(
+                config('modularous.auth_pages.pages.complete_register', []),
+                [
+                    'pageTitle' => 'authentication.complete-registration',
+                    'layoutPreset' => 'banner',
+                    'formDraft' => 'complete_register_form',
+                    'actionRoute' => 'admin.complete.register',
+                    'formTitle' => 'authentication.complete-registration-title',
+                    'buttonText' => 'Complete',
+                    'formSlotsPreset' => 'complete_register_restart_below',
+                    'formTitleOverrides' => [
+                        'margin' => 'b-8',
+                        'transform' => 'uppercase',
+                    ],
+                ]
+            ),
+        ]);
+
+        $data = $this->controller->buildAuthViewData('complete_register');
+
+        $this->assertArrayNotHasKey('options', $data['formSlots']);
+        $this->assertArrayHasKey('bottom', $data['formSlots']);
+        $this->assertEquals('v-btn', $data['formSlots']['bottom']['tag']);
+        $this->assertEquals('primary', $data['formSlots']['bottom']['attributes']['color']);
+    }
+
+    /** @test */
+    public function it_resolves_form_slots_preset_sign_in_below(): void
+    {
+        $pages = config('modularous.auth_pages.pages');
+        $pages['forgot_password']['formSlotsPreset'] = 'sign_in_below';
+        config(['modularous.auth_pages.pages' => $pages]);
+
+        $data = $this->controller->buildAuthViewData('forgot_password');
+
+        $this->assertArrayNotHasKey('options', $data['formSlots']);
+        $this->assertArrayHasKey('bottom', $data['formSlots']);
+        $this->assertEquals('primary', $data['formSlots']['bottom']['attributes']['color']);
+    }
+
+    /** @test */
+    public function it_resolves_forgot_password_v2_with_submit_enabled(): void
+    {
+        config([
+            'modularous.auth_pages.pages.forgot_password' => array_merge(
+                config('modularous.auth_pages.pages.forgot_password', []),
+                [
+                    'formOverrides' => [
+                        'formClass' => 'py-6 auth-v2-form',
+                        'hasSubmit' => true,
+                    ],
+                    'buttonText' => 'authentication.reset-password',
+                    'slotsPreset' => 'forgot_password_bottom_v2',
+                ]
+            ),
+        ]);
+
+        $data = $this->controller->buildAuthViewData('forgot_password');
+
+        $this->assertTrue($data['formAttributes']['hasSubmit']);
+        $this->assertEquals('authentication.reset-password', $data['formAttributes']['buttonText']);
+        $elements = $data['slots']['bottom']['elements'];
+        $this->assertEquals('text', $elements[1]['attributes']['variant']);
+    }
 }

@@ -1,7 +1,6 @@
 import { createVuetify } from 'vuetify'
 import { aliases, mdi } from 'vuetify/iconsets/mdi'
 import { fa } from 'vuetify/iconsets/fa'
-import { VDateInput } from 'vuetify/labs/VDateInput'
 
 
 // Stylesheets
@@ -137,7 +136,6 @@ const opts = {
   directives,
   components: {
     ...components,
-    VDateInput
     // VTreeview
   }
 }

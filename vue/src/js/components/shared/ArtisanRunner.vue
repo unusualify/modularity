@@ -1,9 +1,9 @@
 <template>
   <v-card
     :elevation="elevation"
-    :class="['artisan-runner-widget', cardClass]"
+    :class="['artisan-runner-widget', 'd-flex', 'flex-column', 'flex-grow-1', 'min-height-0', cardClass]"
   >
-    <v-card-title class="text-h6 d-flex align-center ga-2">
+    <v-card-title class="text-headline-small d-flex align-center ga-2">
       <v-icon
         icon="mdi-console"
         size="small"
@@ -45,14 +45,14 @@
           <template #item="{ props: itemProps, item }">
             <v-list-item
               v-bind="itemProps"
-              :subtitle="item.raw.description"
+              :subtitle="item.description"
             />
           </template>
         </v-autocomplete>
 
         <div
           v-if="errorMessage"
-          class="text-error text-caption mt-2"
+          class="text-error text-body-small mt-2"
         >
           {{ errorMessage }}
         </div>
@@ -104,7 +104,7 @@
         <template v-else-if="definition">
           <div
             v-if="!(definition.arguments?.length) && !(definition.options?.length)"
-            class="text-body-2 text-medium-emphasis mb-4"
+            class="text-body-medium text-medium-emphasis mb-4"
           >
             {{ $t('messages.artisan_runner_no_params', 'This command has no arguments or options.') }}
           </div>
@@ -162,7 +162,7 @@
           v-if="output || running || exitCode !== null"
           class="mb-2 d-flex align-center ga-2"
         >
-          <span class="text-subtitle-2">
+          <span class="text-label-large">
             {{ $t('messages.artisan_runner_output', 'Command output') }}
           </span>
           <v-chip
@@ -182,7 +182,7 @@
 
         <pre
           v-if="output || running"
-          class="artisan-runner-widget-output text-body-2"
+          class="artisan-runner-widget-output text-body-medium"
         >{{ output || '…' }}</pre>
 
         <v-card
@@ -190,7 +190,7 @@
           class="mt-4"
           variant="tonal"
         >
-          <v-card-title class="text-subtitle-1">
+          <v-card-title class="text-body-large">
             {{ $t('messages.artisan_runner_prompt', 'Command prompt') }}
           </v-card-title>
           <v-card-text>

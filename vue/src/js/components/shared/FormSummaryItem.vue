@@ -1,7 +1,7 @@
 <template>
   <div class="mb-6">
     <!-- Step title -->
-    <div class="d-inline-flex align-center text-body-2" style="line-height: 1;">
+    <div class="d-inline-flex align-center text-body-medium" style="line-height: 1;">
       <v-avatar
         variant="flat"
         color="primary"
@@ -16,7 +16,7 @@
     </div>
 
     <!-- Secondary title -->
-    <div class="text-body-1 font-weight-bold text-truncate mb-5">
+    <div class="text-body-large font-weight-bold text-truncate mb-5">
       {{ title }}
     </div>
 

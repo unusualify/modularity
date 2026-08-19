@@ -7,7 +7,7 @@
         justify="center"
         :text="stepUp.title || t('messages.step_up_verification_required', 'Verification required')"
       />
-      <div class="text-body-2 text-medium-emphasis mt-2">
+      <div class="text-body-medium text-medium-emphasis mt-2">
         {{ stepUp.description || t('messages.step_up_description_default', 'Please enter the verification code sent to your email.') }}
       </div>
     </div>

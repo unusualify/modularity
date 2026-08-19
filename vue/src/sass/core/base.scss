@@ -21,7 +21,6 @@ $theme-config: map.merge($default-theme-config, $theme-config);
 @use 'vuetify' with (
   // $color-pack: $color-pack,
   $reset: $reset,
-  $layers: $layers,
   $utilities: (
     "height": (
       property: height,
@@ -53,6 +52,8 @@ $theme-config: map.merge($default-theme-config, $theme-config);
 
 
   $body-font-family: $body-font-family,
+  $heading-font-family: $heading-font-family,
+  $typography: $typography,
   $spacer: $spacer,
   $grid-gutter: $spacer * 12,
   // $grid-gutter-secondary: $spacer * 12 * calc(2 / 3),

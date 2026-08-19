@@ -11,6 +11,7 @@ $button-font-weight: 700 !default;
 $button-font-size: 0.75rem !default;
 $button-density: ('default': 0, 'comfortable': -2, 'compact': -4) !default;
 $button-icon-font-size: 1rem !default;
+$button-text-transform: 'uppercase' !default;
 
 /* INPUT */
 $input-density: ('default': 1, 'comfortable': 0, 'compact': -2) !default;
@@ -18,10 +19,38 @@ $input-font-size: 1rem !default;
 $input-control-height: 52px !default;
 $input-line-height: 1.2 !default; // default 1.5
 
+// vuetify root
+$color-pack: true !default;
+$reset: true !default;
+
+$font-size: 87.5% !default;
+$body-font-family: 'Montserrat' !default;
+$heading-font-family: $body-font-family !default;
+$font-size-root: 1rem !default;
+$line-height-root: 1.5 !default; // default 1.5
+
+// Overlay for Vuetify `$typography`. Empty keeps MD3 defaults (map-deep-merge).
+// Themes `@forward` a partial or full map — see `core/_settings.scss`.
+$typography: () !default;
+$border-color-root: rgba(var(--v-border-color), var(--v-border-opacity)) !default;
+$border-radius-root: 4px !default;
+$button-border-radius: $border-radius-root !default;
+$border-style-root: solid !default;
+$border-width-root: thin !default;
+$transition-duration-root: 0.3s !default;
+$transition-move-duration-root: 0.5s !default;
+
 /* FIELDS */
 $field-font-size: $input-font-size !default;
-$field-control-height: $input-control-height;
+$field-control-height: $input-control-height !default;
 $field-label-floating-scale: 0.81 !default;
+$field-border-radius: $border-radius-root !default;
+$field-outline-opacity: 0.38 !default;
+$field-control-padding-start: 16px !default;
+$field-control-padding-end: 16px !default;
+$field-control-padding-top: 8px !default;
+$field-control-padding-bottom: 4px !default;
+$text-field-border-radius: $field-border-radius !default;
 
 $zindex__loadingTable: 4 !default;
 
@@ -36,24 +65,6 @@ $breakpoints: (
   large: (start: 1040, end: 1539),
   xlarge: (start: 1540, end: null),
 );
-
-
-// vuetify
-$color-pack: true !default;
-$reset: true !default;
-$layers: false !default;
-
-$font-size: 87.5% !default;
-$body-font-family: 'Montserrat' !default;
-$font-size-root: 1rem !default;
-$line-height-root: 1.5 !default; // default 1.5
-$border-color-root: rgba(var(--v-border-color), var(--v-border-opacity)) !default;
-$border-radius-root: 4px !default;
-$border-style-root: solid !default;
-$border-width-root: thin !default;
-$transition-duration-root: 0.3s !default;
-$transition-move-duration-root: 0.5s !default;
-
 $spacer: 4px !default;
 // $theme-space: 6 * $spacer; //1.56%;æ
 

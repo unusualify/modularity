@@ -15,7 +15,7 @@
     </v-btn>
     <span
       v-if="meta?.expiresInMinutes"
-      class="text-caption text-medium-emphasis"
+      class="text-body-small text-medium-emphasis"
     >
       {{
         t('fields.signed_preview_expires_note', {

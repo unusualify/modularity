@@ -20,7 +20,7 @@ class LayoutBuilderHtmlPreviewController
             abort(404);
         }
 
-        $body = '<div class="cms-layout-preview-marker p-8 text-body-2">Layout preview marker (replace with hosted page content).</div>';
+        $body = '<div class="cms-layout-preview-marker p-8 text-body-medium">Layout preview marker (replace with hosted page content).</div>';
 
         $placeholder = CmsLayoutShellPreviewPlaceholder::mergeDataForShellPreview(null);
 

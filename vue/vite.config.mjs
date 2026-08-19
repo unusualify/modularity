@@ -206,6 +206,7 @@ export default defineConfig(({ command, mode }) => {
       // VitePluginSvgSpritemap('./src/icons/**/*.svg', svgConfig()),
     ],
     resolve: {
+      dedupe: ['vue'],
       extensions: [
         '.js',
         '.json',
@@ -216,7 +217,7 @@ export default defineConfig(({ command, mode }) => {
         '.vue'
       ],
       alias: {
-        vue: 'vue/dist/vue.esm-bundler.js',
+        vue: fileURLToPath(new URL('./node_modules/vue/dist/vue.esm-bundler.js', import.meta.url)),
         'vue-template-compiler$': '~/vue-template-compiler/build.js',
 
         '@': fileURLToPath(new URL(`${srcDir}/js`, import.meta.url)),

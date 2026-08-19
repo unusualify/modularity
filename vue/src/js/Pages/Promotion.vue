@@ -37,11 +37,11 @@
     </v-alert>
 
     <v-card class="mb-6">
-      <v-card-title class="text-h6">
+      <v-card-title class="text-title-large">
         {{ $t('messages.promotion_scope', 'Scope') }}
       </v-card-title>
       <v-card-text>
-        <v-row dense>
+        <v-row density="compact">
           <v-col
             v-for="key in scopeKeys"
             :key="key"
@@ -79,11 +79,11 @@
     </div>
 
     <v-card v-if="lastResponse !== null">
-      <v-card-title class="text-subtitle-1">
+      <v-card-title class="text-body-large">
         {{ $t('messages.promotion_last_result', 'Last response') }}
       </v-card-title>
       <v-card-text>
-        <pre class="text-body-2 overflow-auto promotion-json">{{ formattedJson }}</pre>
+        <pre class="text-body-medium overflow-auto promotion-json">{{ formattedJson }}</pre>
       </v-card-text>
     </v-card>
 

@@ -54,7 +54,7 @@
           md="5"
         >
           <v-card class="mb-4">
-            <v-card-title class="text-h6">
+            <v-card-title class="text-headline-small">
               {{ $t('messages.artisan_runner_command', 'Command') }}
             </v-card-title>
             <v-card-text>
@@ -73,13 +73,13 @@
                 <template #item="{ props: itemProps, item }">
                   <v-list-item
                     v-bind="itemProps"
-                    :subtitle="item.raw.description"
+                    :subtitle="item.description"
                   />
                 </template>
               </v-autocomplete>
               <div
                 v-if="definition?.description"
-                class="text-body-2 text-medium-emphasis mt-2"
+                class="text-body-medium text-medium-emphasis mt-2"
               >
                 {{ definition.description }}
               </div>
@@ -95,13 +95,13 @@
             v-if="definition"
             class="mb-4"
           >
-            <v-card-title class="text-h6">
+            <v-card-title class="text-headline-small">
               {{ $t('messages.artisan_runner_parameters', 'Parameters') }}
             </v-card-title>
             <v-card-text>
               <div
                 v-if="!(definition.arguments?.length) && !(definition.options?.length)"
-                class="text-body-2 text-medium-emphasis"
+                class="text-body-medium text-medium-emphasis"
               >
                 {{ $t('messages.artisan_runner_no_params', 'This command has no arguments or options.') }}
               </div>
@@ -241,14 +241,14 @@
           </v-btn>
         </v-card-title>
         <v-card-text>
-          <pre class="artisan-runner-output text-body-2">{{ output || '…' }}</pre>
+          <pre class="artisan-runner-output text-body-medium">{{ output || '…' }}</pre>
 
           <v-card
             v-if="currentPrompt"
             class="mt-4"
             variant="tonal"
           >
-            <v-card-title class="text-subtitle-1">
+            <v-card-title class="text-body-large">
               {{ $t('messages.artisan_runner_prompt', 'Command prompt') }}
             </v-card-title>
             <v-card-text>

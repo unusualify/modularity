@@ -2,7 +2,7 @@
   <div class="ue-input-layout-blades w-100">
     <p
       v-if="layoutBladesSubtitle"
-      class="text-body-2 text-medium-emphasis mb-2">
+      class="text-body-medium text-medium-emphasis mb-2">
       {{ layoutBladesSubtitle }}
     </p>
     <div class="d-flex flex-wrap align-center mb-1" style="gap: 8px">
@@ -24,7 +24,7 @@
         style="max-width: min(100%, 520px)"
         :text="persistMainFormWarningText"
       />
-      <span class="text-caption text-medium-emphasis">{{ segmentSummary }}</span>
+      <span class="text-body-small text-medium-emphasis">{{ segmentSummary }}</span>
     </div>
 
     <v-dialog
@@ -39,7 +39,7 @@
           density="comfortable"
           class="px-2 flex-shrink-0"
           color="surface">
-          <v-toolbar-title class="text-subtitle-1 text-truncate pe-2" style="max-width: min(40vw, 280px)">
+          <v-toolbar-title class="text-body-large text-truncate pe-2" style="max-width: min(40vw, 280px)">
             {{ displayModalTitle }}
           </v-toolbar-title>
           <v-spacer />
@@ -116,7 +116,7 @@
                   >
                     {{ $t('fields.json_toolbar_copy', 'Copy') }}
                   </v-btn>
-                  <span class="text-caption text-medium-emphasis ms-auto d-none d-lg-inline">
+                  <span class="text-body-small text-medium-emphasis ms-auto d-none d-lg-inline">
                     {{ $t('fields.layout_blades_shortcuts_hint', 'Tab / Shift+Tab: indent • Alt+Shift + F (format) / C (copy) • also ⌘/Ctrl+Alt+F/C') }}
                   </span>
                 </div>
@@ -150,7 +150,7 @@
             />
             <div class="ue-lb-preview-pane d-flex flex-column min-width-0 min-height-0 overflow-hidden bg-surface-variant">
               <div class="d-flex flex-wrap align-center gap-2 mb-1 pa-2 pb-0 flex-shrink-0">
-                <span class="text-caption text-medium-emphasis">
+                <span class="text-body-small text-medium-emphasis">
                   {{ displayPreviewColumnTitle }}
                 </span>
                 <v-spacer class="d-none d-sm-block" />
@@ -183,7 +183,7 @@
                   />
                   <div
                     v-else
-                    class="text-body-2 text-medium-emphasis pa-4 bg-surface"
+                    class="text-body-medium text-medium-emphasis pa-4 bg-surface"
                   >
                     {{ previewUnavailableReason }}
                   </div>

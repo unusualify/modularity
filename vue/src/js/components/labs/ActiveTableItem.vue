@@ -36,21 +36,21 @@
                 <!-- <v-col cols="12" md="6" class="pa-4">
                   <v-item v-slot="{ isSelected, selectedClass, toggle }">
                     <v-card :class="['d-flex align-center bg-primary ue-card-button px-4', selectedClass]" dark height="200" @click="selectNested(1)" >
-                      <div class="text-h6 font-weight-bold flex-grow-1 text-center" > COMPANY INFORMATION</div>
+                      <div class="text-title-large font-weight-bold flex-grow-1 text-center" > COMPANY INFORMATION</div>
                     </v-card>
                   </v-item>
                 </v-col>
                 <v-col cols="12" md="6" class="pa-4">
                   <v-item v-slot="{ isSelected, selectedClass, toggle }">
                     <v-card :class="['d-flex align-center bg-cta ue-card-button px-4', selectedClass]" dark height="200" @click="selectNested(2)" >
-                      <div class="text-h6 font-weight-bold flex-grow-1 text-center" > PRESS RELEASES </div>
+                      <div class="text-title-large font-weight-bold flex-grow-1 text-center" > PRESS RELEASES </div>
                     </v-card>
                   </v-item>
                 </v-col>
                 <v-col cols="12" md="12" class="pa-4">
                   <v-item v-slot="{ isSelected, selectedClass, toggle }">
                     <v-card :class="['d-flex align-center bg-success ue-card-button px-4', selectedClass]" dark height="80" @click="selectNested(3)" >
-                      <div class="text-h6 font-weight-bold flex-grow-1 text-center"> CREDITS & INVOICES </div>
+                      <div class="text-title-large font-weight-bold flex-grow-1 text-center"> CREDITS & INVOICES </div>
                     </v-card>
                   </v-item>
                 </v-col> -->

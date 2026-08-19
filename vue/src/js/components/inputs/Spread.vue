@@ -3,16 +3,16 @@
     <!-- Header Row -->
     <v-row no-gutters class="header-row py-2">
       <v-col cols="4">
-        <div class="px-3 text-subtitle-1 font-weight-medium">Key</div>
+        <div class="px-3 text-body-large font-weight-medium">Key</div>
       </v-col>
       <v-col cols="4">
-        <div class="px-3 text-subtitle-1 font-weight-medium">Value</div>
+        <div class="px-3 text-body-large font-weight-medium">Value</div>
       </v-col>
       <v-col cols="2">
-        <div class="px-3 text-subtitle-1 font-weight-medium">Type</div>
+        <div class="px-3 text-body-large font-weight-medium">Type</div>
       </v-col>
       <v-col cols="2">
-        <div class="px-3 text-subtitle-1 font-weight-medium">Actions</div>
+        <div class="px-3 text-body-large font-weight-medium">Actions</div>
       </v-col>
     </v-row>
 

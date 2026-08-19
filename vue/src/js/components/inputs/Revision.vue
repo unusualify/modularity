@@ -644,13 +644,13 @@
         >
           <div class="d-flex align-center ga-2">
             <v-icon size="small" color="primary">mdi-history</v-icon>
-            <span class="text-body-2 font-weight-medium">
+            <span class="text-body-medium font-weight-medium">
               Revisions
-              <span v-if="revisions.length" class="text-caption text-medium-emphasis">({{ revisions.length }})</span>
+              <span v-if="revisions.length" class="text-body-small text-medium-emphasis">({{ revisions.length }})</span>
             </span>
           </div>
           <div class="d-flex align-center ga-2">
-            <span v-if="lastEditedText" class="text-caption text-medium-emphasis">{{ lastEditedText }}</span>
+            <span v-if="lastEditedText" class="text-body-small text-medium-emphasis">{{ lastEditedText }}</span>
             <v-icon size="small">{{ expanded ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
           </div>
         </div>

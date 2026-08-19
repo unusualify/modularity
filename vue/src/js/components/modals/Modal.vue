@@ -48,7 +48,7 @@
             :closeDialog="close"
           >
           <v-card >
-            <div v-if="title" class="text-h5 text-center" style="word-break: break-word;">
+            <div v-if="title" class="text-headline-small text-center" style="word-break: break-word;">
               <ue-title :justify="titleJustify" :padding="titlePadding" :class="titleClass">
                 {{ title }}
                 <template #right>

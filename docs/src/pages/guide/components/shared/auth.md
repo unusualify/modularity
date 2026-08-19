@@ -55,8 +55,8 @@ window.__MODULAROUS_AUTH_CONFIG__ = {
 ```html
 <ue-auth>
   <template #description>
-    <h2 class="text-h5 font-weight-bold">Welcome back</h2>
-    <p class="text-body-2 text-medium-emphasis">Sign in to your account</p>
+    <h2 class="text-headline-small font-weight-bold">Welcome back</h2>
+    <p class="text-body-medium text-medium-emphasis">Sign in to your account</p>
   </template>
 
   <ue-form :model-value="credentials" :schema="loginSchema" action-url="/login" has-submit button-text="Sign In" />

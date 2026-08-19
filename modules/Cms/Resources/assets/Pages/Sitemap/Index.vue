@@ -125,11 +125,11 @@
     >
       <v-card v-if="lastDryPayload">
         <v-card-title class="d-flex align-center flex-wrap ga-2 pe-2">
-          <span class="text-subtitle-1">
+          <span class="text-body-large">
             {{ t('modules.cms.sitemap.last_dry', 'Last dry-run') }}
           </span>
           <v-spacer />
-          <span class="text-body-2 text-medium-emphasis font-weight-regular">
+          <span class="text-body-medium text-medium-emphasis font-weight-regular">
             {{ t('modules.cms.sitemap.url_count', 'URL count') }}: {{ lastDryPayload.urlCount }}
             ·
             {{ t('modules.cms.sitemap.bytes', 'Bytes') }}: {{ lastDryPayload.bytes }}
@@ -179,7 +179,7 @@
               </div>
             </v-tabs-window-item>
             <v-tabs-window-item value="raw">
-              <pre class="text-caption overflow-auto sitemap-xml-preview ma-4">{{ lastDryPayload.xml }}</pre>
+              <pre class="text-body-small overflow-auto sitemap-xml-preview ma-4">{{ lastDryPayload.xml }}</pre>
             </v-tabs-window-item>
           </v-tabs-window>
         </v-card-text>

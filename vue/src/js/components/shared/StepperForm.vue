@@ -15,7 +15,7 @@
 
       <v-row class="mt-2 flex-fil">
         <!-- left side -->
-        <v-col v-bind="formCol" v-fit-grid order-md="1" order="2">
+        <v-col v-bind="formCol" v-fit-grid class="order-md-1 order-2">
           <StepperContent
             v-model="models"
             :schemas="schemas"
@@ -64,7 +64,7 @@
         </v-col>
 
         <!-- right side -->
-        <v-col v-bind="summaryCol" order-md="2" order="1">
+        <v-col v-bind="summaryCol" class="order-md-2 order-1">
           <StepperSummary
             :is-last-step="isLastStep"
             :forms="forms"
@@ -115,7 +115,7 @@
                   </template>
                   <template v-slot:total>
                     <slot name='summary.final.total' v-bind="{payload: this.payload}">
-                      <!-- <ue-text-display class="text-h5 text-white" text="$2500" subText="+ {{ $t('VAT') }}" /> -->
+                      <!-- <ue-text-display class="text-headline-small text-white" text="$2500" subText="+ {{ $t('VAT') }}" /> -->
                     </slot>
                   </template>
                   <template v-slot:description>
@@ -160,8 +160,8 @@
         <template v-slot:body.description>
           <div class="d-flex flex-column align-center justify-center">
             <v-icon size="64" color="success" class="mb-4">{{ responseModalIcon }}</v-icon>
-            <h2 class="text-h4 mb-4 text-success">{{ responseModalTitle }}</h2>
-            <p class="text-subtitle-1 grey--text text-center" style="white-space: pre-line;">{{ responseModalMessage }}</p>
+            <h2 class="text-headline-large mb-4 text-success">{{ responseModalTitle }}</h2>
+            <p class="text-body-large text-medium-emphasis text-center" style="white-space: pre-line;">{{ responseModalMessage }}</p>
           </div>
         </template>
         <template v-slot:body.options>

@@ -5,6 +5,7 @@
   $button-font-size: $button-font-size,
   $button-height: $button-height,
   $button-max-width: $button-max-width,
+  $button-border-radius: $button-border-radius,
   $button-density: $button-density,
   $button-stacked-density: $button-density,
 
@@ -14,6 +15,13 @@
   $field-label-floating-scale: $field-label-floating-scale, //0.81,
   $field-control-height: $field-control-height, //56px,
   $field-input-min-height: $field-input-min-height,
+  $field-border-radius: $field-border-radius,
+  $field-outline-opacity: $field-outline-opacity,
+  $field-control-padding-start: $field-control-padding-start,
+  $field-control-padding-end: $field-control-padding-end,
+  $field-control-padding-top: $field-control-padding-top,
+  $field-control-padding-bottom: $field-control-padding-bottom,
+  $text-field-border-radius: $text-field-border-radius,
 
   $grid-gutter: $spacer * 4,
 
@@ -38,6 +46,12 @@
   $list-item-icon-margin-start: calc($spacer * 3),
   // $list-item-avatar-size: 56px,
   // $table-border: thin solid $table-border-color !default;
+  $button-text-transform: $button-text-transform,
 
-
+  $body-font-family: $body-font-family,
+  $heading-font-family: $heading-font-family,
+  $font-size-root: $font-size-root,
+  $line-height-root: $line-height-root,
+  $font-weights: $font-weights,
+  $typography: $typography,
 );

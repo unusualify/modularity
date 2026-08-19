@@ -13,7 +13,7 @@
           <v-hover v-slot="{ isHovering, props }">
             <div class="media w-100" :class="{ 'media--slide' : isSlide }" v-bind="props">
               <div class="_media__field ">
-                <v-row dense class="" no-gutters>
+                <v-row density="compact" class="" no-gutters>
                   <v-col v-for="(index) in totalElementCount" :key="index"
                     v-bind="imageCol"
                     v-fit-grid

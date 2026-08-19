@@ -16,14 +16,7 @@ declare(strict_types=1);
 return [
     'useLegacy' => false,
 
-    'formWidth' => [
-        'xs' => '85vw',
-        'sm' => '450px',
-        'md' => '450px',
-        'lg' => '500px',
-        'xl' => '600px',
-        'xxl' => 700,
-    ],
+    'formWidth' => [],
 
     'layout' => [
         'leftColumnClass' => 'py-12 d-flex flex-column align-center justify-center bg-white',
@@ -32,7 +25,7 @@ return [
     ],
 
     'banner' => [
-        'titleClass' => 'text-white mt-5 text-h4 custom-mb-8rem fs-2rem',
+        'titleClass' => 'text-white mt-5 text-headline-large custom-mb-8rem fs-2rem',
         'buttonVariant' => 'outlined',
         'buttonClass' => 'text-white custom-right-auth-button my-5',
     ],

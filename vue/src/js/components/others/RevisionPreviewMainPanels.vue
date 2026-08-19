@@ -118,17 +118,17 @@
               @update:model-value="setCompareBase"
             />
           </v-sheet>
-          <p class="text-caption text-medium-emphasis mt-2 mb-0">
+          <p class="text-body-small text-medium-emphasis mt-2 mb-0">
             {{ t('messages.revision.compare-hint') }}
           </p>
         </div>
         <v-progress-linear v-if="compareLoading" indeterminate color="primary" />
-        <v-row v-else class="ma-0 revision-compare-row" dense>
+        <v-row v-else class="ma-0 revision-compare-row" density="compact">
           <v-col cols="12" md="6" class="pa-2">
-            <div class="text-caption text-medium-emphasis mb-1">
+            <div class="text-body-small text-medium-emphasis mb-1">
               {{ t('messages.revision.compare-older') }}
             </div>
-            <div class="text-body-2 mb-2 text-white">{{ compareLeftCaption }}</div>
+            <div class="text-body-medium mb-2 text-white">{{ compareLeftCaption }}</div>
             <div :style="comparePaneFrameStyle">
               <iframe
                 v-if="compareHtmlLeft"
@@ -140,10 +140,10 @@
             </div>
           </v-col>
           <v-col cols="12" md="6" class="pa-2">
-            <div class="text-caption text-medium-emphasis mb-1">
+            <div class="text-body-small text-medium-emphasis mb-1">
               {{ t('messages.revision.compare-newer') }}
             </div>
-            <div class="text-body-2 mb-2 text-white">{{ compareRightCaption }}</div>
+            <div class="text-body-medium mb-2 text-white">{{ compareRightCaption }}</div>
             <div :style="comparePaneFrameStyle">
               <iframe
                 v-if="compareHtmlRight"
@@ -184,14 +184,14 @@
               @update:model-value="setCompareBase"
             />
           </v-sheet>
-          <p class="text-caption text-medium-emphasis mt-2 mb-0">
+          <p class="text-body-small text-medium-emphasis mt-2 mb-0">
             {{ t('messages.revision.diff-from-to') }}
           </p>
         </div>
         <v-progress-linear v-if="diffLoading" indeterminate color="primary" />
         <pre
           v-else
-          class="revision-diff-pre font-monospace text-body-2 pa-4 pt-2"
+          class="revision-diff-pre font-monospace text-body-medium pa-4 pt-2"
         ><template v-for="(part, di) in diffLineParts" :key="di"><span :class="diffPartClass(part)">{{ part.value }}</span></template></pre>
       </template>
     </div>

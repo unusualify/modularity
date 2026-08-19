@@ -102,11 +102,11 @@
   >
     <template #prepend>
       <v-avatar size="28" :color="avatarColor" variant="tonal" class="mr-3">
-        <span class="text-caption font-weight-medium">{{ getInitials(revision.author) }}</span>
+        <span class="text-body-small font-weight-medium">{{ getInitials(revision.author) }}</span>
       </v-avatar>
     </template>
 
-    <v-list-item-title class="text-body-2 d-flex align-center flex-wrap ga-1">
+    <v-list-item-title class="text-body-medium d-flex align-center flex-wrap ga-1">
       <span class="font-weight-medium">{{ revision.label }}</span>
       <v-chip
         v-if="showStatusChip"
@@ -121,7 +121,7 @@
       <span class="text-medium-emphasis"> · {{ revision.author }}</span>
     </v-list-item-title>
 
-    <v-list-item-subtitle class="text-caption text-medium-emphasis d-flex align-center flex-wrap ga-1">
+    <v-list-item-subtitle class="text-body-small text-medium-emphasis d-flex align-center flex-wrap ga-1">
       <span>{{ formatDate(revision.datetime) }}</span>
       <template v-if="sourceDisplayDate">
         <span class="mx-1">·</span>
@@ -135,7 +135,7 @@
               {{ sourceDisplayDate }}
             </span>
           </template>
-          <div class="text-caption revision-source-tooltip">
+          <div class="text-body-small revision-source-tooltip">
             {{ sourceDateTooltip }}
           </div>
         </v-tooltip>

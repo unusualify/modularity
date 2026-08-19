@@ -71,7 +71,7 @@
                           icon="mdi-drag-vertical"
                           size="small"
                         />
-                        <span class="text-body-2 text-truncate flex-grow-1 min-width-0">{{ getRepeaterItemTitle(itemSlot.index) }}</span>
+                        <span class="text-body-medium text-truncate flex-grow-1 min-width-0">{{ getRepeaterItemTitle(itemSlot.index) }}</span>
                         <div v-if="!noToolbar" class="d-flex align-center ga-1 ms-2 flex-shrink-0" @click.stop>
                           <v-btn v-if="isAddible" @click="addRepeaterBlock()" color="success" variant="text" density="compact" icon="">
                             <v-icon size="x-small" icon="mdi-plus" />
@@ -198,7 +198,7 @@
                 class="v-input-repeater__panel"
               >
                 <v-expansion-panel-title class="py-2 min-h-auto">
-                  <span class="text-body-2 text-truncate flex-grow-1">{{ getRepeaterItemTitle(index) }}</span>
+                  <span class="text-body-medium text-truncate flex-grow-1">{{ getRepeaterItemTitle(index) }}</span>
                   <div v-if="!noToolbar" class="d-flex align-center ga-1 ms-2 flex-shrink-0" @click.stop>
                     <v-btn v-if="isAddible" @click="addRepeaterBlock()" color="success" variant="text" density="compact" icon="">
                       <v-icon size="x-small" icon="mdi-plus" />

@@ -72,11 +72,18 @@ resources/vendor/modularous/themes/mytheme/
 
 1. Run `make:theme:folder` to scaffold the working directory
 2. Edit `resources/vendor/modularous/themes/{name}/` to customize
-3. Run [`make:theme`](./theme) to promote the custom theme to the built-in set
+3. Set `VUE_APP_THEME={name}` in `.env`
+4. **Development:** `php artisan modularous:dev --noInstall` ([guide](/guide/custom-themes/developing))
+5. **Deploy:** `php artisan modularous:build --noInstall`
+
+For app-specific themes, steps 3–5 are enough — no need to promote into the package.
+
+To **promote** a theme into the package built-in set (maintainers only), run [`make:theme`](./theme).
 
 ---
 
 ## See also
 
+- [Custom Themes guide](/guide/custom-themes/creating-a-theme) — end-user workflow with Sass/JS/Vuetify context
 - [make:theme](./theme) — promote a custom theme to built-in
 - [System Reference](/guide/console/make/overview)

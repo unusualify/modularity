@@ -37,6 +37,18 @@ This section covers UI components, forms, tables, and CMS public-site features i
 | [Tabs](/guide/components/shared/tabs) | Tab component |
 | [Stepper Form](/guide/components/shared/stepper-form) | Stepper form component |
 
+## Custom Themes
+
+| Page | Description |
+|------|-------------|
+| [Custom Themes](/guide/custom-themes/) | App theme folder — colors, Sass tokens, icons |
+| [Creating a theme](/guide/custom-themes/creating-a-theme) | `modularous:make:theme:folder` scaffold command |
+| [Dev & build](/guide/custom-themes/developing) | `modularous:dev --noInstall` (daily) · `modularous:build --noInstall` (deploy) |
+| [Overview & variable flow](/guide/custom-themes/overview) | How Sass and JS connect to Vuetify |
+| [Sass customization](/guide/custom-themes/sass) | Tokens, `_abstract.scss`, `main.scss` |
+| [Colors (JS)](/guide/custom-themes/colors) | `{name}.js` palette |
+| [Icons](/guide/custom-themes/icon-sets) | Theme SVG icons |
+
 ## Directives
 
 | Page | Description |

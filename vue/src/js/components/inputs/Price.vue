@@ -56,8 +56,8 @@
         elevation="0"
       >
         <v-card-text class="text-center py-6">
-          <div class="text-h6 text-white mb-2">{{ $t('Total Pay') }}</div>
-          <div class="text-h2 text-white font-weight-bold">
+          <div class="text-title-large text-white mb-2">{{ $t('Total Pay') }}</div>
+          <div class="text-display-large text-white font-weight-bold">
             {{ displayFormattedPrice(displayedCurrencyISO4217[i], deepModel[i] )}}
           </div>
         </v-card-text>

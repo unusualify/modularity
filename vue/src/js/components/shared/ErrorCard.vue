@@ -61,13 +61,13 @@
         >
           {{ icon }}
         </v-icon>
-        <h1 class="text-h1 font-weight-bold text-{{ alert }} mb-4">
+        <h1 class="text-display-large font-weight-bold text-{{ alert }} mb-4">
           {{ statusCode }}
         </h1>
-        <h2 class="text-h4 font-weight-medium mb-6">
+        <h2 class="text-headline-large font-weight-medium mb-6">
           {{ $t(statusText) }}
         </h2>
-        <p class="text-h6 text-medium-emphasis mb-4">
+        <p class="text-title-large text-medium-emphasis mb-4">
           {{ $t(description) }}
         </p>
         <v-alert

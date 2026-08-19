@@ -143,7 +143,7 @@
                 </template>
                 <template v-slot:body="props">
                   <v-card >
-                    <v-card-title class="text-h5 grey lighten-2"> </v-card-title>
+                    <v-card-title class="text-headline-small grey lighten-2"> </v-card-title>
 
                     <v-card-text>
                       <ue-form
@@ -195,7 +195,7 @@
             >
             <template v-slot:body="props" >
               <v-card >
-                <v-card-title class="text-h5 text-center" style="word-break: break-word;">
+                <v-card-title class="text-headline-small text-center" style="word-break: break-word;">
                   <!-- {{ textDescription }} -->
                 </v-card-title>
                 <v-card-text class="text-center" style="word-break: break-word;" >

@@ -1,6 +1,6 @@
 <template>
-  <v-container class="fill-height">
-    <v-row justify="center" align="center">
+  <v-container class="fill-height d-flex align-center justify-center">
+    <v-row class="justify-center align-center">
       <v-col cols="12" sm="12" md="12" lg="12" class="text-center">
         <v-card flat class="bg-transparent">
           <v-card-item>
@@ -10,8 +10,8 @@
               size="64"
               class="mb-4"
             ></v-icon>
-            <h1 class="text-h4 mb-2 text-success">{{ title }}</h1>
-            <p class="text-body-1 text-medium-emphasis mb-6">
+            <h1 class="text-headline-large mb-2 text-success">{{ title }}</h1>
+            <p class="text-body-large text-medium-emphasis mb-6">
               {{ description }}
             </p>
             <v-btn

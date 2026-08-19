@@ -23,7 +23,7 @@ A single KPI card showing a large value and a label.
 | `labelColor` | `String` | `null` | Override label text color independently |
 | `valueClass` | `String` | `''` | Extra classes on the value element |
 | `labelClass` | `String` | `''` | Extra classes on the label element |
-| `dense` | `Boolean` | `false` | Compact mode — smaller text (`text-h4` vs `text-h3`) |
+| `dense` | `Boolean` | `false` | Compact mode — smaller text (`text-headline-large` vs `text-display-medium`) |
 | `noInline` | `Boolean` | `false` | Render as block instead of inline-block |
 | `center` | `Boolean` | `false` | Center-align the content |
 | `icon` | `String` | `null` | MDI icon shown before the label |

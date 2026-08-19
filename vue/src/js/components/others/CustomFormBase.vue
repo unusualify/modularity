@@ -152,8 +152,8 @@
                     <!-- <v-card-title v-if="obj.schema.title">{{obj.schema.title}}</v-card-title>
                     <v-card-subtitle v-if="obj.schema.subtitle">{{obj.schema.subtitle}}</v-card-subtitle>  -->
                     <div v-if="obj.schema.noLabel !== true && (obj.schema.title || obj.schema.subtitle)" class="mb-3">
-                      <ue-title padding="a-0" margin="b-0" transform="none" weight="bold" class="text-body-1" v-if="obj.schema.title">{{obj.schema.title}}</ue-title>
-                      <ue-title padding="a-0" margin="b-4" transform="none" weight="regular" class="text-caption" v-if="obj.schema.subtitle">
+                      <ue-title padding="a-0" margin="b-0" transform="none" weight="bold" class="text-body-large" v-if="obj.schema.title">{{obj.schema.title}}</ue-title>
+                      <ue-title padding="a-0" margin="b-4" transform="none" weight="regular" class="text-body-small" v-if="obj.schema.subtitle">
                         <span v-html="obj.schema.subtitle"></span>
                       </ue-title>
                     </div>

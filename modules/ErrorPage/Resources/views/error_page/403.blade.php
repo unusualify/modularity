@@ -1,15 +1,15 @@
 @extends('error_page::error_page.standalone')
 
 @section('content')
-    <v-container class="fill-height py-12" style="min-height:100vh;">
-        <v-row justify="center" align="center" class="fill-height">
+    <v-container class="fill-height d-flex align-center flex-wrap py-12" style="min-height:100vh;">
+        <v-row class="justify-center align-center fill-height">
             <v-col cols="12" sm="10" md="7" lg="5">
                 <v-card class="mx-auto text-center" elevation="2" rounded="lg">
                     <v-card-text class="pa-8 pa-md-12">
                         <v-icon color="warning" size="96" class="mb-6">mdi-lock-outline</v-icon>
-                        <div class="text-h2 font-weight-bold text-warning mb-2">403</div>
-                        <div class="text-h5 font-weight-medium mb-4">{{ __('error_page::messages.403.title') }}</div>
-                        <p class="text-body-1 text-medium-emphasis mb-8">
+                        <div class="text-display-medium font-weight-bold text-warning mb-2">403</div>
+                        <div class="text-headline-medium font-weight-medium mb-4">{{ __('error_page::messages.403.title') }}</div>
+                        <p class="text-body-large text-medium-emphasis mb-8">
                             {{ __('error_page::messages.403.description') }}
                         </p>
                         <v-btn

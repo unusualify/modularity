@@ -113,7 +113,7 @@ final class LayoutBuilderShellDraftPreviewController
         $layout->unsetRelation('styleSheet');
         $layout->loadMissing('styleSheet');
 
-        $marker = '<div class="cms-layout-preview-marker p-8 text-body-2">Layout preview marker (hosted page replaces this).</div>';
+        $marker = '<div class="cms-layout-preview-marker p-8 text-body-medium">Layout preview marker (hosted page replaces this).</div>';
 
         $placeholder = CmsLayoutShellPreviewPlaceholder::mergeDataForShellPreview(
             isset($validated['target_model_class']) ? (string) $validated['target_model_class'] : null

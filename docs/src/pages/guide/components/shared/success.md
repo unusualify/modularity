@@ -28,4 +28,6 @@ sidebarTitle: Success
 
 ## Behaviour
 
-The component uses a vertically and horizontally centred `v-container fill-height` layout. All four props are required — omitting any of them will cause Vue to emit a prop validation warning.
+The component centres its content with `v-container` classes `fill-height d-flex align-center justify-center` and a `v-row` using `justify-center align-center`. In Vuetify 4, `fill-height` alone no longer vertically centres children — the flex utilities restore that behaviour.
+
+All four props are required — omitting any of them will cause Vue to emit a prop validation warning.

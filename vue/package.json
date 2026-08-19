@@ -90,7 +90,7 @@
     "vue-filepond": "^7.0.4",
     "vue-i18n": "^11.4.2",
     "vuedraggable": "^4.1.0",
-    "vuetify": "^3.12.5",
+    "vuetify": "^4.0.0",
     "vuetify-form-base": "^0.3.3",
     "vuex": "^4.1.0",
     "webfontloader": "^1.0.0",

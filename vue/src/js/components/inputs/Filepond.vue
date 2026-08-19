@@ -518,7 +518,6 @@
 <style lang="scss" scoped>
   .v-input-filepond__file-field {
     width: 100%;
-    display: block;
     border-radius: 4px;
     overflow-x: hidden;
 

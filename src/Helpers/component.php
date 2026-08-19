@@ -124,7 +124,7 @@ if (! function_exists('modularous_new_response_modal_body_component')) {
                     ->setElements($title),
                 Component::makeDiv()
                     ->setAttributes([
-                        'class' => 'text-subtitle-1 grey--text text-center',
+                        'class' => 'text-body-large text-medium-emphasis text-center',
                         'style' => 'white-space: pre-line;',
                     ])
                     ->setElements($description),

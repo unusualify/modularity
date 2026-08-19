@@ -23,7 +23,7 @@
           size="small"
           @click="toggleGroup(group)"
         />
-        <div class="ue-table-group-header__label d-flex min-width-0 justify-start text-start text-body-2">
+        <div class="ue-table-group-header__label d-flex min-width-0 justify-start text-start text-body-medium">
           <TableFormatterCell
             v-if="formatterColumn"
             :col="formatterColumn"
@@ -38,7 +38,7 @@
           />
           <span v-else class="text-truncate">{{ group.value }}</span>
         </div>
-        <span class="ue-table-group-header__count text-medium-emphasis text-caption flex-shrink-0 text-no-wrap">({{ rowCount }})</span>
+        <span class="ue-table-group-header__count text-medium-emphasis text-body-small flex-shrink-0 text-no-wrap">({{ rowCount }})</span>
       </div>
     </td>
   </tr>

@@ -3,7 +3,7 @@
     <!-- Header -->
     <div class="d-flex align-center ga-2 mb-4">
       <v-icon color="primary" size="28">mdi-eye-check-outline</v-icon>
-      <span class="text-h6 font-weight-bold">Preview</span>
+      <span class="text-title-large font-weight-bold">Preview</span>
     </div>
 
     <v-divider class="mb-6" />
@@ -11,13 +11,13 @@
     <!-- Grouped sections -->
     <template v-if="hasSections">
       <div v-for="section in sections" :key="section.name" class="mb-6">
-        <div class="text-caption text-uppercase text-medium-emphasis font-weight-bold mb-2 letter-spacing-wide">
+        <div class="text-body-small text-uppercase text-medium-emphasis font-weight-bold mb-2 letter-spacing-wide">
           {{ section.name }}
         </div>
         <v-table density="comfortable" class="preview-table">
           <tbody>
             <tr v-for="field in section.fields" :key="field.key">
-              <td class="label-col text-caption text-medium-emphasis font-weight-medium border-0">
+              <td class="label-col text-body-small text-medium-emphasis font-weight-medium border-0">
                 {{ field.label }}
               </td>
               <td class="border-0">
@@ -33,7 +33,7 @@
     <v-table v-else density="comfortable" class="preview-table">
       <tbody>
         <tr v-for="field in visibleFields" :key="field.key">
-          <td class="label-col text-caption text-medium-emphasis font-weight-medium border-0">
+          <td class="label-col text-body-small text-medium-emphasis font-weight-medium border-0">
             {{ field.label }}
           </td>
           <td class="border-0">
@@ -90,7 +90,7 @@ const FieldValue = defineComponent({
 
       if (type === 'html') {
         return h('div', {
-          class: 'text-body-2 preview-html',
+          class: 'text-body-medium preview-html',
           innerHTML: val,
           style: 'max-height: 300px; overflow-y: auto;',
         })
@@ -118,7 +118,7 @@ const FieldValue = defineComponent({
               hour: '2-digit', minute: '2-digit', hour12: false,
             }).format(new Date(val))
           : null
-        return h('span', { class: 'text-body-2' }, formatted || '—')
+        return h('span', { class: 'text-body-medium' }, formatted || '—')
       }
 
       if (type === 'list') {
@@ -141,7 +141,7 @@ const FieldValue = defineComponent({
       }
 
       // default: text
-      return h('span', { class: 'text-body-2' }, String(val))
+      return h('span', { class: 'text-body-medium' }, String(val))
     }
   },
 })

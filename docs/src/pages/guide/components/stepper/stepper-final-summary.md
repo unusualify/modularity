@@ -79,7 +79,7 @@ Overrides the total value cell. Receives `{ payload }` (the full merged payload 
 
 ```html
 <template #summary.final.total="{ payload }">
-  <span class="text-h5 text-white">{{ payload.amount_formatted }}</span>
+  <span class="text-headline-small text-white">{{ payload.amount_formatted }}</span>
 </template>
 ```
 

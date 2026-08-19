@@ -51,7 +51,7 @@
 
 <template>
   <div class="revision-preview-sidebar d-flex flex-column flex-shrink-0">
-    <div class="text-caption font-weight-medium pa-3 pb-2 text-medium-emphasis revision-preview-sidebar-header">
+    <div class="text-body-small font-weight-medium pa-3 pb-2 text-medium-emphasis revision-preview-sidebar-header">
       {{ t('messages.revision.preview-sidebar-title') }}
     </div>
     <v-list
@@ -71,7 +71,7 @@
                 disabled
                 rounded="lg"
               >
-                <v-list-item-title class="text-body-2 d-flex align-center flex-wrap ga-1 min-width-0">
+                <v-list-item-title class="text-body-medium d-flex align-center flex-wrap ga-1 min-width-0">
                   <span class="text-truncate">{{ rev.label }}</span>
                   <v-chip
                     v-if="showRevisionStatusChip(rev)"
@@ -92,7 +92,7 @@
                     size="28"
                     :color="revisionSidebarAvatarColor(rev, true)"
                     variant="flat"
-                    class="text-caption"
+                    class="text-body-small"
                   >
                     {{ String(rev.label || '?').slice(0, 1).toUpperCase() }}
                   </v-avatar>
@@ -108,7 +108,7 @@
           rounded="lg"
           @click="emit('select', rev.id)"
         >
-          <v-list-item-title class="text-body-2 d-flex align-center flex-wrap ga-1 min-width-0">
+          <v-list-item-title class="text-body-medium d-flex align-center flex-wrap ga-1 min-width-0">
             <span class="text-truncate">{{ rev.label }}</span>
             <v-chip
               v-if="showRevisionStatusChip(rev)"
@@ -129,7 +129,7 @@
               size="28"
               :color="revisionSidebarAvatarColor(rev, false)"
               variant="tonal"
-              class="text-caption"
+              class="text-body-small"
             >
               {{ String(rev.label || '?').slice(0, 1).toUpperCase() }}
             </v-avatar>

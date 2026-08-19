@@ -578,7 +578,7 @@ trait FormSchema
                 $input['margin'] ??= 'b-0';
                 $input['transform'] ??= 'none';
                 $input['weight'] ??= 'bold';
-                $input['class'] ??= 'text-body-1';
+                $input['class'] ??= 'text-body-large';
                 $input['color'] ??= null;
 
                 // $input = [];

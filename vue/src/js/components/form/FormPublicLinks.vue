@@ -7,14 +7,14 @@
       v-if="localizedPublicPermalinks && localizedPublicPermalinks.length"
       class="d-flex flex-wrap align-center ga-2 mt-2"
     >
-      <span class="text-caption text-medium-emphasis">{{ t('fields.public_permalink', 'Public page') }}</span>
+      <span class="text-body-small text-medium-emphasis">{{ t('fields.public_permalink', 'Public page') }}</span>
       <a
         v-for="row in localizedPublicPermalinks"
         :key="row.locale"
         :href="row.url"
         target="_blank"
         rel="noopener noreferrer"
-        class="d-inline-flex align-center ga-1 text-caption text-primary text-decoration-none"
+        class="d-inline-flex align-center ga-1 text-body-small text-primary text-decoration-none"
       >
         <span>{{ permalinkLocaleLabel(row.locale) }}</span>
         <v-icon size="small" color="primary">mdi-open-in-new</v-icon>
