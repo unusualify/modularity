@@ -168,6 +168,7 @@ Defined in `sass/core/abstract/_variables.scss`. Common overrides:
 - `$typography` — overlay for Vuetify MD3 type roles; `()` keeps framework defaults (deep-merged in `vuetify/settings`)
 - `$border-radius-root` (affects cards, chips, fields — not just buttons)
 - `$spacer`
+- `$grid-gutter` — Vuetify `v-row` col gap (`--v-col-gap-x/y`) and `.v-row + .v-row` margin-top (default `$spacer * 4`; b2pressV2 uses `24px`)
 
 **Sidebar**
 - `$sidebar-padding`, `$sidebar-icon-size`, `$sidebar-list-item-overlay-color`, …

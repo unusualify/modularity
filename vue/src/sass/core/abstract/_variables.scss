@@ -101,6 +101,9 @@ $stepper-form-summary-final-background: #005868 !default;
 
 $field-input-min-height: max(var(--v-input-control-height, 52px), 1.2rem + var(--v-field-input-padding-top) + var(--v-field-input-padding-bottom));
 
+/* GRID — drives Vuetify `--v-col-gap-x/y` and `.v-row + .v-row` margin-top */
+$grid-gutter: $spacer * 6 !default;
+
 $grid-gutter-secondary: $spacer * 6 * calc(2 / 3) !default;
 
 $grid-gutter-tertiary: $spacer * 6 * calc(1 / 3) !default;
