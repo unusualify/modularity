@@ -65,6 +65,10 @@ class FormPageUtilityCoverageTest extends TestCase
 
             public string $routeName = 'Item';
 
+            public ?string $moduleRouteName = null;
+
+            public $moduleRoute = null;
+
             public string $routePrefix = 'admin';
 
             public $nestedParentId = null;
@@ -160,7 +164,7 @@ class FormPageUtilityCoverageTest extends TestCase
                 return $formItemCallback();
             }
 
-            protected function getModuleRoute($id, $action, $singleton = false): string
+            protected function getModuleRouteUrl($id, $action, $singleton = false): string
             {
                 return "/admin/item/{$id}/{$action}";
             }
