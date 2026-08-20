@@ -18,8 +18,6 @@ class FilepondController extends Controller
     public function upload(Request $request)
     {
         return $this->filepondManager->createTemporaryFilepond($request);
-
-        return response($this->filepondManager->createTemporaryFilepond($request));
     }
 
     public function revert(Request $request)
