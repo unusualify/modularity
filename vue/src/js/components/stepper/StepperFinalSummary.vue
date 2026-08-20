@@ -40,7 +40,7 @@
   </div>
 
   <!-- Complete button -->
-  <v-sheet class="pb-0 px-0 ue-stepper-form__preview-bottom bg-primary-darken-3">
+  <div class="pb-0 px-0 ue-stepper-form__preview-bottom">
     <v-btn-secondary
       class="v-stepper-form__nextButton"
       block
@@ -50,7 +50,7 @@
     >
       {{ $t('Complete Request').toUpperCase() }}
     </v-btn-secondary>
-  </v-sheet>
+  </div>
     <!-- </div> -->
 </template>
 
