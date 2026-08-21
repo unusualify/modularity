@@ -158,8 +158,90 @@ export default function useFilepond(props, context) {
     filepondRules.value = newVal
   })
 
+  const pendingUploads = ref(0)
+  const isUploading = computed(() => pendingUploads.value > 0)
+
+  const startUpload = () => {
+    pendingUploads.value += 1
+  }
+
+  const finishUpload = () => {
+    pendingUploads.value = Math.max(0, pendingUploads.value - 1)
+  }
+
+  const commitProcessedInput = (currentInput, file) => {
+    return commitProcessedFilepondInput(currentInput, file, props.endPoints, {
+      allowMultiple: props.allowMultiple,
+    })
+  }
+
+  const canRemoveFromModel = (file) => {
+    return shouldCommitFilepondRemove(file, {
+      isUploading: isUploading.value,
+      allowMultiple: props.allowMultiple,
+    })
+  }
+
   return {
     filepondRules,
-    max
+    max,
+    pendingUploads,
+    isUploading,
+    startUpload,
+    finishUpload,
+    commitProcessedInput,
+    canRemoveFromModel,
   }
+}
+
+/**
+ * Server process result only — never the local FilePond file item.
+ */
+export function toProcessedFilepondEntry(file, endPoints = {}) {
+  const uuid = file?.serverId
+  if (!uuid) {
+    return null
+  }
+
+  return {
+    uuid,
+    file_name: file.filename,
+    source: `${endPoints.load ?? ''}${uuid}`,
+  }
+}
+
+/**
+ * Commit a file to v-model only after FilePond `process` has a server id.
+ * Single-file fields replace the previous committed value so replace-upload
+ * does not dirty the form with a cleared array mid-request.
+ */
+export function commitProcessedFilepondInput(currentInput, file, endPoints, { allowMultiple = false } = {}) {
+  const entry = toProcessedFilepondEntry(file, endPoints)
+  const list = Array.isArray(currentInput) ? currentInput : []
+
+  if (!entry) {
+    return list
+  }
+
+  if (!allowMultiple) {
+    return [entry]
+  }
+
+  return list.concat(entry)
+}
+
+/**
+ * Local / in-flight items were never written to modelValue.
+ * While a single-file replacement is uploading, keep the previous committed value.
+ */
+export function shouldCommitFilepondRemove(file, { isUploading = false, allowMultiple = false } = {}) {
+  if (!file?.serverId) {
+    return false
+  }
+
+  if (isUploading && !allowMultiple) {
+    return false
+  }
+
+  return true
 }
