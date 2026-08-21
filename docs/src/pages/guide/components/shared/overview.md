@@ -53,7 +53,8 @@ Form inputs (30+ `input-*` components) are documented under [Form Inputs](../../
 | Component | Purpose |
 |-----------|---------|
 | [Configurable Card](./configurable-card) | Card with slot-based sections |
-| [Metric](./metric) | Stat/metric tile |
+| [Metric](./metric) | Stat/metric tile (`ue-metric` / `ue-metrics`) |
+| [Metric Cards](./metric-cards) | Independent glance cards (`ue-metric-card` / `ue-metric-cards`) |
 | [Property List](./property-list) | Key/value list for record detail |
 | [List Section](./list-section) | Titled list block |
 | [Text Display](./text-display) | Truncation, copy-on-click, formatting |

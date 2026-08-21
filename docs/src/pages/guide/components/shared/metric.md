@@ -6,6 +6,8 @@ sidebarTitle: Metric / Metrics / MetricGroups
 
 Three related components for displaying KPI-style numeric cards. Use `ue-metric` for a single value, `ue-metrics` for a grouped collection with an optional date-range filter, and `ue-metric-groups` for multiple `ue-metrics` groups laid out in a grid.
 
+For the new dashboard glance row (independent cards, title outside a parent card), use [`ue-metric-cards`](./metric-cards) instead of wrapping `ue-metric` in `ue-metrics`.
+
 ---
 
 ## `ue-metric`
