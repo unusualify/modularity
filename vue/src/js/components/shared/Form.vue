@@ -3,6 +3,7 @@
     :class="[
       'ue-form',
       fillHeight ? 'd-flex flex-column flex-grow-1 min-height-0' : '',
+      surfaceClasses,
     ]">
     <v-form
       :id="id"
@@ -13,7 +14,7 @@
       @update:modelValue="updateFormValid"
       @submit="submit"
       :class="formClasses"
-      >
+    >
       <input v-if="!async" type="hidden" name="_token" :value="$csrf"/>
 
       <!-- Header Section -->
@@ -475,6 +476,7 @@ import { computed, onMounted, watch } from 'vue'
 import { useStore } from 'vuex'
 import { useI18n } from 'vue-i18n'
 import { useForm, makeFormProps } from '@/hooks/form'
+import { useSurface } from '@/hooks/utils/useSurface'
 import { cloneDeep, omit, isObject } from 'lodash-es'
 import FormActions from '../form/FormActions.vue'
 import FormPreviewFields from '../form/FormPreviewFields.vue'
@@ -592,6 +594,7 @@ export default {
     const store = useStore()
     const useFormInstance = useForm(props, context)
     const { t, te } = useI18n({ useScope: 'global' })
+    const { surfaceClasses } = useSurface(props)
     // const i18n = useI18n()
 
     const formClasses = computed(() => [
@@ -703,6 +706,7 @@ export default {
     return {
       ...useFormInstance,
       t,
+      surfaceClasses,
       formClasses,
       formSlots,
       titleOptions,

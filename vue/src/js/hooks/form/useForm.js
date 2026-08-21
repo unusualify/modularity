@@ -3,10 +3,11 @@ import { ref, computed, watch, toRefs, reactive, nextTick, onMounted, provide } 
 import { router } from '@inertiajs/vue3'
 import { useStore } from 'vuex'
 import { useI18n } from 'vue-i18n'
-import { cloneDeep, isEqual, find, reduce, set, get, isArray, isPlainObject } from 'lodash-es'
+import { cloneDeep, isEqual, find, reduce, set, get, isArray, isPlainObject, debounce } from 'lodash-es'
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
 
 import { useConfig, useInputHandlers, useValidation, useLocale, useItemActions, useAuthorization, useUser, useEditPresence } from '@/hooks'
+import { makeSurfaceProps } from '@/hooks/utils/useSurface'
 import useFormResponseStatus from './useFormResponseStatus'
 import { LANGUAGE } from '@/store/mutations/index'
 import ACTIONS from '@/store/actions'
@@ -18,6 +19,7 @@ import { getTranslationInputsCount, processInputs } from '@/utils/schema.js'
 import { redirector } from '@/utils/response'
 
 export const makeFormProps = propsFactory({
+  ...makeSurfaceProps(),
   modelValue: {
     type: Object,
     required: true,
@@ -220,6 +222,14 @@ export const makeFormProps = propsFactory({
    * mode that discards dirty values and returns to preview.
    */
   previewableCancel: {
+    type: Boolean,
+    default: false,
+  },
+  /**
+   * When true, persist as soon as a submittable field becomes dirty
+   * (e.g. profile header avatar after FilePond finishes).
+   */
+  submitOnChange: {
     type: Boolean,
     default: false,
   },
@@ -844,6 +854,27 @@ export default function useForm(props, context) {
     },
   })
 
+  const submitOnChangeReady = ref(false)
+
+  const submitOnChangeIfDirty = debounce(() => {
+    if (!submitOnChangeReady.value || !props.submitOnChange || !isDirty.value || formLoading.value || !props.actionUrl) {
+      return
+    }
+
+    methods.submit()
+  }, 400)
+
+  watch(isDirty, (dirty) => {
+    if (!props.submitOnChange) {
+      return
+    }
+
+    if (dirty) {
+      submitOnChangeIfDirty()
+    } else {
+      submitOnChangeIfDirty.cancel()
+    }
+  })
 
   // Add watch to sync with modelValue when it exists
   watch(() => props.modelValue, (newVal, oldVal) => {
@@ -935,6 +966,12 @@ export default function useForm(props, context) {
   }, { deep: true })
 
   initialize()
+
+  onMounted(() => {
+    nextTick(() => {
+      submitOnChangeReady.value = true
+    })
+  })
 
 
   if(isSuperAdmin.value) {

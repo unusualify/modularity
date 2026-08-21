@@ -2,8 +2,7 @@
   <v-layout fluid v-resize="onResize"
     :class="[
       noFullScreen ? 'd-flex flex-column flex-grow-1 min-height-0' : '',
-      rounded ? $lodash.isBoolean(rounded) ? 'rounded' : `rounded-${rounded}` : '',
-      elevation ? `elevation-${elevation}` : '',
+      surfaceClasses,
     ]"
     :style="noFullScreen
       ? 'min-height: 0; max-height: 100%;'
@@ -26,9 +25,8 @@
           options.groupBy?.length ? 'ue-table--has-group-by' : '',
           $store.getters.isSuperAdmin && showSelect ? 'ue-table--has-row-select' : '',
           tableClasses,
-          rounded ? $lodash.isBoolean(rounded) ? 'rounded' : `rounded-${rounded}` : '',
+          tableSurfaceClasses,
           fullWidthWrapper ? '' : 'ue-table--narrow-wrapper',
-          tableElevation ? `elevation-${tableElevation}` : '',
           striped ? 'ue-datatable--striped' : '',
           roundedRows ? 'ue-datatable--rounded-row' : '',
           hideBorderRow ? 'ue-datatable--no-border-row' : '',
