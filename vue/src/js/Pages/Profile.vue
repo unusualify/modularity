@@ -25,8 +25,8 @@ defineOptions({
 </template>
 
 <style scoped>
-.profile {
-  flex: 1 1 auto;
-  min-height: 0;
-}
+  .profile {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
 </style>

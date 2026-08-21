@@ -54,11 +54,52 @@ class ProfileController extends BaseController
 
     public function edit($id = null, $submoduleId = null)
     {
+        $formSurfaceAttributes = [
+            'elevation' => 0,
+            'rounded' => 'lg',
+            'border' => 'sm',
+        ];
 
         $user = auth()->user();
 
         $userSchema = $this->createFormSchema(getFormDraft('user'));
         $userFields = $this->userRepository->getFormFields($user, $userSchema);
+
+        $headerSchema = $this->createFormSchema(getFormDraft('profile_header'));
+        $headerFields = $this->userRepository->getFormFields($user, $headerSchema);
+        $displayName = trim(implode(' ', array_filter([$user->name, $user->surname])));
+        $companyName = $user->company_name ?? '';
+
+        $identityTitle = e($displayName);
+        $identityAttrs = 'class="px-5" title="' . $identityTitle . '"';
+        if ($companyName !== '') {
+            $identityAttrs .= ' subtitle="' . e($companyName) . '"';
+        }
+
+        $headerSchema['identity']['subject'] = '<v-list-item ' . $identityAttrs . '></v-list-item>';
+
+        $headerForm = UComponent::makeUeForm()
+            ->setAttributes([
+                'class' => 'd-flex flex-column',
+                ...$formSurfaceAttributes,
+                'formClass' => 'rounded',
+                'noTitle' => true,
+                'hasSubmit' => false,
+                'submitOnChange' => true,
+                'stickyButton' => false,
+                'modelValue' => $headerFields,
+                'refreshOnSaved' => true,
+                'forceRefresh' => true,
+                'schema' => $headerSchema,
+                'rowAttribute' => [
+                    'noGutters' => true,
+                    'class' => 'align-center py-0',
+                ],
+                'defaultItem' => collect($headerSchema)->mapWithKeys(function ($item, $key) {
+                    return [$item['name'] => $item['default'] ?? ''];
+                })->toArray(),
+                'actionUrl' => $this->getModuleRouteUrl(id: $userFields['id'], action: 'update', singleton: true),
+            ]);
 
         $userPasswordSchema = $this->createFormSchema(getFormDraft('user_password'));
         $userPasswordFields = $this->userRepository->getFormFields($user, $userPasswordSchema, noSerialization: false);
@@ -86,6 +127,7 @@ class ProfileController extends BaseController
 
         $personalForm = $personalForm->setAttributes([
             'class' => 'd-flex flex-column flex-grow-1 min-height-0',
+            ...$formSurfaceAttributes,
             'pushButtonToBottom' => true,
             'formClass' => 'rounded d-flex flex-column flex-grow-1',
 
@@ -132,12 +174,13 @@ class ProfileController extends BaseController
             $personalForm = $personalForm->addSlot('options', $verifyEmailButton);
         }
 
-        $sectionFields = [
+        $bodySectionFields = [
             [
                 $personalForm,
                 UComponent::makeUeForm()
                     ->setAttributes([
                         'class' => 'd-flex flex-column flex-grow-1 min-height-0',
+                        ...$formSurfaceAttributes,
                         'pushButtonToBottom' => true,
                         'formClass' => 'rounded d-flex flex-column flex-grow-1',
                         'clearOnSaved' => true,
@@ -188,11 +231,12 @@ class ProfileController extends BaseController
                 }, $companySchema);
             }
 
-            $sectionFields[] = [
+            $bodySectionFields[] = [
                 'content' => [
                     UComponent::makeUeForm()
                         ->setAttributes([
                             'class' => 'd-flex flex-column flex-grow-1 min-height-0',
+                            ...$formSurfaceAttributes,
                             'pushButtonToBottom' => true,
                             'formClass' => 'rounded d-flex flex-column flex-grow-1',
                             'title' => [
@@ -224,14 +268,29 @@ class ProfileController extends BaseController
                 ],
             ];
         }
-        $data = [];
-
-        // dd($sectionFields);
 
         $elements = [
-            UWrapper::makeGridSection($sectionFields, rowAttributes: ['class' => 'flex-grow-1 min-height-0'], colAttributes: ['class' => 'd-flex flex-column ga-6']),
+            UWrapper::makeGridSection(
+                [
+                    [
+                        'parent_attributes' => [
+                            'cols' => 12,
+                            'lg' => 12,
+                        ],
+                        'content' => [
+                            $headerForm,
+                        ],
+                    ],
+                ],
+                rowAttributes: ['class' => 'flex-grow-0'],
+                colAttributes: ['class' => 'd-flex flex-column']
+            ),
+            UWrapper::makeGridSection(
+                $bodySectionFields,
+                rowAttributes: ['class' => 'flex-grow-1 min-height-0'],
+                colAttributes: ['class' => 'd-flex flex-column ga-6']
+            ),
         ];
-        // dd($data);
         $endpoints = $this->getUrls();
 
         $pageTitle = __('Profile Settings') . ' - ' . Modularous::pageTitle();
@@ -271,14 +330,15 @@ class ProfileController extends BaseController
 
         $item = $this->repository->getById($id);
 
-        $formRequest = $this->validateFormRequest(
-            getFormDraft('user') + getFormDraft('user_password')
-        );
-
         $schema = null;
 
-        if (array_key_exists('avatar', $formRequest->all())) {
+        if ($this->request->exists('avatar')) {
+            $formRequest = $this->validateFormRequest(getFormDraft('profile_header'));
             $schema = getFormDraft('profile_shortcut');
+        } else {
+            $formRequest = $this->validateFormRequest(
+                getFormDraft('user') + getFormDraft('user_password')
+            );
         }
 
         $this->repository->update($id, $formRequest->all(), $schema);
