@@ -15,7 +15,7 @@
       <template v-if="Array.isArray(values)">
         <div v-for="(item, index) in values" :key="index">
           <ue-text-display
-            class="text-h5"
+            class="text-headline-small"
             :text="getDisplayText(item, index)"
             :sub-text="getSubText(item, index)"
           />
@@ -25,7 +25,7 @@
       <!-- For single object response -->
       <template v-else>
         <ue-text-display
-          class="text-h5"
+          class="text-headline-small"
           :text="getDisplayText(values)"
           :sub-text="$t(getSubText(values))"
         />

@@ -55,7 +55,6 @@
             <template v-slot:body.description="formModalBodyScope">
               <ue-form
                 :ref="`extra-form-${key}`"
-
                 :modelValue="createModel(action.schema, action)"
                 :title="action.formTitle ?? null"
                 :schema="action.schema"
@@ -66,6 +65,7 @@
                 class="w-100"
                 :style="formModalBodyScope.isFullActive ? 'height: 90vh !important;' : 'height: 70vh !important;'"
 
+                :border="false"
                 fill-height
                 scrollable
 

@@ -8,7 +8,7 @@
       <v-col class="d-flex flex-column justify-center px-0">
         <v-card class="pa-4 payment-container" elevation="0">
           <v-card-text class="pa-0">
-            <p class="text-h5 text-center ma-6">{{ $t('How would you like to pay?') }}</p>
+            <p class="text-headline-medium text-center ma-6">{{ $t('How would you like to pay?') }}</p>
           </v-card-text>
 
           <!-- Currency Selector -->
@@ -72,13 +72,9 @@
                 </div>
 
               </div>
-              <!-- <v-row align="center">
-                <v-col class="d-flex justify-content-end">
-                </v-col>
-              </v-row> -->
             </div>
             <div v-if="currencyHasTransactionFee" class="service-container" style="border: none;">
-              <div class="text-body-1">
+              <div class="text-body-large">
                 {{ '* ' + $t(transactionFeeDescription) }}
               </div>
             </div>
@@ -109,7 +105,7 @@
             >
               <template #button="{ pay }">
                 <div class="d-flex flex-column align-center" style="width: 100%;">
-                  <p class="text-h5 text-center ma-4">{{ $t('Click below to pay securely') }}</p>
+                  <p class="text-headline-medium text-center ma-4">{{ $t('Click below to pay securely') }}</p>
                   <v-btn
                     :style="selectedCurrency?.payment_service?.button_style"
                     density="comfortable"
@@ -142,14 +138,15 @@
         <template v-else-if="isTransferrableForm">
           <div class="w-100 h-100 d-flex border-thin d-flex flex-column pa-4 ga-4">
             <div v-for="(value, key) in selectedService?.bank_details ?? {}" :key="key" class="">
-              <h6 class="text-body-1 font-weight-bold " >{{ $headline(key) }}</h6>
-              <p class="text-body-1" >{{ value }}</p>
+              <h6 class="text-body-large font-weight-bold " >{{ $headline(key) }}</h6>
+              <p class="text-body-large" >{{ value }}</p>
             </div>
             <ue-form
               ref="transferForm"
               :schema="transferSchema"
               :modelValue="transferFormModel"
               :action-url="paymentUrl"
+              :border="false"
 
               noDefaultSurface
               noDefaultFormPadding
@@ -166,7 +163,7 @@
           </div>
         </template>
         <div v-else class="d-flex flex-column align-center" style="width: 100%;">
-          <p class="text-h5 text-center ma-4">{{ $t('Click below to pay securely') }}</p>
+          <p class="text-headline-medium text-center ma-4">{{ $t('Click below to pay securely') }}</p>
           <v-btn
             :style="selectedService?.button_style"
             @click="submitForm"
@@ -193,7 +190,7 @@
   <Teleport to="body">
     <div v-if="paymentProcessing" class="payment-service-overlay">
       <v-progress-circular indeterminate color="primary" size="64" :width="5" />
-      <p class="mt-4 text-body-1 font-weight-medium">{{ $t('Please wait...') }}</p>
+      <p class="mt-4 text-body-large font-weight-medium">{{ $t('Please wait...') }}</p>
     </div>
   </Teleport>
 </template>

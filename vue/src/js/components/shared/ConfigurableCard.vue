@@ -1,7 +1,7 @@
 <template>
   <v-card class="ue-configurable-card" :class="[$bindAttributes().class, cardClass]">
     <!-- <template v-if="title" v-slot:title>
-      <span class="font-weight-bold text-primary text-body-1">{{ title }}</span>
+      <span class="font-weight-bold text-primary text-body-large">{{ title }}</span>
     </template> -->
     <slot name="title">
       <ue-title v-if="title" :text="title" :color="titleColor" :padding="`x-${titlePXNumber}`" class="pt-4"/>

@@ -13,7 +13,7 @@
     <v-alert
       v-if="jsonFieldSubtitle"
       border="start"
-      class="mb-2 text-body-2"
+      class="mb-2 text-body-medium"
       density="compact"
       prominent
       type="info"
@@ -23,7 +23,7 @@
     </v-alert>
 
     <div v-if="variantChipsNormalized.length" class="d-flex flex-wrap ga-2 mb-2 align-start">
-      <span class="text-caption text-medium-emphasis text-no-wrap mt-1">
+      <span class="text-body-small text-medium-emphasis text-no-wrap mt-1">
         {{ variantChipsLabel }}
       </span>
       <div class="d-flex flex-wrap ga-1">
@@ -31,7 +31,7 @@
           <template #activator="{ props }">
             <v-chip size="small" variant="tonal" color="primary" class="cursor-default" v-bind="props">{{ chip.label }}</v-chip>
           </template>
-          <div class="text-caption">{{ chip.detail }}</div>
+          <div class="text-body-small">{{ chip.detail }}</div>
         </v-tooltip>
       </div>
     </div>
@@ -49,10 +49,10 @@
         :key="'gp-' + ix"
         rounded="lg"
       >
-        <v-expansion-panel-title class="text-body-2 py-3 min-h-auto">
+        <v-expansion-panel-title class="text-body-medium py-3 min-h-auto">
           {{ panel.title }}
         </v-expansion-panel-title>
-        <v-expansion-panel-text class="text-body-2 text-medium-emphasis">
+        <v-expansion-panel-text class="text-body-medium text-medium-emphasis">
           <div class="ue-json-field-guide-body">{{ panel.body }}</div>
         </v-expansion-panel-text>
       </v-expansion-panel>
@@ -104,13 +104,13 @@
             rounded="sm"
             @click="applySnippet(row)"
           >
-            <v-list-item-title class="text-body-2">{{ row.label }}</v-list-item-title>
+            <v-list-item-title class="text-body-medium">{{ row.label }}</v-list-item-title>
             <v-list-item-subtitle v-if="row.hint">{{ row.hint }}</v-list-item-subtitle>
           </v-list-item>
         </v-list>
       </v-menu>
 
-      <span class="text-caption text-medium-emphasis ms-auto d-none d-sm-inline">
+      <span class="text-body-small text-medium-emphasis ms-auto d-none d-sm-inline">
         {{ $t('fields.json_shortcuts_hint', 'Tab / Shift+Tab: indent • Alt+Shift + F/M/C • also ⌘/Ctrl+Alt+F/M/C') }}
       </span>
     </div>

@@ -27,9 +27,9 @@ sidebarTitle: List Section
 | `showHeader` | `Boolean` | `false` | Show the header row |
 | `title` | `String` | — | Optional title above the list |
 | `titleTag` | `String` | `'h3'` | HTML element for the title |
-| `titleClasses` | `String` | `'text-body-1 font-weight-medium'` | Classes applied to the title |
-| `itemClasses` | `String` | `'text-body-2'` | Classes applied to each data row |
-| `headerClasses` | `String` | `'text-body-2 font-weight-bold'` | Classes applied to the header row |
+| `titleClasses` | `String` | `'text-body-large font-weight-medium'` | Classes applied to the title |
+| `itemClasses` | `String` | `'text-body-medium'` | Classes applied to each data row |
+| `headerClasses` | `String` | `'text-body-medium font-weight-bold'` | Classes applied to the header row |
 | `colClasses` | `Array` | `[]` | Per-column CSS class array |
 | `colWidths` | `Array` | `[]` | Fixed widths per column, e.g. `['120px', '1fr']` |
 | `colRatios` | `Array` | `[]` | Flex ratios per column, e.g. `[2, 1, 1]` |

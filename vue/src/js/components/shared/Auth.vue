@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-main class="auth-main">
+    <main class="auth-main">
       <div class="auth-scrim" />
       <v-container fluid class="auth-container fill-height">
         <div class="auth-card" :style="formSheetStyle">
@@ -32,7 +32,7 @@
           <slot name="bottom" v-bind="{}" />
         </div>
       </v-container>
-    </v-main>
+    </main>
     <ue-alert ref="alert" />
     <ue-dynamic-modal />
   </v-app>

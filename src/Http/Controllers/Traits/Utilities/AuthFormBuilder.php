@@ -28,7 +28,7 @@ trait AuthFormBuilder
             'text' => $text,
             'tag' => 'h1',
             'color' => 'primary',
-            'type' => 'h5',
+            'type' => 'headline-small',
             'weight' => 'bold',
             'transform' => 'uppercase',
             'align' => 'center',
@@ -122,6 +122,29 @@ trait AuthFormBuilder
     }
 
     /**
+     * Returns create account as a primary text link (V2 auth layout).
+     */
+    protected function createAccountLinkSlot(): array
+    {
+        $registerRoute = modularousConfig('email_verified_register')
+            ? Route::hasAdmin('register.email_form')
+            : Route::hasAdmin('register.form');
+
+        return [
+            'tag' => 'v-btn',
+            'elements' => ___('authentication.create-an-account'),
+            'attributes' => [
+                'variant' => 'text',
+                'href' => route($registerRoute),
+                'class' => 'my-2 text-none auth-v2-create-account',
+                'color' => 'primary',
+                'density' => 'default',
+                'block' => true,
+            ],
+        ];
+    }
+
+    /**
      * Returns form option slot (e.g. forgot password, have account link).
      *
      * @param array<string, mixed> $attributes
@@ -152,6 +175,7 @@ trait AuthFormBuilder
         return [
             'tag' => 'v-sheet',
             'attributes' => array_merge([
+                'border' => false,
                 'class' => 'd-flex pb-5 justify-end flex-column w-100 text-black',
             ], $sheetAttributes),
             'elements' => $elements,
@@ -274,6 +298,7 @@ trait AuthFormBuilder
         $buttonText = $pageConfig['buttonText'] ?? '';
 
         $formAttributes = $overrides['formAttributes'] ?? [];
+        $formAttributes['buttonDensity'] ??= 'default';
 
         if ($formDraft !== null) {
             $actionUrl = Route::has($actionRoute) ? route($actionRoute) : $actionRoute;
@@ -287,7 +312,10 @@ trait AuthFormBuilder
         }
 
         if ($formTitle && ! isset($formAttributes['title'])) {
-            $formTitleOverrides = $pageKey === 'register' ? ['transform' => ''] : [];
+            $formTitleOverrides = array_merge(
+                $pageKey === 'register' ? ['transform' => ''] : [],
+                $pageConfig['formTitleOverrides'] ?? []
+            );
             $formAttributes['title'] = $this->authFormTitle(
                 is_string($formTitle) ? __($formTitle) : $formTitle,
                 $formTitleOverrides
@@ -327,6 +355,30 @@ trait AuthFormBuilder
                     route('admin.password.reset.link')
                 ),
             ],
+            'login_forgot_below' => [
+                'bottom' => $this->authFormOptionSlot(
+                    __('authentication.forgot-password'),
+                    route('admin.password.reset.link'),
+                    [
+                        'variant' => 'text',
+                        'color' => 'primary',
+                        'block' => true,
+                        'class' => 'w-100 mt-2 text-none auth-v2-forgot',
+                    ]
+                ),
+            ],
+            'sign_in_below' => [
+                'bottom' => $this->authFormOptionSlot(
+                    __('authentication.sign-in'),
+                    route(Route::hasAdmin('login.form')),
+                    [
+                        'variant' => 'text',
+                        'color' => 'primary',
+                        'block' => true,
+                        'class' => 'w-100 mt-2 text-none auth-v2-sign-in',
+                    ]
+                ),
+            ],
             'login_mfa_options' => [
                 'options' => $this->authFormOptionSlot(
                     __('authentication.create-an-account'),
@@ -346,7 +398,31 @@ trait AuthFormBuilder
                 ),
             ],
             'have_account' => $this->haveAccountOptionSlot(),
+            'register_have_account_below' => [
+                'bottom' => $this->authFormOptionSlot(
+                    __('authentication.have-an-account'),
+                    route(Route::hasAdmin('login.form')),
+                    [
+                        'variant' => 'text',
+                        'color' => 'primary',
+                        'block' => true,
+                        'class' => 'w-100 mt-2 text-none auth-v2-have-account',
+                    ]
+                ),
+            ],
             'restart' => $this->restartOptionSlot(),
+            'complete_register_restart_below' => [
+                'bottom' => $this->authFormOptionSlot(
+                    __('Restart'),
+                    route(Route::hasAdmin('register.email_form')),
+                    [
+                        'variant' => 'text',
+                        'color' => 'primary',
+                        'block' => true,
+                        'class' => 'w-100 mt-2 text-none auth-v2-restart',
+                    ]
+                ),
+            ],
             'resend' => $this->resendOptionSlot(),
             'oauth_submit' => $this->authFormBottomSlots([
                 [
@@ -411,6 +487,12 @@ trait AuthFormBuilder
                     $this->createAccountButtonSlot(),
                 ]),
             ],
+            'login_bottom_v2' => [
+                'bottom' => $this->authBottomSlots([
+                    $this->oauthGoogleButtonSlot('sign-in'),
+                    $this->createAccountLinkSlot(),
+                ]),
+            ],
             'login_mfa_bottom' => [
                 'bottom' => $this->authBottomSlots([
                     $this->oauthGoogleButtonSlot('sign-in'),
@@ -425,6 +507,12 @@ trait AuthFormBuilder
                 'bottom' => $this->authBottomSlots([
                     $this->oauthGoogleButtonSlot('sign-in'),
                     $this->createAccountButtonSlot(),
+                ]),
+            ],
+            'forgot_password_bottom_v2' => [
+                'bottom' => $this->authBottomSlots([
+                    $this->oauthGoogleButtonSlot('sign-in'),
+                    $this->createAccountLinkSlot(),
                 ]),
             ],
             default => [],

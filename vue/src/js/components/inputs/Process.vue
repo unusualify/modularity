@@ -13,6 +13,8 @@
         <v-card class="fill-height d-flex flex-column">
           <ue-form
             ref="UeForm"
+            :border="false"
+
             v-model="processableModel"
             :schema="formSchema"
 
@@ -70,14 +72,14 @@
 
           <!-- Processable Title -->
           <v-row no-gutters class="pb-4">
-            <v-col cols="12" sm="6" md="6" lg="7" xl="8" class="text-h5 font-weight-medium text-wrap">
+            <v-col cols="12" sm="6" md="6" lg="7" xl="8" class="text-headline-medium font-weight-medium text-wrap">
               {{ title }}
             </v-col>
             <v-col cols="12" sm="6" md="6" lg="5" xl="4" class="d-flex justify-sm-end">
               <v-chip
                 :prepend-icon="status.icon"
                 :color="status.color"
-                class="text-subtitle-1"
+                class="text-body-large"
               >
                 {{ status.label }}
               </v-chip>
@@ -128,7 +130,7 @@
               col-element="div"
               :item-fields="['title', 'value']"
               :col-classes="['font-weight-medium text-wrap', 'd-flex justify-start']"
-              item-classes="text-body-2"
+              item-classes="text-body-medium"
               :col-ratios="displayColRatio"
               vertical-align-top
             >
@@ -145,7 +147,7 @@
                     {{ slotScope.value ? $d(slotScope.value, formInput.displayDateFormat ?? 'numeric') : '' }}
                   </template>
                   <template v-else
-                    class="text-subtitle-1"
+                    class="text-body-large"
                   >
                     {{ slotScope.value }}
                   </template>
@@ -195,7 +197,7 @@
                   </template>
                   <v-card max-width="360">
                     <v-card-text
-                      class="text-body-2 text-break"
+                      class="text-body-medium text-break"
                       style="white-space: pre-line;"
                     >
                       {{ slotScope.value }}
@@ -265,7 +267,7 @@
                         <ue-title padding="b-6" justify="center">
                           {{ getStatusConfigurationValue('rejected', 'dialog_title', $t('Confirm Rejection')) }}
                         </ue-title>
-                        <p class="text-subtitle-1 mb-4" v-if="getStatusConfigurationValue('rejected', 'dialog_message')">
+                        <p class="text-body-large mb-4" v-if="getStatusConfigurationValue('rejected', 'dialog_message')">
                           {{ getStatusConfigurationValue('rejected', 'dialog_message') }}
                         </p>
                         <v-textarea

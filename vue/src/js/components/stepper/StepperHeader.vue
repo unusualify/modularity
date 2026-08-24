@@ -1,5 +1,5 @@
 <template>
-  <v-stepper-header class="rounded elevation-2">
+  <v-stepper-header>
     <!-- Form steps -->
     <template v-for="(form, i) in forms" :key="`stepper-item-${i}`">
       <v-stepper-item

@@ -16,6 +16,7 @@
           :width="showInlineFileName || showFileName ? '100%' : `${imageSize}`"
           :height="imageSize"
           :elevation="isHovering ? 4 : 0"
+          :border="false"
           @click="canPreviewFile(index) ? previewFile(index) : downloadFile(item.uuid)"
         >
           <!-- Left side: Icon/Image -->
@@ -52,11 +53,11 @@
             v-if="showInlineFileName || showFileName"
             class="d-flex align-center px-4"
           >
-            <span class="text-body-2 text-truncate">{{ shortenFileName(item.file_name) }}</span>
+            <span class="text-body-medium text-truncate">{{ shortenFileName(item.file_name) }}</span>
           </div>
 
           <div v-if="showDate" class="ml-auto mr-1">
-            <span class="text-caption text-truncate">{{ $d(new Date(item.created_at), 'numeric-full') }}</span>
+            <span class="text-body-small text-truncate">{{ $d(new Date(item.created_at), 'numeric-full') }}</span>
           </div>
 
           <!-- Right side: Filename (only if showInlineFileName is true) -->

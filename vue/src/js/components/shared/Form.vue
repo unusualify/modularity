@@ -1,9 +1,11 @@
 <template>
-  <div
+  <v-sheet
     :class="[
       'ue-form',
-    ]"
-    :style="{height: fillHeight ? ($vuetify.display.mdAndDown ? `calc(97vh - 64px)` : `calc(97vh)` ) : ''}">
+      fillHeight ? 'd-flex flex-column flex-grow-1 min-height-0' : '',
+      sheetClasses,
+    ]">
+
     <v-form
       :id="id"
       ref="VForm"
@@ -13,7 +15,7 @@
       @update:modelValue="updateFormValid"
       @submit="submit"
       :class="formClasses"
-      >
+    >
       <input v-if="!async" type="hidden" name="_token" :value="$csrf"/>
 
       <!-- Header Section -->
@@ -56,7 +58,38 @@
               </slot>
             </template>
             <template v-slot:right>
-              <div class="d-flex mt-2 mt-md-0 gc-2">
+              <div class="d-flex mt-2 mt-md-0 gc-2 ms-auto align-center">
+                <v-btn
+                  v-if="previewable && canPreviewEdit && !previewEditing"
+                  variant="tonal"
+                  color="primary"
+                  prepend-icon="mdi-pencil-outline"
+                  :density="buttonDensity"
+                  :disabled="loading"
+                  @click="enterPreviewEdit"
+                >
+                  {{ t('Edit') }}
+                </v-btn>
+                <v-btn
+                  v-if="previewable && previewableCancel && previewEditing"
+                  variant="text"
+                  :disabled="loading"
+                  :density="buttonDensity"
+                  @click="cancelPreviewEdit"
+                >
+                  {{ t('Cancel') }}
+                </v-btn>
+                <v-btn
+                  v-if="previewable && previewEditing"
+                  type="submit"
+                  color="primary"
+                  :density="buttonDensity"
+                  prepend-icon="mdi-check"
+                  :disabled="!(validModel || !serverValid) || loading || !isSubmittable"
+                  :loading="loading"
+                >
+                  {{ buttonDefaultText }}
+                </v-btn>
                 <!-- Title Center Form Actions -->
                 <FormActions v-if="actionsPosition == 'title-center' && formActionsActive"
                   :modelValue="formItem"
@@ -114,7 +147,7 @@
 
           <!-- Mobile dialog/modal for right section -->
           <v-btn v-if="hasAdditionalSection && $vuetify.display.mdAndDown"
-            density="compact"
+            :density="buttonDensity"
             :rounded="true"
             size="default"
             icon="mdi-book-information-variant"
@@ -187,7 +220,13 @@
               />
             </div>
 
-            <v-custom-form-base v-if="!schemaUpdating"
+            <FormPreviewFields
+              v-if="isPreviewView && !schemaUpdating"
+              :schema="inputSchema"
+              :model="model"
+            />
+
+            <v-custom-form-base v-else-if="!schemaUpdating"
               :class="hasSchemaInputSourceLoading && !noWaitSourceLoading ? 'd-none' : ''"
               :id="formBaseId"
 
@@ -328,7 +367,7 @@
               <v-card-title class="d-flex align-center">
                 <span>{{ additionalSectionDialogTitle || 'Additional Options' }}</span>
                 <v-spacer></v-spacer>
-                <v-btn variant="text" size="default" icon @click="showAdditionalSectionDialog = false">
+                <v-btn variant="text" size="default" icon :density="buttonDensity" @click="showAdditionalSectionDialog = false">
                   <v-icon>mdi-close</v-icon>
                 </v-btn>
               </v-card-title>
@@ -373,13 +412,14 @@
       <v-spacer v-if="pushButtonToBottom"></v-spacer>
 
       <!-- Bottom Section -->
-      <div :class="['px-1', scrollable ? 'flex-grow-0' : '']" v-if="(hasSubmit && isSubmittable) || $slots.submit || $slots.options || $slots.bottom">
-        <v-divider v-if="hasSubmit && !stickyButton && hasDivider" class=""></v-divider>
-        <div class="d-flex flex-wrap justify-center justify-md-start pt-6 w-100 ga-4 flex-md-row" v-if="hasSubmit && !stickyButton">
+      <div :class="['px-1', scrollable ? 'flex-grow-0' : '']" v-if="(!previewable && hasSubmit && isSubmittable) || $slots.submit || $slots.options || $slots.bottom">
+        <v-divider v-if="!previewable && hasSubmit && !stickyButton && hasDivider" class=""></v-divider>
+        <div class="d-flex flex-wrap justify-center justify-md-start pt-6 w-100 ga-4 flex-md-row" v-if="!previewable && hasSubmit && !stickyButton">
           <template v-if="$store.getters.isSuperAdmin">
             <v-btn-secondary
               :slim="false"
               variant="outlined"
+              :density="buttonDensity"
               @click="validate()"
             >
               {{ $t('fields.validate') }}
@@ -400,8 +440,10 @@
                 loading
               }"></slot>
             </div>
+            {{ console.log(buttonDensity) }}
             <v-btn v-if="isSubmittable"
               type="submit"
+              :density="buttonDensity"
               :disabled="!(validModel || !serverValid) || loading || !isSubmittable"
               class="ml-auto flex-1-1-100 flex-md-1-1-0 flex-lg-0-1-1 order-md-last order-first"
               :block="$vuetify.display.smAndDown"
@@ -413,7 +455,7 @@
           </slot>
         </div>
 
-        <div v-if="hasSubmit && !stickyButton">
+        <div v-if="!previewable && hasSubmit && !stickyButton">
           <v-progress-linear
             v-if="loading"
             indeterminate
@@ -427,7 +469,7 @@
       </div>
 
     </v-form>
-  </div>
+  </v-sheet>
 </template>
 
 <script>
@@ -437,6 +479,7 @@ import { useI18n } from 'vue-i18n'
 import { useForm, makeFormProps } from '@/hooks/form'
 import { cloneDeep, omit, isObject } from 'lodash-es'
 import FormActions from '../form/FormActions.vue'
+import FormPreviewFields from '../form/FormPreviewFields.vue'
 import FormPublicLinks from '../form/FormPublicLinks.vue'
 import FormLocaleSelector from '../form/FormLocaleSelector.vue'
 import FormEvents from '../form/FormEvents.vue'
@@ -518,6 +561,7 @@ export default {
   name: 'ue-form',
   components: {
     FormActions,
+    FormPreviewFields,
     FormEvents,
     FormSecondaryInputs,
     FormPublicLinks,
@@ -552,10 +596,13 @@ export default {
     const { t, te } = useI18n({ useScope: 'global' })
     // const i18n = useI18n()
 
-    const formClasses = computed(() => [
+    const sheetClasses = computed(() => [
       props.noDefaultFormPadding ? '' : 'pa-4',
-      props.noDefaultSurface ? '' : 'bg-surface',
-      props.fillHeight ? 'd-flex flex-column h-100' : '',
+      props.noDefaultSurface ? 'bg-transparent' : '',
+    ])
+
+    const formClasses = computed(() => [
+      (props.fillHeight || props.pushButtonToBottom) ? 'd-flex flex-column flex-grow-1 min-height-0 h-100' : '',
       props.formClass,
     ])
 
@@ -620,7 +667,7 @@ export default {
           padding: props.title.padding || 'a-0',
           margin: props.title.margin || 'a-0',
           align: props.title.align || 'left',
-          justify: props.title.justify || 'start',
+          justify: props.previewable ? 'space-between' : (props.title.justify || 'start'),
           ...(props.title.class ? {class: props.title.class} : {class: 'flex-md-row flex-column justify-md-space-between'})
         }
       } else {
@@ -661,6 +708,7 @@ export default {
     return {
       ...useFormInstance,
       t,
+      sheetClasses,
       formClasses,
       formSlots,
       titleOptions,

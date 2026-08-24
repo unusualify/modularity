@@ -48,7 +48,7 @@ class TableWidget extends ModularousWidget
         ],
         'noFullScreen' => true,
 
-        'class' => '',
+        'class' => 'd-flex flex-column flex-grow-1 min-height-0',
         'elevation' => 2,
         'rounded' => true,
         'toolbarOptions' => [

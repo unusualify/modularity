@@ -1,12 +1,13 @@
 <?php
 
 return [
-    'class' => 'pa-3',
-    'formClass' => 'elevation-2 rounded',
-    'hasSubmit' => true,
-    'stickyButton' => false,
+    'class' => '',
     'fillHeight' => true,
+    'formClass' => '',
+    'hasDivider' => true,
+    'hasSubmit' => true,
+    'noDefaultFormPadding' => false,
+    'noDefaultSurface' => false,
     'stickyButton' => false,
     'scrollable' => true,
-    'hasDivider' => true,
 ];

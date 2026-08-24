@@ -81,7 +81,7 @@
 </script>
 
 <template>
-  <v-card>
+  <v-card class="d-flex flex-column flex-grow-1 min-height-0">
     <v-card-title>
       {{ title }}
     </v-card-title>

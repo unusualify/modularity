@@ -1,6 +1,6 @@
 <template>
   <!-- TODO: V2: This component and it's incoming config can be changed and can be made with RecursiveStuff -->
-  <v-card :color="container.color" density="comfortable" :elevation="container.elevation" :class="container.class">
+  <v-card :color="container.color" density="comfortable" :elevation="container.elevation" :class="['d-flex', 'flex-column', 'flex-grow-1', 'min-height-0', container.class]">
 
     <v-card-title style="font-weight: bolder" class="py-4"> {{ $t("AT A GLANCE") }}</v-card-title>
 
@@ -115,9 +115,9 @@ export default {
         borderRadius : 14,
         class: 'px-5',
         border : 'sm',
-        titleClass : 'pt-3 pb-3 text-subtitle-2',
+        titleClass : 'pt-3 pb-3 text-title-small',
         titleColor : 'grey',
-        infoClass : 'text-h4 pa-0',
+        infoClass : 'text-headline-large pa-0',
         infoColor : '#000000',
         infoLineHeight: '1',
         infoFontWeight: '700',

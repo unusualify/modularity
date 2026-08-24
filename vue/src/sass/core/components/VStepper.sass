@@ -1,0 +1,14 @@
+@use '../abstract' as *
+
+@layer components
+  .v-stepper-header
+    @if $stepper-header-elevation == 0
+      box-shadow: none
+
+    @if $stepper-header-border-radius
+      border-radius: $stepper-header-border-radius
+
+    @if $stepper-header-border-width
+      border-width: $stepper-header-border-width
+      border-style: $stepper-header-border-style
+      border-color: $stepper-header-border-color

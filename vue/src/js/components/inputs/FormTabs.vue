@@ -46,6 +46,7 @@
 
                 v-model:valid="valids[i]"
 
+                :border="false"
                 noDefaultFormPadding
                 class="pt-3"
               />

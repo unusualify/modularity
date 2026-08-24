@@ -333,10 +333,10 @@
               indeterminate
               class="mb-6"
             />
-            <div class="text-h5 mb-3 text-primary font-weight-medium">
+            <div class="text-headline-small mb-3 text-primary font-weight-medium">
               {{ $t('Uploading Attachment') }}
             </div>
-            <div class="text-body-1 text-medium-emphasis mb-4">
+            <div class="text-body-large text-medium-emphasis mb-4">
               {{ $t('Please wait while your file is being processed...') }}
             </div>
           </v-card-text>

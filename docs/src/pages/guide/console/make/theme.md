@@ -51,7 +51,7 @@ php artisan modularous:make:theme mytheme
 
 1. Copies `resources/vendor/modularous/themes/mytheme/mytheme.js` → `vue/src/js/config/themes/mytheme.js`
 2. Copies `resources/vendor/modularous/themes/mytheme/sass/` → `vue/src/sass/themes/mytheme/`
-3. Deletes `vue/src/js/config/themes/customs/mytheme.js` and `vue/src/sass/themes/customs/mytheme/`
+3. Deletes `vue/src/js/config/themes/customs/mytheme/` and `vue/src/sass/themes/customs/mytheme/`
 4. Deletes `resources/vendor/modularous/themes/mytheme/`
 5. Appends to `vue/src/js/config/themes/index.js`:
    ```js

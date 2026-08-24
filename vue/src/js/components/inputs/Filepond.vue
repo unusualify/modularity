@@ -3,7 +3,7 @@
   <!-- <v-btn @click="pondBrowse">Text</v-btn> -->
   <v-input
     ref="VInput"
-    v-model="input"
+    :model-value="input"
     hide-details
     :class="classes"
     :rules="noRules ? [] : filepondRules"
@@ -81,12 +81,12 @@
 
             :files="files"
             :server="server"
-            @processfile="postProcessFilepond"
+            @processfile="onProcessFile"
             @removefile="removeFilepond"
 
-            @addfilestart="$emit('loadingFile', $event)"
+            @addfilestart="onAddFileStart"
             @addfileprogress="$emit('loadingFileProgress', $event)"
-            @addfile="$emit('loadedFile', $event)"
+            @addfile="onAddFile"
             @init="init"
 
             @warning="warning"
@@ -209,18 +209,32 @@
       }
     },
     methods:{
+      onAddFileStart(event) {
+        this.startUpload()
+        this.$emit('loadingFile', event)
+      },
+      onAddFile(error, file) {
+        if (error || !this.allowProcess) {
+          this.finishUpload()
+        }
+        this.$emit('loadedFile', error, file)
+      },
+      onProcessFile(error, file) {
+        this.postProcessFilepond(error, file)
+        this.finishUpload()
+      },
       postProcessFilepond : function(error, file){
         if(!error){
-          this.input = this.input.concat({
-            uuid: file.serverId,
-            file_name: file.filename,
-            source: `${this.endPoints.load}${file.serverId}`
-          });
+          this.input = this.commitProcessedInput(this.input, file);
         }else{
           __log('postProcess error', error)
         }
       },
       removeFilepond: function(error, file) {
+        if (!this.canRemoveFromModel(file)) {
+          return
+        }
+
         const uuid = file.filename ?? file.serverId?.replace(`/${file.filename}`, '') ?? file.uuid;
 
         let index = this.input.findIndex((asset) => asset.uuid == uuid);
@@ -370,6 +384,9 @@
             let requestId = 'process-' + fieldName
             axios.post( this.endPoints.process, formData, {
                 requestId,
+                headers: {
+                  'Content-Type': false,
+                },
                 onUploadProgress: e => {
                   // Should call the progress method to update the progress to 100% before calling load
                   // Setting computable to false switches the loading indicator to infinite mode
@@ -518,7 +535,6 @@
 <style lang="scss" scoped>
   .v-input-filepond__file-field {
     width: 100%;
-    display: block;
     border-radius: 4px;
     overflow-x: hidden;
 

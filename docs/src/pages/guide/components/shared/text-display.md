@@ -17,7 +17,7 @@ The `ue-text-display` component renders a bold primary value with an optional sm
 | Prop | Type | Required | Description |
 |------|------|----------|-------------|
 | `text` | `String` | yes | The main value to display (bold) |
-| `subText` | `String` | no | A secondary label rendered in `text-body-1` aligned to the baseline |
+| `subText` | `String` | no | A secondary label rendered in `text-body-large` aligned to the baseline |
 
 ## Examples
 
@@ -29,5 +29,5 @@ The `ue-text-display` component renders a bold primary value with an optional sm
 <ue-text-display text="42" />
 
 <!-- Inside a stepper summary card -->
-<ue-text-display class="text-h5 text-white" text="$2500" sub-text="+ VAT" />
+<ue-text-display class="text-headline-small text-white" text="$2500" sub-text="+ VAT" />
 ```

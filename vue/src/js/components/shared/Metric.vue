@@ -70,7 +70,7 @@
   const valueClasses = computed(() => {
     return [
       'font-weight-bold',
-      props.dense ? 'text-h4' : 'text-h3',
+      props.dense ? 'text-headline-large' : 'text-display-medium',
       props.color ? `text-${props.color}` : '',
       props.valueClass,
     ];
@@ -80,7 +80,7 @@
     return [
       props.color ? `text-${props.color}` : '',
       props.labelColor ? `text-${props.labelColor}` : '',
-      props.dense ? 'text-caption' : 'text-subtitle',
+      props.dense ? 'text-body-small' : 'text-subtitle',
       props.labelClass
     ];
   });

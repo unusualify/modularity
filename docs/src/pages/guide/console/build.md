@@ -37,14 +37,25 @@ sidebarTitle: Build
 ## Examples
 
 ```bash
-php artisan modularous:build
-php artisan modularous:build --hot
+# Daily development — hot reload (recommended)
+php artisan modularous:dev --noInstall
+
+# Production / deploy
+php artisan modularous:build --noInstall
+
+# Equivalent explicit flags
+php artisan modularous:build --hot --noInstall
+
 php artisan modularous:build --watch
 php artisan modularous:build --copyOnly
 php artisan modularous:build --copyTheme --theme=my-theme
 ```
 
+Prefer [`modularous:dev --noInstall`](/guide/console/dev) over `build --hot` for local work — same behavior, clearer intent.
+
 ## Related
+
+- [Dev](./dev) — hot reload entry point
 
 - [refresh](./refresh) — republish compiled assets to `public/vendor/modularous`
 - [ModularousVite](/system-reference/backend/support/modularous-vite) — how published assets are loaded in Blade

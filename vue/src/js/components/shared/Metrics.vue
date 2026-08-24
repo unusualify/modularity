@@ -79,8 +79,7 @@
   const cardClasses = computed(() => {
     return [
       !props.noInline ? 'd-inline-block' : '',
-      // 'rounded-lg',
-      // 'overflow-hidden',
+      'd-flex flex-column flex-grow-1 min-height-0',
     ];
   });
 
@@ -94,14 +93,14 @@
   const titleClasses = computed(() => {
     return [
       props.color ? `text-${props.color}` : '',
-      'font-weight-medium text-body-1 text-wrap',
+      'font-weight-medium text-body-large text-wrap',
     ];
   });
 
   const filterClasses = computed(() => {
     return [
       props.filterColor ? `text-${props.filterColor}` : '',
-      // 'text-body-2 text-medium-emphasis',
+      // 'text-body-medium text-medium-emphasis',
       'd-flex align-center'
     ];
   });

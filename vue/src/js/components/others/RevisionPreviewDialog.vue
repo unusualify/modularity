@@ -177,7 +177,7 @@
               </v-btn>
             </span>
           </template>
-          <span class="text-caption">{{ bindings.restorePreviewDisabledTooltip }}</span>
+          <span class="text-body-small">{{ bindings.restorePreviewDisabledTooltip }}</span>
         </v-tooltip>
         <v-btn
           v-else-if="bindings.canRestore && bindings.showRestoreButtonInPreview && bindings.canRestoreFromPreview"

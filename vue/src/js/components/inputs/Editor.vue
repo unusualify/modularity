@@ -29,7 +29,7 @@
       >
         <label
           v-if="fieldLabel"
-          class="ue-input-editor__label text-body-2 text-medium-emphasis mb-2 d-block"
+          class="ue-input-editor__label text-body-medium text-medium-emphasis mb-2 d-block"
         >
           {{ fieldLabel }}
         </label>

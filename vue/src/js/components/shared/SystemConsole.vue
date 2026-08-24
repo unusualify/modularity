@@ -1,9 +1,11 @@
 <template>
   <v-card
-    :elevation="elevation"
-    :class="['system-console-widget', cardClass]"
+    :class="[
+      'system-console-widget',
+      attrs.class,
+    ]"
   >
-    <v-card-title class="text-h6 d-flex align-center ga-2">
+    <v-card-title class="text-title-large d-flex align-center ga-2">
       <v-icon
         icon="mdi-cog-outline"
         size="small"
@@ -41,7 +43,7 @@
       </v-alert>
 
       <template v-else>
-        <div class="text-subtitle-2 mb-2">
+        <div class="text-title-small mb-2">
           {{ $t('messages.system_console_maintenance', 'Maintenance mode') }}
         </div>
 
@@ -74,7 +76,7 @@
         </div>
         <div
           v-else
-          class="text-caption text-medium-emphasis mb-3"
+          class="text-body-small text-medium-emphasis mb-3"
         >
           {{ $t('messages.system_console_down_options_empty', 'No down options resolved for this preset.') }}
         </div>
@@ -104,7 +106,7 @@
 
         <v-divider class="mb-4" />
 
-        <div class="text-subtitle-2 mb-2">
+        <div class="text-title-small mb-2">
           {{ $t('messages.system_console_cache', 'Cache & optimize') }}
         </div>
 
@@ -126,7 +128,7 @@
 
         <div
           v-if="errorMessage"
-          class="text-error text-caption mt-3"
+          class="text-error text-body-small mt-3"
         >
           {{ errorMessage }}
         </div>
@@ -140,7 +142,7 @@
     persistent
   >
     <v-card>
-      <v-card-title class="text-h6">
+      <v-card-title class="text-title-large">
         {{ $t('messages.confirm', 'Confirm') }}
       </v-card-title>
       <v-card-text>
@@ -204,14 +206,14 @@
       </v-card-title>
 
       <v-card-text>
-        <pre class="system-console-widget-output text-body-2">{{ output || '…' }}</pre>
+        <pre class="system-console-widget-output text-body-medium">{{ output || '…' }}</pre>
 
         <v-card
           v-if="currentPrompt"
           class="mt-4"
           variant="tonal"
         >
-          <v-card-title class="text-subtitle-1">
+          <v-card-title class="text-body-large">
             {{ $t('messages.artisan_runner_prompt', 'Command prompt') }}
           </v-card-title>
           <v-card-text>
@@ -290,10 +292,6 @@ const props = defineProps({
     type: String,
     default: null,
   },
-  elevation: {
-    type: [Number, String],
-    default: 2,
-  },
   runnerDisabled: {
     type: Boolean,
     default: false,
@@ -330,7 +328,6 @@ const props = defineProps({
 })
 
 const attrs = useAttrs()
-const cardClass = computed(() => attrs.class)
 
 const {
   running,

@@ -1,13 +1,13 @@
 <template>
-  <v-layout fluid v-resize="onResize"
+  <v-sheet fluid v-resize="onResize"
     :class="[
-      noFullScreen ? 'h-100' : '',
-      rounded ? $lodash.isBoolean(rounded) ? 'rounded' : `rounded-${rounded}` : '',
-      elevation ? `elevation-${elevation}` : '',
+      noFullScreen ? 'd-flex flex-column flex-grow-1 min-height-0' : '',
+      surfaceClasses,
     ]"
-    :style="$vuetify.display.lgAndUp ? 'max-height: calc(100vh - 24px)' : 'max-height: calc(100vh - 24px - 64px)'"
+    :style="noFullScreen
+      ? 'min-height: 0; max-height: 100%;'
+      : ($vuetify.display.lgAndUp ? 'max-height: calc(100vh - 48px)' : 'max-height: calc(100vh - 24px - 64px)')"
     >
-    <div :class="['ue-datatable__container', noFullScreen ? 'fill-height' : 'fill-heigh ue-datatable--full-screen' ]">
       <ActiveTableItem
         class=""
         v-model="activeTableItem"
@@ -20,19 +20,18 @@
       <v-data-table-server
         v-if="!hideTable"
         :class="[
-          'px-4 h-100',
-          options.groupBy?.length ? 'ue-table--has-group-by' : '',
+          'bg-transparent',
           $store.getters.isSuperAdmin && showSelect ? 'ue-table--has-row-select' : '',
-          tableClasses,
-          rounded ? $lodash.isBoolean(rounded) ? 'rounded' : `rounded-${rounded}` : '',
-          fullWidthWrapper ? '' : 'ue-table--narrow-wrapper',
-          tableElevation ? `elevation-${tableElevation}` : '',
-          striped ? 'ue-datatable--striped' : '',
-          roundedRows ? 'ue-datatable--rounded-row' : '',
-          hideBorderRow ? 'ue-datatable--no-border-row' : '',
           controlsPosition === 'bottom' || $vuetify.display.smAndDown ? 'ue-datatable--bottom-controls' : '',
           fixedLastColumn ? 'ue-datatable--fixed-last-column' : '',
+          fullWidthWrapper ? '' : 'ue-table--narrow-wrapper',
+          hideBorderRow ? 'ue-datatable--no-border-row' : '',
           isDraggableActive ? 'ue-table--draggable' : '',
+          options.groupBy?.length ? 'ue-table--has-group-by' : '',
+          roundedRows ? 'ue-datatable--rounded-row' : '',
+          noFullScreen ? 'px-4 d-flex flex-column flex-grow-1 min-height-0' : 'px-4 h-100',
+          striped ? 'ue-datatable--striped' : '',
+          tableClasses,
         ]"
         id="ue-table"
 
@@ -52,7 +51,9 @@
         :item-title="titleKey"
         ref="datatable"
 
-        :height="windowSize.y - 64 - 24 - 59 - (hideTableFooter ? 0 : 76) - ($vuetify.display.mdAndDown ? 80 : 0)"
+        :height="noFullScreen
+          ? '100%'
+          : (windowSize.y - 64 - 48 - 59 - (hideTableFooter ? 0 : 76) - ($vuetify.display.mdAndDown ? 80 : 0))"
 
         :hide-default-header="hideHeaders || ($vuetify.display.smAndDown && !showMobileHeaders)"
         :hide-default-body="isDraggableActive"
@@ -284,7 +285,7 @@
                 <v-card-title class="d-flex align-center justify-space-between">
                   <div class="d-flex flex-column">
                     <span>{{ $t('Filters') }}</span>
-                    <!-- <div v-if="activeFilterCount > 0" class="text-caption text-medium-emphasis flex-grow-1 flex-shrink-0">
+                    <!-- <div v-if="activeFilterCount > 0" class="text-body-small text-medium-emphasis flex-grow-1 flex-shrink-0">
                       {{ $t('{count} active filter(s)', { count: activeFilterCount }) }}
                     </div> -->
                   </div>
@@ -313,7 +314,7 @@
                       <!-- Category header -->
                       <v-expansion-panel-title>
                         <div class="d-flex align-center justify-space-between w-100 pr-4">
-                          <span class="text-subtitle-1 font-weight-medium">
+                          <span class="text-body-large font-weight-medium">
                             {{ getCategoryLabel(category) }}
                           </span>
                           <v-chip
@@ -329,7 +330,7 @@
 
                       <!-- Category filters -->
                       <v-expansion-panel-text>
-                        <v-row dense>
+                        <v-row density="compact">
                           <v-col
                             v-for="(filter, index) in filters"
                             :key="`${category}-${index}`"
@@ -394,7 +395,7 @@
                   variant="tonal"
                   >
                   <!-- @click:close="removeFilter(category, slug)" -->
-                  <span class="text-caption">
+                  <span class="text-body-small">
                     {{ getFilterLabel(category, slug) }}:
                     <strong>{{ formatFilterValue(category, slug) }}</strong>
                   </span>
@@ -427,6 +428,8 @@
               <v-card class="fill-height d-flex flex-column py-4">
                 <ue-form
                   ref="UeForm"
+                  :border="false"
+
                   form-class="px-4"
                   fill-height
                   scrollable
@@ -525,6 +528,8 @@
               <v-expand-transition>
                 <v-card class="mb-theme" elevation="4" v-if="formActive">
                   <ue-form
+                    :border="false"
+
                     has-submit
                     button-text="save"
                     :title="formTitle"
@@ -608,6 +613,8 @@
               <template v-slot:body.description>
                 <ue-form
                   ref="customForm"
+                  :border="false"
+
                   v-model="customFormModel"
                   :title="null"
                   fill-height
@@ -1060,8 +1067,9 @@
         </template>
 
       </v-data-table-server>
+    <div :class="['ue-datatable__container', noFullScreen ? 'd-flex flex-column flex-grow-1 min-height-0' : 'fill-heigh ue-datatable--full-screen' ]">
     </div>
-  </v-layout>
+  </v-sheet>
 </template>
 
 <script>
@@ -1208,6 +1216,10 @@ export default {
 
   .ue-datatable__container
     width: 100%
+
+    &.d-flex
+      flex: 1 1 auto
+      min-height: 0
 
     // &.ue-datatable--full-screen
     //   height: calc(100vh - (2*8 * $spacer))

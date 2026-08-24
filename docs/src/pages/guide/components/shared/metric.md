@@ -6,6 +6,8 @@ sidebarTitle: Metric / Metrics / MetricGroups
 
 Three related components for displaying KPI-style numeric cards. Use `ue-metric` for a single value, `ue-metrics` for a grouped collection with an optional date-range filter, and `ue-metric-groups` for multiple `ue-metrics` groups laid out in a grid.
 
+For the new dashboard glance row (independent cards, title outside a parent card), use [`ue-metric-cards`](./metric-cards) instead of wrapping `ue-metric` in `ue-metrics`.
+
 ---
 
 ## `ue-metric`
@@ -23,7 +25,7 @@ A single KPI card showing a large value and a label.
 | `labelColor` | `String` | `null` | Override label text color independently |
 | `valueClass` | `String` | `''` | Extra classes on the value element |
 | `labelClass` | `String` | `''` | Extra classes on the label element |
-| `dense` | `Boolean` | `false` | Compact mode — smaller text (`text-h4` vs `text-h3`) |
+| `dense` | `Boolean` | `false` | Compact mode — smaller text (`text-headline-large` vs `text-display-medium`) |
 | `noInline` | `Boolean` | `false` | Render as block instead of inline-block |
 | `center` | `Boolean` | `false` | Center-align the content |
 | `icon` | `String` | `null` | MDI icon shown before the label |

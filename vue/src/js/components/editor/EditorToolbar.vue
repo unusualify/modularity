@@ -133,7 +133,7 @@
 
     <div
       v-if="showWordCount && wordCount"
-      class="ue-input-editor__toolbar-footer text-caption text-medium-emphasis px-2 pb-1"
+      class="ue-input-editor__toolbar-footer text-body-small text-medium-emphasis px-2 pb-1"
     >
       {{ wordCount.words }} kelime · {{ wordCount.chars }} karakter
     </div>

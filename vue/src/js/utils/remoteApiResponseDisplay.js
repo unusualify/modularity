@@ -45,7 +45,7 @@ export const buildStructuredResponseDescription = (fields) => {
     const escapedLabel = escapeHtml(label || key)
     const escapedValue = escapeHtml(text).replace(/\n/g, '<br>')
 
-    return `<div class="mb-3"><div class="text-caption text-medium-emphasis">${escapedLabel}</div><div class="text-body-2">${escapedValue}</div></div>`
+    return `<div class="mb-3"><div class="text-body-small text-medium-emphasis">${escapedLabel}</div><div class="text-body-medium">${escapedValue}</div></div>`
   }).join('')
 }
 

@@ -15,6 +15,7 @@ import { getSubmitFormData } from '@/utils/getFormData.js'
 import { isset } from '@/utils/helpers'
 
 import { useRoot, useFormatter } from '@/hooks'
+import { makeSurfaceProps, useSurface } from '@/hooks/utils/useSurface'
 
 import {
   useTableItem,
@@ -32,17 +33,19 @@ import {
 
 
 export const makeTableProps = propsFactory({
-  elevation: {
-    type: [Number, String],
-  },
-  rounded: {
-    type: [Boolean, String],
+  ...makeSurfaceProps(),
+  noDivider: {
+    type: Boolean,
+    default: false
   },
   tableElevation: {
     type: [Number, String],
   },
   tableRounded: {
-    type: [Boolean, String],
+    type: [Boolean, String, Number],
+  },
+  tableBorder: {
+    type: [Boolean, Number, String],
   },
   fillHeight: {
     type: Boolean,
@@ -236,6 +239,13 @@ export default function useTable (props, context) {
     return w < display.thresholds.value[bp]
   })
   const { t, te, tm } = useI18n({ useScope: 'global' })
+
+  const { surfaceClasses } = useSurface(props)
+  const { surfaceClasses: tableSurfaceClasses } = useSurface(computed(() => ({
+    elevation: props.tableElevation,
+    rounded: props.tableRounded ?? props.rounded,
+    border: props.tableBorder,
+  })))
 
   if(props.languages && _.isArray(props.languages) && props.languages.length > 0) {
     store.commit(LANGUAGE.SET_LANGUAGES, props.languages)
@@ -978,6 +988,8 @@ export default function useTable (props, context) {
     isDataTableMobile,
     isDraggableActive,
     hideTableFooter,
+    surfaceClasses,
+    tableSurfaceClasses,
     ...formatter,
   }
 }

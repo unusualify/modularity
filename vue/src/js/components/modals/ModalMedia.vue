@@ -187,7 +187,7 @@
                   </div>
                   <p
                     v-else-if="gridLoaded && maxPage > 1 && page >= maxPage"
-                    class="text-center text-medium-emphasis py-3 text-caption"
+                    class="text-center text-medium-emphasis py-3 text-body-small"
                   >
                     {{ $t('media-library.end-of-list', 'All items loaded') }}
                   </p>

@@ -1,5 +1,5 @@
 <template>
-  <v-row justify="center">
+  <v-row class="justify-center">
     <v-btn
       color="primary"
       dark
@@ -13,7 +13,7 @@
       max-width="290"
     >
       <v-card>
-        <v-card-title class="text-h5">
+        <v-card-title class="text-headline-small">
           Use Google's location service?
         </v-card-title>
 

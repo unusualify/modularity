@@ -3,7 +3,7 @@ import { ref, computed, watch, toRefs, reactive, nextTick, onMounted, provide } 
 import { router } from '@inertiajs/vue3'
 import { useStore } from 'vuex'
 import { useI18n } from 'vue-i18n'
-import { cloneDeep, isEqual, find, reduce, set, get, isArray, isPlainObject } from 'lodash-es'
+import { cloneDeep, isEqual, find, reduce, set, get, isArray, isPlainObject, debounce } from 'lodash-es'
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
 
 import { useConfig, useInputHandlers, useValidation, useLocale, useItemActions, useAuthorization, useUser, useEditPresence } from '@/hooks'
@@ -59,6 +59,13 @@ export const makeFormProps = propsFactory({
   hasSubmit: {
     type: Boolean,
     default: false
+  },
+  buttonDensity: {
+    type: String,
+    default: 'compact',
+    validator (value) {
+      return ['default', 'comfortable', 'compact'].includes(value)
+    }
   },
   stickyFrame: {
     type: Boolean,
@@ -199,6 +206,31 @@ export const makeFormProps = propsFactory({
     type: Object,
     default: null,
   },
+  /**
+   * When true, the form starts in view (preview) mode: values are shown
+   * without inputs, and the title-right control toggles Edit → Update.
+   * Standard bottom submit is hidden. Does not reuse `isEditing`.
+   */
+  previewable: {
+    type: Boolean,
+    default: false,
+  },
+  /**
+   * When true (and `previewable` is on), show a Cancel control in edit
+   * mode that discards dirty values and returns to preview.
+   */
+  previewableCancel: {
+    type: Boolean,
+    default: false,
+  },
+  /**
+   * When true, persist as soon as a submittable field becomes dirty
+   * (e.g. profile header avatar after FilePond finishes).
+   */
+  submitOnChange: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 export default function useForm(props, context) {
@@ -261,6 +293,7 @@ export default function useForm(props, context) {
   const initialModel = ref(cloneDeep(model.value))
 
   const schemaUpdating = ref(false)
+  const previewEditing = ref(false)
 
   const setSchemaUpdating = (value) => {
     if(value && props.noSchemaUpdatingProgressBar) {
@@ -474,6 +507,14 @@ export default function useForm(props, context) {
       return Object.values(schema).some(s => Object.prototype.hasOwnProperty.call(s, 'sourceLoading') && s.sourceLoading === true
         || (Object.prototype.hasOwnProperty.call(s, 'type') && (s.type === 'wrap' || s.type === 'group') && s.schema && Object.values(s.schema).some(nested => Object.prototype.hasOwnProperty.call(nested, 'sourceLoading') && nested.sourceLoading === true)))
     }),
+
+    previewEditing,
+    isPreviewView: computed(() => props.previewable && !previewEditing.value),
+    canPreviewEdit: computed(() =>
+      props.previewable
+      && isSubmittable.value
+      && !!props.actionUrl
+    ),
   })
   // Methods
 
@@ -512,7 +553,10 @@ export default function useForm(props, context) {
             (!Object.prototype.hasOwnProperty.call(response?.data ?? {}, "variant") || response?.data?.variant === "success");
 
           if (persisted) {
-            initialModel.value = cloneDeep(model.value);
+            initialModel.value = cloneDeep(model.value)
+            if (props.previewable) {
+              previewEditing.value = false
+            }
           }
         },
         (response) => {
@@ -741,6 +785,19 @@ export default function useForm(props, context) {
 
     },
     saveForm,
+    enterPreviewEdit: () => {
+      if (!states.canPreviewEdit) {
+        return
+      }
+      previewEditing.value = true
+    },
+    cancelPreviewEdit: () => {
+      if (!props.previewable || !props.previewableCancel) {
+        return
+      }
+      model.value = cloneDeep(initialModel.value)
+      previewEditing.value = false
+    },
     submit: (e, callback = null, errorCallback = null) => {
       if (props.noValidation || validations.validModel.value) {
         if (props.async) {
@@ -795,6 +852,27 @@ export default function useForm(props, context) {
     },
   })
 
+  const submitOnChangeReady = ref(false)
+
+  const submitOnChangeIfDirty = debounce(() => {
+    if (!submitOnChangeReady.value || !props.submitOnChange || !isDirty.value || formLoading.value || !props.actionUrl) {
+      return
+    }
+
+    methods.submit()
+  }, 400)
+
+  watch(isDirty, (dirty) => {
+    if (!props.submitOnChange) {
+      return
+    }
+
+    if (dirty) {
+      submitOnChangeIfDirty()
+    } else {
+      submitOnChangeIfDirty.cancel()
+    }
+  })
 
   // Add watch to sync with modelValue when it exists
   watch(() => props.modelValue, (newVal, oldVal) => {
@@ -886,6 +964,12 @@ export default function useForm(props, context) {
   }, { deep: true })
 
   initialize()
+
+  onMounted(() => {
+    nextTick(() => {
+      submitOnChangeReady.value = true
+    })
+  })
 
 
   if(isSuperAdmin.value) {

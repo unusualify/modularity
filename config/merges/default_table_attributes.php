@@ -1,32 +1,39 @@
 <?php
 
 return [
-    'embeddedForm' => false,
-    'createOnModal' => true,
-    'class' => 'pa-3',
-    'editOnModal' => true,
-    'formWidth' => '60%',
-    'isRowEditing' => false,
-    'rowActionsType' => 'inline',
-    'hideDefaultFooter' => false,
-    'tableElevation' => 2,
-    'tableRounded' => true,
+    // v-sheet props
+    'class' => '',
 
-    'itemsPerPage' => 15,
+    // v-data-table props
+    'fixedHeader' => true,
     'hideHeaders' => false,
-    'hideSearchField' => false,
+    'itemsPerPage' => 15,
     'multiSort' => false,
     'mustSort' => false,
-    'tableDensity' => 'compact', // compact, comfortable, null
-    // 'tableSubtitle' => '',
     'sticky' => true,
-    'fixedHeader' => true,
+
+    // ue-table props
+    'controlsPosition' => 'top', // top, bottom
+    'createOnModal' => true,
+    'editOnModal' => true,
+    'embeddedForm' => false,
+    'fixedLastColumn' => true,
+    'formWidth' => '60%',
+    'hideBorderRow' => false,
+    'hideDefaultFooter' => false,
+    'hideSearchField' => false,
+    'isRowEditing' => false,
+    'noDivider' => false,
+    'noFullScreen' => false,
+    // 'tableSubtitle' => '',
+    'roundedRows' => true,
+    'rowActionsType' => 'inline',
     'showSelect' => true,
     'striped' => true,
-    'hideBorderRow' => false,
-    'roundedRows' => true,
-    'controlsPosition' => 'top', // top, bottom
-    'noFullScreen' => false,
+    'tableClasses' => '',
+    'tableDensity' => 'compact', // compact, comfortable, null
+    'tableRounded' => true,
+
     'toolbarOptions' => [
         'color' => 'transparent', // rgb(255,255,255,1) or utility colors like white, purple
         'border' => false, // false, 'xs', 'sm', 'md', 'lg', 'xl'.
@@ -108,31 +115,31 @@ return [
         ],
     ],
     'customRowComponent' => [
-    /**
-     * an object with the following properties:
-     * 'iteratorComponent' => 'configurable-card-iterator',
-     * 'col' => [
-     *     'cols' => 12,
-     * ]
-     *
-     * or
-     *
-     * an array of objects with the following properties:
-     * [
-     *     'name' => 'configurable-card-iterator',
-     *     'allowedRoles' => ['admin'],
-     *     'col' => [
-     *     'cols' => 12,
-     * ]
-     * ],
-     * [
-     *     'name' => 'configurable-card-iterator',
-     *     'allowedRoles' => ['manager'],
-     *     'col' => [
-     *     'cols' => 12,
-     * ]
-     * ],
-     */
+        /**
+         * an object with the following properties:
+         * 'iteratorComponent' => 'configurable-card-iterator',
+         * 'col' => [
+         *     'cols' => 12,
+         * ]
+         *
+         * or
+         *
+         * an array of objects with the following properties:
+         * [
+         *     'name' => 'configurable-card-iterator',
+         *     'allowedRoles' => ['admin'],
+         *     'col' => [
+         *     'cols' => 12,
+         * ]
+         * ],
+         * [
+         *     'name' => 'configurable-card-iterator',
+         *     'allowedRoles' => ['manager'],
+         *     'col' => [
+         *     'cols' => 12,
+         * ]
+         * ],
+         */
     ],
     'cellOptions' => [
         'maxChar' => 3,
@@ -140,8 +147,6 @@ return [
     'headerOptions' => [
         'color' => 'rgba(140,160,167, .2)', // Hex, rgba or default css colors
     ],
-    'fixedLastColumn' => true,
-
     'formAttributes' => [
         'rowAttribute' => [
             'noGutters' => false,
@@ -163,5 +168,5 @@ return [
         'widthType' => 'lg',
         'fullscreen' => false,
         'transition' => 'dialog-bottom-transition',
-    ],
+    ]
 ];

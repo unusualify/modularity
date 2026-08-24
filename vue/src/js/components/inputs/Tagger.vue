@@ -25,7 +25,7 @@
       >
         <template v-slot:selection="{ item, index }">
           <v-chip v-if="item === Object(item)"
-            :color="`${item.raw.color}-lighten-3`"
+            :color="`${item.color}-lighten-3`"
             :text="item.title"
             size="small"
             variant="flat"
@@ -35,7 +35,7 @@
           ></v-chip>
         </template>
         <template v-slot:item="{ props, item }">
-          <v-list-item v-if="item.raw.header && search">
+          <v-list-item v-if="item.header && search">
             <span class="mr-3">Create</span>
             <v-chip
               :color="`${colors[nonce - 1]}-lighten-3`"
@@ -46,10 +46,10 @@
               {{ search }}
             </v-chip>
           </v-list-item>
-          <v-list-subheader v-else-if="item.raw.header" :title="props.title"></v-list-subheader>
+          <v-list-subheader v-else-if="item.header" :title="props.title"></v-list-subheader>
           <v-list-item v-else @click="props.onClick">
             <v-text-field
-              v-if="editingItem === item.raw"
+              v-if="editingItem === item"
               v-model="editingItem[itemTitle]"
               bg-color="transparent"
               class="mr-3"
@@ -59,22 +59,22 @@
               hide-details
               @click.stop
               @keydown.stop
-              @keyup.enter="edit(item.raw)"
+              @keyup.enter="edit(item)"
             ></v-text-field>
             <v-chip
               v-else
-              :color="`${item.raw.color}-lighten-3`"
+              :color="`${item.color}-lighten-3`"
               :text="props.title"
               variant="flat"
               label
             ></v-chip>
             <template v-slot:append>
               <v-btn
-                :color="editingItem !== item.raw ? 'primary' : 'success'"
-                :icon="editingItem !== item.raw ? 'mdi-pencil' : 'mdi-check'"
+                :color="editingItem !== item ? 'primary' : 'success'"
+                :icon="editingItem !== item ? 'mdi-pencil' : 'mdi-check'"
                 size="small"
                 variant="text"
-                @click.stop.prevent="edit(item.raw)"
+                @click.stop.prevent="edit(item)"
               ></v-btn>
             </template>
           </v-list-item>
@@ -213,9 +213,9 @@ export default {
       const hasAnyMatch = availableOptions.some(
         x => !x.header && toLowerCaseString(x[this.itemTitle]).includes(query)
       )
-      if (item.raw.header) return !hasAnyMatch
+      if (item.header) return !hasAnyMatch
 
-      const text = toLowerCaseString(item.raw[this.itemTitle])
+      const text = toLowerCaseString(item[this.itemTitle])
 
       return text.includes(query)
     },

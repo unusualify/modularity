@@ -49,7 +49,7 @@
         </v-chip>
       </template>
       <template #item.targets="{ item }">
-        <span class="text-body-2">{{ formatTargets(item.targets) }}</span>
+        <span class="text-body-medium">{{ formatTargets(item.targets) }}</span>
       </template>
       <template #item.actions="{ item }">
         <v-btn
@@ -115,7 +115,7 @@
             class="mb-4"
           />
 
-          <div class="text-subtitle-2 mb-2">
+          <div class="text-title-small mb-2">
             {{ $t('messages.parent_segment_targets', 'Bindings (model class + locale)') }}
           </div>
           <v-card
@@ -124,7 +124,7 @@
             variant="outlined"
             class="mb-2 pa-2"
           >
-            <v-row dense>
+            <v-row density="compact">
               <v-col cols="12">
                 <v-text-field
                   v-model="row.target_class"

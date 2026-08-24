@@ -13,7 +13,7 @@
         lines="one"
       >
         <template v-slot:title>
-          <strong class="text-h6">
+          <strong class="text-title-large">
             {{ item.name }}
           </strong>
         </template>

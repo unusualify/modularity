@@ -17,7 +17,7 @@ sidebarTitle: Board Information Plus
 | Prop | Type | Description |
 |------|------|-------------|
 | `cards` | `Array` | Array of card objects (see Card Shape below) |
-| `container` | `Object` | Styles applied to the outer container card (defaults: `{ color: '#F8F8FF', elevation: 10, class: 'px-6 py-5' }`) |
+| `container` | `Object` | Styles applied to the outer container card. The PHP widget default is `{ color: '', elevation: 2, class: 'h-100' }`. Vuetify 4 elevation is **0–5** only; do not pass values such as `10`. |
 | `cardAttribute` | `Object` | Shared visual attributes for all inner cards (variant, border radius, title/info styles — see defaults in source) |
 
 ## Card Shape

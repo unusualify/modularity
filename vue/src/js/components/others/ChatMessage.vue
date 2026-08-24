@@ -19,7 +19,7 @@
       <!-- Time positioned at bottom corner -->
       <span
         v-if="$vuetify.display.smAndUp"
-        class="text-caption text-grey-darken-1"
+        class="text-body-small text-grey-darken-1"
         :style="{
           position: 'absolute',
           bottom: '8px',
@@ -81,7 +81,7 @@
         <!-- Header with name and icons (always clear) -->
         <div
           :class="[
-            'text-grey text-caption w-100 d-flex justify-space-between',
+            'text-grey text-body-small w-100 d-flex justify-space-between',
             reverse ? 'flex-row-reverse' : 'flex-row'
           ]">
 

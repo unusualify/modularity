@@ -1,7 +1,7 @@
 import { createVuetify } from 'vuetify'
 import { aliases, mdi } from 'vuetify/iconsets/mdi'
 import { fa } from 'vuetify/iconsets/fa'
-import { VDateInput } from 'vuetify/labs/VDateInput'
+import { merge } from 'lodash-es'
 
 
 // Stylesheets
@@ -27,19 +27,76 @@ import * as themes from '@/config/themes'
 
 const APP_THEME = import.meta.env.VUE_APP_THEME || 'unusualify'
 
-function loadIcons ($font) {
-  const locales = require.context('../config/icons', true, /[A-Za-z0-9-_,\s]+.json$/i)
-  const messages = {}
+/**
+ * Optional per-theme Vuetify `defaults` (elevation / rounded / border / …).
+ * Missing file → empty object (no error).
+ *
+ * Paths (build copies app theme `defaults.js` here):
+ * - built-in:  `config/themes/defaults/{theme}.js`
+ * - custom:    `config/themes/customs/{theme}/defaults.js`
+ */
+function loadThemeDefaults (themeName) {
+  const modules = import.meta.glob([
+    '../config/themes/defaults/*.js',
+    '../config/themes/customs/*/defaults.js',
+  ], { eager: true })
 
-  locales.keys().forEach(key => {
-    const matched = key.match(/([A-Za-z0-9-_]+)\./i)
-    if (matched && matched.length > 1) {
-      const locale = matched[1]
-      messages[locale] = locales(key)
+  const candidates = [
+    `../config/themes/customs/${themeName}/defaults.js`,
+    `../config/themes/defaults/${themeName}.js`,
+  ]
+
+  for (const key of candidates) {
+    const mod = modules[key]
+    if (mod) {
+      return mod.default ?? mod
     }
-  })
+  }
 
-  return messages
+  return {}
+}
+
+const themeDefaults = loadThemeDefaults(APP_THEME)
+
+const baseDefaults = {
+  global: {
+    ripple: false
+  },
+  VSheet: {
+    // class: 'rounded'
+    //   elevation: 4
+  },
+  VSheetRounded: {
+    class: 'rounded'
+  },
+  VBtn: {
+    color: 'primary',
+    density: 'comfortable',
+    variant: 'elevated'
+  },
+  VBtnPrimary: {
+    color: 'primary',
+    density: 'comfortable',
+    variant: 'elevated',
+  },
+  VBtnSecondary: {
+    color: 'secondary',
+    density: 'comfortable',
+    variant: 'elevated',
+  },
+  VBtnSuccess: {
+    color: 'success',
+    variant: 'elevated'
+  },
+  VImgIcon: {
+    height: '2.5rem',
+  },
+  VRowSecondary: {
+    'class': 'v-row-secondary'
+  },
+  VRowTertiary: {
+    'class': 'v-row-tertiary'
+  }
 }
 
 const opts = {
@@ -47,72 +104,13 @@ const opts = {
   aliases: {
     VBtnPrimary: components.VBtn,
     VBtnSecondary: components.VBtn,
-    // VBtnTertiary: components.VBtn,
-    // VBtnCta: components.VBtn,
-    // VBtnCtaSecondary: components.VBtn,
     VBtnSuccess: components.VBtn,
     VImgIcon: components.VImg,
     VSheetRounded: components.VSheet,
     VRowSecondary: components.VRow,
     VRowTertiary: components.VRow,
-
-
   },
-  defaults: {
-    global: {
-      ripple: false
-    },
-    VSheet: {
-      // class: 'rounded'
-      //   elevation: 4
-    },
-    VSheetRounded: {
-      class: 'rounded'
-    },
-    VBtn: {
-      color: 'primary',
-      density: 'comfortable',
-      variant: 'elevated'
-    },
-    VBtnPrimary: {
-      color: 'primary',
-      density: 'comfortable',
-      variant: 'elevated',
-      class: 'text-uppercase',
-    },
-    VBtnSecondary: {
-      color: 'secondary',
-      density: 'comfortable',
-      variant: 'elevated',
-      class: 'text-uppercase',
-    },
-    // VBtnTertiary: {
-    //   color: 'tertiary'
-    //   // variant: 'plain'
-    // },
-    // VBtnCta: {
-    //   color: 'cta'
-    //   // variant: 'plain'
-    // },
-    // VBtnCtaSecondary: {
-    //   color: 'cta-secondary'
-    //   // variant: 'plain'
-    // },
-    VBtnSuccess: {
-      color: 'success',
-      variant: 'elevated'
-    },
-    VImgIcon: {
-      height: '2.5rem',
-    },
-    VRowSecondary: {
-      'class': 'v-row-secondary'
-    },
-    VRowTertiary: {
-      'class': 'v-row-tertiary'
-    }
-
-  },
+  defaults: merge({}, baseDefaults, themeDefaults),
   theme: {
     defaultTheme: APP_THEME,
     themes
@@ -137,15 +135,17 @@ const opts = {
   directives,
   components: {
     ...components,
-    VDateInput
     // VTreeview
   }
 }
 
-export default function createModularousVuetify (options) {
+export default function createModularousVuetify (options = {}) {
+  const { defaults: optionDefaults, ...rest } = options
+
   return createVuetify({
     ...opts,
-    ...options,
+    ...rest,
+    defaults: merge({}, opts.defaults, optionDefaults),
   })
 }
 

@@ -318,7 +318,7 @@ class Module extends NwidartModule
             return $this->routeNamesMemo;
         }
 
-        $statuses = $this->moduleActivator->getRoutesStatuses();
+        $statuses = $this->moduleActivator->readJson();
         if (! is_array($statuses)) {
             return $this->routeNamesMemo = [];
         }

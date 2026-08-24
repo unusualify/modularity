@@ -29,8 +29,14 @@ const props = defineProps({
   },
   type: {
     type: String,
-    default: 'body-1',
-    validator: (value) => value === null || ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'subtitle-1', 'subtitle-2', 'body-1', 'body-2', 'button', 'caption', 'overline'].includes(value)
+    default: 'body-large',
+    validator: (value) => value === null || [
+      'display-large', 'display-medium', 'display-small',
+      'headline-large', 'headline-medium', 'headline-small',
+      'title-large', 'title-medium', 'title-small',
+      'body-large', 'body-medium', 'body-small',
+      'label-large', 'label-medium', 'label-small',
+    ].includes(value)
   },
   weight: {
     type: String,
@@ -87,7 +93,7 @@ const props = defineProps({
   },
   descriptionClasses: {
     type: [String, Array],
-    default: 'font-weight-light text-subtitle-2 text-truncate'
+    default: 'font-weight-light text-title-small text-truncate'
   },
 });
 

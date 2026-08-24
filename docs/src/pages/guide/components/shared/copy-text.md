@@ -26,7 +26,7 @@ The `ue-copy-text` component renders a clipboard icon that copies a value to the
 ```html
 <!-- Copy an API key -->
 <div class="d-flex align-center ga-2">
-  <span class="text-caption font-weight-mono">{{ item.api_key }}</span>
+  <span class="text-body-small font-weight-mono">{{ item.api_key }}</span>
   <ue-copy-text :text="item.api_key" />
 </div>
 

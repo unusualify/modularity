@@ -59,15 +59,14 @@ return [
                     'lg' => 6,
                 ],
                 'widgetAttributes' => [
-                    'class' => 'h-50',
+                    'class' => 'd-flex flex-column flex-grow-1 min-height-0',
                     'style' => 'min-height: 160px',
                 ],
                 'allowedRoles' => ['superadmin'],
                 'attributes' => [
-                    'class' => 'h-100',
+                    'class' => 'd-flex flex-column flex-grow-1 min-height-0',
                     'title' => 'System Console',
                     'subtitle' => 'Maintenance mode and cache / optimize commands.',
-                    'elevation' => 2,
                 ],
             ],
             'artisan-runner' => [
@@ -77,15 +76,14 @@ return [
                     'lg' => 6,
                 ],
                 'widgetAttributes' => [
-                    'class' => 'h-50',
+                    'class' => 'd-flex flex-column flex-grow-1 min-height-0',
                     'style' => 'min-height: 160px',
                 ],
                 'allowedRoles' => ['superadmin'],
                 'attributes' => [
-                    'class' => 'h-100',
+                    'class' => 'd-flex flex-column flex-grow-1 min-height-0',
                     'title' => 'Artisan Runner',
                     'subtitle' => 'Select a command to configure and run.',
-                    'elevation' => 2,
                 ],
             ],
 

@@ -7,8 +7,8 @@
 @endpush
 
 @section('content')
-    <v-container class="fill-height">
-        <v-row justify="center" align="center" class="fill-height">
+    <v-container class="fill-height d-flex align-center flex-wrap">
+        <v-row class="justify-center align-center fill-height">
             <v-col cols="12" md="8" lg="6">
                 <ue-error-card
                     icon="mdi-server-network-off"

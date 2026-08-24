@@ -24,7 +24,7 @@
           {{ item[itemTitle].toUpperCase() }}
         </v-btn>
 
-        <div v-if="item[descriptionTitle]" class="text-caption pa-2" v-html="item[descriptionTitle]"></div>
+        <div v-if="item[descriptionTitle]" class="text-body-small pa-2" v-html="item[descriptionTitle]"></div>
       </v-col>
     </v-row>
   </v-radio-group>

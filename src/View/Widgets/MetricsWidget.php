@@ -17,7 +17,7 @@ class MetricsWidget extends ModularousWidget
     ];
 
     public $attributes = [
-        // 'class' => 'w-100',
+        'class' => 'd-flex flex-column flex-grow-1 min-height-0',
 
         'title' => 'Metrics',
 

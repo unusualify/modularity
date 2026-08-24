@@ -2,14 +2,14 @@
 
 return [
     'user' => [
-        'avatar' => [
-            'type' => 'filepond-avatar',
-            // 'label' => 'Profile Avatar',
-            'name' => 'avatar',
-            'allow-image-preview' => true,
-            'label-idle' => 'Drop files here...',
-            'acceptedExtensions' => ['jpg', 'jpeg', 'png'],
-        ],
+        // 'avatar' => [
+        //     'type' => 'filepond-avatar',
+        //     // 'label' => 'Profile Avatar',
+        //     'name' => 'avatar',
+        //     'allow-image-preview' => true,
+        //     'label-idle' => 'Drop files here...',
+        //     'acceptedExtensions' => ['jpg', 'jpeg', 'png'],
+        //  ],
         'name' => [
             'type' => '_name',
             'col' => [
@@ -230,6 +230,33 @@ return [
             'spreadable' => true,
         ],
 
+    ],
+    'profile_header' => [
+        'id' => [
+            'type' => 'hidden',
+            'name' => 'id',
+        ],
+        'avatar' => [
+            'type' => 'filepond-avatar',
+            'name' => 'avatar',
+            'allow-image-preview' => true,
+            'label-idle' => 'Drop files here...',
+            'acceptedExtensions' => ['jpg', 'jpeg', 'png'],
+            'hideDetails' => true,
+            'col' => [
+                'cols' => 'auto',
+                'class' => 'flex-grow-0',
+            ],
+        ],
+        'identity' => [
+            'type' => 'dynamic-component',
+            'name' => 'identity',
+            'noSubmit' => true,
+            'col' => [
+                'cols' => 'auto',
+                'class' => 'flex-grow-1',
+            ],
+        ],
     ],
     'profile_shortcut' => [
         'id' => [

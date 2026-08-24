@@ -40,7 +40,7 @@
           v-bind="menuProps"
           size="x-small"
           variant="tonal"
-          class="text-caption px-2"
+          class="text-body-small px-2"
         >
           {{ currentWidthLabel }}
         </v-btn>

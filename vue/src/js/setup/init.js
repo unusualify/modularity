@@ -205,13 +205,30 @@ export default function init(){
   window.axios.defaults.validateStatus = validateStatus
 
   axios.interceptors.request.use(function (config) {
-    // Do something before request is sent
     store.commit(CONFIG.INCREASE_AXIOS_REQUEST)
 
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
     if (csrfToken) {
-      config.headers = config.headers || {}
-      config.headers['X-CSRF-TOKEN'] = csrfToken
+      if (config.headers && typeof config.headers.set === 'function') {
+        config.headers.set('X-CSRF-TOKEN', csrfToken)
+      } else {
+        config.headers = config.headers || {}
+        config.headers['X-CSRF-TOKEN'] = csrfToken
+      }
+    }
+
+    // Axios 1 applies defaults.headers.post['Content-Type'] = application/json.
+    // That prevents PHP from populating $_FILES for FilePond FormData uploads.
+    if (typeof FormData !== 'undefined' && config.data instanceof FormData) {
+      const headers = config.headers
+      if (headers && typeof headers.setContentType === 'function') {
+        headers.setContentType(false)
+      } else if (headers && typeof headers.delete === 'function') {
+        headers.delete('Content-Type')
+      } else if (headers) {
+        delete headers['Content-Type']
+        delete headers['content-type']
+      }
     }
 
     return config;

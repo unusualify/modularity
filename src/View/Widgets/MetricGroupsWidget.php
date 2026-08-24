@@ -17,7 +17,7 @@ class MetricGroupsWidget extends ModularousWidget
     ];
 
     public $attributes = [
-        'class' => 'h-100 overflow-y-auto',
+        'class' => 'd-flex flex-column flex-grow-1 min-height-0 overflow-y-auto',
 
         'title' => 'Metrics',
 

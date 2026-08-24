@@ -1,33 +1,6 @@
 <template>
     <v-row no-gutters  :class="['vue-tel-input-vuetify flex-nowrap', $lodash.pick(boundProps, ['wrapperClasses']) ?? getDefault('wrapperClasses')]">
-      <v-autocomplete
-        class="flex-grow-0 flex-shrink-1"
-        :ref="makeReference('countryInput')"
-        v-model="countryCode"
-        v-bind="$lodash.pick(boundProps, ['variant', 'menuProps', 'selectClasses', 'selectLabel', 'dense', 'density', 'color'])"
-        :items="sortedCountries"
-        item-title="name"
-        item-value="iso2"
-        :menu-props="{ maxHeight: 200 }"
-        autocomplete="off"
-        return-object
-        @update:model-value="choose"
-        :disabled="disabled"
-      >
-        <template #selection>
-          <div v-if="activeCountry && activeCountry.iso2" :class="activeCountry.iso2.toLowerCase()" class="vti__flag" />
-        </template>
-        <template #item="{ item, props }">
-          <v-list-item v-bind="props">
-            <template #prepend>
-              <div :class="item.raw.iso2.toLowerCase()" class="vti__flag" />
-            </template>
-            <v-list-item-title>
-              +{{ item.raw.dialCode }}
-            </v-list-item-title>
-          </v-list-item>
-        </template>
-      </v-autocomplete>
+
       <v-text-field
           :ref="makeReference('phoneInput')"
           type="tel"
@@ -47,7 +20,43 @@
           @keyup.space="onSpace"
           :disabled="disabled"
         >
-
+        <template #prepend-inner>
+          <!-- Country Selector -->
+          <v-autocomplete
+            class="vue-tel-input-vuetify__country"
+            :ref="makeReference('countryInput')"
+            v-model="countryCode"
+            v-bind="$lodash.pick(boundProps, ['menuProps', 'selectClasses', 'color'])"
+            variant="plain"
+            density="compact"
+            hide-details
+            single-line
+            :items="sortedCountries"
+            item-title="name"
+            item-value="iso2"
+            :menu-props="{ maxHeight: 280, minWidth: 260 }"
+            autocomplete="off"
+            return-object
+            @update:model-value="choose"
+            @mousedown.stop
+            @click.stop
+            :disabled="disabled"
+          >
+            <template #selection>
+              <div v-if="activeCountry && activeCountry.iso2" :class="activeCountry.iso2.toLowerCase()" class="vti__flag" />
+            </template>
+            <template #item="{ item, props }">
+              <v-list-item v-bind="props">
+                <template #prepend>
+                  <div :class="item.iso2.toLowerCase()" class="vti__flag" />
+                </template>
+                <v-list-item-title>
+                  +{{ item.dialCode }}
+                </v-list-item-title>
+              </v-list-item>
+            </template>
+          </v-autocomplete>
+        </template>
       </v-text-field>
     </v-row>
 
@@ -706,25 +715,77 @@ export default {
       border-bottom: 1px solid #cacaca;
     }
 
-    .v-text-field {
-      .v-select__selections {
-        position: relative;
-        .vti__flag {
-          position: absolute;
-          margin-left: 18px;
+    .v-field__prepend-inner {
+      align-items: center;
+      padding-inline-end: 8px;
+    }
+
+    .vue-tel-input-vuetify__country {
+      flex: 0 0 auto !important;
+      width: 64px;
+      min-width: 64px;
+      max-width: 64px;
+      margin: 0;
+      padding-inline-end: 8px;
+      border-inline-end: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+
+      .v-input__control,
+      .v-field,
+      .v-field__field,
+      .v-field__input {
+        min-height: 24px !important;
+        height: 24px;
+      }
+
+      .v-field {
+        --v-field-padding-start: 0px;
+        --v-field-padding-end: 0px;
+        padding: 0;
+        box-shadow: none;
+        background: transparent;
+      }
+
+      .v-field__outline,
+      .v-field__overlay,
+      .v-field__loader,
+      .v-input__details {
+        display: none;
+      }
+
+      .v-field__input {
+        padding: 0;
+        row-gap: 0;
+        align-items: center;
+        overflow: visible;
+
+        input {
+          width: 0 !important;
+          min-width: 0 !important;
+          padding: 0 !important;
+          opacity: 0;
+          caret-color: transparent;
         }
       }
-      &--outlined {
-        .v-select__selections {
-          .vti__flag {
-            margin-left: auto;
-          }
-        }
+
+      .v-field__append-inner {
+        padding: 0;
+        margin: 0;
+      }
+
+      .v-select__selection {
+        margin: 0;
+        overflow: visible;
+      }
+
+      .vti__flag {
+        margin-right: 0;
+        flex: none;
       }
     }
-    .v-field__input{
-      input{
-        min-width:0 !important
+
+    .v-field__input {
+      input {
+        min-width: 0 !important;
       }
     }
   }

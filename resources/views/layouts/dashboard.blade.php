@@ -14,7 +14,7 @@
 @endpush
 
 @section('content')
-    <div class="dashboard pa-3 h-100">
+    <div class="dashboard flex-grow-1 min-height-0 d-flex flex-column">
         <ue-blocks :items='@json($blockItems ?? [])'>
     </div>
 @stop

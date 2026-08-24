@@ -354,7 +354,7 @@ class Connector
 
         foreach ($this->events as $event) {
             $target = call_user_func_array([$target, $event['name']], [
-                ...$event['args'],
+                ...$event['args'] ?? [],
             ]);
         }
 

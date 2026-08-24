@@ -30,7 +30,7 @@
       v-if="bulkToolSheet.length"
       class="mb-6"
     >
-      <v-card-title class="text-subtitle-1">
+      <v-card-title class="text-body-large">
         {{ bulkT('columns', 'Expected columns') }}
       </v-card-title>
       <v-card-text>
@@ -65,7 +65,7 @@
     </v-card>
 
     <v-card class="mb-6">
-      <v-card-title class="text-h6">
+      <v-card-title class="text-title-large">
         {{ bulkT('csv_file', 'CSV file') }}
       </v-card-title>
       <v-card-text>
@@ -107,13 +107,13 @@
     </v-card>
 
     <v-card v-if="lastPayload !== null">
-      <v-card-title class="text-subtitle-1">
+      <v-card-title class="text-body-large">
         {{ bulkT('result', 'Result') }}
       </v-card-title>
       <v-card-text>
         <div
           v-if="lastPayload.summary"
-          class="text-body-2 mb-4"
+          class="text-body-medium mb-4"
         >
           <span v-if="lastPayload.summary.created !== undefined">
             {{ bulkT('created', 'Created') }}:
@@ -142,15 +142,15 @@
             />
           </template>
           <template #item.errors="{ item }">
-            <span class="text-error text-body-2">{{ (item.errors || []).join('; ') }}</span>
+            <span class="text-error text-body-medium">{{ (item.errors || []).join('; ') }}</span>
           </template>
           <template #item.warnings="{ item }">
-            <span class="text-warning text-body-2">{{ (item.warnings || []).join('; ') }}</span>
+            <span class="text-warning text-body-medium">{{ (item.warnings || []).join('; ') }}</span>
           </template>
         </v-data-table>
         <pre
           v-else
-          class="text-body-2 overflow-auto bulk-sheet-json"
+          class="text-body-medium overflow-auto bulk-sheet-json"
         >{{ formattedJson }}</pre>
       </v-card-text>
     </v-card>

@@ -69,3 +69,5 @@ export { default as useModuleRouteInspect } from './useModuleRouteInspect'
 export { useSignedPublicPreview } from './useSignedPublicPreview'
 
 export { default as useEditPresence } from './useEditPresence'
+
+export { default as useSurface, makeSurfaceProps } from './utils/useSurface'

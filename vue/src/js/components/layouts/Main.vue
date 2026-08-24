@@ -58,7 +58,7 @@
       </template>
     </ue-sidebar>
 
-    <v-main>
+    <v-main class="d-flex flex-column flex-grow-1 min-height-0">
       <slot name="top" />
       <slot />
       <slot name="bottom" />
@@ -150,6 +150,7 @@
                 :action-url="store.state.user.profileRoute"
                 :async="true"
                 :hasSubmit="true"
+                :border="false"
                 no-default-form-padding
                 is-editing
                 buttonText="fields.save"
@@ -210,7 +211,7 @@
               <div>
                 {{ $t('Login') }}
                 <br />
-                <span class="text-grey-darken-2 text-caption">
+                <span class="text-grey-darken-2 text-body-small">
                   {{ $t('Your session has expired, please login again.') }}
                 </span>
               </div>
@@ -220,6 +221,8 @@
           <v-card-text>
             <ue-form
               class="flex-grow-1"
+              :border="false"
+
               :schema="store.state.user.loginShortcutSchema"
               v-model="store.state.user.loginShortcutModel"
               :action-url="store.state.user.loginRoute"
@@ -366,3 +369,17 @@ onMounted(() => {
   )
 })
 </script>
+
+<style>
+.min-height-0 {
+  min-height: 0;
+}
+
+.v-main > .v-main__wrap {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  max-width: 100%;
+}
+</style>

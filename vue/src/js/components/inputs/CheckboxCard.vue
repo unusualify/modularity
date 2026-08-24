@@ -58,10 +58,10 @@
             <v-col v-for="(stat, index) in stats" :key="index"
                   :cols="12 / stats.length"
                   class="text-center">
-              <div class="text-h4 font-weight-bold" :class="`text-${stat.color || 'primary'}`">
+              <div class="text-headline-large font-weight-bold" :class="`text-${stat.color || 'primary'}`">
                 {{ stat.value }}
               </div>
-              <div :class="`text-body-2 text-${stat.color || 'primary'}`">{{ stat.label }}</div>
+              <div :class="`text-body-medium text-${stat.color || 'primary'}`">{{ stat.label }}</div>
             </v-col>
           </v-row>
         </v-card-text>

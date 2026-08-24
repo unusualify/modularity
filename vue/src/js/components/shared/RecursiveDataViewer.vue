@@ -3,7 +3,7 @@
     <v-card variant="flat" class="mb-2">
       <v-card-title class="py-2 px-4">
         <v-icon icon="mdi-code-brackets" class="mr-2" size="small" />
-        <span class="text-body-2">Array ({{ data.length }} items)</span>
+        <span class="text-body-medium">Array ({{ data.length }} items)</span>
       </v-card-title>
 
       <div class="array-items">
@@ -28,7 +28,7 @@
   <template v-else-if="typeof data === 'object' && data !== null">
     <v-card variant="flat" class="mb-2">
       <v-card-title
-        class="d-flex align-center py-2 px-4 collapsible-header text-body-2"
+        class="d-flex align-center py-2 px-4 collapsible-header text-body-medium"
         @click="isExpanded = !isExpanded"
       >
         <!-- <div v-if="objectTitle" class="json-key-title">{{ objectTitle }}</div> -->

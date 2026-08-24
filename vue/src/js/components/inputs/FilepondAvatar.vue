@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from 'vue';
+import { ref } from 'vue';
 import { useInput, makeInputProps, makeInputEmits, makeFilepondProps } from '@/hooks';
 
 // This component renders a fragment (two sibling root elements: the avatar
@@ -23,8 +23,6 @@ const props = defineProps({
 
 const emit = defineEmits(makeInputEmits);
 
-const previewUrl = ref(null);
-
 const Input = useInput(props, { emit, updateModelValue: (val, old) => {
   if (val.length > 1) {
     Input.input.value = [val[1]];
@@ -45,10 +43,12 @@ const browse = () => {
 }
 
 const activateLoading = () => {
+  console.log('activateLoading');
   fileLoading.value = true;
 }
 
 const deactivateLoading = () => {
+  console.log('deactivateLoading');
   fileLoading.value = false;
 }
 
@@ -75,14 +75,13 @@ const deactivateLoading = () => {
       'v-input-filepond__edit-icon',
       !fileLoading ? 'bg-primary-lighten-3' : 'bg-surface'
     ]">
-      <!-- you can swap mdi-pencil for any edit icon you prefer -->
       <v-progress-circular
         v-if="fileLoading"
         :size="25"
         color="success"
         indeterminate
       ></v-progress-circular>
-      <v-icon :disabled="disabled" size="default">mdi-account-edit-outline</v-icon>
+      <v-icon :disabled="disabled" size="default">mdi-account-circle-outline</v-icon>
     </div>
   </div>
   <v-input-filepond
@@ -116,6 +115,16 @@ const deactivateLoading = () => {
 </template>
 
 <style scoped lang="scss">
+  .v-input-filepond-avatar {
+    height: 0;
+    max-height: 0;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+  }
+
   .v-input-filepond-avatar .filepond--root {
     background: transparent;
     border:    none;
@@ -123,7 +132,6 @@ const deactivateLoading = () => {
     padding:   0;
   }
 
-  /* 1) Wrap avatar in a relative container */
   .v-input-filepond__avatar-wrapper  {
     position: relative;
     display: inline-block;
@@ -132,7 +140,7 @@ const deactivateLoading = () => {
       position: absolute;
       bottom: 10px;
       right: 0;
-      transform: translate(25%, 25%); /* nudge it slightly outside the circle */
+      transform: translate(25%, 25%);
       background: rgba(var(--v-theme-primary), 0.5);
       border-radius: 50%;
       padding: 2px;

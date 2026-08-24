@@ -103,7 +103,7 @@
 
               <ue-form
                 :ref="`extra-form-${key}`"
-
+                :border="false"
                 :modelValue="createModel(action.schema)"
                 :title="action.formTitle ?? null"
                 :schema="action.schema"
@@ -146,10 +146,10 @@
         </template>
         <span>
           <template v-if="action.tooltipItems?.length">
-            <div class="text-caption mb-1 font-weight-medium">
+            <div class="text-body-small mb-1 font-weight-medium">
               {{ action.tooltip ?? action.label }}
             </div>
-            <ul class="text-caption ps-3 mb-0">
+            <ul class="text-body-small ps-3 mb-0">
               <li
                 v-for="(f, i) in action.tooltipItems"
                 :key="i"

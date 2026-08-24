@@ -43,8 +43,8 @@
     :z-index="zIndex"
   >
     <v-card rounded="lg">
-      <v-card-title class="text-h6">{{ title }}</v-card-title>
-      <v-card-text class="text-body-2 text-medium-emphasis">
+      <v-card-title class="text-title-large">{{ title }}</v-card-title>
+      <v-card-text class="text-body-medium text-medium-emphasis">
         {{ body }}
       </v-card-text>
       <v-card-actions class="pa-4 pt-0">

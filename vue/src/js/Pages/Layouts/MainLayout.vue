@@ -71,7 +71,7 @@ defineOptions({
       v-bind="mainConfiguration"
     >
       <Head v-if="headData && headData.pageTitle" :title="headData.pageTitle"/>
-      <div id="ue-main-body" class="ue--main-container pa-3 h-100">
+      <div id="ue-main-body" class="ue--main-container d-flex flex-column flex-grow-1 min-height-0 pa-6">
         <slot />
 
         <div id="ue-bottom-content">

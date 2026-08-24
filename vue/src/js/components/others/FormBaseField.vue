@@ -105,8 +105,8 @@
       @click="ctx.onEvent($event, obj)"
     >
       <div v-if="obj.schema.noLabel !== true && (obj.schema.title || obj.schema.subtitle)" class="mb-3">
-        <ue-title v-if="obj.schema.title" padding="a-0" margin="b-0" transform="none" weight="bold" class="text-body-1">{{ obj.schema.title }}</ue-title>
-        <ue-title v-if="obj.schema.subtitle" padding="a-0" margin="b-4" transform="none" weight="regular" class="text-caption">
+        <ue-title v-if="obj.schema.title" padding="a-0" margin="b-0" transform="none" weight="bold" class="text-body-large">{{ obj.schema.title }}</ue-title>
+        <ue-title v-if="obj.schema.subtitle" padding="a-0" margin="b-4" transform="none" weight="regular" class="text-body-small">
           <span v-html="obj.schema.subtitle"></span>
         </ue-title>
       </div>

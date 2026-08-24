@@ -77,11 +77,11 @@ watch(() => props.markdown, (newValue) => {
       </v-col>
       <v-col v-if="headings.length" md="3" class="d-none d-md-block">
         <v-card class="sticky-top" flat>
-          <v-card-title class="text-subtitle-1 py-2 px-3 font-weight-medium">On this page</v-card-title>
+          <v-card-title class="text-body-large py-2 px-3 font-weight-medium">On this page</v-card-title>
           <v-list density="compact" nav>
             <v-list-item v-for="heading in headings"
               :class="[
-                'text-body-2 py-1',
+                'text-body-medium py-1',
                 `heading-level-${heading.level}`
               ]"
               :key="heading.id"

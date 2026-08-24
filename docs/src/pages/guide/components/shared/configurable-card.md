@@ -79,7 +79,7 @@ Each segment value can be:
   <template #segment.1="{ data }">
     <div class="d-flex flex-column">
       <span class="font-weight-bold">{{ data.name }}</span>
-      <span class="text-caption text-grey">{{ data.role }}</span>
+      <span class="text-body-small text-grey">{{ data.role }}</span>
     </div>
   </template>
 </ue-configurable-card>

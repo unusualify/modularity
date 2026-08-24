@@ -578,7 +578,7 @@ trait FormSchema
                 $input['margin'] ??= 'b-0';
                 $input['transform'] ??= 'none';
                 $input['weight'] ??= 'bold';
-                $input['class'] ??= 'text-body-1';
+                $input['class'] ??= 'text-body-large';
                 $input['color'] ??= null;
 
                 // $input = [];
@@ -914,7 +914,7 @@ trait FormSchema
                         $eventName = 'format' . studlyName($methodName);
                         if ($targetInputName && $targetPropName) {
 
-                            $events[] = implode(':', [$eventName, $targetInputName, $targetPropName, $setProp, ...($modelNotation ? [modelNotation] : [])]);
+                            $events[] = implode(':', [$eventName, $targetInputName, $targetPropName, $setProp, ...($modelNotation ? [$modelNotation] : [])]);
                         }
 
                         break;

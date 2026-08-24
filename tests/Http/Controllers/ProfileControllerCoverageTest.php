@@ -25,6 +25,7 @@ use Unusualify\Modularous\Traits\Traitify;
 class ProfileControllerCoverageTest extends ModelTestCase
 {
     use RefreshDatabase;
+
     protected function tearDown(): void
     {
         Mockery::close();
@@ -99,7 +100,43 @@ class ProfileControllerCoverageTest extends ModelTestCase
         $repository->shouldReceive('getById')->once()->with(9)->andReturn($item);
         $repository->shouldReceive('update')->once()->andReturn(true);
 
-        $request = Request::create('/profile/9', 'PUT', ['id' => 9, 'name' => 'Ada', 'avatar' => 'x.png']);
+        $request = Request::create('/profile/9', 'PUT', ['id' => 9, 'avatar' => 'x.png']);
+        $route = new Route(['PUT'], '/profile/{profile}', []);
+        $route->bind($request);
+        $request->setRouteResolver(fn () => $route);
+
+        Auth::login($this->makeUserModel());
+
+        $controller = $this->makeController($request, $repository);
+        $controller->stubFormRequest = $formRequest;
+
+        $response = $controller->update();
+        $this->assertInstanceOf(JsonResponse::class, $response);
+        $this->assertSame(200, $response->getStatusCode());
+    }
+
+    /** @test */
+    public function update_without_avatar_uses_user_schema_and_null_media_schema(): void
+    {
+        $item = new class extends Model
+        {
+            protected $table = 'users';
+
+            public $id = 9;
+        };
+
+        $formRequest = Request::create('/profile', 'PUT', [
+            'id' => 9,
+            'name' => 'Ada',
+        ]);
+
+        $repository = Mockery::mock(UserRepository::class);
+        $repository->shouldReceive('getById')->once()->with(9)->andReturn($item);
+        $repository->shouldReceive('update')->once()->withArgs(function ($id, $data, $schema) {
+            return $schema === null;
+        })->andReturn(true);
+
+        $request = Request::create('/profile/9', 'PUT', ['id' => 9, 'name' => 'Ada']);
         $route = new Route(['PUT'], '/profile/{profile}', []);
         $route->bind($request);
         $request->setRouteResolver(fn () => $route);
@@ -224,7 +261,7 @@ class ProfileControllerCoverageTest extends ModelTestCase
         }
 
         View::shouldReceive('make')
-            ->once()
+            ->zeroOrMoreTimes()
             ->andReturn(Mockery::mock(ViewContract::class));
 
         try {

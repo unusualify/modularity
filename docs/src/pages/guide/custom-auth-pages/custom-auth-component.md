@@ -62,38 +62,38 @@ Your custom Auth.vue receives:
 
 ## Example: Split Layout with Banner
 
+Do **not** wrap the form in `v-layout` / `v-main`. Vuetify 4’s `VMain` delays default-slot rendering; nested `<slot>` inside `v-main` can crash Vue (`renderSlot` / `currentRenderingInstance.ce`). Auth pages have no drawers, so a native `<main>` is enough — same pattern as the package `ue-auth` component.
+
 ```vue
 <template>
   <v-app>
-    <v-layout>
-      <v-main>
-        <v-row>
-          <!-- Left: form -->
-          <v-col cols="12" md="6">
-            <ue-svg-icon :symbol="lightSymbol" />
-            <slot name="cardTop" />
-            <v-sheet :style="{ width }">
-              <slot />
-            </v-sheet>
-            <div v-if="!noDivider && $slots.bottom">
-              <v-divider />
-              <span>{{ dividerText }}</span>
-              <v-divider />
-            </div>
-            <slot name="bottom" />
-          </v-col>
-          <!-- Right: banner -->
-          <v-col v-if="!noSecondSection" cols="12" md="6" class="bg-primary">
-            <slot name="description">
-              <h2>{{ bannerDescription }}</h2>
-            </slot>
-            <v-btn v-if="redirectUrl" :href="redirectUrl">
-              {{ redirectButtonText }}
-            </v-btn>
-          </v-col>
-        </v-row>
-      </v-main>
-    </v-layout>
+    <main class="auth-main">
+      <v-row>
+        <!-- Left: form -->
+        <v-col cols="12" md="6">
+          <ue-svg-icon :symbol="lightSymbol" />
+          <slot name="cardTop" />
+          <v-sheet :style="{ width }">
+            <slot />
+          </v-sheet>
+          <div v-if="!noDivider && $slots.bottom">
+            <v-divider />
+            <span>{{ dividerText }}</span>
+            <v-divider />
+          </div>
+          <slot name="bottom" />
+        </v-col>
+        <!-- Right: banner -->
+        <v-col v-if="!noSecondSection" cols="12" md="6" class="bg-primary">
+          <slot name="description">
+            <h2>{{ bannerDescription }}</h2>
+          </slot>
+          <v-btn v-if="redirectUrl" :href="redirectUrl">
+            {{ redirectButtonText }}
+          </v-btn>
+        </v-col>
+      </v-row>
+    </main>
   </v-app>
 </template>
 ```

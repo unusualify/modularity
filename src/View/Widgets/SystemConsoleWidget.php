@@ -20,9 +20,8 @@ class SystemConsoleWidget extends ModularousWidget
     ];
 
     public $attributes = [
-        'class' => 'h-100',
+        'class' => '',
         'title' => 'System Console',
-        'elevation' => 2,
         'subtitle' => 'Maintenance mode and cache / optimize commands.',
     ];
 

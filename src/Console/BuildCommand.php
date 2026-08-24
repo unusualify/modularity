@@ -223,6 +223,9 @@ class BuildCommand extends BaseCommand
 
             $path = resource_path('vendor/modularous/themes/' . "$theme/$theme.js");
             $this->startWatcher($path, "php artisan modularous:build --copyThemeScript --theme='{$theme}'");
+
+            $path = resource_path('vendor/modularous/themes/' . $theme . '/defaults.js');
+            $this->startWatcher($path, "php artisan modularous:build --copyThemeScript --theme='{$theme}'");
         }
 
     }
@@ -384,10 +387,24 @@ class BuildCommand extends BaseCommand
     {
         $this->info('Copying custom theme script...');
 
+        $targetDir = get_modularous_vendor_path('vue/src/js/config/themes/customs/' . $theme);
+
+        if (! $this->filesystem->exists($targetDir)) {
+            $this->filesystem->makeDirectory($targetDir, 0755, true);
+        }
+
         $source = resource_path('vendor/modularous/themes/' . "{$theme}/{$theme}.js");
-        $targetPath = get_modularous_vendor_path('vue/src/js/config/themes/customs/' . $theme . '.js');
+        $targetPath = $targetDir . '/' . $theme . '.js';
 
         $this->copyFile($source, $targetPath);
+
+        $defaultsSource = resource_path('vendor/modularous/themes/' . "{$theme}/defaults.js");
+        $defaultsTarget = $targetDir . '/defaults.js';
+
+        if ($this->filesystem->exists($defaultsSource)) {
+            $this->copyFile($defaultsSource, $defaultsTarget);
+            $this->info('Copied theme Vuetify defaults.');
+        }
 
         $this->info('Done.');
 

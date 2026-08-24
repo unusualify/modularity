@@ -26,11 +26,11 @@
     </v-alert>
 
     <v-card>
-      <v-card-title class="text-h6">
+      <v-card-title class="text-title-large">
         {{ $t('messages.site_seo_robots_title', 'Global robots.txt') }}
       </v-card-title>
       <v-card-text>
-        <p class="text-body-2 mb-4">
+        <p class="text-body-medium mb-4">
           {{ $t('messages.site_seo_robots_moved', 'Global robots.txt is now managed under System Settings → General (SEO section).') }}
         </p>
         <v-btn
