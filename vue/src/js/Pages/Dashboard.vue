@@ -16,7 +16,7 @@ defineOptions({
 </script>
 
 <template>
-  <div class="dashboard pa-3 flex-grow-1 min-height-0 d-flex flex-column">
+  <div class="dashboard flex-grow-1 min-height-0 d-flex flex-column">
     <ue-blocks :items='blockItems' />
   </div>
 </template>

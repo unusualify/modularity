@@ -16,7 +16,7 @@ defineOptions({
 </script>
 
 <template>
-  <div class="profile pa-3 d-flex flex-column flex-grow-1 min-height-0">
+  <div class="profile d-flex flex-column flex-grow-1 min-height-0">
     <ue-recursive-stuff v-for="(context, i) in elements"
       :key="`profile-element-${i}`"
       :configuration="context"
