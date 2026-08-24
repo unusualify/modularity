@@ -34,6 +34,10 @@ import {
 
 export const makeTableProps = propsFactory({
   ...makeSurfaceProps(),
+  noDivider: {
+    type: Boolean,
+    default: false
+  },
   tableElevation: {
     type: [Number, String],
   },
