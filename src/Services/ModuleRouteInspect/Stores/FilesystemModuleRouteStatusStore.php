@@ -21,7 +21,7 @@ final class FilesystemModuleRouteStatusStore implements ModuleRouteStatusStoreIn
         $module = $this->resolveModule($moduleName);
 
         /** @var array<string, bool> $statuses */
-        $statuses = $module->getActivator()->getRoutesStatuses();
+        $statuses = $module->getActivator()->readJson();
 
         return $statuses;
     }

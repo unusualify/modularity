@@ -28,7 +28,7 @@ The class uses a fixed cache lifetime of `604800` seconds (7 days).
 | `enable($route)` / `disable($route)` | Toggle one route status |
 | `setActiveByName(string $name, bool $status)` | Persist one route status |
 | `hasStatus($route, bool $status)` | Check route status with default-false semantics |
-| `getRoutesStatuses()` | Resolve statuses from cache or JSON |
+| `readJson()` | Resolve statuses from cache or JSON |
 | `delete($route)` | Remove explicit status record for one route |
 | `reset()` | Delete statuses file, clear map and cache |
 | `getRoutes()` | Return all stored route keys |

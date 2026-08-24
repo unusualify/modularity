@@ -105,7 +105,7 @@ class ModuleActivatorTest extends TestCase
     /** @test */
     public function it_returns_empty_statuses_when_json_file_does_not_exist()
     {
-        $statuses = $this->activator->getRoutesStatuses();
+        $statuses = $this->activator->readJson();
 
         $this->assertIsArray($statuses);
         $this->assertEmpty($statuses);
@@ -130,7 +130,7 @@ class ModuleActivatorTest extends TestCase
 
         // Create activator instance with new constructor signature
         $this->activator = new ModuleActivator($this->container, $this->cacheKey, $this->statusFile);
-        $statuses = $this->activator->getRoutesStatuses();
+        $statuses = $this->activator->readJson();
 
         $this->assertIsArray($statuses);
         $this->assertEmpty($statuses);
@@ -304,8 +304,8 @@ class ModuleActivatorTest extends TestCase
         $this->activator->enable('items');
         $this->activator->disable('categories');
 
-        $firstRead = $this->activator->getRoutesStatuses();
-        $secondRead = $this->activator->getRoutesStatuses();
+        $firstRead = $this->activator->readJson();
+        $secondRead = $this->activator->readJson();
 
         $this->assertEquals($firstRead, $secondRead);
         $this->assertTrue($firstRead['items']);
@@ -321,7 +321,7 @@ class ModuleActivatorTest extends TestCase
         // Now enable another route
         $this->activator->enable('tags');
 
-        $statuses = $this->activator->getRoutesStatuses();
+        $statuses = $this->activator->readJson();
 
         // All three should be present
         $this->assertTrue($statuses['items']);
@@ -501,12 +501,12 @@ class ModuleActivatorTest extends TestCase
         $this->activator->enable('route1');
         $this->activator->enable('route2');
 
-        $statuses = $this->activator->getRoutesStatuses();
+        $statuses = $this->activator->readJson();
         $this->assertCount(2, $statuses);
 
         $this->activator->enable('route3');
 
-        $updatedStatuses = $this->activator->getRoutesStatuses();
+        $updatedStatuses = $this->activator->readJson();
         $this->assertCount(3, $updatedStatuses);
     }
 
@@ -593,13 +593,13 @@ class ModuleActivatorTest extends TestCase
         $this->activator->enable('route2');
         $this->activator->disable('route3');
 
-        $initialState = $this->activator->getRoutesStatuses();
+        $initialState = $this->activator->readJson();
 
         // Perform more operations
         $this->activator->enable('route4');
         $this->activator->disable('route1');
 
-        $updatedState = $this->activator->getRoutesStatuses();
+        $updatedState = $this->activator->readJson();
 
         // Verify all data is intact
         $this->assertFalse($updatedState['route1']);  // was changed
