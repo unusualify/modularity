@@ -66,6 +66,7 @@ use Modules\Cms\Services\Stylesheet\UtilityCssGenerator;
 use Modules\Cms\Support\CmsPublicUrlRegistryAboutReporter;
 use Modules\Cms\Support\CmsPublicUrlRegistryCacheManager;
 use Modules\Cms\Support\DuplicateSystemSettingsToCmsSettings;
+use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Facades\ModularousCache;
 use Unusualify\Modularous\Services\Security\SecurityService;
 use Unusualify\Modularous\Services\SlugInputValidationService;
@@ -200,6 +201,10 @@ class CmsServiceProvider extends ServiceProvider
     private function registerUrlStaleServeMiddleware(): void
     {
         $prepend = static function (HttpKernel $kernel): void {
+            if (! Modularous::isFrontUrl()) {
+                return;
+            }
+
             if (! ModularousCache::isUrlStaleServeFirst()) {
                 return;
             }
@@ -222,7 +227,7 @@ class CmsServiceProvider extends ServiceProvider
         }
 
         $this->app->booted(static function (): void {
-            if (ModularousCache::isUrlStaleServeFirst()) {
+            if (! Modularous::isFrontUrl() || ModularousCache::isUrlStaleServeFirst()) {
                 return;
             }
 

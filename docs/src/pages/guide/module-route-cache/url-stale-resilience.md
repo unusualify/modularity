@@ -87,7 +87,7 @@ sequenceDiagram
     end
 ```
 
-`ServeUrlKeyedStaleMiddleware` runs **before route matching** (global HTTP middleware when `serve_first` is enabled) and again is unnecessary on the catch-all stack. When `serve_first` is on, cached HTML is served even on hosts that are not bound to {@see CmsFrontRouteRegistrar::resolvePublicFrontRouteDomain()} (e.g. admin hostname during local dev), as long as the path is not excluded (admin `/system`, `/api`, etc.).
+`ServeUrlKeyedStaleMiddleware` runs **before route matching** (global HTTP middleware when `serve_first` is enabled) and is skipped on artisan/queue (`Modularous::isNonHttpConsoleContext()`) and on panel URLs (`! Modularous::isFrontUrl()`). Public front is `APP_URL`; the panel is `ADMIN_APP_URL` (subdomain) or `APP_URL` + `ADMIN_APP_PATH` (path prefix). Path exclusions (`/system`, `/api`, …) still apply on the front host.
 
 ## Configuration
 

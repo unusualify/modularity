@@ -241,6 +241,45 @@ class ServeUrlKeyedStaleMiddlewareTest extends TestCase
     }
 
     /** @test */
+    public function it_does_not_serve_stale_html_on_panel_urls(): void
+    {
+        ModularousCache::getUrlKeyedStaleCache()->put(
+            'en',
+            '/admin/dashboard',
+            '<html>should-not-serve</html>',
+            [
+                'published' => true,
+                'visibility_profile' => StalePublicationMeta::PROFILE_STANDARD,
+            ],
+            900,
+            3600,
+        );
+
+        $resolver = new class implements CmsVisitorRequestContextResolverInterface
+        {
+            public function shouldExcludeRequest(Request $request): bool
+            {
+                return false;
+            }
+
+            public function resolveLocalePathKeyAndExplicitFlag(Request $request): array
+            {
+                return ['en', '/admin/dashboard', true];
+            }
+        };
+
+        $localization = $this->createMock(CmsLocalizationContract::class);
+        $localization->method('defaultLocale')->willReturn('en');
+
+        $middleware = new ServeUrlKeyedStaleMiddleware($resolver, $localization);
+        $request = Request::create('http://localhost/admin/dashboard', 'GET');
+
+        $response = $middleware->handle($request, fn () => response('panel', 200));
+
+        $this->assertSame('panel', $response->getContent());
+    }
+
+    /** @test */
     public function it_falls_through_when_meta_is_not_visible(): void
     {
         ModularousCache::getUrlKeyedStaleCache()->put(
