@@ -4,6 +4,8 @@
 - `js/components/` → `components/customs/` (UeCustom*)
 - `js/components/Auth.vue` → customs/ as UeCustomAuth (custom design for app-specific layouts)
 - `themes/{name}/sass` → `sass/themes/customs/{name}`
+- `themes/{name}/{name}.js` → `js/config/themes/customs/{name}/{name}.js`
+- `themes/{name}/defaults.js` → `js/config/themes/customs/{name}/defaults.js`
 - `js/Pages/` → `Pages/customs/`
 
 ## Frontend hard rules

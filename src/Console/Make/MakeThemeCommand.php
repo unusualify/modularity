@@ -70,19 +70,30 @@ class MakeThemeCommand extends BaseCommand
             return E_ERROR;
         }
 
-        $jsTarget = get_modularous_vendor_path("vue/src/js/config/themes/{$name}.js");
+        $jsThemeColorsTarget = get_modularous_vendor_path("vue/src/js/config/themes/{$name}.js");
         $sassTarget = get_modularous_vendor_path("vue/src/sass/themes/{$name}");
 
         $this->filesystem->copy(
-            $jsSource, $jsTarget
+            $jsSource, $jsThemeColorsTarget
         );
 
         $this->filesystem->copyDirectory(
             $sassSource, $sassTarget
         );
 
+        $defaultsSource = resource_path("vendor/modularous/themes/{$name}/defaults.js");
+        $defaultsBuiltinTarget = get_modularous_vendor_path("vue/src/js/config/themes/defaults/{$name}.js");
+
+        if ($this->filesystem->isFile($defaultsSource)) {
+            $defaultsDir = dirname($defaultsBuiltinTarget);
+            if (! $this->filesystem->exists($defaultsDir)) {
+                $this->filesystem->makeDirectory($defaultsDir, 0755, true);
+            }
+            $this->filesystem->copy($defaultsSource, $defaultsBuiltinTarget);
+        }
+
         // delete custom modularous paths
-        $this->filesystem->delete(get_modularous_vendor_path("vue/src/js/config/themes/customs/{$name}.js"));
+        $this->filesystem->deleteDirectory(get_modularous_vendor_path("vue/src/js/config/themes/customs/{$name}"));
         $this->filesystem->deleteDirectory(get_modularous_vendor_path("vue/src/sass/themes/customs/{$name}"));
 
         // delete custom resource path

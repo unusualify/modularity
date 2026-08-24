@@ -2,11 +2,21 @@ import path from 'path'
 import fs from 'fs'
 
 export function getCustomThemes() {
-  return fs.readdirSync(path.join(__dirname, 'src/js/config/themes/customs'), {withFileTypes: true})
-    .filter(dirent => dirent.name.includes('.js'))
-    .map(function(dirent){
-      return dirent.name.substring(0, dirent.name.lastIndexOf('.')) || dirent.name
+  const customsDir = path.join(__dirname, 'src/js/config/themes/customs')
+
+  if (!fs.existsSync(customsDir)) {
+    return []
+  }
+
+  return fs.readdirSync(customsDir, { withFileTypes: true })
+    .filter((dirent) => {
+      if (!dirent.isDirectory()) {
+        return false
+      }
+
+      return fs.existsSync(path.join(customsDir, dirent.name, `${dirent.name}.js`))
     })
+    .map((dirent) => dirent.name)
 }
 
 export function isCustomTheme(themeName) {
@@ -143,7 +153,7 @@ export default function modularous (config) {
       if (/modularous\/vue\/src\/js\/config\/themes\/index.js$/g.test(id)) {
         transformedCode = code
         getCustomThemes().forEach(function(themeName){
-          transformedCode += `\r\nexport {default as ${themeName}} from './customs/${themeName}'`
+          transformedCode += `\r\nexport {default as ${themeName}} from './customs/${themeName}/${themeName}'`
         })
       }
 
