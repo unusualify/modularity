@@ -1,5 +1,5 @@
 <template>
-  <v-sheet-rounded class="ue-stepper-form__body d-flex w-100 flex-column justify-space-between elevation-2">
+  <v-sheet class="ue-stepper-form__body d-flex w-100 flex-column justify-space-between">
     <v-stepper-window id="ue-stepper-content-window" class="fill-height overflow-y-auto px-4" :style="`max-height: calc(${maxHeight} - ${coverHeight}px)`">
       <!-- Form steps -->
       <v-stepper-window-item
@@ -42,7 +42,7 @@
         <slot name="preview"></slot>
       </v-stepper-window-item>
     </v-stepper-window>
-  </v-sheet-rounded>
+  </v-sheet>
 </template>
 
 <script>

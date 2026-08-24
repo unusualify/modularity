@@ -144,6 +144,7 @@
                   <component
                     v-if="obj.schema && obj.schema.schema"
                     :is="checkInternGroupType(obj)"
+                    border="0"
                     v-bind="bindSchema(obj)"
                     :title="obj.schema.typeIntTitle ?? null"
                     :modelValue="obj.schema.typeIntModelValue || false"

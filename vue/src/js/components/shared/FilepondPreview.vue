@@ -16,6 +16,7 @@
           :width="showInlineFileName || showFileName ? '100%' : `${imageSize}`"
           :height="imageSize"
           :elevation="isHovering ? 4 : 0"
+          :border="false"
           @click="canPreviewFile(index) ? previewFile(index) : downloadFile(item.uuid)"
         >
           <!-- Left side: Icon/Image -->

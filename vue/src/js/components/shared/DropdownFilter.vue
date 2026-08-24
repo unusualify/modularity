@@ -15,6 +15,7 @@
             has-submit
             v-model="localFilterState"
             @submit="submitFilter"
+            :border="false"
           >
             <template v-slot:submit>
               <v-btn

@@ -1,7 +1,9 @@
 <template>
   <v-card
-    :elevation="elevation"
-    :class="['artisan-runner-widget', 'd-flex', 'flex-column', 'flex-grow-1', 'min-height-0', cardClass]"
+    :class="[
+      'artisan-runner-widget',
+      attrs.class,
+    ]"
   >
     <v-card-title class="text-headline-small d-flex align-center ga-2">
       <v-icon
@@ -285,10 +287,6 @@ const props = defineProps({
     type: String,
     default: null,
   },
-  elevation: {
-    type: [Number, String],
-    default: 2,
-  },
   runnerDisabled: {
     type: Boolean,
     default: false,
@@ -309,7 +307,6 @@ const props = defineProps({
 })
 
 const attrs = useAttrs()
-const cardClass = computed(() => attrs.class)
 
 const {
   commands,

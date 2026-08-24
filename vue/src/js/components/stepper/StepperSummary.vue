@@ -1,12 +1,12 @@
 <template>
-  <v-sheet-rounded
-    class="d-flex flex-column fill-height pa-6 elevation-2"
+  <v-sheet
+    class="d-flex flex-column fill-height pa-6"
     :style="[isLastStep ? '' : '']"
     :class="[isLastStep ? 'pa-6 bg-primary-darken-2' : '']"
   >
     <template v-if="!isLastStep">
       <slot name="summary.forms">
-        <v-sheet class="ue-stepper-form__preview fill-height">
+        <v-sheet class="ue-stepper-form__preview fill-height" :border="false">
           <!-- Form summaries -->
           <template v-for="(form, i) in forms" :key="`stepper-summary-item-${i}`">
             <slot
@@ -37,7 +37,7 @@
         <v-spacer></v-spacer>
 
         <!-- Next button -->
-        <v-sheet class="ue-stepper-form__preview-bottom">
+        <v-sheet class="ue-stepper-form__preview-bottom" :border="false">
           <v-btn-secondary
             class="v-stepper-form__nextButton"
             density="comfortable"
@@ -60,7 +60,7 @@
         }"
       ></slot>
     </template>
-  </v-sheet-rounded>
+  </v-sheet>
 </template>
 
 <script>
