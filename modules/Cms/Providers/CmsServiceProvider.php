@@ -187,6 +187,12 @@ class CmsServiceProvider extends ServiceProvider
 
         $this->registerCmsPublishSchedule();
 
+        // One-time seed: skip public front and artisan so a down DB cannot
+        // add 10–20s of PDO wait to every frontend.b2press.test request.
+        if ($this->app->runningInConsole() || Modularous::isFrontUrl()) {
+            return;
+        }
+
         try {
             $this->app->make(DuplicateSystemSettingsToCmsSettings::class)->duplicateIfNeeded();
         } catch (\Throwable) {

@@ -23,9 +23,19 @@ class MigrateRobotsTxtFromSiteSetting
 
     public function migrateIfNeeded(): bool
     {
+        if ($this->hasSettledMarker()) {
+            return false;
+        }
+
+        if (! database_exists()) {
+            return false;
+        }
+
         $legacyTable = modularousConfig('tables.cms_site_settings', 'um_cms_site_settings');
 
         if (! Schema::hasTable($legacyTable)) {
+            $this->writeSettledMarker();
+
             return false;
         }
 
@@ -33,6 +43,8 @@ class MigrateRobotsTxtFromSiteSetting
             $existing = trim((string) SystemSettings::get('seo.robots_txt', ''));
 
             if ($existing !== '') {
+                $this->writeSettledMarker();
+
                 return false;
             }
         }
@@ -47,6 +59,8 @@ class MigrateRobotsTxtFromSiteSetting
             ->first();
 
         if ($row === null || trim((string) ($row->value ?? '')) === '') {
+            $this->writeSettledMarker();
+
             return false;
         }
 
@@ -59,8 +73,31 @@ class MigrateRobotsTxtFromSiteSetting
         ]);
 
         $this->systemSettings->forgetCache();
+        $this->writeSettledMarker();
 
         return true;
+    }
+
+    public static function settledMarkerPath(): string
+    {
+        return storage_path('framework/modularous-robots-txt-migrated');
+    }
+
+    protected function hasSettledMarker(): bool
+    {
+        return is_file(self::settledMarkerPath());
+    }
+
+    protected function writeSettledMarker(): void
+    {
+        $path = self::settledMarkerPath();
+        $directory = dirname($path);
+
+        if (! is_dir($directory)) {
+            @mkdir($directory, 0755, true);
+        }
+
+        @touch($path);
     }
 
     /**

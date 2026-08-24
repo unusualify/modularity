@@ -28,15 +28,20 @@ class SystemSettingServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->registerInputAliases();
-        $this->mergeRouteInputs();
 
-        $this->app->make(ApplySmtpMailConfig::class)->apply();
+        $isFront = ! $this->app->runningInConsole() && Modularous::isFrontUrl();
+
+        if (! $isFront) {
+            $this->mergeRouteInputs();
+        }
+
         try {
+            $this->app->make(ApplySmtpMailConfig::class)->apply();
         } catch (\Throwable) {
             // Mail override is best-effort when settings / DB are unavailable.
         }
 
-        if ($this->app->runningInConsole()) {
+        if ($this->app->runningInConsole() || $isFront) {
             return;
         }
 

@@ -71,10 +71,8 @@ class AuthServiceProviderTest extends TestCase
         $this->assertInstanceOf(MailMessage::class, $mail);
     }
 
-    public function test_boot_defines_gates_from_permissions_table(): void
+    public function test_boot_defines_core_gates_without_loading_permissions(): void
     {
-        Permission::create(['name' => 'articles_edit', 'guard_name' => 'web']);
-
         $provider = new AuthServiceProvider($this->app);
         $provider->boot();
 

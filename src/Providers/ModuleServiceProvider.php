@@ -56,8 +56,10 @@ class ModuleServiceProvider extends ServiceProvider implements DeferrableProvide
             // LOAD MODULE CONFIG
             $module->loadConfig();
 
-            // LOAD MODULE COMMANDS
-            $module->loadCommands();
+            // LOAD MODULE COMMANDS (HTTP requests never invoke artisan)
+            if ($this->app->runningInConsole()) {
+                $module->loadCommands();
+            }
 
             // LOAD MODULE MIGRATIONS
             $this->loadMigrationsFrom(
@@ -97,8 +99,6 @@ class ModuleServiceProvider extends ServiceProvider implements DeferrableProvide
                     $module->getSnakeName()
                 );
             }
-        }
-        if (! $this->app->runningInConsole()) {
         }
     }
 }
