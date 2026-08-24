@@ -1,10 +1,11 @@
 <template>
-  <div
+  <v-sheet
     :class="[
       'ue-form',
       fillHeight ? 'd-flex flex-column flex-grow-1 min-height-0' : '',
-      surfaceClasses,
+      sheetClasses,
     ]">
+
     <v-form
       :id="id"
       ref="VForm"
@@ -468,7 +469,7 @@
       </div>
 
     </v-form>
-  </div>
+  </v-sheet>
 </template>
 
 <script>
@@ -476,7 +477,6 @@ import { computed, onMounted, watch } from 'vue'
 import { useStore } from 'vuex'
 import { useI18n } from 'vue-i18n'
 import { useForm, makeFormProps } from '@/hooks/form'
-import { useSurface } from '@/hooks/utils/useSurface'
 import { cloneDeep, omit, isObject } from 'lodash-es'
 import FormActions from '../form/FormActions.vue'
 import FormPreviewFields from '../form/FormPreviewFields.vue'
@@ -594,12 +594,14 @@ export default {
     const store = useStore()
     const useFormInstance = useForm(props, context)
     const { t, te } = useI18n({ useScope: 'global' })
-    const { surfaceClasses } = useSurface(props)
     // const i18n = useI18n()
 
-    const formClasses = computed(() => [
+    const sheetClasses = computed(() => [
       props.noDefaultFormPadding ? '' : 'pa-4',
-      props.noDefaultSurface ? '' : 'bg-surface',
+      props.noDefaultSurface ? 'bg-transparent' : '',
+    ])
+
+    const formClasses = computed(() => [
       (props.fillHeight || props.pushButtonToBottom) ? 'd-flex flex-column flex-grow-1 min-height-0 h-100' : '',
       props.formClass,
     ])
@@ -706,7 +708,7 @@ export default {
     return {
       ...useFormInstance,
       t,
-      surfaceClasses,
+      sheetClasses,
       formClasses,
       formSlots,
       titleOptions,

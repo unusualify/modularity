@@ -13,6 +13,8 @@
     </div>
 
     <ue-form
+      :border="false"
+
       :model-value="model"
       :schema="schema"
       :action-url="stepUp.verifyUrl"

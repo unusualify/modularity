@@ -146,6 +146,7 @@
               :schema="transferSchema"
               :modelValue="transferFormModel"
               :action-url="paymentUrl"
+              :border="false"
 
               noDefaultSurface
               noDefaultFormPadding

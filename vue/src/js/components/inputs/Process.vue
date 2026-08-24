@@ -13,6 +13,8 @@
         <v-card class="fill-height d-flex flex-column">
           <ue-form
             ref="UeForm"
+            :border="false"
+
             v-model="processableModel"
             :schema="formSchema"
 

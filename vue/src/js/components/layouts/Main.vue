@@ -150,6 +150,7 @@
                 :action-url="store.state.user.profileRoute"
                 :async="true"
                 :hasSubmit="true"
+                :border="false"
                 no-default-form-padding
                 is-editing
                 buttonText="fields.save"
@@ -220,6 +221,8 @@
           <v-card-text>
             <ue-form
               class="flex-grow-1"
+              :border="false"
+
               :schema="store.state.user.loginShortcutSchema"
               v-model="store.state.user.loginShortcutModel"
               :action-url="store.state.user.loginRoute"

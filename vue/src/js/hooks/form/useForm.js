@@ -7,7 +7,6 @@ import { cloneDeep, isEqual, find, reduce, set, get, isArray, isPlainObject, deb
 import { propsFactory } from 'vuetify/lib/util/index.mjs' // Types
 
 import { useConfig, useInputHandlers, useValidation, useLocale, useItemActions, useAuthorization, useUser, useEditPresence } from '@/hooks'
-import { makeSurfaceProps } from '@/hooks/utils/useSurface'
 import useFormResponseStatus from './useFormResponseStatus'
 import { LANGUAGE } from '@/store/mutations/index'
 import ACTIONS from '@/store/actions'
@@ -19,7 +18,6 @@ import { getTranslationInputsCount, processInputs } from '@/utils/schema.js'
 import { redirector } from '@/utils/response'
 
 export const makeFormProps = propsFactory({
-  ...makeSurfaceProps(),
   modelValue: {
     type: Object,
     required: true,

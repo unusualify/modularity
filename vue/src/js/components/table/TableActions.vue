@@ -103,7 +103,7 @@
 
               <ue-form
                 :ref="`extra-form-${key}`"
-
+                :border="false"
                 :modelValue="createModel(action.schema)"
                 :title="action.formTitle ?? null"
                 :schema="action.schema"

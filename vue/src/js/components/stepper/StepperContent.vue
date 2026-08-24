@@ -12,6 +12,7 @@
           :ref="formRefs[i]"
           :id="`stepper-form-${i+1}`"
           :isEditing="isEditing"
+          :border="false"
 
           v-model="models[i]"
           @update:modelValue="val => updateFormModel(val, i)"
