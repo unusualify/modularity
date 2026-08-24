@@ -82,8 +82,8 @@ trait FormPageUtility
      */
     public function getFormUrl($itemId = null)
     {
-        $routeName = $this->moduleRoute?->name()
-            ?? $this->moduleRouteName
+        $routeName = ($this->moduleRoute ?? null)?->name()
+            ?? ($this->moduleRouteName ?? null)
             ?? $this->routeName;
 
         return $itemId
