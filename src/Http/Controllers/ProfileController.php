@@ -129,6 +129,7 @@ class ProfileController extends BaseController
             'class' => 'd-flex flex-column flex-grow-1 min-height-0',
             ...$formSurfaceAttributes,
             'pushButtonToBottom' => true,
+            'fillHeight' => true,
             'formClass' => 'rounded d-flex flex-column flex-grow-1',
 
             'title' => [
@@ -181,6 +182,7 @@ class ProfileController extends BaseController
                     ->setAttributes([
                         'class' => 'd-flex flex-column flex-grow-1 min-height-0',
                         ...$formSurfaceAttributes,
+                        'fillHeight' => true,
                         'pushButtonToBottom' => true,
                         'formClass' => 'rounded d-flex flex-column flex-grow-1',
                         'clearOnSaved' => true,
@@ -237,6 +239,7 @@ class ProfileController extends BaseController
                         ->setAttributes([
                             'class' => 'd-flex flex-column flex-grow-1 min-height-0',
                             ...$formSurfaceAttributes,
+                            'fillHeight' => true,
                             'pushButtonToBottom' => true,
                             'formClass' => 'rounded d-flex flex-column flex-grow-1',
                             'title' => [
