@@ -40,6 +40,10 @@ $border-width-root: thin !default;
 $transition-duration-root: 0.3s !default;
 $transition-move-duration-root: 0.5s !default;
 
+// Overlay for Vuetify `$rounded`. Empty keeps framework defaults (map-deep-merge).
+// Themes `@forward` a partial map to add/override keys — see `core/_settings.scss` and `core/base.scss`.
+$rounded: () !default;
+
 /* FIELDS */
 $field-font-size: $input-font-size !default;
 $field-control-height: $input-control-height !default;
@@ -99,6 +103,13 @@ $sidebar-list-item-overlay-color: currentColor !default;
 
 $stepper-form-summary-final-background: #005868 !default;
 
+/* STEPPER — header surface (VStepperHeader has no Vuetify props; styled via core/components/VStepper.sass) */
+$stepper-header-elevation: 0 !default;
+$stepper-header-border-radius: null !default;
+$stepper-header-border-width: null !default;
+$stepper-header-border-style: $border-style-root !default;
+$stepper-header-border-color: $border-color-root !default;
+
 $field-input-min-height: max(var(--v-input-control-height, 52px), 1.2rem + var(--v-field-input-padding-top) + var(--v-field-input-padding-bottom));
 
 /* GRID — drives Vuetify `--v-col-gap-x/y` and `.v-row + .v-row` margin-top */
@@ -107,5 +118,6 @@ $grid-gutter: $spacer * 6 !default;
 $grid-gutter-secondary: $spacer * 6 * calc(2 / 3) !default;
 
 $grid-gutter-tertiary: $spacer * 6 * calc(1 / 3) !default;
+
 
 
