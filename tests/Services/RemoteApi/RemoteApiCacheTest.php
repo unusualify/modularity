@@ -72,6 +72,42 @@ class RemoteApiCacheTest extends TestCase
         $this->assertSame(2, $calls);
     }
 
+    public function test_flush_invalidates_paginated_catalog_v2_keys(): void
+    {
+        config(['cache.default' => 'array']);
+
+        $configuration = new RemoteApiConfiguration($this->makeModule(), 'package', [
+            'enabled' => true,
+            'endpoint' => 'packages',
+        ]);
+
+        $cache = new RemoteApiCache($configuration);
+        $calls = 0;
+        $key = 'catalog:v2:regions:hash';
+
+        $cache->rememberPaginatedCatalog($key, function () use (&$calls) {
+            $calls++;
+
+            return [
+                'expected_total' => 1,
+                'items' => [['id' => 1, 'name' => 'EU']],
+            ];
+        });
+
+        $cache->flush();
+
+        $cache->rememberPaginatedCatalog($key, function () use (&$calls) {
+            $calls++;
+
+            return [
+                'expected_total' => 1,
+                'items' => [['id' => 2, 'name' => 'US']],
+            ];
+        });
+
+        $this->assertSame(2, $calls);
+    }
+
     public function test_remember_non_empty_does_not_persist_empty_arrays(): void
     {
         config(['cache.default' => 'array']);

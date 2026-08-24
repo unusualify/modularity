@@ -23,6 +23,38 @@ Remote API integrates with Modularous forms (link picker) and data tables (sync 
 ],
 ```
 
+### Dependent catalog (`catalogDependsOn`)
+
+Opt-in only. When omitted, hydrate and `RemoteApi.vue` keep the historical default path (primary / static `catalog` endpoint, no sibling watch).
+
+```php
+[
+    'type' => 'select',
+    'name' => 'packageable_type',
+    'items' => [
+        ['id' => 'region', 'name' => 'Region'],
+        ['id' => 'country', 'name' => 'Country'],
+    ],
+],
+[
+    'type' => 'remote-api',
+    'name' => 'packageable_id',
+    'label' => 'Packageable',
+    'catalogDependsOn' => [
+        'field' => 'packageable_type',
+        'map' => [
+            'region' => 'regions',
+            'country' => 'countries',
+        ],
+    ],
+],
+```
+
+Behavior when configured:
+
+- Hydrate does **not** prefetch the connector default catalog until a sibling value maps to a named catalog (or `catalog` / `catalogDependsOnValue` is supplied).
+- Vue watches the sibling via `ueFormPayload`, fetches `GET …/list-remote-catalog?catalog={key}`, clears the selection when the sibling changes, and disables the select while no catalog key is resolved.
+
 ### Hydrate → Vue Pipeline
 
 | Stage | Output |
@@ -41,9 +73,10 @@ Hydrate adds:
 
 ### Frontend Behavior (`RemoteApi.vue`)
 
-- Renders a `v-select` bound to virtual `remote_id`.
-- On mount, if hydrated items are empty or `catalogTotal` exceeds loaded rows, fetches `catalogEndpoint` via GET.
-- Validates completeness: warns in console if response rows < expected total.
+- Renders a `v-select` bound to the configured field name (often virtual `remote_id`).
+- **Default (no `catalogDependsOn`):** on mount, if hydrated items are empty or `catalogTotal` exceeds loaded rows, fetches `catalogEndpoint` via GET (no query string).
+- **With `catalogDependsOn`:** watches the sibling field on `ueFormPayload`, fetches with `?catalog={mappedKey}`, clears the value when the sibling changes, and disables the control until a catalog key resolves.
+- Validates completeness: warns in console if response rows &lt; expected total.
 - Prepends a “Please Select” row when items exist.
 
 ### Catalog API
@@ -170,7 +203,9 @@ Success message summarizes created/updated/skipped counts. JSON includes:
 { "message": "Remote API cache cleared." }
 ```
 
-Flushes the full connector cache tag/version — use after remote bulk updates.
+Flushes the full connector cache tag/version — including `list:v2:*`, `record:*`, `preview:*`, and catalog keys (`catalog:v2:default:*`, `catalog:v2:{catalogKey}:*`). Use after remote bulk updates or when combobox catalogs look stale.
+
+Catalog-only connectors (no sync) can expose just this action: `'actions' => ['clear_cache']`.
 
 ## Controller Requirements
 
@@ -185,6 +220,7 @@ Routes are registered automatically in `RouteServiceProvider` when the controlle
 | Hide all Remote API UI | `'enabled' => false` in connector config |
 | Hide sync buttons only | Remove `sync_all` / `clear_cache` from `actions` |
 | Keep link picker, no sync | `'actions' => []` but leave `enabled` true and form input |
+| Catalog picker + clear caches only | `'actions' => ['clear_cache']` (no `sync_*` / `preview`) |
 
 Misconfigured connectors (missing base URL) fail closed — no table actions, hydrate skips connector schema.
 

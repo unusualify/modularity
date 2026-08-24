@@ -113,7 +113,7 @@ $connector->clearCache(42);
 // forgets record:42 and preview:42
 ```
 
-Full flush from admin: **Clear Remote Cache** table action → `clearRemoteApiCache()` without id.
+Full flush from admin: **Clear Remote Cache** table action (`clear_cache` → `clearRemoteCache`) → `clearRemoteApiCache()` without id. That invalidates **all** logical keys for the connector, including named catalogs (`catalog:v2:{catalogKey}:*`).
 
 ## Outgoing Rate Limiting
 
