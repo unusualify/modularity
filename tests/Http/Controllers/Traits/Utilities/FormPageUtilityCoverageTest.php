@@ -65,6 +65,10 @@ class FormPageUtilityCoverageTest extends TestCase
 
             public string $routeName = 'Item';
 
+            public ?string $moduleRouteName = null;
+
+            public mixed $moduleRoute = null;
+
             public string $routePrefix = 'admin';
 
             public $nestedParentId = null;
@@ -160,7 +164,7 @@ class FormPageUtilityCoverageTest extends TestCase
                 return $formItemCallback();
             }
 
-            protected function getModuleRoute($id, $action, $singleton = false): string
+            protected function getModuleRouteUrl($id, $action, $singleton = false): string
             {
                 return "/admin/item/{$id}/{$action}";
             }
@@ -213,7 +217,12 @@ class FormPageUtilityCoverageTest extends TestCase
     {
         $controller = $this->makeController();
         $this->assertSame('/admin/item/3/update', $controller->getFormUrl(3));
-        // getFormUrl(null) calls moduleRoute and dd() on failure — skipped (tightly coupled).
+
+        $moduleRoute = Mockery::mock();
+        $moduleRoute->shouldReceive('name')->once()->andReturn('Item');
+        $controller->moduleRoute = $moduleRoute;
+        $this->assertSame('/admin/item/3/update', $controller->getFormUrl(3));
+        // getFormUrl(null) calls moduleRoute() helper and dd() on failure — skipped (tightly coupled).
 
         $this->assertSame([], $controller->modalFormData(Request::create('/')));
 
