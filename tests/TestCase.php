@@ -33,6 +33,10 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         // Note: this also flushes the cache from within the migration
         $this->setUpDatabase($this->app);
 
+        if (function_exists('forget_database_exists_cache')) {
+            forget_database_exists_cache();
+        }
+
         $this->path = realpath(__DIR__ . '/..');
 
         $this->modulesPath = realpath($this->path . '/modules');

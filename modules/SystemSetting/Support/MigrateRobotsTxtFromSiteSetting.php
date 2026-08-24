@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Schema;
 use Modules\SystemSetting\Entities\General;
 use Modules\SystemSetting\Repositories\GeneralRepository;
 use Modules\SystemSetting\Services\SystemSettingsService;
-use Unusualify\Modularous\Facades\SystemSettings;
 
 /**
  * One-time migration: legacy KV um_cms_site_settings robots.txt row → {@see General} singleton.
@@ -27,22 +26,28 @@ class MigrateRobotsTxtFromSiteSetting
             return false;
         }
 
-        if (! database_exists()) {
-            return false;
-        }
-
         $legacyTable = modularousConfig('tables.cms_site_settings', 'um_cms_site_settings');
 
-        if (! Schema::hasTable($legacyTable)) {
-            $this->writeSettledMarker();
-
+        try {
+            if (! Schema::hasTable($legacyTable)) {
+                // Do not mark settled: the legacy table may appear after migrations.
+                return false;
+            }
+        } catch (\Throwable) {
             return false;
         }
 
-        if (SystemSettings::has('seo.robots_txt')) {
-            $existing = trim((string) SystemSettings::get('seo.robots_txt', ''));
+        // Read the singleton row directly — SystemSettings cache can be polluted
+        // across PHPUnit tests in the same ParaTest worker process.
+        try {
+            $general = General::query()->first();
+        } catch (\Throwable) {
+            return false;
+        }
 
-            if ($existing !== '') {
+        if ($general !== null) {
+            $existingSeo = is_array($general->seo) ? $general->seo : [];
+            if (trim((string) ($existingSeo['robots_txt'] ?? '')) !== '') {
                 $this->writeSettledMarker();
 
                 return false;
@@ -51,12 +56,20 @@ class MigrateRobotsTxtFromSiteSetting
 
         [$group, $key, $locale] = $this->legacyRobotsKeys();
 
-        $row = DB::table($legacyTable)
-            ->where('group_key', $group)
-            ->where('key', $key)
-            ->where('locale', $locale)
-            ->whereNull('deleted_at')
-            ->first();
+        try {
+            $rowQuery = DB::table($legacyTable)
+                ->where('group_key', $group)
+                ->where('key', $key)
+                ->where('locale', $locale);
+
+            if (Schema::hasColumn($legacyTable, 'deleted_at')) {
+                $rowQuery->whereNull('deleted_at');
+            }
+
+            $row = $rowQuery->first();
+        } catch (\Throwable) {
+            return false;
+        }
 
         if ($row === null || trim((string) ($row->value ?? '')) === '') {
             $this->writeSettledMarker();
@@ -64,7 +77,7 @@ class MigrateRobotsTxtFromSiteSetting
             return false;
         }
 
-        $general = General::single();
+        $general ??= General::single();
         $seo = is_array($general->seo) ? $general->seo : [];
         $seo['robots_txt'] = rtrim((string) $row->value, "\r\n");
 
@@ -80,16 +93,56 @@ class MigrateRobotsTxtFromSiteSetting
 
     public static function settledMarkerPath(): string
     {
+        // Under storage/framework/cache — ignored by storage/framework/cache/.gitignore
+        return storage_path('framework/cache/modularous-robots-txt-migrated');
+    }
+
+    /**
+     * Legacy path before markers lived under the ignored cache/ directory.
+     */
+    public static function legacySettledMarkerPath(): string
+    {
         return storage_path('framework/modularous-robots-txt-migrated');
+    }
+
+    protected function markersEnabled(): bool
+    {
+        // ParaTest workers share the host filesystem; a marker written by one
+        // process would short-circuit migrateIfNeeded() in another.
+        if (defined('MODULAROUS_TEST_TOKEN') || getenv('TEST_TOKEN') !== false) {
+            return false;
+        }
+
+        return ! app()->runningUnitTests();
     }
 
     protected function hasSettledMarker(): bool
     {
-        return is_file(self::settledMarkerPath());
+        if (! $this->markersEnabled()) {
+            return false;
+        }
+
+        if (is_file(self::settledMarkerPath())) {
+            return true;
+        }
+
+        $legacy = self::legacySettledMarkerPath();
+        if (! is_file($legacy)) {
+            return false;
+        }
+
+        $this->writeSettledMarker();
+        @unlink($legacy);
+
+        return true;
     }
 
     protected function writeSettledMarker(): void
     {
+        if (! $this->markersEnabled()) {
+            return;
+        }
+
         $path = self::settledMarkerPath();
         $directory = dirname($path);
 

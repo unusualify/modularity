@@ -8,31 +8,54 @@ use Mockery;
 use Modules\Cms\Repositories\SiteSettingRepository;
 use Modules\Cms\Services\CmsSettingsService;
 use Modules\Cms\Support\DuplicateSystemSettingsToCmsSettings;
+use ReflectionMethod;
 use Unusualify\Modularous\Tests\TestCase;
 
 class DuplicateSystemSettingsToCmsSettingsTest extends TestCase
 {
     protected function tearDown(): void
     {
-        $marker = DuplicateSystemSettingsToCmsSettings::settledMarkerPath();
-        if (is_file($marker)) {
-            @unlink($marker);
+        foreach ([
+            DuplicateSystemSettingsToCmsSettings::settledMarkerPath(),
+            DuplicateSystemSettingsToCmsSettings::legacySettledMarkerPath(),
+        ] as $marker) {
+            if (is_file($marker)) {
+                @unlink($marker);
+            }
         }
 
         parent::tearDown();
     }
 
-    public function test_duplicate_if_needed_is_a_no_op_when_settled_marker_exists(): void
+    public function test_markers_are_disabled_during_unit_tests(): void
+    {
+        $service = new DuplicateSystemSettingsToCmsSettings(
+            Mockery::mock(SiteSettingRepository::class),
+            Mockery::mock(CmsSettingsService::class),
+        );
+
+        $markersEnabled = new ReflectionMethod($service, 'markersEnabled');
+        $markersEnabled->setAccessible(true);
+
+        $this->assertFalse($markersEnabled->invoke($service));
+    }
+
+    public function test_write_settled_marker_is_a_no_op_during_unit_tests(): void
     {
         $path = DuplicateSystemSettingsToCmsSettings::settledMarkerPath();
-        @mkdir(dirname($path), 0755, true);
-        touch($path);
+        if (is_file($path)) {
+            @unlink($path);
+        }
 
         $service = new DuplicateSystemSettingsToCmsSettings(
             Mockery::mock(SiteSettingRepository::class),
             Mockery::mock(CmsSettingsService::class),
         );
 
-        $this->assertFalse($service->duplicateIfNeeded());
+        $write = new ReflectionMethod($service, 'writeSettledMarker');
+        $write->setAccessible(true);
+        $write->invoke($service);
+
+        $this->assertFileDoesNotExist($path);
     }
 }

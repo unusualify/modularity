@@ -49,14 +49,16 @@ class DbHelpersTest extends TestCase
     }
 
     /** @test */
-    public function test_database_exists_caches_the_connection_result()
+    public function test_database_exists_does_not_memoize_during_unit_tests()
     {
+        // Memoization is disabled under PHPUnit/ParaTest so a Mockery stub
+        // cannot poison later tests in the same worker via a sticky false.
         DB::shouldReceive('connection')
-            ->once()
+            ->twice()
             ->andReturnSelf();
 
         DB::shouldReceive('getPDO')
-            ->once()
+            ->twice()
             ->andReturn(new \PDO('sqlite::memory:'));
 
         $this->assertTrue(database_exists());
