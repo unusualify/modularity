@@ -19,6 +19,10 @@ final class CmsPublicSystemRouteRegistrar
             return;
         }
 
+        if (app()->routesAreCached()) {
+            return;
+        }
+
         foreach (CmsPublicSystemRoutes::definitions() as $def) {
             if (! $def['enabled']) {
                 continue;
