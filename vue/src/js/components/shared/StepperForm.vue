@@ -13,7 +13,7 @@
         @step-click="goStep"
       />
 
-      <v-row class="mt-2 flex-fil">
+      <v-row class="mt-6 flex-fil">
         <!-- left side -->
         <v-col v-bind="formCol" v-fit-grid class="order-md-1 order-2">
           <StepperContent
@@ -130,22 +130,22 @@
         </v-col>
       </v-row>
 
-      <v-sheet-rounded v-if="activeStepIsFullWidth" class="mt-4 elevation-2 pt-4">
+      <v-sheet v-if="activeStepIsFullWidth" class="mt-4 pt-4">
         <v-stepper-actions
           click:prev @click:prev="goStep(activeStep - 1)"
         >
           <template #next>
-            <v-btn
-              variant="elevated"
-              color="secondary"
+            <v-btn-primary
+              class="text-none"
+              density="compact"
               @click="nextForm(activeStep - 1)"
               :disabled="$hasRequestInProgress()"
               >
               {{ $t('next').toUpperCase() }}
-            </v-btn>
+            </v-btn-primary>
           </template>
         </v-stepper-actions>
-      </v-sheet-rounded>
+      </v-sheet>
 
 
       <ue-modal
