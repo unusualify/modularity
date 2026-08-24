@@ -26,7 +26,7 @@ class ModularousWidget extends Component
             'cols' => 12,
         ],
         'widgetAttributes' => [
-            'class' => 'd-flex flex-column  min-height-0 overflow-y-auto',
+            'class' => '',
         ],
         'widgetSlots' => [],
     ];

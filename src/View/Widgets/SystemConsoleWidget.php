@@ -20,9 +20,8 @@ class SystemConsoleWidget extends ModularousWidget
     ];
 
     public $attributes = [
-        'class' => 'd-flex flex-column flex-grow-1 min-height-0',
+        'class' => '',
         'title' => 'System Console',
-        'elevation' => 2,
         'subtitle' => 'Maintenance mode and cache / optimize commands.',
     ];
 

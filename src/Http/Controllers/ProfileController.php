@@ -55,9 +55,9 @@ class ProfileController extends BaseController
     public function edit($id = null, $submoduleId = null)
     {
         $formSurfaceAttributes = [
-            'elevation' => 0,
-            'rounded' => 'lg',
-            'border' => 'sm',
+            // 'elevation' => 0,
+            // 'rounded' => 'lg',
+            // 'border' => 'sm',
         ];
 
         $user = auth()->user();

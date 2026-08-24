@@ -175,6 +175,7 @@ trait AuthFormBuilder
         return [
             'tag' => 'v-sheet',
             'attributes' => array_merge([
+                'border' => false,
                 'class' => 'd-flex pb-5 justify-end flex-column w-100 text-black',
             ], $sheetAttributes),
             'elements' => $elements,
