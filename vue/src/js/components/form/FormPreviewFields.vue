@@ -6,10 +6,10 @@
       v-bind="colAttrs(input)"
       class="ue-form-preview__col py-3"
     >
-      <div class="ue-form-preview__label text-body-small text-medium-emphasis mb-1">
+      <div class="ue-form-preview__label text-body-small text-medium-emphasis mb-1 text-break">
         {{ input.label }}
       </div>
-      <div class="ue-form-preview__value text-body-large font-weight-medium">
+      <div class="ue-form-preview__value text-body-large font-weight-medium text-break">
         <v-icon
           v-if="display(input).kind === 'boolean' && display(input).value"
           color="primary"
