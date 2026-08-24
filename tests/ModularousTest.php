@@ -572,4 +572,35 @@ class ModularousTest extends TestModulesCase
         $this->assertIsArray($pageLayoutOnly);
         $this->assertIsArray($both);
     }
+
+    public function test_is_front_url_with_subdomain_admin(): void
+    {
+        $this->setUrlHosts('http://frontend.b2press.test', 'http://cms.b2press.test', '');
+
+        $this->assertTrue($this->modularous->isFrontUrl('http://frontend.b2press.test/en/pages/about'));
+        $this->assertFalse($this->modularous->isFrontUrl('http://cms.b2press.test/system/dashboard'));
+        $this->assertTrue($this->modularous->isPanelUrl('http://cms.b2press.test/system/dashboard'));
+    }
+
+    public function test_is_front_url_with_path_admin(): void
+    {
+        $this->setUrlHosts('http://localhost', '', 'admin');
+
+        $this->assertTrue($this->modularous->isFrontUrl('http://localhost/en/pages/about'));
+        $this->assertFalse($this->modularous->isFrontUrl('http://localhost/admin/dashboard'));
+    }
+
+    public function test_is_non_http_console_context_is_false_during_phpunit(): void
+    {
+        $this->assertFalse($this->modularous->isNonHttpConsoleContext());
+    }
+
+    private function setUrlHosts(string $appUrl, string $adminAppUrl, string $adminAppPath): void
+    {
+        foreach (['modularous', 'modules'] as $namespace) {
+            $this->app['config']->set("{$namespace}.app_url", $appUrl);
+            $this->app['config']->set("{$namespace}.admin_app_url", $adminAppUrl);
+            $this->app['config']->set("{$namespace}.admin_app_path", $adminAppPath);
+        }
+    }
 }
