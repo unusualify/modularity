@@ -42,6 +42,10 @@ trait ManageRemoteApiSync
         }
 
         $routePrefix = $this->repository->resolveRemoteApiRoutePrefix();
+        if ($routePrefix === null) {
+            return;
+        }
+
         $existing = is_array($this->tableActions ?? null) ? $this->tableActions : [];
         $actions = [];
 
