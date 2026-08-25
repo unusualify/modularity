@@ -20,6 +20,8 @@ final class CmsPublicPresentationInnerData
      *   seoDescription: ?string,
      *   canonicalUrl: string,
      *   robotsMeta: string,
+     *   ogImage: ?string,
+     *   twitterImage: ?string,
      *   hreflangAlternates: list<array{hreflang: string, href: string}>,
      *   pageSlug: string,
      *   pageFallbackSlug: string,
@@ -47,6 +49,8 @@ final class CmsPublicPresentationInnerData
      *   seoDescription: ?string,
      *   canonicalUrl: string,
      *   robotsMeta: string,
+     *   ogImage: ?string,
+     *   twitterImage: ?string,
      *   hreflangAlternates: list<array{hreflang: string, href: string}>,
      *   pageSlug: string,
      *   pageFallbackSlug: string,
@@ -65,13 +69,15 @@ final class CmsPublicPresentationInnerData
     }
 
     /**
-     * @param array{title: string, description: ?string, canonicalUrl: string, robotsMeta: string} $seo
+     * @param array{title: string, seoTitle?: mixed, description: ?string, canonicalUrl: string, robotsMeta: string, ogImage?: ?string, twitterImage?: ?string} $seo
      * @return array{
      *   item: Model,
      *   seoTitle: string,
      *   seoDescription: ?string,
      *   canonicalUrl: string,
      *   robotsMeta: string,
+     *   ogImage: ?string,
+     *   twitterImage: ?string,
      *   hreflangAlternates: list<array{hreflang: string, href: string}>,
      *   pageSlug: string,
      *   pageFallbackSlug: string,
@@ -89,6 +95,8 @@ final class CmsPublicPresentationInnerData
             'seoDescription' => $seo['description'],
             'canonicalUrl' => $seo['canonicalUrl'],
             'robotsMeta' => $seo['robotsMeta'],
+            'ogImage' => $seo['ogImage'] ?? null,
+            'twitterImage' => $seo['twitterImage'] ?? $seo['ogImage'] ?? null,
             'hreflangAlternates' => self::hreflangAlternates($item),
             'pageSlug' => $slugLeaves['pageSlug'],
             'pageFallbackSlug' => $slugLeaves['pageFallbackSlug'],

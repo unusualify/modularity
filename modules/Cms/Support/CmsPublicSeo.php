@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Modules\Cms\Contracts\CanonicalUrlResolverInterface;
 use Modules\Cms\Entities\Translations\PageTranslation;
 use Unusualify\Modularous\Entities\Traits\HasTranslation;
+use Unusualify\Modularous\Support\TranslatableMetadata;
 
 /**
  * Head tags for public CMS pages: canonical URL, robots, title/description from translation.
@@ -23,7 +24,7 @@ final class CmsPublicSeo
      * Live request path — uses {@see Request} for host, path, and application locale.
      *
      * @param object|null $translation e.g. {@see PageTranslation}
-     * @return array{title: string, description: ?string, canonicalUrl: string, robotsMeta: string}
+     * @return array{title: string, seoTitle: mixed, description: ?string, canonicalUrl: string, robotsMeta: string, ogImage: ?string}
      */
     public static function build(Request $request, Model $item, CanonicalUrlResolverInterface $canonical): array
     {
@@ -37,7 +38,7 @@ final class CmsPublicSeo
     /**
      * Cache / warmup path — explicit locale and registry path; no {@see Request} or app locale.
      *
-     * @return array{title: string, description: ?string, canonicalUrl: string, robotsMeta: string}
+     * @return array{title: string, seoTitle: mixed, description: ?string, canonicalUrl: string, robotsMeta: string, ogImage: ?string}
      */
     public static function buildForCache(
         string $locale,
@@ -55,7 +56,7 @@ final class CmsPublicSeo
     }
 
     /**
-     * @return array{title: string, description: ?string, canonicalUrl: string, robotsMeta: string}
+     * @return array{title: string, seoTitle: mixed, description: ?string, canonicalUrl: string, robotsMeta: string, ogImage: ?string}
      */
     private static function buildSeo(string $locale, Model $item, string $canonicalUrl): array
     {
@@ -106,7 +107,26 @@ final class CmsPublicSeo
             'description' => $description,
             'canonicalUrl' => $canonicalUrl,
             'robotsMeta' => $robotsMeta,
+            'ogImage' => self::resolveOgImage($item, $locale),
         ];
+    }
+
+    /**
+     * Per-page Open Graph image URL, or null so the layout can fall back to site/default assets.
+     */
+    private static function resolveOgImage(Model $item, string $locale): ?string
+    {
+        if (! method_exists($item, 'image')) {
+            return null;
+        }
+
+        $url = $item->image(TranslatableMetadata::OG_IMAGE_ROLE, 'default', [], true, false, null, $locale);
+
+        if (! is_string($url) || trim($url) === '') {
+            return null;
+        }
+
+        return $url;
     }
 
     public static function shouldForceNoIndex(): bool

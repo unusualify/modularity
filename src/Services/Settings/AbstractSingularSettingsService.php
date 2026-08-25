@@ -336,6 +336,11 @@ abstract class AbstractSingularSettingsService
                 continue;
             }
 
+            // Untranslated fallback must not return a raw locale map (e.g. get('site.logo')).
+            if (is_array($candidate) && $this->looksLikeLocaleMap($candidate)) {
+                continue;
+            }
+
             if (is_array($candidate) && Arr::isList($candidate)) {
                 $listDeferred ??= $candidate;
 

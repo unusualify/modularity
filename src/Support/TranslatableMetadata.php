@@ -31,6 +31,11 @@ final class TranslatableMetadata
     ];
 
     /**
+     * Media-library role for a per-page Open Graph image (HasImages, not a translation column).
+     */
+    public const OG_IMAGE_ROLE = 'og_image';
+
+    /**
      * Casts for a dedicated translation model, if you define one (optional).
      *
      * @return array<string, string>
@@ -70,6 +75,19 @@ final class TranslatableMetadata
         return [
             ['name' => 'seo_title', 'label' => 'SEO Title', 'type' => 'text', 'translated' => true, 'isSecondary' => true],
             ['name' => 'seo_description', 'label' => 'SEO Description', 'type' => 'textarea', 'translated' => true, 'isSecondary' => true],
+            [
+                'name' => self::OG_IMAGE_ROLE,
+                'label' => 'OG Image',
+                'type' => 'image',
+                'translated' => true,
+                'isSecondary' => true,
+                'hideDetails' => 'auto',
+                'imageCol' => [
+                    'cols' => 12,
+                    'md' => 12,
+                    'lg' => 12
+                ]
+            ],
             ['name' => 'canonical_url', 'label' => 'Canonical URL', 'type' => 'text', 'translated' => true, 'isSecondary' => true],
             ['name' => 'robots_index', 'label' => 'Robots Index', 'type' => 'switch', 'translated' => true, 'isSecondary' => true],
             ['name' => 'robots_follow', 'label' => 'Robots Follow', 'type' => 'switch', 'translated' => true, 'isSecondary' => true],

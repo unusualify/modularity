@@ -29,4 +29,14 @@ class TranslatableMetadataTest extends TestCase
             $this->assertContains($attr, $names, "Missing form input for [{$attr}]");
         }
     }
+
+    public function test_default_form_inputs_include_og_image_uploader(): void
+    {
+        $inputs = collect(TranslatableMetadata::defaultFormInputs())->keyBy('name');
+
+        $this->assertTrue($inputs->has(TranslatableMetadata::OG_IMAGE_ROLE));
+        $this->assertSame('image', $inputs[TranslatableMetadata::OG_IMAGE_ROLE]['type']);
+        $this->assertTrue($inputs[TranslatableMetadata::OG_IMAGE_ROLE]['translated']);
+        $this->assertNotContains(TranslatableMetadata::OG_IMAGE_ROLE, TranslatableMetadata::TRANSLATED_ATTRIBUTES);
+    }
 }

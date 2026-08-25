@@ -34,6 +34,55 @@ class CmsPublicSeoTest extends TestCase
         $out = CmsPublicSeo::build($request, $page, $canonical);
 
         $this->assertSame('index, follow', $out['robotsMeta']);
+        $this->assertNull($out['ogImage']);
+    }
+
+    public function test_og_image_uses_page_image_helper_when_present(): void
+    {
+        $request = Request::create('https://example.test/about', 'GET');
+
+        $item = new class extends Model
+        {
+            protected $guarded = [];
+
+            public $timestamps = false;
+
+            public function image($role, $crop = 'default', $params = [], $has_fallback = false, $cms = false, $media = null, $locale = null): ?string
+            {
+                if ($role !== 'og_image') {
+                    return $has_fallback ? null : '';
+                }
+
+                return 'https://cdn.example.test/og-about.png';
+            }
+        };
+
+        $canonical = new CanonicalUrlResolver;
+        $out = CmsPublicSeo::build($request, $item, $canonical);
+
+        $this->assertSame('https://cdn.example.test/og-about.png', $out['ogImage']);
+    }
+
+    public function test_og_image_is_null_when_image_helper_returns_empty(): void
+    {
+        $request = Request::create('https://example.test/about', 'GET');
+
+        $item = new class extends Model
+        {
+            protected $guarded = [];
+
+            public $timestamps = false;
+
+            public function image($role, $crop = 'default', $params = [], $has_fallback = false, $cms = false, $media = null, $locale = null): ?string
+            {
+                return $has_fallback ? null : '';
+            }
+        };
+
+        $canonical = new CanonicalUrlResolver;
+        $out = CmsPublicSeo::build($request, $item, $canonical);
+
+        $this->assertNull($out['ogImage']);
     }
 
     public function test_seo_index_false_maps_to_noindex_when_robots_index_unset(): void
