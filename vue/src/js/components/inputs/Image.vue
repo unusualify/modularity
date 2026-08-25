@@ -1,188 +1,212 @@
 <template>
   <v-input
     v-model="input"
-    hideDetails="auto"
-    appendIcon="mdi-close"
+    hide-details="auto"
+    append-icon="mdi-close"
     :variant="boundProps.variant"
-    class="v-input-image"
-    >
-    <template v-slot:default="defaultSlot">
+    class="v-input-image ue-input-image"
+  >
+    <template #default="defaultSlot">
       <div class="v-field v-field--active v-field--center-affix v-field--dirty v-field--variant-outlined v-locale--is-ltr">
         <div class="v-field__field" data-no-activator="">
-
-          <v-hover v-slot="{ isHovering, props }">
-            <div class="media w-100" :class="{ 'media--slide' : isSlide }" v-bind="props">
-              <div class="_media__field ">
-                <v-row dense class="" no-gutters>
-                  <v-col v-for="(index) in totalElementCount" :key="index"
-                    v-bind="imageCol"
-                    v-fit-grid
+          <div
+            class="ue-input-image__body w-100"
+            :class="{ 'ue-input-image--slide': isSlide }"
+          >
+            <div class="ue-input-image__field">
+              <v-row dense no-gutters>
+                <v-col
+                  v-for="index in totalElementCount"
+                  :key="index"
+                  v-bind="imageCol"
+                  v-fit-grid
+                >
+                  <v-card
+                    class="ue-input-image__card w-100 d-flex flex-column justify-end"
+                    variant="text"
+                    flat
+                  >
+                    <v-hover
+                      v-if="input[index] !== undefined"
+                      v-slot="{ isHovering, props: hoverProps }"
                     >
-                    <v-card color="" class="w-100 d-flex flex-column justify-end" style="box-shadow: unset;">
-                      <v-hover v-slot="{ isHovering, props }">
-                        <div v-if="input[index] !== undefined" class="d-flex flex-no-wrap" v-bind="props" data-test="imageCard">
-                          <div class="media__img px-2 py-2">
-                            <v-hover v-slot="{ isHovering, props }">
-                              <div class="media__imgFrame" v-bind="props">
-                                <div class="media__imgCentered" :style="cropThumbnailStyle">
-                                  <v-img v-if="showImg" :src="input[index].thumbnail" ref="mediaImg" :class="[cropThumbnailClass]" max-width="240"/>
-                                </div>
-                                <v-overlay
-                                  v-if="!disabled"
-                                  :model-value="isHovering"
-                                  class="align-end justify-end"
-                                  contained
-                                  @click="openMediaLibrary(1, mediaKey, index)"
-                                  :elevation="isHovering ? 12 : 2"
-                                >
-                                  <v-btn icon="$edit" size="small" class="mb-2 mr-2" color="blue-lighten-5"></v-btn>
-                                </v-overlay>
-                              </div>
-                            </v-hover>
-                          </div>
-                          <v-list lines="one" :class="[ (!hover || isHovering ) ? 'opacity-100' : 'opacity-70' ,'w-50']" class="w-50" style="min-width: 50px;transition: opacity 250ms ease-in;">
-                            <v-hover>
-                              <template v-slot:default="{ isHovering, props }">
-                                <v-list-item
-                                  v-bind="props"
-                                  :class="{'text-blue': isHovering }"
-                                  :title="input[index].name"
-                                  @click="openMediaLibrary(1, mediaKey, index)"
-                                ></v-list-item>
-                              </template>
-                            </v-hover>
-                            <v-list-item v-if="input[index].size" :subtitle="`File size: {{ input[index].size }}`"></v-list-item>
-                            <v-list-item v-if="input[index].width + input[index].height"
-                              :subtitle="`${$t('fields.medias.original-dimensions')}: ${input[index].width}&nbsp;&times;&nbsp;${input[index].height}`"
-                              ></v-list-item>
-                          </v-list>
-
-                          <div style="min-width: 50px;transition: opacity 250ms ease-in;" :class="[ (!hover || isHovering ) ? 'opacity-100' : 'opacity-10' ,'d-flex justify-end ma-2']" v-if="!disabled" >
-                            <v-btn data-test="downloadButton" icon="$download" color="blue-lighten-5" rounded="0" size="small" :href="input[index].original" download />
-                            <v-btn data-test="cropButton" icon="mdi-crop" color="blue-lighten-5" rounded="0" size="small"/>
-                            <v-btn data-test="deleteButton" icon="$delete" color="blue-lighten-5" rounded="0" size="small"  @click="deleteMediaClick(index, defaultSlot.validate)"/>
+                      <div
+                        class="ue-input-image__item d-flex align-center"
+                        v-bind="hoverProps"
+                        data-test="imageCard"
+                      >
+                        <div class="ue-input-image__thumb pa-2">
+                          <div
+                            class="ue-input-image__thumb-frame"
+                            tabindex="0"
+                            @click="!disabled && openMediaLibrary(1, mediaKey, index)"
+                            @keyup.enter="!disabled && openMediaLibrary(1, mediaKey, index)"
+                          >
+                            <div
+                              class="ue-input-image__thumb-center"
+                              :style="cropThumbnailStyle"
+                            >
+                              <v-img
+                                v-if="showImg"
+                                :src="input[index].thumbnail"
+                                ref="mediaImg"
+                                :class="cropThumbnailClass"
+                                max-width="240"
+                              />
+                            </div>
+                            <div
+                              v-if="!disabled"
+                              class="ue-input-image__overlay"
+                              :class="{ 'ue-input-image__overlay--active': isHovering }"
+                            >
+                              <v-btn
+                                icon="$edit"
+                                variant="flat"
+                                size="x-small"
+                                density="compact"
+                                color="surface"
+                                data-test="editButton"
+                                :aria-label="$t('fields.medias.edit', 'Edit')"
+                                @click.stop="openMediaLibrary(1, mediaKey, index)"
+                              />
+                            </div>
                           </div>
                         </div>
-                      </v-hover>
-                      <template v-if="input[index] === undefined" v-slot:actions>
-                          <v-btn
-                            data-test="addButton"
-                            append-icon="$add"
-                            variant="outlined"
-                            block
-                            @click="openMediaLibrary(remainingItems)"
-                            >
-                            {{ addLabel }}
-                          </v-btn>
-                      </template>
-                    </v-card>
-                  </v-col>
-                  <!-- <v-col v-for="(media, index) in input" :key="index"
-                    cols="12"
-                    md="6"
-                    lg="4"
-                    v-fit-grid
-                    >
-                    <v-card color="" class="d-flex flex-no-wrap w-100" >
-                      <div class="media__img px-2 py-2">
-                        <v-hover v-slot="{ isHovering, props }">
-                          <div class="media__imgFrame" v-bind="props">
-                            <div class="media__imgCentered" :style="cropThumbnailStyle">
-                              <v-img v-if="showImg" :src="media.thumbnail" ref="mediaImg" :class="[cropThumbnailClass]" max-width="240"/>
+
+                        <v-list
+                          lines="one"
+                          density="compact"
+                          class="ue-input-image__meta flex-grow-1 py-1"
+                          min-width="0"
+                        >
+                          <v-tooltip
+                            :model-value="overflowTooltip === `name-${index}`"
+                            :open-on-hover="false"
+                            location="top"
+                            max-width="360"
+                            :text="input[index].name"
+                          >
+                            <template #activator="{ props: tooltipProps }">
+                              <v-list-item
+                                v-bind="tooltipProps"
+                                class="ue-input-image__meta-item"
+                                :title="input[index].name"
+                                @click="openMediaLibrary(1, mediaKey, index)"
+                                @mouseenter="showOverflowTooltip($event, `name-${index}`)"
+                                @mouseleave="hideOverflowTooltip(`name-${index}`)"
+                                @focus="showOverflowTooltip($event, `name-${index}`)"
+                                @blur="hideOverflowTooltip(`name-${index}`)"
+                              />
+                            </template>
+                          </v-tooltip>
+                          <v-tooltip
+                            v-if="input[index].size"
+                            :model-value="overflowTooltip === `size-${index}`"
+                            :open-on-hover="false"
+                            location="top"
+                            max-width="360"
+                            :text="fileSizeLabel(input[index])"
+                          >
+                            <template #activator="{ props: tooltipProps }">
+                              <v-list-item
+                                v-bind="tooltipProps"
+                                :subtitle="fileSizeLabel(input[index])"
+                                @mouseenter="showOverflowTooltip($event, `size-${index}`)"
+                                @mouseleave="hideOverflowTooltip(`size-${index}`)"
+                                @focus="showOverflowTooltip($event, `size-${index}`)"
+                                @blur="hideOverflowTooltip(`size-${index}`)"
+                              />
+                            </template>
+                          </v-tooltip>
+                          <v-tooltip
+                            v-if="input[index].width + input[index].height"
+                            :model-value="overflowTooltip === `dims-${index}`"
+                            :open-on-hover="false"
+                            location="top"
+                            max-width="360"
+                            :text="originalDimensionsLabel(input[index])"
+                          >
+                            <template #activator="{ props: tooltipProps }">
+                              <v-list-item
+                                v-bind="tooltipProps"
+                                :subtitle="originalDimensionsLabel(input[index])"
+                                @mouseenter="showOverflowTooltip($event, `dims-${index}`)"
+                                @mouseleave="hideOverflowTooltip(`dims-${index}`)"
+                                @focus="showOverflowTooltip($event, `dims-${index}`)"
+                                @blur="hideOverflowTooltip(`dims-${index}`)"
+                              />
+                            </template>
+                          </v-tooltip>
+                          <v-list-item
+                            v-if="!disabled"
+                            class="ue-input-image__actions px-2"
+                            density="compact"
+                            :lines="false"
+                            :ripple="false"
+                          >
+                            <div class="d-flex align-center flex-nowrap">
+                              <v-btn
+                                icon="$download"
+                                variant="text"
+                                size="x-small"
+                                density="compact"
+                                data-test="downloadButton"
+                                :href="input[index].original"
+                                :aria-label="$t('fields.medias.download', 'Download')"
+                                download
+                              />
+                              <v-btn
+                                v-if="activeCrop"
+                                icon="mdi-crop"
+                                variant="text"
+                                size="x-small"
+                                density="compact"
+                                data-test="cropButton"
+                                :aria-label="$t('fields.medias.crop-edit', 'Crop')"
+                              />
+                              <v-btn
+                                icon="$delete"
+                                variant="text"
+                                size="x-small"
+                                density="compact"
+                                color="error"
+                                data-test="deleteButton"
+                                :aria-label="$t('fields.medias.delete', 'Delete')"
+                                @click="deleteMediaClick(index, defaultSlot.validate)"
+                              />
                             </div>
-                            <v-overlay
-                              v-if="!disabled"
-                              :model-value="isHovering"
-                              class="align-end justify-end"
-                              contained
-                              @click="openMediaLibrary(1, mediaKey, index)"
-                              :elevation="isHovering ? 12 : 2"
-                            >
-                              <v-btn icon="$edit" size="small" class="mb-2 mr-2" color="blue-lighten-5"></v-btn>
-                            </v-overlay>
-                          </div>
-                        </v-hover>
+                          </v-list-item>
+                        </v-list>
                       </div>
-                      <v-list lines="one" class="w-50">
-                        <v-hover>
-                          <template v-slot:default="{ isHovering, props }">
-                            <v-list-item
-                              v-bind="props"
-                              :class="{'text-blue': isHovering }"
-                              :title="media.name"
-                              @click="openMediaLibrary(1, mediaKey, index)"
-                            ></v-list-item>
-                          </template>
-                        </v-hover>
-                        <v-list-item v-if="media.size" :subtitle="`File size: {{ media.size }}`"></v-list-item>
-                        <v-list-item v-if="media.width + media.height"
-                          :subtitle="`${$t('fields.medias.original-dimensions')}: ${media.width}&nbsp;&times;&nbsp;${media.height}`"
-                          ></v-list-item>
-                      </v-list>
-                      <div style="min-width: 50px;" :class="[ (!hover || isHovering ) ? 'opacity-1' : 'opacity-0' ,'d-flex justify-end ma-2']" v-if="!disabled" >
-                        <v-btn icon="$download" color="blue-lighten-5" rounded="0" size="small" :href="media.original" download/>
-                        <v-btn icon="mdi-crop" color="blue-lighten-5" rounded="0" size="small"/>
-                        <v-btn icon="$delete" color="blue-lighten-5" rounded="0" size="small"  @click="deleteMediaClick(index, defaultSlot.validate)"/>
-                      </div>
-                    </v-card>
-                  </v-col> -->
-
-                </v-row>
-
-                <!--Add media button-->
-                <!-- <v-btn v-if="remainingItems" type="button" class="ml-2 my-2" @click="openMediaLibrary(remainingItems)">{{ addLabel }}</v-btn> -->
-                <!--
-                  <a17-button variant="ghost" @click="openMediaLibrary" :disabled="disabled" v-if="!hasMedia">{{ btnLabel }}</a17-button>
-                -->
-                <p class="media__note f--small" v-if="!!this.$slots.default">
-                  <slot/>
-                </p>
-
-                <!-- Metadatas options -->
-                <!--
-                  <div class="media__metadatas--options" :class="{ 's--active' : metadatas.active }" v-if="hasMedia && withAddInfo">
-                    <a17-mediametadata :name='metadataName' :label="$trans('fields.medias.alt-text', 'Alt Text')" id="altText" :media="media" :maxlength="altTextMaxLength" @change="updateMetadata"/>
-
-                    <a17-mediametadata v-if="withCaption" :wysiwyg="useWysiwyg" :wysiwyg-options="wysiwygOptions" type='text' :name='metadataName' :label="$trans('fields.medias.caption', 'Caption')" id="caption" :media="media" :maxlength="captionMaxLength" @change="updateMetadata"/>
-
-                    <a17-mediametadata v-if="withVideoUrl" :name='metadataName' :label="$trans('fields.medias.video-url', 'Video URL (optional)')" id="video" :media="media" @change="updateMetadata"/>
-
-                    <template v-for="field in extraMetadatas">
-                      <a17-mediametadata v-if="extraMetadatas.length > 0"
-                                        :key="field.name"
-                                        :type="field.type"
-                                        :name='metadataName'
-                                        :wysiwyg='field.wysiwyg || false'
-                                        :wysiwyg-options='field.wysiwygOptions || wysiwygOptions'
-                                        :label="field.label"
-                                        :id="field.name"
-                                        :media="media"
-                                        :maxlength="field.maxlength || 0"
-                                        @change="updateMetadata"/>
+                    </v-hover>
+                    <template v-if="input[index] === undefined" #actions>
+                      <v-btn
+                        data-test="addButton"
+                        append-icon="$add"
+                        variant="outlined"
+                        block
+                        @click="openMediaLibrary(remainingItems)"
+                      >
+                        {{ addLabel }}
+                      </v-btn>
                     </template>
-                  </div>
-                -->
-              </div>
+                  </v-card>
+                </v-col>
+              </v-row>
 
-              <!-- Crop modal -->
-              <!--
-                <a17-modal class="modal--cropper" :ref="cropModalName" :forceClose="true" :title="$trans('fields.medias.crop-edit')" mode="medium" v-if="hasMedia && activeCrop">
-                  <a17-cropper :media="media" v-on:crop-end="cropMedia" :aspectRatio="16 / 9" :context="cropContext" :key="cropperKey">
-                    <a17-button class="cropper__button" variant="action" @click="$refs[cropModalName].close()">{{ $trans('fields.medias.crop-save') }}</a17-button>
-                  </a17-cropper>
-                </a17-modal>
-              -->
-              <input :name="this.name" :value="JSON.stringify(media)" type="hidden">
+              <p v-if="$slots.default" class="ue-input-image__note">
+                <slot />
+              </p>
+              <input :name="name" :value="JSON.stringify(media)" type="hidden">
             </div>
-          </v-hover>
-
+          </div>
         </div>
 
         <div class="v-field__outline">
           <div class="v-field__outline__start"></div>
           <div class="v-field__outline__notch">
-            <label class="v-label v-field-label v-field-label--floating" aria-hidden="true" for="input-29">
-              <slot name="label" v-bind="{label: label}">
+            <label class="v-label v-field-label v-field-label--floating" aria-hidden="true">
+              <slot name="label" v-bind="{ label }">
                 {{ boundProps.label }}
               </slot>
             </label>
@@ -280,7 +304,8 @@ export default {
         textClose: this?.$t('fields.medias.edit-close') ?? '',
         active: false
       },
-      totalElementCount: range(0, this.max)
+      totalElementCount: range(0, this.max),
+      overflowTooltip: null
     }
   },
   filters: a17VueFilters,
@@ -304,8 +329,8 @@ export default {
       if (!this.media.crops) return {}
       const crop = this.media.crops[Object.keys(this.media.crops)[0]]
       return {
-        'media__img--landscape': crop.width / crop.height >= 1,
-        'media__img--portrait': crop.width / crop.height < 1
+        'ue-input-image__thumb--landscape': crop.width / crop.height >= 1,
+        'ue-input-image__thumb--portrait': crop.width / crop.height < 1
       }
     },
     mediaKey: function () {
@@ -705,6 +730,29 @@ export default {
     metadatasInfos: function () {
       this.metadatas.active = !this.metadatas.active
       this.metadatas.text = this.metadatas.active ? this.metadatas.textClose : this.metadatas.textOpen
+    },
+    fileSizeLabel (media) {
+      return `${this.$t('fields.medias.filesize', 'File size')}: ${media.size}`
+    },
+    originalDimensionsLabel (media) {
+      return `${this.$t('fields.medias.original-dimensions')}: ${media.width} × ${media.height}`
+    },
+    isMetaTextOverflowing (event) {
+      const root = event?.currentTarget
+      if (!(root instanceof HTMLElement)) {
+        return false
+      }
+
+      const el = root.querySelector('.v-list-item-title, .v-list-item-subtitle')
+      return !!(el && el.scrollWidth > el.clientWidth)
+    },
+    showOverflowTooltip (event, key) {
+      this.overflowTooltip = this.isMetaTextOverflowing(event) ? key : null
+    },
+    hideOverflowTooltip (key) {
+      if (this.overflowTooltip === key) {
+        this.overflowTooltip = null
+      }
     }
   },
   beforeMount: function () {
@@ -719,27 +767,152 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.ue-input-image {
+  padding-block: 8px;
 
-  $input-bg: #FCFCFC;
-  $input-border: #DFDFDF;
-  $height_input: 45px;
-
-  .v-input-image {
-    padding-top: 8px;
-    padding-bottom: 8px;
-  }
-
-  .media--slide {
+  &--slide {
     border: 0 none;
+
+    .ue-input-image__thumb {
+      max-width: 120px;
+    }
   }
 
-  .media__note {
-    color: $color__text--light;
-    float: right;
+  &__item {
+    min-width: 0;
+    overflow: visible;
+  }
+
+  &__thumb {
+    position: relative;
+    width: 33.33%;
+    max-width: 240px;
+    min-width: 100px;
+    user-select: none;
+  }
+
+  &__thumb-frame {
+    position: relative;
+    width: 100%;
+    padding-bottom: 100%;
+    overflow: hidden;
+    cursor: pointer;
+    outline: none;
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background: rgb(0 0 0 / 0.4);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 150ms ease;
+    }
+
+    &:hover::after,
+    &:focus-visible::after,
+    &:focus-within::after {
+      opacity: 1;
+    }
+  }
+
+  &__thumb-center {
     position: absolute;
-    bottom: 18px;
+    inset: 0;
+    display: flex;
+    background-color: $color__lighter;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    transition: background-image 350ms cubic-bezier(0.795, 0.125, 0.280, 0.990), background-size 0ms 350ms;
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border: 1px solid rgb(0 0 0 / 0.05);
+    }
+
+    :deep(img) {
+      display: block;
+      max-width: 100%;
+      max-height: 100%;
+      margin: auto;
+    }
+
+    :deep(.ue-input-image__thumb--landscape img) {
+      width: 100%;
+      height: auto;
+    }
+
+    :deep(.ue-input-image__thumb--portrait img) {
+      width: auto;
+      height: 100%;
+    }
+  }
+
+  &__overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    padding: 4px;
+    pointer-events: none;
+
+    :deep(.v-btn) {
+      pointer-events: auto;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      :deep(.v-btn) {
+        opacity: 0;
+        transition: opacity 150ms ease;
+      }
+
+      &--active :deep(.v-btn),
+      .ue-input-image__thumb-frame:hover & :deep(.v-btn),
+      .ue-input-image__thumb-frame:focus-within & :deep(.v-btn) {
+        opacity: 1;
+      }
+    }
+  }
+
+  &__actions {
+    min-height: 0;
+
+    :deep(.v-list-item__content) {
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: center;
+      overflow: visible;
+    }
+  }
+
+  &__meta {
+    min-width: 0;
+    overflow: hidden;
+
+    :deep(.v-list-item-title),
+    :deep(.v-list-item-subtitle) {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  &__meta-item:hover {
+    color: rgb(var(--v-theme-primary));
+  }
+
+  &__note {
+    display: none;
+    position: absolute;
     right: 15px;
-    display:none;
+    bottom: 18px;
+    color: $color__text--light;
 
     @include breakpoint('small+') {
       display: inline-block;
@@ -748,168 +921,6 @@ export default {
     @include breakpoint('medium') {
       display: none;
     }
-
-    .s--in-editor & {
-      @include breakpoint('small+') {
-        display: none;
-      }
-    }
   }
-
-  .media__img {
-    width: 33.33%;
-    max-width: 240px;
-    user-select: none;
-    position:relative;
-    min-width: 100px;
-
-    img {
-      display:block;
-      max-width:100%;
-      max-height:100%;
-      margin:auto;
-
-      &.media__img--landscape {
-        width: 100%;
-        height: auto;
-      }
-
-      &.media__img--portrait {
-        width: auto;
-        height: 100%;
-      }
-    }
-  }
-
-  .media--slide .media__img {
-    max-width: 120px;
-  }
-
-  .media__crop-link {
-    text-decoration: none;
-    cursor: pointer;
-
-    p:first-letter {
-      text-transform: capitalize;
-    }
-
-    &:hover .f--small span {
-      @include bordered($color__text, false);
-    }
-
-    @include breakpoint('medium-') {
-      flex-direction: column;
-    }
-  }
-
-  // Image centered in a square option
-  .media__imgFrame {
-    width:100%;
-    padding-bottom:100%;
-    position:relative;
-    overflow:hidden;
-  }
-
-  .media__imgCentered {
-    top:0;
-    bottom:0;
-    left:0;
-    right:0;
-    position: absolute;
-    display: flex;
-    background-color: $color__lighter;
-    background-size: contain;
-    background-repeat:no-repeat;
-    background-position:center center;
-    transition: background-image 350ms cubic-bezier(0.795, 0.125, 0.280, 0.990), background-size 0ms 350ms;
-
-    &:before {
-      content: "";
-      position: absolute;
-      display:block;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      border:1px solid rgba(0,0,0,0.05);
-    }
-  }
-
-  .media__info {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    align-items: flex-start;
-    align-content: flex-start;
-  }
-
-  .media__metadatas {
-    padding: 5px 15px;
-    flex-grow: 1;
-    color: $color__text--light;
-    overflow: hidden;
-
-    li {
-      overflow:hidden;
-    }
-
-    a {
-      color:$color__link;
-    }
-  }
-
-
-  .media__metadatas--options {
-    display: none;
-    margin-top: 35px;
-  }
-
-  .media__metadatas--options.s--active {
-    display: block;
-  }
-
-
-  .media__actions-dropDown {
-    @media screen and (min-width: 1139px) {
-      display: none;
-    }
-
-    .s--in-editor & {
-      display: block!important;
-    }
-  }
-
-  // .media.media--hoverable {
-  //   .media__actions {
-  //     opacity: 0;
-  //     transition: opacity 250ms ease;
-  //   }
-
-  //   :hover .media__actions {
-  //     opacity: 1;
-  //   }
-  // }
-
-  /* Modal with cropper */
-  .modal--cropper .cropper__button {
-    width:100%;
-    display:block;
-    margin-top:20px;
-    margin-bottom:20px;
-
-    @include breakpoint('small+') {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width:auto;
-      margin-top:20px;
-      margin-bottom:20px;
-    }
-  }
-</style>
-
-<style lang="scss">
-  .media .media__actions-dropDown .dropdown__content {
-    margin-top: 10px;
-  }
+}
 </style>
