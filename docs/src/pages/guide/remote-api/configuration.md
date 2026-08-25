@@ -112,6 +112,9 @@ public static function remoteApiConfiguration(): array
 
         'catalog_title_key' => 'name',      // Used by RemoteApiHydrate for itemTitle
 
+        // Form-only (not connector config): see Admin UI → catalogDependsOn
+        // on a remote-api input to switch among named catalogs from a sibling field.
+
         'actions' => [
             'sync_record',
             'sync_all',

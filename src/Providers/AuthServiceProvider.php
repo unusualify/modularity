@@ -12,10 +12,8 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Lang;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\URL;
 use Laravel\Horizon\Horizon;
-use Spatie\Permission\Models\Permission;
 use Unusualify\Modularous\Entities\User;
 
 class AuthServiceProvider extends ServiceProvider implements DeferrableProvider
@@ -40,7 +38,10 @@ class AuthServiceProvider extends ServiceProvider implements DeferrableProvider
 
     public function boot()
     {
-        if (exceptionalRunningInConsole() && database_exists() && Schema::hasTable(config('permission.table_names.permissions'))) {
+        // Spatie already maps permission names via Gate::before at check time.
+        // Do not query permissions (or even PDO) during boot — that is 30ms
+        // on a healthy DB and ~10s when the host cannot reach MariaDB.
+        if (exceptionalRunningInConsole()) {
             Gate::before(function (User $user, $ability) {
                 return $user->hasRole(self::SUPERADMIN) ? true : null;
             });
@@ -51,16 +52,6 @@ class AuthServiceProvider extends ServiceProvider implements DeferrableProvider
                     // return $this->userHasRole($user, [UserRole::VIEWONLY, UserRole::PUBLISHER, UserRole::ADMIN]);
                 });
             });
-
-            foreach (Permission::all() as $permission) {
-                Gate::define($permission->name, function ($user) use ($permission) {
-                    return $this->authorize($user, function ($user) use ($permission) {
-                        // return $this->userHasPermission($user, [$permission->name]);
-                        return $user->hasPermission($permission->name);
-                        // return $this->userHasRole($user, [UserRole::VIEWONLY, UserRole::PUBLISHER, UserRole::ADMIN]);
-                    });
-                });
-            }
 
             Gate::define('impersonate', function ($user) {
                 return $user->role === self::SUPERADMIN;

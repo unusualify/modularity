@@ -16,6 +16,9 @@ use Unusualify\Modularous\Services\RemoteApi\RemoteApiConfiguration;
  * Config type: {@code remote-api} → hydrated {@code input-remote-api}.
  * Loads catalog rows from the route repository's {@see RemoteApiSourceTrait::listRemoteCatalog()} and
  * exposes {@code catalogEndpoint} for frontend refresh when hydrate could not load items.
+ *
+ * Optional {@code catalogDependsOn} switches the named catalog from a sibling form field
+ * ({@code field} + {@code map}). When absent, behavior matches the historical default path.
  */
 class RemoteApiHydrate extends InputHydrate
 {
@@ -42,6 +45,10 @@ class RemoteApiHydrate extends InputHydrate
 
         $this->applyRemoteApiConnectorSchema($input);
 
+        if ($this->hasCatalogDependsOn($input)) {
+            $input['catalogDependsOn'] = $this->normalizeCatalogDependsOn($input['catalogDependsOn']);
+        }
+
         return $input;
     }
 
@@ -50,23 +57,30 @@ class RemoteApiHydrate extends InputHydrate
         $input = $this->input;
 
         if ((! isset($input['items']) || $input['items'] === []) && ! App::runningInConsole()) {
-            $repository = $this->resolveRepository();
+            $depends = $this->hasCatalogDependsOn($input);
+            $catalogKey = $this->resolveCatalogKey($input);
 
-            if ($repository !== null && method_exists($repository, 'listRemoteCatalog')) {
-                $catalogKey = isset($input['catalog']) && is_string($input['catalog']) ? $input['catalog'] : null;
+            if ($depends && $catalogKey === null) {
+                // Waiting on sibling field — do not prefetch the connector default catalog.
+                $input['items'] = [];
+                $input['catalogTotal'] = 0;
+            } else {
+                $repository = $this->resolveRepository();
 
-                try {
-                    $items = $repository->listRemoteCatalog($catalogKey);
-                    $input['items'] = $items;
-                    $input['catalogTotal'] = count($items);
-                } catch (\Throwable $exception) {
-                    Log::warning('Remote API catalog hydrate failed.', [
-                        'catalog_key' => $catalogKey,
-                        'repository' => $repository::class,
-                        'message' => $exception->getMessage(),
-                    ]);
-                    $input['items'] = [];
-                    $input['catalogTotal'] = 0;
+                if ($repository !== null && method_exists($repository, 'listRemoteCatalog')) {
+                    try {
+                        $items = $repository->listRemoteCatalog($catalogKey);
+                        $input['items'] = $items;
+                        $input['catalogTotal'] = count($items);
+                    } catch (\Throwable $exception) {
+                        Log::warning('Remote API catalog hydrate failed.', [
+                            'catalog_key' => $catalogKey,
+                            'repository' => $repository::class,
+                            'message' => $exception->getMessage(),
+                        ]);
+                        $input['items'] = [];
+                        $input['catalogTotal'] = 0;
+                    }
                 }
             }
         }
@@ -76,6 +90,67 @@ class RemoteApiHydrate extends InputHydrate
         }
 
         return $input;
+    }
+
+    /**
+     * @param  array<string, mixed>  $input
+     */
+    protected function hasCatalogDependsOn(array $input): bool
+    {
+        return isset($input['catalogDependsOn']) && is_array($input['catalogDependsOn']);
+    }
+
+    /**
+     * @param  array<string, mixed>  $depends
+     * @return array{field: string, map: array<string, string>}
+     */
+    protected function normalizeCatalogDependsOn(array $depends): array
+    {
+        $field = isset($depends['field']) && is_string($depends['field']) ? $depends['field'] : '';
+        $map = [];
+
+        if (isset($depends['map']) && is_array($depends['map'])) {
+            foreach ($depends['map'] as $siblingValue => $catalogKey) {
+                if (is_string($catalogKey) || is_numeric($catalogKey)) {
+                    $map[(string) $siblingValue] = (string) $catalogKey;
+                }
+            }
+        }
+
+        return [
+            'field' => $field,
+            'map' => $map,
+        ];
+    }
+
+    /**
+     * Resolve named catalog key for prefetch.
+     *
+     * Priority: explicit {@code catalog} → {@code catalogDependsOn} map via
+     * {@code catalogDependsOnValue} (optional hydrate-time sibling) → null (default catalog).
+     *
+     * @param  array<string, mixed>  $input
+     */
+    protected function resolveCatalogKey(array $input): ?string
+    {
+        if (isset($input['catalog']) && is_string($input['catalog']) && $input['catalog'] !== '') {
+            return $input['catalog'];
+        }
+
+        if (! $this->hasCatalogDependsOn($input)) {
+            return null;
+        }
+
+        $depends = $this->normalizeCatalogDependsOn($input['catalogDependsOn']);
+        $siblingValue = $input['catalogDependsOnValue'] ?? null;
+
+        if ($siblingValue === null || $siblingValue === '') {
+            return null;
+        }
+
+        $mapped = $depends['map'][(string) $siblingValue] ?? null;
+
+        return is_string($mapped) && $mapped !== '' ? $mapped : null;
     }
 
     /**

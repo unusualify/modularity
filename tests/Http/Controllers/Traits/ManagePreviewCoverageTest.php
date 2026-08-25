@@ -139,7 +139,7 @@ class ManagePreviewCoverageTest extends TestCase
         ]);
 
         $view = Mockery::mock(ViewContract::class);
-        View::shouldReceive('exists')->with('modularous::preview.item')->andReturn(false);
+        View::shouldReceive('exists')->andReturn(false);
         View::shouldReceive('make')
             ->once()
             ->with('twill::errors.preview', Mockery::type('array'))

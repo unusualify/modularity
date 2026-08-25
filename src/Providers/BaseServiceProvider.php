@@ -266,7 +266,7 @@ class BaseServiceProvider extends ServiceProvider
         // Register our modularous exception handler
         $this->app->extend(ExceptionHandler::class, function ($handler, $app) {
             // If the current handler is the default app handler, wrap it with modularous functionality
-            if (get_class($handler) === Handler::class) {
+            if (get_class($handler) === \Illuminate\Foundation\Exceptions\Handler::class) {
                 if ($app['modularous']->isPanelUrl()) {
                     return new \Unusualify\Modularous\Exceptions\Handler($app);
                 }
@@ -319,6 +319,10 @@ class BaseServiceProvider extends ServiceProvider
      */
     private function registerCommands()
     {
+        if (! $this->app->runningInConsole()) {
+            return;
+        }
+
         $this->commands($this->resolveCommands());
     }
 

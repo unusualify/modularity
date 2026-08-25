@@ -218,7 +218,7 @@ trait RemoteApiSourceTrait
             return [];
         }
 
-        $routePrefix = $this->resolveRemoteApiFormActionRoutePrefix();
+        $routePrefix = $this->resolveRemoteApiRoutePrefix();
         if ($routePrefix === null) {
             return [];
         }
@@ -303,7 +303,7 @@ trait RemoteApiSourceTrait
         return $this->remoteApiConnectorIsEnabled();
     }
 
-    protected function resolveRemoteApiFormActionRoutePrefix(): ?string
+    public function resolveRemoteApiRoutePrefix(): ?string
     {
         try {
             $module = Modularous::find($this->resolveRemoteApiModuleName());
@@ -313,6 +313,12 @@ trait RemoteApiSourceTrait
 
         if ($module === null) {
             return null;
+        }
+
+        $isParent = $module->isParentRoute($this->getRouteName());
+
+        if ($isParent) {
+            return $module->panelRouteNamePrefix();
         }
 
         return $module->panelRouteNamePrefix() . $this->resolveRemoteApiRouteName() . '.';

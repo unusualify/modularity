@@ -105,7 +105,7 @@ final class CmsFrontRouteRegistrar
             return;
         }
 
-        if (Modularous::isPanelUrl()) {
+        if (! app()->runningInConsole() && ! Modularous::isFrontUrl()) {
             return;
         }
 
@@ -496,6 +496,10 @@ final class CmsFrontRouteRegistrar
      */
     private static function resolveControllerForUrlStaleResilienceOrNull(): ?string
     {
+        if (! Modularous::isFrontUrl()) {
+            return null;
+        }
+
         if (! ModularousCache::isUrlStaleServeFirst()) {
             return null;
         }

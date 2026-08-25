@@ -185,7 +185,7 @@ abstract class InputHydrate
 
         $this->input = $this->hydrateRules();
 
-        $this->input = Arr::except($this->input, ['route', 'model', 'repository', 'cascades', 'connector', 'onlyParentSegmentModels', 'onlyPageLayoutModels']);
+        $this->input = Arr::except($this->input, ['route', 'model', 'repository', 'cascades', 'connector', 'onlyParentSegmentModels', 'onlyPageLayoutModels', 'catalogDependsOnValue']);
 
         return $this->input;
     }

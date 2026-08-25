@@ -7,7 +7,9 @@ namespace Unusualify\Modularous\Tests\Http\Controllers\Traits;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Mockery;
+use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Http\Controllers\Traits\ManageRemoteApiSync;
+use Unusualify\Modularous\Module;
 use Unusualify\Modularous\Repositories\Traits\RemoteApiSourceTrait;
 use Unusualify\Modularous\Services\RemoteApi\Exceptions\RemoteApiConfigurationException;
 use Unusualify\Modularous\Services\RemoteApi\Exceptions\RemoteApiSyncException;
@@ -135,6 +137,19 @@ class ManageRemoteApiSyncCoverageTest extends TestCase
         };
     }
 
+    private function mockRemoteApiModule(
+        string $moduleName = 'Test',
+        string $routeName = 'Item',
+        string $panelPrefix = 'admin.test.',
+        bool $isParent = false,
+    ): void {
+        $module = Mockery::mock(Module::class);
+        $module->shouldReceive('isParentRoute')->andReturn($isParent);
+        $module->shouldReceive('panelRouteNamePrefix')->andReturn($panelPrefix);
+
+        Modularous::shouldReceive('find')->with($moduleName)->andReturn($module);
+    }
+
     /** @test */
     public function appends_withs_and_table_actions_guard_on_connector(): void
     {
@@ -188,6 +203,8 @@ class ManageRemoteApiSyncCoverageTest extends TestCase
             ],
         ]);
         $noActionsController = $this->makeController($noActionsRepo, $module);
+        $this->mockRemoteApiModule();
+        $noActionsRepo->setModuleName('Test')->setRouteName('Item');
         $noActionsController->call('setTableActionsManageRemoteApiSync');
         $this->assertSame([], $noActionsController->tableActions);
     }
@@ -220,6 +237,8 @@ class ManageRemoteApiSyncCoverageTest extends TestCase
         $module->shouldReceive('panelRouteNamePrefix')->andReturn('admin.test.');
 
         $controller = $this->makeController($repo, $module);
+        $this->mockRemoteApiModule();
+        $repo->setModuleName('Test')->setRouteName('Item');
         $controller->tableActions = [['name' => 'existing']];
         $controller->call('setTableActionsManageRemoteApiSync');
 

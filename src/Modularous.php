@@ -477,6 +477,55 @@ class Modularous extends FileRepository
     }
 
     /**
+     * Public front (APP_URL) request — not artisan/queue, not the admin panel.
+     *
+     * APP_URL is always the public site. The panel is either another host
+     * ({@see config('modularous.admin_app_url')}) or the same host with
+     * {@see config('modularous.admin_app_path')} as the first path segment.
+     *
+     * @param  string|null  $url
+     */
+    public function isFrontUrl($url = null): bool
+    {
+        if ($url === null && $this->isNonHttpConsoleContext()) {
+            return false;
+        }
+
+        $host = request()->getHost();
+        $firstSegment = (string) request()->segment(1);
+
+        if ($url) {
+            $parsed = parse_url($url);
+            $host = $parsed['host'] ?? '';
+            $path = $parsed['path'] ?? '';
+            $parts = explode('/', trim($path, '/'));
+            $firstSegment = $parts[0] ?? '';
+        }
+
+        $appHost = $this->getAppHost();
+
+        if ($host === '' || $appHost === null || $host !== $appHost) {
+            return false;
+        }
+
+        if ($this->hasAdminAppUrl()) {
+            return $host !== $this->getAdminAppHost();
+        }
+
+        $adminPrefix = $this->getAdminUrlPrefix();
+
+        return $adminPrefix === false || $firstSegment !== (string) $adminPrefix;
+    }
+
+    /**
+     * Artisan/queue/CLI — not PHPUnit HTTP tests (those still use the CLI SAPI).
+     */
+    public function isNonHttpConsoleContext(): bool
+    {
+        return $this->app->runningInConsole() && ! $this->app->runningUnitTests();
+    }
+
+    /**
      * Check if a route is a modularous route via admin route name prefix.
      */
     public function isModularousRoute(string $routeName): bool

@@ -7,6 +7,7 @@ namespace Unusualify\Modularous\Tests\Repositories\Traits;
 use Mockery;
 use Unusualify\Modularous\Entities\Model;
 use Unusualify\Modularous\Entities\User;
+use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Module;
 use Unusualify\Modularous\Repositories\Repository;
 use Unusualify\Modularous\Repositories\Traits\RemoteApiSourceTrait;
@@ -68,6 +69,7 @@ class RemoteApiSourceTraitTest extends TestCase
             actions: ['preview'],
             enabled: true,
             routePrefix: 'admin.business_package.package_region.',
+            routeName: 'PackageRegion',
             connector: $this->makePreviewConnector(
                 display: 'fields',
                 fields: [
@@ -97,6 +99,62 @@ class RemoteApiSourceTraitTest extends TestCase
         $this->assertSame([], $repository->getFormActionsRemoteApiSourceTrait(Mockery::mock(User::class)));
     }
 
+    public function test_get_remote_api_action_schema_supports_clear_cache_only(): void
+    {
+        $repository = $this->makeRepositoryWithConnector(
+            actions: ['clear_cache'],
+            enabled: true,
+            routePrefix: 'admin.use_case.use_case.',
+            moduleName: 'UseCase',
+            routeName: 'UseCase',
+        );
+
+        $schema = $repository->getRemoteApiActionSchema();
+
+        $this->assertCount(1, $schema);
+        $this->assertSame('clearRemoteCache', $schema[0]['name']);
+        $this->assertSame('table', $schema[0]['scope']);
+        $this->assertSame([], $repository->getFormActionsRemoteApiSourceTrait(Mockery::mock(User::class)));
+    }
+
+    public function test_resolve_remote_api_route_prefix_appends_route_name_for_child_route(): void
+    {
+        $repository = $this->makeRepositoryWithConnector(
+            actions: ['preview'],
+            enabled: true,
+            routePrefix: 'admin.business_package.package.',
+        );
+
+        $this->assertSame('admin.business_package.package.', $repository->resolveRemoteApiRoutePrefix());
+    }
+
+    public function test_resolve_remote_api_route_prefix_uses_panel_prefix_for_parent_route(): void
+    {
+        $repository = $this->makeRepositoryWithConnector(
+            actions: ['preview'],
+            enabled: true,
+            routePrefix: 'admin.use_case.',
+            moduleName: 'UseCase',
+            routeName: 'UseCase',
+            isParent: true,
+        );
+
+        $this->assertSame('admin.use_case.', $repository->resolveRemoteApiRoutePrefix());
+    }
+
+    public function test_get_form_actions_remote_api_source_trait_returns_empty_when_module_missing(): void
+    {
+        $repository = $this->makeRepositoryWithConnector(
+            actions: ['sync_record', 'preview'],
+            enabled: true,
+            routePrefix: 'admin.business_package.package.',
+            withModule: false,
+        );
+
+        $this->assertNull($repository->resolveRemoteApiRoutePrefix());
+        $this->assertSame([], $repository->getFormActionsRemoteApiSourceTrait(Mockery::mock(User::class)));
+    }
+
     /**
      * @param list<string> $actions
      */
@@ -105,6 +163,10 @@ class RemoteApiSourceTraitTest extends TestCase
         bool $enabled,
         string $routePrefix,
         ?RemoteApiConnectorInterface $connector = null,
+        string $moduleName = 'BusinessPackage',
+        string $routeName = 'Package',
+        bool $isParent = false,
+        bool $withModule = true,
     ): RemoteApiSourceTraitTestRepository {
         if ($connector === null) {
             $configuration = Mockery::mock(RemoteApiConfiguration::class);
@@ -115,13 +177,35 @@ class RemoteApiSourceTraitTest extends TestCase
             $connector->shouldReceive('configuration')->andReturn($configuration);
         }
 
+        if ($withModule) {
+            $this->mockRemoteApiModule($moduleName, $routeName, $routePrefix, $isParent);
+        } else {
+            Modularous::shouldReceive('find')->with($moduleName)->andReturn(null);
+        }
+
         $repository = new RemoteApiSourceTraitTestRepository(new RemoteApiSourceTraitTestModel);
-        $repository->setModuleName('BusinessPackage');
-        $repository->setRouteName('Package');
+        $repository->setModuleName($moduleName);
+        $repository->setRouteName($routeName);
         $repository->setRemoteApiConnector($connector);
-        $repository->setRemoteApiFormActionRoutePrefix($routePrefix);
 
         return $repository;
+    }
+
+    private function mockRemoteApiModule(
+        string $moduleName,
+        string $routeName,
+        string $routePrefix,
+        bool $isParent,
+    ): void {
+        $panelPrefix = $isParent
+            ? $routePrefix
+            : substr($routePrefix, 0, -(strlen(snakeCase($routeName)) + 1));
+
+        $module = Mockery::mock(Module::class);
+        $module->shouldReceive('isParentRoute')->with($routeName)->andReturn($isParent);
+        $module->shouldReceive('panelRouteNamePrefix')->andReturn($panelPrefix);
+
+        Modularous::shouldReceive('find')->with($moduleName)->andReturn($module);
     }
 
     private function makePreviewConnector(string $display, array $fields): RemoteApiSourceTraitPreviewConnector
@@ -170,8 +254,6 @@ class RemoteApiSourceTraitTestRepository extends Repository
 
     private ?RemoteApiConnectorInterface $remoteApiConnector = null;
 
-    private ?string $remoteApiFormActionRoutePrefix = null;
-
     public function __construct(RemoteApiSourceTraitTestModel $model)
     {
         $this->model = $model;
@@ -182,11 +264,6 @@ class RemoteApiSourceTraitTestRepository extends Repository
         $this->remoteApiConnector = $connector;
     }
 
-    public function setRemoteApiFormActionRoutePrefix(string $routePrefix): void
-    {
-        $this->remoteApiFormActionRoutePrefix = $routePrefix;
-    }
-
     public function remoteApiConnector(): RemoteApiConnectorInterface
     {
         if ($this->remoteApiConnector === null) {
@@ -194,11 +271,6 @@ class RemoteApiSourceTraitTestRepository extends Repository
         }
 
         return $this->remoteApiConnector;
-    }
-
-    protected function resolveRemoteApiFormActionRoutePrefix(): ?string
-    {
-        return $this->remoteApiFormActionRoutePrefix;
     }
 }
 

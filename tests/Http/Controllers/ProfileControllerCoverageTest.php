@@ -174,6 +174,7 @@ class ProfileControllerCoverageTest extends ModelTestCase
         ]);
 
         $companyRepository = Mockery::mock(CompanyRepository::class);
+        $companyRepository->shouldReceive('getById')->andReturn((object) ['id' => 3, 'name' => 'Acme']);
         $companyRepository->shouldReceive('getFormFields')->andReturn([
             'id' => 3,
             'name' => 'Acme',
@@ -203,7 +204,9 @@ class ProfileControllerCoverageTest extends ModelTestCase
                 return $schema;
             }
 
-            public function getModuleRoute($id = null, $action = null, $singleton = false, $absolute = true): string
+            protected $baseKey = 'modularous';
+
+            protected function getModuleRouteUrl($id, $action, $singleton = false): string
             {
                 return '/profile/update';
             }
@@ -223,9 +226,9 @@ class ProfileControllerCoverageTest extends ModelTestCase
             $this->markTestSkipped('getFormDraft helper unavailable');
         }
 
-        View::shouldReceive('make')
-            ->once()
-            ->andReturn(Mockery::mock(ViewContract::class));
+        $view = Mockery::mock(ViewContract::class);
+        View::shouldReceive('exists')->andReturn(false);
+        View::shouldReceive('make')->andReturn($view);
 
         try {
             $result = $controller->edit();

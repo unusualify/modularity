@@ -7,6 +7,13 @@ use Unusualify\Modularous\Tests\TestCase;
 
 class DbHelpersTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        forget_database_exists_cache();
+    }
+
     /** @test */
     public function test_database_exists_returns_true_when_connection_succeeds()
     {
@@ -41,8 +48,26 @@ class DbHelpersTest extends TestCase
         $this->assertFalse($result);
     }
 
+    /** @test */
+    public function test_database_exists_does_not_memoize_during_unit_tests()
+    {
+        // Memoization is disabled under PHPUnit/ParaTest so a Mockery stub
+        // cannot poison later tests in the same worker via a sticky false.
+        DB::shouldReceive('connection')
+            ->twice()
+            ->andReturnSelf();
+
+        DB::shouldReceive('getPDO')
+            ->twice()
+            ->andReturn(new \PDO('sqlite::memory:'));
+
+        $this->assertTrue(database_exists());
+        $this->assertTrue(database_exists());
+    }
+
     protected function tearDown(): void
     {
+        forget_database_exists_cache();
         \Mockery::close();
         parent::tearDown();
     }

@@ -41,7 +41,11 @@ trait ManageRemoteApiSync
             return;
         }
 
-        $routePrefix = $this->module->panelRouteNamePrefix() . Str::snake($this->routeName) . '.';
+        $routePrefix = $this->repository->resolveRemoteApiRoutePrefix();
+        if ($routePrefix === null) {
+            return;
+        }
+
         $existing = is_array($this->tableActions ?? null) ? $this->tableActions : [];
         $actions = [];
 
@@ -49,8 +53,8 @@ trait ManageRemoteApiSync
             if (! is_array($def) || ($def['scope'] ?? null) !== 'table') {
                 continue;
             }
-
             $action = $this->mapRemoteApiTableAction($def, $routePrefix);
+
             if ($action !== null) {
                 $actions[] = $action;
             }

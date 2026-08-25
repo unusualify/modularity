@@ -27,10 +27,38 @@ class CmsSiteSeoSettingsServiceTest extends ModelTestCase
 
         $this->app->singleton(SystemSettingsService::class);
         $this->app->alias(SystemSettingsService::class, 'system.settings');
+        $this->app->forgetInstance(SystemSettingsService::class);
+        $this->app->forgetInstance('system.settings');
+
         $this->app->singleton(CmsSettingsService::class);
         $this->app->alias(CmsSettingsService::class, 'cms.settings');
         $this->app->singleton(SiteSettingsService::class);
         $this->app->alias(SiteSettingsService::class, 'site.settings');
+
+        if (function_exists('forget_database_exists_cache')) {
+            forget_database_exists_cache();
+        }
+
+        $this->forgetRobotsTxtMigrationMarkers();
+    }
+
+    protected function tearDown(): void
+    {
+        $this->forgetRobotsTxtMigrationMarkers();
+
+        parent::tearDown();
+    }
+
+    protected function forgetRobotsTxtMigrationMarkers(): void
+    {
+        foreach ([
+            MigrateRobotsTxtFromSiteSetting::settledMarkerPath(),
+            MigrateRobotsTxtFromSiteSetting::legacySettledMarkerPath(),
+        ] as $marker) {
+            if (is_file($marker)) {
+                @unlink($marker);
+            }
+        }
     }
 
     public function test_resolved_robots_txt_body_reads_from_system_settings(): void
@@ -69,9 +97,21 @@ class CmsSiteSeoSettingsServiceTest extends ModelTestCase
             'updated_at' => now(),
         ]);
 
+        // Ensure a clean General singleton so "already migrated" short-circuit cannot fire.
+        General::query()->delete();
+        $this->app->make(SystemSettingsService::class)->forgetCache();
+
+        $this->assertNotNull(
+            DB::table($legacyTable)
+                ->where('group_key', 'seo')
+                ->where('key', 'global_robots_txt')
+                ->where('locale', '*')
+                ->first()
+        );
+
         $migrated = $this->app->make(MigrateRobotsTxtFromSiteSetting::class)->migrateIfNeeded();
 
-        $this->assertTrue($migrated);
+        $this->assertTrue($migrated, 'migrateIfNeeded() returned false; legacy row was present and General had no robots_txt');
         $this->assertSame("User-agent: *\nDisallow: /old", SystemSettings::get('seo.robots_txt'));
 
         $general = General::single()->refresh();
