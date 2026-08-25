@@ -44,6 +44,11 @@ abstract class AbstractSingularSettingsService
      * `site.logo.frontend` → `site.logo.{locale}.frontend`
      *                     → `site.logo.{locale}.0.frontend`
      *                     → `site.logo.{locale}.frontend.0`
+     *
+     * When no locale map is present, the same expansion runs without a locale prefix:
+     * `seo.og_image.original` → `seo.og_image.original`
+     *                        → `seo.og_image.0.original`
+     *                        → `seo.og_image.original.0`
      */
     public function get(string $key, mixed $default = null, ?string $locale = null): mixed
     {
@@ -245,11 +250,26 @@ abstract class AbstractSingularSettingsService
                 $cursor = $this->resolveTranslatedValue($cursor, $locale);
             }
 
-            if (! is_array($cursor) || ! array_key_exists($segment, $cursor)) {
-                return null;
+            if (is_array($cursor) && array_key_exists($segment, $cursor)) {
+                $cursor = $cursor[$segment];
+
+                continue;
             }
 
-            $cursor = $cursor[$segment];
+            // Non-translated media list: seo.og_image.original → seo.og_image.0.original
+            if (
+                is_array($cursor)
+                && Arr::isList($cursor)
+                && isset($cursor[0])
+                && is_array($cursor[0])
+                && array_key_exists($segment, $cursor[0])
+            ) {
+                $cursor = $cursor[0][$segment];
+
+                continue;
+            }
+
+            return null;
         }
 
         return $this->resolveTranslatedValue($cursor, $locale);
@@ -284,34 +304,48 @@ abstract class AbstractSingularSettingsService
                 continue;
             }
 
-            $listDeferred = null;
-
-            foreach ([
+            $resolved = $this->firstNonEmptyLeaf($parent, [
                 "{$tryLocale}.{$leaf}",
                 "{$tryLocale}.0.{$leaf}",
                 "{$tryLocale}.{$leaf}.0",
-            ] as $relativePath) {
-                $candidate = data_get($parent, $relativePath);
+            ]);
 
-                if ($this->isEmptySettingValue($candidate)) {
-                    continue;
-                }
-
-                if (is_array($candidate) && Arr::isList($candidate)) {
-                    $listDeferred ??= $candidate;
-
-                    continue;
-                }
-
-                return $candidate;
-            }
-
-            if ($listDeferred !== null) {
-                return $listDeferred;
+            if (! $this->isEmptySettingValue($resolved)) {
+                return $resolved;
             }
         }
 
-        return null;
+        return $this->firstNonEmptyLeaf($parent, [
+            $leaf,
+            "0.{$leaf}",
+            "{$leaf}.0",
+        ]);
+    }
+
+    /**
+     * @param list<string> $relativePaths
+     */
+    protected function firstNonEmptyLeaf(array $parent, array $relativePaths): mixed
+    {
+        $listDeferred = null;
+
+        foreach ($relativePaths as $relativePath) {
+            $candidate = data_get($parent, $relativePath);
+
+            if ($this->isEmptySettingValue($candidate)) {
+                continue;
+            }
+
+            if (is_array($candidate) && Arr::isList($candidate)) {
+                $listDeferred ??= $candidate;
+
+                continue;
+            }
+
+            return $candidate;
+        }
+
+        return $listDeferred;
     }
 
     /**
