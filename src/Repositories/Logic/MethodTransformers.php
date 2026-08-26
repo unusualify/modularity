@@ -294,7 +294,7 @@ trait MethodTransformers
     {
         $this->setSchema($schema);
 
-        $chunkedInputs = $this->chunkInputs(all: true, schema: empty($schema) ? null : $schema);
+        $chunkedInputs = $this->chunkInputs(schema: empty($schema) ? null : $schema, all: true, noGroupChunk: true);
 
         $this->setColumns($chunkedInputs);
 
