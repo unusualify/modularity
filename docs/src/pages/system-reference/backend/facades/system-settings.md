@@ -14,7 +14,7 @@ Backend / system source of truth for global settings. Full usage guide: [Setting
 
 ## Sections
 
-`site`, `social`, `contact`, `seo`, `smtp`, `analytics`, `locale`, `down_presets`
+`site`, `social`, `contact`, `seo`, `scripts`, `smtp`, `analytics`, `locale`, `down_presets`
 
 ## Methods
 

@@ -14,7 +14,7 @@ Frontend/CMS-facing settings singleton. No System fallback — use [`SiteSetting
 
 ## Sections
 
-`site`, `social`, `contact`, `seo` only.
+`site`, `social`, `contact`, `seo`, `scripts`
 
 `smtp`, `analytics`, and `locale` are **not** editable on `SiteSetting` — use [`SystemSettings`](./system-settings).
 

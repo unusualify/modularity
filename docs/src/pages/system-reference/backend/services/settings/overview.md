@@ -11,8 +11,8 @@ Singular settings are stored as JSON sections on `IsSingular` models and read th
 
 | Facade | Accessor | Service | Model | Sections |
 |--------|----------|---------|-------|----------|
-| [`SystemSettings`](/system-reference/backend/facades/system-settings) | `system.settings` | `Modules\SystemSetting\Services\SystemSettingsService` | `General` | `site`, `social`, `contact`, `seo`, `smtp`, `analytics`, `locale` |
-| [`CmsSettings`](/system-reference/backend/facades/cms-settings) | `cms.settings` | `Modules\Cms\Services\CmsSettingsService` | `SiteSetting` | `site`, `social`, `contact`, `seo` only |
+| [`SystemSettings`](/system-reference/backend/facades/system-settings) | `system.settings` | `Modules\SystemSetting\Services\SystemSettingsService` | `General` | `site`, `social`, `contact`, `seo`, `scripts`, `smtp`, `analytics`, `locale` |
+| [`CmsSettings`](/system-reference/backend/facades/cms-settings) | `cms.settings` | `Modules\Cms\Services\CmsSettingsService` | `SiteSetting` | `site`, `social`, `contact`, `seo`, `scripts` |
 | [`SiteSettings`](/system-reference/backend/facades/site-settings) | `site.settings` | `Modules\Cms\Services\SiteSettingsService` | (router) | Context-aware — see below |
 
 **Abstract base**: `Unusualify\Modularous\Services\Settings\AbstractSingularSettingsService` — shared by `SystemSettingsService` and `CmsSettingsService`.
@@ -108,6 +108,10 @@ On the backend layer, every method delegates to SystemSettings only.
 @foreach (SiteSettings::get('social', []) as $link)
     <a href="{{ $link['url'] ?? '#' }}">{{ $link['platform'] ?? '' }}</a>
 @endforeach
+
+{{-- Global third-party scripts (layout shell already emits these) --}}
+{!! app(\Modules\Cms\Support\CustomScripts::class)->headHtml() !!}
+{!! app(\Modules\Cms\Support\CustomScripts::class)->bodyHtml() !!}
 ```
 
 ### System-only (SMTP / backend)
@@ -253,9 +257,31 @@ SiteSettings::get('analytics.gtm_id');
 SystemSettings::get('analytics.enabled');
 ```
 
+### `CustomScripts`
+
+`Modules\Cms\Support\CustomScripts` — emits admin-supplied global head/body HTML.
+
+- Reads `scripts.head` / `scripts.body` via `SiteSettingsService` (frontend CMS → System fallback)
+- Trims strings; non-string values are ignored
+- Layout builder shell injects head HTML after CMP/GTM and before `<base>` / CSS / `$headHtml`
+- Body HTML is injected after `$footerHtml` (and before extra layout JS). Hosts may append `$afterCustomBodyHtml` after that slot
+- Values are raw HTML (trusted admins only) — same trust model as `seo.json_schema`
+
+```blade
+{{-- after AnalyticsScripts::headHtml(), before <base> --}}
+{!! app(\Modules\Cms\Support\CustomScripts::class)->headHtml() !!}
+{{-- after $footerHtml, before extra layout JS --}}
+{!! app(\Modules\Cms\Support\CustomScripts::class)->bodyHtml() !!}
+```
+
+```php
+SiteSettings::get('scripts.head');
+CmsSettings::set('scripts.body', '<script src="https://example.com/pixel.js"></script>');
+```
+
 ### `DuplicateSystemSettingsToCmsSettings`
 
-`Modules\Cms\Support\DuplicateSystemSettingsToCmsSettings` — one-time seed that copies `General` sections into an empty `SiteSetting` (CMS sections only: `site`, `social`, `contact`, `seo`). Skips when CMS already has content. Invoked from `CmsServiceProvider` boot (and host operations when needed).
+`Modules\Cms\Support\DuplicateSystemSettingsToCmsSettings` — one-time seed that copies `General` sections into an empty `SiteSetting` (CMS sections only: `site`, `social`, `contact`, `seo`, `scripts`). Skips when CMS already has content. Invoked from `CmsServiceProvider` boot (and host operations when needed).
 
 ```php
 app(\Modules\Cms\Support\DuplicateSystemSettingsToCmsSettings::class)->duplicateIfNeeded();

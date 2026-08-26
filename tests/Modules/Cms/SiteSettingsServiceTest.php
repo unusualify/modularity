@@ -60,7 +60,7 @@ class SiteSettingsServiceTest extends ModelTestCase
         SystemSettings::set('analytics.enabled', true);
 
         $this->assertSame(
-            ['site', 'social', 'contact', 'seo'],
+            ['site', 'social', 'contact', 'seo', 'scripts'],
             SiteSetting::settingsSections()
         );
         $this->assertFalse(CmsSettings::filled('analytics.gtm_id'));

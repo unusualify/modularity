@@ -29,6 +29,7 @@ class SiteSetting extends Model
         'social',
         'contact',
         'seo',
+        'scripts',
     ];
 
     /**
@@ -39,6 +40,7 @@ class SiteSetting extends Model
         'social' => 'array',
         'contact' => 'array',
         'seo' => 'array',
+        'scripts' => 'array',
         'published' => 'boolean',
     ];
 
@@ -47,6 +49,6 @@ class SiteSetting extends Model
      */
     public static function settingsSections(): array
     {
-        return ['site', 'social', 'contact', 'seo'];
+        return ['site', 'social', 'contact', 'seo', 'scripts'];
     }
 }

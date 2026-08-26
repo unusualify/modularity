@@ -74,6 +74,8 @@ final class GeneralFormInputs implements ModuleRouteInputsProvider
                         'type' => 'switch',
                         'label' => 'Enable analytics',
                         'default' => false,
+                        'trueValue' => true,
+                        'falseValue' => false,
                         'hideDetails' => 'auto',
                         'rules' => 'nullable|boolean',
                         'col' => ['cols' => 12],
@@ -158,6 +160,29 @@ final class GeneralFormInputs implements ModuleRouteInputsProvider
                     ['name' => 'default_meta_description', 'type' => 'textarea', 'label' => 'Default meta description', 'translated' => true, 'rules' => 'nullable|string'],
                     ['name' => 'og_image', 'type' => 'image', 'label' => 'Default OG image', 'rules' => 'nullable'],
                     ['name' => 'json_schema', 'type' => 'textarea', 'label' => 'Global JSON-LD (Schema.org)', 'rules' => 'nullable|string', 'hint' => 'Raw JSON-LD object/array for the site homepage defaults'],
+                ],
+            ],
+            [
+                'type' => '@collapsible_group',
+                'name' => 'scripts',
+                'typeIntTitle' => 'Custom Scripts',
+                'schema' => [
+                    [
+                        'name' => 'head',
+                        'type' => 'textarea',
+                        'label' => 'Head scripts',
+                        'rules' => 'nullable|string',
+                        'hint' => 'Raw HTML after consent/GTM and before layout CSS on every public page (verification, extra tags). Trusted admins only.',
+                        'col' => ['cols' => 12],
+                    ],
+                    [
+                        'name' => 'body',
+                        'type' => 'textarea',
+                        'label' => 'Body scripts',
+                        'rules' => 'nullable|string',
+                        'hint' => 'Raw HTML after the layout footer on every public page (tracking pixels). Trusted admins only.',
+                        'col' => ['cols' => 12],
+                    ],
                 ],
             ],
         ];

@@ -52,6 +52,8 @@
     {{-- Optional CMP / consent (e.g. CookieFirst) must precede GTM --}}
     {!! $consentHeadHtml ?? '' !!}
     {!! app(\Modules\SystemSetting\Support\AnalyticsScripts::class)->headHtml() !!}
+    {{-- Admin scripts.head: after CMP/GTM, before base/CSS/layout head (legacy metadata slot) --}}
+    {!! app(\Modules\Cms\Support\CustomScripts::class)->headHtml() !!}
 
     <base href="{{ rtrim($siteAddress ?? url('/'), '/') }}/">
     <link rel="canonical" href="{{ $resolvedCanonicalUrl }}">
@@ -81,6 +83,9 @@
         {!! $cmsLayoutMarkerBeforeFooter ?? '' !!}
     @endif
     {!! $footerHtml ?? '' !!}
+    {{-- Admin scripts.body: after layout footer (e.g. Statcounter), before host afterCustomBodyHtml (e.g. Zoho zcga) --}}
+    {!! app(\Modules\Cms\Support\CustomScripts::class)->bodyHtml() !!}
+    {!! $afterCustomBodyHtml ?? '' !!}
     @foreach ($stylesheetScriptSrcs ?? [] as $src)
         <script src="{{ $src }}"></script>
     @endforeach

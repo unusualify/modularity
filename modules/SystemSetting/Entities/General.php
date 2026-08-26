@@ -22,6 +22,7 @@ class General extends Model
         'social',
         'contact',
         'seo',
+        'scripts',
         'smtp',
         'analytics',
         'locale',
@@ -36,6 +37,7 @@ class General extends Model
         'social' => 'array',
         'contact' => 'array',
         'seo' => 'array',
+        'scripts' => 'array',
         'smtp' => 'array',
         'analytics' => 'array',
         'locale' => 'array',
@@ -48,6 +50,6 @@ class General extends Model
      */
     public static function settingsSections(): array
     {
-        return ['site', 'social', 'contact', 'seo', 'smtp', 'analytics', 'locale', 'down_presets'];
+        return ['site', 'social', 'contact', 'seo', 'scripts', 'smtp', 'analytics', 'locale', 'down_presets'];
     }
 }
