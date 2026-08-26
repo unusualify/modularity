@@ -183,7 +183,7 @@
         ],
         errorMessages: [],
         onStart: true,
-        files: isArray(this.modelValue) ? this.modelValue.map(function (filepond) {
+        files: isArray(this.modelValue) ? this.modelValue.map((filepond) => {
           return {
             source:  filepond.source ?? `${this.endPoints.load}${filepond.uuid}`,
             options: {
