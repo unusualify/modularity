@@ -2,6 +2,7 @@
 
 use Modules\Cms\Entities\Page;
 use Modules\Cms\Http\Controllers\Front\CmsController;
+use Modules\Cms\Http\Controllers\Front\LlmsTxtController;
 use Modules\Cms\Http\Controllers\Front\RobotsTxtController;
 use Modules\Cms\Services\CanonicalUrlResolver;
 use Modules\Cms\Services\CmsAdminWarnings;
@@ -14,9 +15,10 @@ use Unusualify\Modularous\Facades\SiteSettings;
 return [
     /**
      * Staging / pre-production: force {@code noindex, nofollow} on every public CMS page and serve
-     * {@code Disallow: /} at GET /robots.txt ({@see CmsPublicSeo},
+     * {@code Disallow: /} at GET /robots.txt and a staging stub at GET /llms.txt ({@see CmsPublicSeo},
      * {@see CmsController},
-     * {@see RobotsTxtController}).
+     * {@see RobotsTxtController},
+     * {@see LlmsTxtController}).
      */
     'staging' => [
         'force_noindex' => env('MODULAROUS_CMS_SEO_STAGING_FORCE_NOINDEX', false),
@@ -55,6 +57,24 @@ return [
             'key' => env('MODULAROUS_CMS_SEO_ROBOTS_SITE_KEY', 'global_robots_txt'),
             'locale' => env('MODULAROUS_CMS_SEO_ROBOTS_SITE_LOCALE', '*'),
         ],
+    ],
+
+    /**
+     * Global llms.txt (served at GET /llms.txt when route enabled). Spec: https://llmstxt.org/
+     *
+     * Host apps opt in via {@code route_enabled} (package default false).
+     *
+     * @see LlmsTxtController
+     * @see CmsSiteSeoSettingsService
+     */
+    'llms' => [
+        'route_enabled' => env('MODULAROUS_CMS_LLMS_TXT_ROUTE_ENABLED', false),
+        'global_llms_txt' => env('MODULAROUS_CMS_SEO_GLOBAL_LLMS_TXT', ''),
+        /**
+         * When true, GET /llms.txt prefers {@see CmsSiteSeoSettingsService}
+         * ({@see SiteSettings} → CmsSettings with SystemSettings fallback).
+         */
+        'use_system_settings' => env('MODULAROUS_CMS_SEO_LLMS_USE_SYSTEM_SETTINGS', true),
     ],
 
     /**

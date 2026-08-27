@@ -4,6 +4,7 @@ namespace Modules\Cms\Routing;
 
 use Illuminate\Support\Facades\Route;
 use Modules\Cms\Http\Controllers\CmsSignedPublicPreviewController;
+use Modules\Cms\Http\Controllers\Front\LlmsTxtController;
 use Modules\Cms\Http\Controllers\Front\PublicSitemapController;
 use Modules\Cms\Http\Controllers\Front\PublicSitemapXslController;
 use Modules\Cms\Http\Controllers\Front\RobotsTxtController;
@@ -44,6 +45,17 @@ final class CmsPublicSystemRoutes
                     Route::middleware('web')
                         ->get('/robots.txt', RobotsTxtController::class)
                         ->name('cms.robots_txt');
+                },
+            ],
+            [
+                'key' => 'llms_txt',
+                'enabled' => (bool) modularousConfig('cms_seo.llms.route_enabled', false),
+                'exclude_prefix' => 'llms.txt',
+                'bind_public_domain' => true,
+                'register' => static function (): void {
+                    Route::middleware('web')
+                        ->get('/llms.txt', LlmsTxtController::class)
+                        ->name('cms.llms_txt');
                 },
             ],
             [

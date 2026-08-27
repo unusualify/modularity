@@ -74,7 +74,7 @@ Filesystem appends: [Page layouts](./page-layouts) — `{module}::{route}.page_l
 | Key | Purpose |
 |-----|---------|
 | `cms_sitemap.*` | `/sitemap.xml` + `/sitemap.xsl`, cache key, defaults, build-on-miss, panel step-up |
-| `cms_seo.*` | Canonical helpers, robots.txt, staging noindex, admin soft warnings |
+| `cms_seo.*` | Canonical helpers, robots.txt, llms.txt, staging noindex, admin soft warnings |
 
 ## Other
 
@@ -84,4 +84,4 @@ Filesystem appends: [Page layouts](./page-layouts) — `{module}::{route}.page_l
 | `cms_schedule.*` | Publish-window boundary scan |
 | `cms_promotion.*` | Staging→prod promotion workflow |
 
-Toggle individual public endpoints via flags used by `CmsPublicSystemRoutes` (e.g. `cms_sitemap.route_enabled`, `cms_seo.robots.route_enabled`, `cms_routing.signed_preview.enabled`, `cms_stylesheets.public_route.enabled`).
+Toggle individual public endpoints via flags used by `CmsPublicSystemRoutes` (e.g. `cms_sitemap.route_enabled`, `cms_seo.robots.route_enabled`, `cms_seo.llms.route_enabled`, `cms_routing.signed_preview.enabled`, `cms_stylesheets.public_route.enabled`).

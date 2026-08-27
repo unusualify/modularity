@@ -11,7 +11,7 @@ use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Http\Controllers\BaseController;
 
 /**
- * Inertia shell for CMS site-wide SEO tools (page-level SEO; robots.txt lives in System Settings).
+ * Inertia shell for CMS site-wide SEO tools (page-level SEO; robots.txt and llms.txt live in System Settings).
  */
 class SiteSeoToolController extends BaseController
 {

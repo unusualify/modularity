@@ -25,6 +25,10 @@ Panel dry-run returns XSLT HTML when PHP `ext-xsl` is available (`CmsSitemapXslt
 
 `GET /robots.txt` → `RobotsTxtController` when `cms_seo.robots.route_enabled`. Body from System Settings (when enabled) or `cms_seo.robots.global_robots_txt`. Staging noindex can force disallow-all (`cms_seo`).
 
+## llms.txt
+
+`GET /llms.txt` → `LlmsTxtController` when `cms_seo.llms.route_enabled` (package default **false**; host apps opt in). Markdown body from System Settings `seo.llms_txt` (when enabled) or `cms_seo.llms.global_llms_txt`. Staging noindex serves a stub instead of production content. Spec: [llmstxt.org](https://llmstxt.org/).
+
 ## Config
 
 `modularous.cms_sitemap`, `modularous.cms_seo`. See [Configuration](./configuration).

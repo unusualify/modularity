@@ -20,6 +20,10 @@ final class CmsPublicSeo
 
     public const ROBOTS_TXT_STAGING_DISALLOW_ALL = "User-agent: *\nDisallow: /";
 
+    public const LLMS_TXT_DEFAULT = '# Site';
+
+    public const LLMS_TXT_STAGING = "# Staging\n\nThis site is not available for LLM indexing.";
+
     /**
      * Live request path — uses {@see Request} for host, path, and application locale.
      *
@@ -160,6 +164,18 @@ final class CmsPublicSeo
         }
 
         return self::ROBOTS_TXT_STAGING_DISALLOW_ALL . "\n";
+    }
+
+    /**
+     * When staging {@see shouldForceNoIndex()} is on, overrides DB/env llms.txt with {@see LLMS_TXT_STAGING}.
+     */
+    public static function resolvedStagingLlmsTxtBody(): ?string
+    {
+        if (! self::shouldForceNoIndex()) {
+            return null;
+        }
+
+        return self::LLMS_TXT_STAGING . "\n";
     }
 
     private static function resolveCanonicalFromRequest(

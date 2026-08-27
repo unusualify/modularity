@@ -71,4 +71,35 @@ class CmsSiteSeoSettingsServiceTest extends ModelTestCase
 
         $this->assertSame(CmsPublicSeo::ROBOTS_TXT_STAGING_DISALLOW_ALL . "\n", $body);
     }
+
+    public function test_resolved_llms_prefers_persisted_system_settings_value(): void
+    {
+        config([
+            'modularous.cms_seo.llms.use_system_settings' => true,
+            'modularous.cms_seo.llms.global_llms_txt' => '# Config fallback',
+        ]);
+
+        SystemSettings::set('seo.llms_txt', "# B2Press\n\n> Press release distribution");
+
+        $service = $this->app->make(CmsSiteSeoSettingsService::class);
+        $body = $service->resolvedLlmsTxtBody();
+
+        $this->assertStringContainsString('# B2Press', $body);
+        $this->assertStringEndsWith("\n", $body);
+    }
+
+    public function test_staging_force_noindex_overrides_persisted_llms_txt(): void
+    {
+        config([
+            'modularous.cms_seo.staging.force_noindex' => true,
+            'modularous.cms_seo.llms.use_system_settings' => true,
+        ]);
+
+        SystemSettings::set('seo.llms_txt', '# Production');
+
+        $service = $this->app->make(CmsSiteSeoSettingsService::class);
+        $body = $service->resolvedLlmsTxtBody();
+
+        $this->assertSame(CmsPublicSeo::LLMS_TXT_STAGING . "\n", $body);
+    }
 }

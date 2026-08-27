@@ -13,7 +13,7 @@ How public HTTP routes are registered so CMS pages, system endpoints, and host r
 
 Laravel uses **first match wins**. Modularous registers in this order:
 
-1. **Built-in system routes** (`CmsPublicSystemRoutes`) — boot — `/robots.txt`, `/sitemap.xml`, `/sitemap.xsl`, signed preview, public stylesheets
+1. **Built-in system routes** (`CmsPublicSystemRoutes`) — boot — `/robots.txt`, `/llms.txt`, `/sitemap.xml`, `/sitemap.xsl`, signed preview, public stylesheets
 2. **Host app** — `routes/web.php` (framework `booted`)
 3. **CMS catch-all** — `GET {path}` → `CmsPublicFrontController` (later `booted`)
 
