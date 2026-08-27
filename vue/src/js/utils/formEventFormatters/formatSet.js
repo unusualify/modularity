@@ -1,32 +1,28 @@
 // utils/formEventFormatters/formatSet.js
-import formatHelpers from './helpers'
+import formatHelpers, { coerceFormEventValue } from './helpers'
 import _ from 'lodash-es'
 
 import store from '@/store'  // Adjust path to your store file
 import { CACHE } from '@/store/mutations'
 
 import { getModel } from '@/utils/getFormData'
-import { getTranslationLanguages } from '@/utils/locale'
 
 export default async function formatSet(args, model, schema, input, index = null, preview = []) {
   const targetInputNotation = formatHelpers.getInputToFormat(args, model, schema, index)
-  const languages = getTranslationLanguages()
 
   if (!targetInputNotation)
     return
 
-  const targetInputName = targetInputNotation
   const targetPropName = args.shift()
-  const setterNotation = `${targetInputName}.${targetPropName}`
+  const setterNotation = `${targetInputNotation}.${targetPropName}`
   const setPropFormat = args.shift() // items.*.schema
 
-  let { handlerName, handlerSchema, handlerValue } = formatHelpers.handlers(input, model, index)
+  let { handlerSchema, handlerValue } = formatHelpers.handlers(input, model, index)
 
   if (!(handlerSchema.accordingToEmptiness ?? false) && Array.isArray(handlerValue) && handlerValue.length < 1)
     return
 
   if (handlerValue) {
-    let dataSet = []
     let newValue = formatHelpers.getNewValue(setPropFormat, handlerValue, handlerSchema)
 
     if (newValue !== undefined && newValue !== null) {
@@ -45,21 +41,39 @@ export default async function formatSet(args, model, schema, input, index = null
         let isRepeater = targetInput.type == 'input-repeater'
         let isArrayValue = Array.isArray(newValue)
 
-        if (__isset(targetInput['translated']) && targetInput['translated']) {
-          let translationParts = notation.split('.')
-          let field = translationParts.pop()
-          let translationNotation = translationParts.join('.') + '.translations'
-          notation.split('.').pop()
-          let rawTranslation = __data_get(handlerSchema, translationNotation).shift()
+        let explicitModelNotation = null
+        let sourceLocale = 'fallback'
 
-          if (rawTranslation) {
-            // TODO: translations do not comes from package_type
-            newValue = _.reduce(languages, (acc, language) => {
-              let translation = _.find(rawTranslation, (el) => el.locale == language) ?? rawTranslation[0]
-              let value = translation[field] ?? null
-              acc[language] = translation[field] ?? null
-              return acc
-            }, {})
+        while (args.length) {
+          const token = args.shift()
+          if (formatHelpers.isFormEventLocaleSourceToken(token)) {
+            sourceLocale = token
+          } else if (!explicitModelNotation) {
+            explicitModelNotation = token
+          }
+        }
+
+        const resolvedNotation = formatHelpers.hydrateModelNotation(
+          explicitModelNotation ?? targetInputName,
+          model,
+          schema,
+          input,
+          index,
+        )
+        const modelNotation = (resolvedNotation === false || resolvedNotation == null)
+          ? targetInputName
+          : resolvedNotation
+
+        if (!isArrayValue) {
+          newValue = coerceFormEventValue(newValue, {
+            sourceTranslated: !!input.translated,
+            targetTranslated: !!targetInput.translated,
+            currentTargetValue: _.get(model, modelNotation),
+            sourceLocale,
+          })
+
+          if (_.get(model, modelNotation) === newValue) {
+            return
           }
         }
 
@@ -78,11 +92,9 @@ export default async function formatSet(args, model, schema, input, index = null
             }
           })
 
-          _.set(model, inputToFormat, values)
+          _.set(model, modelNotation, values)
         } else if (!isArrayValue) {
           try {
-            let modelNotation = formatHelpers.hydrateModelNotation(args.shift() ?? inputToFormat, model, schema, input, index)
-
             _.set(model, modelNotation, newValue)
           } catch (e) {
             console.error(e)

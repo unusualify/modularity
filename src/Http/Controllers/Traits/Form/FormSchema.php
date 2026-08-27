@@ -913,8 +913,11 @@ trait FormSchema
 
                         $eventName = 'format' . studlyName($methodName);
                         if ($targetInputName && $targetPropName) {
-
-                            $events[] = implode(':', [$eventName, $targetInputName, $targetPropName, $setProp, ...($modelNotation ? [modelNotation] : [])]);
+                            $tail = array_values(array_filter(
+                                [$modelNotation, ...$args],
+                                static fn ($part) => $part !== null && $part !== ''
+                            ));
+                            $events[] = implode(':', [$eventName, $targetInputName, $targetPropName, $setProp, ...$tail]);
                         }
 
                         break;

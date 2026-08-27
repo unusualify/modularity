@@ -1,5 +1,95 @@
 // utils/formEventFormatters/helpers.js
 
+import { getActiveContentLocale, getFallbackContentLocale, getTranslationLanguages } from '@/utils/locale'
+
+function isLocaleMap (value) {
+  return value !== null && typeof value === 'object' && !Array.isArray(value)
+}
+
+export function resolveFormEventSourceLocale (sourceLocale = 'fallback') {
+  if (!sourceLocale || sourceLocale === 'fallback') {
+    return getFallbackContentLocale()
+  }
+
+  if (String(sourceLocale).startsWith('locale.')) {
+    return sourceLocale.slice('locale.'.length)
+  }
+
+  return sourceLocale
+}
+
+export function isFormEventLocaleSourceToken (token) {
+  if (!token || typeof token !== 'string') {
+    return false
+  }
+
+  if (token === 'fallback' || token.startsWith('locale.')) {
+    return true
+  }
+
+  return getTranslationLanguages().includes(token)
+}
+
+function pickScalarFromLocaleMap (value, sourceLocale = 'fallback') {
+  const locale = resolveFormEventSourceLocale(sourceLocale)
+
+  if (locale == null || !Object.prototype.hasOwnProperty.call(value, locale)) {
+    return ''
+  }
+
+  const picked = value[locale]
+
+  return picked == null ? '' : String(picked)
+}
+
+/**
+ * Align set/update modelValue writes when source and target differ in translation shape.
+ *
+ * Translated → scalar always uses {@link resolveFormEventSourceLocale} (fallback
+ * locale by default, or an explicit `en` / `locale.tr` token). Other locales
+ * never fill the target.
+ *
+ * @param {*} newValue
+ * @param {{ sourceTranslated?: boolean, targetTranslated?: boolean, currentTargetValue?: *, sourceLocale?: string }} options
+ */
+export function coerceFormEventValue (newValue, {
+  sourceTranslated = false,
+  targetTranslated = false,
+  currentTargetValue = undefined,
+  sourceLocale = 'fallback',
+} = {}) {
+  const fromMap = !!sourceTranslated || isLocaleMap(newValue)
+  const toMap = !!targetTranslated
+
+  if (fromMap && !toMap) {
+    if (!isLocaleMap(newValue)) {
+      return newValue ?? ''
+    }
+
+    return pickScalarFromLocaleMap(newValue, sourceLocale)
+  }
+
+  if (!fromMap && toMap) {
+    const languages = getTranslationLanguages()
+    const active = getActiveContentLocale() ?? languages[0]
+    const base = isLocaleMap(currentTargetValue) ? { ...currentTargetValue } : {}
+
+    for (const lang of languages) {
+      if (!(lang in base)) {
+        base[lang] = ''
+      }
+    }
+
+    if (active) {
+      base[active] = newValue ?? ''
+    }
+
+    return base
+  }
+
+  return newValue
+}
+
 export default {
   handlers: (input, model, index = null) => {
     const handlerName = input.name
@@ -107,4 +197,8 @@ export default {
 
     return newValue
   },
+
+  coerceFormEventValue,
+  resolveFormEventSourceLocale,
+  isFormEventLocaleSourceToken,
 }

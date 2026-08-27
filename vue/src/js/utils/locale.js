@@ -14,6 +14,33 @@ export function getActiveContentLocale (storeInstance = store) {
 }
 
 /**
+ * Default/fallback content locale (not the language tab).
+ * Used when copying a translated field onto a scalar (e.g. title → name).
+ */
+export function getFallbackContentLocale (storeInstance = store) {
+  const bag = storeInstance?.state?.language
+    ?? window[import.meta.env.VUE_APP_NAME]?.STORE?.languages
+    ?? {}
+
+  if (typeof bag.fallback === 'string' && bag.fallback !== '') {
+    return bag.fallback
+  }
+
+  if (bag.fallback?.value) {
+    return bag.fallback.value
+  }
+
+  const all = bag.all ?? []
+  const marked = all.find((language) => language?.fallback || language?.default)
+
+  if (marked?.value) {
+    return marked.value
+  }
+
+  return all[0]?.value
+}
+
+/**
  * Language codes for translated form fields.
  * Reads Vuex directly — safe outside setup() (e.g. getModel from a watch).
  * Do not call useLocale()/useStore() here; inject() only works in setup.
