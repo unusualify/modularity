@@ -27,7 +27,7 @@ Panel dry-run returns XSLT HTML when PHP `ext-xsl` is available (`CmsSitemapXslt
 
 ## llms.txt
 
-`GET /llms.txt` → `LlmsTxtController` when `cms_seo.llms.route_enabled` (package default **false**; host apps opt in). Markdown body from System Settings `seo.llms_txt` (when enabled) or `cms_seo.llms.global_llms_txt`. Staging noindex serves a stub instead of production content. Spec: [llmstxt.org](https://llmstxt.org/).
+`GET /llms.txt` → `LlmsTxtController` when `cms_seo.llms.route_enabled` (package default **false**; host apps opt in). Markdown body from System Settings `seo.llms_txt` (when enabled) or `cms_seo.llms.global_llms_txt`. Staging noindex serves a stub instead of production content. Spec: [llmstxt.org](https://llmstxt.org/). The admin field is a [`source-text`](/guide/form-inputs/input-source-text) input (`format: md`).
 
 ## Config
 

@@ -40,6 +40,17 @@ return [
     'assignment' => [
         'task-to-assignee-by-assigner' => 'İlgili kullanıcı: {assigneeName} &mdash; Oluşturan: {assignerName}',
     ],
+    'source-text' => [
+        'discard' => 'Vazgeç',
+        'discard-body' => 'Kaydedilmemiş düzenlemeleriniz var. Saklamadan kapatılsın mı?',
+        'discard-title' => 'Değişiklikler silinsin mi?',
+        'empty' => 'Boş',
+        'keep' => 'Sakla',
+        'open' => 'Editörü aç',
+        'preview' => 'Önizleme',
+        'preview-empty' => 'Önizlenecek içerik yok',
+        'preview-scripts-off' => 'Önizlemede betikler çalışmaz.',
+    ],
     'billing-banner' => 'Şirket detaylarınızı doldurarak devam edebilirsiniz.',
     'error' => 'Bir Hata Oluştu!',
     'info' => 'Tamamlandı!',

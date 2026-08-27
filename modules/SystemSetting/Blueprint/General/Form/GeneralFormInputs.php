@@ -155,13 +155,14 @@ final class GeneralFormInputs implements ModuleRouteInputsProvider
                 'name' => 'seo',
                 'typeIntTitle' => 'SEO',
                 'schema' => [
-                    ['name' => 'robots_txt', 'type' => 'textarea', 'label' => 'Global robots.txt', 'rules' => 'nullable|string'],
+                    ['name' => 'robots_txt', 'type' => 'source-text', 'format' => 'txt', 'label' => 'Global robots.txt', 'rules' => 'nullable|string'],
                     [
                         'name' => 'llms_txt',
-                        'type' => 'textarea',
+                        'type' => 'source-text',
                         'label' => 'Global llms.txt',
+                        'format' => 'md',
                         'rules' => 'nullable|string',
-                        'hint' => 'Markdown served at GET /llms.txt when the route is enabled (llmstxt.org).',
+                        'hint' => 'Markdown served at GET /llms.txt (llmstxt.org).',
                     ],
                     ['name' => 'default_meta_title', 'type' => 'text', 'label' => 'Default meta title', 'translated' => true, 'rules' => 'nullable|string|max:255'],
                     ['name' => 'default_meta_description', 'type' => 'textarea', 'label' => 'Default meta description', 'translated' => true, 'rules' => 'nullable|string'],

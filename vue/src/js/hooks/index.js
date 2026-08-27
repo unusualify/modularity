@@ -47,6 +47,15 @@ export {
 } from './useJsonDiff'
 
 export {
+  default as useSourceText,
+  SOURCE_TEXT_FORMATS,
+  normalizeSourceTextFormat,
+  sourceTextAsString,
+  sourceTextFirstLine,
+  sourceTextLineCount,
+} from './useSourceText'
+
+export {
   resolveNativeTextareaFromVuetifyHost,
   textareaLineBlockSlice,
   applyTabOrShiftTabInText,

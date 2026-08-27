@@ -111,6 +111,7 @@ Each field in the schema has:
 | [radio-group](/guide/form-inputs/input-radio-group) | RadioGroupHydrate | input-radio-group | VInputRadioGroup |
 | [repeater](/guide/form-inputs/input-repeater) | RepeaterHydrate | input-repeater | VInputRepeater |
 | [select-scroll](/guide/form-inputs/input-select-scroll) | SelectScrollHydrate | input-select-scroll | VInputSelectScroll |
+| [source-text](/guide/form-inputs/input-source-text) | SourceTextHydrate | input-source-text | VInputSourceText |
 | [spread](/guide/form-inputs/input-spread) | SpreadHydrate | input-spread | VInputSpread |
 | [switch](/guide/form-inputs/input-switch) | SwitchHydrate | input-switch | VInputSwitch |
 | [tag](/guide/form-inputs/input-tag) | TagHydrate | input-tag | VInputTag |

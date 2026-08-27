@@ -52,6 +52,7 @@ FormBase/FormBaseField → mapTypeToComponent('input-checklist') → VInputCheck
 | [relationships](/guide/form-inputs/input-relationships) | RelationshipsHydrate | input-relationships | VInputRelationships ⚠️ |
 | select | SelectHydrate | select | v-select (Vuetify) |
 | [select-scroll](/guide/form-inputs/input-select-scroll) | SelectScrollHydrate | input-select-scroll | VInputSelectScroll |
+| [source-text](/guide/form-inputs/input-source-text) | SourceTextHydrate | input-source-text | VInputSourceText |
 | [spread](/guide/form-inputs/input-spread) | SpreadHydrate | input-spread | VInputSpread |
 | stateable | StateableHydrate | select | v-select (Vuetify) |
 | [switch](/guide/form-inputs/input-switch) | SwitchHydrate | input-switch | VInputSwitch |
@@ -83,6 +84,7 @@ FormBase/FormBaseField → mapTypeToComponent('input-checklist') → VInputCheck
 | input-radio-group | VInputRadioGroup |
 | input-repeater | VInputRepeater |
 | input-select-scroll | VInputSelectScroll |
+| input-source-text | VInputSourceText |
 | input-spread | VInputSpread |
 | input-tag | VInputTag |
 | input-tagger | VInputTagger |

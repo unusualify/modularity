@@ -37,6 +37,7 @@ When adding a Hydrate-backed input:
 1. Create `src/Hydrates/Inputs/{Studly}Hydrate.php` (output `type: 'input-{kebab}'`)
 2. Create `inputs/{Studly}.vue` (registers as VInput{Studly})
 3. Add to `hydrateTypeMap` in registry.js
+   (e.g. `input-source-text` → `VInputSourceText`)
 
 ## Extracted Types
 

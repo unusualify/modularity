@@ -7,6 +7,17 @@ return [
     'assignment' => [
         'task-to-assignee-by-assigner' => 'to {assigneeName} &mdash; by {assignerName}',
     ],
+    'source-text' => [
+        'discard' => 'Discard',
+        'discard-body' => 'You have unsaved edits. Close without keeping them?',
+        'discard-title' => 'Discard changes?',
+        'empty' => 'Empty',
+        'keep' => 'Keep',
+        'open' => 'Open editor',
+        'preview' => 'Preview',
+        'preview-empty' => 'Nothing to preview',
+        'preview-scripts-off' => 'Scripts are disabled in preview.',
+    ],
     'billing-banner' => 'Please complete your company details to continue.',
     'error' => 'There is an error!',
     'info' => 'Completed!',
