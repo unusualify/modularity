@@ -13,6 +13,7 @@
 - Helpers: `import { isObject, dataGet } from '@/utils/helpers'` — no new `window.__*` usage
 - Tests colocated under package Vue test conventions when touching components
 - Directives live in `vue/src/js/directives/` and register via `plugins/UEConfig.js` (`app.use(...)`) — docs: `docs/src/pages/guide/directives/`
+- Form `ext` / `event` formatters: `vue/src/js/utils/formEventFormatters/AGENTS.md` — docs: `docs/src/pages/guide/js/form-events.md`
 
 ## Form inputs (Hydrate contract)
 

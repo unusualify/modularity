@@ -22,11 +22,13 @@ Keep prompts short and concrete — avoid high-level product requests. Always in
 | Entities / model traits | `src/Entities/AGENTS.md` |
 | Repositories / MethodTransformers | `src/Repositories/AGENTS.md` |
 | Http controllers / middleware | `src/Http/AGENTS.md` |
+| Form `ext` / events compile | `src/Http/Controllers/Traits/Form/AGENTS.md` |
 | Console commands | `src/Console/AGENTS.md` |
 | Hydrates (form schema) | `src/Hydrates/AGENTS.md` |
 | Cache services | `src/Services/Cache/AGENTS.md` |
 | CMS module | `modules/Cms/AGENTS.md` |
 | Vue / inputs | `vue/src/js/AGENTS.md` |
+| Form event formatters | `vue/src/js/utils/formEventFormatters/AGENTS.md` |
 | Package root / docs map | `AGENTS.md` (package root) |
 
 Docs map: see package root `AGENTS.md` → **DOCS MAP**.

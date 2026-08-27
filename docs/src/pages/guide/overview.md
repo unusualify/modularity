@@ -37,6 +37,13 @@ This section covers UI components, forms, tables, and CMS public-site features i
 | [Tabs](/guide/components/shared/tabs) | Tab component |
 | [Stepper Form](/guide/components/shared/stepper-form) | Stepper form component |
 
+## JS
+
+| Page | Description |
+|------|-------------|
+| [JS utilities overview](/guide/js/overview) | formEvents, schema, getFormData |
+| [Form events](/guide/js/form-events) | `ext` → `event` → formatters; translated vs scalar |
+
 ## Directives
 
 | Page | Description |
