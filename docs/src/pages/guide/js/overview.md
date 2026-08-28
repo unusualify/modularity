@@ -12,7 +12,7 @@ Modularous admin forms are schema-driven. Besides Hydrates and Vue input compone
 
 | File | Purpose |
 |------|---------|
-| [`form-events`](./form-events) | `ext` → `event` → `formEventFormatters` (set, update, filter, …) |
+| [`form-events`](./form-events) | `formEvents` (or `ext` fallback) → `FormEventCompiler` → `schema.formEvents[]` / `event` → `formEventFormatters` |
 | `schema.js` | `isViewOnlyInput`, flatten wrap/group schema, translation input walk |
 | `getFormData.js` | `getSchema` / `getModel` / submit payload; calls `handleEvents` on hydrate |
 

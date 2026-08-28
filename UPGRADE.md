@@ -23,3 +23,14 @@ After running the script, it is highly recommended to clear your application cac
 ```bash
 php artisan optimize:clear
 ```
+
+## Form events (`ext` → `formEvents`)
+
+### 13.x
+
+Declare cross-field form behaviour with **`formEvents`** (pipe string or nested arrays). Event DSL on **`ext`** still compiles and emits a deprecation (`unusualify/modularous` 13.0). Type aliases (`date`, `time`, `number`, …) stay on `ext`.
+
+### 14.x
+
+**Breaking:** `ext` is no longer compiled as event DSL. Migrate `set` / `update` / `lock` / `toggleInput` / … to `formEvents` before upgrading. Type aliases on `ext` are unchanged until they get a dedicated key.
+

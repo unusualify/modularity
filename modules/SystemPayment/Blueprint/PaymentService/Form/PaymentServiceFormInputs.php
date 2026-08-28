@@ -68,7 +68,7 @@ final class PaymentServiceFormInputs implements ModuleRouteInputsProvider
                         'transfer_details_toggleInputValue' => true,
                     ],
                 ],
-                'ext' => [
+                'formEvents' => [
                     [
                         'toggleInput',
                         'transfer_details',
@@ -129,7 +129,7 @@ final class PaymentServiceFormInputs implements ModuleRouteInputsProvider
                     ],
                 ],
             ],
-        
+
             [
                 'name' => 'is_external',
                 'label' => __('Is an external service ?'),

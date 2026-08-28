@@ -197,6 +197,23 @@ See [Broadcasting troubleshooting](/guide/broadcasting/troubleshooting).
 
 ---
 
+## Form events (`ext` → `formEvents`)
+
+Cross-field form DSL moved from **`ext`** to **`formEvents`**. See [Form events](/guide/js/form-events) and [ADR](/system-reference/adr-form-events).
+
+### v13
+
+- Write **`formEvents`** on new and migrated inputs (pipe string or nested arrays).
+- Event DSL on **`ext`** still compiles, with a deprecation warning (`unusualify/modularous` 13.0).
+- Type aliases stay on `ext`: `date`, `time`, `price`, `softCurrency`, `scroll`, `number`, `relationship`, `morphTo`.
+
+### v14
+
+- **`ext` is no longer an event source.** Inputs that still declare `set` / `update` / `lock` / … on `ext` will not compile those tokens.
+- `ext` itself remains only until type aliases have another home.
+
+---
+
 ## Before You Upgrade in Production
 
 - [ ] Pin the current version in `composer.json` so a `composer update` doesn't move further

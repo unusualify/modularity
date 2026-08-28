@@ -1,10 +1,10 @@
 # Form event formatters
 
-PHP `ext` compiles to schema `event` (pipe of `formatXxx:args`). Runtime: `handleEvents` / `handleMultiFormEvents` in `formEvents.js` look up this folder.
+PHP `FormEventCompiler` writes schema `formEvents[]` + legacy `event` (pipe of `formatXxx:args`). Runtime: `handleEvents` / `handleMultiFormEvents` in `formEvents.js` resolve tokens via `resolveFormEventTokens` (prefer `formEvents`, then `event`) and look up this folder.
 
 ## Hard rules
 
-1. New event method = PHP `hydrateInputExtension` case **and** `format{Name}.js` **and** export in `index.js`. Do not add cases to the legacy `handleInputEvents` switch.
+1. New event method = PHP `FormEventCompiler` case **and** `format{Name}.js` **and** export in `index.js`. Do not add cases to the legacy `handleInputEvents` switch.
 2. Formatter signature: `(args, model, schema, input, index = null, preview = [])`. `args` is already split; `getInputToFormat` mutates it with `shift()`.
 3. `set` runs on create hydrate and on input. `update` (and `clearModel`) skip when `valueChanged` is false (`nonRunEventsOnCreate`).
 4. Target path is **schema notation** (`wrap1.schema.slugs`). `modelValue` / `model` writes the model; anything else writes a schema prop.
@@ -17,3 +17,4 @@ PHP `ext` compiles to schema `event` (pipe of `formatXxx:args`). Runtime: `handl
 - `docs/src/pages/guide/js/form-events.md`
 - `docs/src/pages/system-reference/adr-form-events.md`
 - PHP companion: `src/Http/Controllers/Traits/Form/AGENTS.md`
+- Compiler: `src/Hydrates/FormEventCompiler.php`

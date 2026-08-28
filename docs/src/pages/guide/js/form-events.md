@@ -3,16 +3,16 @@ sidebarPos: 2
 sidebarTitle: Form events
 ---
 
-# Form events (`ext`)
+# Form events (`formEvents`)
 
-Cross-field form behaviour is declared on an input as **`ext`**. PHP compiles it to schema **`event`**. Vue `handleEvents` runs `vue/src/js/utils/formEventFormatters` when the source field hydrates or changes.
+Cross-field form behaviour is declared on an input as **`formEvents`**. PHP `FormEventCompiler` compiles it to schema **`formEvents[]`** and legacy **`event`**. Vue `handleEvents` runs `vue/src/js/utils/formEventFormatters` when the source field hydrates or changes.
 
-New module code will switch to an **`events`** config key later (`ext` stays as fallback until v14). Write **`ext`** today. See [ADR — Form events](/system-reference/adr-form-events).
+If **`formEvents` is absent**, event DSL on **`ext`** is still compiled (deprecated in v13, **removed in v14**). Type aliases on `ext` (`date`, `time`, `number`, …) are not events. See [ADR — Form events](/system-reference/adr-form-events).
 
 ## Pipeline
 
 ```
-config ext  →  hydrateInputExtension  →  schema.event  →  handleEvents  →  formatXxx.js
+config formEvents (or ext fallback)  →  FormEventCompiler  →  schema.formEvents[] + event  →  handleEvents  →  formatXxx.js
 ```
 
 Trigger:
@@ -27,27 +27,33 @@ Trigger:
 Pipe string:
 
 ```php
-'ext' => 'update:wrap1.schema.slugs:slugSourceValue:modelValue',
+'formEvents' => 'update:wrap1.schema.slugs:slugSourceValue:modelValue',
 ```
 
 Several methods:
 
 ```php
-'ext' => 'update:wrap1.schema.slugs:slugSourceValue:modelValue|update:wrap1.schema.name:modelValue:modelValue',
+'formEvents' => 'update:wrap1.schema.slugs:slugSourceValue:modelValue|update:wrap1.schema.name:modelValue:modelValue',
 ```
 
 Nested array (same as PressRelease / PaymentService):
 
 ```php
-'ext' => [
+'formEvents' => [
     ['toggleInput', 'transfer_details', 'items.*.transfer_details_toggleInputValue'],
 ],
 ```
 
+Deprecated until v14 (prefer `formEvents`):
+
+```php
+'ext' => 'update:slugs:slugSourceValue:modelValue',
+```
+
 ## Methods
 
-| `ext` method | Schema `event` | Typical target |
-|--------------|----------------|----------------|
+| Config method | Schema token | Typical target |
+|---------------|--------------|----------------|
 | `set` | `formatSet` | Schema prop or `modelValue` (also on create hydrate) |
 | `update` | `formatUpdate` (same JS as `set`) | Same, **only** when the source value changed |
 | `filter` | `formatFilter` | Load/filter another input’s `items` |
@@ -60,7 +66,7 @@ Nested array (same as PressRelease / PaymentService):
 | `removeValue` | `formatRemoveValue` | Drop a value |
 | `toggleInput` | `formatToggleInput` | `d-none` / rules |
 
-`ext` values that are **not** events (do not put these in `events` later): `date`, `time`, `price`, `scroll`, `number`, `relationship`, `morphTo`.
+`ext` values that are **not** events (do not put these in `formEvents`): `date`, `time`, `price`, `scroll`, `number`, `relationship`, `morphTo`.
 
 ## Targets
 
@@ -73,14 +79,14 @@ The first argument after the method is **schema notation**, not always the model
 Cms Page title → slug:
 
 ```php
-['type' => 'text', 'name' => 'title', 'translated' => true, 'ext' => 'update:slugs:slugSourceValue:modelValue'],
+['type' => 'text', 'name' => 'title', 'translated' => true, 'formEvents' => 'update:slugs:slugSourceValue:modelValue'],
 ['type' => 'slug', 'name' => 'slugs', 'translated' => true, …],
 ```
 
 Blog title → slug **and** scalar admin name (`update` so edit does not clobber `name`). Trailing `fallback` copies **only** the fallback locale (usually `en`); typing `tr` / `nl` does not change `name`:
 
 ```php
-'ext' => 'update:wrap1.schema.slugs:slugSourceValue:modelValue|update:wrap1.schema.name:modelValue:modelValue:fallback',
+'formEvents' => 'update:wrap1.schema.slugs:slugSourceValue:modelValue|update:wrap1.schema.name:modelValue:modelValue:fallback',
 ```
 
 Pin a locale with `en`, `tr`, or `locale.en` instead of `fallback`.
@@ -101,7 +107,7 @@ Do not assign a locale object to a scalar field. That path is `coerceFormEventVa
 
 ## Adding a method
 
-1. PHP `FormSchema::hydrateInputExtension` case → `format{Name}:…`
+1. PHP `FormEventCompiler` case → `format{Name}:…`
 2. `vue/src/js/utils/formEventFormatters/format{Name}.js`
 3. Export from `index.js`
 

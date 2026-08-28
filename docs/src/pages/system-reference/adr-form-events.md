@@ -3,31 +3,31 @@ sidebarPos: 16
 sidebarTitle: ADR — Form events
 ---
 
-# ADR: Form events (`ext` → `events`)
+# ADR: Form events (`ext` → `formEvents`)
 
 **Status:** Accepted, incremental  
 **Date:** 2026-08-28
 
 ## Context
 
-Admin inputs declare cross-field behaviour with **`ext`**. `FormSchema::hydrateInputExtension` (and a drifting copy in `hydrate_input_extension()`) compile that DSL to schema **`event`**. Vue `handleEvents` dispatches `formEventFormatters`.
+Admin inputs declared cross-field behaviour with **`ext`**. Two PHP compilers (trait vs helper) drifted. Vue `handleEvents` dispatched `formEventFormatters` from schema **`event`**.
 
 Problems:
 
 1. **`ext` is overloaded.** Event DSL (`set`, `update`, `lock`, …) shares the key with type aliases (`date`, `time`, `price`, `scroll`, `number`, `relationship`, `morphTo`).
-2. **Two PHP compilers** (trait vs helper) already disagree (`set` uses undefined `$targetPropName` in the helper).
+2. **Two PHP compilers** disagreed (`set` used undefined `$targetPropName` in the helper).
 3. **Two JS paths:** `handleEvents` + formatters vs legacy `handleInputEvents` switch (permalink/lock).
-4. **Translated vs scalar.** `set`/`update` with `modelValue` copied locale maps onto string fields. Issue #51 (title → admin name) needs a coerce step; a later compiler extract is not required for that fix.
+4. **Translated vs scalar.** `set`/`update` with `modelValue` copied locale maps onto string fields (issue #51).
 
 ## Decision
 
-### Canonical config key: `events`
+### Canonical config key: `formEvents`
 
-Future input config uses **`events`** (pipe string or nested arrays, same shapes as today’s `ext` DSL).
+Input config uses **`formEvents`** (pipe string or nested arrays, same shapes as the old `ext` DSL).
 
 ### `ext` fallback until v14
 
-If **`events` is absent**, keep compiling event DSL from **`ext`**. When both are present, **`events` wins**. v14 removes `ext` as an event source.
+If **`formEvents` is absent**, compile event DSL from **`ext`**. When both are present, **`formEvents` wins**. Compiling from `ext` emits a **v13** deprecation (`unusualify/modularous` 13.0). **v14 removes `ext` as an event source.**
 
 ### Type aliases stay out of the compiler
 
@@ -35,28 +35,26 @@ If **`events` is absent**, keep compiling event DSL from **`ext`**. When both ar
 
 ### Runtime schema
 
-Today: schema **`event`** (pipe of `formatXxx:args`). Later: schema **`events[]`** plus dual-write `event` until JS reads the array first.
+`FormEventCompiler` dual-writes schema **`formEvents[]`** (compiled `formatXxx:args` tokens) and legacy **`event`** (pipe). Vue `resolveFormEventTokens` reads `formEvents` first, then `event`.
 
-### Later phases (not this change)
+### Compiler
 
-1. Extract one PHP `FormEventCompiler`; trait + helper call it.
-2. JS dispatcher prefers `input.events`, then `input.event`; retire `handleInputEvents` for permalink/lock.
-3. Migrate package inputs from `ext` DSL to `events`.
-4. Deprecation signal on DSL-`ext` without `events`.
-5. v14: drop event fallback; drop `ext` after type aliases have a home.
+One PHP `FormEventCompiler` (`src/Hydrates/FormEventCompiler.php`). `FormSchema::hydrateInputExtension` and `hydrate_input_extension()` call it.
 
-### This change
+### Later (v14)
 
-Document the contract. Coerce translated ↔ scalar on `formatSet` / `formatUpdate` `modelValue` writes. Do not extract the compiler or add the `events` key yet.
+1. Remove `ext` event fallback.
+2. Drop `ext` entirely after type aliases have a home.
+3. Optionally retire `handleInputEvents` (legacy permalink/lock); formatters remain the runtime path.
 
 ## Consequences
 
-- New docs and AGENTS tell authors to keep writing `ext` until the compiler lands.
-- Host apps remain valid `ext` examples; do not migrate them in the package repo.
-- Issue #51 can ship without waiting on v14.
+- New module / package inputs write **`formEvents`**. Host apps may keep `ext` until they migrate; they will see the v13 warning.
+- Do not migrate `b2press-app` from this package repo.
+- Issue #51 coerce stays independent of the v14 cut.
 
 ## Related
 
 - Guide: [Form events](/guide/js/form-events)
-- `FormSchema::hydrateInputExtension`
-- `vue/src/js/utils/formEvents.js`, `formEventFormatters/`
+- `src/Hydrates/FormEventCompiler.php`
+- `vue/src/js/utils/formEvents.js`, `resolveFormEventTokens.js`, `formEventFormatters/`

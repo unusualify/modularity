@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route as RouteFacade;
 use Mockery;
+use Nwidart\Modules\Module;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Http\Controllers\Traits\Form\FormSchema;
 use Unusualify\Modularous\Tests\TestCase;
@@ -237,6 +238,7 @@ class FormSchemaCoverageTest extends TestCase
         $this->assertStringContainsString('formatPreview', (string) ($withDate['status']['event'] ?? ''));
         $this->assertStringContainsString('formatClearModel', (string) ($withDate['status']['event'] ?? ''));
         $this->assertStringContainsString('formatToggleInput', (string) ($withDate['status']['event'] ?? ''));
+        $this->assertContains('formatLock:url:url', $withDate['status']['formEvents'] ?? []);
 
         $filtered = $controller->filterSchemaByRoles([
             'title' => ['type' => 'text', 'name' => 'title'],
@@ -286,7 +288,7 @@ class FormSchemaCoverageTest extends TestCase
             ['type' => 'relationship'],
         ]));
 
-        $module = Mockery::mock(\Nwidart\Modules\Module::class);
+        $module = Mockery::mock(Module::class);
         Modularous::shouldReceive('find')->with('SystemSetting')->andReturn($module);
 
         $input = [
@@ -382,7 +384,7 @@ class FormSchemaCoverageTest extends TestCase
         $this->assertArrayHasKey('amount', $withPrice);
         $this->assertArrayHasKey('soft', $withPrice);
 
-        $module = Mockery::mock(\Nwidart\Modules\Module::class);
+        $module = Mockery::mock(Module::class);
         $module->shouldReceive('getRouteActionUrl')->andReturn('/items');
         Modularous::shouldReceive('find')->with('Blog')->andReturn($module);
 

@@ -689,10 +689,12 @@ if (! function_exists('extract_schema_extensions')) {
             return $results;
         }
 
-        // Process current level ext configurations
-        if (isset($haystack['ext']) && is_array($haystack['ext'])) {
+        $dsl = $haystack['formEvents'] ?? $haystack['ext'] ?? null;
 
-            foreach ($haystack['ext'] as $ext) {
+        // Process current-level event DSL (canonical `formEvents`, deprecated `ext`)
+        if (is_array($dsl)) {
+
+            foreach ($dsl as $ext) {
                 if (is_array($ext) && count($ext) >= 4 && in_array($ext[0], ['set', 'prependSchema'])) {
                     $format = $ext[0];
 

@@ -16,7 +16,7 @@ Controller
 
 Keep controllers thin: DI + form requests; domain work in repositories/services. Traits under `Controllers/Traits/` for form/table/cache/scopes.
 
-Form input `ext` compile: `src/Http/Controllers/Traits/Form/AGENTS.md`.
+Form input `formEvents` compile: `src/Http/Controllers/Traits/Form/AGENTS.md`.
 
 ## Hard rules
 
@@ -34,7 +34,7 @@ Form input `ext` compile: `src/Http/Controllers/Traits/Form/AGENTS.md`.
 
 ## Read before edit
 
-- Form `ext` / events: `src/Http/Controllers/Traits/Form/AGENTS.md`
+- Form `formEvents` compile: `src/Http/Controllers/Traits/Form/AGENTS.md`
 - `docs/src/pages/system-reference/backend/http/controllers/overview.md`
 - `docs/src/pages/guide/module-route-cache/admin-cache-actions.md`
 - Presentation: `src/Services/Cache/AGENTS.md`, `modules/Cms/AGENTS.md`

@@ -8,6 +8,7 @@ import { getTranslationLanguages } from './locale'
 import filters from '@/utils/filters'
 
 import FormEventFormatters from './formEventFormatters'
+import { resolveFormEventTokens } from './resolveFormEventTokens'
 
 const nonRunEventsOnCreate = [
   'formatClearModel',
@@ -56,6 +57,7 @@ export const onInputEventFormData = (obj, schema, stateData, sortedStateData, va
   }
 }
 
+/** Legacy permalink/lock switch. Main path is handleEvents + formEventFormatters. */
 export const handleInputEvents = (events = null, fields, moduleSchema, name = null) => {
   const _fields = fields ?? {}
   if(fields) {
@@ -121,22 +123,20 @@ export const handleEvents = ( model, schema, input, valueChanged = false) => {
 
   const isFieldFalsy = (Array.isArray(handlerValue) && handlerValue.length > 0) || (!Array.isArray(handlerValue) && !!handlerValue)
 
-  if (input.event) {
-    let events = _.uniq(input.event.split('|'));
+  const events = resolveFormEventTokens(input)
 
-    events.forEach(event => {
-      let args = event.split(':')
-      let methodName = args.shift()
-      let runnable = true
+  events.forEach(event => {
+    let args = event.split(':')
+    let methodName = args.shift()
+    let runnable = true
 
-      if(nonRunEventsOnCreate.includes(methodName) && !valueChanged)
-        runnable = false
+    if(nonRunEventsOnCreate.includes(methodName) && !valueChanged)
+      runnable = false
 
-      if(runnable && typeof FormEventFormatters[methodName] !== 'undefined')
-        FormEventFormatters?.[methodName](args, model, schema, input)
+    if(runnable && typeof FormEventFormatters[methodName] !== 'undefined')
+      FormEventFormatters?.[methodName](args, model, schema, input)
 
-    })
-  }
+  })
 }
 
 export const handleMultiFormEvents = ( models, schemas, input, index, preview = [], valueChanged = true) => {
@@ -146,22 +146,20 @@ export const handleMultiFormEvents = ( models, schemas, input, index, preview = 
 
   const isFieldFalsy = (Array.isArray(handlerValue) && handlerValue.length > 0) || (!Array.isArray(handlerValue) && !!handlerValue)
 
-  if (input.event) {
-    let events = _.uniq(input.event.split('|'));
-    events.forEach(event => {
-      let args = event.split(':')
-      let methodName = args.shift()
-      let runnable = true
+  const events = resolveFormEventTokens(input)
+  events.forEach(event => {
+    let args = event.split(':')
+    let methodName = args.shift()
+    let runnable = true
 
-      if (nonRunEventsOnCreate.includes(methodName) && !valueChanged) {
-        runnable = false
-      }
+    if (nonRunEventsOnCreate.includes(methodName) && !valueChanged) {
+      runnable = false
+    }
 
-      if (runnable && typeof FormEventFormatters[methodName] !== 'undefined')
-        FormEventFormatters?.[methodName](args, models, schemas, input, index, preview)
+    if (runnable && typeof FormEventFormatters[methodName] !== 'undefined')
+      FormEventFormatters?.[methodName](args, models, schemas, input, index, preview)
 
-    })
-  }
+  })
 
   if(false && input.schema){
     for(const name in input.schema){
@@ -173,10 +171,15 @@ export const handleMultiFormEvents = ( models, schemas, input, index, preview = 
   }
 }
 
+export {
+  resolveFormEventTokens,
+}
+
 export default {
   setSchemaInputField,
   onInputEventFormData,
   handleInputEvents,
   handleEvents,
   handleMultiFormEvents,
+  resolveFormEventTokens,
 }

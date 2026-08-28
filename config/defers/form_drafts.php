@@ -116,7 +116,7 @@ return [
             'default' => false,
             'trueValue' => 1,
             'falseValue' => 0,
-            'ext' => [
+            'formEvents' => [
                 [
                     'set',
                     'name',

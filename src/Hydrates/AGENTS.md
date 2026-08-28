@@ -30,5 +30,5 @@ php artisan modularous:make:input-hydrate {Name}
 - `docs/src/pages/system-reference/hydrates.md`
 - `docs/src/pages/guide/form-inputs/overview.md`
 - Frontend companion: `vue/src/js/AGENTS.md`
-- Form `ext` compile: `src/Http/Controllers/Traits/Form/AGENTS.md`
+- Form event compile: `src/Hydrates/FormEventCompiler.php` + `src/Http/Controllers/Traits/Form/AGENTS.md`
 - Form event formatters: `vue/src/js/utils/formEventFormatters/AGENTS.md`

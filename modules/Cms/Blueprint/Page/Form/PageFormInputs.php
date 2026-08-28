@@ -15,9 +15,9 @@ final class PageFormInputs implements ModuleRouteInputsProvider
         return [
             ['type' => 'switch', 'name' => 'active', 'label' => 'Active', 'translated' => true, 'trueValue' => true, 'falseValue' => false, 'isSecondary' => true],
             ['type' => 'revision', 'maxHeight' => '150px'],
-            ['type' => 'text', 'name' => 'title', 'label' => 'Title', 'translated' => true, 'rules' => 'required', 'ext' => 'update:slugs:slugSourceValue:modelValue'],
+            ['type' => 'text', 'name' => 'title', 'label' => 'Title', 'translated' => true, 'rules' => 'required', 'formEvents' => 'update:slugs:slugSourceValue:modelValue'],
             ['type' => 'slug', 'name' => 'slugs', 'label' => 'URL slug', 'translated' => true, 'rules' => 'required', '_moduleName' => 'Cms', '_routeName' => 'page', 'localeScoped' => true],
-        
+
             ['type' => 'file', 'name' => 'documents', 'label' => 'Files', 'translated' => true],
             ['type' => 'image', 'name' => 'photos', 'label' => 'Images', 'translated' => true],
             [

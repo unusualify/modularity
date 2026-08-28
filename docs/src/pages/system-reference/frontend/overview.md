@@ -106,7 +106,7 @@ For the full hook reference including all 38 composables, see **[Vue Hooks](/sys
 | schema.js | isViewOnlyInput, processInputs, flattenGroupSchema |
 | getFormData.js | getSchema, getModel, getSubmitFormData |
 | helpers.js | isset, isObject, dataGet (prefer over window.__*) |
-| formEvents.js | handleEvents, handleInputEvents, setSchemaInputField — [guide](/guide/js/form-events) |
+| formEvents.js | `resolveFormEventTokens` (`formEvents[]` then `event`), handleEvents — [guide](/guide/js/form-events) |
 | formEventFormatters/ | set, update, filter, lock, … (+ translated/scalar coerce) |
 
 ## Store (Vuex)

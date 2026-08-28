@@ -14,7 +14,7 @@ Modularous (Modularous) is a Laravel package that provides a modular admin panel
 | [Architecture](./architecture) | System overview, request flow, schema flow, core classes |
 | [ADR — ModuleRoute Blueprint](./adr-module-route-blueprint) | Index/form UI class tree, field map, drivers |
 | [ADR — ModuleRoute Hot Path](./adr-module-route-hot-path) | Perf contract for ModuleRoute vs registry / presentation |
-| [ADR — Form events](./adr-form-events) | `ext` → `events` (v14); compiler vs type aliases |
+| [ADR — Form events](./adr-form-events) | `formEvents` canonical; `ext` fallback until v14; `FormEventCompiler` |
 | [Hydrates](./hydrates) | Backend → frontend schema transformation (input types) |
 | [Repositories](./repositories) | Data access layer, lifecycle, Logic traits |
 | [Backend](./backend/overview) | Controllers, Console commands, Entities, Services |

@@ -22,7 +22,7 @@ format_input()  → type-specific logic (group, wrap, morphTo, polymorphic, titl
     ↓
 hydrate_input()  → runs InputHydrator
     ↓
-hydrate_input_extension()  → processes ext patterns (permalink, filter, toggle, etc.)
+hydrate_input_extension()  → FormEventCompiler (formEvents, or ext fallback until v14)
     ↓
 modularous_format_input()  → merges with default input, keys by name
     ↓
@@ -82,24 +82,26 @@ Resolves `connector` shorthand strings to actual `endpoint` URLs or `repository`
 hydrate_input_extension(array &$input, &$data, &$arrayable, array $inputs): void
 ```
 
-Processes the `ext` key on an input definition. Supported extension patterns:
+Delegates to `FormEventCompiler`. Canonical config key is **`formEvents`** (pipe string or nested arrays). If `formEvents` is absent, event DSL on **`ext`** is compiled (deprecated in v13, removed in v14). Type aliases (`date`, `time`, `number`, …) stay on `ext` and skip the compiler.
+
+Supported event methods:
 
 | Pattern | Effect |
 |---------|--------|
-| `date` / `time` | Sets default to current date/time |
 | `permalink:slug` | Adds a readonly slug input and a `formatPermalink` event |
 | `permalinkPrefix:slug` | Adds a `formatPermalinkPrefix` event |
 | `lock:url:url` | Adds a `formatLock` event |
 | `filter:target:prop` | Resolves a filter endpoint and adds `formatFilter` event |
 | `preview:field` | Adds `formatPreview` event |
 | `set:target:prop` | Adds `formatSet` event |
+| `update:target:prop` | Adds `formatUpdate` event (not on create hydrate) |
 | `clearModel:target` | Adds `formatClearModel` event |
 | `resetItems:target` | Adds `formatResetItems` event |
 | `prependSchema:...` | Adds `formatPrependSchema` event |
 | `removeValue:target` | Adds `formatRemoveValue` event |
 | `toggleInput:target:value:level` | Adds `formatToggleInput` event |
 
-Events are stored pipe-delimited in `$input['event']` and consumed by the Vue form engine.
+Compiled tokens are stored on `$input['formEvents']` (array) and `$input['event']` (pipe) for the Vue form engine.
 
 ---
 
