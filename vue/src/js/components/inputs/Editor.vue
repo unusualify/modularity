@@ -102,14 +102,14 @@
 </template>
 
 <script>
-import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { useEditor, EditorContent } from '@tiptap/vue-3'
 import { BubbleMenu } from '@tiptap/vue-3/menus'
 import { VueRenderer } from '@tiptap/vue-3'
 import { useInput, makeInputProps, makeInputEmits } from '@/hooks'
 import { buildEditorConfig } from '@/config/editor/editorConfig.js'
 import { formatEditorHtml } from '@/config/editor/editorFormatHtml.js'
-import { cleanEditorHtml } from '@/config/editor/cleanEditorHtml.js'
+import { isSameEditorHtml, normalizeEditorHtml } from '@/config/editor/cleanEditorHtml.js'
 import {
   buildInteractiveExtensions,
 } from '@/config/editor/editorExtensions.js'
@@ -158,6 +158,7 @@ export default {
     let slashRenderer   = null
     let mentionRenderer = null
     const toolbarRef    = ref(null)
+    let applyingFromEditor = false
 
     const openImageUpload = () => {
       toolbarRef.value?.openImageUpload?.()
@@ -231,8 +232,7 @@ export default {
     const disabled   = computed(() => props.editable === false || props.editable === 'false')
 
     const serializeEditorHtml = (activeEditor) => {
-      const html = activeEditor.getHTML()
-      return cleanEditorHtml(html === '<p></p>' ? '' : html)
+      return normalizeEditorHtml(activeEditor.getHTML())
     }
 
     // ── Tiptap editor ─────────────────────────────────────
@@ -250,7 +250,11 @@ export default {
       editable: !disabled.value,
       onUpdate: ({ editor: activeEditor }) => {
         if (sourceMode.value) return
+        applyingFromEditor = true
         inputApi.input.value = serializeEditorHtml(activeEditor)
+        nextTick(() => {
+          applyingFromEditor = false
+        })
       },
       onFocus: () => { isFocused.value = true;  context.emit('focus') },
       onBlur:  () => { isFocused.value = false; context.emit('blur') },
@@ -273,11 +277,13 @@ export default {
           sourceHtml.value = normalized
           return
         }
-        const current    = editor.value.getHTML()
-        const comparable = current === '<p></p>' ? '' : current
-        if (normalized !== comparable) {
-          editor.value.commands.setContent(normalized || '', false)
+        if (applyingFromEditor) {
+          return
         }
+        if (isSameEditorHtml(editor.value.getHTML(), normalized)) {
+          return
+        }
+        editor.value.commands.setContent(normalized || '', { emitUpdate: false })
       },
       { immediate: true },
     )
