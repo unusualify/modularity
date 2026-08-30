@@ -18,9 +18,9 @@ return [
      * Superadmin always bypasses this and sees/runs all Artisan commands.
      * Supports exact names and globs (e.g. modularous:cache:*).
      *
-     * SystemConsoleWidget uses down, up, route:clear, route:cache, optimize,
-     * and optimize:clear via the same runner. If you grant admin (non-superadmin)
-     * access to that widget, include those command names in this allowlist.
+     * SystemConsoleWidget uses down, up, cache_commands, and custom_commands
+     * via the same runner. If you grant admin (non-superadmin) access to that
+     * widget, include those command names in this allowlist.
      *
      * @var list<string>
      */

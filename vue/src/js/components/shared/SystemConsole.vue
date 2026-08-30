@@ -109,20 +109,78 @@
         </div>
 
         <div class="d-flex flex-wrap ga-2">
-          <v-btn
+          <v-tooltip
             v-for="cmd in uniqueCacheCommands"
             :key="cmd.command"
-            :color="cmd.color || 'primary'"
-            :variant="cmd.variant || 'tonal'"
-            size="small"
-            :prepend-icon="cmd.icon || undefined"
-            :loading="running && activeAction === cmd.command"
-            :disabled="running"
-            @click="requestCacheCommand(cmd)"
+            :disabled="!commandTooltip(cmd)"
+            location="top"
           >
-            {{ cmd.label }}
-          </v-btn>
+            <template #activator="{ props: tip }">
+              <v-btn
+                v-bind="tip"
+                :color="cmd.color || 'primary'"
+                :variant="cmd.variant || 'tonal'"
+                size="small"
+                :prepend-icon="cmd.icon || undefined"
+                :loading="running && activeAction === cmd.command"
+                :disabled="running"
+                @click="requestCommand(cmd, cmd.command)"
+              >
+                {{ cmd.label }}
+              </v-btn>
+            </template>
+            <div
+              v-if="cmd.tooltip"
+              class="text-body-2"
+            >
+              {{ cmd.tooltip }}
+            </div>
+            <div class="text-caption font-weight-medium">
+              {{ cmd.command }}
+            </div>
+          </v-tooltip>
         </div>
+
+        <template v-if="uniqueCustomCommands.length">
+          <v-divider class="my-4" />
+
+          <div class="text-subtitle-2 mb-2">
+            {{ $t('messages.system_console_custom', 'Custom commands') }}
+          </div>
+
+          <div class="d-flex flex-wrap ga-2">
+            <v-tooltip
+              v-for="cmd in uniqueCustomCommands"
+              :key="cmd.key"
+              :disabled="!commandTooltip(cmd)"
+              location="top"
+            >
+              <template #activator="{ props: tip }">
+                <v-btn
+                  v-bind="tip"
+                  :color="cmd.color || 'primary'"
+                  :variant="cmd.variant || 'tonal'"
+                  size="small"
+                  :prepend-icon="cmd.icon || undefined"
+                  :loading="running && activeAction === cmd.key"
+                  :disabled="running"
+                  @click="requestCommand(cmd, cmd.key)"
+                >
+                  {{ cmd.label }}
+                </v-btn>
+              </template>
+              <div
+                v-if="cmd.tooltip"
+                class="text-body-2"
+              >
+                {{ cmd.tooltip }}
+              </div>
+              <div class="text-caption font-weight-medium">
+                {{ cmd.command }}
+              </div>
+            </v-tooltip>
+          </div>
+        </template>
 
         <div
           v-if="errorMessage"
@@ -327,6 +385,10 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  customCommands: {
+    type: Array,
+    default: () => [],
+  },
 })
 
 const attrs = useAttrs()
@@ -371,6 +433,18 @@ const uniqueCacheCommands = computed(() => {
       return false
     }
     seen.add(name)
+    return true
+  })
+})
+
+const uniqueCustomCommands = computed(() => {
+  const seen = new Set()
+  return (props.customCommands || []).filter((cmd) => {
+    const key = cmd?.key || cmd?.command
+    if (!key || seen.has(key)) {
+      return false
+    }
+    seen.add(key)
     return true
   })
 })
@@ -436,6 +510,19 @@ function maskSecret (value) {
   return `${'•'.repeat(Math.min(text.length - 4, 8))}${text.slice(-4)}`
 }
 
+function commandTooltip (cmd) {
+  const tooltip = typeof cmd?.tooltip === 'string' ? cmd.tooltip.trim() : ''
+  const command = typeof cmd?.command === 'string' ? cmd.command.trim() : ''
+  if (!tooltip) {
+    return command
+  }
+  if (!command || tooltip === command) {
+    return tooltip
+  }
+
+  return `${tooltip}\n${command}`
+}
+
 function requestDown () {
   const preset = selectedPreset()
   if (!preset) {
@@ -444,7 +531,9 @@ function requestDown () {
 
   pendingAction.value = {
     type: 'down',
+    actionKey: 'down',
     command: 'down',
+    arguments: {},
     options: { ...(preset.options || {}) },
   }
   confirmMessage.value = t(
@@ -461,12 +550,14 @@ function runUp () {
   })
 }
 
-function requestCacheCommand (cmd) {
+function requestCommand (cmd, actionKey = cmd.key || cmd.command) {
   if (cmd.confirm) {
     pendingAction.value = {
-      type: 'cache',
+      type: 'command',
+      actionKey,
       command: cmd.command,
-      options: {},
+      arguments: { ...(cmd.arguments || {}) },
+      options: { ...(cmd.options || {}) },
     }
     confirmMessage.value = t(
       'messages.system_console_confirm_command',
@@ -477,7 +568,7 @@ function requestCacheCommand (cmd) {
     return
   }
 
-  executeRun(cmd.command, cmd.command, {})
+  executeRun(actionKey, cmd.command, cmd.options || {}, undefined, cmd.arguments || {})
 }
 
 function confirmPendingAction () {
@@ -488,18 +579,19 @@ function confirmPendingAction () {
     return
   }
 
-  executeRun(action.type === 'down' ? 'down' : action.command, action.command, action.options || {}, () => {
+  const actionKey = action.actionKey ?? (action.type === 'down' ? 'down' : action.command)
+  executeRun(actionKey, action.command, action.options || {}, () => {
     if (action.type === 'down') {
       maintenanceModeLocal.value = true
     }
-  })
+  }, action.arguments || {})
 }
 
-async function executeRun (actionKey, command, options, onSuccess) {
+async function executeRun (actionKey, command, options, onSuccess, args = {}) {
   activeAction.value = actionKey
   showOutputModal.value = true
 
-  const ok = await runDirect(command, {}, options)
+  const ok = await runDirect(command, args, options)
 
   activeAction.value = null
 

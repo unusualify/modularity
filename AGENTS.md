@@ -46,6 +46,7 @@ Before editing a folder, read its local `AGENTS.md` when present (`src/`, `Conso
 | Controllers / HTTP | `docs/src/pages/system-reference/backend/http/` |
 | Frontend composables | `docs/src/pages/system-reference/frontend/` |
 | Vue directives | `docs/src/pages/guide/directives/` |
+| Dashboard widgets / System Console | `docs/src/pages/guide/dashboard/` |
 | Form events (`formEvents`) | `docs/src/pages/guide/js/form-events.md` |
 | Form events ADR | `docs/src/pages/system-reference/adr-form-events.md` |
 

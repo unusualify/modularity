@@ -66,6 +66,8 @@ class SystemConsoleWidgetTest extends TestCase
         $this->assertSame('default', $result['defaultDownPreset']);
         $this->assertCount(1, $result['downPresets']);
         $this->assertSame('optimize:clear', $result['cacheCommands'][0]['command']);
+        $this->assertArrayHasKey('customCommands', $result);
+        $this->assertSame([], $result['customCommands']);
     }
 
     /** @test */
@@ -81,6 +83,13 @@ class SystemConsoleWidgetTest extends TestCase
                     'command' => 'optimize',
                     'label' => 'Optimize',
                     'confirm' => true,
+                ],
+            ],
+            'modularous.system_console.custom_commands' => [
+                'queue-restart' => [
+                    'command' => 'queue:restart',
+                    'label' => 'Restart queues',
+                    'tooltip' => 'Signals workers to restart.',
                 ],
             ],
             'modularous.widgets.system-console' => [
@@ -109,6 +118,11 @@ class SystemConsoleWidgetTest extends TestCase
         $this->assertSame(['route:clear', 'optimize'], array_column($cacheCommands, 'command'));
         $this->assertCount(1, $downPresets);
         $this->assertSame(['default'], array_column($downPresets, 'key'));
+
+        $customCommands = $inner['attributes']['customCommands'] ?? [];
+        $this->assertCount(1, $customCommands);
+        $this->assertSame('queue-restart', $customCommands[0]['key']);
+        $this->assertSame('Signals workers to restart.', $customCommands[0]['tooltip']);
     }
 
     /** @test */
@@ -131,6 +145,17 @@ class SystemConsoleWidgetTest extends TestCase
                 'optimize' => [
                     'command' => 'optimize',
                     'label' => 'Optimize',
+                ],
+            ],
+            'modularous.system_console.custom_commands' => [
+                'queue-restart' => [
+                    'command' => 'queue:restart',
+                    'label' => 'Restart queues',
+                    'tooltip' => 'Signals workers to restart.',
+                ],
+                'inspire' => [
+                    'command' => 'inspire',
+                    'label' => 'Inspire',
                 ],
             ],
         ]);
@@ -157,6 +182,11 @@ class SystemConsoleWidgetTest extends TestCase
             ['route:clear', 'route:cache', 'optimize:clear', 'optimize'],
             array_column($cacheCommands, 'command')
         );
+
+        $customCommands = $inner['attributes']['customCommands'] ?? [];
+        $this->assertCount(2, $customCommands);
+        $this->assertSame(['queue-restart', 'inspire'], array_column($customCommands, 'key'));
+        $this->assertSame('Signals workers to restart.', $customCommands[0]['tooltip']);
     }
 
     /** @test */

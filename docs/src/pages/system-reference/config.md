@@ -17,7 +17,7 @@ Modularous uses a layered configuration system. Understanding the layers helps w
 
 Package defaults that do not depend on the translator. Merged recursively with `array_merge_recursive_preserve()`.
 
-**Files**: api, cache, composer, default_form_action, default_form_attributes, default_header, default_input, default_table_action, default_table_attributes, enabled, file_library, glide, imgix, input_types, laravel-relationship-map, mail, media_library, notifications, paths, payment, remote_api, schemas, services, stubs, tables, traits
+**Files**: api, artisan_runner, cache, composer, default_form_action, default_form_attributes, default_header, default_input, default_table_action, default_table_attributes, enabled, file_library, glide, imgix, input_types, laravel-relationship-map, mail, media_library, notifications, paths, payment, remote_api, schemas, services, stubs, system_console, tables, traits
 
 ### 2. defers (Localized Config)
 

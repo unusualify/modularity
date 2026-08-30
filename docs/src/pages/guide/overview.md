@@ -21,6 +21,13 @@ This section covers UI components, forms, tables, and CMS public-site features i
 | [Sitemap & SEO](/guide/cms/sitemap-and-seo) | `/sitemap.xml`, robots.txt |
 | [Configuration](/guide/cms/configuration) | `modularous.cms_*` keys |
 
+## Dashboard
+
+| Page | Description |
+|------|-------------|
+| [Dashboard widgets](/guide/dashboard/overview) | `ui_settings.dashboard.blocks`, widget schema, host overrides |
+| [System Console](/guide/dashboard/system-console) | `system_console` config: down presets, cache and custom commands |
+
 ## Components
 
 | Page | Description |

@@ -68,44 +68,43 @@ final class SystemConsoleConfig
 
     /**
      * @return list<array{
+     *     key: string,
      *     command: string,
      *     label: string,
+     *     tooltip: string|null,
      *     confirm: bool,
      *     color: string|null,
      *     variant: string|null,
-     *     icon: string|null
+     *     icon: string|null,
+     *     arguments: array<string, scalar>,
+     *     options: array<string, scalar>
      * }>
      */
     public static function cacheCommandsForUi(): array
     {
-        /** @var array<int|string, mixed> $commands */
-        $commands = (array) modularousConfig('system_console.cache_commands', []);
+        return self::commandsForUi('system_console.cache_commands', uniqueBy: 'command');
+    }
 
-        $items = [];
-        $seen = [];
-
-        foreach ($commands as $command) {
-            if (! is_array($command) || empty($command['command'])) {
-                continue;
-            }
-
-            $name = (string) $command['command'];
-            if (isset($seen[$name])) {
-                continue;
-            }
-            $seen[$name] = true;
-
-            $items[] = [
-                'command' => $name,
-                'label' => (string) ($command['label'] ?? $name),
-                'confirm' => (bool) ($command['confirm'] ?? false),
-                'color' => isset($command['color']) ? (string) $command['color'] : null,
-                'variant' => isset($command['variant']) ? (string) $command['variant'] : 'tonal',
-                'icon' => isset($command['icon']) ? (string) $command['icon'] : null,
-            ];
-        }
-
-        return $items;
+    /**
+     * Extra one-click commands; uniqued by config key so the same artisan
+     * command may appear more than once with different arguments/options.
+     *
+     * @return list<array{
+     *     key: string,
+     *     command: string,
+     *     label: string,
+     *     tooltip: string|null,
+     *     confirm: bool,
+     *     color: string|null,
+     *     variant: string|null,
+     *     icon: string|null,
+     *     arguments: array<string, scalar>,
+     *     options: array<string, scalar>
+     * }>
+     */
+    public static function customCommandsForUi(): array
+    {
+        return self::commandsForUi('system_console.custom_commands', uniqueBy: 'key');
     }
 
     public static function isInMaintenance(): bool
@@ -176,6 +175,62 @@ final class SystemConsoleConfig
         }
 
         return $overrides;
+    }
+
+    /**
+     * @param 'command'|'key' $uniqueBy
+     * @return list<array{
+     *     key: string,
+     *     command: string,
+     *     label: string,
+     *     tooltip: string|null,
+     *     confirm: bool,
+     *     color: string|null,
+     *     variant: string|null,
+     *     icon: string|null,
+     *     arguments: array<string, scalar>,
+     *     options: array<string, scalar>
+     * }>
+     */
+    private static function commandsForUi(string $configKey, string $uniqueBy = 'command'): array
+    {
+        /** @var array<int|string, mixed> $commands */
+        $commands = (array) modularousConfig($configKey, []);
+
+        $items = [];
+        $seen = [];
+
+        foreach ($commands as $index => $command) {
+            if (! is_array($command) || empty($command['command'])) {
+                continue;
+            }
+
+            $name = (string) $command['command'];
+            $key = (string) ($command['key'] ?? (is_string($index) && $index !== '' ? $index : $name));
+            $uniqueValue = $uniqueBy === 'key' ? $key : $name;
+
+            if ($uniqueValue === '' || isset($seen[$uniqueValue])) {
+                continue;
+            }
+            $seen[$uniqueValue] = true;
+
+            $tooltip = isset($command['tooltip']) ? trim((string) $command['tooltip']) : '';
+
+            $items[] = [
+                'key' => $key !== '' ? $key : $name,
+                'command' => $name,
+                'label' => (string) ($command['label'] ?? $name),
+                'tooltip' => $tooltip !== '' ? $tooltip : null,
+                'confirm' => (bool) ($command['confirm'] ?? false),
+                'color' => isset($command['color']) ? (string) $command['color'] : null,
+                'variant' => isset($command['variant']) ? (string) $command['variant'] : 'tonal',
+                'icon' => isset($command['icon']) ? (string) $command['icon'] : null,
+                'arguments' => self::normalizeOptions((array) ($command['arguments'] ?? [])),
+                'options' => self::normalizeOptions((array) ($command['options'] ?? [])),
+            ];
+        }
+
+        return $items;
     }
 
     /**

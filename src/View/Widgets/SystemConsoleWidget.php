@@ -45,6 +45,7 @@ class SystemConsoleWidget extends ModularousWidget
         $attributes['downPresets'] = SystemConsoleConfig::downPresetsForUi();
         $attributes['defaultDownPreset'] = SystemConsoleConfig::defaultDownPresetKey();
         $attributes['cacheCommands'] = SystemConsoleConfig::cacheCommandsForUi();
+        $attributes['customCommands'] = SystemConsoleConfig::customCommandsForUi();
 
         return $attributes;
     }

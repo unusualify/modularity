@@ -33,9 +33,10 @@ return [
      * Granular cache / optimize actions shown in SystemConsoleWidget.
      * Commands must be runnable via ArtisanRunner (superadmin or allowlist).
      *
-     * @var list<array{
+     * @var array<string, array{
      *     command: string,
      *     label: string,
+     *     tooltip?: string,
      *     confirm?: bool,
      *     color?: string,
      *     variant?: string,
@@ -71,5 +72,34 @@ return [
             'color' => 'primary',
             'icon' => 'mdi-rocket-launch',
         ],
+    ],
+
+    /**
+     * Extra one-click Artisan actions on a separate SystemConsole row.
+     * Independent from cache_commands. Deduped by array key so the same
+     * artisan command may appear twice with different arguments/options.
+     * Empty list hides the row. Commands must be runnable via ArtisanRunner.
+     *
+     * @var array<string, array{
+     *     command: string,
+     *     label?: string,
+     *     tooltip?: string,
+     *     confirm?: bool,
+     *     color?: string,
+     *     variant?: string,
+     *     icon?: string,
+     *     arguments?: array<string, mixed>,
+     *     options?: array<string, mixed>
+     * }>
+     */
+    'custom_commands' => [
+        // 'queue-restart' => [
+        //     'command' => 'queue:restart',
+        //     'label' => 'Restart queues',
+        //     'tooltip' => 'Signals all queue workers to restart after the current job.',
+        //     'confirm' => true,
+        //     'color' => 'secondary',
+        //     'icon' => 'mdi-restart',
+        // ],
     ],
 ];

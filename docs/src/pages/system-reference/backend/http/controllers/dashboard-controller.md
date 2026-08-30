@@ -49,16 +49,8 @@ Renders the dashboard using Inertia with shared store variables and metadata req
 
 ## Block Configuration
 
-Blocks are defined in `config/modularous.php` under `ui_settings.dashboard.blocks`:
+Blocks are defined in deferred `ui_settings` under `dashboard.blocks` (`config/defers/ui_settings.php`, host override `modularous/ui_settings.php`).
 
-```php
-'blocks' => [
-    [
-        'component' => 'StatCard',
-        'allowedRoles' => ['admin', 'manager'],
-        'props' => [ ... ],
-    ],
-],
-```
+User-facing schema, widget keys, and System Console command config: [Dashboard widgets](/guide/dashboard/overview) and [System Console](/guide/dashboard/system-console).
 
 Each block's `allowedRoles` is checked against the current user's roles via the `Allowable` trait. Blocks with no `allowedRoles` key are visible to all users.

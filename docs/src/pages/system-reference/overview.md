@@ -32,6 +32,8 @@ Modularous (Modularous) is a Laravel package that provides a modular admin panel
 | Page | Description |
 |------|-------------|
 | [Remote API](/guide/remote-api/overview) | Sync entities from external JSON APIs (connector, cache, admin UI) |
+| [Dashboard widgets](/guide/dashboard/overview) | Admin dashboard blocks (`ui_settings.dashboard.blocks`) |
+| [System Console](/guide/dashboard/system-console) | Maintenance, cache, and custom Artisan commands |
 
 ## Quick Reference
 
