@@ -1,5 +1,8 @@
 <?php
 
+use Unusualify\Modularous\Module;
+use Unusualify\Modularous\Services\ModuleRouteInspect\Contracts\ModuleRouteStatusStoreInterface;
+
 return [
     /**
      * Enable the Module Route Inspect admin panel + JSON API.
@@ -22,8 +25,8 @@ return [
      * - filesystem: {module}/routes_statuses.json via ModuleActivator (default)
      * - database: um_module_route_statuses (env-specific; not git-tracked)
      *
-     * Runtime ({@see \Unusualify\Modularous\Module::enableRoute} / isEnabledRoute)
-     * and the inspect panel both resolve {@see \Unusualify\Modularous\Services\ModuleRouteInspect\Contracts\ModuleRouteStatusStoreInterface}.
+     * Runtime ({@see Module::enableRoute} / isEnabledRoute)
+     * and the inspect panel both resolve {@see ModuleRouteStatusStoreInterface}.
      */
     'driver' => env('MODULAROUS_MODULE_ROUTE_STATUS_DRIVER', 'filesystem'),
 

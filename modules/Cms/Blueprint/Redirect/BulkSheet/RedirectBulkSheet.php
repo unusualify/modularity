@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace Modules\Cms\Blueprint\Redirect\BulkSheet;
 
+use Modules\Cms\Http\Controllers\RedirectController;
 use Unusualify\Modularous\Contracts\ModuleRoute\ModuleRouteBlueprintProvider;
 use Unusualify\Modularous\ModuleRoute;
 
 /**
  * CSV bulk sheet options + column schema for Cms Redirect.
  *
- * Imperative import/validate/commit/export stay on {@see \Modules\Cms\Http\Controllers\RedirectController}.
+ * Imperative import/validate/commit/export stay on {@see RedirectController}.
  */
 final class RedirectBulkSheet implements ModuleRouteBlueprintProvider
 {

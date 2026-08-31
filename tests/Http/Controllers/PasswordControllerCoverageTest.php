@@ -27,6 +27,7 @@ use Unusualify\Modularous\Traits\Traitify;
 class PasswordControllerCoverageTest extends ModelTestCase
 {
     use RefreshDatabase;
+
     protected function tearDown(): void
     {
         Mockery::close();

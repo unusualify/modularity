@@ -60,7 +60,7 @@ final class BlueprintConfigSourceExtractor
 
         while (preg_match($pattern, $haystack, $match, PREG_OFFSET_CAPTURE, $offset) === 1) {
             $matchStart = $match[0][1];
-            $matchLen = strlen($match[0][0]);
+            $matchLen = mb_strlen($match[0][0]);
 
             if ($this->isInLineComment($haystack, $matchStart)) {
                 $offset = $matchStart + $matchLen;
@@ -124,7 +124,7 @@ final class BlueprintConfigSourceExtractor
             'key_start' => $keyStart,
             'value_start' => $valueStart,
             'value_end' => $valueEnd,
-            'literal' => substr($src, $valueStart, $valueEnd - $valueStart),
+            'literal' => mb_substr($src, $valueStart, $valueEnd - $valueStart),
         ];
     }
 
@@ -146,7 +146,7 @@ final class BlueprintConfigSourceExtractor
         return [
             'key_start' => $entry['key_start'],
             'value_start' => $entry['value_start'],
-            'value_end' => $entry['value_start'] + strlen($literal),
+            'value_end' => $entry['value_start'] + mb_strlen($literal),
             'literal' => $literal,
         ];
     }
@@ -164,7 +164,7 @@ final class BlueprintConfigSourceExtractor
 
         while (preg_match($pattern, $haystack, $match, PREG_OFFSET_CAPTURE, $offset) === 1) {
             $matchStart = $match[0][1];
-            $matchLen = strlen($match[0][0]);
+            $matchLen = mb_strlen($match[0][0]);
 
             if ($this->isInLineComment($haystack, $matchStart)) {
                 $offset = $matchStart + $matchLen;
@@ -173,7 +173,7 @@ final class BlueprintConfigSourceExtractor
             }
 
             $valueStart = $matchStart + $matchLen;
-            while ($valueStart < strlen($haystack) && ctype_space($haystack[$valueStart])) {
+            while ($valueStart < mb_strlen($haystack) && ctype_space($haystack[$valueStart])) {
                 $valueStart++;
             }
 
@@ -182,7 +182,7 @@ final class BlueprintConfigSourceExtractor
                 return [
                     'key_start' => $matchStart,
                     'value_start' => $valueStart,
-                    'value_end' => $valueStart + strlen($arrayLiteral),
+                    'value_end' => $valueStart + mb_strlen($arrayLiteral),
                     'value' => $arrayLiteral,
                 ];
             }
@@ -192,7 +192,7 @@ final class BlueprintConfigSourceExtractor
                 return [
                     'key_start' => $matchStart,
                     'value_start' => $valueStart,
-                    'value_end' => $valueStart + strlen($expr),
+                    'value_end' => $valueStart + mb_strlen($expr),
                     'value' => $expr,
                 ];
             }
@@ -208,9 +208,9 @@ final class BlueprintConfigSourceExtractor
      */
     public function isInLineComment(string $src, int $pos): bool
     {
-        $lineStart = strrpos(substr($src, 0, $pos), "\n");
+        $lineStart = mb_strrpos(mb_substr($src, 0, $pos), "\n");
         $lineStart = $lineStart === false ? 0 : $lineStart + 1;
-        $before = substr($src, $lineStart, max(0, $pos - $lineStart));
+        $before = mb_substr($src, $lineStart, max(0, $pos - $lineStart));
 
         // Strip string literals on the line so // inside quotes does not count.
         $before = preg_replace("/'(?:\\\\'|[^'])*'/", "''", $before) ?? $before;
@@ -221,7 +221,7 @@ final class BlueprintConfigSourceExtractor
 
     public function readArrayLiteral(string $src, int $offset): ?string
     {
-        $len = strlen($src);
+        $len = mb_strlen($src);
         while ($offset < $len && ctype_space($src[$offset])) {
             $offset++;
         }
@@ -235,13 +235,13 @@ final class BlueprintConfigSourceExtractor
         }
 
         if (preg_match('/\Garray\s*\(/A', $src, $m, 0, $offset) === 1) {
-            $parenPos = $offset + strlen($m[0]) - 1;
+            $parenPos = $offset + mb_strlen($m[0]) - 1;
             $balanced = $this->readBalanced($src, $parenPos, '(', ')');
             if ($balanced === null) {
                 return null;
             }
 
-            return substr($src, $offset, ($parenPos - $offset) + strlen($balanced));
+            return mb_substr($src, $offset, ($parenPos - $offset) + mb_strlen($balanced));
         }
 
         return null;
@@ -249,7 +249,7 @@ final class BlueprintConfigSourceExtractor
 
     private function readExpression(string $src, int $offset): ?string
     {
-        $len = strlen($src);
+        $len = mb_strlen($src);
         if ($offset >= $len) {
             return null;
         }
@@ -327,20 +327,20 @@ final class BlueprintConfigSourceExtractor
             }
 
             if ($depthParen === 0 && ($ch === ',' || $ch === "\n" || $ch === ']')) {
-                $expr = rtrim(substr($src, $offset, $i - $offset));
+                $expr = rtrim(mb_substr($src, $offset, $i - $offset));
 
                 return $expr !== '' ? $expr : null;
             }
         }
 
-        $expr = rtrim(substr($src, $offset));
+        $expr = rtrim(mb_substr($src, $offset));
 
         return $expr !== '' ? $expr : null;
     }
 
     private function readBalanced(string $src, int $start, string $open, string $close): ?string
     {
-        $len = strlen($src);
+        $len = mb_strlen($src);
         if ($start >= $len || $src[$start] !== $open) {
             return null;
         }
@@ -402,7 +402,7 @@ final class BlueprintConfigSourceExtractor
 
             // Line comments
             if ($ch === '/' && $i + 1 < $len && $src[$i + 1] === '/') {
-                $nl = strpos($src, "\n", $i);
+                $nl = mb_strpos($src, "\n", $i);
                 if ($nl === false) {
                     return null;
                 }
@@ -419,7 +419,7 @@ final class BlueprintConfigSourceExtractor
             if ($ch === $close) {
                 $depth--;
                 if ($depth === 0) {
-                    return substr($src, $start, $i - $start + 1);
+                    return mb_substr($src, $start, $i - $start + 1);
                 }
             }
         }
@@ -438,7 +438,7 @@ final class BlueprintConfigSourceExtractor
                 continue;
             }
             if (preg_match('/^(\s*)/', $line, $m) === 1) {
-                $indents[] = strlen(str_replace("\t", '    ', $m[1]));
+                $indents[] = mb_strlen(str_replace("\t", '    ', $m[1]));
             }
         }
 
@@ -456,8 +456,8 @@ final class BlueprintConfigSourceExtractor
                 continue;
             }
             $normalized = str_replace("\t", '    ', $line);
-            if ($min > 0 && strlen($normalized) >= $min) {
-                $normalized = substr($normalized, $min);
+            if ($min > 0 && mb_strlen($normalized) >= $min) {
+                $normalized = mb_substr($normalized, $min);
             }
             $out[] = $normalized;
         }

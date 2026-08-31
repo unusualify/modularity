@@ -141,6 +141,7 @@ trait Moduleable
 
     /**
      * @return $this
+     *
      * @deprecated Use setModuleRouteName instead
      */
     public function setRouteName(string $routeName): static

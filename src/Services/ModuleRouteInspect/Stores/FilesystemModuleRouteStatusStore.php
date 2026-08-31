@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Unusualify\Modularous\Services\ModuleRouteInspect\Stores;
 
+use Unusualify\Modularous\Activators\ModuleActivator;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Module;
 use Unusualify\Modularous\Services\ModuleRouteInspect\Contracts\ModuleRouteStatusStoreInterface;
 
 /**
- * Filesystem adapter wrapping {@see \Unusualify\Modularous\Activators\ModuleActivator}.
+ * Filesystem adapter wrapping {@see ModuleActivator}.
  *
  * Writes `{module}/routes_statuses.json` via the activator directly (not
  * {@see Module::enableRoute}) to avoid recursion when Module delegates to this store.

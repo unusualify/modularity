@@ -14,7 +14,7 @@ final class PaymentIndexOptions implements ModuleRouteTableOptionsProvider
     {
         return [
             'subtitle' => __('You can check all the payments that you receive and the invoices related to the payments here according to company list.'),
-        
+
             'createOnModal' => false,
             'editOnModal' => false,
             'isRowEditing' => false,

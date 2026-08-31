@@ -21,7 +21,7 @@ final class PriceFormInputs implements ModuleRouteInputsProvider
                     'priceable_type' => 'Priceable Type',
                 ],
             ],
-        
+
         ];
     }
 }

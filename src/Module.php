@@ -16,7 +16,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Nwidart\Modules\Laravel\Module as NwidartModule;
 use Nwidart\Modules\Support\Config\GenerateConfigReader;
@@ -307,7 +306,7 @@ class Module extends NwidartModule
      * Studly route names from the status store (hot path — no ModuleRoute registry).
      *
      * Uses in-memory activator statuses when available; avoids ModuleRouteRegistry
-     * and avoids {@see \Unusualify\Modularous\Activators\ModuleActivator::getRoutes()}
+     * and avoids {@see ModuleActivator::getRoutes()}
      * which re-reads JSON from disk on every call.
      *
      * @return list<string>
@@ -396,7 +395,7 @@ class Module extends NwidartModule
      */
     private function usesFilesystemRouteStatusDriver(): bool
     {
-        $driver = strtolower((string) modularousConfig('module_route_inspect.driver', 'filesystem'));
+        $driver = mb_strtolower((string) modularousConfig('module_route_inspect.driver', 'filesystem'));
 
         return $driver === 'filesystem' || $driver === '';
     }
@@ -433,7 +432,7 @@ class Module extends NwidartModule
     }
 
     /**
-     * @return \Illuminate\Support\Collection<string, ModuleRoute>
+     * @return Collection<string, ModuleRoute>
      */
     public function moduleRoutes()
     {
@@ -448,7 +447,7 @@ class Module extends NwidartModule
      *
      * @see docs/src/pages/system-reference/adr-module-route-hot-path.md
      *
-     * @return \Illuminate\Support\Collection<string, ModuleRoute>
+     * @return Collection<string, ModuleRoute>
      */
     public function sidebarRoutes()
     {
@@ -498,7 +497,7 @@ class Module extends NwidartModule
     }
 
     /**
-     * @return \Illuminate\Support\Collection<string, ModuleRoute>
+     * @return Collection<string, ModuleRoute>
      */
     public function enabledModuleRoutes()
     {
@@ -508,7 +507,7 @@ class Module extends NwidartModule
     /**
      * @deprecated Use {@see enabledModuleRoutes()} instead.
      *
-     * @return \Illuminate\Support\Collection<string, ModuleRoute>
+     * @return Collection<string, ModuleRoute>
      */
     public function enabledRoutes()
     {
@@ -526,7 +525,7 @@ class Module extends NwidartModule
     /**
      * @deprecated Use {@see moduleRoutes()} instead.
      *
-     * @return \Illuminate\Support\Collection<string, ModuleRoute>
+     * @return Collection<string, ModuleRoute>
      */
     public function routes()
     {
@@ -802,7 +801,6 @@ class Module extends NwidartModule
      * Hot path: route registration, sidebar, controllers. Memoized per Module instance.
      *
      * @param string $routeName
-     * @return bool
      *
      * @deprecated Prefer ModuleRoute::isSingleton() when you already have a ModuleRoute
      */
@@ -1480,11 +1478,11 @@ class Module extends NwidartModule
     }
 
     /**
-     * @param  array<string, mixed>  $raw
+     * @param array<string, mixed> $raw
      */
     private function routeBlueprintFieldNeedsModuleRoute(array $raw, string $field): bool
     {
-        $globalDriver = strtolower((string) modularousConfig('module_route_presentation.driver', 'config'));
+        $globalDriver = mb_strtolower((string) modularousConfig('module_route_presentation.driver', 'config'));
         if ($globalDriver !== 'config' && $globalDriver !== '') {
             return true;
         }

@@ -32,8 +32,7 @@ final class ModuleRouteRegistry
         private readonly Module $module,
         private readonly ModuleRouteStatusStoreInterface $statusStore,
         private readonly FeatureDetector $featureDetector,
-    ) {
-    }
+    ) {}
 
     /**
      * @return Collection<string, ModuleRoute> keyed by Studly route name

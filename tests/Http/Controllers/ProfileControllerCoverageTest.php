@@ -25,6 +25,7 @@ use Unusualify\Modularous\Traits\Traitify;
 class ProfileControllerCoverageTest extends ModelTestCase
 {
     use RefreshDatabase;
+
     protected function tearDown(): void
     {
         Mockery::close();

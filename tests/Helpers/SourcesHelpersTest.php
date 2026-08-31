@@ -5,6 +5,7 @@ namespace Unusualify\Modularous\Tests\Helpers;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\File;
+use Unusualify\Modularous\Entities\User;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Tests\TestCase;
 
@@ -326,7 +327,7 @@ class SourcesHelpersTest extends TestCase
         ]);
         Config::set('auth.providers.users', [
             'driver' => 'eloquent',
-            'model' => \Unusualify\Modularous\Entities\User::class,
+            'model' => User::class,
         ]);
 
         $this->assertCount(0, get_user_currency_vat_rates());

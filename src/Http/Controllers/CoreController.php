@@ -315,7 +315,7 @@ abstract class CoreController extends LaravelController implements ModuleableInt
             return false;
         }
 
-        $globalDriver = strtolower((string) modularousConfig('module_route_presentation.driver', 'config'));
+        $globalDriver = mb_strtolower((string) modularousConfig('module_route_presentation.driver', 'config'));
         if ($globalDriver !== 'config' && $globalDriver !== '') {
             return true;
         }

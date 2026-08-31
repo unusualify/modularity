@@ -47,7 +47,7 @@ final class RoleFormInputs implements ModuleRouteInputsProvider
                 'rules' => 'sometimes|required|min:3',
                 // 'prepend-icon' => 'mdi-card-text-outline',
             ],
-        
+
             [
                 'type' => 'text',
                 'name' => 'guard_name',
@@ -68,7 +68,7 @@ final class RoleFormInputs implements ModuleRouteInputsProvider
                 'flat',
                 // 'full-width',
                 'hide-spin-buttons',
-        
+
             ],
             [
                 'type' => 'checklist',

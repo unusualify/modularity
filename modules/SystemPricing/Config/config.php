@@ -1,5 +1,18 @@
 <?php
 
+use Modules\SystemPricing\Blueprint\Currency\Form\CurrencyFormInputs;
+use Modules\SystemPricing\Blueprint\Currency\Index\CurrencyIndexColumns;
+use Modules\SystemPricing\Blueprint\Currency\Index\CurrencyIndexOptions;
+use Modules\SystemPricing\Blueprint\Price\Form\PriceFormInputs;
+use Modules\SystemPricing\Blueprint\Price\Index\PriceIndexColumns;
+use Modules\SystemPricing\Blueprint\Price\Index\PriceIndexOptions;
+use Modules\SystemPricing\Blueprint\PriceType\Form\PriceTypeFormInputs;
+use Modules\SystemPricing\Blueprint\PriceType\Index\PriceTypeIndexColumns;
+use Modules\SystemPricing\Blueprint\PriceType\Index\PriceTypeIndexOptions;
+use Modules\SystemPricing\Blueprint\VatRate\Form\VatRateFormInputs;
+use Modules\SystemPricing\Blueprint\VatRate\Index\VatRateIndexColumns;
+use Modules\SystemPricing\Blueprint\VatRate\Index\VatRateIndexOptions;
+
 return [
     'name' => 'SystemPricing',
     'system_prefix' => true,
@@ -8,11 +21,11 @@ return [
     'routes' => [
         'vat_rate' => [
             'index' => [
-                'columns' => \Modules\SystemPricing\Blueprint\VatRate\Index\VatRateIndexColumns::class,
-                'options' => \Modules\SystemPricing\Blueprint\VatRate\Index\VatRateIndexOptions::class,
+                'columns' => VatRateIndexColumns::class,
+                'options' => VatRateIndexOptions::class,
             ],
             'form' => [
-                'inputs' => \Modules\SystemPricing\Blueprint\VatRate\Form\VatRateFormInputs::class,
+                'inputs' => VatRateFormInputs::class,
             ],
             'name' => 'VatRate',
             'headline' => 'Vat Rates',
@@ -75,11 +88,11 @@ return [
         ],
         'currency' => [
             'index' => [
-                'columns' => \Modules\SystemPricing\Blueprint\Currency\Index\CurrencyIndexColumns::class,
-                'options' => \Modules\SystemPricing\Blueprint\Currency\Index\CurrencyIndexOptions::class,
+                'columns' => CurrencyIndexColumns::class,
+                'options' => CurrencyIndexOptions::class,
             ],
             'form' => [
-                'inputs' => \Modules\SystemPricing\Blueprint\Currency\Form\CurrencyFormInputs::class,
+                'inputs' => CurrencyFormInputs::class,
             ],
             'name' => 'Currency',
             'headline' => 'Currencies',
@@ -158,11 +171,11 @@ return [
         ],
         'price_type' => [
             'index' => [
-                'columns' => \Modules\SystemPricing\Blueprint\PriceType\Index\PriceTypeIndexColumns::class,
-                'options' => \Modules\SystemPricing\Blueprint\PriceType\Index\PriceTypeIndexOptions::class,
+                'columns' => PriceTypeIndexColumns::class,
+                'options' => PriceTypeIndexOptions::class,
             ],
             'form' => [
-                'inputs' => \Modules\SystemPricing\Blueprint\PriceType\Form\PriceTypeFormInputs::class,
+                'inputs' => PriceTypeFormInputs::class,
             ],
             'name' => 'PriceType',
             'headline' => 'Price Types',
@@ -209,11 +222,11 @@ return [
         ],
         'price' => [
             'index' => [
-                'columns' => \Modules\SystemPricing\Blueprint\Price\Index\PriceIndexColumns::class,
-                'options' => \Modules\SystemPricing\Blueprint\Price\Index\PriceIndexOptions::class,
+                'columns' => PriceIndexColumns::class,
+                'options' => PriceIndexOptions::class,
             ],
             'form' => [
-                'inputs' => \Modules\SystemPricing\Blueprint\Price\Form\PriceFormInputs::class,
+                'inputs' => PriceFormInputs::class,
             ],
             'name' => 'Price',
             'headline' => 'Prices',

@@ -199,7 +199,7 @@ class RemoteApiSourceTraitTest extends TestCase
     ): void {
         $panelPrefix = $isParent
             ? $routePrefix
-            : substr($routePrefix, 0, -(strlen(snakeCase($routeName)) + 1));
+            : mb_substr($routePrefix, 0, -(mb_strlen(snakeCase($routeName)) + 1));
 
         $module = Mockery::mock(Module::class);
         $module->shouldReceive('isParentRoute')->with($routeName)->andReturn($isParent);

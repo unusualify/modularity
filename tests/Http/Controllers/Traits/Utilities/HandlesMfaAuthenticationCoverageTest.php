@@ -123,7 +123,7 @@ class HandlesMfaAuthenticationCoverageTest extends TestCase
         $this->assertSame('register.verification.success', $controller->call('resolveRegistrationSuccessRouteName'));
 
         $code = $controller->call('generateMfaCode');
-        $this->assertSame(6, strlen($code));
+        $this->assertSame(6, mb_strlen($code));
 
         $user = (object) ['google_2fa_secret' => 'ABC', 'google_2fa_enabled' => true];
         $this->assertTrue($controller->call('userHasMfaEnabled', $user));
@@ -216,7 +216,7 @@ class HandlesMfaAuthenticationCoverageTest extends TestCase
             'modularous.security.mfa.email_otp.expire_minutes' => 10,
         ]);
 
-        \Illuminate\Support\Facades\Route::get('/login-2fa', fn () => 'ok')->name('login-2fa.form');
+        Route::get('/login-2fa', fn () => 'ok')->name('login-2fa.form');
         $modularous = Mockery::mock(\Unusualify\Modularous\Modularous::class)->makePartial();
         $modularous->shouldReceive('getAuthGuardName')->andReturn('modularous');
         $modularous->shouldReceive('getAdminRouteNamePrefix')->andReturn('admin');

@@ -10,15 +10,14 @@ namespace Unusualify\Modularous\Services\ModuleRouteInspect;
 final class ModuleRouteInspectReport
 {
     /**
-     * @param  list<ModuleRouteInspectEntry>  $entries
+     * @param list<ModuleRouteInspectEntry> $entries
      */
     public function __construct(
         public readonly array $entries,
-    ) {
-    }
+    ) {}
 
     /**
-     * @param  list<string>  $featureKeys
+     * @param list<string> $featureKeys
      */
     public function filter(bool $findingsOnly = false, array $featureKeys = []): self
     {

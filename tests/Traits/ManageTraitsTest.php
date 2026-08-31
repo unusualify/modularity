@@ -90,7 +90,7 @@ class ManageTraitsTest extends TestCase
     /** @test */
     public function it_can_resolve_model()
     {
-        $module = \Mockery::mock(Module::class);
+        $module = Mockery::mock(Module::class);
         $module->shouldReceive('hasRoute')->with('TestRoute')->andReturn(true);
         $module->shouldReceive('getModel')->with('TestRoute')->once()->andReturn('TestModel');
 

@@ -14,7 +14,7 @@ final class MyNotificationIndexOptions implements ModuleRouteTableOptionsProvide
     {
         return [
             'subtitle' => __('You can easily monitor the entire process by following the notifications.'),
-        
+
             'createOnModal' => false,
             'editOnModal' => true,
             'isRowEditing' => false,

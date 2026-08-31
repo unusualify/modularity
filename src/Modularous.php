@@ -483,7 +483,7 @@ class Modularous extends FileRepository
      * ({@see config('modularous.admin_app_url')}) or the same host with
      * {@see config('modularous.admin_app_path')} as the first path segment.
      *
-     * @param  string|null  $url
+     * @param string|null $url
      */
     public function isFrontUrl($url = null): bool
     {

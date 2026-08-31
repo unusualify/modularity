@@ -14,7 +14,7 @@ final class BlueprintConfigPersister
     ) {}
 
     /**
-     * @param  list<array{nested: string, fqcn: string, legacy: string}>  $wires
+     * @param list<array{nested: string, fqcn: string, legacy: string}> $wires
      * @return array{
      *     ok: bool,
      *     message: string,
@@ -53,7 +53,7 @@ final class BlueprintConfigPersister
         }
 
         $routeLiteral = $route['literal'];
-        $inner = substr($routeLiteral, 1, -1); // strip [ ]
+        $inner = mb_substr($routeLiteral, 1, -1); // strip [ ]
         $indent = $this->detectInnerIndent($inner);
 
         $commented = [];
@@ -73,9 +73,9 @@ final class BlueprintConfigPersister
         }
 
         $newRouteLiteral = '[' . $inner . ']';
-        $content = substr($configContents, 0, $route['value_start'])
+        $content = mb_substr($configContents, 0, $route['value_start'])
             . $newRouteLiteral
-            . substr($configContents, $route['value_end']);
+            . mb_substr($configContents, $route['value_end']);
 
         return [
             'ok' => true,
@@ -91,7 +91,7 @@ final class BlueprintConfigPersister
     }
 
     /**
-     * @param  list<array{nested: string, fqcn: string, legacy: string}>  $wires
+     * @param list<array{nested: string, fqcn: string, legacy: string}> $wires
      * @return array{
      *     ok: bool,
      *     message: string,
@@ -127,7 +127,7 @@ final class BlueprintConfigPersister
     }
 
     /**
-     * @param  list<array{nested: string, fqcn: string, legacy: string}>  $wires
+     * @param list<array{nested: string, fqcn: string, legacy: string}> $wires
      * @return array<string, array<string, string>> surface => [leaf => \Fqcn::class]
      */
     private function groupBySurface(array $wires): array
@@ -151,7 +151,7 @@ final class BlueprintConfigPersister
     /**
      * Route-root class leaves (nested_key === legacy, e.g. bulk_sheet).
      *
-     * @param  list<array{nested: string, fqcn: string, legacy: string}>  $wires
+     * @param list<array{nested: string, fqcn: string, legacy: string}> $wires
      * @return array<string, string> key => \Fqcn::class
      */
     private function groupRootLeaves(array $wires): array
@@ -176,13 +176,13 @@ final class BlueprintConfigPersister
             return "\n{$indent}{$assignment}," . $inner;
         }
 
-        return substr($inner, 0, $entry['key_start'])
+        return mb_substr($inner, 0, $entry['key_start'])
             . $assignment
-            . substr($inner, $entry['value_end']);
+            . mb_substr($inner, $entry['value_end']);
     }
 
     /**
-     * @param  array<string, string>  $leaves
+     * @param array<string, string> $leaves
      */
     private function upsertSurface(string $inner, string $surface, array $leaves, string $indent): string
     {
@@ -202,9 +202,9 @@ final class BlueprintConfigPersister
             return $inner;
         }
 
-        return substr($inner, 0, $entry['key_start'])
+        return mb_substr($inner, 0, $entry['key_start'])
             . $replacement
-            . substr($inner, $entry['value_end']);
+            . mb_substr($inner, $entry['value_end']);
     }
 
     /**
@@ -212,7 +212,7 @@ final class BlueprintConfigPersister
      */
     private function readExistingClassLeaves(string $surfaceLiteral): array
     {
-        $inner = substr(trim($surfaceLiteral), 1, -1);
+        $inner = mb_substr(trim($surfaceLiteral), 1, -1);
         $leaves = [];
         $candidates = [
             'options',
@@ -241,7 +241,7 @@ final class BlueprintConfigPersister
     }
 
     /**
-     * @param  array<string, string>  $leaves
+     * @param array<string, string> $leaves
      */
     private function formatSurfaceBlock(string $surface, array $leaves, string $indent): string
     {
@@ -256,7 +256,7 @@ final class BlueprintConfigPersister
     }
 
     /**
-     * @param  list<array{nested: string, fqcn: string, legacy: string}>  $wires
+     * @param list<array{nested: string, fqcn: string, legacy: string}> $wires
      * @return array{0: string, 1: list<string>}
      */
     private function commentLegacyFlats(string $inner, array $wires, string $indent): array
@@ -277,7 +277,7 @@ final class BlueprintConfigPersister
             if (isset($inner[$end]) && $inner[$end] === ',') {
                 $end++;
             } elseif (preg_match('/\G\s*,/', $inner, $m, 0, $end) === 1) {
-                $end += strlen($m[0]);
+                $end += mb_strlen($m[0]);
             }
             $spans[] = [$start, $end, $legacy];
         }
@@ -293,10 +293,10 @@ final class BlueprintConfigPersister
 
         $commented = [];
         foreach ($spans as [$start, $end, $legacy]) {
-            $chunk = substr($inner, $start, $end - $start);
-            $inner = substr($inner, 0, $start)
+            $chunk = mb_substr($inner, $start, $end - $start);
+            $inner = mb_substr($inner, 0, $start)
                 . $this->commentChunk($chunk, $indent)
-                . substr($inner, $end);
+                . mb_substr($inner, $end);
             $commented[] = $legacy;
         }
 
@@ -305,7 +305,7 @@ final class BlueprintConfigPersister
 
     private function lineStartOffset(string $src, int $pos): int
     {
-        $lineStart = strrpos(substr($src, 0, $pos), "\n");
+        $lineStart = mb_strrpos(mb_substr($src, 0, $pos), "\n");
 
         return $lineStart === false ? 0 : $lineStart + 1;
     }
@@ -322,10 +322,11 @@ final class BlueprintConfigPersister
             if (preg_match('/^(\s*)/', str_replace("\t", '    ', $line), $m) === 1) {
                 $baseIndent = $m[1];
             }
+
             break;
         }
 
-        $baseLen = strlen($baseIndent);
+        $baseLen = mb_strlen($baseIndent);
         $out = [];
 
         foreach ($lines as $i => $line) {
@@ -351,7 +352,7 @@ final class BlueprintConfigPersister
 
             $relative = $normalized;
             if ($baseLen > 0 && str_starts_with($normalized, $baseIndent)) {
-                $relative = substr($normalized, $baseLen);
+                $relative = mb_substr($normalized, $baseLen);
             } else {
                 $relative = ltrim($normalized);
             }

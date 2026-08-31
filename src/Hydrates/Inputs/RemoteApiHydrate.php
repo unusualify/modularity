@@ -93,7 +93,7 @@ class RemoteApiHydrate extends InputHydrate
     }
 
     /**
-     * @param  array<string, mixed>  $input
+     * @param array<string, mixed> $input
      */
     protected function hasCatalogDependsOn(array $input): bool
     {
@@ -101,7 +101,7 @@ class RemoteApiHydrate extends InputHydrate
     }
 
     /**
-     * @param  array<string, mixed>  $depends
+     * @param array<string, mixed> $depends
      * @return array{field: string, map: array<string, string>}
      */
     protected function normalizeCatalogDependsOn(array $depends): array
@@ -129,7 +129,7 @@ class RemoteApiHydrate extends InputHydrate
      * Priority: explicit {@code catalog} → {@code catalogDependsOn} map via
      * {@code catalogDependsOnValue} (optional hydrate-time sibling) → null (default catalog).
      *
-     * @param  array<string, mixed>  $input
+     * @param array<string, mixed> $input
      */
     protected function resolveCatalogKey(array $input): ?string
     {

@@ -1,5 +1,28 @@
 <?php
 
+use Modules\Cms\Blueprint\HomepageTest\Form\HomepageTestFormInputs;
+use Modules\Cms\Blueprint\HomepageTest\Index\HomepageTestIndexColumns;
+use Modules\Cms\Blueprint\HomepageTest\Index\HomepageTestIndexOptions;
+use Modules\Cms\Blueprint\LayoutBuilder\Form\LayoutBuilderFormInputs;
+use Modules\Cms\Blueprint\LayoutBuilder\Index\LayoutBuilderIndexColumns;
+use Modules\Cms\Blueprint\LayoutBuilder\Index\LayoutBuilderIndexOptions;
+use Modules\Cms\Blueprint\Page\Form\PageFormInputs;
+use Modules\Cms\Blueprint\Page\Index\PageIndexColumns;
+use Modules\Cms\Blueprint\Page\Index\PageIndexOptions;
+use Modules\Cms\Blueprint\PageLayout\Form\PageLayoutFormInputs;
+use Modules\Cms\Blueprint\PageLayout\Index\PageLayoutIndexColumns;
+use Modules\Cms\Blueprint\PageLayout\Index\PageLayoutIndexOptions;
+use Modules\Cms\Blueprint\ParentSegment\Form\ParentSegmentFormInputs;
+use Modules\Cms\Blueprint\ParentSegment\Index\ParentSegmentIndexColumns;
+use Modules\Cms\Blueprint\ParentSegment\Index\ParentSegmentIndexOptions;
+use Modules\Cms\Blueprint\Redirect\BulkSheet\RedirectBulkSheet;
+use Modules\Cms\Blueprint\Redirect\Form\RedirectFormInputs;
+use Modules\Cms\Blueprint\Redirect\Index\RedirectIndexColumns;
+use Modules\Cms\Blueprint\Sitemap\Index\SitemapIndexColumns;
+use Modules\Cms\Blueprint\SiteSetting\Form\SiteSettingFormInputs;
+use Modules\Cms\Blueprint\StyleSheet\Form\StyleSheetFormInputs;
+use Modules\Cms\Blueprint\StyleSheet\Index\StyleSheetIndexColumns;
+use Modules\Cms\Blueprint\StyleSheet\Index\StyleSheetIndexOptions;
 use Modules\Cms\Entities\PageLayout;
 use Modules\Cms\Http\Controllers\CmsSitemapPanelController;
 use Modules\Cms\Http\Controllers\SitemapController;
@@ -23,11 +46,11 @@ return [
     'routes' => [
         'style_sheet' => [
             'index' => [
-                'columns' => \Modules\Cms\Blueprint\StyleSheet\Index\StyleSheetIndexColumns::class,
-                'options' => \Modules\Cms\Blueprint\StyleSheet\Index\StyleSheetIndexOptions::class,
+                'columns' => StyleSheetIndexColumns::class,
+                'options' => StyleSheetIndexOptions::class,
             ],
             'form' => [
-                'inputs' => \Modules\Cms\Blueprint\StyleSheet\Form\StyleSheetFormInputs::class,
+                'inputs' => StyleSheetFormInputs::class,
             ],
             'name' => 'StyleSheet',
             'headline' => 'Style Sheets',
@@ -194,11 +217,11 @@ return [
         ],
         'layout_builder' => [
             'index' => [
-                'columns' => \Modules\Cms\Blueprint\LayoutBuilder\Index\LayoutBuilderIndexColumns::class,
-                'options' => \Modules\Cms\Blueprint\LayoutBuilder\Index\LayoutBuilderIndexOptions::class,
+                'columns' => LayoutBuilderIndexColumns::class,
+                'options' => LayoutBuilderIndexOptions::class,
             ],
             'form' => [
-                'inputs' => \Modules\Cms\Blueprint\LayoutBuilder\Form\LayoutBuilderFormInputs::class,
+                'inputs' => LayoutBuilderFormInputs::class,
             ],
             'name' => 'LayoutBuilder',
             'headline' => 'Layout Builders',
@@ -324,11 +347,11 @@ return [
          */
         'page_layout' => [
             'index' => [
-                'columns' => \Modules\Cms\Blueprint\PageLayout\Index\PageLayoutIndexColumns::class,
-                'options' => \Modules\Cms\Blueprint\PageLayout\Index\PageLayoutIndexOptions::class,
+                'columns' => PageLayoutIndexColumns::class,
+                'options' => PageLayoutIndexOptions::class,
             ],
             'form' => [
-                'inputs' => \Modules\Cms\Blueprint\PageLayout\Form\PageLayoutFormInputs::class,
+                'inputs' => PageLayoutFormInputs::class,
             ],
             'name' => 'PageLayout',
             'headline' => 'Presentation shells',
@@ -418,11 +441,11 @@ return [
         ],
         'parent_segment' => [
             'index' => [
-                'columns' => \Modules\Cms\Blueprint\ParentSegment\Index\ParentSegmentIndexColumns::class,
-                'options' => \Modules\Cms\Blueprint\ParentSegment\Index\ParentSegmentIndexOptions::class,
+                'columns' => ParentSegmentIndexColumns::class,
+                'options' => ParentSegmentIndexOptions::class,
             ],
             'form' => [
-                'inputs' => \Modules\Cms\Blueprint\ParentSegment\Form\ParentSegmentFormInputs::class,
+                'inputs' => ParentSegmentFormInputs::class,
             ],
             'name' => 'ParentSegment',
             'headline' => 'Public route registry',
@@ -466,7 +489,7 @@ return [
         ],
         'site_setting' => [
             'form' => [
-                'inputs' => \Modules\Cms\Blueprint\SiteSetting\Form\SiteSettingFormInputs::class,
+                'inputs' => SiteSettingFormInputs::class,
             ],
             'name' => 'SiteSetting',
             'headline' => 'Site Settings',
@@ -523,10 +546,10 @@ return [
         ],
         'redirect' => [
             'index' => [
-                'columns' => \Modules\Cms\Blueprint\Redirect\Index\RedirectIndexColumns::class,
+                'columns' => RedirectIndexColumns::class,
             ],
             'form' => [
-                'inputs' => \Modules\Cms\Blueprint\Redirect\Form\RedirectFormInputs::class,
+                'inputs' => RedirectFormInputs::class,
             ],
             'name' => 'Redirect',
             'headline' => 'Redirects',
@@ -557,7 +580,7 @@ return [
             // ],
 
             // CSV bulk sheet: default tool_key is derived from module + route (e.g. cms.redirect); override with tool_key if needed.
-            'bulk_sheet' => \Modules\Cms\Blueprint\Redirect\BulkSheet\RedirectBulkSheet::class,
+            'bulk_sheet' => RedirectBulkSheet::class,
         ],
         /**
          * Panel Inertia index ({@code Cms/Sitemap/Index}): item table + dry-run + commit; {@see SitemapRepository},
@@ -565,7 +588,7 @@ return [
          */
         'sitemap' => [
             'index' => [
-                'columns' => \Modules\Cms\Blueprint\Sitemap\Index\SitemapIndexColumns::class,
+                'columns' => SitemapIndexColumns::class,
             ],
             'name' => 'Sitemap',
             'headline' => 'Sitemap',
@@ -583,11 +606,11 @@ return [
         ],
         'homepage_test' => [
             'index' => [
-                'columns' => \Modules\Cms\Blueprint\HomepageTest\Index\HomepageTestIndexColumns::class,
-                'options' => \Modules\Cms\Blueprint\HomepageTest\Index\HomepageTestIndexOptions::class,
+                'columns' => HomepageTestIndexColumns::class,
+                'options' => HomepageTestIndexOptions::class,
             ],
             'form' => [
-                'inputs' => \Modules\Cms\Blueprint\HomepageTest\Form\HomepageTestFormInputs::class,
+                'inputs' => HomepageTestFormInputs::class,
             ],
             'name' => 'HomepageTest',
             'headline' => 'Homepage Tests',
@@ -643,11 +666,11 @@ return [
         ],
         'page' => [
             'index' => [
-                'columns' => \Modules\Cms\Blueprint\Page\Index\PageIndexColumns::class,
-                'options' => \Modules\Cms\Blueprint\Page\Index\PageIndexOptions::class,
+                'columns' => PageIndexColumns::class,
+                'options' => PageIndexOptions::class,
             ],
             'form' => [
-                'inputs' => \Modules\Cms\Blueprint\Page\Form\PageFormInputs::class,
+                'inputs' => PageFormInputs::class,
             ],
             'name' => 'Page',
             'headline' => 'Pages',

@@ -8,8 +8,8 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 use Unusualify\Modularous\Services\ModuleRouteInspect\ModuleRouteInspectEntry;
 use Unusualify\Modularous\Services\ModuleRouteInspect\ModuleRouteInspectHealer;
-use Unusualify\Modularous\Services\ModuleRouteInspect\ModuleRouteInspectRemedyMapper;
 use Unusualify\Modularous\Services\ModuleRouteInspect\ModuleRouteInspector;
+use Unusualify\Modularous\Services\ModuleRouteInspect\ModuleRouteInspectRemedyMapper;
 
 class RouteInspectCommand extends Command
 {
@@ -104,7 +104,7 @@ class RouteInspectCommand extends Command
                 foreach ($entry->findings as $finding) {
                     $this->line(sprintf(
                         '  [%s] %s::%s — %s (%s)',
-                        strtoupper($finding->severity),
+                        mb_strtoupper($finding->severity),
                         $entry->module,
                         $entry->route,
                         $finding->message,
@@ -145,7 +145,7 @@ class RouteInspectCommand extends Command
     }
 
     /**
-     * @param  list<array{module: string, route: string, code: string, feature?: ?string, remedy: array<string, mixed>}>  $suggestions
+     * @param list<array{module: string, route: string, code: string, feature?: ?string, remedy: array<string, mixed>}> $suggestions
      */
     private function runHeal(ModuleRouteInspectHealer $healer, array $suggestions): int
     {
@@ -209,7 +209,7 @@ class RouteInspectCommand extends Command
     }
 
     /**
-     * @param  list<string>  $highlightKeys
+     * @param list<string> $highlightKeys
      * @return list<string>
      */
     private function entryToRow(ModuleRouteInspectEntry $entry, array $highlightKeys): array
@@ -252,7 +252,7 @@ class RouteInspectCommand extends Command
         }
 
         return array_values(array_filter(array_map(
-            static fn (string $part): string => strtolower(trim($part)),
+            static fn (string $part): string => mb_strtolower(trim($part)),
             explode(',', $raw)
         )));
     }

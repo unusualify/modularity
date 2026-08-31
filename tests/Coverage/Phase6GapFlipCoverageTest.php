@@ -10,23 +10,30 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Routing\ResponseFactory;
+use Illuminate\Routing\UrlGenerator;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Mockery;
 use ReflectionMethod;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 use Unusualify\Modularous\Entities\Traits\HasProcesses;
+use Unusualify\Modularous\Exceptions\ModularousException;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Facades\ModularousCache;
 use Unusualify\Modularous\Facades\UFinder;
 use Unusualify\Modularous\Http\Controllers\Utility\FileLibraryController;
 use Unusualify\Modularous\Http\Controllers\Utility\MediaLibraryController;
+use Unusualify\Modularous\Module;
 use Unusualify\Modularous\Repositories\FileRepository;
 use Unusualify\Modularous\Repositories\Logic\CacheableTrait;
 use Unusualify\Modularous\Repositories\MediaRepository;
 use Unusualify\Modularous\Repositories\Repository;
 use Unusualify\Modularous\Repositories\Traits\RemoteApiSourceTrait;
 use Unusualify\Modularous\Services\ArtisanRunner\CommandExecutor;
+use Unusualify\Modularous\Services\ArtisanRunner\Exceptions\ArtisanRunnerException;
 use Unusualify\Modularous\Services\RemoteApi\Contracts\RemoteApiConnectorInterface;
 use Unusualify\Modularous\Services\RemoteApi\Exceptions\RemoteApiSyncException;
 use Unusualify\Modularous\Services\RemoteApi\RemoteApiConfiguration;
@@ -59,7 +66,7 @@ class Phase6GapFlipCoverageTest extends TestCase
             'email' => ['type' => 'text', 'inputType' => 'email'],
         ]);
 
-        $module = Mockery::mock(\Unusualify\Modularous\Module::class);
+        $module = Mockery::mock(Module::class);
         $module->shouldReceive('getRouteActionUrl')->andReturn('/posts');
         $module->shouldReceive('getRouteClass')->andReturn('Modules\\Blog\\Repositories\\PostRepository');
         Modularous::shouldReceive('find')->with('Blog')->andReturn($module);
@@ -252,18 +259,18 @@ class Phase6GapFlipCoverageTest extends TestCase
 
         $method = new ReflectionMethod(CommandExecutor::class, 'normalizeArgumentValue');
         $method->setAccessible(true);
-        $argument = new \Symfony\Component\Console\Input\InputArgument('ids', \Symfony\Component\Console\Input\InputArgument::IS_ARRAY);
+        $argument = new InputArgument('ids', InputArgument::IS_ARRAY);
         $this->assertSame(['1', '2'], $method->invoke($executor, $argument, '1,2'));
         $this->assertSame(['a', 'b'], $method->invoke($executor, $argument, ['a', 'b']));
-        $scalarArg = new \Symfony\Component\Console\Input\InputArgument('name', \Symfony\Component\Console\Input\InputArgument::OPTIONAL);
+        $scalarArg = new InputArgument('name', InputArgument::OPTIONAL);
         $this->assertSame('a b', $method->invoke($executor, $scalarArg, ['a', 'b']));
         $this->assertSame('x', $method->invoke($executor, $scalarArg, 'x'));
 
         $optMethod = new ReflectionMethod(CommandExecutor::class, 'normalizeOptionValue');
         $optMethod->setAccessible(true);
-        $arrayOpt = new \Symfony\Component\Console\Input\InputOption('tags', null, \Symfony\Component\Console\Input\InputOption::VALUE_IS_ARRAY | \Symfony\Component\Console\Input\InputOption::VALUE_OPTIONAL);
+        $arrayOpt = new InputOption('tags', null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL);
         $this->assertSame(['x', 'y'], $optMethod->invoke($executor, $arrayOpt, "x\ny"));
-        $scalarOpt = new \Symfony\Component\Console\Input\InputOption('label', null, \Symfony\Component\Console\Input\InputOption::VALUE_OPTIONAL);
+        $scalarOpt = new InputOption('label', null, InputOption::VALUE_OPTIONAL);
         $this->assertSame('a,b', $optMethod->invoke($executor, $scalarOpt, ['a', 'b']));
 
         $split = new ReflectionMethod(CommandExecutor::class, 'splitList');
@@ -271,7 +278,7 @@ class Phase6GapFlipCoverageTest extends TestCase
         $this->assertSame([], $split->invoke($executor, '   '));
         $this->assertSame(['one', 'two'], $split->invoke($executor, "one,\ntwo"));
 
-        $this->expectException(\Unusualify\Modularous\Services\ArtisanRunner\Exceptions\ArtisanRunnerException::class);
+        $this->expectException(ArtisanRunnerException::class);
         $executor->buildParameters('definitely-missing-command-xyz', [], []);
     }
 
@@ -368,7 +375,7 @@ class Phase6GapFlipCoverageTest extends TestCase
         }
 
         Storage::fake('local');
-        $responseFactory = $this->app->make(\Illuminate\Routing\ResponseFactory::class);
+        $responseFactory = $this->app->make(ResponseFactory::class);
         $config = new \Illuminate\Config\Repository([
             'modularous' => [
                 'media_library' => [
@@ -534,7 +541,7 @@ class Phase6GapFlipCoverageTest extends TestCase
         $fileRepo->shouldReceive('getTags')->andReturn([]);
         $fileRepo->shouldReceive('addIgnoreFieldsBeforeSave')->andReturnNull();
 
-        $urlGenerator = Mockery::mock(\Illuminate\Routing\UrlGenerator::class);
+        $urlGenerator = Mockery::mock(UrlGenerator::class);
         $urlGenerator->shouldReceive('route')->andReturn('/files');
 
         $tmpPdf = tempnam(sys_get_temp_dir(), 'pdf');
@@ -604,8 +611,8 @@ class Phase6GapFlipCoverageTest extends TestCase
         try {
             curtModuleName('/tmp/not-a-module/path.php');
             $this->fail('Expected ModularousException');
-        } catch (\Unusualify\Modularous\Exceptions\ModularousException $e) {
-            $this->assertStringContainsString('module', strtolower($e->getMessage()));
+        } catch (ModularousException $e) {
+            $this->assertStringContainsString('module', mb_strtolower($e->getMessage()));
         }
         $this->assertSame('Blog', curtModuleName('Modules/Blog/Http/Controllers/PostController.php'));
 

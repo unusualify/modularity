@@ -9,15 +9,19 @@ use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Illuminate\Contracts\View\View as ViewContract;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Route as RouteFacade;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
+use Illuminate\View\Engines\PhpEngine;
 use Mockery;
 use Modules\SystemUser\Repositories\UserRepository;
 use Unusualify\Modularous\Contracts\CurrencyProviderInterface;
+use Unusualify\Modularous\Entities\Tag;
+use Unusualify\Modularous\Entities\Traits\Processable;
 use Unusualify\Modularous\Entities\Traits\Publishable;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Facades\Utm;
@@ -49,6 +53,8 @@ use Unusualify\Modularous\Jobs\Cache\Concerns\ModularousCacheJob;
 use Unusualify\Modularous\Module;
 use Unusualify\Modularous\Notifications\StepUpCodeNotification;
 use Unusualify\Modularous\Observers\RemoteApiSourceableObserver;
+use Unusualify\Modularous\Repositories\MediaRepository;
+use Unusualify\Modularous\Repositories\Repository;
 use Unusualify\Modularous\Repositories\Traits\PublishableTrait;
 use Unusualify\Modularous\Services\RedirectService;
 use Unusualify\Modularous\Services\Security\SecurityService;
@@ -224,7 +230,7 @@ class Phase4GapFlipCoverageTest extends TestCase
         $factory = View::getFacadeRoot();
         $view = new \Illuminate\View\View(
             $factory,
-            new \Illuminate\View\Engines\PhpEngine($this->app['files']),
+            new PhpEngine($this->app['files']),
             'modularous::layouts.app-inertia',
             __FILE__,
             ['existing' => 1]
@@ -301,7 +307,7 @@ class Phase4GapFlipCoverageTest extends TestCase
         $factory = View::getFacadeRoot();
         $view = new \Illuminate\View\View(
             $factory,
-            new \Illuminate\View\Engines\PhpEngine($this->app['files']),
+            new PhpEngine($this->app['files']),
             modularousBaseKey() . '::layouts.master',
             __FILE__,
             []
@@ -639,7 +645,7 @@ class Phase4GapFlipCoverageTest extends TestCase
             'name' => 'rows',
             'label' => 'Rows',
             'draggable' => true,
-            'repository' => \Unusualify\Modularous\Repositories\MediaRepository::class,
+            'repository' => MediaRepository::class,
             'schema' => [
                 ['type' => 'select', 'name' => 'media_id'],
                 ['type' => 'text', 'name' => 'title'],
@@ -665,13 +671,13 @@ class Phase4GapFlipCoverageTest extends TestCase
         $tag = (new TagHydrate([
             'type' => 'tag',
             'name' => 'tags',
-            'taggable' => \Unusualify\Modularous\Entities\Tag::class,
+            'taggable' => Tag::class,
             'translated' => true,
         ], null, null, true))->render();
         $this->assertSame('input-tag', $tag['type']);
         $this->assertArrayHasKey('cacheKey', $tag);
 
-        $revisionRepo = Mockery::mock(\Unusualify\Modularous\Repositories\Repository::class);
+        $revisionRepo = Mockery::mock(Repository::class);
         $revisionRepo->shouldReceive('hasBehavior')->with('revisions')->andReturn(false);
 
         $revisionModule = Mockery::mock(Module::class)->shouldIgnoreMissing();
@@ -773,7 +779,7 @@ class Phase4GapFlipCoverageTest extends TestCase
 
         $processableModel = new class
         {
-            use \Unusualify\Modularous\Entities\Traits\Processable;
+            use Processable;
         };
 
         $module = Mockery::mock(Module::class)->shouldIgnoreMissing();
@@ -872,7 +878,7 @@ class Phase4GapFlipCoverageTest extends TestCase
         $jsonReq = Request::create('/', 'POST', [], [], [], ['HTTP_ACCEPT' => 'application/json']);
         $jsonReq->headers->set('Accept', 'application/json');
         $denied = $enforcer->call($jsonReq, $user);
-        $this->assertInstanceOf(\Illuminate\Http\JsonResponse::class, $denied);
+        $this->assertInstanceOf(JsonResponse::class, $denied);
         $this->assertSame(403, $denied->getStatusCode());
     }
 }

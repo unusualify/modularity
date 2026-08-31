@@ -132,7 +132,7 @@ final class PaymentFormInputs implements ModuleRouteInputsProvider
                 'allowedRoles' => ['superadmin', 'admin', 'manager', 'account-executive'],
                 'acceptedExtensions' => ['pdf'],
             ],
-        
+
         ];
     }
 }

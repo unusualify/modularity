@@ -59,7 +59,7 @@ final class CompanyIndexColumns implements ModuleRouteHeadersProvider
                 'align' => 'center',
                 'sortable' => false,
                 'width' => '15%',
-        
+
                 'class' => 'actions-extra',
             ],
         ];

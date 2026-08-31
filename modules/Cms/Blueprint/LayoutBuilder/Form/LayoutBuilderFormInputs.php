@@ -86,7 +86,7 @@ final class LayoutBuilderFormInputs implements ModuleRouteInputsProvider
                     ],
                 ],
             ],
-        
+
         ];
     }
 }

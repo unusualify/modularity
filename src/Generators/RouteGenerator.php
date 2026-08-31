@@ -499,12 +499,12 @@ class RouteGenerator extends Generator
     }
 
     /**
-     * @param  string  $presentation  config|class
+     * @param string $presentation config|class
      * @return $this
      */
     public function setPresentation($presentation)
     {
-        $presentation = strtolower((string) $presentation);
+        $presentation = mb_strtolower((string) $presentation);
         $this->presentation = in_array($presentation, ['config', 'class'], true)
             ? $presentation
             : 'config';

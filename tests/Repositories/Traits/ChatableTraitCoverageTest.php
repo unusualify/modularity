@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Unusualify\Modularous\Tests\Repositories\Traits;
 
+use Unusualify\Modularous\Entities\Company;
+use Unusualify\Modularous\Entities\Traits\HasUuid;
 use Unusualify\Modularous\Entities\User;
 use Unusualify\Modularous\Repositories\Traits\ChatableTrait;
 use Unusualify\Modularous\Tests\TestCase;
@@ -42,15 +44,16 @@ class ChatableTraitCoverageTest extends TestCase
     {
         $uuidType = null;
         foreach ([
-            \Unusualify\Modularous\Entities\User::class,
-            \Unusualify\Modularous\Entities\Company::class,
+            User::class,
+            Company::class,
         ] as $candidate) {
             if (in_array(
-                \Unusualify\Modularous\Entities\Traits\HasUuid::class,
+                HasUuid::class,
                 class_uses_recursive($candidate),
                 true
             )) {
                 $uuidType = $candidate;
+
                 break;
             }
         }

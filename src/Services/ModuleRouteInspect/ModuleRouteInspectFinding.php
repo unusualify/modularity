@@ -10,7 +10,7 @@ namespace Unusualify\Modularous\Services\ModuleRouteInspect;
 final class ModuleRouteInspectFinding
 {
     /**
-     * @param  array<string, mixed>  $meta
+     * @param array<string, mixed> $meta
      */
     public function __construct(
         public readonly string $severity,
@@ -18,8 +18,7 @@ final class ModuleRouteInspectFinding
         public readonly string $message,
         public readonly ?string $feature = null,
         public readonly array $meta = [],
-    ) {
-    }
+    ) {}
 
     /**
      * @return array{severity: string, code: string, message: string, feature?: string, meta?: array<string, mixed>}

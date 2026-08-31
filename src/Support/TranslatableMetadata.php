@@ -85,8 +85,8 @@ final class TranslatableMetadata
                 'imageCol' => [
                     'cols' => 12,
                     'md' => 12,
-                    'lg' => 12
-                ]
+                    'lg' => 12,
+                ],
             ],
             ['name' => 'canonical_url', 'label' => 'Canonical URL', 'type' => 'text', 'translated' => true, 'isSecondary' => true],
             ['name' => 'robots_index', 'label' => 'Robots Index', 'type' => 'switch', 'translated' => true, 'isSecondary' => true],

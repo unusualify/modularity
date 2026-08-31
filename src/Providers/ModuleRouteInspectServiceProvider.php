@@ -8,8 +8,8 @@ use Unusualify\Modularous\Services\ModuleRouteInspect\Contracts\ModuleRouteInspe
 use Unusualify\Modularous\Services\ModuleRouteInspect\Contracts\ModuleRouteStatusStoreInterface;
 use Unusualify\Modularous\Services\ModuleRouteInspect\FeatureDetector;
 use Unusualify\Modularous\Services\ModuleRouteInspect\ModuleRouteInspectHealer;
-use Unusualify\Modularous\Services\ModuleRouteInspect\ModuleRouteInspectRemedyMapper;
 use Unusualify\Modularous\Services\ModuleRouteInspect\ModuleRouteInspector;
+use Unusualify\Modularous\Services\ModuleRouteInspect\ModuleRouteInspectRemedyMapper;
 use Unusualify\Modularous\Services\ModuleRouteInspect\Stores\DatabaseModuleRouteStatusStore;
 use Unusualify\Modularous\Services\ModuleRouteInspect\Stores\FilesystemModuleRouteStatusStore;
 

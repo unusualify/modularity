@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Unusualify\Modularous\Tests\Entities\Traits;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 use Mockery;
 use Unusualify\Modularous\Entities\RemoteApiSource;
 use Unusualify\Modularous\Entities\Traits\HasRemoteApiSource;
@@ -141,7 +142,7 @@ class HasRemoteApiSourceTest extends TestCase
         $never = $model->exposeFormatRemoteApiLastSyncChip(null);
         $this->assertStringContainsString('mdi-sync-off', $never);
 
-        $synced = $model->exposeFormatRemoteApiLastSyncChip(\Illuminate\Support\Carbon::parse('2026-06-21 12:00:00'));
+        $synced = $model->exposeFormatRemoteApiLastSyncChip(Carbon::parse('2026-06-21 12:00:00'));
         $this->assertStringContainsString('mdi-sync', $synced);
         $this->assertStringContainsString('2026-06-21', $synced);
 
@@ -194,7 +195,7 @@ class RemoteApiSourceTestModel extends Model
         return static::resolveRemoteApiSourceableObserver();
     }
 
-    public function exposeFormatRemoteApiLastSyncChip(?\Illuminate\Support\Carbon $syncedAt): string
+    public function exposeFormatRemoteApiLastSyncChip(?Carbon $syncedAt): string
     {
         return $this->formatRemoteApiLastSyncChip($syncedAt);
     }

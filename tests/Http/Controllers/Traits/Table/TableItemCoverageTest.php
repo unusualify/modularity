@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Unusualify\Modularous\Tests\Http\Controllers\Traits\Table;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Mockery;
@@ -428,7 +430,7 @@ class TableItemCoverageTest extends TestCase
                 $parent = $this;
                 $related = $this->authorModel;
 
-                return new class($parent, $related) extends \Illuminate\Database\Eloquent\Relations\BelongsTo
+                return new class($parent, $related) extends BelongsTo
                 {
                     public function __construct($parent, $related)
                     {
@@ -453,7 +455,7 @@ class TableItemCoverageTest extends TestCase
                 $parent = $this;
                 $rows = $this->tagModels ?? collect();
 
-                return new class($parent, $rows) extends \Illuminate\Database\Eloquent\Relations\HasMany
+                return new class($parent, $rows) extends HasMany
                 {
                     private $rows;
 
@@ -565,7 +567,7 @@ class TableItemCoverageTest extends TestCase
                 $parent = $this;
                 $related = $this->authorModel;
 
-                return new class($parent, $related) extends \Illuminate\Database\Eloquent\Relations\BelongsTo
+                return new class($parent, $related) extends BelongsTo
                 {
                     public function __construct($parent, $related)
                     {
@@ -602,7 +604,7 @@ class TableItemCoverageTest extends TestCase
             {
                 $rows = $this->tagModels ?? collect();
 
-                return new class($this, $rows) extends \Illuminate\Database\Eloquent\Relations\HasMany
+                return new class($this, $rows) extends HasMany
                 {
                     private $rows;
 

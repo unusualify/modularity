@@ -1,5 +1,28 @@
 <?php
 
+use Modules\SystemPayment\Blueprint\CardType\Form\CardTypeFormInputs;
+use Modules\SystemPayment\Blueprint\CardType\Index\CardTypeIndexColumns;
+use Modules\SystemPayment\Blueprint\CardType\Index\CardTypeIndexOptions;
+use Modules\SystemPayment\Blueprint\MyPayment\Form\MyPaymentFormInputs;
+use Modules\SystemPayment\Blueprint\MyPayment\Index\MyPaymentIndexColumns;
+use Modules\SystemPayment\Blueprint\MyPayment\Index\MyPaymentIndexOptions;
+use Modules\SystemPayment\Blueprint\MyPayment\Index\MyPaymentIndexRowActions;
+use Modules\SystemPayment\Blueprint\Payment\Form\PaymentFormAppends;
+use Modules\SystemPayment\Blueprint\Payment\Form\PaymentFormInputs;
+use Modules\SystemPayment\Blueprint\Payment\Form\PaymentFormWith;
+use Modules\SystemPayment\Blueprint\Payment\Index\PaymentIndexAdvancedFilters;
+use Modules\SystemPayment\Blueprint\Payment\Index\PaymentIndexColumns;
+use Modules\SystemPayment\Blueprint\Payment\Index\PaymentIndexOptions;
+use Modules\SystemPayment\Blueprint\Payment\Index\PaymentIndexRowActions;
+use Modules\SystemPayment\Blueprint\PaymentCountry\Form\PaymentCountryFormInputs;
+use Modules\SystemPayment\Blueprint\PaymentCountry\Index\PaymentCountryIndexColumns;
+use Modules\SystemPayment\Blueprint\PaymentCountry\Index\PaymentCountryIndexOptions;
+use Modules\SystemPayment\Blueprint\PaymentCurrency\Form\PaymentCurrencyFormInputs;
+use Modules\SystemPayment\Blueprint\PaymentCurrency\Index\PaymentCurrencyIndexColumns;
+use Modules\SystemPayment\Blueprint\PaymentCurrency\Index\PaymentCurrencyIndexOptions;
+use Modules\SystemPayment\Blueprint\PaymentService\Form\PaymentServiceFormInputs;
+use Modules\SystemPayment\Blueprint\PaymentService\Index\PaymentServiceIndexColumns;
+use Modules\SystemPayment\Blueprint\PaymentService\Index\PaymentServiceIndexOptions;
 use Unusualify\Modularous\Entities\Enums\PaymentStatus;
 
 return [
@@ -11,11 +34,11 @@ return [
     'routes' => [
         'payment_service' => [
             'index' => [
-                'columns' => \Modules\SystemPayment\Blueprint\PaymentService\Index\PaymentServiceIndexColumns::class,
-                'options' => \Modules\SystemPayment\Blueprint\PaymentService\Index\PaymentServiceIndexOptions::class,
+                'columns' => PaymentServiceIndexColumns::class,
+                'options' => PaymentServiceIndexOptions::class,
             ],
             'form' => [
-                'inputs' => \Modules\SystemPayment\Blueprint\PaymentService\Form\PaymentServiceFormInputs::class,
+                'inputs' => PaymentServiceFormInputs::class,
             ],
             'name' => 'PaymentService',
             'headline' => 'Payment Services',
@@ -237,15 +260,15 @@ return [
         ],
         'payment' => [
             'index' => [
-                'columns' => \Modules\SystemPayment\Blueprint\Payment\Index\PaymentIndexColumns::class,
-                'options' => \Modules\SystemPayment\Blueprint\Payment\Index\PaymentIndexOptions::class,
-                'row_actions' => \Modules\SystemPayment\Blueprint\Payment\Index\PaymentIndexRowActions::class,
-                'advanced_filters' => \Modules\SystemPayment\Blueprint\Payment\Index\PaymentIndexAdvancedFilters::class,
+                'columns' => PaymentIndexColumns::class,
+                'options' => PaymentIndexOptions::class,
+                'row_actions' => PaymentIndexRowActions::class,
+                'advanced_filters' => PaymentIndexAdvancedFilters::class,
             ],
             'form' => [
-                'inputs' => \Modules\SystemPayment\Blueprint\Payment\Form\PaymentFormInputs::class,
-                'with' => \Modules\SystemPayment\Blueprint\Payment\Form\PaymentFormWith::class,
-                'appends' => \Modules\SystemPayment\Blueprint\Payment\Form\PaymentFormAppends::class,
+                'inputs' => PaymentFormInputs::class,
+                'with' => PaymentFormWith::class,
+                'appends' => PaymentFormAppends::class,
             ],
             'name' => 'Payment',
             'headline' => 'Payments',
@@ -575,11 +598,11 @@ return [
         ],
         'payment_currency' => [
             'index' => [
-                'columns' => \Modules\SystemPayment\Blueprint\PaymentCurrency\Index\PaymentCurrencyIndexColumns::class,
-                'options' => \Modules\SystemPayment\Blueprint\PaymentCurrency\Index\PaymentCurrencyIndexOptions::class,
+                'columns' => PaymentCurrencyIndexColumns::class,
+                'options' => PaymentCurrencyIndexOptions::class,
             ],
             'form' => [
-                'inputs' => \Modules\SystemPayment\Blueprint\PaymentCurrency\Form\PaymentCurrencyFormInputs::class,
+                'inputs' => PaymentCurrencyFormInputs::class,
             ],
             'name' => 'PaymentCurrency',
             'headline' => 'Payment Currencies',
@@ -712,11 +735,11 @@ return [
         ],
         'card_type' => [
             'index' => [
-                'columns' => \Modules\SystemPayment\Blueprint\CardType\Index\CardTypeIndexColumns::class,
-                'options' => \Modules\SystemPayment\Blueprint\CardType\Index\CardTypeIndexOptions::class,
+                'columns' => CardTypeIndexColumns::class,
+                'options' => CardTypeIndexOptions::class,
             ],
             'form' => [
-                'inputs' => \Modules\SystemPayment\Blueprint\CardType\Form\CardTypeFormInputs::class,
+                'inputs' => CardTypeFormInputs::class,
             ],
             'name' => 'CardType',
             'headline' => 'Card Types',
@@ -789,12 +812,12 @@ return [
         ],
         'my_payment' => [
             'index' => [
-                'columns' => \Modules\SystemPayment\Blueprint\MyPayment\Index\MyPaymentIndexColumns::class,
-                'options' => \Modules\SystemPayment\Blueprint\MyPayment\Index\MyPaymentIndexOptions::class,
-                'row_actions' => \Modules\SystemPayment\Blueprint\MyPayment\Index\MyPaymentIndexRowActions::class,
+                'columns' => MyPaymentIndexColumns::class,
+                'options' => MyPaymentIndexOptions::class,
+                'row_actions' => MyPaymentIndexRowActions::class,
             ],
             'form' => [
-                'inputs' => \Modules\SystemPayment\Blueprint\MyPayment\Form\MyPaymentFormInputs::class,
+                'inputs' => MyPaymentFormInputs::class,
             ],
             'name' => 'MyPayment',
             'headline' => 'My Payments',
@@ -906,11 +929,11 @@ return [
         ],
         'payment_country' => [
             'index' => [
-                'columns' => \Modules\SystemPayment\Blueprint\PaymentCountry\Index\PaymentCountryIndexColumns::class,
-                'options' => \Modules\SystemPayment\Blueprint\PaymentCountry\Index\PaymentCountryIndexOptions::class,
+                'columns' => PaymentCountryIndexColumns::class,
+                'options' => PaymentCountryIndexOptions::class,
             ],
             'form' => [
-                'inputs' => \Modules\SystemPayment\Blueprint\PaymentCountry\Form\PaymentCountryFormInputs::class,
+                'inputs' => PaymentCountryFormInputs::class,
             ],
             'name' => 'PaymentCountry',
             'headline' => 'Payment Countries',

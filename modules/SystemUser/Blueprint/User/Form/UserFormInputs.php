@@ -107,7 +107,7 @@ final class UserFormInputs implements ModuleRouteInputsProvider
                 'rules' => 'required',
                 // 'editable' => false,
                 'connector' => 'SystemUser:Role|repository:list:column=title',
-        
+
                 // 'type' => 'select-scroll',
                 // 'page' => 1,
                 // 'endpoint' => [

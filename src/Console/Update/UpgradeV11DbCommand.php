@@ -4,6 +4,7 @@ namespace Unusualify\Modularous\Console\Update;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Laravel\Telescope\Telescope;
 use Unusualify\Modularous\Console\BaseCommand;
 
 /**
@@ -51,17 +52,17 @@ class UpgradeV11DbCommand extends BaseCommand
 
     public function handle(): int
     {
-        $telescope = class_exists(\Laravel\Telescope\Telescope::class);
+        $telescope = class_exists(Telescope::class);
 
         if ($telescope) {
-            \Laravel\Telescope\Telescope::stopRecording();
+            Telescope::stopRecording();
         }
 
         try {
             return $this->runUpgrade();
         } finally {
             if ($telescope) {
-                \Laravel\Telescope\Telescope::startRecording();
+                Telescope::startRecording();
             }
         }
     }

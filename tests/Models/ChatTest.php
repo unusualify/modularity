@@ -5,6 +5,7 @@ namespace Unusualify\Modularous\Tests\Models;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Unusualify\Modularous\Entities\Chat;
@@ -315,7 +316,7 @@ class ChatTest extends ModelTestCase
             'chatable_type' => get_class($user),
         ]);
 
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\HasOne::class, $chat->latestMessage());
+        $this->assertInstanceOf(HasOne::class, $chat->latestMessage());
 
         $older = ChatMessage::create([
             'chat_id' => $chat->id,

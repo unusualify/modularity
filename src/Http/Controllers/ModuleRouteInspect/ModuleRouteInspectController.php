@@ -9,8 +9,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Unusualify\Modularous\Services\ModuleRouteInspect\ModuleRouteInspectHealer;
-use Unusualify\Modularous\Services\ModuleRouteInspect\ModuleRouteInspectRemedyMapper;
 use Unusualify\Modularous\Services\ModuleRouteInspect\ModuleRouteInspector;
+use Unusualify\Modularous\Services\ModuleRouteInspect\ModuleRouteInspectRemedyMapper;
 
 final class ModuleRouteInspectController extends Controller
 {
@@ -18,8 +18,7 @@ final class ModuleRouteInspectController extends Controller
         private readonly ModuleRouteInspector $inspector,
         private readonly ModuleRouteInspectRemedyMapper $remedyMapper,
         private readonly ModuleRouteInspectHealer $healer,
-    ) {
-    }
+    ) {}
 
     public function inspect(Request $request): JsonResponse
     {
@@ -35,7 +34,7 @@ final class ModuleRouteInspectController extends Controller
         $featureKeys = [];
         if (! empty($validated['feature'])) {
             $featureKeys = array_values(array_filter(array_map(
-                static fn (string $part): string => strtolower(trim($part)),
+                static fn (string $part): string => mb_strtolower(trim($part)),
                 explode(',', (string) $validated['feature'])
             )));
         }

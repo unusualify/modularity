@@ -1,5 +1,7 @@
 <?php
 
+use Modules\SystemSetting\Blueprint\General\Form\GeneralFormInputs;
+
 return [
     'name' => 'SystemSetting',
     'system_prefix' => true,
@@ -8,7 +10,7 @@ return [
     'routes' => [
         'general' => [
             'form' => [
-                'inputs' => \Modules\SystemSetting\Blueprint\General\Form\GeneralFormInputs::class,
+                'inputs' => GeneralFormInputs::class,
             ],
             'name' => 'General',
             'headline' => 'General Settings',

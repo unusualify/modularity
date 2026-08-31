@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Unusualify\Modularous\Console\Blueprint\Concerns;
 
+use Unusualify\Modularous\Console\BaseCommand;
 use Unusualify\Modularous\Console\Blueprint\BlueprintClassWriter;
 use Unusualify\Modularous\Console\Blueprint\BlueprintConfigSourceExtractor;
 use Unusualify\Modularous\Console\Blueprint\BlueprintFieldCatalog;
@@ -13,12 +14,12 @@ use Unusualify\Modularous\Services\ModuleRoutePresentation\ModuleRoutePresentati
 /**
  * Shared dry-run / plan output for Blueprint scaffold commands.
  *
- * @mixin \Unusualify\Modularous\Console\BaseCommand
+ * @mixin BaseCommand
  */
 trait ReportsBlueprintPlan
 {
     /**
-     * @param  array<string, mixed>|list<mixed>|string  $items
+     * @param array<string, mixed>|list<mixed>|string $items
      * @return array{
      *     action: string,
      *     field: string,
@@ -60,7 +61,7 @@ trait ReportsBlueprintPlan
     }
 
     /**
-     * @param  array<string, mixed>|list<mixed>|string  $items
+     * @param array<string, mixed>|list<mixed>|string $items
      */
     protected function blueprintSeedSummary(array|string $items, bool $fromConfig): string
     {
@@ -69,7 +70,7 @@ trait ReportsBlueprintPlan
         }
 
         if (is_string($items)) {
-            $bytes = strlen($items);
+            $bytes = mb_strlen($items);
 
             return $items === '[]' || $items === ''
                 ? 'from-config: empty source'
@@ -90,7 +91,7 @@ trait ReportsBlueprintPlan
     /**
      * Prefer raw config.php source (keeps __() / Component::); fall back to evaluated array.
      *
-     * @param  array<string, mixed>  $routeConfig
+     * @param array<string, mixed> $routeConfig
      * @return array<string, mixed>|list<mixed>|string
      */
     protected function resolveBlueprintSeed(
@@ -192,7 +193,7 @@ trait ReportsBlueprintPlan
                 continue;
             }
 
-            $leaf = substr($nested, strrpos($nested, '.') + 1);
+            $leaf = mb_substr($nested, mb_strrpos($nested, '.') + 1);
 
             if (str_starts_with($nested, 'index.')) {
                 $index[$leaf] = $classExpr;

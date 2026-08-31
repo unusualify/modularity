@@ -15,6 +15,7 @@ use Unusualify\Modularous\Repositories\Repository;
 use Unusualify\Modularous\Repositories\Traits\RemoteApiSourceTrait;
 use Unusualify\Modularous\Services\ModuleRouteInspect\Contracts\ModuleRouteStatusStoreInterface;
 use Unusualify\Modularous\Services\ModuleRouteInspect\FeatureDetector;
+use Unusualify\Modularous\Services\ModuleRouteInspect\ModuleRouteInspector;
 use Unusualify\Modularous\Services\ModuleRoutePresentation\ModuleRoutePresentationResolver;
 
 /**
@@ -22,7 +23,7 @@ use Unusualify\Modularous\Services\ModuleRoutePresentation\ModuleRoutePresentati
  *
  * Aggregates config.php route slice, status-store enablement, and (lazily)
  * model/repository/feature metadata. Inspection findings stay in
- * {@see \Unusualify\Modularous\Services\ModuleRouteInspect\ModuleRouteInspector}.
+ * {@see ModuleRouteInspector}.
  */
 final class ModuleRoute
 {
@@ -276,7 +277,7 @@ final class ModuleRoute
      */
     public function presentation(string $field): array
     {
-        $field = strtolower($field);
+        $field = mb_strtolower($field);
 
         if (! array_key_exists($field, $this->presentationCache)) {
             $this->presentationCache[$field] = $this->presentationResolver()->resolve($this, $field);
@@ -498,7 +499,7 @@ final class ModuleRoute
 
     public function hasFeature(string $featureKey): bool
     {
-        $key = strtolower($featureKey);
+        $key = mb_strtolower($featureKey);
 
         return ($this->features()[$key]['present'] ?? false) === true;
     }

@@ -12,7 +12,7 @@ final class BlueprintPhpArrayFormatter
     /**
      * Export an evaluated array to short-array syntax for `return $ITEMS$;`.
      *
-     * @param  array<string, mixed>|list<mixed>  $items
+     * @param array<string, mixed>|list<mixed> $items
      */
     public static function export(array $items, int $methodIndent = 8): string
     {

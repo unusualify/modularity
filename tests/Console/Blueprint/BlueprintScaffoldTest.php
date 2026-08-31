@@ -218,10 +218,10 @@ PHP);
             $content = (string) file_get_contents($tmp);
 
             $this->assertStringContainsString("            // 'headers' => [", $content);
-            $this->assertStringContainsString("            //     [", $content);
+            $this->assertStringContainsString('            //     [', $content);
             $this->assertStringContainsString("            //         'title' => 'Name',", $content);
             $this->assertStringContainsString("            //             'edit',", $content);
-            $this->assertStringNotContainsString("                // [", $content);
+            $this->assertStringNotContainsString('                // [', $content);
         } finally {
             @unlink($tmp);
         }

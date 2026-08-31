@@ -10,8 +10,8 @@ namespace Unusualify\Modularous\Services\ModuleRouteInspect;
 final class ModuleRouteInspectEntry
 {
     /**
-     * @param  array<string, array{present: bool, model: bool|null, repository: bool|null, extras?: array<string, mixed>}>  $features
-     * @param  list<ModuleRouteInspectFinding>  $findings
+     * @param array<string, array{present: bool, model: bool|null, repository: bool|null, extras?: array<string, mixed>}> $features
+     * @param list<ModuleRouteInspectFinding> $findings
      */
     public function __construct(
         public readonly string $module,
@@ -24,8 +24,7 @@ final class ModuleRouteInspectEntry
         public readonly array $findings,
         public readonly bool $inConfig = true,
         public readonly bool $inStatuses = true,
-    ) {
-    }
+    ) {}
 
     public function hasFindings(): bool
     {

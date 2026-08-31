@@ -199,7 +199,7 @@ final class CompanyFormInputs implements ModuleRouteInputsProvider
             //     ],
             //     'rules' => 'sometimes|required|min:5',
             // ],
-        
+
         ];
     }
 }

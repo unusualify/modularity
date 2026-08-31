@@ -179,7 +179,7 @@ final class BlueprintFieldCatalog
      */
     public static function normalize(string $field): ?string
     {
-        $field = strtolower(trim(str_replace(['-', ' '], '_', $field)));
+        $field = mb_strtolower(trim(str_replace(['-', ' '], '_', $field)));
 
         $aliases = [
             'inputs' => 'inputs',

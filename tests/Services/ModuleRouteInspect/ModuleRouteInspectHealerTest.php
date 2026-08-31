@@ -146,9 +146,7 @@ class ModuleRouteInspectHealerTest extends TestCase
     {
         return new class($report) implements ModuleRouteInspectSource
         {
-            public function __construct(private readonly ModuleRouteInspectReport $report)
-            {
-            }
+            public function __construct(private readonly ModuleRouteInspectReport $report) {}
 
             public function inspect(?string $moduleName = null, ?string $routeName = null): ModuleRouteInspectReport
             {

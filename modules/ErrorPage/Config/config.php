@@ -1,5 +1,9 @@
 <?php
 
+use Modules\ErrorPage\Blueprint\ErrorPage\Form\ErrorPageFormInputs;
+use Modules\ErrorPage\Blueprint\ErrorPage\Index\ErrorPageIndexColumns;
+use Modules\ErrorPage\Blueprint\ErrorPage\Index\ErrorPageIndexOptions;
+
 return [
     'name' => 'ErrorPage',
     'system_prefix' => true,
@@ -9,11 +13,11 @@ return [
     'routes' => [
         'error_page' => [
             'index' => [
-                'options' => \Modules\ErrorPage\Blueprint\ErrorPage\Index\ErrorPageIndexOptions::class,
-                'columns' => \Modules\ErrorPage\Blueprint\ErrorPage\Index\ErrorPageIndexColumns::class,
+                'options' => ErrorPageIndexOptions::class,
+                'columns' => ErrorPageIndexColumns::class,
             ],
             'form' => [
-                'inputs' => \Modules\ErrorPage\Blueprint\ErrorPage\Form\ErrorPageFormInputs::class,
+                'inputs' => ErrorPageFormInputs::class,
             ],
             'parent' => true,
             'name' => 'ErrorPage',

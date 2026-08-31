@@ -11,6 +11,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
 use Unusualify\Modularous\Entities\Revision;
 use Unusualify\Modularous\Entities\Traits\HasRevisions;
+use Unusualify\Modularous\Exceptions\ValidationException;
 use Unusualify\Modularous\Repositories\Repository;
 use Unusualify\Modularous\Repositories\Traits\RevisionsTrait;
 use Unusualify\Modularous\Tests\ModelTestCase;
@@ -192,7 +193,7 @@ class RevisionsTraitTest extends ModelTestCase
     public function test_before_save_revisions_trait_throws_when_workflow_locked(): void
     {
         $object = new RevisionsWorkflowLockedModel(['title' => 'Locked']);
-        $this->expectException(\Unusualify\Modularous\Exceptions\ValidationException::class);
+        $this->expectException(ValidationException::class);
         $this->repository->beforeSaveRevisionsTrait($object, ['title' => 'X']);
     }
 
@@ -413,9 +414,7 @@ class RevisionsWorkflowNoApproveModel extends RevisionsWorkflowTestModel
     }
 }
 
-trait FilesTrait
-{
-}
+trait FilesTrait {}
 
 class RepositoryUsingRevisionsTrait extends Repository
 {

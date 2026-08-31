@@ -35,7 +35,7 @@ final class BlueprintClassWriter
     }
 
     /**
-     * @param  array<string, mixed>|list<mixed>|string  $items  Evaluated array, or raw PHP array literal
+     * @param array<string, mixed>|list<mixed>|string $items Evaluated array, or raw PHP array literal
      * @return string|null Absolute path written, or null if skipped
      */
     public function write(

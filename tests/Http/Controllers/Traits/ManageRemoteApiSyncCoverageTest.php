@@ -11,6 +11,7 @@ use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Http\Controllers\Traits\ManageRemoteApiSync;
 use Unusualify\Modularous\Module;
 use Unusualify\Modularous\Repositories\Traits\RemoteApiSourceTrait;
+use Unusualify\Modularous\Services\RemoteApi\AbstractRemoteApiConnector;
 use Unusualify\Modularous\Services\RemoteApi\Exceptions\RemoteApiConfigurationException;
 use Unusualify\Modularous\Services\RemoteApi\Exceptions\RemoteApiSyncException;
 use Unusualify\Modularous\Tests\TestCase;
@@ -260,7 +261,7 @@ class ManageRemoteApiSyncCoverageTest extends TestCase
     {
         $config = Mockery::mock();
         $config->shouldReceive('isEnabled')->andReturn(true);
-        $connector = Mockery::mock(\Unusualify\Modularous\Services\RemoteApi\AbstractRemoteApiConnector::class);
+        $connector = Mockery::mock(AbstractRemoteApiConnector::class);
         $connector->shouldReceive('configuration')->andReturn($config);
         $connector->shouldReceive('previewResponseDisplay')->andReturn('json');
         $connector->shouldReceive('buildPreviewResponseDisplay')->andReturn(['pretty' => true]);

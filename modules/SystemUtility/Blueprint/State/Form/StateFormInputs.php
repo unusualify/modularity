@@ -18,7 +18,7 @@ final class StateFormInputs implements ModuleRouteInputsProvider
                 'label' => 'Name',
                 'type' => 'text',
                 'rules' => 'sometimes|required',
-        
+
             ],
             [
                 'type' => 'text',

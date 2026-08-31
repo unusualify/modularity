@@ -25,7 +25,7 @@ final class RoleIndexColumns implements ModuleRouteHeadersProvider
                 'cellClass' => '', // || []
                 // 'width' => '', // || int
                 // vuetify datatable header fields end
-        
+
                 // custom fields for ue-datatable start
                 'searchable' => true,
                 'isRowEditable' => false,
@@ -47,7 +47,7 @@ final class RoleIndexColumns implements ModuleRouteHeadersProvider
                 'cellClass' => '', // || []
                 // 'width' => '', // || int
                 // vuetify datatable header fields end
-        
+
                 // custom fields for ue-datatable start
                 'searchable' => true,
                 'isRowEditable' => false,
@@ -70,7 +70,7 @@ final class RoleIndexColumns implements ModuleRouteHeadersProvider
                 'cellClass' => '', // || []
                 // 'width' => '', // || int
                 // vuetify datatable header fields end
-        
+
                 // custom fields for ue-datatable start
                 'searchable' => true,
                 'isRowEditable' => false,
@@ -90,7 +90,7 @@ final class RoleIndexColumns implements ModuleRouteHeadersProvider
             //     'cellClass' => '', // || []
             //     'width' => '', // || int
             //     // vuetify datatable header fields end
-        
+
             //     // custom fields for ue-datatable start
             //     'searchable' => true,
             //     'isRowEditable' => false,

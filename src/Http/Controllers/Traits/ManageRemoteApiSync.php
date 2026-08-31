@@ -6,7 +6,6 @@ namespace Unusualify\Modularous\Http\Controllers\Traits;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Unusualify\Modularous\Http\Controllers\Traits\Table\TableActions;
 use Unusualify\Modularous\Repositories\Traits\RemoteApiSourceTrait;

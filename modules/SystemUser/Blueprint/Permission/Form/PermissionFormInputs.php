@@ -86,7 +86,7 @@ final class PermissionFormInputs implements ModuleRouteInputsProvider
             //         ]
             //     ],
             // ],
-        
+
             // [
             //     'title' => 'Activity of Permission',
             //     'name' => 'is_active',
@@ -106,7 +106,7 @@ final class PermissionFormInputs implements ModuleRouteInputsProvider
             //         'full-width',
             //         'hide-spin-buttons',
             //         // 'false-value' => false,
-        
+
             //         // 'false-value' => true,
             //         // 'true-value' => false,
             //         // 'appendIcon' => 'mdi-dropbox',
@@ -141,16 +141,16 @@ final class PermissionFormInputs implements ModuleRouteInputsProvider
             //     'props' => [
             //         'activeClass' => '',
             //         'color' => 'success',
-        
+
             //         'mandatory',
             //         'row',
-        
+
             //         'props' => [
             //             'color' => 'error',
             //             'on-icon' => '$radioOn',
             //             'off-icon' => '$radioOff'
             //         ]
-        
+
             //         // 'appendIcon' => 'mdi-dropbox',
             //         // 'prependIcon' => 'mdi-radioactive',
             //         // 'offIcon' => 'mdi-inactive',
@@ -169,7 +169,7 @@ final class PermissionFormInputs implements ModuleRouteInputsProvider
             //         'small-chips',
             //         'prependIcon' => '',
             //         'prependInnerIcon' => 'mdi-camera'
-        
+
             //     ]
             // ],
             // [
@@ -186,7 +186,7 @@ final class PermissionFormInputs implements ModuleRouteInputsProvider
             //         'tick-size' => 1,
             //         // 'background-color' => 'success',
             //         'hint' => '',
-        
+
             //         // 'vertical',
             //     ]
             // ],
@@ -198,7 +198,7 @@ final class PermissionFormInputs implements ModuleRouteInputsProvider
             //     'cols' => 12,
             //     'sm' => 12,
             //     'md' => 12,
-        
+
             //     'props' => [
             //         'placeholder' => '#FFDD11FF',
             //         // 'dotSize' => 'rgba',
@@ -207,7 +207,7 @@ final class PermissionFormInputs implements ModuleRouteInputsProvider
             //             'dotSize' => 25,
             //             'maxHeight' => 200,
             //         ]
-        
+
             //     ]
             // ],
             // [
@@ -232,7 +232,7 @@ final class PermissionFormInputs implements ModuleRouteInputsProvider
             //         'max' => "2018-03-20",
             //         // 'type' => "month",
             //         // 'range',
-        
+
             //         // 'show-adjacent-months',
             //     ]
             // ],
@@ -256,7 +256,7 @@ final class PermissionFormInputs implements ModuleRouteInputsProvider
             //         'header-color' => 'info',
             //         // 'type' => "month",
             //         // 'range',
-        
+
             //         // 'show-adjacent-months',
             //     ]
             // ],

@@ -10,7 +10,9 @@ use GuzzleHttp\Psr7\Response as GuzzleResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
+use Laravel\Socialite\Contracts\Factory;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\InvalidStateException;
 use Mockery;
@@ -30,9 +32,9 @@ class HandlesOAuthCoverageTest extends TestCase
 
     private function bindSocialiteDriver($driver): void
     {
-        $factory = Mockery::mock(\Laravel\Socialite\Contracts\Factory::class);
+        $factory = Mockery::mock(Factory::class);
         $factory->shouldReceive('driver')->andReturn($driver);
-        $this->app->instance(\Laravel\Socialite\Contracts\Factory::class, $factory);
+        $this->app->instance(Factory::class, $factory);
         Socialite::swap($factory);
     }
 
@@ -123,7 +125,7 @@ class HandlesOAuthCoverageTest extends TestCase
     /** @test */
     public function handle_provider_callback_error_paths(): void
     {
-        \Illuminate\Support\Facades\Route::get('/login', fn () => 'login')->name('admin.login.form');
+        Route::get('/login', fn () => 'login')->name('admin.login.form');
 
         $clientException = new ClientException(
             'cancelled',
@@ -169,8 +171,8 @@ class HandlesOAuthCoverageTest extends TestCase
         $modularous->shouldReceive('getAuthGuardName')->andReturn('modularous');
         $modularous->shouldReceive('find')->andReturn(null);
         Modularous::swap($modularous);
-        \Illuminate\Support\Facades\Route::get('/oauth/password', fn () => 'pwd')->name('admin.login.oauth.showPasswordForm');
-        \Illuminate\Support\Facades\Route::get('/home', fn () => 'home')->name('admin.home');
+        Route::get('/oauth/password', fn () => 'pwd')->name('admin.login.oauth.showPasswordForm');
+        Route::get('/home', fn () => 'home')->name('admin.home');
 
         $linkedUser = new class
         {
@@ -235,7 +237,7 @@ class HandlesOAuthCoverageTest extends TestCase
         $modularous = Mockery::mock(\Unusualify\Modularous\Modularous::class)->makePartial();
         $modularous->shouldReceive('getAuthGuardName')->andReturn('modularous');
         Modularous::swap($modularous);
-        \Illuminate\Support\Facades\Route::get('/login', fn () => 'login')->name('admin.login.form');
+        Route::get('/login', fn () => 'login')->name('admin.login.form');
 
         // linkProvider success needs User::findOrFail — skipped (DB-coupled).
         try {

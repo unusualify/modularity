@@ -45,7 +45,7 @@ final class PaymentIndexColumns implements ModuleRouteHeadersProvider
                 'minWidth' => 150,
                 'searchable' => true,
                 'searchKey' => 'creator.company.name',
-        
+
                 'groupable' => true,
                 'groupOrder' => 'asc',
             ],

@@ -19,8 +19,7 @@ final class ModuleRouteInspector implements ModuleRouteInspectSource
 {
     public function __construct(
         private readonly FeatureDetector $featureDetector,
-    ) {
-    }
+    ) {}
 
     public function inspect(?string $moduleName = null, ?string $routeName = null): ModuleRouteInspectReport
     {

@@ -3,6 +3,7 @@
 namespace Unusualify\Modularous\Tests\Helpers;
 
 use Illuminate\Database\Eloquent\Concerns\HasAttributes;
+use Unusualify\Modularous\Entities\Enums\Permission;
 use Unusualify\Modularous\Exceptions\ModularousException;
 use Unusualify\Modularous\Tests\TestCase;
 
@@ -115,8 +116,8 @@ class ModuleHelpersTest extends TestCase
         );
 
         $records = routePermissionRecords('Item', 'modularous', [
-            \Unusualify\Modularous\Entities\Enums\Permission::CREATE,
-            \Unusualify\Modularous\Entities\Enums\Permission::VIEW,
+            Permission::CREATE,
+            Permission::VIEW,
         ]);
         $this->assertCount(2, $records);
         $this->assertSame('item_create', $records[0]['name']);

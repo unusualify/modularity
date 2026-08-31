@@ -1,5 +1,27 @@
 <?php
 
+use Modules\SystemUser\Blueprint\Capability\Form\CapabilityFormInputs;
+use Modules\SystemUser\Blueprint\Capability\Index\CapabilityIndexColumns;
+use Modules\SystemUser\Blueprint\Capability\Index\CapabilityIndexOptions;
+use Modules\SystemUser\Blueprint\Capability\Index\CapabilityIndexWith;
+use Modules\SystemUser\Blueprint\CapabilityRoute\Form\CapabilityRouteFormInputs;
+use Modules\SystemUser\Blueprint\CapabilityRoute\Index\CapabilityRouteIndexColumns;
+use Modules\SystemUser\Blueprint\CapabilityRoute\Index\CapabilityRouteIndexOptions;
+use Modules\SystemUser\Blueprint\Company\Form\CompanyFormInputs;
+use Modules\SystemUser\Blueprint\Company\Index\CompanyIndexColumns;
+use Modules\SystemUser\Blueprint\Company\Index\CompanyIndexOptions;
+use Modules\SystemUser\Blueprint\Company\Index\CompanyIndexWith;
+use Modules\SystemUser\Blueprint\Permission\Form\PermissionFormInputs;
+use Modules\SystemUser\Blueprint\Permission\Index\PermissionIndexColumns;
+use Modules\SystemUser\Blueprint\Permission\Index\PermissionIndexOptions;
+use Modules\SystemUser\Blueprint\Role\Form\RoleFormInputs;
+use Modules\SystemUser\Blueprint\Role\Index\RoleIndexColumns;
+use Modules\SystemUser\Blueprint\Role\Index\RoleIndexOptions;
+use Modules\SystemUser\Blueprint\User\Form\UserFormInputs;
+use Modules\SystemUser\Blueprint\User\Index\UserIndexAdvancedFilters;
+use Modules\SystemUser\Blueprint\User\Index\UserIndexColumns;
+use Modules\SystemUser\Blueprint\User\Index\UserIndexOptions;
+use Modules\SystemUser\Blueprint\User\Index\UserIndexWith;
 use Spatie\Permission\Models\Permission;
 
 return [
@@ -10,13 +32,13 @@ return [
     'routes' => [
         'user' => [
             'index' => [
-                'columns' => \Modules\SystemUser\Blueprint\User\Index\UserIndexColumns::class,
-                'options' => \Modules\SystemUser\Blueprint\User\Index\UserIndexOptions::class,
-                'advanced_filters' => \Modules\SystemUser\Blueprint\User\Index\UserIndexAdvancedFilters::class,
-                'with' => \Modules\SystemUser\Blueprint\User\Index\UserIndexWith::class,
+                'columns' => UserIndexColumns::class,
+                'options' => UserIndexOptions::class,
+                'advanced_filters' => UserIndexAdvancedFilters::class,
+                'with' => UserIndexWith::class,
             ],
             'form' => [
-                'inputs' => \Modules\SystemUser\Blueprint\User\Form\UserFormInputs::class,
+                'inputs' => UserFormInputs::class,
             ],
             'parent' => true,
             'name' => 'User',
@@ -200,11 +222,11 @@ return [
         ],
         'role' => [
             'index' => [
-                'columns' => \Modules\SystemUser\Blueprint\Role\Index\RoleIndexColumns::class,
-                'options' => \Modules\SystemUser\Blueprint\Role\Index\RoleIndexOptions::class,
+                'columns' => RoleIndexColumns::class,
+                'options' => RoleIndexOptions::class,
             ],
             'form' => [
-                'inputs' => \Modules\SystemUser\Blueprint\Role\Form\RoleFormInputs::class,
+                'inputs' => RoleFormInputs::class,
             ],
             'name' => 'Role',
             'headline' => 'Roles',
@@ -1108,11 +1130,11 @@ return [
         ],
         'permission' => [
             'index' => [
-                'columns' => \Modules\SystemUser\Blueprint\Permission\Index\PermissionIndexColumns::class,
-                'options' => \Modules\SystemUser\Blueprint\Permission\Index\PermissionIndexOptions::class,
+                'columns' => PermissionIndexColumns::class,
+                'options' => PermissionIndexOptions::class,
             ],
             'form' => [
-                'inputs' => \Modules\SystemUser\Blueprint\Permission\Form\PermissionFormInputs::class,
+                'inputs' => PermissionFormInputs::class,
             ],
             'name' => 'Permission',
             'headline' => 'Permissions',
@@ -1406,12 +1428,12 @@ return [
         ],
         'capability' => [
             'index' => [
-                'columns' => \Modules\SystemUser\Blueprint\Capability\Index\CapabilityIndexColumns::class,
-                'options' => \Modules\SystemUser\Blueprint\Capability\Index\CapabilityIndexOptions::class,
-                'with' => \Modules\SystemUser\Blueprint\Capability\Index\CapabilityIndexWith::class,
+                'columns' => CapabilityIndexColumns::class,
+                'options' => CapabilityIndexOptions::class,
+                'with' => CapabilityIndexWith::class,
             ],
             'form' => [
-                'inputs' => \Modules\SystemUser\Blueprint\Capability\Form\CapabilityFormInputs::class,
+                'inputs' => CapabilityFormInputs::class,
             ],
             'name' => 'Capability',
             'headline' => 'Capabilities',
@@ -1553,11 +1575,11 @@ return [
         ],
         'capability_route' => [
             'index' => [
-                'columns' => \Modules\SystemUser\Blueprint\CapabilityRoute\Index\CapabilityRouteIndexColumns::class,
-                'options' => \Modules\SystemUser\Blueprint\CapabilityRoute\Index\CapabilityRouteIndexOptions::class,
+                'columns' => CapabilityRouteIndexColumns::class,
+                'options' => CapabilityRouteIndexOptions::class,
             ],
             'form' => [
-                'inputs' => \Modules\SystemUser\Blueprint\CapabilityRoute\Form\CapabilityRouteFormInputs::class,
+                'inputs' => CapabilityRouteFormInputs::class,
             ],
             'name' => 'CapabilityRoute',
             'headline' => 'Capability Routes',
@@ -1623,12 +1645,12 @@ return [
         ],
         'company' => [
             'index' => [
-                'columns' => \Modules\SystemUser\Blueprint\Company\Index\CompanyIndexColumns::class,
-                'options' => \Modules\SystemUser\Blueprint\Company\Index\CompanyIndexOptions::class,
-                'with' => \Modules\SystemUser\Blueprint\Company\Index\CompanyIndexWith::class,
+                'columns' => CompanyIndexColumns::class,
+                'options' => CompanyIndexOptions::class,
+                'with' => CompanyIndexWith::class,
             ],
             'form' => [
-                'inputs' => \Modules\SystemUser\Blueprint\Company\Form\CompanyFormInputs::class,
+                'inputs' => CompanyFormInputs::class,
             ],
             'name' => 'Company',
             'headline' => 'Companies',

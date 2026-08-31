@@ -126,7 +126,7 @@ final class ModuleRoutePresentationResolver
      */
     public static function nestedConfigKey(string $field): string
     {
-        $field = strtolower(trim($field));
+        $field = mb_strtolower(trim($field));
 
         if (! isset(self::FIELD_NESTED[$field])) {
             throw new \InvalidArgumentException(
@@ -140,8 +140,7 @@ final class ModuleRoutePresentationResolver
 
     public function __construct(
         private readonly Container $app,
-    ) {
-    }
+    ) {}
 
     /**
      * @return list<array<string, mixed>>|array<string, mixed>
@@ -168,7 +167,7 @@ final class ModuleRoutePresentationResolver
         }
 
         if (is_array($meta) && isset($meta['driver']) && is_string($meta['driver']) && $meta['driver'] !== '') {
-            return strtolower($meta['driver']);
+            return mb_strtolower($meta['driver']);
         }
 
         if (is_array($meta) && isset($meta['class']) && is_string($meta['class']) && $meta['class'] !== '') {
@@ -177,10 +176,10 @@ final class ModuleRoutePresentationResolver
 
         $root = $this->driverRoot($route);
         if (isset($root['driver']) && is_string($root['driver']) && $root['driver'] !== '') {
-            return strtolower($root['driver']);
+            return mb_strtolower($root['driver']);
         }
 
-        return strtolower((string) modularousConfig('module_route_presentation.driver', 'config'));
+        return mb_strtolower((string) modularousConfig('module_route_presentation.driver', 'config'));
     }
 
     /**
@@ -363,12 +362,12 @@ final class ModuleRoutePresentationResolver
      *
      * Provider-meta leaves (class FQCN / driver meta) yield [] — resolve those via ModuleRoute.
      *
-     * @param  array<string, mixed>  $routeConfig
+     * @param array<string, mixed> $routeConfig
      * @return list<array<string, mixed>>|array<string, mixed>
      */
     public static function readConfigPayloadFromArray(array $routeConfig, string $field): array
     {
-        $field = strtolower(trim($field));
+        $field = mb_strtolower(trim($field));
 
         if (! isset(self::FIELD_NESTED[$field])) {
             $legacy = $routeConfig[$field] ?? null;
@@ -421,7 +420,7 @@ final class ModuleRoutePresentationResolver
 
     private function normalizeField(string $field): string
     {
-        $field = strtolower(trim($field));
+        $field = mb_strtolower(trim($field));
 
         if (! isset(self::FIELD_BLUEPRINT[$field])) {
             throw new \InvalidArgumentException(

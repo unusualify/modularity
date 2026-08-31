@@ -91,7 +91,7 @@ class ManagePreviewCoverageTest extends TestCase
     private function bindItemRoute(Request $request, int $itemId): Request
     {
         $route = new Route([$request->method()], '/items/{item}/action', []);
-        $request = Request::create('/items/'.$itemId.'/action', $request->method(), $request->all());
+        $request = Request::create('/items/' . $itemId . '/action', $request->method(), $request->all());
         $route->bind($request);
         $request->setRouteResolver(fn () => $route);
 

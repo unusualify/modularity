@@ -4,6 +4,4 @@ declare(strict_types=1);
 
 namespace Unusualify\Modularous\Contracts\ModuleRoute;
 
-interface ModuleRouteHeadersProvider extends ModuleRouteBlueprintProvider
-{
-}
+interface ModuleRouteHeadersProvider extends ModuleRouteBlueprintProvider {}

@@ -14,8 +14,8 @@ final class ModuleRouteInspectRemedy
     public const ACTION_MANUAL = 'manual';
 
     /**
-     * @param  list<string>  $arguments
-     * @param  array<string, bool|string|int|null>  $options
+     * @param list<string> $arguments
+     * @param array<string, bool|string|int|null> $options
      */
     public function __construct(
         public readonly string $action,
@@ -24,8 +24,7 @@ final class ModuleRouteInspectRemedy
         public readonly array $options = [],
         public readonly bool $safe = true,
         public readonly ?string $tip = null,
-    ) {
-    }
+    ) {}
 
     /**
      * Shell-ready artisan invocation (for copy / --suggest).

@@ -6,6 +6,7 @@ namespace Unusualify\Modularous\Tests\Coverage;
 
 use Illuminate\Contracts\View\View as ViewContract;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\Request;
@@ -13,14 +14,17 @@ use Illuminate\Support\Facades\Route as RouteFacade;
 use Illuminate\Support\Facades\Schema;
 use Mockery;
 use Unusualify\Modularous\Entities\Feature;
+use Unusualify\Modularous\Entities\RemoteApiSource;
 use Unusualify\Modularous\Entities\Setting;
 use Unusualify\Modularous\Entities\Traits\HasTranslation;
 use Unusualify\Modularous\Entities\Traits\IsTranslatable;
 use Unusualify\Modularous\Entities\Traits\Secondary\HasRelation;
 use Unusualify\Modularous\Entities\Translations\SettingTranslation;
+use Unusualify\Modularous\Exceptions\ValidationException;
 use Unusualify\Modularous\Facades\Coverage;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Facades\ValidationException as ValidationExceptionFacade;
+use Unusualify\Modularous\Http\Controllers\GlideController;
 use Unusualify\Modularous\Http\Middleware\CompanyRegistrationMiddleware;
 use Unusualify\Modularous\Http\Requests\FileRequest;
 use Unusualify\Modularous\Http\Requests\OauthRequest;
@@ -65,7 +69,7 @@ class Phase1ClassFlipCoverageTest extends TestCase
         $this->assertInstanceOf(CoverageService::class, Coverage::getFacadeRoot());
 
         $exception = ValidationExceptionFacade::withMessages(['field' => ['invalid']]);
-        $this->assertInstanceOf(\Unusualify\Modularous\Exceptions\ValidationException::class, $exception);
+        $this->assertInstanceOf(ValidationException::class, $exception);
     }
 
     /** @test */
@@ -79,7 +83,7 @@ class Phase1ClassFlipCoverageTest extends TestCase
         $glide->shouldReceive('render')->once()->with('photo.jpg')->andReturn(response('img-bytes'));
         $this->app->instance(Glide::class, $glide);
 
-        $controller = new \Unusualify\Modularous\Http\Controllers\GlideController;
+        $controller = new GlideController;
         $response = $controller('photo.jpg', $this->app);
 
         $this->assertSame('img-bytes', $response->getContent());
@@ -178,7 +182,7 @@ class Phase1ClassFlipCoverageTest extends TestCase
 
         $feature = new Feature;
         $this->assertSame('twill_features', $feature->getTable());
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\MorphTo::class, $feature->featured());
+        $this->assertInstanceOf(MorphTo::class, $feature->featured());
 
         Schema::create('twill_features', function (Blueprint $table) {
             $table->id();
@@ -247,7 +251,7 @@ class Phase1ClassFlipCoverageTest extends TestCase
         $sourceable->exists = true;
         $sourceable->shouldReceive('touchQuietly')->once()->andReturn(true);
 
-        $source = Mockery::mock(\Unusualify\Modularous\Entities\RemoteApiSource::class)->makePartial();
+        $source = Mockery::mock(RemoteApiSource::class)->makePartial();
         $source->shouldReceive('getAttribute')->with('sourceable')->andReturn($sourceable);
 
         (new RemoteApiSourceObserver)->saved($source);
@@ -258,7 +262,7 @@ class Phase1ClassFlipCoverageTest extends TestCase
     /** @test */
     public function remote_api_source_observer_skips_missing_sourceable(): void
     {
-        $source = Mockery::mock(\Unusualify\Modularous\Entities\RemoteApiSource::class)->makePartial();
+        $source = Mockery::mock(RemoteApiSource::class)->makePartial();
         $source->shouldReceive('getAttribute')->with('sourceable')->andReturn(null);
 
         (new RemoteApiSourceObserver)->saved($source);

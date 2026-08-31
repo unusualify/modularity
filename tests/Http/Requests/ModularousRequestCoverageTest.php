@@ -7,6 +7,7 @@ namespace Unusualify\Modularous\Tests\Http\Requests;
 use Illuminate\Http\Request as HttpRequest;
 use Illuminate\Routing\Route;
 use Illuminate\Validation\ValidationException;
+use Unusualify\Modularity\Services\MessageStage;
 use Unusualify\Modularous\Http\Requests\Request;
 use Unusualify\Modularous\Tests\TestCase;
 
@@ -16,10 +17,10 @@ class ModularousRequestCoverageTest extends TestCase
     {
         parent::setUp();
 
-        if (! class_exists(\Unusualify\Modularity\Services\MessageStage::class)) {
+        if (! class_exists(MessageStage::class)) {
             class_alias(
                 \Unusualify\Modularous\Services\MessageStage::class,
-                \Unusualify\Modularity\Services\MessageStage::class
+                MessageStage::class
             );
         }
 

@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Unusualify\Modularous\Tests\Coverage;
 
+use Illuminate\Auth\AuthManager;
+use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Illuminate\Contracts\View\View as ViewContract;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -17,10 +20,14 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
 use Illuminate\View\Engines\PhpEngine;
+use Illuminate\View\Factory;
 use Illuminate\View\View as IlluminateView;
+use Kalnoy\Nestedset\Collection;
 use Mockery;
 use Modules\SystemUser\Repositories\UserRepository;
+use Unusualify\Modularous\Contracts\CurrencyProviderInterface;
 use Unusualify\Modularous\Entities\Feature;
+use Unusualify\Modularous\Entities\NestedsetCollection;
 use Unusualify\Modularous\Entities\Traits\HasTranslation;
 use Unusualify\Modularous\Entities\Traits\IsTranslatable;
 use Unusualify\Modularous\Entities\Traits\Processable;
@@ -59,7 +66,6 @@ use Unusualify\Modularous\Services\Security\SecurityService;
 use Unusualify\Modularous\Services\Security\StepUpService;
 use Unusualify\Modularous\Support\ModularousFlashWarnings;
 use Unusualify\Modularous\Tests\TestCase;
-use Illuminate\Bus\Queueable;
 
 /**
  * Phase-5 flips for near-full / zero classes — hit remaining branches & closures.
@@ -116,7 +122,7 @@ class Phase5GapFlipCoverageTest extends TestCase
         $featured = Feature::query()->forBucket('home');
         $this->assertCount(1, $featured);
         $this->assertTrue($featured->first()->is($target));
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\MorphTo::class, (new Feature)->featured());
+        $this->assertInstanceOf(MorphTo::class, (new Feature)->featured());
         $this->assertSame('twill_features', (new Feature)->getTable());
     }
 
@@ -165,7 +171,7 @@ class Phase5GapFlipCoverageTest extends TestCase
         $repo->shouldReceive('getModel')->andReturn(new Phase5FeaturedTarget);
 
         $module = Mockery::mock(Module::class)->shouldIgnoreMissing();
-        $module->shouldReceive('getRouteClass')->andReturnUsing(function ($route, $type) use ($repo) {
+        $module->shouldReceive('getRouteClass')->andReturnUsing(function ($route, $type) {
             return match ($type) {
                 'repository' => 'Phase5HydrateRepo',
                 'model' => Phase5ProcessableModel::class,
@@ -406,10 +412,10 @@ class Phase5GapFlipCoverageTest extends TestCase
             'priceable.currency' => 'EUR',
         ]);
 
-        $provider = Mockery::mock(\Unusualify\Modularous\Contracts\CurrencyProviderInterface::class);
+        $provider = Mockery::mock(CurrencyProviderInterface::class);
         $provider->shouldReceive('isAvailable')->andReturn(false);
         $provider->shouldReceive('findByIso4217')->andReturn(null);
-        $this->app->instance(\Unusualify\Modularous\Contracts\CurrencyProviderInterface::class, $provider);
+        $this->app->instance(CurrencyProviderInterface::class, $provider);
 
         putenv('MODULAROUS_AUTO_LOCALE_FINDER=true');
         $_ENV['MODULAROUS_AUTO_LOCALE_FINDER'] = 'true';
@@ -800,14 +806,14 @@ class Phase5GapFlipCoverageTest extends TestCase
     /** @test */
     public function nestedset_collection_skipped_when_kalnoy_missing(): void
     {
-        if (! class_exists(\Kalnoy\Nestedset\Collection::class)) {
+        if (! class_exists(Collection::class)) {
             $this->assertTrue(true);
 
             return;
         }
 
-        $collection = new \Unusualify\Modularous\Entities\NestedsetCollection([]);
-        $this->assertInstanceOf(\Unusualify\Modularous\Entities\NestedsetCollection::class, $collection->toTree());
+        $collection = new NestedsetCollection([]);
+        $this->assertInstanceOf(NestedsetCollection::class, $collection->toTree());
     }
 
     /** @test */
@@ -838,7 +844,7 @@ class Phase5GapFlipCoverageTest extends TestCase
         $authUser->shouldReceive('stopImpersonating')->once();
         $guard = Mockery::mock();
         $guard->shouldReceive('user')->andReturn($authUser);
-        $authManager = Mockery::mock(\Illuminate\Auth\AuthManager::class);
+        $authManager = Mockery::mock(AuthManager::class);
         $authManager->shouldReceive('guard')->andReturn($guard);
 
         $modularous = Mockery::mock(\Unusualify\Modularous\Modularous::class)->makePartial();
@@ -864,7 +870,7 @@ class Phase5GapFlipCoverageTest extends TestCase
         $this->app->instance(StepUpService::class, $stepUp);
 
         $view = Mockery::mock(ViewContract::class);
-        $viewFactory = Mockery::mock(\Illuminate\View\Factory::class);
+        $viewFactory = Mockery::mock(Factory::class);
         $viewFactory->shouldReceive('make')
             ->once()
             ->withArgs(fn ($name) => str_contains((string) $name, 'auth.login'))

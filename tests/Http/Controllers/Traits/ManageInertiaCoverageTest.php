@@ -7,6 +7,7 @@ namespace Unusualify\Modularous\Tests\Http\Controllers\Traits;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Request as RequestFacade;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Str;
 use Illuminate\View\Factory as ViewFactory;
 use Mockery;
 use Unusualify\Modularous\Facades\Modularous;
@@ -60,7 +61,7 @@ class ManageInertiaCoverageTest extends TestCase
 
             public function getSnakeCase($value)
             {
-                return \Illuminate\Support\Str::snake($value);
+                return Str::snake($value);
             }
 
             protected function getInertiaMainConfiguration(array $data): array

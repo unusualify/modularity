@@ -15,14 +15,13 @@ use Unusualify\Modularous\Services\ModuleRouteInspect\Contracts\ModuleRouteInspe
 final class ModuleRouteInspectHealer
 {
     /**
-     * @param  (callable(string, array<string, mixed>): array{0: int, 1: string})|null  $artisanRunner
+     * @param (callable(string, array<string, mixed>): array{0: int, 1: string})|null $artisanRunner
      */
     public function __construct(
         private readonly ModuleRouteInspectRemedyMapper $mapper,
         private readonly ModuleRouteInspectSource $inspector,
         private $artisanRunner = null,
-    ) {
-    }
+    ) {}
 
     /**
      * Heal a single finding for a module route.

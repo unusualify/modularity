@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Unusualify\Modularous\Tests\Http\Controllers\Utility;
 
 use Illuminate\Config\Repository as Config;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Routing\ResponseFactory;
@@ -152,7 +153,7 @@ class UtilityControllersPhase2CoverageTest extends TestCase
     {
         Event::fake();
 
-        $messagesRelation = Mockery::mock(\Illuminate\Database\Eloquent\Relations\HasMany::class);
+        $messagesRelation = Mockery::mock(HasMany::class);
         $messagesRelation->shouldReceive('where')->andReturnSelf();
         $messagesRelation->shouldReceive('get')->andReturn(collect([
             (object) ['creator_id' => 1, 'content' => 'a'],
@@ -232,11 +233,7 @@ class UtilityControllersPhase2CoverageTest extends TestCase
         ]);
 
         $mediaRepo = Mockery::mock(MediaRepository::class);
-        $media = new class($this->app, $config, Request::create('/', 'GET', [
-            'search' => 'q',
-            'tag' => '1',
-            'unused' => 1,
-        ]), $responseFactory, $mediaRepo) extends MediaLibraryController
+        $media = new class($this->app, $config, Request::create('/', 'GET', ['search' => 'q', 'tag' => '1', 'unused' => 1]), $responseFactory, $mediaRepo) extends MediaLibraryController
         {
             public function __construct($app, $config, $request, $responseFactory, $repository)
             {
@@ -515,6 +512,6 @@ class TagCoverageTaggable
 
     public function generateLocaleTagsSlug($value, $locale = null): string
     {
-        return strtolower((string) $value);
+        return mb_strtolower((string) $value);
     }
 }

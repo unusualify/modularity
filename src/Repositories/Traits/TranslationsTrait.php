@@ -89,7 +89,7 @@ trait TranslationsTrait
                         $perLocale = isset($attributeValue[$locale]) ? $attributeValue[$locale] : null;
                         $perLocale = $this->normalizeSlugPayloadForTranslationColumn($attribute, $perLocale);
 
-                        if($attribute === 'active' && is_null($perLocale)) {
+                        if ($attribute === 'active' && is_null($perLocale)) {
                             $perLocale = false;
                         }
 

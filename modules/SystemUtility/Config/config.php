@@ -1,5 +1,12 @@
 <?php
 
+use Modules\SystemUtility\Blueprint\Country\Form\CountryFormInputs;
+use Modules\SystemUtility\Blueprint\Country\Index\CountryIndexColumns;
+use Modules\SystemUtility\Blueprint\Country\Index\CountryIndexOptions;
+use Modules\SystemUtility\Blueprint\State\Form\StateFormInputs;
+use Modules\SystemUtility\Blueprint\State\Index\StateIndexColumns;
+use Modules\SystemUtility\Blueprint\State\Index\StateIndexOptions;
+
 return [
     'name' => 'SystemUtility',
     'system_prefix' => true,
@@ -8,11 +15,11 @@ return [
     'routes' => [
         'state' => [
             'index' => [
-                'columns' => \Modules\SystemUtility\Blueprint\State\Index\StateIndexColumns::class,
-                'options' => \Modules\SystemUtility\Blueprint\State\Index\StateIndexOptions::class,
+                'columns' => StateIndexColumns::class,
+                'options' => StateIndexOptions::class,
             ],
             'form' => [
-                'inputs' => \Modules\SystemUtility\Blueprint\State\Form\StateFormInputs::class,
+                'inputs' => StateFormInputs::class,
             ],
             'name' => 'State',
             'headline' => 'States',
@@ -85,11 +92,11 @@ return [
         ],
         'country' => [
             'index' => [
-                'columns' => \Modules\SystemUtility\Blueprint\Country\Index\CountryIndexColumns::class,
-                'options' => \Modules\SystemUtility\Blueprint\Country\Index\CountryIndexOptions::class,
+                'columns' => CountryIndexColumns::class,
+                'options' => CountryIndexOptions::class,
             ],
             'form' => [
-                'inputs' => \Modules\SystemUtility\Blueprint\Country\Form\CountryFormInputs::class,
+                'inputs' => CountryFormInputs::class,
             ],
             'name' => 'Country',
             'headline' => 'Countries',
