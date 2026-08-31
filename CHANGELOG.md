@@ -2,6 +2,81 @@
 
 All notable changes to `modularous` will be documented in this file
 
+## v12.9.0 - 2026-08-31
+
+### :rocket: Features
+
+- introduce ModuleRoute inspection and management features by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/5de97372d20f847e2c35161b27a28073a1c372aa
+- enhance ModuleRoute inspection with new interface and tests by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/fbaf29b5cad9bc79e0a3628500e931e32882afaa
+- enhance Blueprint commands with dry-run functionality by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/00ba33d90e0a9998082f5d3e56e3750e497d9941
+- implement GeneralFormInputs for modular system settings by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/4c6d1f96fe74dc48821e88f83eaf3db8fdceae8b
+- implement database upgrade command for modularity transition by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/4c8423abc071fd827e03686622d0d9bf942fd270
+- implement catalogDependsOn functionality for dynamic catalog selection by @web-flow in https://github.com/unusualify/modularous/commit/c75dd946c30292265516f7c8ee882bdfe9bd52ac
+- add URL context methods for front and console detection by @web-flow in https://github.com/unusualify/modularous/commit/700f1e41be00a01f271a13cf1494bc30e0b41fa1
+- implement caching for database connection checks by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/9cdaa0188dfeccfebb0765f7d469a0d930b769da
+- add Open Graph image support and enhance SEO metadata by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/1583de6e444304c067b9743d4967a600252a6a63
+- add custom scripts section for head and body HTML by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/1fbb6cc071a18ec6206568b62fcdf8319c009b4d
+- add llms.txt support and enhance SEO configuration by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/41e3b8ae9092d29b27ae944877fb050681134f1a
+- introduce source-text input type with CodeMirror support by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/020ff2cfade643b22a8d29b34f6e859cc1b253f8
+- enhance locale handling and introduce coerceFormEventValue utility by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/47379ccd04b85fa53a164f132249ea466baaa04c
+- enhance dashboard widget and system console functionality by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/6fd2a3f1f3b4cb5eea16e412e823706f3f889d73
+
+### :wrench: Bug Fixes
+
+- replace getRoutesStatuses with readJson by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/7e7292d55bad767512254362d7530296db3f6aa7
+- handle null route prefix in setTableActionsManageRemoteApiSync by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/cff06b92c9e50fe39bcf30488cc82eb96247b9f8
+- handle null values for module route and module route name by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/adc6fcaeaecde177d4d17a8a3a39e533d1d83768
+- improve exception handler registration and command registration logic by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/010cade0f450d5df8a467334de930b44bc9afb19
+- enhance locale handling for media lists and add unit tests by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/c40a1687a6c7a1ee663a5d12e565e4770b52ebf1
+- update chunkInputs method parameters for improved functionality by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/530c866a43bcf86cba55bb9f47c848990269ffff
+- update file mapping to use arrow function for improved readability by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/c104a29ab0abcd12a9cd6738b8f0ad0c46f99f18
+- enhance HTML normalization and comparison logic by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/7f88eb2e00e983198328b13404c5c9d33ed873bd
+
+### :zap: Performance
+
+- add early return for cached routes by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/ab8cc3c349a3e51044795a9ec6f5dcd0635ae6fd
+- implement settled marker for system settings duplication and migration by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/e6663682c0c1d03c275dcedc374dea66b5e87278
+
+### :recycle: Refactors
+
+- add form inputs and index configuration for notifications by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/95eff3402bc0d7b0e54a8e01752e9db7083e8e6d
+- add MyNotification module components and configuration by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/8747352fde6fbe601b0d9181b9e7f3252ffe380e
+- add new Blueprint components for HomepageTest, LayoutBuilder, Page, PageLayout, ParentSegment, Redirect, and StyleSheet by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/f94aaef243d4ebd5251c6233eb1cb743d956ca70
+- add new Blueprint components for ErrorPage module by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/462f3beb6e7d187ed01179999d23fc9d21a7fbdb
+- add new Blueprint components for Payment, PaymentCountry, PaymentCurrency, and PaymentService modules by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/7f55f978eb502859dae1f4015c7464f12daeae92
+- add new Blueprint components for Currency, Price, PriceType, and VatRate modules by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/d325e8532a04438fe45cb52ce0ceba26c10dd0b4
+- add new Blueprint components for Capability, Company, Permission, Role, and User modules by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/d44c3a7c93152101f8f64114e239a940ab70c110
+- add new Blueprint components for Country and State modules by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/ac6095799e3acce34598f1c3fffc5baa3bf2602c
+- enhance payload extraction and presentation class generation by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/dfc9df1b215475718d2d365404d5c7b146f21049
+- simplify routes status retrieval method by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/65fca395f62b7fb5b7c3368f89a7f0e8920ea315
+- enhance ServeUrlKeyedStaleMiddleware for front URL handling by @web-flow in https://github.com/unusualify/modularous/commit/a293210692fcb15fb01e396a8794060b5b278953
+- enhance marker handling and migration logic by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/7ca563eaf500ce201984cf444408082af15190a3
+- enhance structure and styling for image input component by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/b1b40aaf5f1a8fb6fc98f59c3cd681c31dc61f33
+- transition from `ext` to `formEvents` for event handling by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/fa41a1dfc3021b7de6152fa98e0539f93653f142
+
+### :memo: Documentation
+
+- enhance documentation and introduce new form events resources by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/854c1f3b99df7f7f3897773881363d437a6f27c3
+
+### :lipstick: Styling
+
+- lint coding styles for v12.9.0 by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/4d218fd9bc0889a6b2242ff071329b55c091ea3e
+
+### :white_check_mark: Testing
+
+- add script to run PHPUnit for changed files by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/39e109341f851bae3200b9dd350409c4d82780f9
+
+### :package: Build
+
+- update docs build artifacts for v12.9.0 by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/79d8f40a22e0094a3875bc68ae4df6066bcbfc08
+- update build artifacts for v12.9.0 by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/8bf5ebfe0e7c87bdf01e72494926ce849f052452
+
+### :beers: Other Stuff
+
+- increase process timeout in composer.json from 300 to 900 seconds for improved performance during long-running tasks. by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/6d6b891e55d39e420ec79e9ae7a93f199ae30451
+- update comment formatting in SystemNotification config file by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/2804ee6a83f3898eb99b032f15f169a4229da3ad
+- arrange order of config keys of SystemNotification MyNotification module route by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/00301090d82e4f9ccaebccf9cfe146cbd3743edd
+
 ## v12.8.1 - 2026-08-19
 
 ### :wrench: Bug Fixes
