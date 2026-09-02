@@ -121,7 +121,7 @@ final class CmsPublicPresentationItemCache
                     ]);
 
                     return [
-                        'html' => $urlEntry['html'],
+                        'html' => CachedPresentationHtmlCsrfRefresher::refresh($urlEntry['html']),
                         'status' => self::CACHE_STATUS_URL_HIT,
                     ];
                 }
@@ -138,7 +138,7 @@ final class CmsPublicPresentationItemCache
                     ]);
 
                     return [
-                        'html' => $urlEntry['html'],
+                        'html' => CachedPresentationHtmlCsrfRefresher::refresh($urlEntry['html']),
                         'status' => self::CACHE_STATUS_URL_STALE,
                     ];
                 }
