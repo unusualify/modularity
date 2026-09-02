@@ -43,6 +43,7 @@ use Unusualify\Modularous\Services\RedirectService;
 use Unusualify\Modularous\Services\UtmParameters;
 use Unusualify\Modularous\Services\View\ModularousNavigation;
 use Unusualify\Modularous\Support\CommandDiscovery;
+use Unusualify\Modularous\Support\ConsoleCommandRegistration;
 use Unusualify\Modularous\Support\FileLoader;
 use Unusualify\Modularous\Support\HostRouteRegistrar;
 use Unusualify\Modularous\Support\HostRouting;
@@ -319,11 +320,23 @@ class BaseServiceProvider extends ServiceProvider
      */
     private function registerCommands()
     {
-        if (! $this->app->runningInConsole()) {
+        if (! ConsoleCommandRegistration::shouldRegister(
+            $this->app->runningInConsole(),
+            $this->artisanRunnerRequestPath(),
+        )) {
             return;
         }
 
         $this->commands($this->resolveCommands());
+    }
+
+    private function artisanRunnerRequestPath(): ?string
+    {
+        if (! $this->app->bound('request')) {
+            return null;
+        }
+
+        return (string) $this->app['request']->path();
     }
 
     public function registerTranslationService()
