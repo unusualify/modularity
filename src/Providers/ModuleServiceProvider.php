@@ -4,8 +4,13 @@ namespace Unusualify\Modularous\Providers;
 
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\Facades\Blade;
+use Nwidart\Modules\Module;
 use Nwidart\Modules\Support\Config\GenerateConfigReader;
+use Unusualify\Modularous\Contracts\ModulePresentationAssetLoaderInterface;
 use Unusualify\Modularous\Facades\Modularous;
+use Unusualify\Modularous\Facades\ModularousCache;
+use Unusualify\Modularous\Services\ModulePresentationAssetLoader;
+use Unusualify\Modularous\Support\ConsoleCommandRegistration;
 
 class ModuleServiceProvider extends ServiceProvider implements DeferrableProvider
 {
@@ -24,17 +29,30 @@ class ModuleServiceProvider extends ServiceProvider implements DeferrableProvide
      *
      * @return void
      */
-    public function register() {}
+    public function register()
+    {
+        $this->app->singleton(
+            ModulePresentationAssetLoaderInterface::class,
+            ModulePresentationAssetLoader::class,
+        );
+    }
 
     public function bootModules()
     {
         $migration_folder = GenerateConfigReader::read('migration')->getPath();
-        $config_folder = GenerateConfigReader::read('config')->getPath();
         $provider_folder = GenerateConfigReader::read('provider')->getPath();
         $provider_namespace = GenerateConfigReader::read('provider')->getNamespace();
         $views_folder = GenerateConfigReader::read('views')->getPath();
         $lang_folder = GenerateConfigReader::read('lang')->getPath();
         $component_class_namespace = GenerateConfigReader::read('component-class')->getNamespace();
+
+        $isFront = ! $this->app->runningInConsole() && Modularous::isFrontUrl();
+        $deferPresentationAssets = $isFront && ModularousCache::isUrlStaleServeFirst();
+
+        $this->app->make(ModulePresentationAssetLoaderInterface::class)->configure(
+            $deferPresentationAssets,
+            fn () => $this->loadDeferredModulePresentationAssets(),
+        );
 
         foreach (Modularous::allEnabled() as $module) {
 
@@ -56,49 +74,94 @@ class ModuleServiceProvider extends ServiceProvider implements DeferrableProvide
             // LOAD MODULE CONFIG
             $module->loadConfig();
 
-            // LOAD MODULE COMMANDS (HTTP requests never invoke artisan)
-            if ($this->app->runningInConsole()) {
+            // LOAD MODULE COMMANDS (CLI, or HTTP ArtisanRunner which uses Artisan::all())
+            if (ConsoleCommandRegistration::shouldRegister(
+                $this->app->runningInConsole(),
+                $this->app->bound('request') ? (string) $this->app['request']->path() : null,
+            )) {
                 $module->loadCommands();
             }
 
-            // LOAD MODULE MIGRATIONS
-            $this->loadMigrationsFrom(
-                $module->getDirectoryPath($migration_folder)
-            );
+            if ($this->app->runningInConsole()) {
+                $this->loadMigrationsFrom(
+                    $module->getDirectoryPath($migration_folder)
+                );
+            }
 
-            // LOAD MODULE VIEWS
-            $sourcePath = $module->getDirectoryPath($views_folder);
-            $this->loadViewsFrom(
-                array_merge(
-                    $this->getPublishableViewPaths(
-                        $module->getSnakeName()
-                    ),
-                    [$sourcePath]
-                ),
-                $module->getSnakeName()
-            );
-
-            // LOAD MODULE VIEW COMPONENTS
-            $namespace = $module->getClassNamespace($component_class_namespace);
-            Blade::componentNamespace($namespace, snakeCase($module_name));
-
-            // LOAD MODULE TRANSLATION
-            $langPath = base_path('lang/modules/' . $module->getSnakeName());
-
-            // Add lang paths to merge with laravel translations
-            /**
-             * Unusualify\Modularous\Translation\Translator::class instance is $this->app['translator']
-             */
-            // $this->app['translator']->addPath($module->getDirectoryPath($lang_folder));
-
-            if (is_dir($langPath)) {
-                $this->loadTranslationsFrom($langPath, $module->getLowerName());
-            } else {
-                $this->loadTranslationsFrom(
-                    $module->getDirectoryPath('Resources/lang'),
-                    $module->getSnakeName()
+            if (! $deferPresentationAssets) {
+                $this->loadModulePresentationAssets(
+                    $module,
+                    $module_name,
+                    $views_folder,
+                    $component_class_namespace,
+                    $lang_folder,
                 );
             }
         }
+    }
+
+    public function loadDeferredModulePresentationAssets(): void
+    {
+        $views_folder = GenerateConfigReader::read('views')->getPath();
+        $lang_folder = GenerateConfigReader::read('lang')->getPath();
+        $component_class_namespace = GenerateConfigReader::read('component-class')->getNamespace();
+
+        foreach (Modularous::allEnabled() as $module) {
+            $this->loadModulePresentationAssets(
+                $module,
+                $module->getName(),
+                $views_folder,
+                $component_class_namespace,
+                $lang_folder,
+            );
+        }
+    }
+
+    protected function loadModulePresentationAssets(
+        Module $module,
+        string $module_name,
+        string $views_folder,
+        string $component_class_namespace,
+        string $lang_folder,
+    ): void {
+        $sourcePath = $module->getDirectoryPath($views_folder);
+        $this->loadViewsFrom(
+            array_merge(
+                $this->getPublishableViewPaths($module->getSnakeName()),
+                [$sourcePath]
+            ),
+            $module->getSnakeName()
+        );
+
+        $namespace = $module->getClassNamespace($component_class_namespace);
+        Blade::componentNamespace($namespace, snakeCase($module_name));
+
+        $langPath = base_path('lang/modules/' . $module->getSnakeName());
+
+        if (is_dir($langPath)) {
+            $this->loadTranslationsFrom($langPath, $module->getLowerName());
+        } else {
+            $this->loadTranslationsFrom(
+                $module->getDirectoryPath('Resources/lang'),
+                $module->getSnakeName()
+            );
+        }
+    }
+
+    /**
+     * @return list<string>
+     */
+    protected function getPublishableViewPaths(?string $moduleSnakeName = null): array
+    {
+        $paths = [];
+        $key = $moduleSnakeName ?? $this->baseKey;
+
+        foreach (config('view.paths') as $path) {
+            if (is_dir($path . '/modules/' . $key)) {
+                $paths[] = $path . '/modules/' . $key;
+            }
+        }
+
+        return $paths;
     }
 }

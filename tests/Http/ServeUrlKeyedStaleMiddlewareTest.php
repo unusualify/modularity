@@ -15,6 +15,7 @@ use Modules\Cms\Services\CanonicalUrlResolver;
 use Modules\Cms\Services\CmsVisitorRedirectResolver;
 use Modules\Cms\Support\CmsPublicPresentationItemCache;
 use Modules\Cms\Support\StalePublicationMeta;
+use Unusualify\Modularous\Contracts\ModulePresentationAssetLoaderInterface;
 use Unusualify\Modularous\Facades\ModularousCache;
 use Unusualify\Modularous\Tests\TestCase;
 
@@ -27,6 +28,17 @@ class ServeUrlKeyedStaleMiddlewareTest extends TestCase
         $canonical = new CanonicalUrlResolver;
 
         return new CmsVisitorRedirectResolver($canonical, new TranslatableCmsLocalizationAdapter($canonical));
+    }
+
+    private function makeMiddleware(
+        CmsVisitorRequestContextResolverInterface $resolver,
+        CmsLocalizationContract $localization,
+    ): ServeUrlKeyedStaleMiddleware {
+        return new ServeUrlKeyedStaleMiddleware(
+            $resolver,
+            $localization,
+            $this->app->make(ModulePresentationAssetLoaderInterface::class),
+        );
     }
 
     protected function setUp(): void
@@ -46,6 +58,30 @@ class ServeUrlKeyedStaleMiddlewareTest extends TestCase
         Config::set('modularous.cms_routing.default_locale', 'en');
 
         $this->app->forgetInstance('modularous.cache');
+        $this->configurePresentationCacheRoute('Cms', 'Page');
+    }
+
+    private function configurePresentationCacheRoute(string $module, string $route, bool $enabled = true): void
+    {
+        Config::set('modularous.cache.enabled', true);
+        Config::set('modularous.cache.modules.' . $module . '.enabled', true);
+        Config::set('modularous.cache.modules.' . $module . '.routes.' . $route . '.enabled', true);
+        Config::set('modularous.cache.modules.' . $module . '.routes.' . $route . '.types.presentationItem', $enabled);
+        $this->app->forgetInstance('modularous.cache');
+    }
+
+    /**
+     * @param array<string, mixed> $extra
+     * @return array<string, mixed>
+     */
+    private function cacheMeta(array $extra = []): array
+    {
+        return array_merge([
+            'published' => true,
+            'visibility_profile' => StalePublicationMeta::PROFILE_STANDARD,
+            'module' => 'Cms',
+            'route' => 'Page',
+        ], $extra);
     }
 
     protected function tearDown(): void
@@ -62,10 +98,7 @@ class ServeUrlKeyedStaleMiddlewareTest extends TestCase
             'en',
             '/pages/blog',
             $html,
-            [
-                'published' => true,
-                'visibility_profile' => StalePublicationMeta::PROFILE_STANDARD,
-            ],
+            $this->cacheMeta(),
             900,
             3600,
         );
@@ -86,7 +119,7 @@ class ServeUrlKeyedStaleMiddlewareTest extends TestCase
         $localization = $this->createMock(CmsLocalizationContract::class);
         $localization->method('defaultLocale')->willReturn('en');
 
-        $middleware = new ServeUrlKeyedStaleMiddleware($resolver, $localization);
+        $middleware = $this->makeMiddleware($resolver, $localization);
         $request = Request::create('/en/pages/blog', 'GET');
 
         $response = $middleware->handle($request, fn () => abort(500, 'controller-should-not-run'));
@@ -107,10 +140,7 @@ class ServeUrlKeyedStaleMiddlewareTest extends TestCase
             'en',
             '/pages/blog',
             $html,
-            [
-                'published' => true,
-                'visibility_profile' => StalePublicationMeta::PROFILE_STANDARD,
-            ],
+            $this->cacheMeta(),
             900,
             3600,
         );
@@ -123,7 +153,7 @@ class ServeUrlKeyedStaleMiddlewareTest extends TestCase
         $resolver = $this->makeVisitorResolver();
         $localization = new TranslatableCmsLocalizationAdapter(new CanonicalUrlResolver);
 
-        $middleware = new ServeUrlKeyedStaleMiddleware($resolver, $localization);
+        $middleware = $this->makeMiddleware($resolver, $localization);
         $request = Request::create('/en/pages/blog', 'GET');
 
         $response = $middleware->handle($request, fn () => abort(500, 'controller-should-not-run'));
@@ -158,15 +188,17 @@ class ServeUrlKeyedStaleMiddlewareTest extends TestCase
         ]);
         $this->app->forgetInstance('modularous.cache');
 
+        $this->configurePresentationCacheRoute('Blog', 'BlogLanding');
+
         $html = '<!DOCTYPE html><html><body>search-page-2</body></html>';
         ModularousCache::getUrlKeyedStaleCache()->put(
             'en',
             '/blog/search?page=2&searchblogtext=press',
             $html,
-            [
-                'published' => true,
-                'visibility_profile' => StalePublicationMeta::PROFILE_STANDARD,
-            ],
+            $this->cacheMeta([
+                'module' => 'Blog',
+                'route' => 'BlogLanding',
+            ]),
             900,
             3600,
         );
@@ -187,7 +219,7 @@ class ServeUrlKeyedStaleMiddlewareTest extends TestCase
         $localization = $this->createMock(CmsLocalizationContract::class);
         $localization->method('defaultLocale')->willReturn('en');
 
-        $middleware = new ServeUrlKeyedStaleMiddleware($resolver, $localization);
+        $middleware = $this->makeMiddleware($resolver, $localization);
         $request = Request::create('/en/blog/search?page=2&searchblogtext=press', 'GET');
 
         $response = $middleware->handle($request, fn () => abort(500, 'controller-should-not-run'));
@@ -208,10 +240,10 @@ class ServeUrlKeyedStaleMiddlewareTest extends TestCase
             'en',
             '/blog/search',
             '<html>default</html>',
-            [
-                'published' => true,
-                'visibility_profile' => StalePublicationMeta::PROFILE_STANDARD,
-            ],
+            $this->cacheMeta([
+                'module' => 'Blog',
+                'route' => 'BlogLanding',
+            ]),
             900,
             3600,
         );
@@ -232,7 +264,7 @@ class ServeUrlKeyedStaleMiddlewareTest extends TestCase
         $localization = $this->createMock(CmsLocalizationContract::class);
         $localization->method('defaultLocale')->willReturn('en');
 
-        $middleware = new ServeUrlKeyedStaleMiddleware($resolver, $localization);
+        $middleware = $this->makeMiddleware($resolver, $localization);
         $request = Request::create('/en/blog/search?utm_source=newsletter', 'GET');
 
         $response = $middleware->handle($request, fn () => response('controller', 200));
@@ -247,10 +279,7 @@ class ServeUrlKeyedStaleMiddlewareTest extends TestCase
             'en',
             '/admin/dashboard',
             '<html>should-not-serve</html>',
-            [
-                'published' => true,
-                'visibility_profile' => StalePublicationMeta::PROFILE_STANDARD,
-            ],
+            $this->cacheMeta(),
             900,
             3600,
         );
@@ -271,7 +300,7 @@ class ServeUrlKeyedStaleMiddlewareTest extends TestCase
         $localization = $this->createMock(CmsLocalizationContract::class);
         $localization->method('defaultLocale')->willReturn('en');
 
-        $middleware = new ServeUrlKeyedStaleMiddleware($resolver, $localization);
+        $middleware = $this->makeMiddleware($resolver, $localization);
         $request = Request::create('http://localhost/admin/dashboard', 'GET');
 
         $response = $middleware->handle($request, fn () => response('panel', 200));
@@ -286,10 +315,9 @@ class ServeUrlKeyedStaleMiddlewareTest extends TestCase
             'en',
             '/pages/hidden',
             '<html>hidden</html>',
-            [
+            $this->cacheMeta([
                 'published' => false,
-                'visibility_profile' => StalePublicationMeta::PROFILE_STANDARD,
-            ],
+            ]),
             900,
             3600,
         );
@@ -310,12 +338,141 @@ class ServeUrlKeyedStaleMiddlewareTest extends TestCase
         $localization = $this->createMock(CmsLocalizationContract::class);
         $localization->method('defaultLocale')->willReturn('en');
 
-        $middleware = new ServeUrlKeyedStaleMiddleware($resolver, $localization);
+        $middleware = $this->makeMiddleware($resolver, $localization);
         $request = Request::create('/en/pages/hidden', 'GET');
 
         $response = $middleware->handle($request, fn () => response('controller', 200));
 
         $this->assertSame('controller', $response->getContent());
+    }
+
+    /** @test */
+    public function it_falls_through_when_presentation_item_cache_is_disabled_for_route(): void
+    {
+        $this->configurePresentationCacheRoute('PrimaryPage', 'SubmitPressRelease', false);
+
+        ModularousCache::getUrlKeyedStaleCache()->put(
+            'en',
+            '/submit-press-release',
+            '<html>cached-submit</html>',
+            $this->cacheMeta([
+                'module' => 'PrimaryPage',
+                'route' => 'SubmitPressRelease',
+            ]),
+            900,
+            3600,
+        );
+
+        $resolver = new class implements CmsVisitorRequestContextResolverInterface
+        {
+            public function shouldExcludeRequest(Request $request): bool
+            {
+                return false;
+            }
+
+            public function resolveLocalePathKeyAndExplicitFlag(Request $request): array
+            {
+                return ['en', '/submit-press-release', true];
+            }
+        };
+
+        $localization = $this->createMock(CmsLocalizationContract::class);
+        $localization->method('defaultLocale')->willReturn('en');
+
+        $middleware = $this->makeMiddleware($resolver, $localization);
+        $request = Request::create('/en/submit-press-release', 'GET');
+
+        $response = $middleware->handle($request, fn () => response('controller', 200));
+
+        $this->assertSame('controller', $response->getContent());
+    }
+
+    /** @test */
+    public function it_falls_through_when_cache_meta_is_missing_module_or_route(): void
+    {
+        ModularousCache::getUrlKeyedStaleCache()->put(
+            'en',
+            '/pages/orphan',
+            '<html>orphan</html>',
+            [
+                'published' => true,
+                'visibility_profile' => StalePublicationMeta::PROFILE_STANDARD,
+            ],
+            900,
+            3600,
+        );
+
+        $resolver = new class implements CmsVisitorRequestContextResolverInterface
+        {
+            public function shouldExcludeRequest(Request $request): bool
+            {
+                return false;
+            }
+
+            public function resolveLocalePathKeyAndExplicitFlag(Request $request): array
+            {
+                return ['en', '/pages/orphan', true];
+            }
+        };
+
+        $localization = $this->createMock(CmsLocalizationContract::class);
+        $localization->method('defaultLocale')->willReturn('en');
+
+        $middleware = $this->makeMiddleware($resolver, $localization);
+        $request = Request::create('/en/pages/orphan', 'GET');
+
+        $response = $middleware->handle($request, fn () => response('controller', 200));
+
+        $this->assertSame('controller', $response->getContent());
+    }
+
+    /** @test */
+    public function it_refreshes_csrf_tokens_when_serving_cached_html(): void
+    {
+        $session = app('session.store');
+        $session->start();
+
+        $freshToken = csrf_token();
+        $this->assertNotSame('', $freshToken);
+
+        $html = '<head><meta name="csrf-token" content="stale-meta"></head>'
+            . '<form><input type="hidden" name="_token" value="stale-input" autocomplete="off"></form>';
+
+        ModularousCache::getUrlKeyedStaleCache()->put(
+            'en',
+            '/pages/blog',
+            $html,
+            $this->cacheMeta(),
+            900,
+            3600,
+        );
+
+        $resolver = new class implements CmsVisitorRequestContextResolverInterface
+        {
+            public function shouldExcludeRequest(Request $request): bool
+            {
+                return false;
+            }
+
+            public function resolveLocalePathKeyAndExplicitFlag(Request $request): array
+            {
+                return ['en', '/pages/blog', true];
+            }
+        };
+
+        $localization = $this->createMock(CmsLocalizationContract::class);
+        $localization->method('defaultLocale')->willReturn('en');
+
+        $middleware = $this->makeMiddleware($resolver, $localization);
+        $request = Request::create('/en/pages/blog', 'GET');
+        $request->setLaravelSession($session);
+
+        $response = $middleware->handle($request, fn () => abort(500, 'controller-should-not-run'));
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertStringContainsString('<meta name="csrf-token" content="' . $freshToken . '">', $response->getContent());
+        $this->assertStringNotContainsString('stale-meta', $response->getContent());
+        $this->assertStringNotContainsString('stale-input', $response->getContent());
     }
 
     private function deleteDirectory(string $directory): void

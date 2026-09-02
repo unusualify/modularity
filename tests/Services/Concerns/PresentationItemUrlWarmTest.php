@@ -16,6 +16,7 @@ use Modules\Cms\Http\Middleware\ServeUrlKeyedStaleMiddleware;
 use Modules\Cms\Support\CmsPublicPresentationItemCache;
 use Modules\Cms\Support\StalePublicationMeta;
 use Unusualify\Modularous\Contracts\Cache\UrlPresentationCacheStoreInterface;
+use Unusualify\Modularous\Contracts\ModulePresentationAssetLoaderInterface;
 use Unusualify\Modularous\Facades\ModularousCache;
 use Unusualify\Modularous\Services\Cache\FileUrlPresentationCacheDriver;
 use Unusualify\Modularous\Services\Cache\StaleFileCache;
@@ -114,7 +115,11 @@ class PresentationItemUrlWarmTest extends TestCase
         $localization = $this->createMock(CmsLocalizationContract::class);
         $localization->method('defaultLocale')->willReturn('en');
 
-        $middleware = new ServeUrlKeyedStaleMiddleware($resolver, $localization);
+        $middleware = new ServeUrlKeyedStaleMiddleware(
+            $resolver,
+            $localization,
+            $this->app->make(ModulePresentationAssetLoaderInterface::class),
+        );
 
         foreach ($paths as $locale => $path) {
             $requestPath = $locale === 'en' ? $path : '/' . trim($locale, '/') . $path;

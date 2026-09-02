@@ -8,11 +8,13 @@ use Closure;
 use Illuminate\Http\Request;
 use Modules\Cms\Contracts\CmsLocalizationContract;
 use Modules\Cms\Contracts\CmsVisitorRequestContextResolverInterface;
+use Modules\Cms\Support\CachedPresentationHtmlCsrfRefresher;
 use Modules\Cms\Support\CmsPublicPresentationItemCache;
 use Modules\Cms\Support\CmsSluglessFallbackLocale;
 use Modules\Cms\Support\StalePublicationGate;
 use Symfony\Component\HttpFoundation\Response;
 use Unusualify\Modularous\Contracts\Cache\UrlPresentationCacheStoreInterface;
+use Unusualify\Modularous\Contracts\ModulePresentationAssetLoaderInterface;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Facades\ModularousCache;
 use Unusualify\Modularous\Support\ModularousCacheLogger;
@@ -25,11 +27,20 @@ final class ServeUrlKeyedStaleMiddleware
     public function __construct(
         private CmsVisitorRequestContextResolverInterface $resolver,
         private CmsLocalizationContract $cmsLocalization,
+        private ModulePresentationAssetLoaderInterface $presentationAssetLoader,
     ) {}
 
     public function handle(Request $request, Closure $next): Response
     {
+        if ($this->isStaticAssetRequest($request)) {
+            return $next($request);
+        }
+
         if (! $this->shouldAttemptServeFirst($request)) {
+            if ($this->presentationAssetLoader->isDeferred()) {
+                $this->presentationAssetLoader->ensureLoaded();
+            }
+
             return $next($request);
         }
 
@@ -52,6 +63,8 @@ final class ServeUrlKeyedStaleMiddleware
                 'explicitLocale' => $explicitLocale,
             ]);
 
+            $this->presentationAssetLoader->ensureLoaded();
+
             return $next($request);
         }
 
@@ -69,7 +82,7 @@ final class ServeUrlKeyedStaleMiddleware
         ]);
 
         return response(
-            $entry['html'],
+            CachedPresentationHtmlCsrfRefresher::refresh($entry['html'], $request),
             200,
             [
                 'Content-Type' => 'text/html; charset=UTF-8',
@@ -127,6 +140,55 @@ final class ServeUrlKeyedStaleMiddleware
             return null;
         }
 
+        if (! $this->isPresentationCacheServeAllowed($entry['meta'])) {
+            ModularousCacheLogger::info('cache.cms.url_stale.route_disabled', [
+                'locale' => $locale,
+                'path' => $pathKey,
+                'cacheLookupKey' => $cacheLookupKey,
+                'module' => $entry['meta']['module'] ?? null,
+                'route' => $entry['meta']['route'] ?? null,
+            ]);
+
+            return null;
+        }
+
         return $entry;
+    }
+
+    /**
+     * @param array<string, mixed> $meta
+     */
+    private function isPresentationCacheServeAllowed(array $meta): bool
+    {
+        $module = $meta['module'] ?? null;
+        $route = $meta['route'] ?? null;
+
+        if (! is_string($module) || $module === '' || ! is_string($route) || $route === '') {
+            return false;
+        }
+
+        return ModularousCache::isCacheTypeConfigured(
+            $module,
+            $route,
+            CmsPublicPresentationItemCache::CACHE_TYPE,
+        );
+    }
+
+    private function isStaticAssetRequest(Request $request): bool
+    {
+        $path = trim($request->path(), '/');
+
+        foreach (['assets/', 'vendor/', 'build/', 'storage/', 'cms/stylesheets/', 'templates/'] as $prefix) {
+            if ($path === rtrim($prefix, '/') || str_starts_with($path, $prefix)) {
+                return true;
+            }
+        }
+
+        $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+
+        return in_array($extension, [
+            'css', 'js', 'map', 'webp', 'png', 'jpg', 'jpeg', 'gif', 'svg', 'ico',
+            'woff', 'woff2', 'ttf', 'eot', 'avif',
+        ], true);
     }
 }

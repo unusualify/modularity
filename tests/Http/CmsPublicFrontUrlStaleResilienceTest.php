@@ -20,6 +20,30 @@ class CmsPublicFrontUrlStaleResilienceTest extends TestCase
 {
     private string $urlStalePath;
 
+    private function configurePresentationCacheRoute(string $module, string $route, bool $enabled = true): void
+    {
+        Config::set('modularous.cache.enabled', true);
+        Config::set('modularous.cache.modules.' . $module . '.enabled', true);
+        Config::set('modularous.cache.modules.' . $module . '.routes.' . $route . '.enabled', true);
+        Config::set('modularous.cache.modules.' . $module . '.routes.' . $route . '.types.presentationItem', $enabled);
+        $this->app->forgetInstance('modularous.cache');
+        ModularousCache::clearResolvedInstance();
+    }
+
+    /**
+     * @param array<string, mixed> $extra
+     * @return array<string, mixed>
+     */
+    private function cacheMeta(array $extra = []): array
+    {
+        return array_merge([
+            'published' => true,
+            'visibility_profile' => StalePublicationMeta::PROFILE_STANDARD,
+            'module' => 'Cms',
+            'route' => 'Page',
+        ], $extra);
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -47,6 +71,9 @@ class CmsPublicFrontUrlStaleResilienceTest extends TestCase
         Config::set('translatable.locales', ['en', 'tr']);
 
         $this->app->forgetInstance('modularous.cache');
+        ModularousCache::clearResolvedInstance();
+        $this->configurePresentationCacheRoute('Cms', 'Page');
+
         $this->app->register(CmsServiceProvider::class);
 
         Config::set('database.connections.testdb.database', '/definitely/not/a/database.sqlite');
@@ -84,7 +111,16 @@ class CmsPublicFrontUrlStaleResilienceTest extends TestCase
         Config::set('modularous.cms_routing.public_front_route_domain', null);
         Config::set('modularous.cms_routing.public_front_routes_allow_any_host', false);
 
-        $this->seedUrlStale('tr', '/ulke-pr-paketleri/arjantin', '<!DOCTYPE html><body>cms-host-stale</body>');
+        $this->configurePresentationCacheRoute('BusinessPackage', 'PackageCountry');
+        $this->seedUrlStale(
+            'tr',
+            '/ulke-pr-paketleri/arjantin',
+            '<!DOCTYPE html><body>cms-host-stale</body>',
+            $this->cacheMeta([
+                'module' => 'BusinessPackage',
+                'route' => 'PackageCountry',
+            ]),
+        );
 
         $response = $this->withServerVariables(['HTTP_HOST' => 'cms.b2press.test'])
             ->get('/tr/ulke-pr-paketleri/arjantin');
@@ -120,16 +156,13 @@ class CmsPublicFrontUrlStaleResilienceTest extends TestCase
         $this->assertSame($webIndex + 1, $staleIndex);
     }
 
-    private function seedUrlStale(string $locale, string $path, string $html): void
+    private function seedUrlStale(string $locale, string $path, string $html, ?array $meta = null): void
     {
         ModularousCache::getUrlKeyedStaleCache()->put(
             $locale,
             $path,
             $html,
-            [
-                'published' => true,
-                'visibility_profile' => StalePublicationMeta::PROFILE_STANDARD,
-            ],
+            $meta ?? $this->cacheMeta(),
             900,
             3600,
         );

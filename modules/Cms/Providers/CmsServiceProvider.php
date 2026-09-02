@@ -73,6 +73,8 @@ use Unusualify\Modularous\Services\SlugInputValidationService;
 
 class CmsServiceProvider extends ServiceProvider
 {
+    private static bool $urlStaleMiddlewarePrepended = false;
+
     public function register(): void
     {
         // $this->app->register(CmsRouteServiceProvider::class);
@@ -207,6 +209,10 @@ class CmsServiceProvider extends ServiceProvider
     private function registerUrlStaleServeMiddleware(): void
     {
         $prepend = static function (HttpKernel $kernel): void {
+            if (self::$urlStaleMiddlewarePrepended) {
+                return;
+            }
+
             if (! Modularous::isFrontUrl()) {
                 return;
             }
@@ -220,10 +226,13 @@ class CmsServiceProvider extends ServiceProvider
             $prop->setAccessible(true);
             $stack = $prop->getValue($kernel);
             if (in_array(ServeUrlKeyedStaleMiddleware::class, $stack, true)) {
+                self::$urlStaleMiddlewarePrepended = true;
+
                 return;
             }
 
             $kernel->prependMiddleware(ServeUrlKeyedStaleMiddleware::class);
+            self::$urlStaleMiddlewarePrepended = true;
         };
 
         $this->app->afterResolving(HttpKernel::class, $prepend);

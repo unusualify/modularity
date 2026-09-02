@@ -4,19 +4,24 @@ declare(strict_types=1);
 
 namespace Unusualify\Modularous\Tests\Providers;
 
+use Unusualify\Modularous\Contracts\ModulePresentationAssetLoaderInterface;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Providers\ModuleServiceProvider;
+use Unusualify\Modularous\Services\ModulePresentationAssetLoader;
 use Unusualify\Modularous\Tests\TestModulesCase;
 
 class ModuleServiceProviderTest extends TestModulesCase
 {
-    public function test_register_is_no_op(): void
+    public function test_register_binds_module_presentation_asset_loader(): void
     {
         $provider = new ModuleServiceProvider($this->app);
 
         $provider->register();
 
-        $this->assertTrue(true);
+        $this->assertInstanceOf(
+            ModulePresentationAssetLoader::class,
+            $this->app->make(ModulePresentationAssetLoaderInterface::class),
+        );
     }
 
     public function test_boot_modules_loads_enabled_module_assets(): void
