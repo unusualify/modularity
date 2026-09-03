@@ -17,6 +17,7 @@ use Modules\Cms\Support\CmsPageLayoutPresentationWrapper;
 use Modules\Cms\Support\CmsPublicFrontViewName;
 use Modules\Cms\Support\CmsPublicPresentationInnerData;
 use Modules\Cms\Support\CmsPublicPresentationItemCache;
+use Unusualify\Modularous\Contracts\ModulePresentationAssetLoaderInterface;
 use Unusualify\Modularous\Facades\ModularousCache;
 use Unusualify\Modularous\Http\Controllers\BaseController;
 use Unusualify\Modularous\Http\Controllers\CoreController;
@@ -167,6 +168,8 @@ abstract class CmsController extends CoreController
         CanonicalUrlResolverInterface $canonical,
         bool $forcePreviewRobotsNoIndex = false,
     ) {
+        app(ModulePresentationAssetLoaderInterface::class)->ensureLoaded();
+
         $viewName = $this->resolvePublicPresentationViewName($request, $item);
 
         $innerData = CmsPublicPresentationInnerData::build($request, $item, $canonical, $forcePreviewRobotsNoIndex);

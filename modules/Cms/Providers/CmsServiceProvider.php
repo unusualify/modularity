@@ -242,7 +242,7 @@ class CmsServiceProvider extends ServiceProvider
         }
 
         $this->app->booted(static function (): void {
-            if (! Modularous::isFrontUrl() || ModularousCache::isUrlStaleServeFirst()) {
+            if (! ModularousCache::isUrlStaleServeFirst()) {
                 return;
             }
 
