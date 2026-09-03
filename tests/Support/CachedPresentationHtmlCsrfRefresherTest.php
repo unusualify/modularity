@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Unusualify\Modularous\Tests\Support;
 
 use Illuminate\Http\Request;
+use Illuminate\Session\SessionManager;
 use Modules\Cms\Support\CachedPresentationHtmlCsrfRefresher;
 use Unusualify\Modularous\Tests\TestCase;
 
@@ -44,13 +45,13 @@ class CachedPresentationHtmlCsrfRefresherTest extends TestCase
         $this->assertStringNotContainsString('stale-meta', $refreshed);
         $this->assertStringNotContainsString('stale-input', $refreshed);
         $this->assertStringNotContainsString('stale-popup', $refreshed);
-        $this->assertSame(2, substr_count($refreshed, 'value="' . $freshToken . '"'));
+        $this->assertSame(2, mb_substr_count($refreshed, 'value="' . $freshToken . '"'));
     }
 
     /** @test */
     public function it_leaves_html_unchanged_when_session_cannot_produce_a_token(): void
     {
-        $sessionManager = \Mockery::mock(\Illuminate\Session\SessionManager::class);
+        $sessionManager = \Mockery::mock(SessionManager::class);
         $sessionManager->shouldReceive('isStarted')->andReturn(true);
         $sessionManager->shouldReceive('token')->andReturn('');
         $this->app->instance('session', $sessionManager);

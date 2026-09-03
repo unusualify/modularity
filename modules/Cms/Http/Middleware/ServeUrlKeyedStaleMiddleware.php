@@ -184,7 +184,7 @@ final class ServeUrlKeyedStaleMiddleware
             }
         }
 
-        $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+        $extension = mb_strtolower(pathinfo($path, PATHINFO_EXTENSION));
 
         return in_array($extension, [
             'css', 'js', 'map', 'webp', 'png', 'jpg', 'jpeg', 'gif', 'svg', 'ico',

@@ -12,7 +12,7 @@ class ModulePresentationAssetLoaderTest extends TestCase
     /** @test */
     public function it_does_not_invoke_load_callback_when_deferral_is_disabled(): void
     {
-        $loader = new ModulePresentationAssetLoader();
+        $loader = new ModulePresentationAssetLoader;
         $invoked = false;
 
         $loader->configure(false, function () use (&$invoked): void {
@@ -28,7 +28,7 @@ class ModulePresentationAssetLoaderTest extends TestCase
     /** @test */
     public function it_invokes_load_callback_once_when_deferred(): void
     {
-        $loader = new ModulePresentationAssetLoader();
+        $loader = new ModulePresentationAssetLoader;
         $invocations = 0;
 
         $loader->configure(true, function () use (&$invocations): void {
