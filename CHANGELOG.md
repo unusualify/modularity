@@ -2,6 +2,31 @@
 
 All notable changes to `modularous` will be documented in this file
 
+## v12.10.0 - 2026-09-03
+
+### :rocket: Features
+
+- enhance directive handling and add scrollable directive by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/b4a1c53ffe920ee620b55ff016e4e6be520fd675
+- add scrollable directive support for dashboard widgets by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/ab6effbc8e31362e363c42c5d48641259af1ed9a
+
+### :wrench: Bug Fixes
+
+- introduce CachedPresentationHtmlCsrfRefresher for CSRF token management by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/9368df17325ac7a52f6ea40831b2308b5bc05074
+- implement command registration logic for Artisan runner by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/a95fedc4359e42f8ff1363505c58f930aea7c931
+- ensure loading of module presentation assets in render method by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/8846f25c6f5dc97f1fb3ea6d3fa165f8931f0a44
+
+### :zap: Performance
+
+- implement ModulePresentationAssetLoader for deferred asset loading by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/2a8d4663a35bb997261559a04c31d3393e583696
+
+### :lipstick: Styling
+
+- lint coding styles for v12.10.0 by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/00212c09b57836ca0e2458add2ebe61717f6c22e
+
+### :package: Build
+
+- update build artifacts for v12.10.0 by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/2ad86f7f486d62b96fc5d0153b76e2c828b69775
+
 ## v12.9.0 - 2026-08-31
 
 ### :rocket: Features
