@@ -28,6 +28,9 @@ Each block is an associative array. The `widget` key is the usual path for dashb
         'class' => 'h-50',
         'style' => 'min-height: 160px',
     ],
+    'widgetDirectives' => [
+        'scrollable' => true,
+    ],
     'allowedRoles' => ['superadmin'],
     'attributes' => [
         'class' => 'h-100',
@@ -43,6 +46,7 @@ Each block is an associative array. The `widget` key is the usual path for dashb
 | `widget` | one of `widget` / `component` / `tag` | Class under `Unusualify\Modularous\View\Widgets\{Name}` (no namespace prefix) |
 | `widgetCol` | no | Vuetify `v-col` breakpoints (`cols`, `lg`, …) merged onto the wrapper |
 | `widgetAttributes` | no | Extra attributes on the wrapper column (height, overflow, style) |
+| `widgetDirectives` | no | Vue directives on the wrapper column. Defaults to `scrollable => true` |
 | `widgetSlots` | no | Slots on the wrapper column |
 | `attributes` | no | Props for the inner Vue component (`title`, `subtitle`, `elevation`, `class`) |
 | `allowedRoles` | no | Roles that may see the block. Omit for every authenticated dashboard user |
@@ -55,11 +59,13 @@ Each block is an associative array. The `widget` key is the usual path for dashb
 A widget renders as a column wrapping the Vue card:
 
 ```
-v-col  ← widgetTag + widgetCol + widgetAttributes
+v-col  ← widgetTag + widgetCol + widgetAttributes + widgetDirectives (`v-scrollable`)
   └── ue-system-console  ← tag + attributes (hydrated at runtime)
 ```
 
 Layout and height belong on `widgetCol` / `widgetAttributes`. Card copy belongs on `attributes`.
+
+Height-capped columns (`h-50`, `h-100`, …) get overflow via **`v-scrollable`** on the wrapper. `ModularousWidget` defaults `widgetDirectives.scrollable` to `true`. The directive sets `min-height: 0` so the flex column can shrink; CSS pins the card title and scrolls `v-card-text`. See [v-scrollable](/guide/directives/scrollable). Opt out with `'widgetDirectives' => ['scrollable' => false]`.
 
 ::: warning Do not put live command lists on the block
 Widgets such as [System Console](./system-console) hydrate `cacheCommands`, `customCommands`, and `downPresets` in `hydrateAttributes()` from `modularous.system_console`. Putting those arrays on the block `attributes` (or `modularous.widgets.{alias}.attributes`) recursive-merges them and **duplicates** the buttons.

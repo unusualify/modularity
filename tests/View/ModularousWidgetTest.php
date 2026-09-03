@@ -18,6 +18,7 @@ class ModularousWidgetTest extends TestCase
         $this->assertSame($widget, $widget->setWidgetCol(['cols' => 6]));
         $this->assertSame($widget, $widget->setWidgetAttributes(['class' => 'test']));
         $this->assertSame($widget, $widget->setWidgetSlots([]));
+        $this->assertSame($widget, $widget->setWidgetDirectives(['scrollable' => false]));
         $this->assertSame($widget, $widget->useWidgetConfig(false));
     }
 
@@ -51,6 +52,7 @@ class ModularousWidgetTest extends TestCase
         $this->assertArrayHasKey('slots', $result);
         $this->assertArrayHasKey('elements', $result);
         $this->assertEquals('v-col', $result['tag']);
+        $this->assertSame(true, $result['directives']['scrollable']);
     }
 
     public function test_render_merges_widget_col_into_attributes()
@@ -63,6 +65,17 @@ class ModularousWidgetTest extends TestCase
         $this->assertArrayHasKey('attributes', $result);
         $this->assertArrayHasKey('cols', $result['attributes']);
         $this->assertEquals(6, $result['attributes']['cols']);
+    }
+
+    public function test_render_includes_widget_directives()
+    {
+        $widget = new MetricsWidget;
+        $widget->setWidgetDirectives(['scrollable' => true, 'show' => false]);
+
+        $result = $widget->render();
+
+        $this->assertSame(true, $result['directives']['scrollable']);
+        $this->assertSame(false, $result['directives']['show']);
     }
 
     public function test_render_uses_widget_config_when_enabled()

@@ -150,6 +150,10 @@ class Component extends LaravelComponent
                 ->setWidgetSlots(array_merge_recursive_preserve(
                     $widget->widgetSlots ?? [],
                     $config['widgetSlots'] ?? [],
+                ))
+                ->setWidgetDirectives(array_merge_recursive_preserve(
+                    $widget->widgetDirectives ?? [],
+                    $config['widgetDirectives'] ?? [],
                 ));
 
             if ($alias) {

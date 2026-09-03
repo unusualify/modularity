@@ -62,6 +62,9 @@ return [
                     'class' => 'h-50',
                     'style' => 'min-height: 160px',
                 ],
+                'widgetDirectives' => [
+                    'scrollable' => true,
+                ],
                 'allowedRoles' => ['superadmin'],
                 'attributes' => [
                     'class' => 'h-100',
@@ -79,6 +82,9 @@ return [
                 'widgetAttributes' => [
                     'class' => 'h-50',
                     'style' => 'min-height: 160px',
+                ],
+                'widgetDirectives' => [
+                    'scrollable' => true,
                 ],
                 'allowedRoles' => ['superadmin'],
                 'attributes' => [

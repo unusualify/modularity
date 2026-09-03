@@ -21,7 +21,11 @@ sidebarTitle: Recursive Stuff
   },
   bind: ['item'],           // keys from bindData to spread as attributes
   directives: {             // Vue directives to apply
-    show: '$item.active'
+    show: '$item.active',
+    'scrollable.height': '100%',
+    scrollable: {           // or a descriptor
+      value: true,
+    },
   }
 }
 ```

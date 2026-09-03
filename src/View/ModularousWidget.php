@@ -25,8 +25,9 @@ class ModularousWidget extends Component
         'widgetCol' => [
             'cols' => 12,
         ],
-        'widgetAttributes' => [
-            'class' => 'overflow-y-auto',
+        'widgetAttributes' => [],
+        'widgetDirectives' => [
+            'scrollable' => true,
         ],
         'widgetSlots' => [],
     ];
@@ -58,6 +59,15 @@ class ModularousWidget extends Component
      * @var array
      */
     public $widgetSlots;
+
+    /**
+     * Vue directives on the wrapper column (e.g. v-scrollable)
+     *
+     * @var array
+     */
+    public $widgetDirectives = [
+        'scrollable' => true,
+    ];
 
     /**
      * Use the widget config on modularous.widgets.{$widgetAlias}
@@ -148,6 +158,13 @@ class ModularousWidget extends Component
         return $this;
     }
 
+    public function setWidgetDirectives(array $widgetDirectives)
+    {
+        $this->widgetDirectives = $widgetDirectives;
+
+        return $this;
+    }
+
     /**
      * Use the widget config on modularous.widgets.{$widgetAlias}
      *
@@ -198,6 +215,10 @@ class ModularousWidget extends Component
             'slots' => array_merge(
                 $this->widgetConfigUsable ? $this->widgetDefaultConfig['widgetSlots'] ?? [] : [],
                 $this->widgetSlots ?? []
+            ),
+            'directives' => array_merge_recursive_preserve(
+                $this->widgetConfigUsable ? $this->widgetDefaultConfig['widgetDirectives'] ?? [] : [],
+                $this->widgetDirectives ?? []
             ),
             'elements' => [$component->render()],
         ];

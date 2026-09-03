@@ -190,6 +190,43 @@ class SystemConsoleWidgetTest extends TestCase
     }
 
     /** @test */
+    public function component_create_applies_scrollable_widget_directive(): void
+    {
+        $rendered = Component::create([
+            'widget' => 'SystemConsoleWidget',
+            'widgetCol' => [
+                'cols' => 12,
+                'lg' => 6,
+            ],
+            'widgetAttributes' => [
+                'class' => 'h-50',
+            ],
+            'widgetDirectives' => [
+                'scrollable' => true,
+            ],
+            'attributes' => [
+                'title' => 'System Console',
+            ],
+        ]);
+
+        $this->assertSame(true, $rendered['directives']['scrollable']);
+        $this->assertSame('h-50', $rendered['attributes']['class']);
+    }
+
+    /** @test */
+    public function component_create_can_disable_scrollable_widget_directive(): void
+    {
+        $rendered = Component::create([
+            'widget' => 'SystemConsoleWidget',
+            'widgetDirectives' => [
+                'scrollable' => false,
+            ],
+        ]);
+
+        $this->assertSame(false, $rendered['directives']['scrollable']);
+    }
+
+    /** @test */
     public function render_returns_widget_structure(): void
     {
         $widget = new SystemConsoleWidget;

@@ -16,7 +16,12 @@ defineOptions({
 </script>
 
 <template>
-  <div class="dashboard pa-3 h-100">
+  <div class="ue-dashboard pa-3 h-100">
     <ue-blocks :items='blockItems' />
   </div>
 </template>
+
+<style lang="sass" scoped>
+.ue-dashboard
+  min-height: 0
+</style>

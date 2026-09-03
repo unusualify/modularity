@@ -27,5 +27,6 @@ const blocks = computed(() => {
 </template>
 
 <style lang="sass" scoped>
-
+.v-row
+  min-height: 0
 </style>

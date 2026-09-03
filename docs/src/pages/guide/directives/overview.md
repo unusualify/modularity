@@ -15,7 +15,7 @@ Modularous ships a small set of global Vue directives under `vue/src/js/directiv
 | [`v-viewport-fit`](./viewport-fit) | `viewport-fit.js` | Fill leftover viewport below dynamic chrome (filters / alerts) |
 | [`v-column`](./column) | `column.js` | Apply Vuetify `v-col-*` classes from a binding object |
 | [`v-fit-grid`](./fit-grid) | `fit-grid.js` | Flex parent + stretch first child to full size |
-| [`v-scrollable`](./scrollable) | `scrollable.js` | Mark a region scrollable; optional fixed height |
+| [`v-scrollable`](./scrollable) | `scrollable.js` | Scroll region; fill parent or fixed height |
 | [`v-svg`](./svg) | `svg.js` | Inject an SVG sprite icon into the element |
 | [`v-transition`](./transition) | `transition.js` | Show/hide transitions driven by `d-none` |
 
