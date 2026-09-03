@@ -58,10 +58,11 @@
 </template>
 
 <script>
-import { computed, ref, onMounted, resolveDirective, withDirectives, h, getCurrentInstance, vShow } from 'vue'
+import { computed, ref, onMounted, resolveComponent, resolveDirective, withDirectives, h, getCurrentInstance, vShow } from 'vue'
 import { reduce, get, cloneDeep, isArray, isString, isNumber } from 'lodash-es'
 
 import { useCastAttributes } from '@/hooks'
+import { isEnabledDirectiveValue, normalizeDirectiveBinding } from '@/utils/parseDirectiveBindings'
 
 export default {
   props: {
@@ -260,7 +261,12 @@ export default {
 
     // Check if component has directives
     const hasDirectives = computed(() => {
-      return props.configuration.directives && Object.keys(props.configuration.directives).length > 0
+      const directives = props.configuration.directives
+      if (!directives || typeof directives !== 'object') {
+        return false
+      }
+
+      return Object.values(directives).some(isEnabledDirectiveValue)
     })
 
     // Built-in Vue directives that don't need resolveDirective
@@ -287,30 +293,35 @@ export default {
 
       const directives = []
       Object.entries(props.configuration.directives).forEach(([directiveName, value]) => {
-        if (builtInDirectives.hasOwnProperty(directiveName)) {
-          if (directiveName === 'html') {
-            // For v-html, we need to create a custom directive-like object
-            directives.push([{
-              beforeMount(el, binding) {
-                el.innerHTML = binding.value
-              },
-              updated(el, binding) {
-                el.innerHTML = binding.value
-              }
-            }, applyCasting(value)])
-          } else if (directiveName === 'text') {
-            directives.push([{
-              beforeMount(el, binding) {
-                el.textContent = binding.value
-              },
-              updated(el, binding) {
-                el.textContent = binding.value
-              }
-            }, applyCasting(value)])
-          } else if (directiveName === 'show') {
-            directives.push([vShow, applyCasting(value)])
-          }
-          // Add other built-in directives as needed
+        if (!isEnabledDirectiveValue(value)) {
+          return
+        }
+
+        const binding = normalizeDirectiveBinding(directiveName, value)
+        if (!builtInDirectives.hasOwnProperty(binding.name)) {
+          return
+        }
+
+        if (binding.name === 'html') {
+          directives.push([{
+            beforeMount(el, bindingArg) {
+              el.innerHTML = bindingArg.value
+            },
+            updated(el, bindingArg) {
+              el.innerHTML = bindingArg.value
+            }
+          }, applyCasting(binding.value)])
+        } else if (binding.name === 'text') {
+          directives.push([{
+            beforeMount(el, bindingArg) {
+              el.textContent = bindingArg.value
+            },
+            updated(el, bindingArg) {
+              el.textContent = bindingArg.value
+            }
+          }, applyCasting(binding.value)])
+        } else if (binding.name === 'show') {
+          directives.push([vShow, applyCasting(binding.value)])
         }
       })
       return directives
@@ -321,18 +332,25 @@ export default {
       if (!props.configuration.directives) return []
 
       return Object.entries(props.configuration.directives)
-        .filter(([directiveName]) => !builtInDirectives.hasOwnProperty(directiveName))
+        .filter(([, value]) => isEnabledDirectiveValue(value))
         .map(([directiveName, value]) => {
-
-          try {
-            const directive = resolveDirective(directiveName)
-            let val = applyCasting(value)
-            return [directive, val]
-          } catch (error) {
-            console.error(`Custom directive '${directiveName}' could not be resolved:`, error)
+          const binding = normalizeDirectiveBinding(directiveName, value)
+          if (builtInDirectives.hasOwnProperty(binding.name)) {
             return null
           }
 
+          try {
+            const directive = resolveDirective(binding.name)
+            if (!directive) {
+              console.error(`Custom directive '${binding.name}' could not be resolved`)
+              return null
+            }
+
+            return [directive, applyCasting(binding.value), binding.arg, binding.modifiers]
+          } catch (error) {
+            console.error(`Custom directive '${binding.name}' could not be resolved:`, error)
+            return null
+          }
         }).filter(Boolean)
     })
 
@@ -345,6 +363,27 @@ export default {
     const builtInDirectiveAttributes = computed(() => {
       return {} // We're now handling all directives properly with withDirectives
     })
+
+    // Render function path: string tags in h() are native custom elements.
+    // Resolve globally registered Vue/Vuetify components (v-col, ue-recursive-stuff, …).
+    function resolveTag (tag) {
+      if (typeof tag !== 'string' || tag === '') {
+        return tag
+      }
+
+      const resolved = resolveComponent(tag)
+
+      return resolved
+    }
+
+    function createRecursiveChild (configuration, key) {
+      return h(instance.type, {
+        key,
+        level: props.level + 1,
+        configuration,
+        bindData: props.bindData ?? {},
+      })
+    }
 
     // Render component with directives using render function
     const renderComponentWithDirectives = () => {
@@ -361,26 +400,15 @@ export default {
       // Handle array elements
       if (isArray(castedElements.value)) {
         castedElements.value.forEach((_configuration, i) => {
-          children.push(
-            h('ue-recursive-stuff', {
-              key: `tag-${props.level}-${i}`,
-              level: props.level + 1,
-              configuration: _configuration,
-              'bind-data': props.bindData ?? {}
-            })
-          )
+          children.push(createRecursiveChild(_configuration, `tag-${props.level}-${i}`))
         })
       }
       // Handle object elements
       else if (isObject(castedElements.value)) {
-        children.push(
-          h('ue-recursive-stuff', {
-            key: `tag-${props.level}-object`,
-            level: props.level + 1,
-            configuration: castObjectAttributes(props.configuration.elements, props.bindData),
-            'bind-data': props.bindData ?? {}
-          })
-        )
+        children.push(createRecursiveChild(
+          castObjectAttributes(props.configuration.elements, props.bindData),
+          `tag-${props.level}-object`,
+        ))
       }
       // Handle text elements
       else if (isTextable(castedElements.value)) {
@@ -391,18 +419,23 @@ export default {
       const slotElements = {}
       Object.entries(slots.value ?? {}).forEach(([slotName, slotConf]) => {
         slotElements[slotName] = (slotScope = {}) =>
-          h('ue-recursive-stuff', {
+          h(instance.type, {
             level: props.level + 1,
             configuration: slotConf,
-            'bind-data': {...props.bindData, ...slotScope}
+            bindData: {...props.bindData, ...slotScope}
           })
       })
 
       // Create the base component
+      const hostTag = resolveTag(props.configuration.tag)
+      const hostChildren = children.length > 0
+        ? (typeof hostTag === 'string' ? children : { default: () => children })
+        : slotElements
+
       const component = h(
-        props.configuration.tag,
+        hostTag,
         componentAttributes,
-        children.length > 0 ? children : slotElements
+        hostChildren
       )
 
       // Apply custom directives if they exist

@@ -1,0 +1,36 @@
+// Constrained dashboard columns (e.g. h-50) are flex items. Default min-height:
+// auto prevents shrinking below content, so overflow never appears.
+// v-scrollable adds .ue-scrollable.
+.ue-scrollable {
+  min-height: 0;
+  overflow-y: auto;
+
+  // Height utilities (not h-auto): pin nested card chrome, scroll the body.
+  // Unconstrained hosts keep overflow-y: auto only — flex:1 + min-height:0 on
+  // v-card-text would collapse an auto-height card.
+  &[class*='h-']:not(.h-auto):has(> .v-card) {
+    overflow: hidden;
+
+    > .v-card {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      max-height: 100%;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    > .v-card > .v-card-title,
+    > .v-card > .v-card-subtitle,
+    > .v-card > .v-card-item,
+    > .v-card > .v-card-actions {
+      flex: 0 0 auto;
+    }
+
+    > .v-card > .v-card-text {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-y: auto;
+    }
+  }
+}

@@ -1,39 +1,67 @@
-export default {
-  install(app, opts = {}) {
-    const dir = {
-      created(el, binding, vnode, prevVnode) {
-        // Initialize any necessary data
-      },
-      beforeMount(el, binding, vnode, prevVnode) {
-        el.classList.add('ue-scrollable');
+/**
+ * v-scrollable
+ *
+ * Marks a region as a scroll container (`ue-scrollable`).
+ *
+ * Without `.height`, the host fills its parent and clips overflow so nested
+ * Vuetify cards can scroll their body (see `.ue-scrollable` CSS).
+ *
+ * With `.height`, sets an explicit height and `overflow-y: auto`.
+ *
+ * Usage:
+ *   <div v-scrollable>…</div>
+ *   <div v-scrollable.height="240">…</div>
+ *   <div v-scrollable.height="'50vh'">…</div>
+ *   <div v-scrollable="'100%'">…</div>
+ */
 
-        // Check if a height modifier is provided
-        if (binding.modifiers.height) {
-          const height = binding.value;
-          if (typeof height === 'number' || (typeof height === 'string' && height.match(/^\d+(\.\d+)?(px|em|rem|vh|%)$/))) {
-            el.style.height = typeof height === 'number' ? `${height}px` : height;
-            el.style.overflowY = 'auto';
-          } else {
-            console.warn('v-scrollable: Invalid height value. Please provide a number (for px) or a valid CSS height value.');
-          }
-        }
-      },
-      mounted(el, binding, vnode, prevVnode) {
-        // Additional mounted logic if needed
-      },
-      updated(el, binding, vnode, prevVnode) {
-        // Update height if the binding value changes
-        if (binding.modifiers.height && binding.value !== binding.oldValue) {
-          const height = binding.value;
-          if (typeof height === 'number' || (typeof height === 'string' && height.match(/^\d+(\.\d+)?(px|em|rem|vh|%)$/))) {
-            el.style.height = typeof height === 'number' ? `${height}px` : height;
-          }
-        }
-      },
-      beforeUpdate(el, binding, vnode, prevVnode) {},
-      beforeUnmount(el, binding, vnode, prevVnode) {},
-      unmounted(el, binding, vnode, prevVnode) {}
-    };
-    app.directive('scrollable', dir);
+const HEIGHT_PATTERN = /^\d+(\.\d+)?(px|em|rem|vh|%)$/
+
+function isValidHeight (height) {
+  return typeof height === 'number'
+    || (typeof height === 'string' && HEIGHT_PATTERN.test(height))
+}
+
+function toCssHeight (height) {
+  return typeof height === 'number' ? `${height}px` : height
+}
+
+function apply (el, binding) {
+  el.classList.add('ue-scrollable')
+  el.style.minHeight = '0'
+
+  const height = binding.modifiers.height ? binding.value : (
+    isValidHeight(binding.value) ? binding.value : null
+  )
+
+  if (height == null) {
+    return
   }
-};
+
+  if (! isValidHeight(height)) {
+    console.warn('v-scrollable: Invalid height value. Please provide a number (for px) or a valid CSS height value.')
+    return
+  }
+
+  el.style.height = toCssHeight(height)
+  el.style.overflowY = 'auto'
+}
+
+const dir = {
+  beforeMount (el, binding) {
+    apply(el, binding)
+  },
+  updated (el, binding) {
+    if (binding.value === binding.oldValue) {
+      return
+    }
+    apply(el, binding)
+  },
+}
+
+export default {
+  install (app) {
+    app.directive('scrollable', dir)
+  },
+  directive: dir,
+}
