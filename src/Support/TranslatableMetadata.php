@@ -92,7 +92,16 @@ final class TranslatableMetadata
     public static function defaultFormInputs(): array
     {
         return [
-            ['name' => 'seo_title', 'label' => 'SEO Title', 'type' => 'text', 'translated' => true, 'isSecondary' => true],
+            [
+              'name' => self::SCHEMA_JSON_ATTRIBUTE,
+              'label' => 'Schema JSON',
+              'type' => 'source-text',
+              'format' => 'json',
+              'translated' => true,
+              'isSecondary' => true,
+              'hideDetails' => 'auto',
+            ],
+            ['name' => 'seo_title', 'label' => 'SEO Title', 'type' => 'textarea', 'rows' => 2, 'translated' => true, 'isSecondary' => true],
             ['name' => 'seo_description', 'label' => 'SEO Description', 'type' => 'textarea', 'translated' => true, 'isSecondary' => true],
             [
                 'name' => self::OG_IMAGE_ROLE,
@@ -108,18 +117,9 @@ final class TranslatableMetadata
                 ],
             ],
             ['name' => 'canonical_url', 'label' => 'Canonical URL', 'type' => 'text', 'translated' => true, 'isSecondary' => true],
-            ['name' => 'robots_index', 'label' => 'Robots Index', 'type' => 'switch', 'translated' => true, 'isSecondary' => true],
-            ['name' => 'robots_follow', 'label' => 'Robots Follow', 'type' => 'switch', 'translated' => true, 'isSecondary' => true],
-            ['name' => 'sitemap_include', 'label' => 'Include in sitemap', 'type' => 'switch', 'translated' => true, 'isSecondary' => true],
-            [
-                'name' => self::SCHEMA_JSON_ATTRIBUTE,
-                'label' => 'Schema JSON',
-                'type' => 'source-text',
-                'format' => 'json',
-                'translated' => true,
-                'isSecondary' => true,
-                'hideDetails' => 'auto',
-            ],
+            ['name' => 'robots_index', 'label' => 'Robots Index', 'type' => 'switch', 'translated' => true, 'isSecondary' => true, 'trueValue' => true, 'falseValue' => false],
+            ['name' => 'robots_follow', 'label' => 'Robots Follow', 'type' => 'switch', 'translated' => true, 'isSecondary' => true, 'trueValue' => true, 'falseValue' => false],
+            ['name' => 'sitemap_include', 'label' => 'Include in sitemap', 'type' => 'switch', 'translated' => true, 'isSecondary' => true, 'trueValue' => true, 'falseValue' => false],
         ];
     }
 }
