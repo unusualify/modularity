@@ -31,7 +31,7 @@ final class SourceTextHydrateTest extends TestCase
         $h = new SourceTextHydrate([
             'type' => 'source-text',
             'name' => 'body',
-            'format' => 'json',
+            'format' => 'yaml',
         ], null, null, true);
 
         $out = $h->render();
@@ -50,5 +50,19 @@ final class SourceTextHydrateTest extends TestCase
         $out = $h->render();
 
         $this->assertSame('php', $out['format']);
+    }
+
+    public function test_json_format_is_allowed(): void
+    {
+        $h = new SourceTextHydrate([
+            'type' => 'source-text',
+            'name' => 'schema_json',
+            'format' => 'JSON',
+        ], null, null, true);
+
+        $out = $h->render();
+
+        $this->assertSame('json', $out['format']);
+        $this->assertSame(2, $out['jsonIndent']);
     }
 }

@@ -7,17 +7,18 @@ namespace Unusualify\Modularous\Hydrates\Inputs;
 /**
  * Hydrates {@code source-text} into {@code input-source-text} for {@code VInputSourceText} (SourceText.vue).
  *
- * Schema-only {@code format} (user cannot change it in the UI): {@code md}|{@code txt}|{@code js}|{@code php}|{@code html}.
+ * Schema-only {@code format} (user cannot change it in the UI): {@code md}|{@code txt}|{@code js}|{@code php}|{@code html}|{@code json}.
  * Vue maps {@code format} to a CodeMirror 6 language in the modal editor.
  * {@code md} and {@code html} also get an Edit / Preview toggle (markdown via marked; HTML in a sandboxed iframe).
- * Optional passthrough: {@code rows} (min editor height), {@code autoGrow}, {@code variant}, {@code density}, {@code persistentHint}.
+ * {@code json} Keep emits a parsed value (or null when empty) so Laravel array/json casts are not double-encoded.
+ * Optional passthrough: {@code rows} (min editor height), {@code jsonIndent}, {@code autoGrow}, {@code variant}, {@code density}, {@code persistentHint}.
  */
 class SourceTextHydrate extends InputHydrate
 {
     /**
      * @var list<string>
      */
-    public const FORMATS = ['md', 'txt', 'js', 'php', 'html'];
+    public const FORMATS = ['md', 'txt', 'js', 'php', 'html', 'json'];
 
     /**
      * @var array<string, mixed>
@@ -25,6 +26,7 @@ class SourceTextHydrate extends InputHydrate
     public $requirements = [
         'format' => 'md',
         'rows' => 18,
+        'jsonIndent' => 2,
         'autoGrow' => true,
         'variant' => 'outlined',
         'density' => 'comfortable',

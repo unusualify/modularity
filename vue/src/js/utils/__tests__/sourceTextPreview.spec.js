@@ -12,6 +12,7 @@ describe('sourceTextHasPreview', () => {
     expect(sourceTextHasPreview('txt')).toBe(false)
     expect(sourceTextHasPreview('js')).toBe(false)
     expect(sourceTextHasPreview('php')).toBe(false)
+    expect(sourceTextHasPreview('json')).toBe(false)
   })
 })
 

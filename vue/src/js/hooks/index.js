@@ -49,8 +49,14 @@ export {
 export {
   default as useSourceText,
   SOURCE_TEXT_FORMATS,
+  SOURCE_TEXT_JSON_INDENT,
   normalizeSourceTextFormat,
+  normalizeSourceTextJsonIndent,
   sourceTextAsString,
+  sourceTextJsonToDraft,
+  sourceTextJsonClosedPreview,
+  parseSourceTextJsonDraft,
+  formatSourceTextJsonDraft,
   sourceTextFirstLine,
   sourceTextLineCount,
 } from './useSourceText'

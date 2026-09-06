@@ -1,6 +1,7 @@
 <!--
   Closed: readonly preview of the first line + "{lineCount} · {format}" chip.
   Open: modal CodeMirror 6 editor (language from schema format). md/html get Edit | Preview.
+  json Keep emits a parsed value (or null when empty). Format / Minify / Copy in the toolbar.
   Keep commits draft; Cancel / Esc / backdrop confirms discard when dirty.
 -->
 <template>
@@ -79,6 +80,38 @@
           >
             {{ format }}
           </v-chip>
+          <template v-if="format === 'json'">
+            <v-btn
+              size="small"
+              variant="tonal"
+              color="primary"
+              class="me-1"
+              prepend-icon="mdi-code-braces"
+              :disabled="isDisabled"
+              @click="formatPretty"
+            >
+              {{ t('fields.json_toolbar_format', 'Format') }}
+            </v-btn>
+            <v-btn
+              size="small"
+              variant="tonal"
+              class="me-1"
+              prepend-icon="mdi-arrow-collapse-horizontal"
+              :disabled="isDisabled"
+              @click="formatMinify"
+            >
+              {{ t('fields.json_toolbar_minify', 'Minify') }}
+            </v-btn>
+            <v-btn
+              size="small"
+              variant="text"
+              class="me-2"
+              prepend-icon="mdi-content-copy"
+              @click="copyToClipboard"
+            >
+              {{ t('fields.json_toolbar_copy', 'Copy') }}
+            </v-btn>
+          </template>
           <v-btn-toggle
             v-if="hasPreview"
             v-model="pane"
@@ -106,6 +139,15 @@
         </v-toolbar>
 
         <v-card-text class="ue-input-source-text__body flex-grow-1 pa-4 d-flex flex-column">
+          <v-alert
+            v-if="parseError"
+            type="error"
+            variant="tonal"
+            density="compact"
+            class="mb-3 flex-shrink-0"
+          >
+            {{ parseError }}
+          </v-alert>
           <div class="ue-input-source-text__stage flex-grow-1">
             <div
               v-show="showEditor"
@@ -216,6 +258,10 @@
       type: String,
       default: 'md',
     },
+    jsonIndent: {
+      type: Number,
+      default: 2,
+    },
     rows: {
       type: Number,
       default: 18,
@@ -278,9 +324,12 @@
     chipLabel,
     isDisabled,
     closedRules,
+    parseError,
     openEditor,
     requestClose,
     onDialogUpdate,
+    formatPretty,
+    formatMinify,
     keep,
     discard,
     stayEditing,
@@ -337,6 +386,15 @@
       parent,
     })
     editorView.value.focus()
+  }
+
+  async function copyToClipboard () {
+    const text = editorView.value ? editorView.value.state.doc.toString() : (draft.value ?? '')
+    try {
+      await navigator.clipboard.writeText(text)
+    } catch {
+      /** ignore */
+    }
   }
 
   watch(

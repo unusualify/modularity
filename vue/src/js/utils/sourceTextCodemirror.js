@@ -1,9 +1,10 @@
 /**
- * CodeMirror 6 for SourceText: language from schema {@code format} (md|txt|js|php|html).
+ * CodeMirror 6 for SourceText: language from schema {@code format} (md|txt|js|php|html|json).
  */
 import { defaultKeymap, history, historyKeymap, indentWithTab } from '@codemirror/commands'
 import { html } from '@codemirror/lang-html'
 import { javascript } from '@codemirror/lang-javascript'
+import { json } from '@codemirror/lang-json'
 import { markdown } from '@codemirror/lang-markdown'
 import { php } from '@codemirror/lang-php'
 import {
@@ -40,6 +41,8 @@ export function sourceTextLanguageExtension (format) {
       return html()
     case 'js':
       return javascript()
+    case 'json':
+      return json()
     case 'php':
       return php()
     case 'txt':
