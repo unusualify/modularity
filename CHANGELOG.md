@@ -2,6 +2,13 @@
 
 All notable changes to `modularous` will be documented in this file
 
+## v12.10.1 - 2026-09-06
+
+### :rocket: Features
+
+- enhance JSON support in source text input by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/389c0b0bfcdd6881b97e1e097bb0de9c20899b56
+- enhance JSON-LD support and update form inputs by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/f5f84f83f355ea0d1f0ad169298d01158f1a05a7
+
 ## v12.10.0 - 2026-09-03
 
 ### :rocket: Features
