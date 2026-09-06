@@ -6,7 +6,7 @@ use Unusualify\Modularous\Repositories\Traits\TranslatableMetadataTrait;
 use Unusualify\Modularous\Support\TranslatableMetadata;
 
 /**
- * Opt-in translatable metadata (SEO + robots + sitemap flag) for models using {@see HasTranslation}.
+ * Opt-in translatable metadata (SEO + robots + sitemap flag + JSON-LD) for models using {@see HasTranslation}.
  *
  * Use **after** {@see HasTranslation} on the model. Merge {@see TranslatableMetadata::TRANSLATED_ATTRIBUTES}
  * into {@see $translatedAttributes}.

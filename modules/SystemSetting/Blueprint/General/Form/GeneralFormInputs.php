@@ -167,7 +167,7 @@ final class GeneralFormInputs implements ModuleRouteInputsProvider
                     ['name' => 'default_meta_title', 'type' => 'text', 'label' => 'Default meta title', 'translated' => true, 'rules' => 'nullable|string|max:255'],
                     ['name' => 'default_meta_description', 'type' => 'textarea', 'label' => 'Default meta description', 'translated' => true, 'rules' => 'nullable|string'],
                     ['name' => 'og_image', 'type' => 'image', 'label' => 'Default OG image', 'rules' => 'nullable'],
-                    ['name' => 'json_schema', 'type' => 'textarea', 'label' => 'Global JSON-LD (Schema.org)', 'rules' => 'nullable|string', 'hint' => 'Raw JSON-LD object/array for the site homepage defaults'],
+                    ['name' => 'json_schema', 'type' => 'textarea', 'label' => 'Global JSON-LD (Schema.org)', 'translated' => true, 'rules' => 'nullable|string', 'hint' => 'Raw JSON-LD object/array used when a page has no schema_json'],
                 ],
             ],
             [

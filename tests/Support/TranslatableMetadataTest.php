@@ -39,4 +39,16 @@ class TranslatableMetadataTest extends TestCase
         $this->assertTrue($inputs[TranslatableMetadata::OG_IMAGE_ROLE]['translated']);
         $this->assertNotContains(TranslatableMetadata::OG_IMAGE_ROLE, TranslatableMetadata::TRANSLATED_ATTRIBUTES);
     }
+
+    public function test_default_form_inputs_include_translated_schema_json(): void
+    {
+        $inputs = collect(TranslatableMetadata::defaultFormInputs())->keyBy('name');
+
+        $this->assertTrue($inputs->has(TranslatableMetadata::SCHEMA_JSON_ATTRIBUTE));
+        $this->assertSame('source-text', $inputs[TranslatableMetadata::SCHEMA_JSON_ATTRIBUTE]['type']);
+        $this->assertSame('json', $inputs[TranslatableMetadata::SCHEMA_JSON_ATTRIBUTE]['format']);
+        $this->assertTrue($inputs[TranslatableMetadata::SCHEMA_JSON_ATTRIBUTE]['translated']);
+        $this->assertContains(TranslatableMetadata::SCHEMA_JSON_ATTRIBUTE, TranslatableMetadata::TRANSLATED_ATTRIBUTES);
+        $this->assertNotContains(TranslatableMetadata::SCHEMA_JSON_ATTRIBUTE, TranslatableMetadata::SEO_ATTRIBUTES);
+    }
 }
