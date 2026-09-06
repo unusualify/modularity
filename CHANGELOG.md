@@ -2,6 +2,12 @@
 
 All notable changes to `modularous` will be documented in this file
 
+## v12.10.2 - 2026-09-06
+
+### :recycle: Refactors
+
+- update default form inputs for enhanced SEO and JSON support by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/e2eb8bdca4149093e4368bfde94cb97cb11cdc66
+
 ## v12.10.1 - 2026-09-06
 
 ### :rocket: Features
