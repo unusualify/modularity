@@ -75,7 +75,8 @@ trait TranslationsTrait
 
                     $shouldPublishFirstLanguage = ($index === 0 && ! $atLeastOneLanguageIsPublished);
 
-                    $activeField = $shouldPublishFirstLanguage || (isset($submittedLanguage) ? $submittedLanguage['published'] : false);
+                    $activeField = $shouldPublishFirstLanguage
+                        || (isset($submittedLanguage) ? (bool) $submittedLanguage['published'] : true);
 
                     $fields[$locale] = $attributes->mapWithKeys(function ($attribute) use (&$fields, $locale, $localesCount, $index, $translationsFields) {
                         $attributeValue = $fields[$attribute] ?? $translationsFields[$attribute] ?? null;
@@ -90,7 +91,7 @@ trait TranslationsTrait
                         $perLocale = $this->normalizeSlugPayloadForTranslationColumn($attribute, $perLocale);
 
                         if ($attribute === 'active' && is_null($perLocale)) {
-                            $perLocale = false;
+                            $perLocale = true;
                         }
 
                         return [
