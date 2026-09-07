@@ -2,6 +2,16 @@
 
 All notable changes to `modularous` will be documented in this file
 
+## v12.11.0 - 2026-09-07
+
+### :rocket: Features
+
+- add PHP CLI binary configuration and improve subprocess handling by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/32ce4cb44de4882ec7b7bdf798103968b864ba99
+
+### :wrench: Bug Fixes
+
+- adjust active field logic for translation handling by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/f881766c8e43f206a1084ef58a09776e44745cdb
+
 ## v12.10.2 - 2026-09-06
 
 ### :recycle: Refactors
