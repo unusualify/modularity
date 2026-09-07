@@ -69,14 +69,24 @@ final class CommandExecutor
         $promptTimeout ??= (int) modularousConfig('artisan_runner.prompt_timeout', 60);
 
         if ($this->shouldExecuteViaSubprocess($commandName)) {
-            return $this->executeViaSubprocess(
-                $commandName,
-                $arguments,
-                $options,
-                $emit,
-                $timeout,
-                $maxOutputBytes,
-            );
+            if ($this->resolvePhpCliBinary() !== null) {
+                return $this->executeViaSubprocess(
+                    $commandName,
+                    $arguments,
+                    $options,
+                    $emit,
+                    $timeout,
+                    $maxOutputBytes,
+                );
+            }
+
+            if ($this->requiresSubprocessExecution()) {
+                throw new ArtisanRunnerException($this->missingPhpCliBinaryMessage());
+            }
+
+            $emit('output', [
+                'chunk' => '[warning] ' . $this->missingPhpCliBinaryMessage() . " Falling back to in-process execution.\n",
+            ]);
         }
 
         return $this->executeInProcess(
@@ -185,9 +195,9 @@ final class CommandExecutor
      */
     public function buildSubprocessCommandLine(array $parameters): array
     {
-        $php = (new PhpExecutableFinder)->find(false);
-        if ($php === false || $php === '') {
-            throw new ArtisanRunnerException('Unable to locate PHP CLI binary for subprocess execution.');
+        $php = $this->resolvePhpCliBinary();
+        if ($php === null) {
+            throw new ArtisanRunnerException($this->missingPhpCliBinaryMessage());
         }
 
         $artisan = base_path('artisan');
@@ -246,6 +256,44 @@ final class CommandExecutor
         $line[] = '--no-interaction';
 
         return $line;
+    }
+
+    /**
+     * Resolve a usable PHP CLI binary for `php artisan` subprocesses.
+     *
+     * Preference: explicit config, then Symfony finder, then FPM-friendly siblings
+     * of PHP_BINARY / PHP_BINDIR (php-fpm often has CLI at ../bin/php).
+     */
+    public function resolvePhpCliBinary(): ?string
+    {
+        $configured = trim((string) modularousConfig('artisan_runner.php_binary', ''));
+        if ($configured !== '') {
+            if ($this->isNonCliSapiBinary($configured)) {
+                throw new ArtisanRunnerException(
+                    "Configured PHP binary [{$configured}] is not a CLI executable (php-fpm/cgi). Set MODULAROUS_ARTISAN_RUNNER_PHP_BINARY to the php CLI path."
+                );
+            }
+
+            if ($this->isUsablePhpCliBinary($configured)) {
+                return $configured;
+            }
+
+            throw new ArtisanRunnerException(
+                "Unable to use configured PHP CLI binary [{$configured}]. Set MODULAROUS_ARTISAN_RUNNER_PHP_BINARY to an executable php CLI path."
+            );
+        }
+
+        foreach ($this->phpCliBinaryCandidates() as $candidate) {
+            if ($this->isNonCliSapiBinary($candidate)) {
+                continue;
+            }
+
+            if ($this->isUsablePhpCliBinary($candidate)) {
+                return $candidate;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -410,5 +458,97 @@ final class CommandExecutor
         $parts = preg_split('/[\r\n,]+/', $text) ?: [];
 
         return array_values(array_filter(array_map('trim', $parts), static fn (string $item) => $item !== ''));
+    }
+
+    private function requiresSubprocessExecution(): bool
+    {
+        return mb_strtolower((string) modularousConfig('artisan_runner.execution', 'auto')) === 'subprocess';
+    }
+
+    private function missingPhpCliBinaryMessage(): string
+    {
+        return 'Unable to locate PHP CLI binary for subprocess execution. Set MODULAROUS_ARTISAN_RUNNER_PHP_BINARY to the php CLI path (for example /usr/bin/php8.3).';
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function phpCliBinaryCandidates(): array
+    {
+        $candidates = [];
+
+        $phpPath = getenv('PHP_PATH');
+        if (is_string($phpPath) && $phpPath !== '') {
+            $candidates[] = $phpPath;
+        }
+
+        $found = (new PhpExecutableFinder)->find(false);
+        if (is_string($found) && $found !== '') {
+            $candidates[] = $found;
+        }
+
+        $phpBindir = rtrim((string) \PHP_BINDIR, DIRECTORY_SEPARATOR);
+        if ($phpBindir !== '') {
+            $candidates[] = $phpBindir . DIRECTORY_SEPARATOR . 'php';
+        }
+
+        $phpBinary = \PHP_BINARY;
+        if (is_string($phpBinary) && $phpBinary !== '') {
+            $directory = dirname($phpBinary);
+            $basename = basename($phpBinary);
+            $cliBasename = preg_replace('/php-fpm/i', 'php', $basename);
+            $versioned = 'php' . \PHP_MAJOR_VERSION . '.' . \PHP_MINOR_VERSION;
+            $major = 'php' . \PHP_MAJOR_VERSION;
+
+            $candidates[] = $phpBinary;
+            $candidates[] = $directory . DIRECTORY_SEPARATOR . 'php';
+            if (is_string($cliBasename) && $cliBasename !== '') {
+                $candidates[] = $directory . DIRECTORY_SEPARATOR . $cliBasename;
+            }
+
+            $parentBin = dirname($directory) . DIRECTORY_SEPARATOR . 'bin';
+            $candidates[] = $parentBin . DIRECTORY_SEPARATOR . 'php';
+            $candidates[] = $parentBin . DIRECTORY_SEPARATOR . $versioned;
+            $candidates[] = $parentBin . DIRECTORY_SEPARATOR . $major;
+            if (is_string($cliBasename) && $cliBasename !== '') {
+                $candidates[] = $parentBin . DIRECTORY_SEPARATOR . $cliBasename;
+            }
+        }
+
+        $versioned = 'php' . \PHP_MAJOR_VERSION . '.' . \PHP_MINOR_VERSION;
+        foreach (['/usr/bin', '/usr/local/bin'] as $dir) {
+            $candidates[] = $dir . '/php';
+            $candidates[] = $dir . '/' . $versioned;
+            $candidates[] = $dir . '/php' . \PHP_MAJOR_VERSION;
+        }
+
+        $unique = [];
+        foreach ($candidates as $candidate) {
+            $candidate = trim($candidate);
+            if ($candidate === '' || isset($unique[$candidate])) {
+                continue;
+            }
+            $unique[$candidate] = $candidate;
+        }
+
+        return array_values($unique);
+    }
+
+    private function isNonCliSapiBinary(string $path): bool
+    {
+        $basename = mb_strtolower(basename($path));
+
+        return str_contains($basename, 'php-fpm')
+            || str_contains($basename, 'cgi-fcgi')
+            || str_contains($basename, 'php-cgi');
+    }
+
+    private function isUsablePhpCliBinary(string $path): bool
+    {
+        if ($path === '' || @is_dir($path)) {
+            return false;
+        }
+
+        return @is_file($path) && @is_executable($path);
     }
 }

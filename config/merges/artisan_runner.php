@@ -38,6 +38,13 @@ return [
     'execution' => env('MODULAROUS_ARTISAN_RUNNER_EXECUTION', 'auto'),
 
     /**
+     * Absolute path to the PHP CLI binary used for subprocess commands.
+     * Required on many PHP-FPM hosts where PhpExecutableFinder cannot see `php`.
+     * Example: /usr/bin/php8.3
+     */
+    'php_binary' => env('MODULAROUS_ARTISAN_RUNNER_PHP_BINARY'),
+
+    /**
      * Commands that must run as a real CLI subprocess when execution=auto.
      *
      * route:cache (and optimize) bootstrap a fresh app to serialize routes. Under

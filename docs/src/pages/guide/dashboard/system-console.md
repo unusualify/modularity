@@ -136,8 +136,11 @@ System Console does not spawn Artisan itself. It posts to the Artisan Runner run
 | `artisan_runner.allowlist` | `MODULAROUS_ARTISAN_RUNNER_ALLOWLIST` | empty | Non-superadmin command names / globs. Superadmin bypasses this |
 | `artisan_runner.subprocess_commands` | `MODULAROUS_ARTISAN_RUNNER_SUBPROCESS_COMMANDS` | `route:cache`, `optimize`, … | CLI subprocess for cache parity under PHP-FPM |
 | `artisan_runner.execution` | `MODULAROUS_ARTISAN_RUNNER_EXECUTION` | `auto` | `auto` / `in_process` / `subprocess` |
+| `artisan_runner.php_binary` | `MODULAROUS_ARTISAN_RUNNER_PHP_BINARY` | empty | Absolute PHP CLI path. Needed when PHP-FPM cannot see `php` (`/usr/bin/php8.3`). In `auto` mode a missing binary falls back to in-process with a warning |
 
 Commands must exist in the Artisan catalog. Custom commands that need a real CLI bootstrap should be added to `subprocess_commands`. If you grant a non-superadmin role access to the widget, include every `cache_commands` and `custom_commands` name in `allowlist`.
+
+On PHP-FPM, `route:cache` / `optimize` spawn `php artisan` so `runningInConsole()` is true. If the panel cannot find a CLI binary, set `MODULAROUS_ARTISAN_RUNNER_PHP_BINARY` (or `PHP_PATH`) to the executable used in SSH (`which php`). Do not point it at `php-fpm`.
 
 The dashboard block `allowedRoles` (`superadmin` by default) is separate: it hides the card. Artisan Runner `enabled` / `allowed_roles` gates actually running commands.
 
