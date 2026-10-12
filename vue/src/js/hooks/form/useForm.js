@@ -747,7 +747,10 @@ export default function useForm(props, context) {
       // Validate all fields at submit time; validModel can be stale when the
       // form is submitted via Enter while a field is still focused
       if (!props.noValidation) {
-        const { valid } = await states.VForm.validate()
+        // const { valid } = await states.VForm.validate()
+        const valid = states.VForm
+          ? (await states.VForm.validate()).valid
+          : validations.validModel.value
 
         if (!valid) return
       }
