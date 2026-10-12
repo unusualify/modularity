@@ -2,6 +2,21 @@
 
 All notable changes to `modularous` will be documented in this file
 
+## v0.58.11 - 2026-10-12
+
+### :wrench: Bug Fixes
+
+- refactor submit method to use async/await for validation by @celikerde in https://github.com/unusualify/modularous/commit/9abe3e4f8e8c427db1d6a56b6751e7c1094ce291
+- restore async/await validation in submit method by @celikerde in https://github.com/unusualify/modularous/commit/319beea85db5b248b2cc86a00b5fa0e6cc664826
+
+### :package: Build
+
+- update build artifacts for v0.58.11 by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/19e092aa0e77b57dfd7d58c33455afbe47f144cf
+
+### :beers: Other Stuff
+
+- downgrade laravel-vite-plugin to version 1.3.0 and update Babel dependencies by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/4397d22ac3951028e13e5ccc7c76762eb39b23e0
+
 ## v12.11.0 - 2026-09-07
 
 ### :rocket: Features
