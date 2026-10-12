@@ -618,24 +618,29 @@ export default function useForm(props, context) {
 
     },
     saveForm,
-    submit: (e, callback = null, errorCallback = null) => {
-      if (props.noValidation || validations.validModel.value) {
-        if (props.async) {
-          e && e.preventDefault()
-          if (!props.actionUrl) {
-            // store.commit(FORM.SET_EDITED_ITEM, states.model)
+    submit: async (e, callback = null, errorCallback = null) => {
+      e && e.preventDefault()
 
-            nextTick(() => {
-              saveForm(callback, errorCallback)
-            })
-          } else {
+      // Validate all fields at submit time; validModel can be stale when the
+      // form is submitted via Enter while a field is still focused
+      if (!props.noValidation) {
+        const { valid } = await states.VForm.validate()
+
+        if (!valid) return
+      }
+
+      if (props.async) {
+        if (!props.actionUrl) {
+          // store.commit(FORM.SET_EDITED_ITEM, states.model)
+
+          nextTick(() => {
             saveForm(callback, errorCallback)
-          }
+          })
         } else {
-          sendSync(e)
+          saveForm(callback, errorCallback)
         }
       } else {
-        e && e.preventDefault()
+        sendSync(e)
       }
     },
     updatedSlotModel: (value, inputName) => {
