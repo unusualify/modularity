@@ -2,6 +2,13 @@
 
 All notable changes to `modularous` will be documented in this file
 
+## v12.11.1 - 2026-10-12
+
+### :wrench: Bug Fixes
+
+- enhance submit method for improved validation and async handling by @celikerde in https://github.com/unusualify/modularous/commit/77b04162dc7d1bb5b23b7e7ddb5c0cb691e8fdfe
+- improve validation handling in submit method by @celikerde in https://github.com/unusualify/modularous/commit/f4bcd505fa5e92bb4092f482883526951f22ec3d
+
 ## v0.58.11 - 2026-10-12
 
 ### :wrench: Bug Fixes
