@@ -1,13 +1,31 @@
 // hooks/utils/useGenerate.js
-import { computed } from 'vue'
+import { computed, getCurrentInstance, inject } from 'vue'
 import { router } from '@inertiajs/vue3'
 import { useDisplay } from 'vuetify'
 import { useConfig } from '@/hooks'
 import { isSameUrl } from '@/utils/pushState'
 
+/**
+ * Append nested params in Laravel's bracket notation (arrays keep their indexes,
+ * so e.g. sortBy[0][key] / sortBy[0][order] stay together)
+ */
+const appendQueryParameters = (searchParams, value, prefix = '') => {
+  if(value === null || value === undefined) return
+
+  if(typeof value === 'object') {
+    Object.entries(value).forEach(([key, item]) => {
+      appendQueryParameters(searchParams, item, prefix ? `${prefix}[${key}]` : key)
+    })
+  } else {
+    searchParams.append(prefix, String(value))
+  }
+}
+
 export default function useGenerate(props, context) {
   const { smAndUp } = useDisplay()
   const { shouldUseInertia } = useConfig()
+  // provided by useTable, only available for actions rendered inside a table
+  const tableRequestPayload = getCurrentInstance() ? inject('tableRequestPayload', null) : null
 
   const generatedButtonProps = computed(() => {
 
@@ -43,7 +61,24 @@ export default function useGenerate(props, context) {
         e.preventDefault()
         const target = action.target ?? '_blank'
 
-        if(shouldUseInertia.value && isSameUrl(action.href, window.location.href)) {
+        // file downloads: pass the table's current query (page, itemsPerPage, sortBy, search, filter)
+        // and the columns hidden via the table cog (see useTableHeaders), and skip inertia
+        if(action.download) {
+          const url = new URL(action.href, window.location.origin)
+
+          if(tableRequestPayload) {
+            appendQueryParameters(url.searchParams, tableRequestPayload())
+          }
+
+          let hiddenColumns = ''
+          try {
+            hiddenColumns = localStorage.getItem(`table_unvisible_columns_${window.location.pathname}`) ?? ''
+          } catch (error) {}
+
+          if(hiddenColumns) url.searchParams.set('hidden_columns', hiddenColumns)
+
+          window.location.href = url.toString()
+        } else if(shouldUseInertia.value && isSameUrl(action.href, window.location.href)) {
           router.visit(action.href)
         } else if (target !== '_blank') {
           router.visit(action.href, { target })
