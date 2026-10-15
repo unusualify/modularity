@@ -1,14 +1,21 @@
 <?php
 
 return [
+    'Additional Information' => 'Ek Bilgiler',
     'Address' => 'Adres',
+
+    'Brand' => 'Marka',
+
     'City' => 'Şehir',
     'Code' => 'Kod',
     'Company' => 'Şirket',
     'Confirm Password' => 'Şifreyi Onayla',
     'Country' => 'Ülke',
+    'Creator' => 'Oluşturan',
     'Current Password' => 'Mevcut Şifre',
+    'Data' => 'Veri',
     'Description' => 'Açıklama',
+    'Details' => 'Detaylar',
     'E-mail' => 'E-posta',
     'File' => 'Dosya',
     'Guard Name' => 'Gard İsmi',
@@ -29,5 +36,6 @@ return [
     'Tax ID' => 'Vergi Numarası',
     'Timezone' => 'Saat Dilimi',
     'Vat Number' => 'KDV Kayıt No',
+    'Work E-mail' => 'İş E-postası',
     'ZIP/Postal Code' => 'ZIP/Posta Kodu',
 ];

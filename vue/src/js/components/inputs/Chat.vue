@@ -12,7 +12,6 @@
         :elevation="elevation"
         :class="[
           !noBackground && background ? `bg-${background}` : '',
-          disabled ? 'bg-grey-lighten-4' : ''
         ]"
         :color="color"
         :heightx="height"
@@ -239,7 +238,21 @@
           </template>
         </v-input-filepond>
 
-        <v-card-actions class="bg-surface" v-if="!noSendAction" id="messageBox">
+        <!-- READ-ONLY NOTICE (e.g. closed tickets) -->
+        <v-card-actions v-if="!noSendAction && isReadOnlyNoticeVisible" class="bg-surface v-input-chat__read-only">
+          <slot name="read-only">
+            <v-alert
+              :color="disabledTextColor"
+              variant="tonal"
+              density="comfortable"
+              class="w-100 text-center"
+            >
+              {{ $t(disabledText) }}
+            </v-alert>
+          </slot>
+        </v-card-actions>
+
+        <v-card-actions class="bg-surface" v-else-if="!noSendAction" id="messageBox">
           <slot name="sending">
             <v-textarea
               _class="position-absolute bg-surface px-4 pb-4"
@@ -461,6 +474,15 @@
       maxMessageboxRows: {
         type: Number,
         default: 5
+      },
+      // shown in place of the message box while the chat is disabled
+      disabledText: {
+        type: String,
+        default: null
+      },
+      disabledTextColor: {
+        type: String,
+        default: 'success'
       }
     },
     setup (props, context) {
@@ -513,11 +535,17 @@
       noRemainingItems() {
         return !this.loading && (this.perPage > -1 && this.page === this.lastPage);
       },
+      // hidden while the chat is empty: nothing older to load, and loading starts as true before the first fetch
       showLoadMoreButton() {
-        return !this.noRemainingItems && this.perPage > -1;
+        return this.isInfiniteScrollable
+          && this.messages.length > 0
+          && !this.noRemainingItems;
       },
       isInfiniteScrollable() {
         return this.perPage > -1;
+      },
+      isReadOnlyNoticeVisible() {
+        return this.disabled && !!this.disabledText;
       },
       isMessageEmpty() {
         return !this.message || !this.message.trim();
@@ -1250,6 +1278,18 @@
         transition: opacity 0.7s ease
         &--loading
           opacity: 0.3
+    // keep messages readable and scrollable while the chat is disabled (e.g. closed tickets)
+    .v-card--disabled
+      > .v-card-title,
+      > .v-card-text,
+      > .v-input-chat__read-only
+        opacity: 1
+      // messages stay interactive (links, "Show more", "Load More Messages")
+      .v-infinite-scroll
+        pointer-events: auto
+      // except starring / pinning
+      .v-input-chat__message-actions
+        pointer-events: none
 
 </style>
 

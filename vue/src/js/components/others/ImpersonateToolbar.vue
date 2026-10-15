@@ -88,7 +88,7 @@
       :ripple="false"
       :append="false"
       prepend-icon="mdi-account-off"
-      title="Stop Impersonating"
+      :title="$t('Stop Impersonating')"
 
       variant="flat"
       base-color="red"
@@ -111,7 +111,7 @@
         :ripple="false"
         :append="false"
         prepend-icon="mdi-account-switch"
-        title="Impersonate User"
+        :title="$t('Impersonate User')"
       />
     </template>
     <template v-slot:item="{ item }">

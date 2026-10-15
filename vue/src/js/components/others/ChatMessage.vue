@@ -95,7 +95,7 @@
             <div>{{ message.user_profile.name }}</div>
           </div>
 
-          <div class="d-flex justify-end">
+          <div class="d-flex justify-end v-input-chat__message-actions">
             <v-icon
               v-if="!noStarring"
               :icon="message.is_starred ? 'mdi-star' : 'mdi-star-outline'"
