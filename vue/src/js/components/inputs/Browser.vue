@@ -50,6 +50,14 @@
     lockInitialItems: {
       type: Boolean,
       default: false
+    },
+    /**
+     * Icon actions rendered inside the field (before the search icon) when a single value is selected.
+     * Each action: { icon, tooltip?, color?, href, target? } — ':id' in href is replaced by the selected id.
+     */
+    innerActions: {
+      type: Array,
+      default: () => []
     }
   })
 
@@ -191,6 +199,28 @@
   const canSelectable = computed(() => {
     return props.max ? selectedItems.value.length < props.max : true
   })
+
+  const selectedId = computed(() => {
+    if (props.multiple || input.value == null || input.value === '') return null
+
+    return isObject(input.value)
+      ? input.value[props.objectIdDefiner ?? props.itemValue]
+      : input.value
+  })
+
+  const visibleInnerActions = computed(() => selectedId.value != null ? props.innerActions : [])
+
+  const runInnerAction = (action) => {
+    if (!action.href) return
+
+    const url = action.href.replace(':id', encodeURIComponent(selectedId.value))
+
+    if (action.target) {
+      window.open(url, action.target)
+    } else {
+      window.location.href = url
+    }
+  }
 
   // Perform search
   const performSearch = async () => {
@@ -552,6 +582,28 @@
           @click="openDialog"
           @keyup.enter="performSearch"
         >
+          <template v-if="visibleInnerActions.length" v-slot:append-inner>
+            <v-tooltip
+              v-for="(action, i) in visibleInnerActions"
+              :key="`inner-action-${i}`"
+              :text="action.tooltip"
+              :disabled="!action.tooltip"
+              location="top"
+            >
+              <template v-slot:activator="{ props: tooltipProps }">
+                <v-btn
+                  v-bind="tooltipProps"
+                  :icon="action.icon"
+                  :color="action.color"
+                  size="small"
+                  variant="text"
+                  density="comfortable"
+                  @click.stop="runInnerAction(action)"
+                  @mousedown.stop
+                />
+              </template>
+            </v-tooltip>
+          </template>
           <template v-slot:selection="{ item, index }">
             <v-chip v-if="item === Object(item)"
               :color="isInitialItem(item)

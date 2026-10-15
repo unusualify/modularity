@@ -2,6 +2,10 @@
 
 namespace Unusualify\Modularous\Hydrates\Inputs;
 
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
+use Unusualify\Modularity\Facades\Modularity;
+
 class CreatorHydrate extends InputHydrate
 {
     /**
@@ -16,6 +20,7 @@ class CreatorHydrate extends InputHydrate
         'appends' => ['email_with_company'],
         'with' => ['company'],
         'allowedRoles' => ['superadmin'],
+        'impersonatable' => true,
     ];
 
     /**
@@ -46,8 +51,39 @@ class CreatorHydrate extends InputHydrate
         ]);
         unset($input['appends'], $input['with']);
 
+        if (($input['impersonatable'] ?? true) && ($impersonateAction = $this->getImpersonateAction())) {
+            $input['innerActions'] = array_merge($input['innerActions'] ?? [], [$impersonateAction]);
+        }
+        unset($input['impersonatable']);
+
         // add your logic
 
         return $input;
+    }
+
+    /**
+     * Build the inner icon action that impersonates the selected creator,
+     * only when the authenticated user is allowed to impersonate.
+     */
+    protected function getImpersonateAction(): ?array
+    {
+        $user = Auth::guard(Modularity::getAuthGuardName())->user();
+
+        if (! $user || ! $user->can('impersonate')) {
+            return null;
+        }
+
+        $routeName = Route::hasAdmin('impersonate');
+
+        if (! $routeName) {
+            return null;
+        }
+
+        return [
+            'icon' => 'mdi-account-switch',
+            'tooltip' => __('Impersonate User'),
+            'color' => 'primary',
+            'href' => route($routeName, ['id' => ':id']),
+        ];
     }
 }
