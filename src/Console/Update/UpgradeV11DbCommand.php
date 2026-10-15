@@ -217,11 +217,21 @@ class UpgradeV11DbCommand extends BaseCommand
         $this->line('▶ um_* namespace / type columns');
 
         $umMap = [
-            'um_authorizations' => ['authorized_type'],
+            'um_assignments' => ['assignable_type', 'assignee_type', 'assigner_type'],
+            'um_authorizations' => ['authorized_type', 'authorizable_type'],
             'um_spreads' => ['spreadable_type'],
             'um_tagged' => ['taggable_type'],
             'um_tags' => ['namespace'],
             'um_creator_records' => ['creator_type', 'creatable_type'],
+            'um_processes' => ['processable_type'],
+            'um_chats' => ['chatable_type'],
+            'um_fileponds' => ['filepondable_type'],
+            'um_stateables' => ['stateable_type'],
+            'um_repeaters' => ['repeatable_type'],
+            'um_remote_api_sources' => ['sourceable_type'],
+            'um_singletons' => ['singleton_type'],
+            'um_mediables' => ['mediable_type'],
+            'um_fileables' => ['fileable_type'],
         ];
 
         foreach ($umMap as $table => $columns) {
