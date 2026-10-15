@@ -39,6 +39,10 @@
       type: Boolean,
       default: false,
     },
+    wellPrint: {
+      type: Boolean,
+      default: false,
+    },
   })
 
   const { invokeRule} = useValidation(props)
@@ -115,6 +119,9 @@
         >
           <template v-slot:prepend="{ isSelected, select }">
             <v-icon icon="mdi-information-outline"></v-icon>
+          </template>
+          <template v-if="wellPrint" v-slot:subtitle="{ subtitle }">
+            <ue-well-print :text="subtitle" class="w-100" style="word-break: break-word;" />
           </template>
         </v-list-item>
 

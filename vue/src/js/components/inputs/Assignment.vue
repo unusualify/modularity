@@ -57,6 +57,11 @@
       type: Object,
       default: null,
     },
+    // renders assignment descriptions with ue-well-print (line breaks, links) instead of plain text
+    wellPrint: {
+      type: Boolean,
+      default: false,
+    },
   })
 
   const emit = defineEmits([...makeInputEmits])
@@ -122,8 +127,6 @@
       let untilText = `${t('Until')}: <span class="font-weight-bold text-blue-darken-1"> ${d(new Date(assignment.due_at), 'medium')}</span>`
       let fromText = `${t('From')}: <span class="">${d(assignment.created_at ? new Date(assignment.created_at) : new Date(), 'medium')}</span>`
 
-      let subtitle = `${assignment.description} </br> </br>`
-
       let subDescription = ""
 
       let appendInnerIcon = null
@@ -133,12 +136,17 @@
 
       subDescription += ` ${fromText}`
 
-      subtitle += subDescription
+      // with wellPrint, description is rendered separately by ue-well-print, so it stays as the raw text the user typed
+      let subtitle = props.wellPrint
+        ? subDescription
+        : `${assignment.description} </br> </br>${subDescription}`
+
       acc.push({
         prependAvatar,
         assignerName,
         assigneeName,
         title,
+        description: assignment.description,
         subtitle,
         subDescription,
         appendInnerIcon,
@@ -339,6 +347,7 @@
               :assignment="lastAssignment"
               :formattedAssignment="lastFormattedAssignment"
               :filepond="filepond"
+              :wellPrint="wellPrint"
               @click:complete="openCompleteModal"
               @click:save="updateAssignment"
             />
@@ -418,6 +427,7 @@
                         <div v-html="title"></div>
                       </template>
                       <template v-slot:subtitle="{ item, subtitle }">
+                        <ue-well-print v-if="wellPrint" :text="item.description" class="w-100 mb-2" style="word-break: break-word;" />
                         <div class="w-100" style="word-break: break-word;white-space: pre-wrap;" v-html="subtitle"></div>
                         <v-expansion-panels class="my-2">
                           <v-expansion-panel v-if="item.preliminaries && item.preliminaries.length > 0">
