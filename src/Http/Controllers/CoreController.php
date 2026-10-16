@@ -198,7 +198,7 @@ abstract class CoreController extends LaravelController implements ModuleableInt
     }
 
     /**
-     * @return \Unusualify\Modularity\Transformers\
+     * @return \Unusualify\Modularous\Transformers\
      */
     protected function getTransformer($data = [])
     {
