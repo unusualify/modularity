@@ -1,12 +1,18 @@
 {
+    ":count day|:count days": ":count day|:count days",
+    ":count hour|:count hours": ":count hour|:count hours",
+
+    "A message must have content or attachments.": "A message must have content or attachments.",
     "Access Forbidden": "Access Forbidden",
     "ADD NEW": "ADD NEW",
     "All": "All",
     "All rights reserved.": "All rights reserved.",
     " and ": " and ",
+    "All your starred messages in this chat will be unstarred.": "All your starred messages in this chat will be unstarred.",
     "ANNOUNCEMENTS": "ANNOUNCEMENTS",
     "Are you sure logout?": "Are you sure logout?",
     "AT A GLANCE": "AT A GLANCE",
+    "Attachment": "Attachment",
 
     "Billing Profile": "Billing Profile",
     "By signing up, you agree to the ": "By signing up, you agree to the ",
@@ -15,6 +21,7 @@
     "Card Holder": "Card Holder",
     "Card Number": "Card Number",
     "Choose Date": "Choose Date",
+    "Choose how long your pin lasts": "Choose how long your pin lasts",
     "CLIENTS": "CLIENTS",
     "COMPANIES": "COMPANIES",
     "Company Information": "Company Information",
@@ -27,7 +34,11 @@
     "CVV": "CVV",
 
     "DASHBOARD": "DASHBOARD",
+    "Delete": "Delete",
+    "Delete message?": "Delete message?",
 
+    "Edit": "Edit",
+    "Edited": "Edited",
     "Email contains invalid characters": "Email contains invalid characters",
     "Email Verification": "Email Verification",
     "Expected Distribution Date": "Expected Distribution Date",
@@ -53,10 +64,13 @@
     "Invalid email format": "Invalid email format",
 
     "LANGUAGES": "LANGUAGES",
+    "Load more": "Load more",
     "Loading... Please wait": "Loading... Please wait",
 
     "Mark All as Read": "Mark All as Read",
     "Media": "Media",
+    "Messages could not be marked as read.": "Messages could not be marked as read.",
+    "Messages could not be unstarred.": "Messages could not be unstarred.",
     "MM": "MM",
     "Month": "Month",
 
@@ -72,6 +86,7 @@
     "PAYMENTS & INVOICES": "PAYMENTS & INVOICES",
     "Permissions": "Permissions",
     "Personal Information": "Personal Information",
+    "Pin": "Pin",
     "Policies": "Policies",
     "Profile Settings": "Profile Settings",
 
@@ -79,6 +94,8 @@
     "Regards, :appName Support": "Regards, \n:appName Support",
     "Regards, :appName Team": "Regards,  \n:appName Team",
     "REGIONS": "REGIONS",
+    "Replace": "Replace",
+    "Replace oldest pin?": "Replace oldest pin?",
     "Report": "Report",
     "Required": "Required",
     "Resend": "Resend",
@@ -96,6 +113,8 @@
     "Show less": "Show less",
     "Show more": "Show more",
     "SIGN UP": "SIGN UP",
+    "Star": "Star",
+    "Starred messages": "Starred messages",
     "Stay tuned, stay updated!": "Stay tuned, stay updated!",
     "Stop Impersonating": "Stop Impersonating",
     "Sub-Total": "Sub-Total",
@@ -104,6 +123,9 @@
     "Terms of Service": "Terms of Service",
     "Thank you for your support!": "Thank you for your support!",
     "This company has registered users and cannot be deleted.": "This company has registered users and cannot be deleted.",
+    "This message can no longer be deleted.": "This message can no longer be deleted.",
+    "This message can no longer be edited.": "This message can no longer be edited.",
+    "This message will be deleted for everyone.": "This message will be deleted for everyone.",
     "This password reset link will expire in :count minutes.": "This password reset link will expire in :count minutes.",
     "This verification link will expire in :count minutes.": "This verification link will expire in :count minutes.",
     "Total": "Total",
@@ -111,6 +133,10 @@
     "Type to Search": "Type to Search",
     "TYPES": "TYPES",
 
+    "Unpin": "Unpin",
+    "Unstar": "Unstar",
+    "Unstar All": "Unstar All",
+    "Unstar all messages?": "Unstar all messages?",
     "Update": "Update",
     "Update Password": "Update Password",
     "USER MANAGEMENT": "USER MANAGEMENT",
@@ -127,9 +153,12 @@
 
     "Year": "Year",
     "Yes": "Yes",
+    "You": "You",
     "You are receiving this email because we need to verify your email address.": "You are receiving this email because we need to verify your email address.",
     "You are receiving this email because we received a password reset request for your account.": "You are receiving this email because we received a password reset request for your account.",
     "You can easily monitor the entire process by following the notifications.": "You can easily monitor the entire process by following the notifications.",
+    "You can unpin at any time.": "You can unpin at any time.",
+    "Your new pin will replace the oldest one.": "Your new pin will replace the oldest one.",
     "Your Request Has Been Sent Successfully": "Your Request Has Been Sent Successfully",
     "messages": {
         "success": "Completed Successfully!",
