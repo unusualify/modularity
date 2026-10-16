@@ -2,6 +2,7 @@
 
 namespace Unusualify\Modularous\Entities;
 
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
@@ -58,10 +59,37 @@ class Chat extends Model
         return $this->morphTo();
     }
 
+    /**
+     * Pinned messages of the chat whose pin has not expired, the most recently pinned first.
+     */
+    public function pinnedMessages(): HasMany
+    {
+        return $this->messages()
+            ->activelyPinned()
+            ->orderByDesc('pinned_at')
+            ->orderByDesc('id');
+    }
+
+    /**
+     * Messages of the chat starred by the given user (the current user by default),
+     * ordered by the message date, the newest first. Stars are private to each user.
+     */
+    public function starredMessages(?Authenticatable $user = null): HasMany
+    {
+        return $this->messages()
+            ->starredBy($user)
+            ->withStarredFor($user)
+            ->orderByDesc('created_at')
+            ->orderByDesc('id');
+    }
+
+    /**
+     * The most recently pinned message.
+     */
     public function pinnedMessage(): Attribute
     {
         return Attribute::make(
-            get: fn ($value) => $this->messages()->where('is_pinned', 1)->first(),
+            get: fn ($value) => $this->pinnedMessages()->first(),
         );
     }
 
