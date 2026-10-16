@@ -2,6 +2,8 @@
 
 namespace Unusualify\Modularous\Hydrates\Inputs;
 
+use Unusualify\Modularous\Entities\ChatMessage;
+
 class ChatHydrate extends InputHydrate
 {
     /**
@@ -37,9 +39,14 @@ class ChatHydrate extends InputHydrate
             'store' => route('admin.chatable.store', ['chat' => ':id']),
             'show' => route('admin.chatable.show', ['chat_message' => ':id']),
             'update' => route('admin.chatable.update', ['chat_message' => ':id']),
+            'edit' => route('admin.chatable.edit', ['chat_message' => ':id']),
             'destroy' => route('admin.chatable.destroy', ['chat_message' => ':id']),
+            'readAll' => route('admin.chatable.read-all', ['chat' => ':id']),
             'attachments' => route('admin.chatable.attachments', ['chat' => ':id']),
             'pinnedMessage' => route('admin.chatable.pinned-message', ['chat' => ':id']),
+            'pinnedMessages' => route('admin.chatable.pinned-messages', ['chat' => ':id']),
+            'starredMessages' => route('admin.chatable.starred-messages', ['chat' => ':id']),
+            'unstarAll' => route('admin.chatable.unstar-all', ['chat' => ':id']),
         ];
 
         $acceptedExtensions = isset($input['acceptedExtensions']) && is_array($input['acceptedExtensions'])
@@ -65,6 +72,9 @@ class ChatHydrate extends InputHydrate
             'noRules' => true,
         ])['filepond'];
 
+        $input['maxPinnedMessages'] ??= ChatMessage::getMaxPinnedMessages();
+        $input['pinDurations'] ??= $this->getPinDurationItems();
+
         $input['name'] = '_chat_id';
         $input['label'] ??= __('messages.chatable.input.label');
 
@@ -73,5 +83,24 @@ class ChatHydrate extends InputHydrate
         $input['rules'] = '';
 
         return $input;
+    }
+
+    /**
+     * Pin duration options for the frontend, e.g. [['value' => 24, 'title' => '24 hours'], ...].
+     *
+     * Durations that are whole days (except a single day) are shown in days, like WhatsApp.
+     *
+     * @return array<int, array{value: int, title: string}>
+     */
+    protected function getPinDurationItems(): array
+    {
+        return collect(ChatMessage::getPinDurations())
+            ->map(fn (int $hours) => [
+                'value' => $hours,
+                'title' => $hours > 24 && $hours % 24 === 0
+                    ? trans_choice(':count day|:count days', $hours / 24, ['count' => $hours / 24])
+                    : trans_choice(':count hour|:count hours', $hours, ['count' => $hours]),
+            ])
+            ->all();
     }
 }
