@@ -112,6 +112,8 @@ export const checkItemConditions = (conditions, haystack) => {
  * @returns {Object} The item if conditions are met, false otherwise
  */
 export const handleItemConditions = (conditions, haystack, item) => {
+  handleDisabledTextConditions(haystack, item)
+
   if (!haystack || !window.__isObject(haystack) || !conditions) {
     return item;
   }
@@ -160,6 +162,56 @@ export const handleItemConditions = (conditions, haystack, item) => {
 
   return condition ? item : false;
 };
+
+/**
+ * Resolves item.disabledText (and item.disabledTextColor) from conditional notices
+ *
+ * Supports two shapes:
+ * - single notice: item.disabledText + item.disabledTextConditions
+ *   e.g. show a read-only notice on a chat only for closed tickets
+ * - multiple notices: item.disabledTexts = [{ text, color?, conditions }]
+ *   the first notice whose conditions are met wins
+ *   e.g. a success notice for closed tickets, a warning notice for pending ones
+ *
+ * @param {Object} haystack - The haystack to check conditions against
+ * @param {Object} item - The item to manipulate
+ */
+export const handleDisabledTextConditions = (haystack, item) => {
+  if (!item || !isObject(item) || (!item.disabledTextConditions && !Array.isArray(item.disabledTexts))) {
+    return
+  }
+
+  if (!Object.prototype.hasOwnProperty.call(item, '_originalDisabledText')) {
+    item._originalDisabledText = item.disabledText ?? null
+    item._originalDisabledTextColor = item.disabledTextColor ?? null
+  }
+
+  const isMet = (conditions) => !!haystack
+    && isObject(haystack)
+    && checkItemConditions(conditions, haystack)
+
+  let text = null
+  let color = item._originalDisabledTextColor
+
+  if (item.disabledTextConditions && isMet(item.disabledTextConditions)) {
+    text = item._originalDisabledText
+  } else if (Array.isArray(item.disabledTexts)) {
+    const notice = item.disabledTexts.find(notice => isObject(notice) && notice.text && isMet(notice.conditions))
+
+    if (notice) {
+      text = notice.text
+      color = notice.color ?? color
+    }
+  }
+
+  item.disabledText = text
+
+  if (color) {
+    item.disabledTextColor = color
+  } else {
+    delete item.disabledTextColor
+  }
+}
 
 /**
  * Evaluates a condition group object

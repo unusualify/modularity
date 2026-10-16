@@ -270,6 +270,36 @@ class AssignmentTest extends ModelTestCase
         $this->assertEquals($assigner->id, $assignment->assigner->id);
     }
 
+    public function test_name_attributes_are_null_when_assignee_or_assigner_is_missing()
+    {
+        $assignee = User::factory()->create();
+        $assigner = User::factory()->create();
+        $assignable = User::factory()->create();
+
+        $assignment = Assignment::create([
+            'assignable_id' => $assignable->id,
+            'assignable_type' => get_class($assignable),
+            'assignee_id' => $assignee->id,
+            'assignee_type' => get_class($assignee),
+            'assigner_id' => $assigner->id,
+            'assigner_type' => get_class($assigner),
+            'description' => 'Missing Users Test Assignment',
+            'due_at' => Carbon::now()->addDays(7),
+        ]);
+
+        $assignee->forceDelete();
+        $assigner->forceDelete();
+
+        $assignment = Assignment::find($assignment->id);
+
+        $this->assertNull($assignment->assignee);
+        $this->assertNull($assignment->assigner);
+        $this->assertNull($assignment->assignee_name);
+        $this->assertNull($assignment->assignee_avatar);
+        $this->assertNull($assignment->assigner_name);
+        $this->assertIsArray($assignment->toArray());
+    }
+
     public function test_assignment_status_enum()
     {
         $assignee = User::factory()->create();

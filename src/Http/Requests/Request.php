@@ -10,7 +10,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
-use Unusualify\Modularity\Services\MessageStage;
+use Unusualify\Modularous\Services\MessageStage;
 use Unusualify\Modularous\Traits\ManageTraits;
 
 abstract class Request extends FormRequest

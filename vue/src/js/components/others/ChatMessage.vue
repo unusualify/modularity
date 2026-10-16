@@ -12,7 +12,8 @@
       :class="[
         'd-flex elevation-2 px-4 py-3 rounded position-relative',
         reverse ? 'flex-row-reverse bg-primary-lighten-5' : 'flex-row bg-grey-lighten-6',
-        isUnread ? 'v-input-chat__message--unread' : ''
+        isUnread ? 'v-input-chat__message--unread' : '',
+        editing ? 'v-input-chat__message--editing' : ''
       ]"
       @mouseenter="startReading"
     >
@@ -31,9 +32,24 @@
       >
         {{ formatDate(message) }}
       </span>
+      <!-- Edited label positioned at the bottom corner opposite to the time -->
+      <span
+        v-if="isEdited && $vuetify.display.smAndUp"
+        class="text-caption text-grey-darken-1 v-input-chat__message-edited"
+        :style="{
+          position: 'absolute',
+          bottom: '8px',
+          fontSize: '10px',
+          whiteSpace: 'nowrap',
+          zIndex: 1,
+          ...(reverse ? { left: '12px', textAlign: 'left' } : { right: '12px', textAlign: 'right' })
+        }"
+      >
+        {{ $t('Edited') }}
+      </span>
       <v-tooltip
         v-else
-        :text="formatDate(message)"
+        :text="formattedDateWithEdited"
         location="top"
       >
         <template v-slot:activator="{ props }">
@@ -57,7 +73,7 @@
       >
         <v-tooltip
           v-if="!$vuetify.display.smAndUp"
-          :text="formatDate(message)"
+          :text="formattedDateWithEdited"
           location="top"
         >
           <template v-slot:activator="{ props }">
@@ -95,19 +111,57 @@
             <div>{{ message.user_profile.name }}</div>
           </div>
 
-          <div class="d-flex justify-end">
-            <v-icon
-              v-if="!noStarring"
-              :icon="message.is_starred ? 'mdi-star' : 'mdi-star-outline'"
-              :color="message.is_starred ? 'secondary' : 'grey'"
-              @click="updateMessage('is_starred', !message.is_starred)"
-            />
-            <v-icon
-              v-if="!noPinning"
-              :icon="message.is_pinned ? 'mdi-pin' : 'mdi-pin-outline'"
-              :color="message.is_pinned ? 'primary' : 'grey'"
-              @click="updateMessage('is_pinned', !message.is_pinned)"
-            />
+          <div class="d-flex justify-end v-input-chat__message-actions">
+            <v-tooltip v-if="canEdit && !editing" :text="$t('Edit')" location="top">
+              <template v-slot:activator="{ props: activatorProps }">
+                <v-icon
+                  v-bind="activatorProps"
+                  icon="mdi-pencil-outline"
+                  color="grey"
+                  @click="$emit('edit', message)"
+                />
+              </template>
+            </v-tooltip>
+            <v-tooltip v-if="canDelete && !editing" :text="$t('Delete')" location="top">
+              <template v-slot:activator="{ props: activatorProps }">
+                <v-icon
+                  v-bind="activatorProps"
+                  icon="mdi-delete-outline"
+                  color="grey"
+                  @click="$emit('delete', message)"
+                />
+              </template>
+            </v-tooltip>
+            <template v-if="!noStarring">
+              <span v-if="updatingFields.is_starred" class="v-input-chat__message-action-loader">
+                <v-progress-circular indeterminate size="18" width="2" color="secondary" />
+              </span>
+              <v-tooltip v-else :text="message.is_starred ? $t('Unstar') : $t('Star')" location="top">
+                <template v-slot:activator="{ props: activatorProps }">
+                  <v-icon
+                    v-bind="activatorProps"
+                    :icon="message.is_starred ? 'mdi-star' : 'mdi-star-outline'"
+                    :color="message.is_starred ? 'secondary' : 'grey'"
+                    @click="updateMessage('is_starred', !message.is_starred)"
+                  />
+                </template>
+              </v-tooltip>
+            </template>
+            <template v-if="!noPinning">
+              <span v-if="updatingFields.is_pinned" class="v-input-chat__message-action-loader">
+                <v-progress-circular indeterminate size="18" width="2" color="primary" />
+              </span>
+              <v-tooltip v-else :text="message.is_pinned ? $t('Unpin') : $t('Pin')" location="top">
+                <template v-slot:activator="{ props: activatorProps }">
+                  <v-icon
+                    v-bind="activatorProps"
+                    :icon="message.is_pinned ? 'mdi-pin' : 'mdi-pin-outline'"
+                    :color="message.is_pinned ? 'primary' : 'grey'"
+                    @click="updateMessage('is_pinned', !message.is_pinned)"
+                  />
+                </template>
+              </v-tooltip>
+            </template>
           </div>
         </div>
 
@@ -179,8 +233,14 @@
 </template>
 
 <script>
+  import WellPrint from '@/components/shared/WellPrint.vue'
+  import { isObject } from '@/utils/helpers'
 
   export default {
+    components: {
+      WellPrint
+    },
+    emits: ['update:modelValue', 'edit', 'delete'],
     props: {
       modelValue: {
         type: Object,
@@ -210,15 +270,30 @@
         type: Boolean,
         default: false
       },
+      // called before pinning, resolves to false to cancel the pin (e.g. the pin limit is reached),
+      // or to an object of extra request data, e.g. { pin_duration: 24 }
+      beforePin: {
+        type: Function,
+        default: null
+      },
       contentTruncateLength: {
         type: Number,
         default: 50
+      },
+      // whether this message is currently being edited in the composer
+      editing: {
+        type: Boolean,
+        default: false
       }
     },
     data() {
       return {
         readingTimer: null,
-        isExpanded: false
+        isExpanded: false,
+        now: Date.now(),
+        editWindowTimer: null,
+        // fields with a pending update request, e.g. { is_pinned: true }
+        updatingFields: {}
       }
     },
     computed: {
@@ -236,6 +311,27 @@
       },
       isUnread() {
         return !this.message.is_read && !this.reverse;
+      },
+      isEdited() {
+        return !!this.message.edited_at;
+      },
+      canEdit() {
+        // only the sender sees the edit action; backend enforces the same rules
+        if (!this.reverse || this.message.loading || !this.message.id) return false;
+        if (this.isEdited || !this.message.is_editable || !this.message.editable_until) return false;
+
+        return new Date(this.message.editable_until).getTime() > this.now;
+      },
+      canDelete() {
+        // deleting follows the editing rules; backend enforces the same rules
+        if (!this.reverse || this.message.loading || !this.message.id) return false;
+        if (this.isEdited || !this.message.is_deletable || !this.message.editable_until) return false;
+
+        return new Date(this.message.editable_until).getTime() > this.now;
+      },
+      formattedDateWithEdited() {
+        const date = this.formatDate(this.message);
+        return this.isEdited ? `${date} · ${this.$t('Edited')}` : date;
       },
       truncatedContent() {
         if (this.message.content && this.message.content.length > this.contentTruncateLength) {
@@ -265,17 +361,38 @@
         return formattedDate;
       },
 
-      updateMessage(field, value) {
+      async updateMessage(field, value) {
+        if (this.updatingFields[field]) return;
+
+        let extra = {};
+
+        if (field === 'is_pinned' && value && this.beforePin) {
+          const result = await this.beforePin(this.input);
+
+          if (!result) return;
+
+          if (isObject(result)) extra = result;
+        }
+
         let endpoint = this.updateEndpoint.replace(':id', this.input.id);
 
         let self = this;
+        this.updatingFields[field] = true;
+
         axios.put(endpoint, {
-          [field]: value
+          [field]: value,
+          ...extra
         }).then(response => {
           self.input = {
             ...self.input,
-            [field]: value
+            [field]: value,
+            // the server sets the pin times
+            ...(field === 'is_pinned' && isObject(response.data)
+              ? { pinned_at: response.data.pinned_at, pinned_until: response.data.pinned_until }
+              : {})
           };
+        }).finally(() => {
+          self.updatingFields[field] = false;
         });
       },
       startReading() {
@@ -293,16 +410,63 @@
       toggleExpand() {
         this.isExpanded = !this.isExpanded;
       },
+      scheduleEditWindowExpiry() {
+        if (this.editWindowTimer) {
+          clearTimeout(this.editWindowTimer);
+          this.editWindowTimer = null;
+        }
+
+        if (!this.reverse || !this.message.editable_until) return;
+
+        const remaining = new Date(this.message.editable_until).getTime() - Date.now();
+
+        if (remaining > 0) {
+          // re-evaluate canEdit once the edit window closes
+          this.editWindowTimer = setTimeout(() => {
+            this.now = Date.now();
+            this.editWindowTimer = null;
+          }, remaining + 100);
+        }
+      },
+    },
+    watch: {
+      'message.editable_until': {
+        handler() {
+          this.now = Date.now();
+          this.scheduleEditWindowExpiry();
+        },
+        immediate: true
+      }
     },
     beforeUnmount() {
       if (this.readingTimer) {
         clearTimeout(this.readingTimer);
+      }
+      if (this.editWindowTimer) {
+        clearTimeout(this.editWindowTimer);
       }
     }
   }
 </script>
 
 <style lang="scss">
+.v-input-chat__message-action-loader {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+
+.v-input-chat__message--editing {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18) !important;
+  transition: box-shadow 0.2s ease;
+}
+
+.v-input-chat__message-edited {
+  font-style: italic;
+}
+
 .message-content--unread {
   filter: blur(2px);
   transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);

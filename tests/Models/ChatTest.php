@@ -195,6 +195,104 @@ class ChatTest extends ModelTestCase
         $this->assertTrue($retrievedPinnedMessage->is_pinned);
     }
 
+    public function test_pinned_messages_are_ordered_by_most_recent_pin()
+    {
+        $user = User::factory()->create();
+        $chat = Chat::create([
+            'chatable_id' => $user->id,
+            'chatable_type' => get_class($user),
+        ]);
+
+        $first = ChatMessage::create(['chat_id' => $chat->id, 'content' => 'First']);
+        $second = ChatMessage::create(['chat_id' => $chat->id, 'content' => 'Second']);
+        ChatMessage::create(['chat_id' => $chat->id, 'content' => 'Not pinned']);
+
+        $second->update(['is_pinned' => true]);
+        $this->travel(1)->minutes();
+        $first->update(['is_pinned' => true]);
+
+        $this->assertInstanceOf(HasMany::class, $chat->pinnedMessages());
+        $this->assertEquals([$first->id, $second->id], $chat->pinnedMessages()->pluck('id')->all());
+        $this->assertEquals($first->id, $chat->pinnedMessage->id);
+    }
+
+    public function test_pinned_messages_exclude_expired_pins()
+    {
+        $user = User::factory()->create();
+        $chat = Chat::create([
+            'chatable_id' => $user->id,
+            'chatable_type' => get_class($user),
+        ]);
+
+        $forever = ChatMessage::create(['chat_id' => $chat->id, 'content' => 'Forever']);
+        $forever->update(['is_pinned' => true]);
+
+        $shortLived = ChatMessage::create(['chat_id' => $chat->id, 'content' => 'Short lived']);
+        $shortLived->update(['is_pinned' => true, 'pinned_until' => now()->addDay()]);
+
+        $this->assertEquals([$shortLived->id, $forever->id], $chat->pinnedMessages()->pluck('id')->all());
+
+        $this->travel(25)->hours();
+
+        $this->assertEquals([$forever->id], $chat->pinnedMessages()->pluck('id')->all());
+    }
+
+    public function test_starred_messages_are_ordered_by_message_date()
+    {
+        $user = User::factory()->create();
+        $chat = Chat::create([
+            'chatable_id' => $user->id,
+            'chatable_type' => get_class($user),
+        ]);
+        $otherChat = Chat::create([
+            'chatable_id' => $user->id,
+            'chatable_type' => get_class($user),
+        ]);
+
+        $star = fn (ChatMessage $message, User $by) => $message->stars()->create([
+            'user_type' => $by->getMorphClass(),
+            'user_id' => $by->getKey(),
+        ]);
+
+        $older = ChatMessage::create(['chat_id' => $chat->id, 'content' => 'Older']);
+        $this->travel(1)->minutes();
+        $newer = ChatMessage::create(['chat_id' => $chat->id, 'content' => 'Newer']);
+        ChatMessage::create(['chat_id' => $chat->id, 'content' => 'Not starred']);
+        $star(ChatMessage::create(['chat_id' => $otherChat->id, 'content' => 'Other chat']), $user);
+
+        // starring order does not matter, the message date does
+        $star($newer, $user);
+        $star($older, $user);
+
+        $this->assertInstanceOf(HasMany::class, $chat->starredMessages($user));
+        $this->assertEquals([$newer->id, $older->id], $chat->starredMessages($user)->pluck('id')->all());
+    }
+
+    public function test_starred_messages_are_private_to_each_user()
+    {
+        $user = User::factory()->create();
+        $other = User::factory()->create();
+        $chat = Chat::create([
+            'chatable_id' => $user->id,
+            'chatable_type' => get_class($user),
+        ]);
+
+        $mine = ChatMessage::create(['chat_id' => $chat->id, 'content' => 'Mine']);
+        $theirs = ChatMessage::create(['chat_id' => $chat->id, 'content' => 'Theirs']);
+
+        $mine->stars()->create(['user_type' => $user->getMorphClass(), 'user_id' => $user->getKey()]);
+        $theirs->stars()->create(['user_type' => $other->getMorphClass(), 'user_id' => $other->getKey()]);
+
+        $this->assertEquals([$mine->id], $chat->starredMessages($user)->pluck('id')->all());
+        $this->assertEquals([$theirs->id], $chat->starredMessages($other)->pluck('id')->all());
+
+        // the current user is used by default
+        $this->actingAs($other);
+        $this->assertEquals([$theirs->id], $chat->starredMessages()->pluck('id')->all());
+        $this->assertTrue($theirs->refresh()->is_starred);
+        $this->assertFalse($mine->refresh()->is_starred);
+    }
+
     public function test_extends_model()
     {
         $chat = new Chat;

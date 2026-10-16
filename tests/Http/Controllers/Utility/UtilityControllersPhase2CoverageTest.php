@@ -27,6 +27,7 @@ use Unusualify\Modularous\Http\Controllers\Utility\TagController;
 use Unusualify\Modularous\Http\Controllers\Utility\UIPreferencesController;
 use Unusualify\Modularous\Repositories\FileRepository;
 use Unusualify\Modularous\Repositories\MediaRepository;
+use Unusualify\Modularous\Services\ChatMessageService;
 use Unusualify\Modularous\Services\SlugInputValidationService;
 use Unusualify\Modularous\Services\Uploader\SignAzureUpload;
 use Unusualify\Modularous\Services\Uploader\SignS3Upload;
@@ -161,17 +162,23 @@ class UtilityControllersPhase2CoverageTest extends TestCase
         ]));
         $messagesRelation->shouldReceive('orderBy')->andReturnSelf();
         $messagesRelation->shouldReceive('paginate')->andReturn(new LengthAwarePaginator([], 0, 10));
+        $messagesRelation->shouldReceive('withTrashed', 'withStarredFor', 'unreadForYou')->andReturnSelf();
+        $messagesRelation->shouldReceive('count')->andReturn(0);
+        $messagesRelation->shouldReceive('pluck')->andReturn(collect());
 
         $chat = Mockery::mock(Chat::class)->shouldIgnoreMissing();
-        $chat->shouldReceive('messages')->andReturn($messagesRelation);
+        $chat->shouldReceive('messages', 'pinnedMessages', 'starredMessages')->andReturn($messagesRelation);
+
+        $service = Mockery::mock(ChatMessageService::class);
+        $service->shouldReceive('releaseExpiredPins')->twice()->with($chat)->andReturn(0);
         $chat->shouldReceive('getAttribute')->with('attachments')->andReturn(collect(['file.pdf']));
 
         $controller = new ChatController;
 
-        $from = $controller->index(Request::create('/', 'GET', ['from' => '2024-01-01', 'user_id' => 1]), $chat);
+        $from = $controller->index(Request::create('/', 'GET', ['from' => '2024-01-01', 'user_id' => 1]), $chat, $service);
         $this->assertCount(1, $from->getData(true));
 
-        $paged = $controller->index(Request::create('/', 'GET', ['perPage' => 10, 'page' => 1]), $chat);
+        $paged = $controller->index(Request::create('/', 'GET', ['perPage' => 10, 'page' => 1]), $chat, $service);
         $this->assertArrayHasKey('data', $paged->getData(true));
 
         $this->assertSame(['file.pdf'], $controller->attachments(Request::create('/'), $chat)->getData(true));

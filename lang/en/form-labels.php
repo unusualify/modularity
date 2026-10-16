@@ -1,14 +1,21 @@
 <?php
 
 return [
+    'Additional Information' => 'Additional Information',
     'Address' => 'Address',
+
+    'Brand' => 'Brand',
+
     'City' => 'City',
     'Code' => 'Code',
     'Company' => 'Company',
     'Confirm Password' => 'Confirm Password',
     'Country' => 'Country',
+    'Creator' => 'Creator',
     'Current Password' => 'Current Password',
+    'Data' => 'Data',
     'Description' => 'Description',
+    'Details' => 'Details',
     'E-mail' => 'E-mail',
     'File' => 'File',
     'Guard Name' => 'Guard Name',
@@ -29,5 +36,6 @@ return [
     'Tax ID' => 'Tax ID',
     'Timezone' => 'Timezone',
     'Vat Number' => 'Vat Number',
+    'Work E-mail' => 'Work E-mail',
     'ZIP/Postal Code' => 'ZIP/Postal Code',
 ];
