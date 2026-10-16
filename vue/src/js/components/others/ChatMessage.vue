@@ -233,7 +233,7 @@
 </template>
 
 <script>
-  import WellPrint from '@/components/WellPrint.vue'
+  import WellPrint from '@/components/shared/WellPrint.vue'
   import { isObject } from '@/utils/helpers'
 
   export default {
