@@ -173,21 +173,21 @@ class Assignment extends Model
     protected function assigneeName(): Attribute
     {
         return new Attribute(
-            get: fn ($value) => $this->assignee->name ?? $this->assignee->email,
+            get: fn ($value) => $this->assignee?->name ?? $this->assignee?->email,
         );
     }
 
     protected function assigneeAvatar(): Attribute
     {
         return new Attribute(
-            get: fn ($value) => $this->assignee->avatar,
+            get: fn ($value) => $this->assignee?->avatar,
         );
     }
 
     protected function assignerName(): Attribute
     {
         return new Attribute(
-            get: fn ($value) => $this->assigner->name ?? $this->assigner->email,
+            get: fn ($value) => $this->assigner?->name ?? $this->assigner?->email,
         );
     }
 
