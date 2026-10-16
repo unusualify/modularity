@@ -175,6 +175,17 @@ class ChatMessage extends Model
         );
     }
 
+    /**
+     * Stored with microseconds so the pin expires exactly after the given duration;
+     * the default date format would truncate them.
+     */
+    protected function pinnedUntil(): Attribute
+    {
+        return Attribute::make(
+            set: fn ($value) => $value === null ? null : Carbon::parse($value)->format('Y-m-d H:i:s.u'),
+        );
+    }
+
     protected function userProfile(): Attribute
     {
         return Attribute::make(
