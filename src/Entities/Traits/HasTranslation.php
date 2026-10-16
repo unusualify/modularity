@@ -2,6 +2,7 @@
 
 namespace Unusualify\Modularous\Entities\Traits;
 
+use Astrotomic\Translatable\Locales;
 use Astrotomic\Translatable\Translatable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -45,6 +46,30 @@ trait HasTranslation
                 return $model->deleteTranslations();
             });
         }
+    }
+
+    /**
+     * The Locales helper, kept in sync with the `translatable.locales` config.
+     *
+     * The helper is a singleton that snapshots the config when first resolved (often while
+     * models boot), so locales set at runtime would otherwise be ignored and their
+     * translations silently dropped.
+     */
+    protected function getLocalesHelper(): Locales
+    {
+        static $loadedConfigs = null;
+
+        $loadedConfigs ??= new \WeakMap;
+
+        $helper = app(Locales::class);
+        $config = (array) config('translatable.locales', []);
+
+        if (! isset($loadedConfigs[$helper]) || $loadedConfigs[$helper] !== $config) {
+            $helper->load();
+            $loadedConfigs[$helper] = $config;
+        }
+
+        return $helper;
     }
 
     public function initializeHasTranslation()
