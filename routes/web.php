@@ -72,8 +72,13 @@ Route::prefix('api')->group(function () {
         Route::get('{chat}', 'index')->name('index');
         Route::get('{chat}/attachments', 'attachments')->name('attachments');
         Route::get('{chat}/pinned-message', 'pinnedMessage')->name('pinned-message');
+        Route::get('{chat}/pinned-messages', 'pinnedMessages')->name('pinned-messages');
+        Route::get('{chat}/starred-messages', 'starredMessages')->name('starred-messages');
         Route::post('{chat}', 'store')->name('store');
+        Route::put('{chat}/read-all', 'markAllAsRead')->name('read-all');
+        Route::put('{chat}/unstar-all', 'unstarAll')->name('unstar-all');
         Route::put('{chat_message}', 'update')->name('update');
+        Route::put('{chat_message}/edit', 'edit')->name('edit');
         Route::get('show/{chat_message}', 'show')->name('show');
         Route::delete('destroy/{chat_message}', 'destroy')->name('destroy');
     });
