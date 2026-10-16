@@ -19,7 +19,7 @@ return new class extends Migration
 
         // already pinned messages keep a null pinned_until, so they stay pinned until unpinned
         Schema::table($chatMessagesTable, function (Blueprint $table) {
-            $table->timestamp('pinned_until')->nullable()->after('pinned_at');
+            $table->timestamp('pinned_until', 6)->nullable()->after('pinned_at');
         });
     }
 
