@@ -20,6 +20,7 @@ return [
     'stateables' => 'um_stateables',
     'chats' => 'um_chats',
     'chat_messages' => 'um_chat_messages',
+    'chat_message_stars' => 'um_chat_message_stars',
     'spreads' => 'um_spreads',
     'remote_api_sources' => 'um_remote_api_sources',
     'module_route_statuses' => 'um_module_route_statuses',
