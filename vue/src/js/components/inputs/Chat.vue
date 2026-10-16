@@ -12,13 +12,112 @@
         :elevation="elevation"
         :class="[
           !noBackground && background ? `bg-${background}` : '',
+          disabled ? 'bg-grey-lighten-4' : '',
+          editingMessage ? 'v-input-chat--editing' : ''
         ]"
         :color="color"
         :heightx="height"
         :disabled="disabled"
       >
-        <v-card-title class="w-100 py-4 text-wrap">
+        <v-card-title class="w-100 py-4 text-wrap v-input-chat__dimmable" @click="cancelEditing">
           <ue-title :text="label" align="center" padding="a-0" transform="none" class="w-100" type="body-1" color="grey-darken-4" weight="medium">
+            <template v-slot:right>
+              <!-- STARRED MESSAGES -->
+              <div v-if="hasStarredMessages" class="ml-auto pl-2 flex-shrink-0">
+                <v-input-browser
+                  ref="starredBrowser"
+                  load-on-open
+                  no-selection
+                  load-more
+                  :endpoint="endpoints.starredMessages.replace(':id', input)"
+                  item-title="content"
+                  item-value="id"
+                  @click:item="jumpToStarredMessage"
+                >
+                  <template v-slot:activator="{ props: browserProps }">
+                    <v-tooltip :text="$t('Starred messages')" location="top">
+                      <template v-slot:activator="{ props: activatorProps }">
+                        <v-btn
+                          v-bind="activatorProps"
+                          variant="text"
+                          color="secondary"
+                          density="comfortable"
+                          size="small"
+                          icon
+                          @click.stop="browserProps.onClick"
+                        >
+                          <v-badge
+                            :model-value="starredCount > 0"
+                            :content="starredCount > 99 ? '99+' : starredCount"
+                            color="secondary"
+                            floating
+                          >
+                            <v-icon>{{ starredCount > 0 ? 'mdi-star' : 'mdi-star-outline' }}</v-icon>
+                          </v-badge>
+                        </v-btn>
+                      </template>
+                    </v-tooltip>
+                  </template>
+                  <template v-slot:item="{ item }">
+                    <div class="d-flex align-start">
+                      <div class="flex-grow-1 overflow-hidden">
+                        <v-list-item-title v-if="item.raw.content">{{ item.raw.content }}</v-list-item-title>
+                        <!-- clicking a file opens it instead of jumping to the message -->
+                        <div v-if="pinnedMessageAttachments(item.raw).length" class="py-1" @click.stop>
+                          <ue-filepond-preview
+                            :source="pinnedMessageAttachments(item.raw)"
+                            image-size="24"
+                            show-file-name
+                            no-overlay
+                          />
+                        </div>
+                        <v-list-item-subtitle>{{ starredMessageSender(item.raw) }}</v-list-item-subtitle>
+                      </div>
+                      <div class="d-flex flex-column align-end flex-shrink-0 pl-4">
+                        <span class="text-caption text-medium-emphasis">{{ starredMessageDate(item.raw) }}</span>
+                        <span v-if="item.raw.edited_at" class="text-caption text-grey-darken-1 font-italic">{{ $t('Edited') }}</span>
+                      </div>
+                    </div>
+                  </template>
+                </v-input-browser>
+              </div>
+              <!-- UNSTAR ALL -->
+              <div v-if="canUnstarAll" class="flex-shrink-0">
+                <v-tooltip :text="$t('Unstar All')" location="top">
+                  <template v-slot:activator="{ props: activatorProps }">
+                    <v-btn
+                      v-bind="activatorProps"
+                      variant="text"
+                      color="secondary"
+                      density="comfortable"
+                      size="small"
+                      icon="mdi-star-off-outline"
+                      :loading="unstarAllLoading"
+                      @click.stop="unstarAllDialog = true"
+                    />
+                  </template>
+                </v-tooltip>
+              </div>
+              <!-- MARK ALL AS READ -->
+              <div v-if="canMarkAllAsRead" :class="[hasStarredMessages ? '' : 'ml-auto', 'pl-2 flex-shrink-0']">
+                <v-tooltip :text="$t('Mark All as Read')" location="top" :disabled="$vuetify.display.smAndUp">
+                  <template v-slot:activator="{ props: activatorProps }">
+                    <v-btn
+                      v-bind="activatorProps"
+                      variant="text"
+                      color="primary"
+                      density="comfortable"
+                      size="small"
+                      :icon="$vuetify.display.smAndUp ? undefined : 'mdi-email-open-multiple-outline'"
+                      :prepend-icon="$vuetify.display.smAndUp ? 'mdi-email-open-multiple-outline' : undefined"
+                      :text="$vuetify.display.smAndUp ? $t('Mark All as Read') : undefined"
+                      :loading="markAllAsReadLoading"
+                      @click.stop="markAllAsRead"
+                    />
+                  </template>
+                </v-tooltip>
+              </div>
+            </template>
             <template v-slot:rightX>
               <div class="w-100 d-flex justify-end">
                 <slot name="actions">
@@ -51,6 +150,8 @@
                             :height="`calc(${dialogHeight} * 0.80)`"
                             :noStarring="noStarring"
                             :noPinning="noPinning"
+                            :maxPinnedMessages="maxPinnedMessages"
+                            :pinDurations="pinDurations"
                             v-bind="$attrs"
                           >
                             <template #actions>
@@ -125,51 +226,48 @@
 
           <v-divider class="mt-2" v-if="!noDivider"></v-divider>
 
-          <!-- Pinned Message -->
-          <v-list v-if="pinnedMessage"
+          <!-- PINNED MESSAGES: one shown at a time, clicking jumps to it and shows the next one (like WhatsApp) -->
+          <v-sheet v-if="activePinnedMessage"
             id="PinnedMessage"
             elevation="3"
-            class="bg-grey-lighten-4 mx-n4"
-            style="z-index: 1000; height: 92px;"
-            :items="[{
-              title: pinnedMessage.content,
-              subtitle: pinnedMessage.created_at ? $d(new Date(pinnedMessage.created_at), 'short') : '',
-              prepend: pinnedMessage.user_profile.avatar_url
-            }]"
-            lines="two"
-            prependIcon="mdi-pin"
-            item-props
+            class="v-input-chat__pinned bg-grey-lighten-4 mx-n4 px-4 py-2 d-flex align-center"
+            style="z-index: 1000;"
+            @click.stop="showNextPinnedMessage"
           >
-            <template #title="{ title }">
+            <!-- one segment per pinned message, the shown one highlighted -->
+            <div v-if="pinnedMessages.length > 1" class="v-input-chat__pinned-indicator mr-3">
+              <span
+                v-for="(pinned, pinnedIndex) in pinnedMessages"
+                :key="pinned.id"
+                :class="[
+                  'v-input-chat__pinned-indicator-segment',
+                  pinnedIndex === activePinnedIndex ? 'bg-primary' : 'bg-grey-lighten-1'
+                ]"
+              />
+            </div>
 
-              <div v-if="pinnedMessageExpanded || title.length < 20">
-                <ue-well-print
-                  :text="title"
-                  :no-linkify="$attrs.noLinkify"
-                  class="text-wrap"
-                />
-                <v-btn v-if="title.length >= 20" density="compact" variant="plain" size="x-small" @click="togglePinnedMessageExpand"> {{ $t('Show less') }}</v-btn>
+            <v-progress-circular v-if="jumpingToMessage" indeterminate size="16" width="2" color="primary" class="mr-3"/>
+            <v-icon v-else size="small" color="primary" class="mr-3" style="transform: rotate(325deg)">mdi-pin</v-icon>
+
+            <v-tooltip :text="activePinnedMessage.user_profile?.name" location="top">
+              <template #activator="{ props: activatorProps }">
+                <v-avatar :image="activePinnedMessage.user_profile?.avatar_url" size="24" class="mr-3" v-bind="activatorProps"/>
+              </template>
+            </v-tooltip>
+
+            <div class="flex-grow-1 overflow-hidden">
+              <div class="d-flex align-center text-body-2 text-grey-darken-4">
+                <!-- messages with attachments are marked with a paperclip, like in the message list -->
+                <v-icon
+                  v-if="pinnedMessageAttachments(activePinnedMessage).length"
+                  size="small"
+                  color="grey-darken-1"
+                  class="mr-1 flex-shrink-0"
+                >mdi-paperclip</v-icon>
+                <span class="text-truncate">{{ pinnedMessagePreview(activePinnedMessage) }}</span>
               </div>
-              <div v-else>
-                <ue-well-print
-                  :text="title.slice(0, 20)"
-                  :full-text="title"
-                  :no-linkify="$attrs.noLinkify"
-                  class="text-wrap"
-                />
-                <span class="text-grey-darken-1">...</span>
-                <v-btn variant="plain" size="small" @click="togglePinnedMessageExpand"> {{ $t('Show more') }}</v-btn>
-              </div>
-            </template>
-            <template #prepend="prependScope">
-              <v-icon size="small" color="primary" class="mr-2" style="transform: rotate(325deg)" @click="unpinMessage(pinnedMessage)">mdi-pin</v-icon>
-              <v-tooltip :text="pinnedMessage.user_profile.name" location="top">
-                <template #activator="{ props: activatorProps }">
-                  <v-avatar :image="prependScope.item.prepend" size="24" v-bind="activatorProps"/>
-                </template>
-              </v-tooltip>
-            </template>
-          </v-list>
+            </div>
+          </v-sheet>
         </v-card-title>
 
         <v-card-text class="mr-n2 mb-n4 mt-n4 pb-0">
@@ -181,25 +279,37 @@
             @load="loadMoreMessages"
             :load-more-text="loadMoreText ? loadMoreText : $t('Load More Messages')"
           >
-            <div class="v-input-chat__messages">
-              <div v-for="(message, index) in formattedMessages" :key="index">
-                <slot name="message" :message="message" :index="index">
-                  <ChatMessage
-                    :class="[
-                      'v-input-chat__message',
-                      message.loading  ? 'v-input-chat__message--loading' : '',
-                    ]"
-                    :modelValue="message"
-                    @update:modelValue="updatedMessage($event, index)"
-                    :reverse="message.reverse"
-                    :updateEndpoint="endpoints.update"
-                    :noStarring="noStarring"
-                    :noPinning="noPinning"
-                    :contentTruncateLength="contentTruncateLength"
-                    v-bind="$attrs"
-                  />
-                </slot>
-              </div>
+            <div
+              v-for="(message, index) in formattedMessages"
+              :key="index"
+              :data-message-id="message.id"
+              :class="[
+                'v-input-chat__messages',
+                editingMessage && !isEditingMessage(message) ? 'v-input-chat__messages--dimmed' : '',
+                highlightedMessageId && highlightedMessageId === message.id ? 'v-input-chat__messages--highlighted' : ''
+              ]"
+              @click="editingMessage && !isEditingMessage(message) && cancelEditing()"
+            >
+              <slot name="message" :message="message" :index="index">
+                <ChatMessage
+                  :class="[
+                    'v-input-chat__message',
+                    message.loading  ? 'v-input-chat__message--loading' : '',
+                  ]"
+                  :modelValue="message"
+                  @update:modelValue="updatedMessage($event, index)"
+                  @edit="startEditing"
+                  @delete="confirmDelete"
+                  :editing="isEditingMessage(message)"
+                  :reverse="message.reverse"
+                  :updateEndpoint="endpoints.update"
+                  :noStarring="noStarring"
+                  :noPinning="noPinning"
+                  :contentTruncateLength="contentTruncateLength"
+                  :beforePin="preparePin"
+                  v-bind="$attrs"
+                />
+              </slot>
             </div>
             <template v-slot:load-more="{ props }">
               <v-btn
@@ -267,12 +377,27 @@
               @click:append="sendMessage"
               @keydown.enter="handleEnterKey"
               @keydown.tab="handleTabKey"
+              @keydown.esc="handleEscKey"
               @focus="handleFieldFocus"
               @blur="handleFieldBlur"
               :rows="textareaRows"
             >
-              <template v-slot:prepend v-if="$vuetify.display.smAndUp">
-                <div class="flex-grow-0">
+              <template v-slot:prepend v-if="$vuetify.display.smAndUp || editingMessage">
+                <!-- cancel editing, in place of the avatar -->
+                <v-tooltip v-if="editingMessage" :text="$t('Cancel')" location="top">
+                  <template v-slot:activator="{ props: activatorProps }">
+                    <v-btn
+                      v-bind="activatorProps"
+                      icon="mdi-close"
+                      variant="outlined"
+                      color="grey-darken-1"
+                      :size="$vuetify.display.smAndUp ? 40 : 32"
+                      :disabled="loading"
+                      @click="cancelEditing"
+                    />
+                  </template>
+                </v-tooltip>
+                <div v-else class="flex-grow-0">
                   <v-avatar class="my-aut" :image="$store.getters.userProfile.avatar_url" size="40"/>
                 </div>
               </template>
@@ -320,6 +445,86 @@
         </v-card-actions>
       </v-card>
 
+      <!-- DELETE MESSAGE CONFIRMATION -->
+      <ue-modal
+        :model-value="!!deletingMessage"
+        @update:model-value="!$event && closeDeleteDialog()"
+        width-type="sm"
+        :title="$t('Delete message?')"
+        :description="$t('This message will be deleted for everyone.')"
+        :confirm-text="$t('Delete')"
+        :cancel-text="$t('Cancel')"
+        :confirm-loading="deleteLoading"
+        :confirm-closing="false"
+        :confirm-callback="deleteMessage"
+        :confirm-button-attributes="{ color: 'error', variant: 'elevated' }"
+        :reject-button-attributes="{ color: 'grey-darken-1', variant: 'outlined' }"
+      />
+
+      <!-- UNSTAR ALL CONFIRMATION -->
+      <ue-modal
+        v-model="unstarAllDialog"
+        width-type="sm"
+        :title="$t('Unstar all messages?')"
+        :description="$t('All your starred messages in this chat will be unstarred.')"
+        :confirm-text="$t('Unstar All')"
+        :cancel-text="$t('Cancel')"
+        :confirm-loading="unstarAllLoading"
+        :confirm-closing="false"
+        :confirm-callback="unstarAll"
+        :confirm-button-attributes="{ color: 'secondary', variant: 'elevated' }"
+        :reject-button-attributes="{ color: 'grey-darken-1', variant: 'outlined' }"
+      />
+
+      <!-- PIN DURATION SELECTION (like WhatsApp) -->
+      <v-dialog
+        :model-value="!!pinDurationRequest"
+        @update:model-value="!$event && resolvePinDuration(null)"
+        max-width="360"
+      >
+        <v-card class="pa-2">
+          <v-card-title class="text-wrap">{{ $t('Choose how long your pin lasts') }}</v-card-title>
+          <v-card-subtitle class="text-wrap">{{ $t('You can unpin at any time.') }}</v-card-subtitle>
+          <v-card-actions class="d-flex flex-column align-stretch ga-1 mt-2">
+            <v-btn
+              v-for="duration in pinDurations"
+              :key="duration.value"
+              variant="text"
+              color="primary"
+              class="ma-0"
+              block
+              @click="resolvePinDuration(duration.value)"
+            >
+              {{ duration.title }}
+            </v-btn>
+            <v-btn
+              variant="text"
+              color="grey-darken-1"
+              class="ma-0"
+              block
+              @click="resolvePinDuration(null)"
+            >
+              {{ $t('Cancel') }}
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+
+      <!-- REPLACE OLDEST PIN CONFIRMATION -->
+      <ue-modal
+        :model-value="!!pinReplacement"
+        @update:model-value="!$event && resolvePinReplacement(false)"
+        width-type="sm"
+        :title="$t('Replace oldest pin?')"
+        :description="$t('Your new pin will replace the oldest one.')"
+        :confirm-text="$t('Replace')"
+        :cancel-text="$t('Cancel')"
+        :confirm-closing="false"
+        :confirm-callback="() => resolvePinReplacement(true)"
+        :confirm-button-attributes="{ color: 'primary', variant: 'elevated' }"
+        :reject-button-attributes="{ color: 'grey-darken-1', variant: 'outlined' }"
+      />
+
       <!-- EMOJI COMPONENT -->
       <ue-emojis
         v-if="!noEmoji"
@@ -362,8 +567,7 @@
 <script>
   import { useInput, makeInputProps, makeInputEmits, useValidation } from '@/hooks'
   import ChatMessage from '@/components/others/ChatMessage.vue';
-  import { RETAINABLE_NOTIFICATION } from '@/store/mutations'
-
+  import { ALERT, RETAINABLE_NOTIFICATION } from '@/store/mutations'
   export default {
     name: 'v-input-chat',
     emits: [...makeInputEmits],
@@ -455,6 +659,19 @@
         type: Boolean,
         default: false
       },
+      maxPinnedMessages: {
+        type: Number,
+        default: 4
+      },
+      // selectable pin durations in hours, e.g. [{ value: 24, title: '24 hours' }]; empty pins until unpinned
+      pinDurations: {
+        type: Array,
+        default: () => [
+          { value: 24, title: '24 hours' },
+          { value: 24 * 7, title: '7 days' },
+          { value: 24 * 30, title: '30 days' },
+        ]
+      },
       contentTruncateLength: {
         type: Number,
         default: 50
@@ -510,9 +727,32 @@
 
         refreshInterval: null,
         chatChannelName: null,
-        pinnedMessage: null,
+        // pinned messages, the most recently pinned first
+        pinnedMessages: [],
+        activePinnedIndex: 0,
+        pinnedMessagesRequest: 0,
+        highlightedMessageId: null,
+        // starred messages are shared by all participants of the chat
+        starredCount: 0,
+        highlightTimer: null,
+        // older pages are being loaded to reach a pinned message
+        jumpingToMessage: false,
         showEmojiPicker: false,
-        pinnedMessageExpanded: false,
+        // pending pin waiting for the "replace oldest pin" confirmation: { message, oldest, resolve }
+        pinReplacement: null,
+        // pending pin waiting for its duration to be chosen: { message, resolve }
+        pinDurationRequest: null,
+
+        editingMessage: null,
+        draftBeforeEditing: null,
+        deletingMessage: null,
+        deleteLoading: false,
+        syncedAt: null,
+
+        markAllAsReadLoading: false,
+        unstarAllDialog: false,
+        unstarAllLoading: false,
+        serverUnreadCount: 0,
 
       }
     },
@@ -531,6 +771,22 @@
       },
       formattedMessages() {
         return this.formatMessages(this.messages);
+      },
+      activePinnedMessage() {
+        return this.pinnedMessages[this.activePinnedIndex] ?? this.pinnedMessages[0] ?? null;
+      },
+      unreadCount() {
+        return this.formattedMessages.filter(message => !message.reverse && !message.is_read).length;
+      },
+      hasStarredMessages() {
+        return !this.noStarring && !!this.endpoints.starredMessages && this.input > -1;
+      },
+      canUnstarAll() {
+        return this.hasStarredMessages && !!this.endpoints.unstarAll && this.starredCount > 0;
+      },
+      canMarkAllAsRead() {
+        // the server count also covers unread messages not loaded yet (paginated chats)
+        return !!this.endpoints.readAll && (this.unreadCount > 0 || this.serverUnreadCount > 0);
       },
       noRemainingItems() {
         return !this.loading && (this.perPage > -1 && this.page === this.lastPage);
@@ -568,6 +824,10 @@
         const hasAttachments = this.attachments && this.attachments.length > 0;
         const hasText = this.message && this.message.trim();
 
+        if (this.editingMessage) {
+          return 'mdi-check';
+        }
+
         if (hasAttachments || hasText) {
           return 'mdi-send-check';
         }
@@ -578,7 +838,7 @@
         let extraHeight = 0;
         let minusHeight = '';
 
-        if(this.pinnedMessage) {
+        if(this.activePinnedMessage) {
           extraHeight += this.$jquery('#PinnedMessage').outerHeight(true);
         }
 
@@ -596,16 +856,6 @@
 
     },
     watch: {
-      messages: {
-        handler(newValue) {
-          this.pinnedMessage = newValue.find(message => message.is_pinned);
-
-          if(!this.pinnedMessage) {
-            this.fetchPinnedMessage();
-          }
-        },
-        deep: true
-      },
       attachments: {
         handler(newValue) {
           // console.log('Attachments changed:', newValue);
@@ -658,9 +908,6 @@
       }
     },
     methods: {
-      togglePinnedMessageExpand() {
-        this.pinnedMessageExpanded = !this.pinnedMessageExpanded;
-      },
       scrollEndInfiniteScroll() {
         this.$nextTick(() => {
           const container = this.$refs.infiniteScroll.$el;
@@ -700,8 +947,13 @@
 
         this.loading = true;
 
-        axios.get(endpoint, { params }).then(response => {
+        return axios.get(endpoint, { params }).then(response => {
           if(response.status === 200) {
+            this.syncedAt ??= response.headers['x-chat-synced-at'] ?? null;
+            this.setServerUnreadCount(response);
+            this.checkPinnedMessages(response);
+            this.setStarredCount(response);
+
             if (this.perPage > -1) {
               const total = response.data.total;
               this.lastPage = response.data.last_page;
@@ -743,20 +995,6 @@
       addMessage(message) {
         return this.messages.push(message) - 1;
       },
-      unpinMessage(message) {
-        let endpoint = this.endpoints.update.replace(':id', message.id);
-
-        let self = this;
-        let index = this.messages.findIndex(m => m.id === message.id);
-        axios.put(endpoint, {
-          is_pinned: false
-        }).then(response => {
-          self.messages[index] = {
-            ...self.messages[index],
-            is_pinned: false
-          };
-        });
-      },
       findMessageByTempId(tempId) {
         return this.messages.findIndex(message => message.tempId === tempId);
       },
@@ -771,6 +1009,10 @@
         }
       },
       sendMessage() {
+        if (this.editingMessage) {
+          return this.submitEdit();
+        }
+
         // Check if there's content to send (text or attachments)
         const hasAttachments = this.attachments && this.attachments.length > 0;
         const hasText = this.message && this.message.trim();
@@ -841,16 +1083,128 @@
           this.uploadedAttachments = response.data;
         });
       },
-      fetchPinnedMessage() {
-        const endpoint = this.endpoints.pinnedMessage.replace(':id', this.input);
-        axios.get(endpoint).then(response => {
+      /**
+       * Load the pinned messages and sync the pin status of the loaded messages with them,
+       * e.g. the oldest pin is unpinned by the server when the limit is exceeded.
+       */
+      fetchPinnedMessages({ showLatest = false } = {}) {
+        if (!this.endpoints.pinnedMessages) return;
 
-          if(response.status === 200 && response.data) {
-            if(Object.keys(response.data).length > 0) {
-              this.pinnedMessage = response.data;
-            }
+        const endpoint = this.endpoints.pinnedMessages.replace(':id', this.input);
+        // only the latest request may update the state
+        const request = ++this.pinnedMessagesRequest;
+
+        axios.get(endpoint).then(response => {
+          if (request !== this.pinnedMessagesRequest || response.status !== 200) return;
+
+          this.pinnedMessages = Array.isArray(response.data) ? response.data : [];
+
+          if (showLatest) {
+            this.activePinnedIndex = 0;
           }
+
+          this.clampActivePinnedIndex();
+          this.syncPinnedStatus();
         });
+      },
+      // reload the pinned messages when the server reports a different set of pins
+      checkPinnedMessages(response) {
+        const header = response.headers['x-chat-pinned-ids'];
+
+        if (header === undefined) return;
+
+        const serverIds = header;
+        const currentIds = this.pinnedMessages.map(pinned => pinned.id).join(',');
+
+        if (serverIds !== currentIds) {
+          this.fetchPinnedMessages();
+        }
+      },
+      syncPinnedStatus() {
+        const pinnedIds = new Set(this.pinnedMessages.map(pinned => pinned.id));
+
+        if (!this.messages.some(message => message.id && !!message.is_pinned !== pinnedIds.has(message.id))) return;
+
+        this.messages = this.messages.map(message =>
+          message.id && !!message.is_pinned !== pinnedIds.has(message.id)
+            ? { ...message, is_pinned: pinnedIds.has(message.id) }
+            : message
+        );
+      },
+      clampActivePinnedIndex() {
+        if (this.activePinnedIndex >= this.pinnedMessages.length) {
+          this.activePinnedIndex = 0;
+        }
+      },
+      // attachments may come as an object keyed by index (a filtered Laravel collection)
+      pinnedMessageAttachments(message) {
+        const attachments = message?.attachments;
+
+        if (!attachments) return [];
+
+        return Array.isArray(attachments) ? attachments : Object.values(attachments);
+      },
+      pinnedMessagePreview(message) {
+        if (message?.content) return message.content;
+
+        const attachments = this.pinnedMessageAttachments(message);
+        const attachment = attachments[0];
+        const name = attachment?.file_name ?? attachment?.name ?? this.$t('Attachment');
+
+        return attachments.length > 1 ? `${name} +${attachments.length - 1}` : name;
+      },
+      showNextPinnedMessage() {
+        if (!this.activePinnedMessage || this.jumpingToMessage) return;
+
+        this.scrollToMessage(this.activePinnedMessage.id);
+
+        if (this.pinnedMessages.length > 1) {
+          this.activePinnedIndex = (this.activePinnedIndex + 1) % this.pinnedMessages.length;
+        }
+      },
+      findMessageElement(id) {
+        return this.$el?.querySelector?.(`[data-message-id="${id}"]`) ?? null;
+      },
+      async scrollToMessage(id) {
+        if (this.jumpingToMessage) return;
+
+        let element = this.findMessageElement(id);
+
+        // older messages of paginated chats may not be loaded yet, load the previous pages until the message shows up
+        if (!element && this.perPage > -1) {
+          this.jumpingToMessage = true;
+
+          try {
+            while (!element && this.page < this.lastPage) {
+              if (this.loading) break;
+
+              this.page++;
+              await this.loadMessages();
+              await this.$nextTick();
+
+              element = this.findMessageElement(id);
+            }
+          } catch (error) {
+            console.error('Error loading older messages:', error);
+          } finally {
+            this.jumpingToMessage = false;
+          }
+        }
+
+        if (!element) return;
+
+        element.scrollIntoView({ block: 'center', behavior: 'smooth' });
+
+        // reset first so the highlight animation restarts when the same message is jumped to again
+        clearTimeout(this.highlightTimer);
+        this.highlightedMessageId = null;
+
+        await this.$nextTick();
+
+        this.highlightedMessageId = id;
+        this.highlightTimer = setTimeout(() => {
+          this.highlightedMessageId = null;
+        }, 2500);
       },
       refreshMessages() {
         const endpoint = this.endpoints.index.replace(':id', this.input);
@@ -871,12 +1225,19 @@
           params: {
             // from: new Date(lastMessage.created_at).getTime(),
             from: created_at,
-            user_id: this.currentUser.id
+            user_id: this.currentUser.id,
+            // also fetch already-loaded messages changed since the last sync (edited, read, ...)
+            ...(this.syncedAt ? { updated_from: this.syncedAt } : {}),
           }
         }).then(response => {
           if(response.status === 200) {
+            this.syncedAt = response.headers['x-chat-synced-at'] ?? this.syncedAt;
+            this.setServerUnreadCount(response);
+            this.checkPinnedMessages(response);
+            this.setStarredCount(response);
+
             if(response.data.length > 0) {
-              this.messages = [...this.messages, ...response.data];
+              this.mergeMessages(response.data);
               this.getAttachments();
             }
           }
@@ -983,6 +1344,340 @@
           this.messages = this.messages.filter((m) => m.id !== message.id)
         }
       },
+      mergeMessages(incomingMessages) {
+        const messages = [...this.messages];
+
+        incomingMessages.forEach(incoming => {
+          const index = messages.findIndex(message => message.id === incoming.id);
+
+          // deleted since the last sync: drop it
+          if (incoming.deleted_at) {
+            if (index !== -1) messages.splice(index, 1);
+            this.handleMessageRemoved(incoming.id);
+            return;
+          }
+
+          if (index !== -1) {
+            messages[index] = { ...messages[index], ...incoming };
+          } else {
+            messages.push(incoming);
+          }
+
+          // the message being edited was read (or otherwise locked) in the meantime
+          if (this.editingMessage && this.editingMessage.id === incoming.id && !incoming.is_editable) {
+            this.abortEditing(this.$t('This message can no longer be edited.'));
+          }
+        });
+
+        this.messages = messages;
+      },
+      setStarredCount(response) {
+        const count = response.headers['x-chat-starred-count'];
+
+        if (count === undefined) return;
+
+        this.starredCount = Number(count) || 0;
+      },
+      async jumpToStarredMessage(message) {
+        this.$refs.starredBrowser?.closeDialog();
+
+        await this.$nextTick();
+
+        this.scrollToMessage(message.id);
+      },
+      starredMessageSender(message) {
+        const profile = message.user_profile;
+
+        return profile && this.currentUser && profile.id === this.currentUser.id
+          ? this.$t('You')
+          : (profile?.name ?? '');
+      },
+      starredMessageDate(message) {
+        return message.created_at ? this.$d(new Date(message.created_at), 'short') : '';
+      },
+      setServerUnreadCount(response) {
+        const count = response.headers['x-chat-unread-count'];
+
+        if (count !== undefined) {
+          this.serverUnreadCount = Number(count) || 0;
+        }
+      },
+      markAllAsRead() {
+        if (!this.endpoints.readAll || this.markAllAsReadLoading) return;
+
+        const endpoint = this.endpoints.readAll.replace(':id', this.input);
+
+        this.markAllAsReadLoading = true;
+
+        axios.put(endpoint).then(() => {
+          // own messages keep their status, it reflects whether the other party has read them
+          this.messages = this.messages.map(message =>
+            message.user_profile && message.user_profile.id !== this.currentUser.id
+              ? { ...message, is_read: true }
+              : message
+          );
+          this.serverUnreadCount = 0;
+        }).catch(error => {
+          console.error('Error marking messages as read:', error);
+          this.$store.commit(ALERT.SET_ALERT, {
+            message: error.response?.data?.message ?? this.$t('Messages could not be marked as read.'),
+            variant: 'error',
+          });
+        }).finally(() => {
+          this.markAllAsReadLoading = false;
+        });
+      },
+      unstarAll() {
+        if (!this.endpoints.unstarAll || this.unstarAllLoading) return;
+
+        const endpoint = this.endpoints.unstarAll.replace(':id', this.input);
+
+        this.unstarAllLoading = true;
+
+        axios.put(endpoint).then(() => {
+          this.messages = this.messages.map(message =>
+            message.is_starred ? { ...message, is_starred: false } : message
+          );
+          this.starredCount = 0;
+          this.unstarAllDialog = false;
+        }).catch(error => {
+          console.error('Error unstarring messages:', error);
+          this.$store.commit(ALERT.SET_ALERT, {
+            message: error.response?.data?.message ?? this.$t('Messages could not be unstarred.'),
+            variant: 'error',
+          });
+        }).finally(() => {
+          this.unstarAllLoading = false;
+        });
+      },
+      /**
+       * Called before pinning: asks how long the pin lasts, then confirms replacing the oldest pin
+       * when the limit is reached. Resolves to false to cancel, or to the extra request data.
+       */
+      async preparePin(message) {
+        let pinDuration = null;
+
+        if (this.pinDurations.length) {
+          pinDuration = await this.choosePinDuration(message);
+
+          if (!pinDuration) return false;
+        }
+
+        if (!(await this.confirmPinReplacement(message))) return false;
+
+        return pinDuration ? { pin_duration: pinDuration } : true;
+      },
+      // resolves to the chosen duration in hours, or null when cancelled
+      choosePinDuration(message) {
+        this.resolvePinDuration(null);
+
+        return new Promise(resolve => {
+          this.pinDurationRequest = { message, resolve };
+        });
+      },
+      resolvePinDuration(duration) {
+        if (!this.pinDurationRequest) return;
+
+        this.pinDurationRequest.resolve(duration);
+        this.pinDurationRequest = null;
+      },
+      // resolves to true when the message can be pinned, asking first when the pin limit is reached
+      confirmPinReplacement(message) {
+        const otherPins = this.pinnedMessages.filter(pinned => pinned.id !== message.id);
+
+        if (otherPins.length < this.maxPinnedMessages) return Promise.resolve(true);
+
+        this.resolvePinReplacement(false);
+
+        return new Promise(resolve => {
+          // pinned messages are ordered the most recently pinned first
+          this.pinReplacement = { message, oldest: otherPins[otherPins.length - 1], resolve };
+        });
+      },
+      resolvePinReplacement(confirmed) {
+        if (!this.pinReplacement) return;
+
+        this.pinReplacement.resolve(confirmed);
+        this.pinReplacement = null;
+      },
+      confirmDelete(message) {
+        if (!message?.id || this.noSendAction) return;
+
+        this.deletingMessage = message;
+      },
+      closeDeleteDialog() {
+        if (this.deleteLoading) return;
+
+        this.deletingMessage = null;
+      },
+      handleMessageRemoved(id) {
+        if (this.pinnedMessages.some(pinned => pinned.id === id)) {
+          this.pinnedMessages = this.pinnedMessages.filter(pinned => pinned.id !== id);
+          this.clampActivePinnedIndex();
+        }
+
+        if (this.editingMessage?.id === id) {
+          this.cancelEditing();
+        }
+
+        if (this.deletingMessage?.id === id && !this.deleteLoading) {
+          this.deletingMessage = null;
+        }
+      },
+      deleteMessage() {
+        if (!this.deletingMessage || this.deleteLoading) return;
+
+        const messageId = this.deletingMessage.id;
+        const endpoint = this.endpoints.destroy.replace(':id', messageId);
+
+        this.deleteLoading = true;
+
+        axios.delete(endpoint).then(() => {
+          this.messages = this.messages.filter(message => message.id !== messageId);
+          this.deleteLoading = false;
+          this.handleMessageRemoved(messageId);
+          this.getAttachments();
+        }).catch(error => {
+          if (error.response?.status === 403) {
+            const index = this.messages.findIndex(message => message.id === messageId);
+            if (index !== -1) {
+              this.messages[index] = { ...this.messages[index], is_deletable: false, is_editable: false, editable_until: null };
+            }
+
+            this.$store.commit(ALERT.SET_ALERT, {
+              message: error.response?.data?.message ?? this.$t('This message can no longer be deleted.'),
+              variant: 'warning',
+            });
+          } else {
+            console.error('Error deleting message:', error);
+          }
+        }).finally(() => {
+          this.deleteLoading = false;
+          this.deletingMessage = null;
+        });
+      },
+      isEditingMessage(message) {
+        return !!this.editingMessage && !!message?.id && this.editingMessage.id === message.id;
+      },
+      startEditing(message) {
+        if (!message?.id || this.noSendAction) return;
+
+        // already editing this message: keep the changes made in the composer (e.g. removed attachments)
+        if (this.editingMessage?.id === message.id) {
+          this.$nextTick(() => this.focusOnTextarea());
+          return;
+        }
+
+        // keep the unsent draft so it can be restored after editing
+        if (!this.editingMessage) {
+          this.draftBeforeEditing = {
+            message: this.message,
+            attachments: [...this.attachments],
+          };
+        }
+
+        this.editingMessage = message;
+        this.message = message.content ?? '';
+        this.attachments = this.$lodash.cloneDeep(message.attachments ?? []);
+
+        this.$nextTick(() => {
+          this.focusOnTextarea();
+          this.scrollToEditingMessage();
+        });
+      },
+      scrollToEditingMessage() {
+        const element = this.$el?.querySelector?.(`[data-message-id="${this.editingMessage?.id}"]`);
+
+        element?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      },
+      restoreDraft() {
+        this.message = this.draftBeforeEditing?.message ?? '';
+        this.attachments = this.draftBeforeEditing?.attachments ?? [];
+        this.draftBeforeEditing = null;
+      },
+      cancelEditing() {
+        if (!this.editingMessage || this.loading) return;
+
+        this.editingMessage = null;
+        this.restoreDraft();
+      },
+      abortEditing(reason) {
+        // keep the typed text so it can still be sent as a new message
+        this.editingMessage = null;
+        this.draftBeforeEditing = null;
+
+        if (reason) {
+          this.$store.commit(ALERT.SET_ALERT, { message: reason, variant: 'warning' });
+        }
+      },
+      hasEditChanges() {
+        if (!this.editingMessage) return false;
+
+        const originalContent = (this.editingMessage.content ?? '').trim();
+        const currentContent = (this.message ?? '').trim();
+
+        if (originalContent !== currentContent) return true;
+
+        const uuids = attachments => (attachments ?? [])
+          .map(attachment => attachment.uuid)
+          .filter(Boolean)
+          .sort();
+
+        const originalUuids = uuids(this.editingMessage.attachments);
+        const currentUuids = uuids(this.attachments);
+
+        return originalUuids.length !== currentUuids.length
+          || originalUuids.some((uuid, index) => uuid !== currentUuids[index]);
+      },
+      submitEdit() {
+        const hasAttachments = this.attachments && this.attachments.length > 0;
+        const hasText = this.message && this.message.trim();
+
+        if (!this.editingMessage || (!hasAttachments && !hasText)) {
+          return;
+        }
+
+        // nothing changed: just leave edit mode, the message must not be marked as edited
+        if (!this.hasEditChanges()) {
+          this.cancelEditing();
+          this.$nextTick(() => this.focusOnTextarea());
+          return;
+        }
+
+        const messageId = this.editingMessage.id;
+        const endpoint = this.endpoints.edit.replace(':id', messageId);
+
+        this.loading = true;
+
+        axios.put(endpoint, {
+          content: this.message,
+          attachments: this.attachments,
+        }).then(response => {
+          if (response.status === 200) {
+            this.editingMessage = null;
+            this.mergeMessages([{ ...response.data, loading: false }]);
+            this.restoreDraft();
+          }
+        }).catch(error => {
+          const status = error.response?.status;
+
+          if (status === 403) {
+            const index = this.messages.findIndex(message => message.id === messageId);
+            if (index !== -1) {
+              this.messages[index] = { ...this.messages[index], is_editable: false, editable_until: null };
+            }
+
+            this.abortEditing(error.response?.data?.message ?? this.$t('This message can no longer be edited.'));
+          } else if (status === 422) {
+            this.$store.commit(ALERT.SET_ALERT, { message: error.response?.data?.message, variant: 'warning' });
+          } else {
+            console.error('Error editing message:', error);
+          }
+        }).finally(() => {
+          this.loading = false;
+          this.$nextTick(() => this.focusOnTextarea());
+        });
+      },
       handleEnterKey(event) {
         // If Shift is pressed, allow default behavior (new line)
         if (event.shiftKey) {
@@ -993,6 +1688,14 @@
         // Allow sending with just attachments (no text required)
         event.preventDefault();
         this.sendMessage();
+      },
+      handleEscKey(event) {
+        if (!this.editingMessage) return;
+
+        // keep Escape from reaching an enclosing dialog (Vuetify listens on window), only the editing is cancelled
+        event.stopPropagation();
+        event.preventDefault();
+        this.cancelEditing();
       },
       handleTabKey(event) {
         // If noTab is true, prevent default tab behavior (navigation)
@@ -1025,25 +1728,8 @@
         let index = messages.findIndex(message => message.id === event.id);
         let oldMessage = this.messages[index];
 
-        if(oldMessage.is_pinned !== event.is_pinned) {
-          if(event.is_pinned) {
-            let oldPinnedMessage = this.pinnedMessage;
-            this.pinnedMessage = event;
-
-            if(oldPinnedMessage) {
-              let oldPinnedMessageIndex = messages.findIndex(message => message.id === oldPinnedMessage.id);
-              if(oldPinnedMessageIndex !== -1) {
-                messages[oldPinnedMessageIndex] = {
-                  ...messages[oldPinnedMessageIndex],
-                  is_pinned: false
-                };
-              }
-            }
-
-          } else {
-            this.pinnedMessage = null;
-          }
-        }
+        const pinChanged = !!oldMessage && !!oldMessage.is_pinned !== !!event.is_pinned;
+        const starChanged = !!oldMessage && !!oldMessage.is_starred !== !!event.is_starred;
 
         if(index !== -1) {
           messages[index] = {
@@ -1053,6 +1739,15 @@
         }
 
         this.messages = messages;
+
+        if (starChanged) {
+          this.starredCount = Math.max(0, this.starredCount + (event.is_starred ? 1 : -1));
+        }
+
+        // the server may have unpinned the oldest pin to stay within the limit
+        if (pinChanged) {
+          this.fetchPinnedMessages({ showLatest: !!event.is_pinned });
+        }
       },
       insertEmoji(emoji) {
         // Insert emoji at cursor position
@@ -1254,6 +1949,7 @@
       if(this.input && this.input > -1) {
         this.loadMessages();
         this.getAttachments();
+        this.fetchPinnedMessages();
         if (!this.subscribeChatChannel()) {
           // Broadcast unavailable — still clear tray for this chat on open.
           this.dismissRetainableForChat();
@@ -1265,6 +1961,7 @@
     beforeUnmount() {
       this.stopRefreshPolling();
       this.unsubscribeChatChannel();
+      clearTimeout(this.highlightTimer);
     }
   }
 </script>
@@ -1290,6 +1987,55 @@
       // except starring / pinning
       .v-input-chat__message-actions
         pointer-events: none
+
+  // focus mode while a message is being edited: everything but the edited message and the composer fades out
+  .v-input-chat--editing
+    .v-input-chat__dimmable > *,
+    .v-input-chat__messages--dimmed > *
+      filter: blur(2px)
+      opacity: 0.4
+      pointer-events: none
+      transition: filter 0.2s ease, opacity 0.2s ease
+    .v-input-chat__dimmable,
+    .v-input-chat__messages--dimmed
+      cursor: pointer
+
+  .v-input-chat__pinned
+    cursor: pointer
+    min-height: 56px
+
+  .v-input-chat__pinned-indicator
+    display: flex
+    flex-direction: column
+    gap: 2px
+    align-self: stretch
+    justify-content: center
+
+  .v-input-chat__pinned-indicator-segment
+    display: block
+    width: 3px
+    flex: 1 1 0
+    max-height: 14px
+    border-radius: 2px
+
+  // a message jumped to from the pinned banner: the whole row is tinted, then fades out (like WhatsApp)
+  .v-input-chat__messages--highlighted
+    position: relative
+    &::before
+      content: ''
+      position: absolute
+      inset: 0
+      background: rgba(var(--v-theme-primary), 0.18)
+      border-radius: 8px
+      pointer-events: none
+      z-index: 1
+      animation: v-input-chat-highlight 2.5s ease forwards
+
+  @keyframes v-input-chat-highlight
+    0%, 50%
+      opacity: 1
+    100%
+      opacity: 0
 
 </style>
 
