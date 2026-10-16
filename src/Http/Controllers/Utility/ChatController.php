@@ -214,7 +214,11 @@ class ChatController extends Controller
         $messages = $chat->starredMessages($request->user())
             ->with('fileponds')
             ->when($search !== '', function ($query) use ($search) {
-                $query->where('content', 'like', '%' . addcslashes($search, '%_\\') . '%');
+                // Explicit ESCAPE: SQLite has no default LIKE escape character (MySQL defaults to `\`).
+                $query->whereRaw(
+                    $query->getQuery()->getGrammar()->wrap('content') . " LIKE ? ESCAPE '!'",
+                    ['%' . str_replace(['!', '%', '_'], ['!!', '!%', '!_'], $search) . '%']
+                );
             })
             ->paginate($validated['perPage'] ?? 20, ['*'], 'page', $validated['page'] ?? 1);
 
