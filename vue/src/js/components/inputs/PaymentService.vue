@@ -16,6 +16,7 @@
             v-model="currencyModel"
             :items="formattedCurrencies"
             :label="$t('Currency')"
+            :placeholder="$t('payment.select-currency')"
             variant="outlined"
             density="comfortable"
             item-title="display"
@@ -26,7 +27,7 @@
           />
 
           <!-- Payment Methods -->
-          <v-radio-group v-model="localPaymentMethod" column >
+          <v-radio-group v-if="selectedCurrency" v-model="localPaymentMethod" column >
             <!-- Credit Card Option -->
             <div v-if="creditCardService"
               class="service-container px-3 py-cs-1 credit-card-service"
@@ -39,7 +40,7 @@
               />
               <div class="flex-md-1-1-0 flex-1-1-100">
                 <div class="d-flex justify-md-end ga-1">
-                  <v-img-icon v-for="(currencyCardType, key) in currencyCardTypes[selectedCurrency.iso_4217]"
+                  <v-img-icon v-for="(currencyCardType, key) in (currencyCardTypes[selectedCurrency.iso_4217] ?? [])"
                     :key="`type-${key}`"
                     :src="currencyCardType.logo"
                     style="max-width: 64px;"
@@ -95,9 +96,19 @@
 
       <!-- Payment Form Section -->
       <v-col class="pa-4 pa-sm-0 d-flex align-center justify-center">
-        <template v-if="isCreditCardForm">
+        <p v-if="!selectedCurrency" class="text-body-1 text-center">
+          {{ $t('payment.select-currency-to-continue') }}
+        </p>
+        <p v-else-if="!selectedService" class="text-body-1 text-center">
+          {{ $t('payment.select-payment-method') }}
+        </p>
+        <template v-else-if="isCreditCardForm">
           <template v-if="selectedCurrency.has_built_in_form">
             <v-progress-circular v-if="builtInFormLoading" indeterminate />
+            <div v-else-if="builtInFormError" class="d-flex flex-column align-center ga-2">
+              <p class="text-body-1 text-error text-center">{{ builtInFormError }}</p>
+              <v-btn variant="outlined" @click="runBuiltInForm">{{ $t('payment.try-again') }}</v-btn>
+            </div>
             <!-- <RevolutCheckout v-else
               v-bind="builtInFormAttributes"
             /> -->
@@ -295,31 +306,32 @@ export default {
     const { t } = useI18n();
 
     // Refs
-    const localPaymentMethod = ref('');
+    const localPaymentMethod = ref(null);
     const localDefaultPaymentMethod = ref(-1);
-    const currencyModel = ref(props.price_object.currency_id || props.supportedCurrencies[0]?.id);
+    const currencyModel = ref(props.price_object.currency_id ?? null);
     const transferFormCompleted = ref(false);
 
     const selectedCurrency = computed(() =>
-      props.supportedCurrencies.find(curr => curr.id === currencyModel.value)
+      props.supportedCurrencies.find(curr => curr.id === currencyModel.value) ?? null
     );
 
-    const currencyHasCreditCardService = computed(() => {
-      return !!selectedCurrency.value.payment_service
-    });
+    const creditCardService = computed(() => selectedCurrency.value?.payment_service ?? null);
 
-    const creditCardService = computed(() => {
-      return selectedCurrency.value.payment_service;
-    });
+    const currencyHasCreditCardService = computed(() => !!creditCardService.value);
 
     const currencyHasTransactionFee = computed(() => {
-      return props.includeTransactionFee && (selectedCurrency.value.payment_service?.has_transaction_fee || selectedCurrency.value.payment_services.some(service => service.has_transaction_fee));
+      return props.includeTransactionFee && (
+        creditCardService.value?.has_transaction_fee
+        || (selectedCurrency.value?.payment_services ?? []).some(service => service.has_transaction_fee)
+      );
     });
 
     const selectedPaymentService = computed(() => {
+      if (!selectedCurrency.value) return null;
+
       return localPaymentMethod.value == -1
-        ? selectedCurrency.value.payment_service
-        : selectedCurrency.value.payment_services.find(service => service.id === localPaymentMethod.value);
+        ? creditCardService.value
+        : selectedCurrency.value.payment_services?.find(service => service.id === localPaymentMethod.value);
     });
 
     const calculatePrice = (amount) => {
@@ -330,7 +342,7 @@ export default {
       return (amount + Math.round(transactionFee)) / 100;
     }
 
-    const priceAmount = ref(props.useCountryBasedVatRates && selectedCurrency.value.companyVatRate
+    const priceAmount = ref(props.useCountryBasedVatRates && selectedCurrency.value?.companyVatRate
       ? props.price_object.discounted_raw_amount * (1 + selectedCurrency.value.companyVatRate.vat_multiplier)
       : props.price_object.total_amount
     );
@@ -343,7 +355,8 @@ export default {
       return formatPrice(calculatedPriceAmount.value, selectedCurrency.value?.symbol || '');
     });
 
-    const builtInFormLoading = ref(true);
+    const builtInFormLoading = ref(false);
+    const builtInFormError = ref(null);
     const builtInFormAttributes = ref({});
     const paymentProcessing = ref(false);
 
@@ -428,26 +441,18 @@ export default {
       set: (newValue) => emit('update:modelValue', newValue)
     });
 
-    if(!currencyHasCreditCardService.value){
-      localPaymentMethod.value = filteredServiceItems.value[0].id;
-
+    const syncInput = () => {
       input.value = {
         payment_method: localPaymentMethod.value,
         credit_card: { ...localCreditCard },
         currency: selectedCurrency.value,
       };
-    } else {
-      localPaymentMethod.value = localDefaultPaymentMethod.value;
+    };
 
-      input.value = {
-        payment_method: localPaymentMethod.value,
-        credit_card: { ...localCreditCard },
-        currency: selectedCurrency.value,
-      };
-    }
+    syncInput();
 
     const isExchanged = computed(() =>
-      selectedCurrency.value?.iso_4217 !== props.baseCurrency
+      !!selectedCurrency.value && selectedCurrency.value.iso_4217 !== props.baseCurrency
     );
 
     const exchangeRate = ref(0);
@@ -490,31 +495,60 @@ export default {
       builtInFormAttributes.value = attributes;
     }
 
-    const runBuiltInForm = () => {
+    const shouldLoadBuiltInForm = computed(() =>
+      isCreditCardForm.value
+      && currencyHasCreditCardService.value
+      && !!selectedCurrency.value?.has_built_in_form
+      && !!props.checkoutUrl
+    );
+
+    // Responses of superseded requests are ignored so a slow checkout call
+    // cannot overwrite the form of a newer currency / method selection.
+    let builtInFormRequestId = 0;
+
+    const cancelBuiltInForm = () => {
+      builtInFormRequestId++;
+      builtInFormLoading.value = false;
+    };
+
+    const runBuiltInForm = async () => {
+      if (!shouldLoadBuiltInForm.value) {
+        cancelBuiltInForm();
+        return;
+      }
+
+      const requestId = ++builtInFormRequestId;
       builtInFormLoading.value = true;
-      axios.post(props.checkoutUrl, {
-        price_id: props.price_object.id,
-        payment_service: {
-          payment_method: selectedCurrency.value.payment_service_id,
-          credit_card: {
-            card_name: localCreditCard.card_name,
-            card_number: localCreditCard.card_number,
-            card_month: localCreditCard.card_month,
-            card_year: localCreditCard.card_year,
-            card_cvv: localCreditCard.card_cvv,
-          },
-          currency: selectedCurrency.value,
+      builtInFormError.value = null;
+
+      try {
+        const { data } = await axios.post(props.checkoutUrl, {
+          price_id: props.price_object.id,
+          payment_service: {
+            payment_method: selectedCurrency.value.payment_service_id,
+            credit_card: { ...localCreditCard },
+            currency: selectedCurrency.value,
+          }
+        });
+
+        if (requestId !== builtInFormRequestId) return;
+
+        setBuiltInFormAttributes({ ...data, orderId: data.order_id });
+      } catch (error) {
+        if (requestId !== builtInFormRequestId) return;
+
+        builtInFormAttributes.value = {};
+        builtInFormError.value = error?.response?.data?.message ?? t('payment.form-load-error');
+      } finally {
+        if (requestId === builtInFormRequestId) {
+          builtInFormLoading.value = false;
         }
-      }).then(response => {
-        setBuiltInFormAttributes({...response.data, orderId: response.data.order_id});
-        builtInFormLoading.value = false;
-      });
+      }
     }
 
     // Methods
     const handleCurrencyChange = async (newCurrencyId) => {
       currencyModel.value = newCurrencyId;
-      localPaymentMethod.value = localDefaultPaymentMethod.value;
 
       // const selectedCurrencyObject = props.supportedCurrencies.find(curr => curr.id === newCurrencyId);
       const selectedCurrencyObject = _.cloneDeep(selectedCurrency.value);
@@ -545,8 +579,11 @@ export default {
     };
 
     // Watchers
-    watch(currencyModel, (newValue) => {
-      localPaymentMethod.value = currencyHasCreditCardService.value ? localDefaultPaymentMethod.value : filteredServiceItems.value[0]?.id ?? -1;
+    watch(currencyModel, () => {
+      localPaymentMethod.value = null;
+      builtInFormAttributes.value = {};
+      builtInFormError.value = null;
+      cancelBuiltInForm();
     });
 
     watch(() => props.modelValue, (newValue) => {
@@ -557,17 +594,12 @@ export default {
       }
     }, { immediate: true, deep: true });
 
-    watch([localPaymentMethod, localCreditCard, selectedCurrency], () => {
-      if(selectedCurrency.value.has_built_in_form){
-        runBuiltInForm();
-      }
+    watch([selectedCurrency, localPaymentMethod], () => {
+      syncInput();
+      runBuiltInForm();
+    });
 
-      input.value = {
-        payment_method: localPaymentMethod.value,
-        credit_card: { ...localCreditCard },
-        currency: selectedCurrency.value,
-      };
-    }, { deep: true });
+    watch(localCreditCard, syncInput, { deep: true });
 
     watch([isTransferrableForm, localPaymentMethod, selectedCurrency], () => {
       if(isTransferrableForm.value){
@@ -575,10 +607,6 @@ export default {
         transferFormModel.value.currency_id = selectedCurrency.value?.id ?? null;
       }
     });
-
-    if(selectedCurrency.value.has_built_in_form){
-      runBuiltInForm();
-    }
 
     return {
       input,
@@ -615,6 +643,7 @@ export default {
       isExchanged,
 
       builtInFormLoading,
+      builtInFormError,
       builtInFormAttributes,
       setBuiltInFormAttributes,
       runBuiltInForm,
