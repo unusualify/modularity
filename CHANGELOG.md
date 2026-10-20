@@ -2,6 +2,12 @@
 
 All notable changes to `modularous` will be documented in this file
 
+## v0.58.12 - 2026-10-20
+
+### :wrench: Bug Fixes
+
+- handle the case in no credit-card payment service by @oguzhanbukcuoglu in https://github.com/unusualify/modularous/commit/feba36c8a4ea4f80dd15e2ad16cade1f11141cd9
+
 ## v12.11.1 - 2026-10-12
 
 ### :wrench: Bug Fixes
