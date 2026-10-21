@@ -1,5 +1,6 @@
 <script setup>
-  import { watch, ref, computed, nextTick } from 'vue'
+  import { watch, ref, computed } from 'vue'
+  import axios from 'axios'
 
   const props = defineProps({
     modelValue: {
@@ -68,16 +69,32 @@
     }
   })
 
-  watch(selected, function (newValue, oldValue) {
-    if(newValue) {
-      nextTick(() => {
-        window.location.href = impersonateRoute.value
-      })
-    }
-  })
+  const submitting = ref(false)
 
   const impersonateRoute = computed(() => {
     return props.route.replace(':id', selected.value)
+  })
+
+  const postAndReload = async (url) => {
+    if (submitting.value) return
+
+    submitting.value = true
+    try {
+      await axios.post(url, {}, { headers: { Accept: 'application/json' } })
+      window.location.reload()
+    } catch (error) {
+      submitting.value = false
+      selected.value = null
+      console.error('[ImpersonateToolbar]', error)
+    }
+  }
+
+  const stopImpersonating = () => postAndReload(props.stopRoute)
+
+  watch(selected, (newValue) => {
+    if (newValue) {
+      postAndReload(impersonateRoute.value)
+    }
   })
 </script>
 <template>
@@ -92,8 +109,9 @@
 
       variant="flat"
       base-color="red"
+      :disabled="submitting"
 
-      @click="() => window.location.href = stopRoute"
+      @click="stopImpersonating"
   />
   <v-input-browser v-else
     v-model="selected"

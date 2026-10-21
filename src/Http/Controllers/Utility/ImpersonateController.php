@@ -3,7 +3,9 @@
 namespace Unusualify\Modularous\Http\Controllers\Utility;
 
 use Illuminate\Auth\AuthManager;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Modules\SystemUser\Repositories\UserRepository;
 use Unusualify\Modularous\Facades\Modularous;
@@ -21,32 +23,57 @@ class ImpersonateController extends Controller
      */
     protected const RECENT_IMPERSONATIONS_KEY = 'impersonate_recent';
 
-    // /**
-    //  * @var AuthManager
-    //  */
-    // protected $authManager;
-
     public function __construct(protected AuthManager $authManager)
     {
         parent::__construct();
-
-        // $this->authManager = $authManager;
     }
 
     /**
-     * @param int $id
-     * @return RedirectResponse
+     * Start impersonating the given user on behalf of the real (impersonator) user.
      */
-    public function impersonate($id, UserRepository $users)
+    public function impersonate(Request $request, int|string $id, UserRepository $users): RedirectResponse|JsonResponse
     {
-        if ($this->authManager->guard(Modularous::getAuthGuardName())->user()->can('impersonate')) {
-            $user = $users->getById($id);
-            $this->authManager->guard(Modularous::getAuthGuardName())->user()->setImpersonating($user->id);
+        $actor = $this->resolveActor($request);
 
-            $this->pushRecentImpersonation((int) $user->id);
+        abort_unless($actor?->can('impersonate'), 403);
+
+        $user = $users->getById($id);
+        $actor->setImpersonating($user->id);
+
+        $this->pushRecentImpersonation((int) $user->id);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'impersonating' => true,
+                'user_id' => (int) $user->id,
+            ]);
         }
 
         return back();
+    }
+
+    /**
+     * Stop the active impersonation and return to the real user.
+     */
+    public function stopImpersonate(Request $request): RedirectResponse|JsonResponse
+    {
+        $this->resolveActor($request)?->stopImpersonating();
+
+        if ($request->expectsJson()) {
+            return response()->json(['impersonating' => false]);
+        }
+
+        return back();
+    }
+
+    /**
+     * The real user behind the request: while impersonating, the guard resolves the
+     * impersonated user, so the impersonator stashed by ImpersonateMiddleware wins.
+     */
+    protected function resolveActor(Request $request): mixed
+    {
+        return $request->attributes->get('impersonator')
+            ?? $this->authManager->guard(Modularous::getAuthGuardName())->user();
     }
 
     /**
@@ -65,15 +92,5 @@ class ImpersonateController extends Controller
             self::RECENT_IMPERSONATIONS_KEY,
             \array_slice($recent, 0, self::RECENT_IMPERSONATIONS_LIMIT)
         );
-    }
-
-    /**
-     * @return RedirectResponse
-     */
-    public function stopImpersonate()
-    {
-        $this->authManager->guard(Modularous::getAuthGuardName())->user()->stopImpersonating();
-
-        return back();
     }
 }

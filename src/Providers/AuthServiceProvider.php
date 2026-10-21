@@ -63,7 +63,7 @@ class AuthServiceProvider extends ServiceProvider implements DeferrableProvider
             }
 
             Gate::define('impersonate', function ($user) {
-                return $user->role === self::SUPERADMIN;
+                return (bool) $user->is_superadmin;
             });
         }
 

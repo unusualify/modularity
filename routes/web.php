@@ -51,8 +51,8 @@ Route::resource('', 'DashboardController', ['as' => 'dashboard', 'names' => ['in
 Route::get('artisan-runner', ArtisanRunnerToolController::class)->name('artisan-runner');
 Route::get('module-route-inspect', ModuleRouteInspectToolController::class)->name('module-route-inspect');
 
-Route::get('users/impersonate/stop', 'Utility\ImpersonateController@stopImpersonate')->name('impersonate.stop');
-Route::get('users/impersonate/{id}', 'Utility\ImpersonateController@impersonate')->name('impersonate');
+Route::post('users/impersonate/stop', 'Utility\ImpersonateController@stopImpersonate')->name('impersonate.stop');
+Route::post('users/impersonate/{id}', 'Utility\ImpersonateController@impersonate')->whereNumber('id')->name('impersonate');
 
 // system internal api routes (for ajax web routes)
 Route::prefix('api')->group(function () {

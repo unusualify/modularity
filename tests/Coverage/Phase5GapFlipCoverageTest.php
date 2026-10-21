@@ -850,11 +850,11 @@ class Phase5GapFlipCoverageTest extends TestCase
 
         Session::put('impersonate_recent', ['x', 42, 7]);
         $impersonate = new ImpersonateController($authManager);
-        $impersonateReq = Request::create('/impersonate/42');
+        $impersonateReq = Request::create('/impersonate/42', 'POST');
         $impersonateReq->headers->set('referer', 'https://example.test/users');
         $this->app->instance('request', $impersonateReq);
-        $this->assertTrue($impersonate->impersonate(42, $users)->isRedirect());
-        $this->assertTrue($impersonate->stopImpersonate()->isRedirect());
+        $this->assertTrue($impersonate->impersonate($impersonateReq, 42, $users)->isRedirect());
+        $this->assertTrue($impersonate->stopImpersonate($impersonateReq)->isRedirect());
 
         $stepUp = Mockery::mock(StepUpService::class);
         $stepUp->shouldReceive('hasActiveChallenge')->once()->andReturn(true);

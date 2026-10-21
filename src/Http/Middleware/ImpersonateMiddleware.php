@@ -28,7 +28,10 @@ class ImpersonateMiddleware
     public function handle($request, Closure $next)
     {
         if ($request->hasSession() && $request->session()->has('impersonate')) {
-            $this->authFactory->guard(Modularous::getAuthGuardName())->onceUsingId($request->session()->get('impersonate'));
+            $guard = $this->authFactory->guard(Modularous::getAuthGuardName());
+
+            $request->attributes->set('impersonator', $guard->user());
+            $guard->onceUsingId($request->session()->get('impersonate'));
         }
 
         view()->composer(modularousBaseKey() . '::layouts.master', function ($view) {

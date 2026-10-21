@@ -113,6 +113,23 @@ class AuthServiceProviderTest extends TestCase
         $this->assertTrue(Gate::has('impersonate'));
     }
 
+    public function test_impersonate_gate_checks_is_superadmin(): void
+    {
+        $provider = new AuthServiceProvider($this->app);
+        $provider->boot();
+
+        $superadmin = Mockery::mock(User::class)->makePartial();
+        $superadmin->shouldReceive('hasRole')->with('superadmin')->andReturn(false);
+        $superadmin->shouldReceive('getAttribute')->with('is_superadmin')->andReturn(true);
+
+        $regular = Mockery::mock(User::class)->makePartial();
+        $regular->shouldReceive('hasRole')->with('superadmin')->andReturn(false);
+        $regular->shouldReceive('getAttribute')->with('is_superadmin')->andReturn(false);
+
+        $this->assertTrue(Gate::forUser($superadmin)->allows('impersonate'));
+        $this->assertFalse(Gate::forUser($regular)->allows('impersonate'));
+    }
+
     public function test_horizon_auth_allows_local_environment(): void
     {
         $this->app['env'] = 'local';

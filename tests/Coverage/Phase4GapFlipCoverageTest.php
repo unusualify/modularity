@@ -266,7 +266,9 @@ class Phase4GapFlipCoverageTest extends TestCase
         $userRepo = Mockery::mock(UserRepository::class);
         $this->app->instance(UserRepository::class, $userRepo);
 
+        $impersonator = (object) ['id' => 1];
         $guard = Mockery::mock();
+        $guard->shouldReceive('user')->once()->andReturn($impersonator);
         $guard->shouldReceive('onceUsingId')->once()->with(99);
         $auth = Mockery::mock(AuthFactory::class);
         $auth->shouldReceive('guard')->andReturn($guard);
@@ -297,6 +299,7 @@ class Phase4GapFlipCoverageTest extends TestCase
 
         $middleware = new ImpersonateMiddleware($auth);
         $this->assertSame('ok', $middleware->handle($request, static fn () => response('ok'))->getContent());
+        $this->assertSame($impersonator, $request->attributes->get('impersonator'));
 
         $factory = View::getFacadeRoot();
         $view = new \Illuminate\View\View(
