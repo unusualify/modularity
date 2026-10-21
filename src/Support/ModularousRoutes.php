@@ -25,6 +25,7 @@ use Unusualify\Modularous\Http\Middleware\TimezoneMiddleware;
 use Unusualify\Modularous\Http\Middleware\UtmMiddleware;
 use Unusualify\Modularous\Http\Middleware\VerifyModularousCacheWebhook;
 use Unusualify\Modularous\Module;
+use Unusualify\Modularous\Services\DevAuth\DevAutoLoginService;
 
 class ModularousRoutes
 {
@@ -157,11 +158,12 @@ class ModularousRoutes
         Route::aliasMiddleware('modularous.guest', RedirectIfAuthenticatedMiddleware::class);
 
         $authGuardName = Modularous::getAuthGuardName();
-        Route::middlewareGroup('web.auth', [
+        Route::middlewareGroup('web.auth', array_values(array_filter([
             'web',
+            app(DevAutoLoginService::class)->isEnabled() ? 'modularous.dev_auto_login' : null,
             'modularous.auth:' . $authGuardName,
             // 'auth',
-        ]);
+        ])));
         Route::middlewareGroup('api.auth', [
             'api',
             'throttle:api',
