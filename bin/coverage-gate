@@ -1,0 +1,418 @@
+#!/usr/bin/env php
+<?php
+
+/**
+ * Coverage gate driven by quality.json.
+ *
+ * Usage:
+ *   bin/coverage-gate [options]
+ *
+ * Options:
+ *   --clover=<path>        PHPUnit clover report (default: coverage-clover.xml)
+ *   --vue=<path>           Istanbul coverage-final.json for Vue diff coverage
+ *   --vue-summary=<path>   Istanbul coverage-summary.json for Vue totals
+ *   --no-totals            Skip total coverage thresholds
+ *   --diff                 Enforce diff coverage on changed lines
+ *   --base=<ref>           Diff base ref (default: $QUALITY_BASE or origin/dev)
+ *   --ratchet-update       Raise quality.json thresholds to measured values
+ *   --json                 Print the JSON result to stdout
+ *   --output=<path>        Also write the JSON result to <path>
+ *   -h, --help             Show this help
+ *
+ * Exit codes: 0 pass, 1 threshold failure, 2 usage/input error.
+ */
+
+declare(strict_types=1);
+
+const ROOT = __DIR__ . '/..';
+
+/**
+ * @return array<string, string|bool>
+ */
+function parseOptions(array $argv): array
+{
+    $options = [
+        'clover' => 'coverage-clover.xml',
+        'vue' => null,
+        'vue-summary' => null,
+        'totals' => true,
+        'diff' => false,
+        'base' => getenv('QUALITY_BASE') ?: 'origin/dev',
+        'ratchet-update' => false,
+        'json' => false,
+        'output' => null,
+    ];
+
+    foreach (array_slice($argv, 1) as $arg) {
+        if ($arg === '-h' || $arg === '--help') {
+            usage();
+            exit(0);
+        }
+        if ($arg === '--no-totals') {
+            $options['totals'] = false;
+
+            continue;
+        }
+        if (in_array($arg, ['--diff', '--ratchet-update', '--json'], true)) {
+            $options[substr($arg, 2)] = true;
+
+            continue;
+        }
+        if (preg_match('/^--(clover|vue|vue-summary|base|output)=(.+)$/', $arg, $m)) {
+            $options[$m[1]] = $m[2];
+
+            continue;
+        }
+        fwrite(STDERR, "error: unknown option {$arg}\n");
+        usage();
+        exit(2);
+    }
+
+    return $options;
+}
+
+function usage(): void
+{
+    preg_match('#/\*\*(.*?)\*/#s', (string) file_get_contents(__FILE__), $m);
+    foreach (explode("\n", trim($m[1])) as $line) {
+        echo preg_replace('/^\s*\* ?/', '', rtrim($line)) . "\n";
+    }
+}
+
+function run(string $command): string
+{
+    $output = [];
+    exec($command . ' 2>/dev/null', $output, $code);
+
+    return $code === 0 ? implode("\n", $output) : '';
+}
+
+function relativePath(string $path, string $root): string
+{
+    $real = realpath($path) ?: $path;
+
+    return str_starts_with($real, $root . '/') ? substr($real, strlen($root) + 1) : $real;
+}
+
+function percent(int $covered, int $total): float
+{
+    return $total > 0 ? round($covered / $total * 100, 2) : 100.0;
+}
+
+/**
+ * Changed line numbers per file relative to the repository root.
+ *
+ * Includes committed changes since merge-base(base, HEAD), staged and unstaged
+ * changes, and every line of untracked files.
+ *
+ * @return array<string, array<int, true>>
+ */
+function changedLines(string $base): array
+{
+    $mergeBase = run('git merge-base ' . escapeshellarg($base) . ' HEAD') ?: 'HEAD';
+    $diff = run('git diff -U0 --no-color --no-ext-diff ' . escapeshellarg(trim($mergeBase)));
+
+    $changed = [];
+    $file = null;
+    foreach (explode("\n", $diff) as $line) {
+        if (str_starts_with($line, '+++ ')) {
+            $file = $line === '+++ /dev/null' ? null : substr($line, 6);
+
+            continue;
+        }
+        if ($file !== null && preg_match('/^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@/', $line, $m)) {
+            $start = (int) $m[1];
+            $count = isset($m[2]) ? (int) $m[2] : 1;
+            for ($i = $start; $i < $start + $count; $i++) {
+                $changed[$file][$i] = true;
+            }
+        }
+    }
+
+    foreach (array_filter(explode("\n", run('git ls-files --others --exclude-standard'))) as $untracked) {
+        $count = count(@file($untracked) ?: []);
+        for ($i = 1; $i <= $count; $i++) {
+            $changed[$untracked][$i] = true;
+        }
+    }
+
+    return $changed;
+}
+
+/**
+ * @return array{totals: array{lines: float, methods: float, statements: int, coveredStatements: int}, files: array<string, array<int, int>>}
+ */
+function readClover(string $path, string $root): array
+{
+    $xml = @simplexml_load_file($path);
+    if ($xml === false) {
+        fwrite(STDERR, "error: cannot read clover report {$path}\n");
+        exit(2);
+    }
+
+    $metrics = $xml->project->metrics;
+    $statements = (int) $metrics['statements'];
+    $covered = (int) $metrics['coveredstatements'];
+
+    $files = [];
+    foreach ($xml->xpath('//file') as $file) {
+        $lines = [];
+        foreach ($file->line as $line) {
+            if ((string) $line['type'] === 'stmt') {
+                $lines[(int) $line['num']] = (int) $line['count'];
+            }
+        }
+        $files[relativePath((string) $file['name'], $root)] = $lines;
+    }
+
+    return [
+        'totals' => [
+            'lines' => percent($covered, $statements),
+            'methods' => percent((int) $metrics['coveredmethods'], (int) $metrics['methods']),
+            'statements' => $statements,
+            'coveredStatements' => $covered,
+        ],
+        'files' => $files,
+    ];
+}
+
+/**
+ * Statement hit counts per start line from an Istanbul coverage-final.json.
+ *
+ * @return array<string, array<int, int>>
+ */
+function readIstanbul(string $path, string $root): array
+{
+    $data = json_decode((string) @file_get_contents($path), true);
+    if (! is_array($data)) {
+        fwrite(STDERR, "error: cannot read istanbul report {$path}\n");
+        exit(2);
+    }
+
+    $files = [];
+    foreach ($data as $file => $coverage) {
+        $lines = [];
+        foreach ($coverage['statementMap'] ?? [] as $id => $location) {
+            $line = (int) $location['start']['line'];
+            $lines[$line] = max($lines[$line] ?? 0, (int) ($coverage['s'][$id] ?? 0));
+        }
+        $files[relativePath((string) ($coverage['path'] ?? $file), $root)] = $lines;
+    }
+
+    return $files;
+}
+
+/**
+ * @param  array<string, array<int, int>>  $coverage
+ * @param  array<string, array<int, true>>  $changed
+ * @return array{coverable: int, covered: int, files: array<string, array{coverable: int, covered: int, uncoveredLines: list<int>}>}
+ */
+function diffCoverage(array $coverage, array $changed): array
+{
+    $result = ['coverable' => 0, 'covered' => 0, 'files' => []];
+
+    foreach ($changed as $file => $lines) {
+        if (! isset($coverage[$file])) {
+            continue;
+        }
+        $coverable = 0;
+        $covered = 0;
+        $uncovered = [];
+        foreach (array_keys($lines) as $line) {
+            if (! array_key_exists($line, $coverage[$file])) {
+                continue;
+            }
+            $coverable++;
+            if ($coverage[$file][$line] > 0) {
+                $covered++;
+            } else {
+                $uncovered[] = $line;
+            }
+        }
+        if ($coverable === 0) {
+            continue;
+        }
+        $result['coverable'] += $coverable;
+        $result['covered'] += $covered;
+        $result['files'][$file] = [
+            'coverable' => $coverable,
+            'covered' => $covered,
+            'uncoveredLines' => $uncovered,
+        ];
+    }
+
+    return $result;
+}
+
+/**
+ * @param  list<int>  $lines
+ */
+function compressLines(array $lines): string
+{
+    sort($lines);
+    $ranges = [];
+    $start = $prev = null;
+    foreach ($lines as $line) {
+        if ($start === null) {
+            $start = $prev = $line;
+        } elseif ($line === $prev + 1) {
+            $prev = $line;
+        } else {
+            $ranges[] = $start === $prev ? "{$start}" : "{$start}-{$prev}";
+            $start = $prev = $line;
+        }
+    }
+    if ($start !== null) {
+        $ranges[] = $start === $prev ? "{$start}" : "{$start}-{$prev}";
+    }
+
+    return implode(',', $ranges);
+}
+
+function floorHalf(float $value): float
+{
+    return floor($value * 2) / 2;
+}
+
+$options = parseOptions($argv);
+chdir(ROOT);
+$root = realpath('.');
+$qualityPath = $root . '/quality.json';
+$quality = json_decode((string) @file_get_contents($qualityPath), true);
+if (! is_array($quality)) {
+    fwrite(STDERR, "error: cannot read {$qualityPath}\n");
+    exit(2);
+}
+
+$result = ['ok' => true, 'base' => $options['base'], 'checks' => []];
+$fail = function (string $check, string $message) use (&$result): void {
+    $result['ok'] = false;
+    $result['checks'][$check]['ok'] = false;
+    $result['checks'][$check]['messages'][] = $message;
+};
+
+$clover = null;
+if (is_file($options['clover'])) {
+    $clover = readClover($options['clover'], $root);
+} elseif ($options['totals'] || $options['ratchet-update']) {
+    fwrite(STDERR, "error: clover report not found: {$options['clover']}\n");
+    exit(2);
+}
+
+$vueSummary = null;
+if ($options['vue-summary'] !== null) {
+    $summary = json_decode((string) @file_get_contents($options['vue-summary']), true);
+    if (! isset($summary['total'])) {
+        fwrite(STDERR, "error: cannot read vue summary {$options['vue-summary']}\n");
+        exit(2);
+    }
+    $vueSummary = [];
+    foreach (['lines', 'statements', 'branches', 'functions'] as $metric) {
+        $vueSummary[$metric] = (float) $summary['total'][$metric]['pct'];
+    }
+}
+
+if ($options['totals']) {
+    if ($clover !== null) {
+        $result['checks']['php-totals'] = ['ok' => true, 'measured' => $clover['totals']];
+        foreach (['lines', 'methods'] as $metric) {
+            $threshold = (float) ($quality['php'][$metric] ?? 0);
+            if ($clover['totals'][$metric] < $threshold) {
+                $fail('php-totals', sprintf('PHP %s coverage %.2f%% is below threshold %.2f%%', $metric, $clover['totals'][$metric], $threshold));
+            }
+        }
+    }
+    if ($vueSummary !== null) {
+        $result['checks']['vue-totals'] = ['ok' => true, 'measured' => $vueSummary];
+        foreach ($vueSummary as $metric => $value) {
+            $threshold = (float) ($quality['vue'][$metric] ?? 0);
+            if ($value < $threshold) {
+                $fail('vue-totals', sprintf('Vue %s coverage %.2f%% is below threshold %.2f%%', $metric, $value, $threshold));
+            }
+        }
+    }
+}
+
+if ($options['diff']) {
+    $coverage = $clover['files'] ?? [];
+    if ($options['vue'] !== null) {
+        $coverage += readIstanbul($options['vue'], $root);
+    }
+    $diff = diffCoverage($coverage, changedLines($options['base']));
+    $threshold = (float) ($quality['diff']['lines'] ?? 80);
+    $minLines = (int) ($quality['diff']['minChangedLines'] ?? 0);
+    $pct = percent($diff['covered'], $diff['coverable']);
+    $skipped = $diff['coverable'] < $minLines;
+
+    $result['checks']['diff'] = [
+        'ok' => true,
+        'threshold' => $threshold,
+        'measured' => $pct,
+        'coverable' => $diff['coverable'],
+        'covered' => $diff['covered'],
+        'skipped' => $skipped,
+        'files' => $diff['files'],
+    ];
+    if (! $skipped && $pct < $threshold) {
+        $fail('diff', sprintf('Diff coverage %.2f%% (%d/%d changed lines) is below threshold %.2f%%', $pct, $diff['covered'], $diff['coverable'], $threshold));
+    }
+}
+
+if ($options['ratchet-update']) {
+    $updated = [];
+    $sections = ['php' => $clover['totals'] ?? [], 'vue' => $vueSummary ?? []];
+    foreach ($sections as $section => $measured) {
+        foreach ($quality[$section] ?? [] as $metric => $threshold) {
+            if (! isset($measured[$metric])) {
+                continue;
+            }
+            $candidate = floorHalf((float) $measured[$metric]);
+            if ($candidate > (float) $threshold) {
+                $quality[$section][$metric] = $candidate;
+                $updated["{$section}.{$metric}"] = [$threshold, $candidate];
+            }
+            $quality['measured'][$section][$metric] = round((float) $measured[$metric], 2);
+        }
+    }
+    $quality['measured']['date'] = date('Y-m-d');
+    file_put_contents($qualityPath, json_encode($quality, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n");
+    $result['checks']['ratchet'] = ['ok' => true, 'updated' => $updated];
+}
+
+$json = json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+if ($options['output'] !== null) {
+    @mkdir(dirname($options['output']), 0777, true);
+    file_put_contents($options['output'], $json . "\n");
+}
+
+if ($options['json']) {
+    echo $json . "\n";
+} else {
+    foreach ($result['checks'] as $name => $check) {
+        $status = $check['ok'] ? 'PASS' : 'FAIL';
+        $detail = match ($name) {
+            'php-totals' => sprintf('lines %.2f%%, methods %.2f%%', $check['measured']['lines'], $check['measured']['methods']),
+            'vue-totals' => implode(', ', array_map(fn ($k, $v) => sprintf('%s %.2f%%', $k, $v), array_keys($check['measured']), $check['measured'])),
+            'diff' => $check['skipped']
+                ? sprintf('skipped (%d coverable changed lines < %d)', $check['coverable'], $quality['diff']['minChangedLines'] ?? 0)
+                : sprintf('%.2f%% (%d/%d changed lines, threshold %.2f%%)', $check['measured'], $check['covered'], $check['coverable'], $check['threshold']),
+            'ratchet' => $check['updated'] === []
+                ? 'no thresholds raised'
+                : implode(', ', array_map(fn ($k, $v) => "{$k} {$v[0]} -> {$v[1]}", array_keys($check['updated']), $check['updated'])),
+            default => '',
+        };
+        echo "[{$status}] {$name}: {$detail}\n";
+        foreach ($check['messages'] ?? [] as $message) {
+            echo "       {$message}\n";
+        }
+        if ($name === 'diff' && ! $check['ok']) {
+            foreach ($check['files'] as $file => $info) {
+                if ($info['uncoveredLines'] !== []) {
+                    echo "       {$file}: uncovered lines " . compressLines($info['uncoveredLines']) . "\n";
+                }
+            }
+        }
+    }
+}
+
+exit($result['ok'] ? 0 : 1);

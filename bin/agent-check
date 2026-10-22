@@ -1,0 +1,245 @@
+#!/usr/bin/env bash
+# Quality gate runner for humans, agents, hooks and CI.
+#
+# Usage:
+#   bin/agent-check [check|full] [--base=<ref>] [--skip=<step,...>] [--keep-going]
+#   composer check
+#   composer check:full
+#
+# Modes:
+#   check  Fast loop: pint (changed files), phpstan, changed PHPUnit tests, changed Vitest tests
+#   full   Pre-push: pint (all), phpstan, PHPUnit + Vitest with coverage, coverage gate (totals + diff)
+#
+# Result: .agent/last-check.json (per-step status, duration, log path, log tail)
+# Exit codes: 0 ok, 2 usage, 10 pint, 20 phpstan, 30 php tests, 35 vue tests, 40 coverage gate
+
+set -uo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT"
+
+MODE="check"
+BASE_REF="${QUALITY_BASE:-origin/dev}"
+SKIP=","
+KEEP_GOING=0
+
+usage() {
+    sed -n '2,15p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
+}
+
+for arg in "$@"; do
+    case "$arg" in
+        check|full) MODE="$arg" ;;
+        --base=*) BASE_REF="${arg#--base=}" ;;
+        --skip=*) SKIP=",${arg#--skip=}," ;;
+        --keep-going) KEEP_GOING=1 ;;
+        -h|--help) usage; exit 0 ;;
+        *) echo "error: unknown argument $arg" >&2; usage >&2; exit 2 ;;
+    esac
+done
+
+AGENT_DIR=".agent"
+LOG_DIR="$AGENT_DIR/logs"
+STEPS_FILE="$AGENT_DIR/steps.tsv"
+mkdir -p "$LOG_DIR"
+: > "$STEPS_FILE"
+rm -f "$AGENT_DIR/coverage-gate.json"
+
+if ! git rev-parse --verify --quiet "$BASE_REF" >/dev/null; then
+    echo "warn: base ref '$BASE_REF' not found, falling back to HEAD" >&2
+    BASE_REF="HEAD"
+fi
+MERGE_BASE="$(git merge-base "$BASE_REF" HEAD 2>/dev/null || echo HEAD)"
+
+now_ms() {
+    php -r 'echo (int) (microtime(true) * 1000);'
+}
+
+quality_value() {
+    php -r '$q = json_decode(file_get_contents("quality.json"), true); $v = $q; foreach (explode(".", $argv[1]) as $k) { $v = $v[$k] ?? null; } echo is_bool($v) ? ($v ? "true" : "false") : (string) $v;' "$1"
+}
+
+changed_files() {
+    {
+        git diff --name-only --diff-filter=ACMR "$MERGE_BASE"
+        git ls-files --others --exclude-standard
+    } | sort -u
+}
+
+record() {
+    printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$1" "$2" "$3" "$4" "$5" "$6" >> "$STEPS_FILE"
+}
+
+FAILED_CODE=0
+
+# run_step <name> <exit-code> <command...>
+run_step() {
+    local name="$1" code="$2"
+    shift 2
+
+    if [[ "$SKIP" == *",$name,"* ]]; then
+        record "$name" skip 0 0 "" "skipped via --skip"
+        echo "[SKIP] $name (--skip)"
+        return 0
+    fi
+    if [[ "$FAILED_CODE" -ne 0 && "$KEEP_GOING" -eq 0 ]]; then
+        record "$name" skip 0 0 "" "previous step failed"
+        return 0
+    fi
+
+    local log="$LOG_DIR/$name.log" start end status
+    echo "[RUN ] $name"
+    start="$(now_ms)"
+    "$@" > "$log" 2>&1
+    status=$?
+    end="$(now_ms)"
+
+    if [[ "$status" -eq 0 ]]; then
+        record "$name" ok "$((end - start))" 0 "$log" ""
+        echo "[ OK ] $name ($(( (end - start) / 1000 ))s)"
+    else
+        record "$name" fail "$((end - start))" "$code" "$log" "exit $status"
+        echo "[FAIL] $name ($(( (end - start) / 1000 ))s) -> $log"
+        tail -n 25 "$log" | sed 's/^/       /'
+        [[ -n "$(tail -c 1 "$log")" ]] && echo
+        [[ "$FAILED_CODE" -eq 0 ]] && FAILED_CODE="$code"
+    fi
+}
+
+skip_step() {
+    record "$1" skip 0 0 "" "$2"
+    echo "[SKIP] $1 ($2)"
+}
+
+step_pint() {
+    if [[ "$MODE" == "full" ]]; then
+        vendor/bin/pint --test
+        return
+    fi
+    local files=()
+    while IFS= read -r file; do
+        [[ "$file" == *.php && -f "$file" ]] && files+=("$file")
+    done < <(changed_files)
+    if [[ ${#files[@]} -eq 0 ]]; then
+        echo "No changed PHP files."
+        return 0
+    fi
+    vendor/bin/pint --test "${files[@]}"
+}
+
+step_phpstan() {
+    vendor/bin/phpstan analyse --memory-limit=2G --no-progress --error-format=table || return $?
+
+    local max
+    max="$(quality_value phpstan.baselineMaxErrors)"
+    if [[ -n "$max" && -f phpstan-baseline.neon ]]; then
+        local count
+        count="$(php -r 'preg_match_all("/^\s*count:\s*(\d+)/m", file_get_contents("phpstan-baseline.neon"), $m); echo array_sum($m[1]);')"
+        echo "Baseline errors: $count (max $max)"
+        if [[ "$count" -gt "$max" ]]; then
+            echo "Baseline grew beyond phpstan.baselineMaxErrors in quality.json. Fix the new errors instead of baselining them."
+            return 1
+        fi
+    fi
+}
+
+step_php_tests() {
+    bin/test-changed --base="$BASE_REF"
+}
+
+step_vue_tests() {
+    if changed_files | grep -qE '^vue/vitest-setup/|^vue/vitest\.config\.mjs$|^vue/package(-lock)?\.json$'; then
+        echo "Vitest config or setup changed; running the full Vue suite."
+        (cd vue && npx vitest run --silent --reporter=dot)
+        return
+    fi
+    (cd vue && npx vitest run --changed "$MERGE_BASE" --passWithNoTests --silent --reporter=dot)
+}
+
+step_php_coverage() {
+    composer test:fast:coverage
+}
+
+step_vue_coverage() {
+    (cd vue && npx vitest run --coverage --silent --reporter=dot)
+}
+
+step_coverage_gate() {
+    bin/coverage-gate \
+        --clover=coverage-clover.xml \
+        --vue=vue/coverage/coverage-final.json \
+        --vue-summary=vue/coverage/coverage-summary.json \
+        --diff --base="$BASE_REF" \
+        --output="$AGENT_DIR/coverage-gate.json"
+}
+
+has_vue_changes() {
+    changed_files | grep -qE '^vue/(src|test|vitest-setup)/|^vue/vitest\.config\.mjs$|^vue/package(-lock)?\.json$'
+}
+
+echo "agent-check $MODE (base: $BASE_REF @ ${MERGE_BASE:0:9})"
+STARTED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+run_step pint 10 step_pint
+
+if [[ "$(quality_value phpstan.enabled)" == "true" ]]; then
+    run_step phpstan 20 step_phpstan
+else
+    skip_step phpstan "phpstan.enabled is false in quality.json"
+fi
+
+if [[ "$MODE" == "full" ]]; then
+    run_step php-coverage 30 step_php_coverage
+    run_step vue-coverage 35 step_vue_coverage
+    run_step coverage-gate 40 step_coverage_gate
+else
+    run_step php-tests 30 step_php_tests
+    if has_vue_changes; then
+        run_step vue-tests 35 step_vue_tests
+    else
+        skip_step vue-tests "no Vue changes"
+    fi
+fi
+
+php -r '
+[$script, $file, $mode, $base, $startedAt, $code] = $argv;
+$steps = [];
+foreach (file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $row) {
+    [$name, $status, $duration, $exit, $log, $reason] = array_pad(explode("\t", $row), 6, "");
+    $step = ["step" => $name, "status" => $status, "ok" => $status !== "fail", "durationMs" => (int) $duration];
+    if ($status === "fail") {
+        $step["exitCode"] = (int) $exit;
+        $lines = file($log, FILE_IGNORE_NEW_LINES) ?: [];
+        $step["failures"] = array_map(fn ($l) => preg_replace("/\e\[[0-9;]*m/", "", $l), array_slice($lines, -40));
+    }
+    if ($log !== "") {
+        $step["log"] = $log;
+    }
+    if ($reason !== "" && $status !== "fail") {
+        $step["reason"] = $reason;
+    }
+    $steps[] = $step;
+}
+$result = [
+    "mode" => $mode,
+    "ok" => (int) $code === 0,
+    "exitCode" => (int) $code,
+    "base" => $base,
+    "startedAt" => $startedAt,
+    "finishedAt" => gmdate("Y-m-d\TH:i:s\Z"),
+    "steps" => $steps,
+];
+if (is_file(".agent/coverage-gate.json") && $mode === "full") {
+    $result["coverageGate"] = ".agent/coverage-gate.json";
+}
+file_put_contents(".agent/last-check.json", json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n");
+' "$STEPS_FILE" "$MODE" "$BASE_REF" "$STARTED_AT" "$FAILED_CODE"
+
+rm -f "$STEPS_FILE"
+
+if [[ "$FAILED_CODE" -eq 0 ]]; then
+    echo "agent-check $MODE passed. Result: $AGENT_DIR/last-check.json"
+else
+    echo "agent-check $MODE failed (exit $FAILED_CODE). Result: $AGENT_DIR/last-check.json"
+fi
+exit "$FAILED_CODE"

@@ -194,6 +194,18 @@
             "@build",
             "@php vendor/bin/testbench serve --ansi"
         ],
+        "check": [
+            "Composer\\Config::disableProcessTimeout",
+            "bin/agent-check check"
+        ],
+        "check:full": [
+            "Composer\\Config::disableProcessTimeout",
+            "bin/agent-check full"
+        ],
+        "coverage:gate": "bin/coverage-gate --diff",
+        "quality:ratchet": "bin/coverage-gate --vue-summary=vue/coverage/coverage-summary.json --ratchet-update",
+        "stan": "@php vendor/bin/phpstan analyse --memory-limit=2G",
+        "stan:baseline": "@php vendor/bin/phpstan analyse --memory-limit=2G --generate-baseline",
         "lint": [
             "@php vendor/bin/pint --ansi",
             "@php vendor/bin/phpstan analyse --verbose --ansi"
