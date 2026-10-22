@@ -44,7 +44,7 @@
     },
     elevation: {
       type: [Number, String],
-      default: 1,
+      default: 0,
     },
     rounded: {
       type: [String, Number, Boolean],
@@ -52,7 +52,7 @@
     },
     border: {
       type: [String, Number, Boolean],
-      default: 'opacity-8',
+      default: 'sm',
     },
   })
 
@@ -98,7 +98,7 @@
     :rounded="rounded"
     :border="border"
   >
-    <v-card-text class="d-flex align-center px-3 py-6 ga-2">
+    <v-card-text class="ue-metric-card__body d-flex align-center px-4 py-4 ga-2">
       <v-sheet v-if="appendIcon"
         class="ue-metric-card__icon d-flex align-center justify-center flex-shrink-0"
         color="grey-lighten-6"
@@ -122,8 +122,6 @@
           inset
           length="28"
           thickness="1"
-          color="grey-lighten-3"
-          opacity="1"
           class="ue-metric-card__divider flex-grow-0 mx-1"
         />
       </div>
@@ -138,6 +136,15 @@
 <style scoped lang="sass">
   .ue-metric-card
     background-color: rgb(var(--v-theme-surface))
+
+  // same tile height as horizontal ue-metric
+  .ue-metric-card__body
+    min-height: 96px
+
+  // same token as the card's border-* utility
+  .ue-metric-card__divider
+    border-color: rgba(var(--v-border-color), var(--v-border-opacity))
+    opacity: 1
 
   .ue-metric-card__value
     line-height: 1

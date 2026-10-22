@@ -8,6 +8,11 @@ use Illuminate\Support\Str;
 class ModularousWidget extends Component
 {
     /**
+     * Class that keeps the widget col at content height inside `ue-blocks`
+     */
+    public const AUTO_HEIGHT_CLASS = 'ue-blocks__col--auto';
+
+    /**
      * The widget alias
      *
      * @var string
@@ -58,6 +63,13 @@ class ModularousWidget extends Component
      * @var array
      */
     public $widgetSlots;
+
+    /**
+     * Keep the widget col at content height inside `ue-blocks` (does not take leftover height)
+     *
+     * @var bool
+     */
+    public $widgetAutoHeight = false;
 
     /**
      * Use the widget config on modularous.widgets.{$widgetAlias}
@@ -148,6 +160,13 @@ class ModularousWidget extends Component
         return $this;
     }
 
+    public function setWidgetAutoHeight(bool $widgetAutoHeight = true)
+    {
+        $this->widgetAutoHeight = $widgetAutoHeight;
+
+        return $this;
+    }
+
     /**
      * Use the widget config on modularous.widgets.{$widgetAlias}
      *
@@ -188,18 +207,38 @@ class ModularousWidget extends Component
             )
         );
 
+        $widgetAttributes = array_merge_recursive_preserve(
+            $this->widgetConfigUsable ? $this->widgetDefaultConfig['widgetAttributes'] ?? [] : [],
+            [...($this->widgetCol ?? [])],
+            ($this->widgetAttributes ?? [])
+        );
+
+        if ($this->widgetAutoHeight) {
+            $widgetAttributes['class'] = $this->appendWidgetClass($widgetAttributes['class'] ?? '', self::AUTO_HEIGHT_CLASS);
+        }
+
         return [
             'tag' => $this->widgetTag,
-            'attributes' => array_merge_recursive_preserve(
-                $this->widgetConfigUsable ? $this->widgetDefaultConfig['widgetAttributes'] ?? [] : [],
-                [...($this->widgetCol ?? [])],
-                ($this->widgetAttributes ?? [])
-            ),
+            'attributes' => $widgetAttributes,
             'slots' => array_merge(
                 $this->widgetConfigUsable ? $this->widgetDefaultConfig['widgetSlots'] ?? [] : [],
                 $this->widgetSlots ?? []
             ),
             'elements' => [$component->render()],
         ];
+    }
+
+    /**
+     * Append a class to a string or list class value without duplicating it
+     */
+    protected function appendWidgetClass(string|array $class, string $className): string|array
+    {
+        if (is_array($class)) {
+            return in_array($className, $class, true) ? $class : [...$class, $className];
+        }
+
+        $classes = preg_split('/\s+/', trim($class), -1, PREG_SPLIT_NO_EMPTY);
+
+        return in_array($className, $classes, true) ? $class : trim($class . ' ' . $className);
     }
 }

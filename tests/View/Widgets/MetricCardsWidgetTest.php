@@ -90,6 +90,38 @@ class MetricCardsWidgetTest extends TestCase
         $this->assertEquals('ue-metric-cards', $result['elements'][0]['tag']);
     }
 
+    public function test_render_marks_widget_col_as_auto_height_by_default()
+    {
+        $widget = new MetricCardsWidget;
+
+        $this->assertTrue($widget->widgetAutoHeight);
+
+        $result = $widget->render();
+
+        $this->assertEquals(MetricCardsWidget::AUTO_HEIGHT_CLASS, $result['attributes']['class']);
+    }
+
+    public function test_render_appends_auto_height_class_to_widget_attributes_class_once()
+    {
+        $widget = (new MetricCardsWidget)
+            ->setWidgetAttributes(['class' => 'd-flex min-height-0']);
+
+        $this->assertEquals('d-flex min-height-0 ue-blocks__col--auto', $widget->render()['attributes']['class']);
+
+        $widget->setWidgetAttributes(['class' => 'd-flex ue-blocks__col--auto']);
+
+        $this->assertEquals('d-flex ue-blocks__col--auto', $widget->render()['attributes']['class']);
+    }
+
+    public function test_render_omits_auto_height_class_when_disabled()
+    {
+        $widget = (new MetricCardsWidget)
+            ->setWidgetAttributes(['class' => 'd-flex'])
+            ->setWidgetAutoHeight(false);
+
+        $this->assertEquals('d-flex', $widget->render()['attributes']['class']);
+    }
+
     public function test_default_attributes_include_metric_attributes()
     {
         $widget = new MetricCardsWidget;

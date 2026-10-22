@@ -28,8 +28,10 @@ A single horizontal card: icon in a circle, label, then a large value on the rig
 | `appendIcon` | `String` | `null` | MDI icon on the left |
 | `appendIconAttributes` | `Object` | `{}` | Forwarded to the icon `v-icon` |
 | `padDigits` | `Number` | `0` | When `> 0` and the value is numeric, pad with leading zeros (`2` → `02`) |
-| `variant` | `String` | `'outlined'` | `v-card` variant |
+| `variant` | `String` | `'flat'` | `v-card` variant |
 | `elevation` | `Number\|String` | `0` | `v-card` elevation |
+| `rounded` | `String\|Number\|Boolean` | `'lg'` | `v-card` rounded |
+| `border` | `String\|Number\|Boolean` | `'sm'` | `v-card` border (`'sm'` → `border-sm`). Modifier-only values such as `'opacity-8'` set no border width, so no border is drawn |
 
 ---
 
@@ -37,7 +39,11 @@ A single horizontal card: icon in a circle, label, then a large value on the rig
 
 Section title + optional date-range filter + a `v-row` of `ue-metric-card` items. Connector values are resolved in `MetricCardsWidget::hydrateAttributes` the same way as `MetricsWidget`.
 
+Tile spacing matches horizontal `ue-metric` tiles in `ue-metrics`: 16px vertical padding, 96px minimum tile height, and a 16px gap between tiles (`v-row density="comfortable"`).
+
 Do not put `pa-*` or extra `ga-*` on the inner `v-row`: column widths (`lg: 3` × 4) already fill the grid, and CSS gap on top of those percentages wraps the last card. Outer inset belongs on the page (for example Dashboard `pa-3`). `ue-blocks` columns that contain `ue-metric-cards` use `overflow: visible` so nested row gutters do not clip tile borders.
+
+`MetricCardsWidget` sets `widgetAutoHeight = true`, so its widget col gets `ue-blocks__col--auto` and keeps its content height on the dashboard; the blocks after it (for example tables) fill the remaining height. Set `'widgetAutoHeight' => false` on the block config to opt out. See [Blocks](./blocks#auto-height-blocks).
 
 ### Props
 

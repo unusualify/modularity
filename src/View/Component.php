@@ -156,6 +156,10 @@ class Component extends LaravelComponent
                 $component->setWidgetAlias($alias);
             }
 
+            if (array_key_exists('widgetAutoHeight', $config)) {
+                $component->setWidgetAutoHeight((bool) $config['widgetAutoHeight']);
+            }
+
             $component->mergeAttributes($config['attributes'] ?? []);
 
         } elseif (isset($config['component'])) {

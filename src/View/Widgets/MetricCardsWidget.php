@@ -16,6 +16,8 @@ class MetricCardsWidget extends ModularousWidget
         'lg' => 12,
     ];
 
+    public $widgetAutoHeight = true;
+
     public $attributes = [
         'class' => '',
 
@@ -32,9 +34,9 @@ class MetricCardsWidget extends ModularousWidget
             'labelColor' => 'grey-darken-1',
             'padDigits' => 2,
             'variant' => 'flat',
-            'elevation' => 1,
+            'elevation' => 0,
             'rounded' => 'lg',
-            'border' => 'opacity-8',
+            'border' => 'none',
             'appendIconAttributes' => [
                 'color' => 'grey-darken-1',
                 'size' => '18',

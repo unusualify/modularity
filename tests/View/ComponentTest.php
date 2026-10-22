@@ -329,6 +329,30 @@ class ComponentTest extends TestCase
         $this->assertArrayHasKey('elements', $result);
     }
 
+    public function test_create_with_widget_auto_height_appends_blocks_auto_class()
+    {
+        $result = Component::create([
+            'widget' => 'MetricsWidget',
+            'widgetAutoHeight' => true,
+            'widgetAttributes' => ['class' => 'd-flex flex-column'],
+            'attributes' => ['title' => 'Dashboard Metrics'],
+        ]);
+
+        $this->assertEquals('d-flex flex-column ue-blocks__col--auto', $result['attributes']['class']);
+    }
+
+    public function test_create_with_widget_auto_height_false_overrides_widget_default()
+    {
+        $result = Component::create([
+            'widget' => 'MetricCardsWidget',
+            'widgetAutoHeight' => false,
+            'widgetAttributes' => ['class' => 'd-flex'],
+            'attributes' => ['title' => 'Glance'],
+        ]);
+
+        $this->assertEquals('d-flex', $result['attributes']['class']);
+    }
+
     public function test_create_with_widget_throws_when_widget_class_missing()
     {
         $this->expectException(\Exception::class);

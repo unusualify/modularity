@@ -11,6 +11,16 @@
       type: String,
       default: null
     },
+    // forwarded to the title's ue-title (type, weight, transform, …); empty keeps the ue-title defaults
+    titleAttributes: {
+      type: Object,
+      default: () => ({})
+    },
+    // full-width divider between the header (title + date filter) and the metrics
+    headerDivider: {
+      type: Boolean,
+      default: false
+    },
     items: {
       type: Array,
       default: () => [],
@@ -64,10 +74,43 @@
       type: [String, Number],
       default: 130
     },
+    // horizontal layout only: max equal-width columns per row; fewer when a column would drop under minMetricWidth
+    metricColumns: {
+      type: [String, Number],
+      default: null
+    },
 
     metricAttributes: {
       type: Object,
       default: () => ({})
+    },
+    // forwarded to every ue-metric as `layout`; 'horizontal' also switches the row to an auto-fill grid
+    metricLayout: {
+      type: String,
+      default: 'stacked',
+      validator: (value) => ['stacked', 'horizontal'].includes(value),
+    },
+
+    elevation: {
+      type: [Number, String],
+      default: 0
+    },
+    rounded: {
+      type: [String, Number, Boolean],
+      default: undefined
+    },
+    border: {
+      type: [String, Number, Boolean],
+      default: undefined
+    },
+
+    compactFilter: {
+      type: Boolean,
+      default: false
+    },
+    filterPlaceholder: {
+      type: String,
+      default: null
     },
 
     endpoint: {
@@ -75,6 +118,10 @@
       default: null
     }
   });
+
+  const METRIC_GRID_GAP = 16;
+
+  const isHorizontalLayout = computed(() => props.metricLayout === 'horizontal');
 
   const cardClasses = computed(() => {
     return [
@@ -86,14 +133,16 @@
   const headerClasses = computed(() => {
     return [
       props.bgHeaderColor ? `bg-${props.bgHeaderColor}` : '',
-      'd-flex justify-space-between align-center pa-4',
+      'd-flex justify-space-between align-center',
+      props.headerDivider ? 'px-4 pt-4 pb-5' : 'pa-4',
+      props.compactFilter ? 'ga-3' : '',
     ];
   });
 
   const titleClasses = computed(() => {
     return [
       props.color ? `text-${props.color}` : '',
-      'font-weight-medium text-body-large text-wrap',
+      'text-wrap',
     ];
   });
 
@@ -101,20 +150,52 @@
     return [
       props.filterColor ? `text-${props.filterColor}` : '',
       // 'text-body-medium text-medium-emphasis',
-      'd-flex align-center'
+      'd-flex align-center',
+      props.compactFilter ? 'ue-metrics__filter--compact' : '',
     ];
   });
 
+  const filterStyle = computed(() => props.compactFilter ? null : { width: '280px' });
+
   const rowClasses = computed(() => {
     return [
-      'd-flex flex-wrap ga-4',
+      isHorizontalLayout.value ? 'ue-metrics__grid' : 'd-flex flex-wrap ga-4',
       props.rowClass ? props.rowClass : '',
       props.hasGutter ? `mx-n${props.gutterStep}` : ''
     ];
   });
 
+  const rowStyle = computed(() => {
+    if (!isHorizontalLayout.value) {
+      return null;
+    }
+
+    const minWidth = props.minMetricWidth ? `${parseInt(props.minMetricWidth, 10)}px` : '0px';
+    const columns = parseInt(props.metricColumns, 10);
+    const columnWidth = columns > 0
+      ? `max(${minWidth}, calc((100% - ${(columns - 1) * METRIC_GRID_GAP}px) / ${columns}))`
+      : minWidth;
+
+    return {
+      gap: `${METRIC_GRID_GAP}px`,
+      gridTemplateColumns: `repeat(auto-fill, minmax(${columnWidth}, 1fr))`,
+    };
+  });
+
+  const metricStyle = computed(() => {
+    if (isHorizontalLayout.value) {
+      return null;
+    }
+
+    return [
+      props.metricWidth ? `width: ${props.metricWidth}` : '',
+      props.minMetricWidth ? `min-width: ${props.minMetricWidth}px` : '',
+    ];
+  });
+
   const defaultMetricAttributes = computed(() => {
     return {
+      layout: props.metricLayout,
       ...(props.metricAttributes ?? {})
     };
   });
@@ -164,20 +245,23 @@
   <v-card
     :color="cardColor"
     :class="cardClasses"
-    elevation="0"
+    :elevation="elevation"
+    :rounded="rounded"
+    :border="border"
   >
     <!-- Header with title and date -->
     <v-card-title :class="headerClasses">
-      <div class="py-2">
-        <ue-title padding="a-0" :text="title" :class="titleClasses" />
+      <div :class="['py-2', { 'flex-shrink-0': compactFilter }]">
+        <ue-title padding="a-0" v-bind="titleAttributes" :text="title" :class="titleClasses" />
         <ue-title padding="a-0" :text="subtitle" type="caption" weight="medium" color="grey-darken-1" transform="none"/>
       </div>
       <!-- <div :class="titleClasses">{{ title }}</div> -->
-      <div :class="filterClasses" style="width: 280px;" v-if="hasFilterableMetric && endpoint">
+      <div :class="filterClasses" :style="filterStyle" v-if="hasFilterableMetric && endpoint">
         <v-date-input
           v-model="dateRangeModel"
           :Xlabel="$t('')"
           :validate-on="`submit blur`"
+          :placeholder="filterPlaceholder ?? undefined"
           variant="outlined"
           density="compact"
           prepend-icon=""
@@ -201,18 +285,17 @@
       </div>
     </v-card-title>
 
+    <v-divider v-if="headerDivider" class="ue-metrics__header-divider" />
+
     <v-card-text>
       <!-- Metrics row -->
-      <div :class="rowClasses">
+      <div :class="rowClasses" :style="rowStyle">
         <template
           v-for="(metric, index) in metrics"
           :key="index"
           >
           <ue-metric
-            :style="[
-              metricWidth ? `width: ${metricWidth}` : '',
-              minMetricWidth ? `min-width: ${minMetricWidth}px` : '',
-            ]"
+            :style="metricStyle"
 
             dense
             no-inline
@@ -244,5 +327,24 @@
 </template>
 
 <style scoped lang="scss">
+  .ue-metrics__grid {
+    display: grid;
+  }
 
+  .ue-metrics__filter--compact {
+    flex: 0 1 220px;
+    min-width: 132px;
+
+    :deep(.v-field) {
+      --v-field-input-padding-top: 4px;
+      --v-field-input-padding-bottom: 4px;
+      --v-input-control-height: 32px;
+      font-size: 0.75rem;
+    }
+
+    :deep(.v-field__input) {
+      min-height: 32px;
+      text-overflow: ellipsis;
+    }
+  }
 </style>

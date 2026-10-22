@@ -131,7 +131,10 @@
       </div>
     </div>
 
-    <v-row class="ue-metric-cards__row">
+    <v-row
+      class="ue-metric-cards__row"
+      density="comfortable"
+    >
       <v-col
         v-for="(metric, index) in metrics"
         :key="index"
