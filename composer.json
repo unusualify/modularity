@@ -186,6 +186,8 @@
             "@clear",
             "@prepare"
         ],
+        "post-install-cmd": "@hooks:install",
+        "hooks:install": "bin/install-hooks",
         "clear": "php -r \"putenv('CACHE_STORE=array'); putenv('CACHE_DRIVER=array'); passthru('php vendor/bin/testbench package:purge-skeleton --ansi');\"",
         "prepare": "php -r \"putenv('CACHE_STORE=array'); putenv('CACHE_DRIVER=array'); passthru('php vendor/bin/testbench package:discover --ansi');\"",
         "build": "@php vendor/bin/testbench workbench:build --ansi",

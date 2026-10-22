@@ -33,6 +33,9 @@ flowchart TD
 | `bin/test-changed` | Maps changed PHP files to their PHPUnit tests |
 | `bin/with-coverage-driver` | Picks xdebug or pcov for coverage runs |
 | `vue/vitest.config.mjs` | Reads Vue coverage thresholds from `quality.json` |
+| `.cursor/rules/quality-gates.mdc` | Always-applied agent rule for the gate |
+| `.cursor/hooks/quality-stop.sh` | Cursor `stop` hook running `check` on uncommitted changes |
+| `.githooks/pre-push`, `bin/install-hooks` | Git `pre-push` hook running `full`, and its installer |
 | `.agent/last-check.json` | Machine-readable result of the last run (git-ignored) |
 | `.agent/logs/<step>.log` | Full output per step (git-ignored) |
 
@@ -156,6 +159,21 @@ Diff coverage needs a fresh report. With a stale `coverage-clover.xml` the line 
 - `src/Entities/NestedsetCollection.php` is excluded: it extends `Kalnoy\Nestedset\Collection`, but `kalnoy/nestedset` is not a dependency.
 - To check that the baseline is reproducible, back it up, reset it to `ignoreErrors: []`, run `composer stan:baseline` and diff against the backup.
 
+## Agent enforcement
+
+Three layers make sure the gate runs even when an agent forgets to call it:
+
+| Layer | File | When it runs | What it does |
+|-------|------|--------------|--------------|
+| Cursor rule | `.cursor/rules/quality-gates.mdc` | Always applied | Tells the agent to run `composer check` after each change, retry at most 5 times, and lists forbidden workarounds |
+| Cursor `stop` hook | `.cursor/hooks.json`, `.cursor/hooks/quality-stop.sh` | When an agent run completes | If tracked paths (`src`, `modules`, `tests`, `vue/src`, …) have uncommitted changes, runs `bin/agent-check check`; on failure sends the failing step and log tail back as `followup_message` (`loop_limit: 3`) |
+| Git `pre-push` hook | `.githooks/pre-push` | `git push` | Runs `bin/agent-check full`; a failure aborts the push |
+
+- **Installing the git hook:** `composer install` runs `bin/install-hooks` (`post-install-cmd`), which sets `git config core.hooksPath .githooks`. Run it manually with `composer hooks:install`. It is skipped when `CI` is set, when the package is not its own git checkout (for example under `vendor/`), and when `core.hooksPath` already points somewhere else.
+- **Stop hook output:** the runner's console output goes to `.agent/stop-hook.log`; the structured result is the usual `.agent/last-check.json`.
+- **Turning the stop hook off temporarily:** start Cursor with `MODULAROUS_SKIP_STOP_HOOK=1`. Agents must not use this or `git push --no-verify`.
+- **Parent workspaces:** the hook resolves the package root from its own path, so it also works when Cursor opens a parent project (such as an app that symlinks this package under `packages/`) alongside the package folder.
+
 ## Rules for contributors and agents
 
 - Run `composer check` after every change and `composer check:full` before pushing.
@@ -168,5 +186,5 @@ Diff coverage needs a fresh report. With a stale `coverage-clover.xml` the line 
 |------|--------|
 | Coverage thresholds | Enforced locally (`check:full`, `npm run test:coverage`) |
 | PHPStan | Enabled at level 8 with `phpstan-baseline.neon` (16592 errors, capped by `baselineMaxErrors`). Next: shrink the baseline; lower `baselineMaxErrors` whenever fixes reduce it |
-| Agent enforcement | Planned: always-applied Cursor rule, Cursor `stop` hook and git `pre-push` hook calling the runner |
+| Agent enforcement | Always-applied Cursor rule, Cursor `stop` hook (`check`) and git `pre-push` hook (`full`) |
 | CI | Planned: reusable workflow calling the same runner and `bin/coverage-gate` instead of inline thresholds |

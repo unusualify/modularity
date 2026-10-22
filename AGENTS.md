@@ -29,6 +29,10 @@ vue/src/                  # Frontend source
 
 Before editing a folder, read its local `AGENTS.md` when present (`src/`, `Console/`, `Entities/`, `Repositories/`, `Http/`, `Http/Controllers/Traits/Form/`, `Hydrates/`, `Services/Cache/`, `modules/Cms/`, `vue/src/js/`, `vue/src/js/utils/formEventFormatters/`).
 
+## QUALITY GATES
+
+Every code change must pass `composer check`; run `composer check:full` before pushing. Rules (retry loop, forbidden workarounds): `.cursor/rules/quality-gates.mdc`. Details: `docs/src/pages/system-reference/quality-gates.md`.
+
 ## DOCS MAP (agents)
 
 | Topic | Docs path |

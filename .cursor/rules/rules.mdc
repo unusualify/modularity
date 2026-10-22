@@ -27,3 +27,7 @@ ALWAYS:
 2. Write tests
 3. Type hint everything
 5. Follow existing patterns
+
+QUALITY GATES:
+- `composer check` after every change, `composer check:full` before push
+- Rules: .cursor/rules/quality-gates.mdc

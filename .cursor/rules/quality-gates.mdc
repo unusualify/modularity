@@ -1,0 +1,33 @@
+---
+description: Quality gate every code change must pass (composer check / check:full)
+alwaysApply: true
+---
+
+# Quality gates
+
+Thresholds live in `quality.json`; the runner is `bin/agent-check`. Details: `docs/src/pages/system-reference/quality-gates.md`.
+
+## Loop
+
+1. After every code change run `composer check`.
+2. If it fails, read `.agent/last-check.json`: the failing step has `exitCode`, `failures` (log tail) and `log` (full output). Fix the cause and run `composer check` again.
+3. Stop after 5 failed attempts and report to the user: the failing step, what you tried, and the remaining error.
+4. Before pushing run `composer check:full` (coverage totals + diff coverage of at least `diff.lines` percent on changed lines). The git `pre-push` hook runs it too.
+
+| Exit code | Step | Usual fix |
+|-----------|------|-----------|
+| 10 | Pint | `vendor/bin/pint <files>` |
+| 20 | PHPStan | Fix the reported error; the baseline is for old code only |
+| 30 | PHPUnit | Fix code or test; new code needs tests under `tests/` |
+| 35 | Vitest | Fix code or test under `vue/test/` |
+| 40 | Coverage gate | Add tests for the uncovered lines listed in `.agent/coverage-gate.json` |
+
+## Never
+
+- Lower any threshold in `quality.json`, or raise `phpstan.baselineMaxErrors`.
+- Add errors to `phpstan-baseline.neon` (regenerating it is only allowed when the count goes down).
+- Add `@phpstan-ignore`, `markTestSkipped()`, `@group skip` or `->skip()` to get a change through.
+- Delete a test or weaken its assertions.
+- Push with `--no-verify`, or pass `--skip=` to `bin/agent-check` to hide a failing step.
+
+If a gate cannot reasonably be met (flaky test, unrelated pre-existing failure), stop and ask the user instead of working around it.

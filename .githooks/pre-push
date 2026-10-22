@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# Git pre-push hook: runs the full quality gate before anything is pushed.
+# Installed by bin/install-hooks (core.hooksPath=.githooks).
+
+set -uo pipefail
+
+ROOT="$(git rev-parse --show-toplevel)"
+cd "$ROOT" || exit 1
+
+zero="0000000000000000000000000000000000000000"
+pushes_code=0
+while read -r _local_ref local_sha _remote_ref _remote_sha; do
+    [[ "$local_sha" != "$zero" ]] && pushes_code=1
+done
+
+# Branch deletions only: nothing to check.
+if [[ "$pushes_code" -eq 0 ]]; then
+    exit 0
+fi
+
+echo "pre-push: running composer check:full (bin/agent-check full)"
+if ! bin/agent-check full; then
+    echo
+    echo "pre-push: quality gate failed, push aborted. Details: .agent/last-check.json"
+    exit 1
+fi
