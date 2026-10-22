@@ -1,0 +1,35 @@
+{
+    "php": {
+        "lines": 79.5,
+        "methods": 70
+    },
+    "vue": {
+        "lines": 62.5,
+        "statements": 62.5,
+        "branches": 69,
+        "functions": 33.5
+    },
+    "diff": {
+        "lines": 80,
+        "minChangedLines": 5
+    },
+    "phpstan": {
+        "enabled": true,
+        "level": 8,
+        "baselineMaxErrors": 16583
+    },
+    "ratchet": true,
+    "measured": {
+        "date": "2026-10-22",
+        "php": {
+            "lines": 79.88,
+            "methods": 70.34
+        },
+        "vue": {
+            "lines": 62.88,
+            "statements": 62.88,
+            "branches": 69.18,
+            "functions": 33.91
+        }
+    }
+}

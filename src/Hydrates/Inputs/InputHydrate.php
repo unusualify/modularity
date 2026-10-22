@@ -43,7 +43,7 @@ abstract class InputHydrate
      * İnput Schema array
      *
      *
-     * @var Unusualify\Modularous\Module
+     * @var Module
      */
     protected $module;
 
@@ -433,7 +433,7 @@ abstract class InputHydrate
     /**
      * Get module
      *
-     * @return Unusualify\Modularous\Module
+     * @return Module
      */
     final protected function getModule(bool $noSelfModule = false)
     {

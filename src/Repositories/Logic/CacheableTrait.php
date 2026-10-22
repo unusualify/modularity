@@ -211,7 +211,7 @@ trait CacheableTrait
      * @param array $lazy
      * @param array $scopes
      * @param bool $useDefaultScopes
-     * @return \Unusualify\Modularous\Models\Model
+     * @return \Unusualify\Modularous\Entities\Model
      */
     public function getByIdCached($id, $with = [], $withCount = [], $lazy = [], $scopes = [], $useDefaultScopes = false)
     {
@@ -252,7 +252,6 @@ trait CacheableTrait
 
         return ModularousCache::remember(
             $cacheKey,
-            'record',
             $ttl,
             fn () => $this->getById($id, $with, $withCount, $lazy, $scopes, $useDefaultScopes),
             $module,

@@ -77,8 +77,6 @@ trait ManageTable
 
     /**
      * getVuetifyDatatableOptions
-     *
-     * @return void
      */
     public function getVuetifyDatatableOptions()
     {

@@ -29,7 +29,6 @@ trait Relationships
     /**
      * @param Model|null $object
      * @param array $fields
-     * @return void
      */
     public function afterSaveRelationships($object, $fields)
     {

@@ -271,7 +271,7 @@ if (! function_exists('formatRulesSchema')) {
  *
  * Can be used for nested arrays
  *
- * @param mixed variable
+ * @param mixed $val
  * @param string $key
  * @param bool $bool to control return type
  * @return mixed|null based on variable

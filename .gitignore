@@ -44,6 +44,10 @@ generated-coverage-clover.xml
 all-coverage.txt
 all-coverage-clover.xml
 
+# Quality gates
+/.agent/
+/.phpstan.cache/
+
 # AI
 .modulai/
 /tmp-modules/

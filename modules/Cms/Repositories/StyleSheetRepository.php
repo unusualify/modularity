@@ -5,7 +5,7 @@ namespace Modules\Cms\Repositories;
 use Illuminate\Support\Str;
 use Modules\Cms\Entities\StyleSheet;
 use Modules\Cms\Services\Stylesheet\StylesheetCompilerService;
-use Unusualify\Modularous\Models\Model;
+use Unusualify\Modularous\Entities\Model;
 use Unusualify\Modularous\Repositories\Repository;
 
 class StyleSheetRepository extends Repository

@@ -6,9 +6,9 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 use Unusualify\Modularous\Entities\Enums\RevisionStatus;
+use Unusualify\Modularous\Entities\Model;
 use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\Facades\ValidationException;
-use Unusualify\Modularous\Models\Model;
 
 trait RevisionsTrait
 {

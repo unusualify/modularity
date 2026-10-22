@@ -2,7 +2,7 @@
 
 namespace Unusualify\Modularous\Http\Controllers\Traits\Table;
 
-use Unusualify\Modularous\Models\Model;
+use Unusualify\Modularous\Entities\Model;
 
 trait TableCustomRow
 {

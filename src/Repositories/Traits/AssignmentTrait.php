@@ -4,7 +4,7 @@ namespace Unusualify\Modularous\Repositories\Traits;
 
 use Illuminate\Database\Query\Builder;
 use Unusualify\Modularous\Entities\Assignment;
-use Unusualify\Modularous\Models\Model;
+use Unusualify\Modularous\Entities\Model;
 use Unusualify\Modularous\Traits\Allowable;
 
 trait AssignmentTrait

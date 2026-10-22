@@ -3,6 +3,7 @@
 namespace Unusualify\Modularous\Repositories\Logic;
 
 use Illuminate\Container\Container;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
@@ -316,7 +317,7 @@ trait QueryBuilder
      * @param array $with
      * @param array $withCount
      * @param array $scopes
-     * @return \Unusualify\Modularous\Models\Model
+     * @return \Unusualify\Modularous\Entities\Model
      *
      * @throws ModelNotFoundException
      */
@@ -641,7 +642,7 @@ trait QueryBuilder
      *      $query->select('id', 'username');
      *   }])
      *
-     * @param Illuminate\Database\Eloquent\Builder $query
+     * @param Builder $query
      * @param array $with for instance ['roles' => ['select', 'id', 'name']]
      * @return array
      */
@@ -667,7 +668,7 @@ trait QueryBuilder
      * @param array $withCount
      * @param array $lazy
      * @param array $scopes
-     * @return \Unusualify\Modularous\Models\Model
+     * @return \Unusualify\Modularous\Entities\Model
      *
      * @throws ModelNotFoundException
      *

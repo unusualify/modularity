@@ -128,7 +128,6 @@ final class CmsPageLayoutResolver
         $aliases = [$targetClass];
         if (class_exists($targetClass) && is_a($targetClass, Model::class, true)) {
             try {
-                /** @phpstan-ignore-next-line */
                 $aliases[] = (new $targetClass)->getMorphClass();
             } catch (\Throwable) {
             }

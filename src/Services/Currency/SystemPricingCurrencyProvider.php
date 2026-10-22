@@ -9,7 +9,7 @@ use Modules\SystemPricing\Entities\Currency;
 use Unusualify\Modularous\Contracts\CurrencyProviderInterface;
 
 /**
- * Currency provider using Modules\SystemPricing\Entities\Currency.
+ * Currency provider using \Modules\SystemPricing\Entities\Currency.
  * Only used when SystemPricing module is enabled.
  */
 class SystemPricingCurrencyProvider implements CurrencyProviderInterface

@@ -9,7 +9,7 @@ sidebarTitle: Create Vue Test
 
 ## Command Information
 
-- **Signature:** `modularous:make:vue:test [name?] [type?] [--importDir] [--F|force]`
+- **Signature:** `modularous:make:vue:test [name?] [type?] [--importDir=] [--F|force]`
 - **Aliases:** `modularous:create:vue:test`, `mod:c:vue:test`
 - **Category:** Generators
 

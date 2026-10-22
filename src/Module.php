@@ -1091,7 +1091,7 @@ class Module extends NwidartModule
     /**
      * Check whether the file is presents
      *
-     * @param string fileName
+     * @param string $fileName
      * @return bool
      */
     public function isFileExists($fileName)

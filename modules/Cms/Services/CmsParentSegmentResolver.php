@@ -161,7 +161,6 @@ final class CmsParentSegmentResolver
         $aliases = [$targetClass];
         if (class_exists($targetClass) && is_a($targetClass, Model::class, true)) {
             try {
-                /** @phpstan-ignore-next-line safe new for morph alias lookup */
                 $aliases[] = (new $targetClass)->getMorphClass();
             } catch (\Throwable) {
             }

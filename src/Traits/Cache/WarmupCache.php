@@ -95,24 +95,21 @@ trait WarmupCache
         if (! $moduleName) {
             return;
         }
-        $moduleRouteName = method_exists($model, 'getCacheModuleRouteName') ? $model->getCacheModuleRouteName() : (method_exists($model, 'getRouteName') ? $model->getModuleRouteName() : null);
+        $moduleRouteName = method_exists($model, 'getCacheModuleRouteName') ? $model->getCacheModuleRouteName() : (method_exists($model, 'getRouteName') ? $model->getRouteName() : null);
 
         $module = Modularous::find($moduleName);
 
         if (! $module) {
             return;
-            throw new \Exception("Module not found: {$moduleName}");
         }
 
         if (! $module->hasRoute($moduleRouteName)) {
             return;
-            throw new \Exception("Route not found: {$moduleRouteName}");
         }
 
         $controller = $module->getController($moduleRouteName);
         if (! $controller) {
             return;
-            throw new \Exception("Controller not found: {$moduleRouteName}");
         }
 
         if (ModularousCache::isEnabled($moduleName, $moduleRouteName, 'counts')) {
@@ -142,7 +139,6 @@ trait WarmupCache
 
         if (! $module) {
             return;
-            throw new \Exception("Module not found: {$moduleName}");
         }
         // dd($module->getRoute($routeName));
         // $route = $module->getRoute($routeName);
@@ -176,12 +172,10 @@ trait WarmupCache
         $module = Modularous::find($moduleName);
         if (! $module) {
             return;
-            throw new \Exception("Module not found: {$moduleName}");
         }
         $route = $module->getRoute($routeName);
         if (! $route) {
             return;
-            throw new \Exception("Route not found: {$routeName}");
         }
         $controller = $module->getController($routeName);
         if (! $controller) {

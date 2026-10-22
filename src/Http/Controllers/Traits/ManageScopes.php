@@ -321,8 +321,6 @@ trait ManageScopes
 
                 if (preg_match('/(.*)(_relation)/', $sort->key, $matches)) {
                     continue;
-                    // dd($sort);
-                    $sort->key = $matches[1];
                 }
 
                 if ($sort->key == 'name') {

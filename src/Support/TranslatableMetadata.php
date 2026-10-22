@@ -93,13 +93,13 @@ final class TranslatableMetadata
     {
         return [
             [
-              'name' => self::SCHEMA_JSON_ATTRIBUTE,
-              'label' => 'Schema JSON',
-              'type' => 'source-text',
-              'format' => 'json',
-              'translated' => true,
-              'isSecondary' => true,
-              'hideDetails' => 'auto',
+                'name' => self::SCHEMA_JSON_ATTRIBUTE,
+                'label' => 'Schema JSON',
+                'type' => 'source-text',
+                'format' => 'json',
+                'translated' => true,
+                'isSecondary' => true,
+                'hideDetails' => 'auto',
             ],
             ['name' => 'seo_title', 'label' => 'SEO Title', 'type' => 'textarea', 'rows' => 2, 'translated' => true, 'isSecondary' => true],
             ['name' => 'seo_description', 'label' => 'SEO Description', 'type' => 'textarea', 'translated' => true, 'isSecondary' => true],

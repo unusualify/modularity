@@ -4,7 +4,7 @@ namespace Modules\Cms\Repositories;
 
 use Illuminate\Support\Str;
 use Modules\Cms\Entities\LayoutBuilder;
-use Unusualify\Modularous\Models\Model;
+use Unusualify\Modularous\Entities\Model;
 use Unusualify\Modularous\Repositories\Repository;
 
 class LayoutBuilderRepository extends Repository

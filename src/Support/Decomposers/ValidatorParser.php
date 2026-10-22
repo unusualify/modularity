@@ -48,7 +48,6 @@ class ValidatorParser implements Arrayable
      * parse
      *
      * @param mixed $rules
-     * @return void
      */
     public function parse($rules)
     {

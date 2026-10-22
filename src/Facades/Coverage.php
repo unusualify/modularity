@@ -8,6 +8,7 @@ use Unusualify\Modularous\Services\CoverageService;
 /**
  * Coverage Analysis Facade
  *
+ * @method static \Unusualify\Modularous\Services\CoverageService make(?string $cloverDir = null, ?string $cloverName = null)
  * @method static \Unusualify\Modularous\Services\CoverageService setCloverPath(string $path)
  * @method static \Unusualify\Modularous\Services\CoverageService filterByFiles(array $files)
  * @method static \Unusualify\Modularous\Services\CoverageService setCoverageThreshold(float $threshold)

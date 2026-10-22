@@ -32,7 +32,7 @@ class FilepondManager
 
             // $this->addFilePondToSession($tmp_file);
             // $request->session()->put("{$this->session_prefix}.{$tmp_file->input_role}", $tmp_file->folder_name, 1440);
-            Session::put("{$this->session_prefix}.{$tmp_file->input_role}", $tmp_file->folder_name, 1440);
+            Session::put("{$this->session_prefix}.{$tmp_file->input_role}", $tmp_file->folder_name);
 
             // Cookie::queue("{$this->cookie_prefix}.{$tmp_file->input_role}", $tmp_file->folder_name, 1440);
 

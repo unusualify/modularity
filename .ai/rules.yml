@@ -43,6 +43,11 @@ repo_rules:
     - controllers_must_not_contain_business_logic
     - direct_db_access_outside_services
 
+  quality_gates:
+    after_change: composer check
+    before_push: composer check:full
+    rules: .cursor/rules/quality-gates.mdc
+
 behavior:
   response:
     structure:

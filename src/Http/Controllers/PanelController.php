@@ -9,7 +9,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
 use Unusualify\Modularous\Contracts\Cache\CacheableInterface;
 use Unusualify\Modularous\Entities\Enums\Permission;
@@ -27,7 +26,7 @@ abstract class PanelController extends CoreController implements CacheableInterf
     use MakesResponses, ManageScopes, ManageAuthorization, CacheableResponse, ManageWiths, ManageAppends;
 
     /**
-     * @var Unusualify\Modularous\Entities\Model
+     * @var Model
      */
     protected $user;
 
@@ -341,17 +340,6 @@ abstract class PanelController extends CoreController implements CacheableInterf
      */
     protected function getParentModuleIdFromRequest(Request $request)
     {
-
-        return null;
-
-        $moduleParts = explode('.', $this->moduleName);
-
-        if (count($moduleParts) > 1) {
-            $parentModule = Str::singular($moduleParts[count($moduleParts) - 2]);
-
-            return $request->route()->parameters()[$parentModule];
-        }
-
         return null;
     }
 
@@ -363,8 +351,6 @@ abstract class PanelController extends CoreController implements CacheableInterf
         $rawRouteConfig = $this->module ? $this->module->getRawRouteConfig($this->routeName) : [];
 
         return $this->isParent ?? ($rawRouteConfig['parent'] ?? false) ?: $this->moduleName == $this->routeName;
-
-        return $this->isParent ?? $this->getConfigFieldsByRoute('parent') ?: $this->moduleName == $this->routeName;
     }
 
     /**
@@ -493,8 +479,6 @@ abstract class PanelController extends CoreController implements CacheableInterf
 
     /**
      * getFormRequestClass
-     *
-     * @return void
      */
     public function getFormRequestClass($schema = null)
     {
@@ -530,21 +514,6 @@ abstract class PanelController extends CoreController implements CacheableInterf
         }
 
         return $this->generateRoutePrefix();
-
-        if ($this->request->route() != null) {
-            $routePrefix = ltrim(
-                str_replace(
-                    Config::get(modularousBaseKey() . '.admin_app_path'), // TODO uri segment control
-                    '',
-                    $this->request->route()->getPrefix()
-                ),
-                '/'
-            );
-
-            return str_replace('/', '.', $routePrefix);
-        }
-
-        return '';
     }
 
     /**
@@ -561,10 +530,6 @@ abstract class PanelController extends CoreController implements CacheableInterf
     protected function getParentModuleForeignKey()
     {
         return Str::singular($this->nestedParentName) . '_id';
-
-        $moduleParts = explode('.', $this->moduleName);
-
-        return Str::singular($moduleParts[count($moduleParts) - 2]) . '_id';
     }
 
     /**

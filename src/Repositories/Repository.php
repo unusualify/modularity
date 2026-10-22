@@ -13,7 +13,7 @@ use Spatie\Activitylog\Facades\LogBatch;
 use Unusualify\Modularous\Contracts\Cache\CacheableInterface;
 use Unusualify\Modularous\Contracts\Cache\UserAwareCacheInterface;
 use Unusualify\Modularous\Contracts\ModuleableInterface;
-use Unusualify\Modularous\Models\Model;
+use Unusualify\Modularous\Entities\Model;
 use Unusualify\Modularous\Repositories\Contracts\Repository as RepositoryContract;
 use Unusualify\Modularous\Repositories\Traits\Concerns\InteractsWithAttachmentPayloads;
 use Unusualify\Modularous\Traits\ManageNames;
@@ -37,7 +37,7 @@ abstract class Repository implements CacheableInterface, ModuleableInterface, Re
         Logic\ResourceCacheActionsTrait;
 
     /**
-     * @var Model
+     * @var \Illuminate\Database\Eloquent\Model
      */
     protected $model;
 
@@ -285,7 +285,6 @@ abstract class Repository implements CacheableInterface, ModuleableInterface, Re
 
     /**
      * @param array $ids
-     * @return void
      */
     public function setNewOrder($ids)
     {

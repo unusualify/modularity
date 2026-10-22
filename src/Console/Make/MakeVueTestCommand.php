@@ -19,7 +19,7 @@ class MakeVueTestCommand extends BaseCommand
     protected $signature = 'modularous:make:vue:test
         {name? : The name of test will be used.}
         {type? : The type of test.}
-        {--importDir : The subfolder for importing.}
+        {--importDir= : The subfolder for importing.}
         {--F|force : Force the operation to run when the route files already exist.}';
 
     protected $aliases = [

@@ -1,0 +1,30 @@
+---
+description: How to open or update a pull request (title, template, required sections)
+alwaysApply: true
+---
+
+# Pull requests
+
+`.github/workflows/pr-template-check.yml` fails the PR if any of this is missing. It re-runs when the title or description is edited.
+
+## Title
+
+Conventional commit: `type(scope): summary`, lowercase type, no trailing period.
+Types: `feat fix docs style refactor perf test build ci chore revert`.
+
+## Description
+
+Start from `.github/PULL_REQUEST_TEMPLATE.md` and keep every heading. Pass the body with `gh pr create --body-file <file>` so markdown is not mangled.
+
+- **Checklist**: tick only what is true. "All new and existing tests passed" means `composer check:full` passed on the pushed head.
+- **Types of changes**: tick every type present in the commits; the title's type must be ticked.
+- **Description**: what the PR does and why, for a reviewer who has not seen the conversation. Link docs instead of repeating them.
+- **Commits**: a table with one row per commit (or group of related commits), `| Commit | What |`. Use the conventional prefix as the commit label.
+- **Behavior changes**: every runtime difference a user or consumer app can notice: bug fixes (old vs new behavior), changed defaults, removed or renamed options, new side effects, migrations. Write `None` only if nothing changes at runtime.
+- **Related Issue**: link it, or leave the section empty.
+
+## After opening
+
+- Open as draft until CI is green.
+- The quality report comment is posted by CI (`bin/quality-report`); do not post it by hand.
+- When new commits change behavior, update the Commits and Behavior changes sections in the same push.

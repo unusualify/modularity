@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# Runs `phpstan analyse` from a reproducible Testbench state; arguments are passed through.
+#
+# Larastan discovers packages through Testbench's laravel/vendor -> vendor symlink and
+# creates it when missing. A real directory at that path hides every vendor provider,
+# while a leftover symlink makes recursive vendor scans in the test suite loop forever,
+# so the path is cleared before and after every run, together with the discovery cache.
+
+set -uo pipefail
+
+cd "$(dirname "${BASH_SOURCE[0]}")/.." || exit 2
+
+SKELETON="vendor/orchestra/testbench-core/laravel"
+
+reset_skeleton() {
+    if [[ -L "$SKELETON/vendor" ]]; then
+        rm -f "$SKELETON/vendor"
+    elif [[ -d "$SKELETON/vendor" ]]; then
+        rm -rf "$SKELETON/vendor"
+    fi
+    rm -f "$SKELETON"/bootstrap/cache/*.php
+}
+
+reset_skeleton
+trap reset_skeleton EXIT
+
+php vendor/bin/phpstan analyse --memory-limit=2G "$@"

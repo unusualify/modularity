@@ -102,7 +102,7 @@ class ResetPasswordController extends Controller
      * https://github.com/laravel/framework/pull/16850
      *
      * @param string $token
-     * @return \Unusualify\Modularous\Models\User|null
+     * @return User|null
      */
     protected function getUserFromToken($token)
     {

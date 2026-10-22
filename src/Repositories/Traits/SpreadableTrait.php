@@ -3,7 +3,7 @@
 namespace Unusualify\Modularous\Repositories\Traits;
 
 use Illuminate\Support\Arr;
-use Unusualify\Modularous\Models\Model;
+use Unusualify\Modularous\Entities\Model;
 
 trait SpreadableTrait
 {

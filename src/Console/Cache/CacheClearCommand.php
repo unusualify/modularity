@@ -93,7 +93,9 @@ class CacheClearCommand extends BaseCommand
         }
 
         if ($clearAll) {
-            ModularousCache::invalidateModule($module, $routeName);
+            $routeName
+                ? ModularousCache::invalidateModuleRoute($module, $routeName)
+                : ModularousCache::invalidateModule($module);
             $this->line("  <fg=green>✓</> All caches cleared for {$module}");
 
             return;

@@ -1,28 +1,18 @@
-name: PR Template Checker Experimental
+name: PR Template Checker
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [opened, edited, synchronize, reopened, labeled, unlabeled]
 
 jobs:
   check-pr:
+    if: >-
+      github.event.pull_request.user.type != 'Bot' &&
+      !contains(github.event.pull_request.labels.*.name, 'bot') &&
+      !contains(github.event.pull_request.labels.*.name, 'merge')
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - name: Get PR Commits
-        id: get-commits
-        run: |
-          # Get all commits in PR excluding merge commits
-          COMMITS=$(git log --no-merges ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} --pretty=format:"%s")
-          echo "commits<<EOF" >> $GITHUB_OUTPUT
-          echo "$COMMITS" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-
-      - name: Check Conventional Commits
-        id: conventional-commits
+      - name: Check conventional PR title
         uses: amannn/action-semantic-pull-request@v5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -39,67 +29,18 @@ jobs:
             ci
             chore
             revert
-          ignoreLabels: |
-            bot
-            merge
+          requireScope: false
 
-      - name: Update PR Template Checklist
-        if: success()
-        uses: actions/github-script@v6
+      - uses: actions/checkout@v4
         with:
-          script: |
-            const pr = context.payload.pull_request;
-            const body = pr.body;
+          sparse-checkout: .github/scripts
 
-            // Get commits from previous step
-            const commits = process.env.commits ? process.env.commits.split('\n').filter(Boolean) : [];
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
 
-            // Parse commit messages (excluding merge commits)
-            const commitPattern = /^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\(.+\))?: .+/;
-            const conventionalCommits = commits.filter(commit =>
-              !commit.startsWith('Merge') && commitPattern.test(commit)
-            );
-
-            let updatedBody = body;
-
-            // Check if all non-merge commits follow convention
-            if (conventionalCommits.length === commits.length) {
-              updatedBody = updatedBody.replace('- [ ] My code follows the code style of this project.', '- [x] My code follows the code style of this project.');
-
-              // Update type of changes based on commit types
-              conventionalCommits.forEach(commit => {
-                const type = commit.split(':')[0];
-                const checkbox = `- [ ] ${type}:`;
-                const checkedBox = `- [x] ${type}:`;
-                updatedBody = updatedBody.replace(checkbox, checkedBox);
-              });
-            }
-
-            // Fetch changed files using GitHub API
-            const { data: changedFiles } = await github.rest.pulls.listFiles({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: context.issue.number,
-            });
-
-            // Check for docs changes
-            const hasDocsChanges = changedFiles.some(file =>
-              file.filename.includes('docs') ||
-              file.filename.endsWith('.md') ||
-              file.filename.endsWith('.mdx')
-            );
-            if (hasDocsChanges) {
-              updatedBody = updatedBody.replace('- [ ] My change requires a change to the documentation.', '- [x] My change requires a change to the documentation.');
-              updatedBody = updatedBody.replace('- [ ] I have updated the documentation accordingly.', '- [x] I have updated the documentation accordingly.');
-            }
-
-            console.log(updatedBody);
-            console.log(context.issue);
-
-            // Update PR body
-            // await github.rest.pulls.update({
-            //   owner: context.repo.owner,
-            //   repo: context.repo.repo,
-            //   pull_number: context.issue.number,
-            //   body: updatedBody
-            // });
+      - name: Check PR description sections
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: node .github/scripts/check-pr-body.mjs

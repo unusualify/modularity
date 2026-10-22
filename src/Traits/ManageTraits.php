@@ -69,8 +69,6 @@ trait ManageTraits
 
                             return [$name => array_merge($_input, ['name' => $name])];
                         });
-
-                        return $this->chunkInputs($input['schema'] ?? []);
                     case 'wrap':
                         return Arr::map($this->chunkInputs($input['schema'] ?? []), function ($_input) use ($input) {
                             if (isset($input['name'])) {
@@ -79,16 +77,12 @@ trait ManageTraits
 
                             return $_input;
                         });
-
-                        break;
                     case 'morphTo':
                         if ($all) {
                             return $this->chunkInputs($input['schema']);
                         }
 
                         return [uniqid() => $input];
-
-                        break;
                     case 'repeater':
                     case 'input-repeater':
                     case 'json-repeater':

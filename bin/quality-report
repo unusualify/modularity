@@ -1,0 +1,176 @@
+#!/usr/bin/env php
+<?php
+
+/**
+ * Markdown summary of the quality gate, used as the PR comment in CI.
+ *
+ * Usage:
+ *   bin/quality-report [options]
+ *
+ * Options:
+ *   --gate=<path>       bin/coverage-gate JSON result (default: .agent/coverage-gate.json)
+ *   --check=<path>      bin/agent-check result (default: .agent/last-check.json)
+ *   --base=<ref>        Ref to compare the PHPStan baseline against (default: $QUALITY_BASE or origin/dev)
+ *   --output=<path>     Write the markdown to <path> instead of stdout
+ *   -h, --help          Show this help
+ *
+ * Missing inputs are reported as "not available"; the script always exits 0
+ * so the comment is posted even when the gate failed.
+ */
+
+declare(strict_types=1);
+
+const MARKER = '<!-- modularous-quality-report -->';
+const MAX_FILES = 15;
+
+$options = ['gate' => '.agent/coverage-gate.json', 'check' => '.agent/last-check.json', 'base' => getenv('QUALITY_BASE') ?: 'origin/dev', 'output' => null];
+foreach (array_slice($argv, 1) as $arg) {
+    if ($arg === '-h' || $arg === '--help') {
+        preg_match('#/\*\*(.*?)\*/#s', (string) file_get_contents(__FILE__), $m);
+        echo preg_replace('/^\s*\* ?/m', '', trim($m[1])) . "\n";
+        exit(0);
+    }
+    if (! preg_match('/^--(gate|check|base|output)=(.+)$/', $arg, $m)) {
+        fwrite(STDERR, "error: unknown option {$arg}\n");
+        exit(2);
+    }
+    $options[$m[1]] = $m[2];
+}
+
+chdir(__DIR__ . '/..');
+
+function readJson(string $path): ?array
+{
+    $data = is_file($path) ? json_decode((string) file_get_contents($path), true) : null;
+
+    return is_array($data) ? $data : null;
+}
+
+function baselineCount(string $contents): int
+{
+    preg_match_all('/^\s*count:\s*(\d+)/m', $contents, $m);
+
+    return array_sum(array_map('intval', $m[1]));
+}
+
+function compressLines(array $lines): string
+{
+    sort($lines);
+    $ranges = [];
+    $start = $prev = null;
+    foreach ($lines as $line) {
+        if ($start !== null && $line === $prev + 1) {
+            $prev = $line;
+
+            continue;
+        }
+        if ($start !== null) {
+            $ranges[] = $start === $prev ? "{$start}" : "{$start}-{$prev}";
+        }
+        $start = $prev = $line;
+    }
+    if ($start !== null) {
+        $ranges[] = $start === $prev ? "{$start}" : "{$start}-{$prev}";
+    }
+
+    return implode(', ', $ranges);
+}
+
+$quality = readJson('quality.json') ?? [];
+$gate = readJson($options['gate']);
+$check = readJson($options['check']);
+$icon = fn (bool $ok): string => $ok ? '✅' : '❌';
+
+$out = [MARKER, '## Quality gate', ''];
+
+if ($check !== null) {
+    $out[] = sprintf('%s `bin/agent-check %s` %s (exit %d)', $icon((bool) $check['ok']), $check['mode'] ?? '?', $check['ok'] ? 'passed' : 'failed', $check['exitCode'] ?? 0);
+    $out[] = '';
+    $out[] = '| Step | Status | Time |';
+    $out[] = '|------|--------|------|';
+    foreach ($check['steps'] ?? [] as $step) {
+        $status = match ($step['status'] ?? '') {
+            'ok' => '✅ ok',
+            'fail' => '❌ fail',
+            default => '⏭️ ' . ($step['reason'] ?? 'skipped'),
+        };
+        $out[] = sprintf('| %s | %s | %ds |', $step['step'], $status, intdiv((int) ($step['durationMs'] ?? 0), 1000));
+    }
+    $out[] = '';
+}
+
+$out[] = '### Coverage';
+$out[] = '';
+if ($gate === null) {
+    $out[] = '_Coverage report not available._';
+} else {
+    $out[] = '| Check | Measured | Threshold | Status |';
+    $out[] = '|-------|----------|-----------|--------|';
+    $totals = ['php-totals' => ['php', ['lines', 'methods']], 'vue-totals' => ['vue', ['lines', 'statements', 'branches', 'functions']]];
+    foreach ($totals as $name => [$section, $metrics]) {
+        if (! isset($gate['checks'][$name])) {
+            continue;
+        }
+        foreach ($metrics as $metric) {
+            $measured = (float) ($gate['checks'][$name]['measured'][$metric] ?? 0);
+            $threshold = (float) ($quality[$section][$metric] ?? 0);
+            $out[] = sprintf('| %s %s | %.2f%% | %.2f%% | %s |', $section === 'php' ? 'PHP' : 'Vue', $metric, $measured, $threshold, $icon($measured >= $threshold));
+        }
+    }
+    $diff = $gate['checks']['diff'] ?? null;
+    if ($diff !== null) {
+        $measured = $diff['skipped']
+            ? sprintf('skipped (%d changed lines)', $diff['coverable'])
+            : sprintf('%.2f%% (%d/%d lines)', $diff['measured'], $diff['covered'], $diff['coverable']);
+        $out[] = sprintf('| Diff (changed lines) | %s | %.2f%% | %s |', $measured, $diff['threshold'], $icon((bool) $diff['ok']));
+    }
+
+    $uncovered = array_filter($diff['files'] ?? [], fn (array $file): bool => $file['uncoveredLines'] !== []);
+    if ($uncovered !== []) {
+        $out[] = '';
+        $out[] = '<details><summary>Uncovered changed lines (' . count($uncovered) . ' files)</summary>';
+        $out[] = '';
+        foreach (array_slice($uncovered, 0, MAX_FILES, true) as $file => $info) {
+            $out[] = sprintf('- `%s`: %s', $file, compressLines($info['uncoveredLines']));
+        }
+        if (count($uncovered) > MAX_FILES) {
+            $out[] = sprintf('- … and %d more files', count($uncovered) - MAX_FILES);
+        }
+        $out[] = '';
+        $out[] = '</details>';
+    }
+}
+$out[] = '';
+
+$out[] = '### PHPStan';
+$out[] = '';
+$level = $quality['phpstan']['level'] ?? '?';
+$max = $quality['phpstan']['baselineMaxErrors'] ?? null;
+if (is_file('phpstan-baseline.neon')) {
+    $current = baselineCount((string) file_get_contents('phpstan-baseline.neon'));
+    $line = sprintf('Level %s, baseline %d errors', $level, $current);
+    $line .= $max !== null ? sprintf(' (cap %d)', $max) : '';
+    exec('git show ' . escapeshellarg($options['base'] . ':phpstan-baseline.neon') . ' 2>/dev/null', $baseLines, $code);
+    if ($code === 0) {
+        exec('git show ' . escapeshellarg($options['base'] . ':quality.json') . ' 2>/dev/null', $baseQuality);
+        $baseLevel = json_decode(implode("\n", $baseQuality), true)['phpstan']['level'] ?? $level;
+        $delta = $current - baselineCount(implode("\n", $baseLines));
+        $line .= match (true) {
+            $baseLevel !== $level => sprintf(', %+d vs `%s` (level %s → %s)', $delta, $options['base'], $baseLevel, $level),
+            $delta < 0 => sprintf(', %d fewer than `%s` 🎉', -$delta, $options['base']),
+            $delta > 0 => sprintf(', %d more than `%s` ❌', $delta, $options['base']),
+            default => sprintf(', unchanged from `%s`', $options['base']),
+        };
+    }
+    $out[] = $line . '.';
+} else {
+    $out[] = '_No baseline file._';
+}
+
+$markdown = implode("\n", $out) . "\n";
+if ($options['output'] !== null) {
+    @mkdir(dirname($options['output']), 0777, true);
+    file_put_contents($options['output'], $markdown);
+} else {
+    echo $markdown;
+}

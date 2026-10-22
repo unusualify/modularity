@@ -26,6 +26,7 @@ Modularous (Modularous) is a Laravel package that provides a modular admin panel
 | [Console Conventions](./console-conventions) | Command naming and signature rules |
 | [Entities](./entities) | Models, entity traits, enums |
 | [Features Pattern](./features) | Entity + Repository + Hydrate triple pattern |
+| [Quality Gates](./quality-gates) | `quality.json`, `composer check` / `check:full`, coverage gate, agent workflow |
 
 **Guides**
 
@@ -56,4 +57,4 @@ Modularous (Modularous) is a Laravel package that provides a modular admin panel
 
 ## For Contributors
 
-See [AGENTS.md](https://github.com/unusualify/modularous/blob/main/AGENTS.md) for package development rules, patterns, and conventions.
+See [AGENTS.md](https://github.com/unusualify/modularous/blob/main/AGENTS.md) for package development rules, patterns, and conventions. Run `composer check` after changes and `composer check:full` before pushing; see [Quality Gates](./quality-gates).

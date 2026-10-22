@@ -1,6 +1,6 @@
 // test/components/v-input-image.test.js
-import { describe, expect, test, vi } from 'vitest'
-import { mount } from '@vue/test-utils'
+import { afterEach, describe, expect, test, vi } from 'vitest'
+import { enableAutoUnmount, mount } from '@vue/test-utils'
 
 import Image from '../../src/js/components/inputs/Image.vue'
 import createModularousVuetify from '../../src/js/plugins/vuetify'
@@ -15,6 +15,9 @@ global.ResizeObserver = class ResizeObserver {
 }
 
 const vuetify = createModularousVuetify()
+
+// VImg polls image size with timers that outlive the test environment unless the wrapper is unmounted.
+enableAutoUnmount(afterEach)
 
 let getModel = () => [
   {

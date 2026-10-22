@@ -2,10 +2,10 @@
     "trigger": "push",
     "scenarios": [
       {
-        "name": "Push to main (security fix)",
-        "description": "Push event to main branch with generated test file update",
+        "name": "Push to dev (security fix)",
+        "description": "Push event to dev with a generated test file update",
         "event": {
-          "ref": "refs/heads/main",
+          "ref": "refs/heads/dev",
           "commits": [
             {
               "message": "Fix: resolve security issue",
@@ -40,10 +40,10 @@
         }
       },
       {
-        "name": "Push to develop (multiple commits)",
+        "name": "Push to 12.x (multiple commits)",
         "description": "Push event with multiple commits and mixed file updates",
         "event": {
-          "ref": "refs/heads/develop",
+          "ref": "refs/heads/12.x",
           "commits": [
             {
               "message": "Refactor: cleanup observer logic",
@@ -69,10 +69,10 @@
         }
       },
       {
-        "name": "Push with docs + config change",
-        "description": "Push event updating documentation and CI config",
+        "name": "Push with docs + workflow change",
+        "description": "Docs-only changes are ignored; the workflow change still runs the quality gate",
         "event": {
-          "ref": "refs/heads/main",
+          "ref": "refs/heads/dev",
           "commits": [
             {
               "message": "Docs: update README and workflow config",
@@ -83,8 +83,27 @@
                   "content": "# Modularous AI\n\nUpdated documentation for local workflow testing.\n"
                 },
                 {
-                  "path": ".github/workflows/tests.yml",
-                  "content": "name: Tests\n\non: [push]\n\njobs:\n  phpunit:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - run: echo \"Running tests...\"\n"
+                  "path": ".github/workflows/quality.yml",
+                  "content": "name: Quality\n\non:\n  workflow_call:\n\njobs:\n  pint:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - run: vendor/bin/pint --test\n"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "name": "Push docs only (skipped)",
+        "description": "Only markdown changes; the Tests workflow is skipped via paths-ignore",
+        "event": {
+          "ref": "refs/heads/dev",
+          "commits": [
+            {
+              "message": "Docs: fix typo",
+              "author": { "name": "Docs Maintainer" },
+              "files": [
+                {
+                  "path": "docs/src/pages/system-reference/quality-gates.md",
+                  "content": "# Quality Gates\n"
                 }
               ]
             }

@@ -68,8 +68,6 @@ trait MakesResponses
     protected function getBackLinkSessionKey()
     {
         return $this->moduleName . '.' . $this->routeName . ($this->isNested ? $this->nestedParentId ?? '' : '') . '_back_link';
-
-        return $this->moduleName . '.' . $this->routeName . ($this->submodule ? $this->submoduleParentId ?? '' : '') . '_back_link';
     }
 
     /**

@@ -1,5 +1,6 @@
 import { defineConfig } from 'vitest/config'
 import path from 'path'
+import { readFileSync } from 'node:fs'
 import { fileURLToPath, URL } from 'node:url'
 
 import Vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
@@ -9,6 +10,7 @@ import { createSassPreprocessorOptions } from './sass-preprocessor-options.mjs'
 const __dirname = fileURLToPath(new URL('.', import.meta.url))
 const srcDir = fileURLToPath(new URL('src', import.meta.url))
 const testThemeFolder = 'unusualify'
+const quality = JSON.parse(readFileSync(new URL('../quality.json', import.meta.url), 'utf8'))
 
 export default defineConfig({
   root: path.resolve(__dirname),
@@ -22,8 +24,15 @@ export default defineConfig({
         ['lcov', { projectRoot: path.resolve(__dirname, '../../..') }],
         'clover',
         'json',
+        'json-summary',
       ],
       reportsDirectory: './coverage',
+      thresholds: {
+        lines: quality.vue.lines,
+        statements: quality.vue.statements,
+        branches: quality.vue.branches,
+        functions: quality.vue.functions,
+      },
       include: ['src/**/*.{js,ts,vue}'],
       exclude: [
         '**/components/customs/**',

@@ -28,9 +28,7 @@ if (! function_exists('getModularousDefaultUrls')) {
         return [
             'languages' => route(Route::hasAdmin('api.languages.index')),
             'base_permalinks' => Arr::mapWithKeys(getLocales(), function ($locale, $key) {
-                extract(parse_url(config('app.url'))); // $scheme, $host
-
-                return [$locale => $host];
+                return [$locale => parse_url(config('app.url'), PHP_URL_HOST)];
             }),
         ];
     }

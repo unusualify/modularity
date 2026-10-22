@@ -30,7 +30,6 @@ trait CollationSelector
      * Set the should use search collation value.
      *
      * @param bool $value
-     * @return void
      */
     public function setShouldUseSearchCollation($value)
     {

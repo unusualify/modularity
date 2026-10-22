@@ -169,21 +169,12 @@ abstract class CoreController extends LaravelController implements ModuleableInt
     public function getRepository()
     {
         return $this->getRepositoryClass($this->modelName) ? App::make($this->getRepositoryClass($this->modelName)) : null;
-        try {
-            // code...
-        } catch (\Throwable $th) {
-            dd(
-                "repositoryClass not exists for {$this->routeName} in {$this->moduleName}",
-            );
-            throw $th;
-        }
     }
 
     /**
      * getRepositoryClass
      *
      * @param mixed $model
-     * @return void
      */
     public function getRepositoryClass($model)
     {
@@ -192,13 +183,10 @@ abstract class CoreController extends LaravelController implements ModuleableInt
         }
 
         return null;
-
-        // TODO if repository is not exists
-        return TwillCapsules::getCapsuleForModel($model)->getRepositoryClass();
     }
 
     /**
-     * @return \Unusualify\Modularity\Transformers\
+     * @return mixed
      */
     protected function getTransformer($data = [])
     {
@@ -437,7 +425,7 @@ abstract class CoreController extends LaravelController implements ModuleableInt
     /**
      * tags
      *
-     * @return Illuminate\Support\Facades\Response
+     * @return Response
      */
     public function tags()
     {
@@ -464,7 +452,7 @@ abstract class CoreController extends LaravelController implements ModuleableInt
     /**
      * update Tags
      *
-     * @return Illuminate\Support\Facades\Response
+     * @return Response
      */
     public function tagsUpdate()
     {
@@ -484,18 +472,6 @@ abstract class CoreController extends LaravelController implements ModuleableInt
             'variant' => MessageStage::SUCCESS,
             'id' => $tag->id,
         ], 200);
-
-        return Response::json(
-            [
-                'resource' => [
-                    'last_page' => 1,
-                    'data' => $tags->map(function ($tag) {
-                        return $tag->name;
-                    }
-                    ),
-                ],
-            ], 200);
-
     }
 
     public function assignments($id)

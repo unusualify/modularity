@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# Points git at the versioned hooks in .githooks (pre-push quality gate).
+# Runs from composer post-install-cmd; skipped in CI and when the package is not
+# its own git checkout (e.g. installed under vendor/).
+
+set -uo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT" || exit 0
+
+if [[ "${CI:-}" == "true" || "${CI:-}" == "1" ]]; then
+    echo "install-hooks: CI detected, skipping"
+    exit 0
+fi
+
+toplevel="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+if [[ "$toplevel" != "$ROOT" ]]; then
+    echo "install-hooks: $ROOT is not a git checkout root, skipping"
+    exit 0
+fi
+
+current="$(git config --get core.hooksPath || true)"
+if [[ -n "$current" && "$current" != ".githooks" ]]; then
+    echo "install-hooks: core.hooksPath is already '$current', leaving it unchanged" >&2
+    exit 0
+fi
+
+chmod +x .githooks/* 2>/dev/null || true
+git config core.hooksPath .githooks
+echo "install-hooks: core.hooksPath=.githooks"

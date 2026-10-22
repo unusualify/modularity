@@ -4,6 +4,7 @@ namespace Unusualify\Modularous\Http\Controllers\Traits\Table;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\AbstractPaginator;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -20,7 +21,7 @@ trait TableItem
     protected $identifierColumnKey = 'id';
 
     /**
-     * @param \Unusualify\Modularous\Models\Model $item
+     * @param \Unusualify\Modularous\Entities\Model $item
      * @return int|string
      */
     protected function getItemIdentifier($item)
@@ -384,7 +385,7 @@ trait TableItem
     }
 
     /**
-     * @param \Unusualify\Modularous\Models\Model $item
+     * @param \Unusualify\Modularous\Entities\Model $item
      * @param bool $translated
      * @param array $schema
      * @return array
@@ -472,7 +473,7 @@ trait TableItem
     }
 
     /**
-     * @param \Unusualify\Modularous\Models\Model $item
+     * @param \Unusualify\Modularous\Entities\Model $item
      * @return array
      */
     public function getFormattedIndexItem($item)
@@ -498,7 +499,7 @@ trait TableItem
     }
 
     /**
-     * @param Illuminate\Pagination\LengthAwarePaginator $paginator
+     * @param LengthAwarePaginator $paginator
      * @return array
      */
     public function getFormattedIndexItems(AbstractPaginator $paginator) // getIndexTableItems

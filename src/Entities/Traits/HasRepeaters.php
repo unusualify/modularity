@@ -37,7 +37,7 @@ trait HasRepeaters
      * Defines the one-to-many relationship between the module and Repeater.
      * Get all repeaters belonging to a module.
      *
-     * @uses  Unusualify\Modularous\Entities\Repeater::class
+     * @uses  \Unusualify\Modularous\Entities\Repeater::class
      */
     public function repeaters($role = null, $locale = null): MorphMany
     {

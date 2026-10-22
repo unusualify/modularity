@@ -2,24 +2,27 @@
 
 namespace Unusualify\Modularous\Activators;
 
+use Illuminate\Cache\CacheManager;
+use Illuminate\Config\Repository;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Filesystem\Filesystem;
 use Nwidart\Modules\Activators\FileActivator;
 
 class ModuleActivator extends FileActivator
 {
     /**
-     * @var Illuminate\Filesystem\Filesystem
+     * @var Filesystem
      */
     private $files;
 
     /**
-     * @var Illuminate\Filesystem\Filesystem
+     * @var CacheManager
      */
     private $cache;
 
     /**
-     * @var Illuminate\Config\Repository
+     * @var Repository
      */
     private $config;
 

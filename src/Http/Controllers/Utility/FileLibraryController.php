@@ -2,6 +2,7 @@
 
 namespace Unusualify\Modularous\Http\Controllers\Utility;
 
+use Illuminate\Config\Repository;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Foundation\Application;
@@ -10,9 +11,9 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\ResponseFactory;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Support\Facades\Route;
+use Unusualify\Modularous\Entities\File;
 use Unusualify\Modularous\Http\Controllers\BaseController;
 use Unusualify\Modularous\Http\Requests\FileRequest;
-use Unusualify\Modularous\Models\File;
 use Unusualify\Modularous\Services\Uploader\SignAzureUpload;
 use Unusualify\Modularous\Services\Uploader\SignS3Upload;
 use Unusualify\Modularous\Services\Uploader\SignUploadListener;
@@ -67,17 +68,17 @@ class FileLibraryController extends BaseController implements SignUploadListener
     protected $endpointType;
 
     /**
-     * @var Illuminate\Routing\UrlGenerator
+     * @var UrlGenerator
      */
     protected $urlGenerator;
 
     /**
-     * @var Illuminate\Routing\ResponseFactory
+     * @var ResponseFactory
      */
     protected $responseFactory;
 
     /**
-     * @var Illuminate\Config\Repository
+     * @var Repository
      */
     protected $laravelConfig;
 

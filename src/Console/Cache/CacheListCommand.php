@@ -78,7 +78,7 @@ class CacheListCommand extends Command
         }
 
         $cacheDir = $store->getDirectory();
-        $this->limit = $this->option('limit');
+        $this->limit = (int) $this->option('limit');
 
         $this->scanDirectory($cacheDir);
 
@@ -133,7 +133,7 @@ class CacheListCommand extends Command
         if ($expire == 9999999999 || $expire > time()) {
             $this->rows[] = [
                 $key,
-                date('Y-m-d H:i:s', $expire),
+                date('Y-m-d H:i:s', (int) $expire),
                 json_encode($value, JSON_PRETTY_PRINT),
             ];
         }

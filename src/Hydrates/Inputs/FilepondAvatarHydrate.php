@@ -43,8 +43,6 @@ class FilepondAvatarHydrate extends InputHydrate
 
     /**
      * Manipulate Input Schema Structure
-     *
-     * @return void
      */
     public function hydrate()
     {

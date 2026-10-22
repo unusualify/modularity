@@ -24,6 +24,7 @@ use Unusualify\Modularous\Facades\Modularous;
 use Unusualify\Modularous\LaravelServiceProvider;
 use Unusualify\Modularous\Module;
 use Unusualify\Modularous\Services\FileTranslation;
+use Unusualify\Modularous\Support\Decomposers\ModelRelationParser;
 use Unusualify\Modularous\Support\Decomposers\SchemaParser;
 use Unusualify\Modularous\Traits\ManageNames;
 
@@ -178,7 +179,7 @@ class RouteGenerator extends Generator
     /**
      * modelRelationParser
      *
-     * @var Unusualify\Modularous\Support\Decomposers\ModelRelationParser::class
+     * @var ModelRelationParser::class
      */
     protected $modelRelationParser;
 
@@ -570,7 +571,7 @@ class RouteGenerator extends Generator
     /**
      * Set custom model.
      *
-     * @param string class
+     * @param string $class
      * @return $this
      */
     public function setCustomModel($class)
