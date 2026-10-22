@@ -9,7 +9,7 @@ use Unusualify\Modularous\Services\ModularousCacheService;
  * @method static string getDriver()
  * @method static string getPrefix()
  * @method static void invalidateFormItemCache(string $module, string $routeName, $id)
- * @method static void invalidatePresentationItemCache(string $module, string $routeName, $id)
+ * @method static void invalidatePresentationItemCache(string $module, string $routeName, $id, ?string $modelClass = null)
  * @method static bool isSwrEnabled(?string $module = null, ?string $routeName = null, ?string $type = null)
  * @method static int getStaleTtl(?string $type = null)
  * @method static bool isWebhookEnabled()

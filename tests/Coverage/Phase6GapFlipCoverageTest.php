@@ -163,8 +163,19 @@ class Phase6GapFlipCoverageTest extends TestCase
         $miss = $repo->rememberIndexWithRelationsPublic('idx', 60, 'Mod', 'Route', [], [], [], 10, [], false, null, []);
         $this->assertInstanceOf(LengthAwarePaginator::class, $miss);
 
-        // withoutRelationTracking -> remember() has a signature mismatch in src; cover the flag toggle only.
         $this->assertFalse($repo->withoutRelationTracking()->trackCacheRelationsPublic());
+
+        ModularousCache::shouldReceive('remember')
+            ->once()
+            ->withArgs(fn ($key, $ttl, $callback, $module, $route) => $key === 'phase6-record'
+                && $ttl === 60
+                && $callback instanceof \Closure
+                && $module === 'Phase6'
+                && $route === 'Post')
+            ->andReturnUsing(fn ($key, $ttl, $callback) => $callback());
+
+        $uncached = $repo->getByIdCached($post->id, ['company']);
+        $this->assertInstanceOf(Phase6CacheablePost::class, $uncached);
     }
 
     /** @test */

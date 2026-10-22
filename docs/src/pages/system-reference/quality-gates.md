@@ -43,7 +43,7 @@ flowchart TD
     "php": { "lines": 79.5, "methods": 70 },
     "vue": { "lines": 62.5, "statements": 62.5, "branches": 69, "functions": 33.5 },
     "diff": { "lines": 80, "minChangedLines": 5 },
-    "phpstan": { "enabled": true, "level": 0, "baselineMaxErrors": 830 },
+    "phpstan": { "enabled": true, "level": 1, "baselineMaxErrors": 1418 },
     "ratchet": true,
     "measured": { "date": "2026-10-22", "php": { "...": "..." }, "vue": { "...": "..." } }
 }
@@ -167,6 +167,6 @@ Diff coverage needs a fresh report. With a stale `coverage-clover.xml` the line 
 | Area | Status |
 |------|--------|
 | Coverage thresholds | Enforced locally (`check:full`, `npm run test:coverage`) |
-| PHPStan | Enabled at level 0 with `phpstan-baseline.neon` (830 errors, capped by `baselineMaxErrors`). Next: level-by-level climb towards level 8+, shrinking the baseline each step |
+| PHPStan | Enabled at level 1 with `phpstan-baseline.neon` (1418 errors, capped by `baselineMaxErrors`). Next: level-by-level climb towards level 8+, shrinking the baseline each step |
 | Agent enforcement | Planned: always-applied Cursor rule, Cursor `stop` hook and git `pre-push` hook calling the runner |
 | CI | Planned: reusable workflow calling the same runner and `bin/coverage-gate` instead of inline thresholds |

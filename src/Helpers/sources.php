@@ -41,6 +41,7 @@ if (! function_exists('getTimezoneList')) {
     {
         return Cache::rememberForever('timezones_list_collection', function () {
             $timestamp = time();
+            $timezone = [];
             foreach (timezone_identifiers_list(DateTimeZone::ALL) as $key => $value) {
                 date_default_timezone_set($value);
                 $timezone[$value] = $value . ' (UTC ' . date('P', $timestamp) . ')';

@@ -252,7 +252,6 @@ trait CacheableTrait
 
         return ModularousCache::remember(
             $cacheKey,
-            'record',
             $ttl,
             fn () => $this->getById($id, $with, $withCount, $lazy, $scopes, $useDefaultScopes),
             $module,

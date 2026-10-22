@@ -43,10 +43,94 @@ parameters:
 			path: modules/Cms/Blueprint/Page/Form/PageFormInputs.php
 
 		-
+			message: '#^Access to an undefined property Modules\\Cms\\Entities\\HomepageTest\:\:\$filepondableClass\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/Cms/Entities/HomepageTest.php
+
+		-
+			message: '#^Access to an undefined property Modules\\Cms\\Entities\\HomepageTest\:\:\$translatedAttributes\.$#'
+			identifier: property.notFound
+			count: 2
+			path: modules/Cms/Entities/HomepageTest.php
+
+		-
 			message: '#^Called ''slice'' on Laravel collection, but could have been retrieved as a query\.$#'
 			identifier: larastan.noUnnecessaryCollectionCall
 			count: 1
 			path: modules/Cms/Entities/HomepageTest.php
+
+		-
+			message: '#^Access to an undefined property Modules\\Cms\\Entities\\Page\:\:\$base_price_discounted_raw_amount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/Cms/Entities/Page.php
+
+		-
+			message: '#^Access to an undefined property Modules\\Cms\\Entities\\Page\:\:\$base_price_discounted_vat_amount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/Cms/Entities/Page.php
+
+		-
+			message: '#^Access to an undefined property Modules\\Cms\\Entities\\Page\:\:\$base_price_raw_amount\.$#'
+			identifier: property.notFound
+			count: 2
+			path: modules/Cms/Entities/Page.php
+
+		-
+			message: '#^Access to an undefined property Modules\\Cms\\Entities\\Page\:\:\$base_price_raw_discount_amount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/Cms/Entities/Page.php
+
+		-
+			message: '#^Access to an undefined property Modules\\Cms\\Entities\\Page\:\:\$base_price_subtotal_amount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/Cms/Entities/Page.php
+
+		-
+			message: '#^Access to an undefined property Modules\\Cms\\Entities\\Page\:\:\$base_price_total_amount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/Cms/Entities/Page.php
+
+		-
+			message: '#^Access to an undefined property Modules\\Cms\\Entities\\Page\:\:\$base_price_total_discount_amount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/Cms/Entities/Page.php
+
+		-
+			message: '#^Access to an undefined property Modules\\Cms\\Entities\\Page\:\:\$base_price_vat_amount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/Cms/Entities/Page.php
+
+		-
+			message: '#^Access to an undefined property Modules\\Cms\\Entities\\Page\:\:\$base_price_vat_discount_amount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/Cms/Entities/Page.php
+
+		-
+			message: '#^Access to an undefined property Modules\\Cms\\Entities\\Page\:\:\$filepondableClass\.$#'
+			identifier: property.notFound
+			count: 2
+			path: modules/Cms/Entities/Page.php
+
+		-
+			message: '#^Access to an undefined property Modules\\Cms\\Entities\\Page\:\:\$getSlugModelClass\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/Cms/Entities/Page.php
+
+		-
+			message: '#^Access to an undefined property Modules\\Cms\\Entities\\Page\:\:\$memoizedTranslations\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/Cms/Entities/Page.php
 
 		-
 			message: '#^Array has 2 duplicate keys with value ''Â'' \(''Â'', ''Â''\)\.$#'
@@ -169,6 +253,72 @@ parameters:
 			path: modules/Cms/Entities/Page.php
 
 		-
+			message: '#^Variable \$slugParams in empty\(\) always exists and is not falsy\.$#'
+			identifier: empty.variable
+			count: 1
+			path: modules/Cms/Entities/Page.php
+
+		-
+			message: '#^Access to an undefined property Modules\\Cms\\Entities\\SiteSetting\:\:\$base_price_discounted_raw_amount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/Cms/Entities/SiteSetting.php
+
+		-
+			message: '#^Access to an undefined property Modules\\Cms\\Entities\\SiteSetting\:\:\$base_price_discounted_vat_amount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/Cms/Entities/SiteSetting.php
+
+		-
+			message: '#^Access to an undefined property Modules\\Cms\\Entities\\SiteSetting\:\:\$base_price_raw_amount\.$#'
+			identifier: property.notFound
+			count: 2
+			path: modules/Cms/Entities/SiteSetting.php
+
+		-
+			message: '#^Access to an undefined property Modules\\Cms\\Entities\\SiteSetting\:\:\$base_price_raw_discount_amount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/Cms/Entities/SiteSetting.php
+
+		-
+			message: '#^Access to an undefined property Modules\\Cms\\Entities\\SiteSetting\:\:\$base_price_subtotal_amount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/Cms/Entities/SiteSetting.php
+
+		-
+			message: '#^Access to an undefined property Modules\\Cms\\Entities\\SiteSetting\:\:\$base_price_total_amount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/Cms/Entities/SiteSetting.php
+
+		-
+			message: '#^Access to an undefined property Modules\\Cms\\Entities\\SiteSetting\:\:\$base_price_total_discount_amount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/Cms/Entities/SiteSetting.php
+
+		-
+			message: '#^Access to an undefined property Modules\\Cms\\Entities\\SiteSetting\:\:\$base_price_vat_amount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/Cms/Entities/SiteSetting.php
+
+		-
+			message: '#^Access to an undefined property Modules\\Cms\\Entities\\SiteSetting\:\:\$base_price_vat_discount_amount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/Cms/Entities/SiteSetting.php
+
+		-
+			message: '#^Access to an undefined property Modules\\Cms\\Entities\\SiteSetting\:\:\$filepondableClass\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/Cms/Entities/SiteSetting.php
+
+		-
 			message: '#^Method Modules\\Cms\\Http\\Controllers\\API\\HomepageTestController\:\:destroy\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
 			identifier: return.missing
 			count: 1
@@ -217,6 +367,12 @@ parameters:
 			path: modules/Cms/Http/Controllers/API/LayoutBuilderController.php
 
 		-
+			message: '#^Call to an undefined static method Mcamara\\LaravelLocalization\\Facades\\LaravelLocalization\:\:getLocalizedURL\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: modules/Cms/Localization/McamaraCmsLocalizationAdapter.php
+
+		-
 			message: '#^Method Modules\\Cms\\Repositories\\PageRepository\:\:afterSaveRepeatersTrait\(\) should return Unusualify\\Modularous\\Entities\\Model but return statement is missing\.$#'
 			identifier: return.missing
 			count: 1
@@ -247,6 +403,12 @@ parameters:
 			path: modules/Cms/Services/Stylesheet/UtilityCssGenerator.php
 
 		-
+			message: '#^Call to an undefined method Modules\\ErrorPage\\Entities\\ErrorPage\:\:getLocaleKey\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: modules/ErrorPage/Entities/ErrorPage.php
+
+		-
 			message: '#^Unsafe usage of new static\(\)\.$#'
 			identifier: new.static
 			count: 2
@@ -275,6 +437,18 @@ parameters:
 			identifier: return.missing
 			count: 1
 			path: modules/ErrorPage/Http/Controllers/API/ErrorPageController.php
+
+		-
+			message: '#^Call to an undefined static method Unusualify\\Modularous\\View\\Component\:\:makeDiv\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 6
+			path: modules/SystemNotification/Blueprint/MyNotification/Index/MyNotificationIndexRowActions.php
+
+		-
+			message: '#^Call to an undefined static method Unusualify\\Modularous\\View\\Component\:\:makeVBtn\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 2
+			path: modules/SystemNotification/Blueprint/MyNotification/Index/MyNotificationIndexRowActions.php
 
 		-
 			message: '#^Method Modules\\SystemNotification\\Http\\Controllers\\API\\MyNotificationController\:\:destroy\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
@@ -325,10 +499,100 @@ parameters:
 			path: modules/SystemNotification/Http/Controllers/API/NotificationController.php
 
 		-
+			message: '#^Access to an undefined property Modules\\SystemPayment\\Entities\\MyPayment\:\:\$definedRelationTypes\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemPayment/Entities/MyPayment.php
+
+		-
+			message: '#^Call to an undefined method \$this\(Modules\\SystemPayment\\Entities\\MyPayment\)\:\:getTranslatedAttributes\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: modules/SystemPayment/Entities/MyPayment.php
+
+		-
+			message: '#^Call to an undefined method Modules\\SystemPayment\\Entities\\MyPayment\:\:getLocaleKey\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: modules/SystemPayment/Entities/MyPayment.php
+
+		-
 			message: '#^Unsafe usage of new static\(\)\.$#'
 			identifier: new.static
 			count: 2
 			path: modules/SystemPayment/Entities/MyPayment.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPayment\\Entities\\Payment\:\:\$amount\.$#'
+			identifier: property.notFound
+			count: 2
+			path: modules/SystemPayment/Entities/Payment.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPayment\\Entities\\Payment\:\:\$authorizedRolesForCreatorRecord\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemPayment/Entities/Payment.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPayment\\Entities\\Payment\:\:\$creator_record_exists\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemPayment/Entities/Payment.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPayment\\Entities\\Payment\:\:\$definedRelationTypes\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemPayment/Entities/Payment.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPayment\\Entities\\Payment\:\:\$filepondableClass\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemPayment/Entities/Payment.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPayment\\Entities\\Payment\:\:\$payment_gateway\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemPayment/Entities/Payment.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPayment\\Entities\\Payment\:\:\$skipCacheInvalidation\.$#'
+			identifier: property.notFound
+			count: 2
+			path: modules/SystemPayment/Entities/Payment.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPayment\\Entities\\Payment\:\:\$status\.$#'
+			identifier: property.notFound
+			count: 5
+			path: modules/SystemPayment/Entities/Payment.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPayment\\Entities\\Payment\:\:\$status_color\.$#'
+			identifier: property.notFound
+			count: 2
+			path: modules/SystemPayment/Entities/Payment.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPayment\\Entities\\Payment\:\:\$status_icon\.$#'
+			identifier: property.notFound
+			count: 2
+			path: modules/SystemPayment/Entities/Payment.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPayment\\Entities\\Payment\:\:\$status_label\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemPayment/Entities/Payment.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPayment\\Entities\\Payment\:\:\$updated_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemPayment/Entities/Payment.php
 
 		-
 			message: '#^Access to an undefined static property static\(Modules\\SystemPayment\\Entities\\Payment\)\:\:\$abortCreatorRoleExceptions\.$#'
@@ -361,6 +625,18 @@ parameters:
 			path: modules/SystemPayment/Entities/Payment.php
 
 		-
+			message: '#^Call to an undefined method \$this\(Modules\\SystemPayment\\Entities\\Payment\)\:\:getTranslatedAttributes\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: modules/SystemPayment/Entities/Payment.php
+
+		-
+			message: '#^Call to an undefined method Modules\\SystemPayment\\Entities\\Payment\:\:getLocaleKey\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: modules/SystemPayment/Entities/Payment.php
+
+		-
 			message: '#^Class App\\Models\\User not found\.$#'
 			identifier: class.notFound
 			count: 1
@@ -371,6 +647,72 @@ parameters:
 			identifier: new.static
 			count: 4
 			path: modules/SystemPayment/Entities/Payment.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPayment\\Entities\\PaymentCountry\:\:\$base_price_discounted_raw_amount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemPayment/Entities/PaymentCountry.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPayment\\Entities\\PaymentCountry\:\:\$base_price_discounted_vat_amount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemPayment/Entities/PaymentCountry.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPayment\\Entities\\PaymentCountry\:\:\$base_price_raw_amount\.$#'
+			identifier: property.notFound
+			count: 2
+			path: modules/SystemPayment/Entities/PaymentCountry.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPayment\\Entities\\PaymentCountry\:\:\$base_price_raw_discount_amount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemPayment/Entities/PaymentCountry.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPayment\\Entities\\PaymentCountry\:\:\$base_price_subtotal_amount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemPayment/Entities/PaymentCountry.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPayment\\Entities\\PaymentCountry\:\:\$base_price_total_amount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemPayment/Entities/PaymentCountry.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPayment\\Entities\\PaymentCountry\:\:\$base_price_total_discount_amount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemPayment/Entities/PaymentCountry.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPayment\\Entities\\PaymentCountry\:\:\$base_price_vat_amount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemPayment/Entities/PaymentCountry.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPayment\\Entities\\PaymentCountry\:\:\$base_price_vat_discount_amount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemPayment/Entities/PaymentCountry.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPayment\\Entities\\PaymentCountry\:\:\$currencyVatRates\.$#'
+			identifier: property.notFound
+			count: 3
+			path: modules/SystemPayment/Entities/PaymentCountry.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPayment\\Entities\\PaymentCountry\:\:\$filepondableClass\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemPayment/Entities/PaymentCountry.php
 
 		-
 			message: '#^Access to an undefined static property static\(Modules\\SystemPayment\\Entities\\PaymentCountry\)\:\:\$spreadableClass\.$#'
@@ -385,6 +727,96 @@ parameters:
 			path: modules/SystemPayment/Entities/PaymentCountry.php
 
 		-
+			message: '#^Call to an undefined method Modules\\SystemPayment\\Entities\\PaymentCountry\:\:hasRepeaterValue\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: modules/SystemPayment/Entities/PaymentCountry.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPayment\\Entities\\PaymentCurrency\:\:\$base_price_discounted_raw_amount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemPayment/Entities/PaymentCurrency.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPayment\\Entities\\PaymentCurrency\:\:\$base_price_discounted_vat_amount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemPayment/Entities/PaymentCurrency.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPayment\\Entities\\PaymentCurrency\:\:\$base_price_raw_amount\.$#'
+			identifier: property.notFound
+			count: 2
+			path: modules/SystemPayment/Entities/PaymentCurrency.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPayment\\Entities\\PaymentCurrency\:\:\$base_price_raw_discount_amount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemPayment/Entities/PaymentCurrency.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPayment\\Entities\\PaymentCurrency\:\:\$base_price_subtotal_amount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemPayment/Entities/PaymentCurrency.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPayment\\Entities\\PaymentCurrency\:\:\$base_price_total_amount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemPayment/Entities/PaymentCurrency.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPayment\\Entities\\PaymentCurrency\:\:\$base_price_total_discount_amount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemPayment/Entities/PaymentCurrency.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPayment\\Entities\\PaymentCurrency\:\:\$base_price_vat_amount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemPayment/Entities/PaymentCurrency.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPayment\\Entities\\PaymentCurrency\:\:\$base_price_vat_discount_amount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemPayment/Entities/PaymentCurrency.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPayment\\Entities\\PaymentCurrency\:\:\$companyVatRate\.$#'
+			identifier: property.notFound
+			count: 3
+			path: modules/SystemPayment/Entities/PaymentCurrency.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPayment\\Entities\\PaymentCurrency\:\:\$companyVatRates\.$#'
+			identifier: property.notFound
+			count: 2
+			path: modules/SystemPayment/Entities/PaymentCurrency.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPayment\\Entities\\PaymentCurrency\:\:\$corporateVatRate\.$#'
+			identifier: property.notFound
+			count: 2
+			path: modules/SystemPayment/Entities/PaymentCurrency.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPayment\\Entities\\PaymentCurrency\:\:\$filepondableClass\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemPayment/Entities/PaymentCurrency.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPayment\\Entities\\PaymentCurrency\:\:\$personalVatRate\.$#'
+			identifier: property.notFound
+			count: 3
+			path: modules/SystemPayment/Entities/PaymentCurrency.php
+
+		-
 			message: '#^Access to an undefined static property static\(Modules\\SystemPayment\\Entities\\PaymentCurrency\)\:\:\$spreadableClass\.$#'
 			identifier: staticProperty.notFound
 			count: 1
@@ -395,6 +827,12 @@ parameters:
 			identifier: staticProperty.notFound
 			count: 1
 			path: modules/SystemPayment/Entities/PaymentCurrency.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPayment\\Entities\\PaymentService\:\:\$serviceClass\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemPayment/Entities/PaymentService.php
 
 		-
 			message: '#^Access to an undefined static property static\(Modules\\SystemPayment\\Entities\\PaymentService\)\:\:\$spreadableClass\.$#'
@@ -655,6 +1093,12 @@ parameters:
 			path: modules/SystemPayment/Http/Controllers/PriceController.php
 
 		-
+			message: '#^Variable \$previousUrl on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.variable
+			count: 4
+			path: modules/SystemPayment/Http/Controllers/PriceController.php
+
+		-
 			message: '#^Method Modules\\SystemPayment\\Repositories\\PaymentCountryRepository\:\:afterSaveRepeatersTrait\(\) should return Unusualify\\Modularous\\Entities\\Model but return statement is missing\.$#'
 			identifier: return.missing
 			count: 1
@@ -673,10 +1117,118 @@ parameters:
 			path: modules/SystemPayment/Repositories/PaymentRepository.php
 
 		-
+			message: '#^Access to an undefined property Modules\\SystemPricing\\Entities\\Currency\:\:\$definedRelationTypes\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemPricing/Entities/Currency.php
+
+		-
+			message: '#^Call to an undefined method \$this\(Modules\\SystemPricing\\Entities\\Currency\)\:\:getTranslatedAttributes\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: modules/SystemPricing/Entities/Currency.php
+
+		-
+			message: '#^Call to an undefined method Modules\\SystemPricing\\Entities\\Currency\:\:getLocaleKey\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: modules/SystemPricing/Entities/Currency.php
+
+		-
 			message: '#^Unsafe usage of new static\(\)\.$#'
 			identifier: new.static
 			count: 2
 			path: modules/SystemPricing/Entities/Currency.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPricing\\Entities\\Price\:\:\$currency_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemPricing/Entities/Price.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPricing\\Entities\\Price\:\:\$definedRelationTypes\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemPricing/Entities/Price.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPricing\\Entities\\Price\:\:\$discount_multiplier\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemPricing/Entities/Price.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPricing\\Entities\\Price\:\:\$discount_percentage\.$#'
+			identifier: property.notFound
+			count: 4
+			path: modules/SystemPricing/Entities/Price.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPricing\\Entities\\Price\:\:\$discounted_raw_amount\.$#'
+			identifier: property.notFound
+			count: 8
+			path: modules/SystemPricing/Entities/Price.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPricing\\Entities\\Price\:\:\$discounted_vat_amount\.$#'
+			identifier: property.notFound
+			count: 2
+			path: modules/SystemPricing/Entities/Price.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPricing\\Entities\\Price\:\:\$is_paid\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemPricing/Entities/Price.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPricing\\Entities\\Price\:\:\$raw_amount\.$#'
+			identifier: property.notFound
+			count: 4
+			path: modules/SystemPricing/Entities/Price.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPricing\\Entities\\Price\:\:\$raw_discount_amount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemPricing/Entities/Price.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPricing\\Entities\\Price\:\:\$total_amount\.$#'
+			identifier: property.notFound
+			count: 4
+			path: modules/SystemPricing/Entities/Price.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPricing\\Entities\\Price\:\:\$vat_amount\.$#'
+			identifier: property.notFound
+			count: 3
+			path: modules/SystemPricing/Entities/Price.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPricing\\Entities\\Price\:\:\$vat_amount_discount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemPricing/Entities/Price.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPricing\\Entities\\Price\:\:\$vat_discount_amount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemPricing/Entities/Price.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPricing\\Entities\\Price\:\:\$vat_multiplier\.$#'
+			identifier: property.notFound
+			count: 3
+			path: modules/SystemPricing/Entities/Price.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPricing\\Entities\\Price\:\:\$vat_percentage\.$#'
+			identifier: property.notFound
+			count: 2
+			path: modules/SystemPricing/Entities/Price.php
 
 		-
 			message: '#^Array has 2 duplicate keys with value ''converted_raw_amount'' \(''converted_raw_amount'', ''converted_raw_amount''\)\.$#'
@@ -687,6 +1239,24 @@ parameters:
 		-
 			message: '#^Array has 2 duplicate keys with value ''converted_total_amount'' \(''converted_total_amount'', ''converted_total_amount''\)\.$#'
 			identifier: array.duplicateKey
+			count: 1
+			path: modules/SystemPricing/Entities/Price.php
+
+		-
+			message: '#^Call to an undefined method \$this\(Modules\\SystemPricing\\Entities\\Price\)\:\:getTranslatedAttributes\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: modules/SystemPricing/Entities/Price.php
+
+		-
+			message: '#^Call to an undefined method Modules\\SystemPricing\\Entities\\Price\:\:getLocaleKey\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: modules/SystemPricing/Entities/Price.php
+
+		-
+			message: '#^Call to an undefined static method Modules\\SystemPricing\\Entities\\Price\:\:resolvePaymentStatusValue\(\)\.$#'
+			identifier: staticMethod.notFound
 			count: 1
 			path: modules/SystemPricing/Entities/Price.php
 
@@ -709,10 +1279,58 @@ parameters:
 			path: modules/SystemPricing/Entities/Price.php
 
 		-
+			message: '#^Access to an undefined property Modules\\SystemPricing\\Entities\\PriceType\:\:\$definedRelationTypes\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemPricing/Entities/PriceType.php
+
+		-
+			message: '#^Call to an undefined method \$this\(Modules\\SystemPricing\\Entities\\PriceType\)\:\:getTranslatedAttributes\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: modules/SystemPricing/Entities/PriceType.php
+
+		-
+			message: '#^Call to an undefined method Modules\\SystemPricing\\Entities\\PriceType\:\:getLocaleKey\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: modules/SystemPricing/Entities/PriceType.php
+
+		-
 			message: '#^Unsafe usage of new static\(\)\.$#'
 			identifier: new.static
 			count: 2
 			path: modules/SystemPricing/Entities/PriceType.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPricing\\Entities\\VatRate\:\:\$definedRelationTypes\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemPricing/Entities/VatRate.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPricing\\Entities\\VatRate\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemPricing/Entities/VatRate.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemPricing\\Entities\\VatRate\:\:\$rate\.$#'
+			identifier: property.notFound
+			count: 3
+			path: modules/SystemPricing/Entities/VatRate.php
+
+		-
+			message: '#^Call to an undefined method \$this\(Modules\\SystemPricing\\Entities\\VatRate\)\:\:getTranslatedAttributes\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: modules/SystemPricing/Entities/VatRate.php
+
+		-
+			message: '#^Call to an undefined method Modules\\SystemPricing\\Entities\\VatRate\:\:getLocaleKey\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: modules/SystemPricing/Entities/VatRate.php
 
 		-
 			message: '#^Unsafe usage of new static\(\)\.$#'
@@ -937,6 +1555,66 @@ parameters:
 			path: modules/SystemPricing/Http/Controllers/Front/VatRateController.php
 
 		-
+			message: '#^Access to an undefined property Modules\\SystemSetting\\Entities\\General\:\:\$base_price_discounted_raw_amount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemSetting/Entities/General.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemSetting\\Entities\\General\:\:\$base_price_discounted_vat_amount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemSetting/Entities/General.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemSetting\\Entities\\General\:\:\$base_price_raw_amount\.$#'
+			identifier: property.notFound
+			count: 2
+			path: modules/SystemSetting/Entities/General.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemSetting\\Entities\\General\:\:\$base_price_raw_discount_amount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemSetting/Entities/General.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemSetting\\Entities\\General\:\:\$base_price_subtotal_amount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemSetting/Entities/General.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemSetting\\Entities\\General\:\:\$base_price_total_amount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemSetting/Entities/General.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemSetting\\Entities\\General\:\:\$base_price_total_discount_amount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemSetting/Entities/General.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemSetting\\Entities\\General\:\:\$base_price_vat_amount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemSetting/Entities/General.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemSetting\\Entities\\General\:\:\$base_price_vat_discount_amount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemSetting/Entities/General.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemSetting\\Entities\\General\:\:\$filepondableClass\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemSetting/Entities/General.php
+
+		-
 			message: '#^Method Modules\\SystemSetting\\Http\\Controllers\\API\\GeneralController\:\:destroy\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
 			identifier: return.missing
 			count: 1
@@ -983,6 +1661,24 @@ parameters:
 			identifier: array.duplicateKey
 			count: 1
 			path: modules/SystemUser/Config/config.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemUser\\Entities\\Role\:\:\$definedRelationTypes\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemUser/Entities/Role.php
+
+		-
+			message: '#^Call to an undefined method \$this\(Modules\\SystemUser\\Entities\\Role\)\:\:getTranslatedAttributes\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: modules/SystemUser/Entities/Role.php
+
+		-
+			message: '#^Call to an undefined method Modules\\SystemUser\\Entities\\Role\:\:getLocaleKey\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: modules/SystemUser/Entities/Role.php
 
 		-
 			message: '#^Unsafe usage of new static\(\)\.$#'
@@ -1187,6 +1883,18 @@ parameters:
 			identifier: class.notFound
 			count: 1
 			path: modules/SystemUtility/Database/Seeders/SystemUtilityDatabaseSeeder.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemUtility\\Entities\\Country\:\:\$memoizedTranslations\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemUtility/Entities/Country.php
+
+		-
+			message: '#^Access to an undefined property Modules\\SystemUtility\\Entities\\State\:\:\$definedRelationTypes\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemUtility/Entities/State.php
 
 		-
 			message: '#^Unsafe usage of new static\(\)\.$#'
@@ -1801,10 +2509,58 @@ parameters:
 			path: src/Console/Setup/SetupModularousDevelopmentCommand.php
 
 		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Assignment\:\:\$completed_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Entities/Assignment.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Assignment\:\:\$due_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Entities/Assignment.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Assignment\:\:\$filepondableClass\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Entities/Assignment.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Assignment\:\:\$status\.$#'
+			identifier: property.notFound
+			count: 7
+			path: src/Entities/Assignment.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Assignment\:\:\$updated_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Entities/Assignment.php
+
+		-
 			message: '#^Property ''attachments'' does not exist in model\.$#'
 			identifier: rules.modelAppends
 			count: 1
 			path: src/Entities/Chat.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\ChatMessage\:\:\$authorizedRolesForCreatorRecord\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/Entities/ChatMessage.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\ChatMessage\:\:\$creator_record_exists\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/Entities/ChatMessage.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\ChatMessage\:\:\$filepondableClass\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Entities/ChatMessage.php
 
 		-
 			message: '#^Access to an undefined static property static\(Unusualify\\Modularous\\Entities\\ChatMessage\)\:\:\$creatableClass\.$#'
@@ -1819,6 +2575,78 @@ parameters:
 			path: src/Entities/ChatMessage.php
 
 		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Company\:\:\$address\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/Entities/Company.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Company\:\:\$city\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/Entities/Company.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Company\:\:\$company_type\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/Entities/Company.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Company\:\:\$country_id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/Entities/Company.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Company\:\:\$email\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Entities/Company.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Company\:\:\$isPersonalCompany\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Entities/Company.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Company\:\:\$is_personal\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Entities/Company.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Company\:\:\$is_valid\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Entities/Company.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Company\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Entities/Company.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Company\:\:\$state\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/Entities/Company.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Company\:\:\$tax_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Entities/Company.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Company\:\:\$zip_code\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/Entities/Company.php
+
+		-
 			message: '#^Access to an undefined static property static\(Unusualify\\Modularous\\Entities\\Company\)\:\:\$spreadableClass\.$#'
 			identifier: staticProperty.notFound
 			count: 1
@@ -1829,6 +2657,42 @@ parameters:
 			identifier: staticProperty.notFound
 			count: 1
 			path: src/Entities/Company.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\File\:\:\$authorizedRolesForCreatorRecord\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Entities/File.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\File\:\:\$creator_record_exists\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Entities/File.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\File\:\:\$filename\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Entities/File.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\File\:\:\$size_for_human\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Entities/File.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\File\:\:\$size_in_mb\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Entities/File.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\File\:\:\$uuid\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/Entities/File.php
 
 		-
 			message: '#^Access to an undefined static property static\(Unusualify\\Modularous\\Entities\\File\)\:\:\$abortCreatorRoleExceptions\.$#'
@@ -1855,6 +2719,78 @@ parameters:
 			path: src/Entities/File.php
 
 		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Filepond\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Entities/Filepond.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Filepond\:\:\$file_name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Entities/Filepond.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Filepond\:\:\$uuid\.$#'
+			identifier: property.notFound
+			count: 3
+			path: src/Entities/Filepond.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Media\:\:\$alt_text\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Entities/Media.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Media\:\:\$authorizedRolesForCreatorRecord\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Entities/Media.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Media\:\:\$caption\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Entities/Media.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Media\:\:\$creator_record_exists\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Entities/Media.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Media\:\:\$filename\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Entities/Media.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Media\:\:\$height\.$#'
+			identifier: property.notFound
+			count: 5
+			path: src/Entities/Media.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Media\:\:\$pivot\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Entities/Media.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Media\:\:\$uuid\.$#'
+			identifier: property.notFound
+			count: 4
+			path: src/Entities/Media.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Media\:\:\$width\.$#'
+			identifier: property.notFound
+			count: 5
+			path: src/Entities/Media.php
+
+		-
 			message: '#^Access to an undefined static property static\(Unusualify\\Modularous\\Entities\\Media\)\:\:\$abortCreatorRoleExceptions\.$#'
 			identifier: staticProperty.notFound
 			count: 1
@@ -1863,6 +2799,12 @@ parameters:
 		-
 			message: '#^Access to an undefined static property static\(Unusualify\\Modularous\\Entities\\Media\)\:\:\$creatableClass\.$#'
 			identifier: staticProperty.notFound
+			count: 1
+			path: src/Entities/Media.php
+
+		-
+			message: '#^Call to an undefined static method Unusualify\\Modularous\\Services\\MediaLibrary\\ImageService\:\:getFrontendUrl\(\)\.$#'
+			identifier: staticMethod.notFound
 			count: 1
 			path: src/Entities/Media.php
 
@@ -1879,6 +2821,18 @@ parameters:
 			path: src/Entities/Media.php
 
 		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Model\:\:\$definedRelationTypes\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Entities/Model.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Model\:\:\$skipCacheInvalidation\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/Entities/Model.php
+
+		-
 			message: '#^Access to an undefined static property Unusualify\\Modularous\\Entities\\Model\:\:\$loadLocalizedTags\.$#'
 			identifier: staticProperty.notFound
 			count: 1
@@ -1893,6 +2847,18 @@ parameters:
 		-
 			message: '#^Access to an undefined static property static\(Unusualify\\Modularous\\Entities\\Model\)\:\:\$localeTagsSlugGenerator\.$#'
 			identifier: staticProperty.notFound
+			count: 1
+			path: src/Entities/Model.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Entities\\Model\:\:getLocaleKey\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: src/Entities/Model.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Entities\\Model\:\:getTranslatedAttributes\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Entities/Model.php
 
@@ -1915,6 +2881,114 @@ parameters:
 			path: src/Entities/Model.php
 
 		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Process\:\:\$status\.$#'
+			identifier: property.notFound
+			count: 9
+			path: src/Entities/Process.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\RemoteApiSource\:\:\$remote_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Entities/RemoteApiSource.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\RemoteApiSource\:\:\$remote_payload\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Entities/RemoteApiSource.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\RemoteApiSource\:\:\$remote_synced_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Entities/RemoteApiSource.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Revision\:\:\$payload\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Entities/Revision.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Setting\:\:\$memoizedTranslations\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Entities/Setting.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\State\:\:\$memoizedTranslations\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Entities/State.php
+
+		-
+			message: '#^Call to an undefined static method Unusualify\\Modularous\\Entities\\State\:\:forceDeleting\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: src/Entities/State.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\User\:\:\$company_exists\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Entities/User.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\User\:\:\$company_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Entities/User.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\User\:\:\$company_name\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/Entities/User.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\User\:\:\$definedRelationTypes\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Entities/User.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\User\:\:\$email\.$#'
+			identifier: property.notFound
+			count: 3
+			path: src/Entities/User.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\User\:\:\$filepondableClass\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Entities/User.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\User\:\:\$is_client\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/Entities/User.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\User\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Entities/User.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\User\:\:\$roles_meta\.$#'
+			identifier: property.notFound
+			count: 4
+			path: src/Entities/User.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\User\:\:\$validCompany\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Entities/User.php
+
+		-
 			message: '#^Access to an undefined static property static\(Unusualify\\Modularous\\Entities\\User\)\:\:\$noCompanyAppends\.$#'
 			identifier: staticProperty.notFound
 			count: 1
@@ -1923,6 +2997,18 @@ parameters:
 		-
 			message: '#^Access to an undefined static property static\(Unusualify\\Modularous\\Entities\\User\)\:\:\$savingCompanyFieldName\.$#'
 			identifier: staticProperty.notFound
+			count: 1
+			path: src/Entities/User.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Entities\\User\:\:getLocaleKey\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: src/Entities/User.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Entities\\User\:\:getTranslatedAttributes\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Entities/User.php
 
@@ -1951,6 +3037,42 @@ parameters:
 			path: src/Helpers/array.php
 
 		-
+			message: '#^Call to an undefined static method Unusualify\\Modularous\\View\\Component\:\:makeDiv\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 5
+			path: src/Helpers/component.php
+
+		-
+			message: '#^Call to an undefined static method Unusualify\\Modularous\\View\\Component\:\:makeUeForm\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: src/Helpers/component.php
+
+		-
+			message: '#^Call to an undefined static method Unusualify\\Modularous\\View\\Component\:\:makeUeTitle\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 3
+			path: src/Helpers/component.php
+
+		-
+			message: '#^Call to an undefined static method Unusualify\\Modularous\\View\\Component\:\:makeVIcon\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 2
+			path: src/Helpers/component.php
+
+		-
+			message: '#^Variable \$repository might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: src/Helpers/connector.php
+
+		-
+			message: '#^Function ___ invoked with 4 parameters, 0\-3 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: src/Helpers/i18n.php
+
+		-
 			message: '#^Undefined variable\: \$this$#'
 			identifier: variable.undefined
 			count: 5
@@ -1963,8 +3085,20 @@ parameters:
 			path: src/Helpers/module.php
 
 		-
+			message: '#^Variable \$message might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: src/Helpers/module.php
+
+		-
 			message: '#^Array has 2 duplicate keys with value ''appends'' \(''appends'', ''appends''\)\.$#'
 			identifier: array.duplicateKey
+			count: 1
+			path: src/Helpers/sources.php
+
+		-
+			message: '#^Static method Illuminate\\Routing\\Router\:\:hasAdmin\(\) invoked with 2 parameters, 1 required\.$#'
+			identifier: arguments.count
 			count: 1
 			path: src/Helpers/sources.php
 
@@ -1997,6 +3131,12 @@ parameters:
 			identifier: class.notFound
 			count: 1
 			path: src/Http/Controllers/API/LanguageController.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\ApiController\:\:validateFormRequest\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: src/Http/Controllers/ApiController.php
 
 		-
 			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:\$baseKey\.$#'
@@ -2107,6 +3247,180 @@ parameters:
 			path: src/Http/Controllers/Auth/Controller.php
 
 		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:addFormAppends\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:filterScope\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:generateRoutePrefix\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:getCacheableFormItem\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:getCamelCase\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:getCamelNameFromForeignKey\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:getConfigFieldsByRoute\(\)\.$#'
+			identifier: method.notFound
+			count: 26
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:getForeignKeyFromName\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:getFormAppends\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:getHeadline\(\)\.$#'
+			identifier: method.notFound
+			count: 4
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:getIndexAppends\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:getIndexOption\(\)\.$#'
+			identifier: method.notFound
+			count: 19
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:getModuleRouteUrl\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:getSingular\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:getSnakeCase\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:getStudlyName\(\)\.$#'
+			identifier: method.notFound
+			count: 6
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:hasTranslatedInput\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:isInertiaAjaxRequest\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:isRelationField\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:localizedPublicPermalinksForFormItem\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:nestedParentScopes\(\)\.$#'
+			identifier: method.notFound
+			count: 4
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:rememberCache\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:routeHas\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:routeHasTrait\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:shouldUseCache\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:signedPublicPreviewFormPayload\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:traitsMethods\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Call to an undefined static method Illuminate\\Support\\Facades\\Request\:\:inertia\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:getCustomRowAppendData\(\) invoked with 1 parameter, 0 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
 			message: '#^Result of method Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:getTableAttributes\(\) \(void\) is used\.$#'
 			identifier: method.void
 			count: 1
@@ -2125,6 +3439,12 @@ parameters:
 			path: src/Http/Controllers/Auth/Controller.php
 
 		-
+			message: '#^Variable \$customRowData in isset\(\) is never defined\.$#'
+			identifier: isset.variable
+			count: 1
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
 			message: '#^Instantiated class PragmaRX\\Google2FA\\Google2FA not found\.$#'
 			identifier: class.notFound
 			count: 1
@@ -2137,6 +3457,18 @@ parameters:
 			path: src/Http/Controllers/Auth/PreRegisterController.php
 
 		-
+			message: '#^Constructor of class Unusualify\\Modularous\\Http\\Controllers\\Auth\\PreRegisterController has an unused parameter \$app\.$#'
+			identifier: constructor.unusedParameter
+			count: 1
+			path: src/Http/Controllers/Auth/PreRegisterController.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\Auth\\RegisterController\:\:sendLoginResponse\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Http/Controllers/Auth/RegisterController.php
+
+		-
 			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\BaseController\:\:\$indexColumns\.$#'
 			identifier: property.notFound
 			count: 1
@@ -2145,6 +3477,48 @@ parameters:
 		-
 			message: '#^Array has 2 duplicate keys with value ''endpoints'' \(''endpoints'', ''endpoints''\)\.$#'
 			identifier: array.duplicateKey
+			count: 1
+			path: src/Http/Controllers/BaseController.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\BaseController\:\:editSingleton\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Http/Controllers/BaseController.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\BaseController\:\:form\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: src/Http/Controllers/BaseController.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\BaseController\:\:getForm\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Http/Controllers/BaseController.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\BaseController\:\:getSideFieldsets\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Http/Controllers/BaseController.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\BaseController\:\:seed\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Http/Controllers/BaseController.php
+
+		-
+			message: '#^Call to an undefined static method Illuminate\\Support\\Facades\\Request\:\:inertia\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 2
+			path: src/Http/Controllers/BaseController.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Http\\Controllers\\BaseController\:\:getCustomRowAppendData\(\) invoked with 1 parameter, 0 required\.$#'
+			identifier: arguments.count
 			count: 1
 			path: src/Http/Controllers/BaseController.php
 
@@ -2167,6 +3541,12 @@ parameters:
 			path: src/Http/Controllers/BaseController.php
 
 		-
+			message: '#^Variable \$customRowData in isset\(\) is never defined\.$#'
+			identifier: isset.variable
+			count: 1
+			path: src/Http/Controllers/BaseController.php
+
+		-
 			message: '#^Result of method Unusualify\\Modularous\\Http\\Controllers\\CoreController\:\:getRepositoryClass\(\) \(void\) is used\.$#'
 			identifier: method.void
 			count: 2
@@ -2181,6 +3561,18 @@ parameters:
 		-
 			message: '#^Array has 2 duplicate keys with value ''endpoints'' \(''endpoints'', ''endpoints''\)\.$#'
 			identifier: array.duplicateKey
+			count: 1
+			path: src/Http/Controllers/DashboardController.php
+
+		-
+			message: '#^Call to an undefined static method Illuminate\\Support\\Facades\\Request\:\:inertia\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: src/Http/Controllers/DashboardController.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Http\\Controllers\\DashboardController\:\:getCustomRowAppendData\(\) invoked with 1 parameter, 0 required\.$#'
+			identifier: arguments.count
 			count: 1
 			path: src/Http/Controllers/DashboardController.php
 
@@ -2203,8 +3595,20 @@ parameters:
 			path: src/Http/Controllers/DashboardController.php
 
 		-
+			message: '#^Variable \$customRowData in isset\(\) is never defined\.$#'
+			identifier: isset.variable
+			count: 1
+			path: src/Http/Controllers/DashboardController.php
+
+		-
 			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\PanelController\:\:\$formSchema\.$#'
 			identifier: property.notFound
+			count: 1
+			path: src/Http/Controllers/PanelController.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\PanelController\:\:createFormSchema\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Http/Controllers/PanelController.php
 
@@ -2347,6 +3751,180 @@ parameters:
 			path: src/Http/Controllers/PasswordController.php
 
 		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:addFormAppends\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:filterScope\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:generateRoutePrefix\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:getCacheableFormItem\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:getCamelCase\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:getCamelNameFromForeignKey\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:getConfigFieldsByRoute\(\)\.$#'
+			identifier: method.notFound
+			count: 26
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:getForeignKeyFromName\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:getFormAppends\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:getHeadline\(\)\.$#'
+			identifier: method.notFound
+			count: 4
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:getIndexAppends\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:getIndexOption\(\)\.$#'
+			identifier: method.notFound
+			count: 19
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:getModuleRouteUrl\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:getSingular\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:getSnakeCase\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:getStudlyName\(\)\.$#'
+			identifier: method.notFound
+			count: 6
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:hasTranslatedInput\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:isInertiaAjaxRequest\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:isRelationField\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:localizedPublicPermalinksForFormItem\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:nestedParentScopes\(\)\.$#'
+			identifier: method.notFound
+			count: 4
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:rememberCache\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:routeHas\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:routeHasTrait\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:shouldUseCache\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:signedPublicPreviewFormPayload\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:traitsMethods\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Call to an undefined static method Illuminate\\Support\\Facades\\Request\:\:inertia\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:getCustomRowAppendData\(\) invoked with 1 parameter, 0 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: src/Http/Controllers/PasswordController.php
+
+		-
 			message: '#^Result of method Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:getTableAttributes\(\) \(void\) is used\.$#'
 			identifier: method.void
 			count: 1
@@ -2365,6 +3943,12 @@ parameters:
 			path: src/Http/Controllers/PasswordController.php
 
 		-
+			message: '#^Variable \$customRowData in isset\(\) is never defined\.$#'
+			identifier: isset.variable
+			count: 1
+			path: src/Http/Controllers/PasswordController.php
+
+		-
 			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\ProfileController\:\:\$indexColumns\.$#'
 			identifier: property.notFound
 			count: 1
@@ -2373,6 +3957,36 @@ parameters:
 		-
 			message: '#^Array has 2 duplicate keys with value ''endpoints'' \(''endpoints'', ''endpoints''\)\.$#'
 			identifier: array.duplicateKey
+			count: 1
+			path: src/Http/Controllers/ProfileController.php
+
+		-
+			message: '#^Call to an undefined static method Illuminate\\Support\\Facades\\Request\:\:inertia\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: src/Http/Controllers/ProfileController.php
+
+		-
+			message: '#^Call to an undefined static method Unusualify\\Modularous\\Services\\View\\UComponent\:\:makeUeForm\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 3
+			path: src/Http/Controllers/ProfileController.php
+
+		-
+			message: '#^Call to an undefined static method Unusualify\\Modularous\\Services\\View\\UComponent\:\:makeVBtnPrimary\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: src/Http/Controllers/ProfileController.php
+
+		-
+			message: '#^Call to an undefined static method Unusualify\\Modularous\\Services\\View\\UComponent\:\:makeVIcon\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: src/Http/Controllers/ProfileController.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Http\\Controllers\\ProfileController\:\:getCustomRowAppendData\(\) invoked with 1 parameter, 0 required\.$#'
+			identifier: arguments.count
 			count: 1
 			path: src/Http/Controllers/ProfileController.php
 
@@ -2391,6 +4005,12 @@ parameters:
 		-
 			message: '#^Result of method Unusualify\\Modularous\\Http\\Controllers\\ProfileController\:\:hydrateTableAttributes\(\) \(void\) is used\.$#'
 			identifier: method.void
+			count: 1
+			path: src/Http/Controllers/ProfileController.php
+
+		-
+			message: '#^Variable \$customRowData in isset\(\) is never defined\.$#'
+			identifier: isset.variable
 			count: 1
 			path: src/Http/Controllers/ProfileController.php
 
@@ -2449,6 +4069,12 @@ parameters:
 			path: src/Http/Controllers/Utility/UIPreferencesController.php
 
 		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\Utility\\UIPreferencesController\:\:traitsMethods\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Http/Controllers/Utility/UIPreferencesController.php
+
+		-
 			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\VerificationController\:\:\$config\.$#'
 			identifier: property.notFound
 			count: 3
@@ -2491,6 +4117,66 @@ parameters:
 			path: src/Http/Controllers/VerificationController.php
 
 		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\VerificationController\:\:getCamelCase\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Http/Controllers/VerificationController.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\VerificationController\:\:getCamelNameFromForeignKey\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: src/Http/Controllers/VerificationController.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\VerificationController\:\:getConfigFieldsByRoute\(\)\.$#'
+			identifier: method.notFound
+			count: 6
+			path: src/Http/Controllers/VerificationController.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\VerificationController\:\:getForeignKeyFromName\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Http/Controllers/VerificationController.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\VerificationController\:\:getSingular\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Http/Controllers/VerificationController.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\VerificationController\:\:getStudlyName\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: src/Http/Controllers/VerificationController.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\VerificationController\:\:isInertiaAjaxRequest\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Http/Controllers/VerificationController.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\VerificationController\:\:mergeIndexWiths\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Http/Controllers/VerificationController.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Controllers\\VerificationController\:\:resolveHeaderWiths\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Http/Controllers/VerificationController.php
+
+		-
+			message: '#^Call to an undefined static method Illuminate\\Support\\Facades\\Request\:\:inertia\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: src/Http/Controllers/VerificationController.php
+
+		-
 			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
 			identifier: larastan.noEnvCallsOutsideOfConfig
 			count: 5
@@ -2511,6 +4197,24 @@ parameters:
 		-
 			message: '#^Access to constant ERROR on an unknown class Unusualify\\Modularity\\Services\\MessageStage\.$#'
 			identifier: class.notFound
+			count: 1
+			path: src/Http/Requests/Request.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Requests\\Request\:\:rulesForAll\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: src/Http/Requests/Request.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Requests\\Request\:\:rulesForCreate\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Http/Requests/Request.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Http\\Requests\\Request\:\:rulesForUpdate\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Http/Requests/Request.php
 
@@ -2539,6 +4243,12 @@ parameters:
 			path: src/Http/ViewComposers/MediasUploaderConfig.php
 
 		-
+			message: '#^Call to an undefined static method Illuminate\\Support\\Facades\\Request\:\:inertia\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: src/Hydrates/InputHydrator.php
+
+		-
 			message: '#^Result of method Unusualify\\Modularous\\Hydrates\\Inputs\\InputHydrate\:\:hydrate\(\) \(void\) is used\.$#'
 			identifier: method.void
 			count: 1
@@ -2557,8 +4267,26 @@ parameters:
 			path: src/Hydrates/Inputs/SlugHydrate.php
 
 		-
+			message: '#^Variable \$spreadableInputs in empty\(\) always exists and is not falsy\.$#'
+			identifier: empty.variable
+			count: 1
+			path: src/Hydrates/Inputs/SpreadHydrate.php
+
+		-
 			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
 			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 1
+			path: src/Module.php
+
+		-
+			message: '#^Variable \$middlewares on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.variable
+			count: 1
+			path: src/Module.php
+
+		-
+			message: '#^Variable \$name on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.variable
 			count: 1
 			path: src/Module.php
 
@@ -2572,6 +4300,12 @@ parameters:
 			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
 			identifier: larastan.noEnvCallsOutsideOfConfig
 			count: 10
+			path: src/Providers/BaseServiceProvider.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Providers\\ServiceProvider\:\:getPublishableViewPaths\(\) invoked with 1 parameter, 0 required\.$#'
+			identifier: arguments.count
+			count: 1
 			path: src/Providers/BaseServiceProvider.php
 
 		-
@@ -2611,9 +4345,33 @@ parameters:
 			path: src/Repositories/MediaRepository.php
 
 		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Repositories\\Repository\:\:getForeignKey\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Repositories/Repository.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Repositories\\Repository\:\:getTranslatedAttributes\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Repositories/Repository.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Repositories\\Repository\:\:getPermissionName\(\) invoked with 2 parameters, 1 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: src/Repositories/Repository.php
+
+		-
 			message: '#^Method Unusualify\\Modularous\\Repositories\\Repository\:\:setColumns\(\) should return array but return statement is missing\.$#'
 			identifier: return.missing
 			count: 3
+			path: src/Repositories/Repository.php
+
+		-
+			message: '#^Variable \$foreignKey might not be defined\.$#'
+			identifier: variable.undefined
+			count: 6
 			path: src/Repositories/Repository.php
 
 		-
@@ -2627,6 +4385,24 @@ parameters:
 			identifier: return.missing
 			count: 1
 			path: src/Services/Connector.php
+
+		-
+			message: '#^Variable \$file in empty\(\) always exists and is not falsy\.$#'
+			identifier: empty.variable
+			count: 1
+			path: src/Services/CoverageService.php
+
+		-
+			message: '#^Function ceil invoked with 2 parameters, 1 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: src/Services/CurrencyExchangeService.php
+
+		-
+			message: '#^Function floor invoked with 2 parameters, 1 required\.$#'
+			identifier: arguments.count
+			count: 2
+			path: src/Services/CurrencyExchangeService.php
 
 		-
 			message: '#^Result of method Unusualify\\Modularous\\Services\\FileTranslation\:\:saveNamespacedGroupTranslations\(\) \(void\) is used\.$#'
@@ -2653,6 +4429,12 @@ parameters:
 			path: src/Services/FilepondManager.php
 
 		-
+			message: '#^Method Unusualify\\Modularous\\Services\\FilepondManager\:\:getFilePondsFromSession\(\) invoked with 2 parameters, 1 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: src/Services/FilepondManager.php
+
+		-
 			message: '#^Undefined variable\: \$notations$#'
 			identifier: variable.undefined
 			count: 1
@@ -2665,6 +4447,18 @@ parameters:
 			path: src/Services/FilepondManager.php
 
 		-
+			message: '#^Call to an undefined static method Illuminate\\Support\\Facades\\Schema\:\:getTableNames\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: src/Services/MigrationBackup.php
+
+		-
+			message: '#^Anonymous function has an unused use \$count\.$#'
+			identifier: closure.unusedUse
+			count: 2
+			path: src/Services/ModularousCacheService.php
+
+		-
 			message: '#^Caught class Predis\\Connection\\ConnectionException not found\.$#'
 			identifier: class.notFound
 			count: 1
@@ -2674,6 +4468,12 @@ parameters:
 			message: '#^Caught class Predis\\Connection\\Resource\\Exception\\StreamInitException not found\.$#'
 			identifier: class.notFound
 			count: 1
+			path: src/Services/ModularousCacheService.php
+
+		-
+			message: '#^Variable \$foundKeys on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.variable
+			count: 2
 			path: src/Services/ModularousCacheService.php
 
 		-
@@ -2737,6 +4537,18 @@ parameters:
 			path: src/Services/Uploader/SignAzureUpload.php
 
 		-
+			message: '#^Variable \$credentialCondition might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: src/Services/Uploader/SignS3Upload.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Services\\UtmParameters\:\:__toArray\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Services/UtmParameters.php
+
+		-
 			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
 			identifier: larastan.noEnvCallsOutsideOfConfig
 			count: 3
@@ -2745,6 +4557,12 @@ parameters:
 		-
 			message: '#^Undefined variable\: \$metric$#'
 			identifier: variable.undefined
+			count: 1
+			path: src/Services/View/ModularousNavigation.php
+
+		-
+			message: '#^Variable \$metric in isset\(\) is never defined\.$#'
+			identifier: isset.variable
 			count: 1
 			path: src/Services/View/ModularousNavigation.php
 
@@ -2765,6 +4583,42 @@ parameters:
 			identifier: new.static
 			count: 1
 			path: src/Services/View/UComponent.php
+
+		-
+			message: '#^Variable \$oldElements in empty\(\) is never defined\.$#'
+			identifier: empty.variable
+			count: 1
+			path: src/Services/View/UComponent.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Services\\View\\UWrapper\:\:addChildren\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Services/View/UWrapper.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Services\\View\\UWrapper\:\:makeComponent\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Services/View/UWrapper.php
+
+		-
+			message: '#^Call to an undefined static method Unusualify\\Modularous\\Services\\View\\UComponent\:\:makeUeForm\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: src/Services/View/UWrapper.php
+
+		-
+			message: '#^Call to an undefined static method Unusualify\\Modularous\\Services\\View\\UComponent\:\:makeVCol\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: src/Services/View/UWrapper.php
+
+		-
+			message: '#^Call to an undefined static method Unusualify\\Modularous\\Services\\View\\UComponent\:\:makeVRow\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: src/Services/View/UWrapper.php
 
 		-
 			message: '#^Unsafe usage of new static\(\)\.$#'
@@ -2791,6 +4645,12 @@ parameters:
 			path: src/Support/Finder.php
 
 		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Support\\HostRouting\:\:model\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Support/HostRouting.php
+
+		-
 			message: '#^Class Spatie\\Permission\\Middlewares\\PermissionMiddleware not found\.$#'
 			identifier: class.notFound
 			count: 1
@@ -2815,6 +4675,12 @@ parameters:
 			path: src/Support/ModularousVite.php
 
 		-
+			message: '#^Variable \$key on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.variable
+			count: 4
+			path: src/Translation/Translator.php
+
+		-
 			message: '#^Method Unusualify\\Modularous\\View\\Component\:\:__call\(\) should return Unusualify\\Modularous\\View\\Component but return statement is missing\.$#'
 			identifier: return.missing
 			count: 1
@@ -2830,6 +4696,12 @@ parameters:
 			message: '#^Unsafe usage of new static\(\)\.$#'
 			identifier: new.static
 			count: 3
+			path: src/View/Component.php
+
+		-
+			message: '#^Variable \$oldElements in empty\(\) is never defined\.$#'
+			identifier: empty.variable
+			count: 1
 			path: src/View/Component.php
 
 		-

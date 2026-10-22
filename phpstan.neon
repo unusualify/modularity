@@ -5,7 +5,7 @@ includes:
 
 parameters:
     # Raised level by level; keep in sync with quality.json phpstan.level
-    level: 0
+    level: 1
     tmpDir: .phpstan.cache
     paths:
         - src
@@ -22,6 +22,17 @@ parameters:
     # Package config lives in config/, config/merges and config/publishes (not config_path())
     configDirectories:
         - %currentWorkingDirectory%/config
+    # Model attributes are inferred from these migrations (Testbench's database_path() has none)
+    databaseMigrationsPath:
+        - %currentWorkingDirectory%/database/migrations
+        - %currentWorkingDirectory%/modules/Cms/Database/Migrations
+        - %currentWorkingDirectory%/modules/ErrorPage/Database/Migrations
+        - %currentWorkingDirectory%/modules/SystemNotification/Database/Migrations
+        - %currentWorkingDirectory%/modules/SystemPayment/Database/Migrations
+        - %currentWorkingDirectory%/modules/SystemPricing/Database/Migrations
+        - %currentWorkingDirectory%/modules/SystemSetting/Database/Migrations
+        - %currentWorkingDirectory%/modules/SystemUser/Database/Migrations
+        - %currentWorkingDirectory%/modules/SystemUtility/Database/Migrations
     ignoreErrors:
         # BaseCommand guards every shared option with hasOption(); Larastan reports the
         # guarded call once per subclass that lacks the option.
