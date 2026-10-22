@@ -25,5 +25,13 @@
 ## Description
 <!--- Please describe your changes in detail -->
 
+## Commits
+<!--- One row per commit or group of related commits. Required. -->
+| Commit | What |
+|--------|------|
+
+## Behavior changes
+<!--- What behaves differently after this PR: bug fixes, changed defaults, removed options, new side effects. Write "None" if nothing changes at runtime. Required. -->
+
 ## Related Issue
 <!--- Please link to the issue here if applicable: -->
