@@ -2,6 +2,7 @@
 
 namespace Unusualify\Modularous\Http\Controllers\Utility;
 
+use Illuminate\Config\Repository;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\JsonResponse;
@@ -65,12 +66,12 @@ class MediaLibraryController extends BaseController implements SignUploadListene
     protected $customFields;
 
     /**
-     * @var Illuminate\Routing\ResponseFactory
+     * @var ResponseFactory
      */
     protected $responseFactory;
 
     /**
-     * @var Illuminate\Config\Repository
+     * @var Repository
      */
     protected $laravelConfig;
 

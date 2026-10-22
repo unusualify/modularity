@@ -6,6 +6,7 @@ use JoeDixon\Translation\TranslationServiceProvider;
 use Nwidart\Modules\LaravelModulesServiceProvider;
 use Oobook\Database\Eloquent\ManageEloquentServiceProvider;
 use Spatie\Permission\PermissionServiceProvider;
+use Unusualify\Modularous\Entities\User;
 use Unusualify\Modularous\LaravelServiceProvider;
 use Unusualify\Modularous\Providers\ModularousProvider;
 
@@ -37,6 +38,7 @@ if (function_exists('app') && app() instanceof Application) {
         'database.connections.phpstan' => ['driver' => 'sqlite', 'database' => ':memory:', 'prefix' => ''],
         'queue.default' => 'sync',
         'broadcasting.default' => 'null',
+        'auth.providers.users.model' => User::class,
     ]);
 
     $providers = [

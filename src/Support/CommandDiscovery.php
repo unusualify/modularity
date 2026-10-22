@@ -20,7 +20,7 @@ class CommandDiscovery
      * - Interfaces
      * - Enums
      * - Traits
-     * - Classes that do not extend Illuminate\Console\Command
+     * - Classes that do not extend \Illuminate\Console\Command
      *
      * @param array<string> $paths Glob patterns (e.g. __DIR__ . '/../Console/*.php')
      * @param array<string> $exclude Optional class names to exclude (e.g. for legacy compatibility)

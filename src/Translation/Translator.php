@@ -4,13 +4,14 @@ namespace Unusualify\Modularous\Translation;
 
 use Illuminate\Support\Str;
 use Illuminate\Translation\Translator as IlluminateTranslator;
+use Unusualify\Modularous\Support\FileLoader;
 
 class Translator extends IlluminateTranslator
 {
     /**
      * The loader implementation.
      *
-     * @var Unusualify\Modularous\Support\FileLoader
+     * @var FileLoader
      */
     protected $loader;
 

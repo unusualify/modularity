@@ -2,8 +2,8 @@
 
 namespace Unusualify\Modularous\Repositories\Traits;
 
+use Unusualify\Modularous\Entities\Model;
 use Unusualify\Modularous\Entities\User;
-use Unusualify\Modularous\Models\Model;
 
 trait ChatableTrait
 {

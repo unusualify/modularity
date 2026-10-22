@@ -5,8 +5,8 @@ namespace Unusualify\Modularous\Http\Controllers\Traits;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
+use Unusualify\Modularous\Entities\Model;
 use Unusualify\Modularous\Facades\Modularous;
-use Unusualify\Modularous\Models\Model;
 use Unusualify\Modularous\Services\BroadcastManager;
 use Unusualify\Modularous\Services\View\UWrapper;
 

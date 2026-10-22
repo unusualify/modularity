@@ -8,7 +8,7 @@ use Unusualify\Modularous\Services\SlugInputValidationService;
 
 /**
  * Extends {@see SlugInputValidationService} with optional checks against
- * {@see Modules\Cms\Contracts\PublicUrlRegistryContract}: nested path warnings + hard collision on exact locale/path.
+ * {@see PublicUrlRegistryContract}: nested path warnings + hard collision on exact locale/path.
  *
  * Subclasses override {@see slugModelsUsingPublicUrlRegistry()}, path building, and message/config hooks.
  */

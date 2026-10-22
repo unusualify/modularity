@@ -5,7 +5,7 @@ includes:
 
 parameters:
     # Raised level by level; keep in sync with quality.json phpstan.level
-    level: 1
+    level: 2
     tmpDir: .phpstan.cache
     paths:
         - src
@@ -34,6 +34,10 @@ parameters:
         - %currentWorkingDirectory%/modules/SystemUser/Database/Migrations
         - %currentWorkingDirectory%/modules/SystemUtility/Database/Migrations
     ignoreErrors:
+        # Eloquent sets $pivot dynamically on models loaded through belongsToMany
+        -
+            identifier: property.notFound
+            message: '#::\$pivot\.$#'
         # BaseCommand guards every shared option with hasOption(); Larastan reports the
         # guarded call once per subclass that lacks the option.
         -

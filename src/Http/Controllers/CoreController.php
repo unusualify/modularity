@@ -198,7 +198,7 @@ abstract class CoreController extends LaravelController implements ModuleableInt
     }
 
     /**
-     * @return \Unusualify\Modularity\Transformers\
+     * @return mixed
      */
     protected function getTransformer($data = [])
     {
@@ -437,7 +437,7 @@ abstract class CoreController extends LaravelController implements ModuleableInt
     /**
      * tags
      *
-     * @return Illuminate\Support\Facades\Response
+     * @return Response
      */
     public function tags()
     {
@@ -464,7 +464,7 @@ abstract class CoreController extends LaravelController implements ModuleableInt
     /**
      * update Tags
      *
-     * @return Illuminate\Support\Facades\Response
+     * @return Response
      */
     public function tagsUpdate()
     {

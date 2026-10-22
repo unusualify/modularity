@@ -4,7 +4,7 @@ namespace Unusualify\Modularous\Repositories\Traits;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
-use Unusualify\Modularous\Models\Model;
+use Unusualify\Modularous\Entities\Model;
 
 trait CreatorTrait
 {

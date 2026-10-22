@@ -4,7 +4,7 @@ namespace Unusualify\Modularous\Repositories\Traits;
 
 use Illuminate\Support\Arr;
 use Modularous\Entities\Models\Process;
-use Unusualify\Modularous\Models\Model;
+use Unusualify\Modularous\Entities\Model;
 
 trait ProcessableTrait
 {

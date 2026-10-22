@@ -204,7 +204,7 @@ abstract class BaseController extends PanelController
 
     /**
      * @param Request $request
-     * @param int|$id
+     * @param int $id
      * @param int|null $submoduleId
      * @return RedirectResponse
      */

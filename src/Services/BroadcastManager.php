@@ -15,8 +15,8 @@ use Unusualify\Modularous\Support\BroadcastAvailability;
  *
  * Usage:
  *   // For example, using events from SystemNotification module:
- *   use Modules\SystemNotification\Events\ModelCreated;
- *   use Modules\SystemNotification\Events\ModelUpdated;
+ *   use \Modules\SystemNotification\Events\ModelCreated;
+ *   use \Modules\SystemNotification\Events\ModelUpdated;
  *
  *   $config = BroadcastManage::forModel($model, [
  *       ModelCreated::class,

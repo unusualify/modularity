@@ -12,8 +12,8 @@ use Modules\SystemPricing\Entities\Price;
 use Modules\SystemPricing\Entities\PriceType;
 use Modules\SystemPricing\Entities\VatRate;
 use Unusualify\Modularous\Entities\Enums\PaymentStatus;
+use Unusualify\Modularous\Entities\Model;
 use Unusualify\Modularous\Entities\User;
-use Unusualify\Modularous\Models\Model;
 
 trait PaymentTrait
 {

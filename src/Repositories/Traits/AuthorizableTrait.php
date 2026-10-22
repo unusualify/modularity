@@ -2,7 +2,7 @@
 
 namespace Unusualify\Modularous\Repositories\Traits;
 
-use Unusualify\Modularous\Models\Model;
+use Unusualify\Modularous\Entities\Model;
 
 trait AuthorizableTrait
 {

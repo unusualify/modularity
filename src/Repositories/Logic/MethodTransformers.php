@@ -8,8 +8,8 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Unusualify\Modularous\Entities\Model;
 use Unusualify\Modularous\Entities\User;
-use Unusualify\Modularous\Models\Model;
 use Unusualify\Modularous\Traits\ManageTraits;
 
 trait MethodTransformers

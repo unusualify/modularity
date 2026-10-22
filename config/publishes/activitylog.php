@@ -34,8 +34,8 @@ return [
 
     /*
      * This model will be used to log activity.
-     * It should be implements the Spatie\Activitylog\Contracts\Activity interface
-     * and extend Illuminate\Database\Eloquent\Model.
+     * It should be implements the \Spatie\Activitylog\Contracts\Activity interface
+     * and extend \Illuminate\Database\Eloquent\Model.
      */
     'activity_model' => Activity::class,
 

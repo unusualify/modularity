@@ -11,7 +11,7 @@ trait ModularModel
 {
     /**
      * Get the module name from a model instance.
-     * Extracts from the model's namespace: Modules\{ModuleName}\Entities\...
+     * Extracts from the model's namespace: \Modules\{ModuleName}\Entities\...
      */
     protected function getModuleNameFromModel(Model $model): ?string
     {

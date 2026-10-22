@@ -13,7 +13,7 @@ use Spatie\Activitylog\Facades\LogBatch;
 use Unusualify\Modularous\Contracts\Cache\CacheableInterface;
 use Unusualify\Modularous\Contracts\Cache\UserAwareCacheInterface;
 use Unusualify\Modularous\Contracts\ModuleableInterface;
-use Unusualify\Modularous\Models\Model;
+use Unusualify\Modularous\Entities\Model;
 use Unusualify\Modularous\Repositories\Contracts\Repository as RepositoryContract;
 use Unusualify\Modularous\Repositories\Traits\Concerns\InteractsWithAttachmentPayloads;
 use Unusualify\Modularous\Traits\ManageNames;

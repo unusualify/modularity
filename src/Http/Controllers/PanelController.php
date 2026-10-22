@@ -27,7 +27,7 @@ abstract class PanelController extends CoreController implements CacheableInterf
     use MakesResponses, ManageScopes, ManageAuthorization, CacheableResponse, ManageWiths, ManageAppends;
 
     /**
-     * @var Unusualify\Modularous\Entities\Model
+     * @var Model
      */
     protected $user;
 
