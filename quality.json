@@ -15,8 +15,8 @@
     },
     "phpstan": {
         "enabled": true,
-        "level": 5,
-        "baselineMaxErrors": 4836
+        "level": 6,
+        "baselineMaxErrors": 14479
     },
     "ratchet": true,
     "measured": {
