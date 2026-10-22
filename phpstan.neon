@@ -5,7 +5,7 @@ includes:
 
 parameters:
     # Raised level by level; keep in sync with quality.json phpstan.level
-    level: 6
+    level: 7
     tmpDir: .phpstan.cache
     paths:
         - src
