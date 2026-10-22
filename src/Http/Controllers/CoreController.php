@@ -169,14 +169,6 @@ abstract class CoreController extends LaravelController implements ModuleableInt
     public function getRepository()
     {
         return $this->getRepositoryClass($this->modelName) ? App::make($this->getRepositoryClass($this->modelName)) : null;
-        try {
-            // code...
-        } catch (\Throwable $th) {
-            dd(
-                "repositoryClass not exists for {$this->routeName} in {$this->moduleName}",
-            );
-            throw $th;
-        }
     }
 
     /**
@@ -191,9 +183,6 @@ abstract class CoreController extends LaravelController implements ModuleableInt
         }
 
         return null;
-
-        // TODO if repository is not exists
-        return TwillCapsules::getCapsuleForModel($model)->getRepositoryClass();
     }
 
     /**
@@ -483,18 +472,6 @@ abstract class CoreController extends LaravelController implements ModuleableInt
             'variant' => MessageStage::SUCCESS,
             'id' => $tag->id,
         ], 200);
-
-        return Response::json(
-            [
-                'resource' => [
-                    'last_page' => 1,
-                    'data' => $tags->map(function ($tag) {
-                        return $tag->name;
-                    }
-                    ),
-                ],
-            ], 200);
-
     }
 
     public function assignments($id)

@@ -76,17 +76,8 @@ trait CacheKeyGenerators
                 break;
             case 'record':
                 throw new \InvalidArgumentException('Record cache type is not ready yet');
-                if (! isset($specifierData['id'])) {
-                    throw new \InvalidArgumentException('ID is required for record cache type');
-                }
-                $specifierKey = 'record:' . $specifierData['id'];
-                $specifierData = Arr::except($specifierData, ['id']);
-
-                break;
             default:
                 throw new \InvalidArgumentException("Invalid cache type: $type");
-
-                break;
         }
 
         $specifierData = method_exists($this, 'addUserContext') ? $this->addUserContext($specifierData) : $specifierData;
