@@ -1,0 +1,188 @@
+name: Quality
+
+# Reusable quality gate. Callers (10.x/11.x/12.x/13.x-tests.yml) only pass the
+# Laravel/Testbench matrix; thresholds come from quality.json and every step
+# runs the same scripts as `composer check` / `composer check:full` locally.
+
+on:
+  workflow_call:
+    inputs:
+      php-versions:
+        description: JSON array of PHP versions for the PHPUnit matrix
+        type: string
+        required: true
+      laravel:
+        description: laravel/framework constraint, e.g. 12.x
+        type: string
+        required: true
+      testbench:
+        description: orchestra/testbench constraint, e.g. ^10.0
+        type: string
+        required: true
+      resolve-matrix:
+        description: Require the given laravel/testbench versions instead of installing composer.lock as is
+        type: boolean
+        default: false
+      quality-php:
+        description: PHP version for Pint, PHPStan and coverage
+        type: string
+        default: '8.3'
+      node-version:
+        description: Node.js version for Vitest
+        type: string
+        default: '22.x'
+
+env:
+  PHP_EXTENSIONS: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick, fileinfo
+
+jobs:
+  pint:
+    name: Pint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ inputs.quality-php }}
+          extensions: ${{ env.PHP_EXTENSIONS }}
+          coverage: none
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist --ignore-platform-reqs
+
+      - name: Pint
+        run: vendor/bin/pint --test
+
+  phpstan:
+    name: PHPStan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ inputs.quality-php }}
+          extensions: ${{ env.PHP_EXTENSIONS }}
+          coverage: none
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist --ignore-platform-reqs
+
+      - name: PHPStan with baseline cap
+        run: bin/agent-check check --skip=pint,php-tests,vue-tests
+
+      - name: Annotate PHPStan errors
+        if: failure()
+        run: vendor/bin/phpstan analyse --memory-limit=2G --no-progress --error-format=github || true
+
+  phpunit:
+    name: PHP ${{ matrix.php }} - Laravel ${{ inputs.laravel }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        php: ${{ fromJSON(inputs.php-versions) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: ${{ env.PHP_EXTENSIONS }}
+          coverage: none
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist --ignore-platform-reqs
+
+      - name: Resolve Laravel ${{ inputs.laravel }} / Testbench ${{ inputs.testbench }}
+        if: inputs.resolve-matrix
+        run: composer require "laravel/framework:${{ inputs.laravel }}" "orchestra/testbench:${{ inputs.testbench }}" --no-interaction --with-all-dependencies --ignore-platform-reqs
+
+      - name: PHPUnit
+        run: composer test:fast
+
+  coverage:
+    name: Coverage gate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ inputs.quality-php }}
+          extensions: ${{ env.PHP_EXTENSIONS }}
+          coverage: pcov
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: npm
+          cache-dependency-path: vue/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          composer install --no-interaction --prefer-dist --ignore-platform-reqs
+          npm ci --prefix vue
+
+      - name: Resolve diff base
+        id: base
+        env:
+          BASE_REF: ${{ github.base_ref }}
+          BEFORE: ${{ github.event.before }}
+        run: |
+          if [ -n "$BASE_REF" ]; then
+            base="origin/$BASE_REF"
+          elif [ -n "$BEFORE" ] && [ "$BEFORE" != "0000000000000000000000000000000000000000" ] && git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
+            base="$BEFORE"
+          else
+            base="HEAD~1"
+          fi
+          echo "ref=$base" >> "$GITHUB_OUTPUT"
+          echo "Diff base: $base"
+
+      - name: Coverage (PHPUnit + Vitest) and gate
+        run: bin/agent-check full --skip=pint,phpstan --base="${{ steps.base.outputs.ref }}"
+
+      - name: Quality report
+        if: always()
+        run: |
+          bin/quality-report --base="${{ steps.base.outputs.ref }}" --output=.agent/quality-report.md
+          cat .agent/quality-report.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: quality-reports-${{ inputs.laravel }}
+          path: |
+            .agent/
+            coverage-clover.xml
+            vue/coverage/coverage-summary.json
+          retention-days: 7
+          if-no-files-found: ignore
+
+      - name: Comment on PR
+        if: always() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = '.agent/quality-report.md';
+            if (!fs.existsSync(path)) return;
+            const body = fs.readFileSync(path, 'utf8');
+            const marker = '<!-- modularous-quality-report -->';
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number });
+            const existing = comments.find(c => c.user.type === 'Bot' && c.body.includes(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number, body });
+            }

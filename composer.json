@@ -205,6 +205,7 @@
             "bin/agent-check full"
         ],
         "coverage:gate": "bin/coverage-gate --diff",
+        "quality:report": "bin/quality-report",
         "quality:ratchet": "bin/coverage-gate --vue-summary=vue/coverage/coverage-summary.json --ratchet-update",
         "stan": "@php vendor/bin/phpstan analyse --memory-limit=2G",
         "stan:baseline": "@php vendor/bin/phpstan analyse --memory-limit=2G --generate-baseline",

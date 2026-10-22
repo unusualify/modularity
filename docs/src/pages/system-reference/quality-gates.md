@@ -36,6 +36,8 @@ flowchart TD
 | `.cursor/rules/quality-gates.mdc` | Always-applied agent rule for the gate |
 | `.cursor/hooks/quality-stop.sh` | Cursor `stop` hook running `check` on uncommitted changes |
 | `.githooks/pre-push`, `bin/install-hooks` | Git `pre-push` hook running `full`, and its installer |
+| `bin/quality-report` | Markdown summary (steps, coverage, diff, PHPStan baseline change) used as the PR comment |
+| `.github/workflows/quality.yml` | Reusable CI workflow; the `*-tests.yml` files call it with their Laravel matrix |
 | `.agent/last-check.json` | Machine-readable result of the last run (git-ignored) |
 | `.agent/logs/<step>.log` | Full output per step (git-ignored) |
 
@@ -73,6 +75,7 @@ flowchart TD
 | `composer quality:ratchet` | Raise `quality.json` thresholds to the measured values (rounded down to 0.5) | < 1 s |
 | `composer stan` | PHPStan with project config | |
 | `composer stan:baseline` | Regenerate `phpstan-baseline.neon` | |
+| `composer quality:report` | Markdown summary of the last run (`.agent/last-check.json`, `.agent/coverage-gate.json`) | < 1 s |
 
 Arguments after `--` are forwarded to the runner, for example `composer check -- --base=origin/12.x`.
 
@@ -174,6 +177,23 @@ Three layers make sure the gate runs even when an agent forgets to call it:
 - **Turning the stop hook off temporarily:** start Cursor with `MODULAROUS_SKIP_STOP_HOOK=1`. Agents must not use this or `git push --no-verify`.
 - **Parent workspaces:** the hook resolves the package root from its own path, so it also works when Cursor opens a parent project (such as an app that symlinks this package under `packages/`) alongside the package folder.
 
+## CI
+
+`10.x-tests.yml`, `11.x-tests.yml`, `12.x-tests.yml` and `13.x-tests.yml` only define triggers and the Laravel/Testbench matrix, then call `.github/workflows/quality.yml`:
+
+| Job | Runs | Same as locally |
+|-----|------|-----------------|
+| `pint` | `vendor/bin/pint --test` | `pint` step of `check:full` |
+| `phpstan` | `bin/agent-check check --skip=pint,php-tests,vue-tests`; on failure re-runs PHPStan with `--error-format=github` for inline annotations | `phpstan` step incl. baseline cap |
+| `phpunit` | `composer test:fast` for every PHP version in `php-versions` | `composer test:fast` |
+| `coverage` | `bin/agent-check full --skip=pint,phpstan --base=<diff base>` (PHP 8.3 + pcov, Vitest with coverage), then `bin/quality-report` | coverage steps of `check:full` |
+
+- **Diff base:** `origin/<base branch>` for pull requests, the previous head (`github.event.before`) for pushes, `HEAD~1` as fallback.
+- **Report:** the markdown from `bin/quality-report` is written to the job summary and posted as a single PR comment that is updated on every push (not for PRs from forks, whose token is read-only). Reports are uploaded as the `quality-reports-<laravel>` artifact.
+- **Dependencies:** `composer.lock` is installed as is. Callers for other Laravel majors set `resolve-matrix: true` so the given `laravel/framework` and `orchestra/testbench` versions are required on top.
+- **Inputs:** `php-versions` (JSON array), `laravel`, `testbench`, `resolve-matrix`, `quality-php` (default `8.3`), `node-version` (default `22.x`).
+- CI splits the runner into jobs with `--skip`; locally (and for agents) `--skip` must not be used to hide a failing step.
+
 ## Rules for contributors and agents
 
 - Run `composer check` after every change and `composer check:full` before pushing.
@@ -187,4 +207,4 @@ Three layers make sure the gate runs even when an agent forgets to call it:
 | Coverage thresholds | Enforced locally (`check:full`, `npm run test:coverage`) |
 | PHPStan | Enabled at level 8 with `phpstan-baseline.neon` (16592 errors, capped by `baselineMaxErrors`). Next: shrink the baseline; lower `baselineMaxErrors` whenever fixes reduce it |
 | Agent enforcement | Always-applied Cursor rule, Cursor `stop` hook (`check`) and git `pre-push` hook (`full`) |
-| CI | Planned: reusable workflow calling the same runner and `bin/coverage-gate` instead of inline thresholds |
+| CI | Reusable `quality.yml` (Pint, PHPStan, PHPUnit matrix, coverage gate) with a PR comment from `bin/quality-report` |
