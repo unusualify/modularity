@@ -325,7 +325,8 @@ class AbstractRepositoryTest extends RepositoryTestCase
 
         $results = $this->repository->cmsSearch('Ali', ['name']);
 
-        $this->assertSame(['Alice', 'Alice B'], $results->pluck('name')->all());
+        // cmsSearch orders by latest(); fixtures created in the same second tie on created_at
+        $this->assertEqualsCanonicalizing(['Alice', 'Alice B'], $results->pluck('name')->all());
     }
 
     public function test_repository_create()
