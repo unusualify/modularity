@@ -160,6 +160,7 @@ Diff coverage needs a fresh report. With a stale `coverage-clover.xml` the line 
 
 - Package config lives in `config/`, `config/merges` and `config/publishes`, so `configDirectories` points at `config/` for Larastan's `env()` rule.
 - `src/Entities/NestedsetCollection.php` is excluded: it extends `Kalnoy\Nestedset\Collection`, but `kalnoy/nestedset` is not a dependency.
+- `composer stan`, `composer stan:baseline` and the runner's `phpstan` step run `composer test-clean` first. Larastan boots Testbench, and a leftover package discovery cache (`vendor/orchestra/testbench-core/laravel/bootstrap/cache/packages.php`, created by `composer install`, deleted by every test run) changes which providers and macros it sees. Without the reset the same code gives different errors locally and in CI.
 - To check that the baseline is reproducible, back it up, reset it to `ignoreErrors: []`, run `composer stan:baseline` and diff against the backup.
 
 ## Agent enforcement
