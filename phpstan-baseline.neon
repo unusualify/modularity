@@ -199,6 +199,48 @@ parameters:
 			path: modules/Cms/Entities/HomepageTest.php
 
 		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: modules/Cms/Entities/HomepageTest.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Support\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:first\(\) expects \(callable\(Illuminate\\Database\\Eloquent\\Model, int\)\: bool\)\|null, Closure\(Modules\\Cms\\Entities\\UrlRoute\)\: bool given\.$#'
+			identifier: argument.type
+			count: 1
+			path: modules/Cms/Entities/HomepageTest.php
+
+		-
+			message: '#^Parameter \#1 \$role of method Modules\\Cms\\Entities\\HomepageTest\:\:image\(\) expects string, null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: modules/Cms/Entities/HomepageTest.php
+
+		-
+			message: '#^Parameter \#2 \$crop of method Modules\\Cms\\Entities\\HomepageTest\:\:image\(\) expects string, null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: modules/Cms/Entities/HomepageTest.php
+
+		-
+			message: '#^Parameter \#4 \$media of method Modules\\Cms\\Entities\\HomepageTest\:\:imageAsArray\(\) expects Unusualify\\Modularous\\Entities\\Media\|null, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 2
+			path: modules/Cms/Entities/HomepageTest.php
+
+		-
+			message: '#^Parameter \#6 \$media of method Modules\\Cms\\Entities\\HomepageTest\:\:image\(\) expects Unusualify\\Modularous\\Entities\\Media\|null, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 3
+			path: modules/Cms/Entities/HomepageTest.php
+
+		-
+			message: '#^Parameter \#6 \$media of method Modules\\Cms\\Entities\\HomepageTest\:\:image\(\) expects Unusualify\\Modularous\\Entities\\Media\|null, false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: modules/Cms/Entities/HomepageTest.php
+
+		-
 			message: '#^Property Modules\\Cms\\Entities\\HomepageTest\:\:\$usePublishDates \(bool\) on left side of \?\? is not nullable\.$#'
 			identifier: nullCoalesce.property
 			count: 1
@@ -637,6 +679,54 @@ parameters:
 			path: modules/Cms/Entities/Page.php
 
 		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: modules/Cms/Entities/Page.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Support\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:first\(\) expects \(callable\(Illuminate\\Database\\Eloquent\\Model, int\)\: bool\)\|null, Closure\(Modules\\Cms\\Entities\\UrlRoute\)\: bool given\.$#'
+			identifier: argument.type
+			count: 1
+			path: modules/Cms/Entities/Page.php
+
+		-
+			message: '#^Parameter \#1 \$role of method Modules\\Cms\\Entities\\Page\:\:image\(\) expects string, null given\.$#'
+			identifier: argument.type
+			count: 2
+			path: modules/Cms/Entities/Page.php
+
+		-
+			message: '#^Parameter \#2 \$crop of method Modules\\Cms\\Entities\\Page\:\:image\(\) expects string, null given\.$#'
+			identifier: argument.type
+			count: 2
+			path: modules/Cms/Entities/Page.php
+
+		-
+			message: '#^Parameter \#3 \$file of method Modules\\Cms\\Entities\\Page\:\:file\(\) expects Unusualify\\Modularous\\Entities\\File\|null, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 2
+			path: modules/Cms/Entities/Page.php
+
+		-
+			message: '#^Parameter \#4 \$media of method Modules\\Cms\\Entities\\Page\:\:imageAsArray\(\) expects Unusualify\\Modularous\\Entities\\Media\|null, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 4
+			path: modules/Cms/Entities/Page.php
+
+		-
+			message: '#^Parameter \#6 \$media of method Modules\\Cms\\Entities\\Page\:\:image\(\) expects Unusualify\\Modularous\\Entities\\Media\|null, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 6
+			path: modules/Cms/Entities/Page.php
+
+		-
+			message: '#^Parameter \#6 \$media of method Modules\\Cms\\Entities\\Page\:\:image\(\) expects Unusualify\\Modularous\\Entities\\Media\|null, false given\.$#'
+			identifier: argument.type
+			count: 2
+			path: modules/Cms/Entities/Page.php
+
+		-
 			message: '#^Property Modules\\Cms\\Entities\\Page\:\:\$slugAttributes \(list\<string\>\) on left side of \?\? is not nullable\.$#'
 			identifier: nullCoalesce.property
 			count: 1
@@ -865,6 +955,42 @@ parameters:
 			path: modules/Cms/Entities/SiteSetting.php
 
 		-
+			message: '#^Parameter \#1 \$role of method Modules\\Cms\\Entities\\SiteSetting\:\:image\(\) expects string, null given\.$#'
+			identifier: argument.type
+			count: 2
+			path: modules/Cms/Entities/SiteSetting.php
+
+		-
+			message: '#^Parameter \#2 \$crop of method Modules\\Cms\\Entities\\SiteSetting\:\:image\(\) expects string, null given\.$#'
+			identifier: argument.type
+			count: 2
+			path: modules/Cms/Entities/SiteSetting.php
+
+		-
+			message: '#^Parameter \#3 \$file of method Modules\\Cms\\Entities\\SiteSetting\:\:file\(\) expects Unusualify\\Modularous\\Entities\\File\|null, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: modules/Cms/Entities/SiteSetting.php
+
+		-
+			message: '#^Parameter \#4 \$media of method Modules\\Cms\\Entities\\SiteSetting\:\:imageAsArray\(\) expects Unusualify\\Modularous\\Entities\\Media\|null, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 4
+			path: modules/Cms/Entities/SiteSetting.php
+
+		-
+			message: '#^Parameter \#6 \$media of method Modules\\Cms\\Entities\\SiteSetting\:\:image\(\) expects Unusualify\\Modularous\\Entities\\Media\|null, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 6
+			path: modules/Cms/Entities/SiteSetting.php
+
+		-
+			message: '#^Parameter \#6 \$media of method Modules\\Cms\\Entities\\SiteSetting\:\:image\(\) expects Unusualify\\Modularous\\Entities\\Media\|null, false given\.$#'
+			identifier: argument.type
+			count: 2
+			path: modules/Cms/Entities/SiteSetting.php
+
+		-
 			message: '#^Unreachable statement \- code above always terminates\.$#'
 			identifier: deadCode.unreachable
 			count: 1
@@ -937,10 +1063,22 @@ parameters:
 			path: modules/Cms/Http/Controllers/API/LayoutBuilderController.php
 
 		-
+			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
+			identifier: argument.type
+			count: 2
+			path: modules/Cms/Http/Controllers/Front/CmsController.php
+
+		-
 			message: '#^Unreachable statement \- code above always terminates\.$#'
 			identifier: deadCode.unreachable
 			count: 1
 			path: modules/Cms/Http/Controllers/LayoutBuilderHtmlPreviewController.php
+
+		-
+			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: modules/Cms/Http/Controllers/LayoutBuilderShellDraftPreviewController.php
 
 		-
 			message: '#^Strict comparison using \!\=\= between mixed and null will always evaluate to true\.$#'
@@ -1207,6 +1345,54 @@ parameters:
 			path: modules/Cms/Repositories/HomepageTestRepository.php
 
 		-
+			message: '#^Parameter \#1 \$array \(list\<string\>\) of array_values is already a list, call has no effect\.$#'
+			identifier: arrayValues.list
+			count: 2
+			path: modules/Cms/Repositories/HomepageTestRepository.php
+
+		-
+			message: '#^Parameter \#1 \$object of method Modules\\Cms\\Repositories\\HomepageTestRepository\:\:processPendingRevisionSubmission\(\) expects Unusualify\\Modularous\\Entities\\Model, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: modules/Cms/Repositories/HomepageTestRepository.php
+
+		-
+			message: '#^Parameter \#1 \$object of method Modules\\Cms\\Repositories\\HomepageTestRepository\:\:restoreRevisionAsPendingOnly\(\) expects Unusualify\\Modularous\\Entities\\Model, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: modules/Cms/Repositories/HomepageTestRepository.php
+
+		-
+			message: '#^Parameter \#1 \$object of method Modules\\Cms\\Repositories\\HomepageTestRepository\:\:revisionTableHasStatusColumn\(\) expects Unusualify\\Modularous\\Entities\\Model, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 6
+			path: modules/Cms/Repositories/HomepageTestRepository.php
+
+		-
+			message: '#^Parameter \#1 \$object of method Modules\\Cms\\Repositories\\HomepageTestRepository\:\:shouldRestoreAsPendingOnly\(\) expects Unusualify\\Modularous\\Entities\\Model, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: modules/Cms/Repositories/HomepageTestRepository.php
+
+		-
+			message: '#^Parameter \#1 \$object of method Unusualify\\Modularous\\Repositories\\Repository\:\:beforeSave\(\) expects Unusualify\\Modularous\\Entities\\Model, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: modules/Cms/Repositories/HomepageTestRepository.php
+
+		-
+			message: '#^Parameter \#1 \$object of method Unusualify\\Modularous\\Repositories\\Repository\:\:prepareFieldsBeforeSave\(\) expects Unusualify\\Modularous\\Entities\\Model, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: modules/Cms/Repositories/HomepageTestRepository.php
+
+		-
+			message: '#^Parameter \#1 \$query of method Unusualify\\Modularous\\Repositories\\Repository\:\:filter\(\) expects Illuminate\\Database\\Query\\Builder, Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: modules/Cms/Repositories/HomepageTestRepository.php
+
+		-
 			message: '#^Right side of && is always true\.$#'
 			identifier: booleanAnd.rightAlwaysTrue
 			count: 1
@@ -1235,6 +1421,12 @@ parameters:
 			identifier: booleanNot.alwaysTrue
 			count: 1
 			path: modules/Cms/Repositories/LayoutBuilderRepository.php
+
+		-
+			message: '#^Parameter \#1 \$object of method Unusualify\\Modularous\\Repositories\\Repository\:\:prepareFieldsBeforeSave\(\) expects Unusualify\\Modularous\\Entities\\Model, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: modules/Cms/Repositories/PageLayoutRepository.php
 
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$mediasParams\.$#'
@@ -1531,6 +1723,54 @@ parameters:
 			path: modules/Cms/Repositories/PageRepository.php
 
 		-
+			message: '#^Parameter \#1 \$array \(list\<string\>\) of array_values is already a list, call has no effect\.$#'
+			identifier: arrayValues.list
+			count: 2
+			path: modules/Cms/Repositories/PageRepository.php
+
+		-
+			message: '#^Parameter \#1 \$object of method Modules\\Cms\\Repositories\\PageRepository\:\:processPendingRevisionSubmission\(\) expects Unusualify\\Modularous\\Entities\\Model, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: modules/Cms/Repositories/PageRepository.php
+
+		-
+			message: '#^Parameter \#1 \$object of method Modules\\Cms\\Repositories\\PageRepository\:\:restoreRevisionAsPendingOnly\(\) expects Unusualify\\Modularous\\Entities\\Model, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: modules/Cms/Repositories/PageRepository.php
+
+		-
+			message: '#^Parameter \#1 \$object of method Modules\\Cms\\Repositories\\PageRepository\:\:revisionTableHasStatusColumn\(\) expects Unusualify\\Modularous\\Entities\\Model, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 6
+			path: modules/Cms/Repositories/PageRepository.php
+
+		-
+			message: '#^Parameter \#1 \$object of method Modules\\Cms\\Repositories\\PageRepository\:\:shouldRestoreAsPendingOnly\(\) expects Unusualify\\Modularous\\Entities\\Model, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: modules/Cms/Repositories/PageRepository.php
+
+		-
+			message: '#^Parameter \#1 \$object of method Unusualify\\Modularous\\Repositories\\Repository\:\:beforeSave\(\) expects Unusualify\\Modularous\\Entities\\Model, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: modules/Cms/Repositories/PageRepository.php
+
+		-
+			message: '#^Parameter \#1 \$object of method Unusualify\\Modularous\\Repositories\\Repository\:\:prepareFieldsBeforeSave\(\) expects Unusualify\\Modularous\\Entities\\Model, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: modules/Cms/Repositories/PageRepository.php
+
+		-
+			message: '#^Parameter \#1 \$query of method Unusualify\\Modularous\\Repositories\\Repository\:\:filter\(\) expects Illuminate\\Database\\Query\\Builder, Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: modules/Cms/Repositories/PageRepository.php
+
+		-
 			message: '#^Right side of && is always true\.$#'
 			identifier: booleanAnd.rightAlwaysTrue
 			count: 4
@@ -1609,6 +1849,12 @@ parameters:
 			path: modules/Cms/Repositories/SiteSettingRepository.php
 
 		-
+			message: '#^Parameter \#1 \$object of method Unusualify\\Modularous\\Repositories\\Repository\:\:afterSave\(\) expects Unusualify\\Modularous\\Entities\\Model, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: modules/Cms/Repositories/SiteSettingRepository.php
+
+		-
 			message: '#^Right side of && is always true\.$#'
 			identifier: booleanAnd.rightAlwaysTrue
 			count: 3
@@ -1647,6 +1893,12 @@ parameters:
 		-
 			message: '#^Argument of an invalid type Illuminate\\Routing\\RouteCollectionInterface supplied for foreach, only iterables are supported\.$#'
 			identifier: foreach.nonIterable
+			count: 1
+			path: modules/Cms/Routing/CmsFrontRouteRegistrar.php
+
+		-
+			message: '#^Parameter \#1 \$array \(non\-empty\-list\<string\>\) of array_values is already a list, call has no effect\.$#'
+			identifier: arrayValues.list
 			count: 1
 			path: modules/Cms/Routing/CmsFrontRouteRegistrar.php
 
@@ -2137,6 +2389,12 @@ parameters:
 			path: modules/Cms/Support/CmsPublicSeo.php
 
 		-
+			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
+			identifier: argument.type
+			count: 4
+			path: modules/Cms/Support/LayoutBladeResolver.php
+
+		-
 			message: '#^Comparison operation "\>" between int\<4096, max\> and 0 is always true\.$#'
 			identifier: greater.alwaysTrue
 			count: 1
@@ -2313,6 +2571,12 @@ parameters:
 		-
 			message: '#^PHPDoc type array of property Modules\\SystemNotification\\Entities\\Notification\:\:\$guarded is not covariant with PHPDoc type array\<string\> of overridden property Illuminate\\Database\\Eloquent\\Model\:\:\$guarded\.$#'
 			identifier: property.phpDocType
+			count: 1
+			path: modules/SystemNotification/Entities/Notification.php
+
+		-
+			message: '#^Parameter \#1 \$items of class Illuminate\\Notifications\\DatabaseNotificationCollection constructor expects Illuminate\\Contracts\\Support\\Arrayable\<\(int\|string\), TModel of Illuminate\\Notifications\\DatabaseNotification\>\|iterable\<\(int\|string\), TModel of Illuminate\\Notifications\\DatabaseNotification\>\|null, array\<Illuminate\\Database\\Eloquent\\Model\> given\.$#'
+			identifier: argument.type
 			count: 1
 			path: modules/SystemNotification/Entities/Notification.php
 
@@ -2501,6 +2765,12 @@ parameters:
 			identifier: booleanAnd.rightAlwaysTrue
 			count: 23
 			path: modules/SystemNotification/Notifications/FeatureNotification.php
+
+		-
+			message: '#^Parameter \#1 \$salutation of method Illuminate\\Notifications\\Messages\\SimpleMessage\:\:salutation\(\) expects string, null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: modules/SystemNotification/Notifications/LogNotification.php
 
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$amount_formatted\.$#'
@@ -2715,6 +2985,36 @@ parameters:
 		-
 			message: '#^PHPDoc type array\<int, string\> of property Modules\\SystemPayment\\Entities\\CardType\:\:\$fillable is not covariant with PHPDoc type list\<string\> of overridden property Illuminate\\Database\\Eloquent\\Model\:\:\$fillable\.$#'
 			identifier: property.phpDocType
+			count: 1
+			path: modules/SystemPayment/Entities/CardType.php
+
+		-
+			message: '#^Parameter \#1 \$role of method Modules\\SystemPayment\\Entities\\CardType\:\:image\(\) expects string, null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: modules/SystemPayment/Entities/CardType.php
+
+		-
+			message: '#^Parameter \#2 \$crop of method Modules\\SystemPayment\\Entities\\CardType\:\:image\(\) expects string, null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: modules/SystemPayment/Entities/CardType.php
+
+		-
+			message: '#^Parameter \#4 \$media of method Modules\\SystemPayment\\Entities\\CardType\:\:imageAsArray\(\) expects Unusualify\\Modularous\\Entities\\Media\|null, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 2
+			path: modules/SystemPayment/Entities/CardType.php
+
+		-
+			message: '#^Parameter \#6 \$media of method Modules\\SystemPayment\\Entities\\CardType\:\:image\(\) expects Unusualify\\Modularous\\Entities\\Media\|null, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 3
+			path: modules/SystemPayment/Entities/CardType.php
+
+		-
+			message: '#^Parameter \#6 \$media of method Modules\\SystemPayment\\Entities\\CardType\:\:image\(\) expects Unusualify\\Modularous\\Entities\\Media\|null, false given\.$#'
+			identifier: argument.type
 			count: 1
 			path: modules/SystemPayment/Entities/CardType.php
 
@@ -3139,6 +3439,18 @@ parameters:
 			path: modules/SystemPayment/Entities/Payment.php
 
 		-
+			message: '#^Parameter \#2 \$subject of function preg_match expects string, false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: modules/SystemPayment/Entities/Payment.php
+
+		-
+			message: '#^Parameter \$get of static method Illuminate\\Database\\Eloquent\\Casts\\Attribute\<mixed,mixed\>\:\:make\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: modules/SystemPayment/Entities/Payment.php
+
+		-
 			message: '#^Property Modules\\SystemPayment\\Entities\\Payment\:\:\$cacheEnabled \(bool\) on left side of \?\? is not nullable\.$#'
 			identifier: nullCoalesce.property
 			count: 1
@@ -3477,6 +3789,42 @@ parameters:
 		-
 			message: '#^PHPDoc tag @var with type Unusualify\\Modularous\\Entities\\Traits\\HasImages is not subtype of native type Illuminate\\Database\\Eloquent\\Model\.$#'
 			identifier: varTag.nativeType
+			count: 1
+			path: modules/SystemPayment/Entities/PaymentCountry.php
+
+		-
+			message: '#^Parameter \#1 \$role of method Modules\\SystemPayment\\Entities\\PaymentCountry\:\:image\(\) expects string, null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: modules/SystemPayment/Entities/PaymentCountry.php
+
+		-
+			message: '#^Parameter \#2 \$crop of method Modules\\SystemPayment\\Entities\\PaymentCountry\:\:image\(\) expects string, null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: modules/SystemPayment/Entities/PaymentCountry.php
+
+		-
+			message: '#^Parameter \#3 \$file of method Modules\\SystemPayment\\Entities\\PaymentCountry\:\:file\(\) expects Unusualify\\Modularous\\Entities\\File\|null, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: modules/SystemPayment/Entities/PaymentCountry.php
+
+		-
+			message: '#^Parameter \#4 \$media of method Modules\\SystemPayment\\Entities\\PaymentCountry\:\:imageAsArray\(\) expects Unusualify\\Modularous\\Entities\\Media\|null, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 2
+			path: modules/SystemPayment/Entities/PaymentCountry.php
+
+		-
+			message: '#^Parameter \#6 \$media of method Modules\\SystemPayment\\Entities\\PaymentCountry\:\:image\(\) expects Unusualify\\Modularous\\Entities\\Media\|null, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 3
+			path: modules/SystemPayment/Entities/PaymentCountry.php
+
+		-
+			message: '#^Parameter \#6 \$media of method Modules\\SystemPayment\\Entities\\PaymentCountry\:\:image\(\) expects Unusualify\\Modularous\\Entities\\Media\|null, false given\.$#'
+			identifier: argument.type
 			count: 1
 			path: modules/SystemPayment/Entities/PaymentCountry.php
 
@@ -3847,6 +4195,42 @@ parameters:
 			path: modules/SystemPayment/Entities/PaymentCurrency.php
 
 		-
+			message: '#^Parameter \#1 \$role of method Modules\\SystemPayment\\Entities\\PaymentCurrency\:\:image\(\) expects string, null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: modules/SystemPayment/Entities/PaymentCurrency.php
+
+		-
+			message: '#^Parameter \#2 \$crop of method Modules\\SystemPayment\\Entities\\PaymentCurrency\:\:image\(\) expects string, null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: modules/SystemPayment/Entities/PaymentCurrency.php
+
+		-
+			message: '#^Parameter \#3 \$file of method Modules\\SystemPayment\\Entities\\PaymentCurrency\:\:file\(\) expects Unusualify\\Modularous\\Entities\\File\|null, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: modules/SystemPayment/Entities/PaymentCurrency.php
+
+		-
+			message: '#^Parameter \#4 \$media of method Modules\\SystemPayment\\Entities\\PaymentCurrency\:\:imageAsArray\(\) expects Unusualify\\Modularous\\Entities\\Media\|null, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 2
+			path: modules/SystemPayment/Entities/PaymentCurrency.php
+
+		-
+			message: '#^Parameter \#6 \$media of method Modules\\SystemPayment\\Entities\\PaymentCurrency\:\:image\(\) expects Unusualify\\Modularous\\Entities\\Media\|null, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 3
+			path: modules/SystemPayment/Entities/PaymentCurrency.php
+
+		-
+			message: '#^Parameter \#6 \$media of method Modules\\SystemPayment\\Entities\\PaymentCurrency\:\:image\(\) expects Unusualify\\Modularous\\Entities\\Media\|null, false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: modules/SystemPayment/Entities/PaymentCurrency.php
+
+		-
 			message: '#^Unreachable statement \- code above always terminates\.$#'
 			identifier: deadCode.unreachable
 			count: 1
@@ -4005,6 +4389,36 @@ parameters:
 		-
 			message: '#^PHPDoc type array\<int, string\> of property Modules\\SystemPayment\\Entities\\PaymentService\:\:\$fillable is not covariant with PHPDoc type list\<string\> of overridden property Illuminate\\Database\\Eloquent\\Model\:\:\$fillable\.$#'
 			identifier: property.phpDocType
+			count: 1
+			path: modules/SystemPayment/Entities/PaymentService.php
+
+		-
+			message: '#^Parameter \#1 \$role of method Modules\\SystemPayment\\Entities\\PaymentService\:\:image\(\) expects string, null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: modules/SystemPayment/Entities/PaymentService.php
+
+		-
+			message: '#^Parameter \#2 \$crop of method Modules\\SystemPayment\\Entities\\PaymentService\:\:image\(\) expects string, null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: modules/SystemPayment/Entities/PaymentService.php
+
+		-
+			message: '#^Parameter \#4 \$media of method Modules\\SystemPayment\\Entities\\PaymentService\:\:imageAsArray\(\) expects Unusualify\\Modularous\\Entities\\Media\|null, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 2
+			path: modules/SystemPayment/Entities/PaymentService.php
+
+		-
+			message: '#^Parameter \#6 \$media of method Modules\\SystemPayment\\Entities\\PaymentService\:\:image\(\) expects Unusualify\\Modularous\\Entities\\Media\|null, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 3
+			path: modules/SystemPayment/Entities/PaymentService.php
+
+		-
+			message: '#^Parameter \#6 \$media of method Modules\\SystemPayment\\Entities\\PaymentService\:\:image\(\) expects Unusualify\\Modularous\\Entities\\Media\|null, false given\.$#'
+			identifier: argument.type
 			count: 1
 			path: modules/SystemPayment/Entities/PaymentService.php
 
@@ -5905,6 +6319,42 @@ parameters:
 			path: modules/SystemSetting/Entities/General.php
 
 		-
+			message: '#^Parameter \#1 \$role of method Modules\\SystemSetting\\Entities\\General\:\:image\(\) expects string, null given\.$#'
+			identifier: argument.type
+			count: 2
+			path: modules/SystemSetting/Entities/General.php
+
+		-
+			message: '#^Parameter \#2 \$crop of method Modules\\SystemSetting\\Entities\\General\:\:image\(\) expects string, null given\.$#'
+			identifier: argument.type
+			count: 2
+			path: modules/SystemSetting/Entities/General.php
+
+		-
+			message: '#^Parameter \#3 \$file of method Modules\\SystemSetting\\Entities\\General\:\:file\(\) expects Unusualify\\Modularous\\Entities\\File\|null, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: modules/SystemSetting/Entities/General.php
+
+		-
+			message: '#^Parameter \#4 \$media of method Modules\\SystemSetting\\Entities\\General\:\:imageAsArray\(\) expects Unusualify\\Modularous\\Entities\\Media\|null, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 4
+			path: modules/SystemSetting/Entities/General.php
+
+		-
+			message: '#^Parameter \#6 \$media of method Modules\\SystemSetting\\Entities\\General\:\:image\(\) expects Unusualify\\Modularous\\Entities\\Media\|null, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 6
+			path: modules/SystemSetting/Entities/General.php
+
+		-
+			message: '#^Parameter \#6 \$media of method Modules\\SystemSetting\\Entities\\General\:\:image\(\) expects Unusualify\\Modularous\\Entities\\Media\|null, false given\.$#'
+			identifier: argument.type
+			count: 2
+			path: modules/SystemSetting/Entities/General.php
+
+		-
 			message: '#^Unreachable statement \- code above always terminates\.$#'
 			identifier: deadCode.unreachable
 			count: 1
@@ -6003,6 +6453,18 @@ parameters:
 		-
 			message: '#^Method Modules\\SystemSetting\\Repositories\\GeneralRepository\:\:afterSaveRepeatersTrait\(\) should return Unusualify\\Modularous\\Entities\\Model but return statement is missing\.$#'
 			identifier: return.missing
+			count: 1
+			path: modules/SystemSetting/Repositories/GeneralRepository.php
+
+		-
+			message: '#^Parameter \#1 \$object of method Unusualify\\Modularous\\Repositories\\Repository\:\:afterSave\(\) expects Unusualify\\Modularous\\Entities\\Model, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: modules/SystemSetting/Repositories/GeneralRepository.php
+
+		-
+			message: '#^Parameter \#1 \$object of method Unusualify\\Modularous\\Repositories\\Repository\:\:prepareFieldsBeforeSave\(\) expects Unusualify\\Modularous\\Entities\\Model, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
 			count: 1
 			path: modules/SystemSetting/Repositories/GeneralRepository.php
 
@@ -6557,6 +7019,12 @@ parameters:
 			identifier: booleanNot.alwaysFalse
 			count: 1
 			path: modules/SystemUser/Repositories/UserRepository.php
+
+		-
+			message: '#^Parameter \#1 \$fields of method Unusualify\\Modularous\\Repositories\\Repository\:\:create\(\) expects array\<string\>, array\<string, int\|string\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: modules/SystemUtility/Database/Seeders/StateSeeder.php
 
 		-
 			message: '#^Class Modules\\SystemUtility\\Database\\Seeders\\CountrySeeder not found\.$#'
@@ -7339,6 +7807,12 @@ parameters:
 			path: src/Console/BaseCommand.php
 
 		-
+			message: '#^Parameter \#1 \$array \(list\<string\>\) of array_values is already a list, call has no effect\.$#'
+			identifier: arrayValues.list
+			count: 1
+			path: src/Console/Blueprint/BlueprintConfigPersister.php
+
+		-
 			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 1
@@ -7420,6 +7894,12 @@ parameters:
 			message: '#^Expression on left side of \?\? is always null\.$#'
 			identifier: nullCoalesce.expr
 			count: 1
+			path: src/Console/Cache/CacheGraphCommand.php
+
+		-
+			message: '#^Parameter \#2 \$second of method Illuminate\\Console\\View\\Components\\Factory\:\:twoColumnDetail\(\) expects string\|null, int\<0, max\> given\.$#'
+			identifier: argument.type
+			count: 3
 			path: src/Console/Cache/CacheGraphCommand.php
 
 		-
@@ -7509,6 +7989,12 @@ parameters:
 		-
 			message: '#^Dead catch \- Exception is never thrown in the try block\.$#'
 			identifier: catch.neverThrown
+			count: 1
+			path: src/Console/Coverage/CoverageReportCommand.php
+
+		-
+			message: '#^Parameter \#1 \$threshold of method Unusualify\\Modularous\\Services\\CoverageService\:\:setCoverageThreshold\(\) expects float, string\|null given\.$#'
+			identifier: argument.type
 			count: 1
 			path: src/Console/Coverage/CoverageReportCommand.php
 
@@ -7780,6 +8266,18 @@ parameters:
 			message: '#^Call to an undefined method Nwidart\\Modules\\Module\:\:getDirectoryPath\(\)\.$#'
 			identifier: method.notFound
 			count: 2
+			path: src/Console/Migration/MigrateRollbackCommand.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Support\\Collection\<\(int\|string\),array\<int, string\>\>\:\:reduce\(\) expects callable\(array, array\<int, string\>, int\|string\)\: array, Closure\(array, int, string\)\: array given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Console/Migration/MigrateRollbackCommand.php
+
+		-
+			message: '#^Parameter \#1 \$name of method Illuminate\\Database\\Migrations\\Migrator\:\:usingConnection\(\) expects string, null given\.$#'
+			identifier: argument.type
+			count: 1
 			path: src/Console/Migration/MigrateRollbackCommand.php
 
 		-
@@ -8119,6 +8617,42 @@ parameters:
 			path: src/Entities/Block.php
 
 		-
+			message: '#^Parameter \#1 \$role of method Unusualify\\Modularous\\Entities\\Block\:\:image\(\) expects string, null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Entities/Block.php
+
+		-
+			message: '#^Parameter \#2 \$crop of method Unusualify\\Modularous\\Entities\\Block\:\:image\(\) expects string, null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Entities/Block.php
+
+		-
+			message: '#^Parameter \#3 \$file of method Unusualify\\Modularous\\Entities\\Block\:\:file\(\) expects Unusualify\\Modularous\\Entities\\File\|null, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Entities/Block.php
+
+		-
+			message: '#^Parameter \#4 \$media of method Unusualify\\Modularous\\Entities\\Block\:\:imageAsArray\(\) expects Unusualify\\Modularous\\Entities\\Media\|null, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Entities/Block.php
+
+		-
+			message: '#^Parameter \#6 \$media of method Unusualify\\Modularous\\Entities\\Block\:\:image\(\) expects Unusualify\\Modularous\\Entities\\Media\|null, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 3
+			path: src/Entities/Block.php
+
+		-
+			message: '#^Parameter \#6 \$media of method Unusualify\\Modularous\\Entities\\Block\:\:image\(\) expects Unusualify\\Modularous\\Entities\\Media\|null, false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Entities/Block.php
+
+		-
 			message: '#^Strict comparison using \=\=\= between mixed and null will always evaluate to false\.$#'
 			identifier: identical.alwaysFalse
 			count: 1
@@ -8253,6 +8787,12 @@ parameters:
 		-
 			message: '#^PHPDoc type array\<int, string\> of property Unusualify\\Modularous\\Entities\\ChatMessage\:\:\$fillable is not covariant with PHPDoc type list\<string\> of overridden property Illuminate\\Database\\Eloquent\\Model\:\:\$fillable\.$#'
 			identifier: property.phpDocType
+			count: 1
+			path: src/Entities/ChatMessage.php
+
+		-
+			message: '#^Parameter \#1 \$user of function get_user_profile expects Unusualify\\Modularous\\Entities\\Model, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
 			count: 1
 			path: src/Entities/ChatMessage.php
 
@@ -9025,6 +9565,36 @@ parameters:
 			path: src/Entities/Setting.php
 
 		-
+			message: '#^Parameter \#1 \$role of method Unusualify\\Modularous\\Entities\\Setting\:\:image\(\) expects string, null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Entities/Setting.php
+
+		-
+			message: '#^Parameter \#2 \$crop of method Unusualify\\Modularous\\Entities\\Setting\:\:image\(\) expects string, null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Entities/Setting.php
+
+		-
+			message: '#^Parameter \#4 \$media of method Unusualify\\Modularous\\Entities\\Setting\:\:imageAsArray\(\) expects Unusualify\\Modularous\\Entities\\Media\|null, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Entities/Setting.php
+
+		-
+			message: '#^Parameter \#6 \$media of method Unusualify\\Modularous\\Entities\\Setting\:\:image\(\) expects Unusualify\\Modularous\\Entities\\Media\|null, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 3
+			path: src/Entities/Setting.php
+
+		-
+			message: '#^Parameter \#6 \$media of method Unusualify\\Modularous\\Entities\\Setting\:\:image\(\) expects Unusualify\\Modularous\\Entities\\Media\|null, false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Entities/Setting.php
+
+		-
 			message: '#^PHPDoc type array\<int, string\> of property Unusualify\\Modularous\\Entities\\Spread\:\:\$fillable is not covariant with PHPDoc type list\<string\> of overridden property Illuminate\\Database\\Eloquent\\Model\:\:\$fillable\.$#'
 			identifier: property.phpDocType
 			count: 1
@@ -9469,6 +10039,12 @@ parameters:
 			path: src/Events/ModelEvent.php
 
 		-
+			message: '#^Parameter \#1 \$class of function get_class_short_name expects string, \$this\(Unusualify\\Modularous\\Events\\ModelEvent\) given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Events/ModelEvent.php
+
+		-
 			message: '#^Property Unusualify\\Modularous\\Events\\ModelEvent\:\:\$stateableChanged \(string\|null\) does not accept default value of type false\.$#'
 			identifier: property.defaultValue
 			count: 1
@@ -9521,12 +10097,6 @@ parameters:
 			identifier: nullsafe.neverNull
 			count: 1
 			path: src/Generators/Generator.php
-
-		-
-			message: '#^Expression on left side of \?\? is not nullable\.$#'
-			identifier: nullCoalesce.expr
-			count: 2
-			path: src/Generators/LaravelTestGenerator.php
 
 		-
 			message: '#^Method Unusualify\\Modularous\\Generators\\LaravelTestGenerator\:\:getTypes\(\) should return array but returns string\.$#'
@@ -9673,12 +10243,6 @@ parameters:
 			path: src/Generators/StubsGenerator.php
 
 		-
-			message: '#^Cannot access offset ''file_convention'' on bool\|int\.$#'
-			identifier: offsetAccess.nonOffsetAccessible
-			count: 2
-			path: src/Generators/VueTestGenerator.php
-
-		-
 			message: '#^Cannot access offset ''import_dir'' on bool\|int\.$#'
 			identifier: offsetAccess.nonOffsetAccessible
 			count: 2
@@ -9693,12 +10257,6 @@ parameters:
 		-
 			message: '#^Cannot access offset ''target_dir'' on bool\|int\.$#'
 			identifier: offsetAccess.nonOffsetAccessible
-			count: 2
-			path: src/Generators/VueTestGenerator.php
-
-		-
-			message: '#^Expression on left side of \?\? is not nullable\.$#'
-			identifier: nullCoalesce.expr
 			count: 2
 			path: src/Generators/VueTestGenerator.php
 
@@ -9765,6 +10323,18 @@ parameters:
 		-
 			message: '#^PHPDoc tag @param has invalid value \(arrays, Array going to be merged with\)\: Unexpected token ",", expected variable at offset 48 on line 3$#'
 			identifier: phpDoc.parseError
+			count: 1
+			path: src/Helpers/array.php
+
+		-
+			message: '#^Parameter \#2 \$replacement of function preg_replace expects array\<float\|int\|string\>\|string, array\<int, string\|null\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Helpers/array.php
+
+		-
+			message: '#^Parameter \#2 \$string of function explode expects string, bool given\.$#'
+			identifier: argument.type
 			count: 1
 			path: src/Helpers/array.php
 
@@ -9913,6 +10483,12 @@ parameters:
 			path: src/Helpers/input.php
 
 		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Support\\Collection\<\(int\|string\),mixed\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: src/Helpers/input.php
+
+		-
 			message: '#^Undefined variable\: \$this$#'
 			identifier: variable.undefined
 			count: 5
@@ -9951,6 +10527,18 @@ parameters:
 		-
 			message: '#^PHPDoc tag @param references unknown parameter\: \$visibility$#'
 			identifier: parameter.notFound
+			count: 1
+			path: src/Helpers/migrations_helpers.php
+
+		-
+			message: '#^Parameter \#1 \$action of method Illuminate\\Database\\Schema\\ForeignKeyDefinition\:\:onDelete\(\) expects ''cascade''\|''no action''\|''restrict''\|''set null'', ''CASCADE'' given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Helpers/migrations_helpers.php
+
+		-
+			message: '#^Parameter \#1 \$action of method Illuminate\\Database\\Schema\\ForeignKeyDefinition\:\:onUpdate\(\) expects ''cascade''\|''no action''\|''restrict''\|''set null'', ''NO ACTION'' given\.$#'
+			identifier: argument.type
 			count: 1
 			path: src/Helpers/migrations_helpers.php
 
@@ -10723,6 +11311,24 @@ parameters:
 			path: src/Http/Controllers/Auth/Controller.php
 
 		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Support\\Collection\<\(int\|string\),mixed\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Parameter \#1 \$item of method Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:getItemIdentifier\(\) expects Unusualify\\Modularous\\Entities\\Model, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Parameter \#3 \$arrayable of method Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:hydrateInputExtension\(\) expects array, bool given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
 			message: '#^Parameter \$app of method Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:__afterConstructManageTable\(\) has invalid type Unusualify\\Modularous\\Http\\Controllers\\Traits\\Application\.$#'
 			identifier: class.notFound
 			count: 1
@@ -10953,6 +11559,12 @@ parameters:
 		-
 			message: '#^PHPDoc tag @param references unknown parameter\: \$data$#'
 			identifier: parameter.notFound
+			count: 1
+			path: src/Http/Controllers/Auth/RegisterController.php
+
+		-
+			message: '#^Parameter \#1 \$user of class Unusualify\\Modularous\\Events\\ModularousUserRegistered constructor expects Illuminate\\Contracts\\Auth\\Authenticatable, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
 			count: 1
 			path: src/Http/Controllers/Auth/RegisterController.php
 
@@ -11473,6 +12085,72 @@ parameters:
 			path: src/Http/Controllers/BaseController.php
 
 		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Support\\Collection\<\(int\|string\),mixed\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: src/Http/Controllers/BaseController.php
+
+		-
+			message: '#^Parameter \#1 \$item of method Unusualify\\Modularous\\Http\\Controllers\\BaseController\:\:getItemIdentifier\(\) expects Unusualify\\Modularous\\Entities\\Model, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Http/Controllers/BaseController.php
+
+		-
+			message: '#^Parameter \#1 \$object of method Unusualify\\Modularous\\Repositories\\Repository\:\:getFormFields\(\) expects Unusualify\\Modularous\\Entities\\Model, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Http/Controllers/BaseController.php
+
+		-
+			message: '#^Parameter \#1 \$prepend of method Unusualify\\Modularous\\Http\\Controllers\\PanelController\:\:filterScope\(\) expects array, string given\.$#'
+			identifier: argument.type
+			count: 3
+			path: src/Http/Controllers/BaseController.php
+
+		-
+			message: '#^Parameter \#1 \$prependScope of method Unusualify\\Modularous\\Http\\Controllers\\BaseController\:\:getIndexData\(\) expects array, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Http/Controllers/BaseController.php
+
+		-
+			message: '#^Parameter \#1 \$request of method Unusualify\\Modularous\\Http\\Controllers\\BaseController\:\:formData\(\) expects Unusualify\\Modularous\\Http\\Controllers\\Traits\\Request, Illuminate\\Http\\Request given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Http/Controllers/BaseController.php
+
+		-
+			message: '#^Parameter \#1 \$request of method Unusualify\\Modularous\\Http\\Controllers\\BaseController\:\:indexData\(\) expects Unusualify\\Modularous\\Http\\Controllers\\Traits\\Request, Illuminate\\Http\\Request given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Http/Controllers/BaseController.php
+
+		-
+			message: '#^Parameter \#1 \$request of method Unusualify\\Modularous\\Http\\Controllers\\BaseController\:\:modalFormData\(\) expects Unusualify\\Modularous\\Http\\Controllers\\Traits\\Utilities\\Request, Illuminate\\Http\\Request given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Http/Controllers/BaseController.php
+
+		-
+			message: '#^Parameter \#1 \$user of method Unusualify\\Modularous\\Repositories\\Repository\:\:getFormActions\(\) expects Unusualify\\Modularous\\Entities\\User\|null, Unusualify\\Modularous\\Entities\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Http/Controllers/BaseController.php
+
+		-
+			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Http/Controllers/BaseController.php
+
+		-
+			message: '#^Parameter \#3 \$arrayable of method Unusualify\\Modularous\\Http\\Controllers\\BaseController\:\:hydrateInputExtension\(\) expects array, bool given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Http/Controllers/BaseController.php
+
+		-
 			message: '#^Parameter \$app of method Unusualify\\Modularous\\Http\\Controllers\\BaseController\:\:__afterConstructManageTable\(\) has invalid type Unusualify\\Modularous\\Http\\Controllers\\Traits\\Application\.$#'
 			identifier: class.notFound
 			count: 1
@@ -11686,6 +12364,12 @@ parameters:
 			message: '#^PHPDoc tag @return contains unresolvable type\.$#'
 			identifier: return.unresolvableType
 			count: 1
+			path: src/Http/Controllers/CoreController.php
+
+		-
+			message: '#^Parameter \#1 \$class of function get_class_short_name expects string, \$this\(Unusualify\\Modularous\\Http\\Controllers\\CoreController\) given\.$#'
+			identifier: argument.type
+			count: 12
 			path: src/Http/Controllers/CoreController.php
 
 		-
@@ -11983,6 +12667,60 @@ parameters:
 			path: src/Http/Controllers/DashboardController.php
 
 		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Support\\Collection\<\(int\|string\),mixed\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: src/Http/Controllers/DashboardController.php
+
+		-
+			message: '#^Parameter \#1 \$item of method Unusualify\\Modularous\\Http\\Controllers\\DashboardController\:\:getItemIdentifier\(\) expects Unusualify\\Modularous\\Entities\\Model, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Http/Controllers/DashboardController.php
+
+		-
+			message: '#^Parameter \#1 \$object of method Unusualify\\Modularous\\Repositories\\Repository\:\:getFormFields\(\) expects Unusualify\\Modularous\\Entities\\Model, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Http/Controllers/DashboardController.php
+
+		-
+			message: '#^Parameter \#1 \$prepend of method Unusualify\\Modularous\\Http\\Controllers\\PanelController\:\:filterScope\(\) expects array, string given\.$#'
+			identifier: argument.type
+			count: 3
+			path: src/Http/Controllers/DashboardController.php
+
+		-
+			message: '#^Parameter \#1 \$request of method Unusualify\\Modularous\\Http\\Controllers\\DashboardController\:\:formData\(\) expects Unusualify\\Modularous\\Http\\Controllers\\Traits\\Request, Illuminate\\Http\\Request given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Http/Controllers/DashboardController.php
+
+		-
+			message: '#^Parameter \#1 \$request of method Unusualify\\Modularous\\Http\\Controllers\\DashboardController\:\:indexData\(\) expects Unusualify\\Modularous\\Http\\Controllers\\Traits\\Request, Illuminate\\Http\\Request given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Http/Controllers/DashboardController.php
+
+		-
+			message: '#^Parameter \#1 \$request of method Unusualify\\Modularous\\Http\\Controllers\\DashboardController\:\:modalFormData\(\) expects Unusualify\\Modularous\\Http\\Controllers\\Traits\\Utilities\\Request, Illuminate\\Http\\Request given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Http/Controllers/DashboardController.php
+
+		-
+			message: '#^Parameter \#1 \$user of method Unusualify\\Modularous\\Repositories\\Repository\:\:getFormActions\(\) expects Unusualify\\Modularous\\Entities\\User\|null, Unusualify\\Modularous\\Entities\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Http/Controllers/DashboardController.php
+
+		-
+			message: '#^Parameter \#3 \$arrayable of method Unusualify\\Modularous\\Http\\Controllers\\DashboardController\:\:hydrateInputExtension\(\) expects array, bool given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Http/Controllers/DashboardController.php
+
+		-
 			message: '#^Parameter \$app of method Unusualify\\Modularous\\Http\\Controllers\\DashboardController\:\:__afterConstructManageTable\(\) has invalid type Unusualify\\Modularous\\Http\\Controllers\\Traits\\Application\.$#'
 			identifier: class.notFound
 			count: 1
@@ -12249,6 +12987,36 @@ parameters:
 		-
 			message: '#^PHPDoc tag @var above a method has no effect\.$#'
 			identifier: varTag.misplaced
+			count: 1
+			path: src/Http/Controllers/PanelController.php
+
+		-
+			message: '#^Parameter \#1 \$class of function get_class_short_name expects string, \$this\(Unusualify\\Modularous\\Http\\Controllers\\PanelController\) given\.$#'
+			identifier: argument.type
+			count: 4
+			path: src/Http/Controllers/PanelController.php
+
+		-
+			message: '#^Parameter \#1 \$items of method Unusualify\\Modularous\\Http\\Controllers\\PanelController\:\:transformIndexItems\(\) expects Illuminate\\Database\\Eloquent\\Collection, Illuminate\\Contracts\\Pagination\\LengthAwarePaginator\|Illuminate\\Support\\Collection given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Http/Controllers/PanelController.php
+
+		-
+			message: '#^Parameter \#1 \$paginator of method Unusualify\\Modularous\\Http\\Controllers\\PanelController\:\:getFormattedIndexItems\(\) expects Illuminate\\Pagination\\AbstractPaginator, Illuminate\\Database\\Eloquent\\Collection given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Http/Controllers/PanelController.php
+
+		-
+			message: '#^Parameter \#1 \$prepend of method Unusualify\\Modularous\\Http\\Controllers\\PanelController\:\:filterScope\(\) expects array, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Http/Controllers/PanelController.php
+
+		-
+			message: '#^Parameter \#2 \$subject of function preg_match expects string, false given\.$#'
+			identifier: argument.type
 			count: 1
 			path: src/Http/Controllers/PanelController.php
 
@@ -12775,6 +13543,24 @@ parameters:
 			path: src/Http/Controllers/PasswordController.php
 
 		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Support\\Collection\<\(int\|string\),mixed\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Parameter \#1 \$item of method Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:getItemIdentifier\(\) expects Unusualify\\Modularous\\Entities\\Model, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Parameter \#3 \$arrayable of method Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:hydrateInputExtension\(\) expects array, bool given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Http/Controllers/PasswordController.php
+
+		-
 			message: '#^Parameter \$app of method Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:__afterConstructManageTable\(\) has invalid type Unusualify\\Modularous\\Http\\Controllers\\Traits\\Application\.$#'
 			identifier: class.notFound
 			count: 1
@@ -13219,6 +14005,72 @@ parameters:
 			path: src/Http/Controllers/ProfileController.php
 
 		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Support\\Collection\<\(int\|string\),mixed\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: src/Http/Controllers/ProfileController.php
+
+		-
+			message: '#^Parameter \#1 \$item of method Unusualify\\Modularous\\Http\\Controllers\\ProfileController\:\:getItemIdentifier\(\) expects Unusualify\\Modularous\\Entities\\Model, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Http/Controllers/ProfileController.php
+
+		-
+			message: '#^Parameter \#1 \$object of method Unusualify\\Modularous\\Repositories\\Repository\:\:getFormFields\(\) expects Unusualify\\Modularous\\Entities\\Model, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Http/Controllers/ProfileController.php
+
+		-
+			message: '#^Parameter \#1 \$object of method Unusualify\\Modularous\\Repositories\\Repository\:\:getFormFields\(\) expects Unusualify\\Modularous\\Entities\\Model, Unusualify\\Modularous\\Entities\\User\|null given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Http/Controllers/ProfileController.php
+
+		-
+			message: '#^Parameter \#1 \$prepend of method Unusualify\\Modularous\\Http\\Controllers\\PanelController\:\:filterScope\(\) expects array, string given\.$#'
+			identifier: argument.type
+			count: 3
+			path: src/Http/Controllers/ProfileController.php
+
+		-
+			message: '#^Parameter \#1 \$request of method Unusualify\\Modularous\\Http\\Controllers\\ProfileController\:\:formData\(\) expects Unusualify\\Modularous\\Http\\Controllers\\Traits\\Request, Illuminate\\Http\\Request given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Http/Controllers/ProfileController.php
+
+		-
+			message: '#^Parameter \#1 \$request of method Unusualify\\Modularous\\Http\\Controllers\\ProfileController\:\:indexData\(\) expects Unusualify\\Modularous\\Http\\Controllers\\Traits\\Request, Illuminate\\Http\\Request given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Http/Controllers/ProfileController.php
+
+		-
+			message: '#^Parameter \#1 \$request of method Unusualify\\Modularous\\Http\\Controllers\\ProfileController\:\:modalFormData\(\) expects Unusualify\\Modularous\\Http\\Controllers\\Traits\\Utilities\\Request, Illuminate\\Http\\Request given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Http/Controllers/ProfileController.php
+
+		-
+			message: '#^Parameter \#1 \$user of function get_user_profile expects Unusualify\\Modularous\\Entities\\Model, Unusualify\\Modularous\\Entities\\User\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Http/Controllers/ProfileController.php
+
+		-
+			message: '#^Parameter \#1 \$user of method Unusualify\\Modularous\\Repositories\\Repository\:\:getFormActions\(\) expects Unusualify\\Modularous\\Entities\\User\|null, Unusualify\\Modularous\\Entities\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Http/Controllers/ProfileController.php
+
+		-
+			message: '#^Parameter \#3 \$arrayable of method Unusualify\\Modularous\\Http\\Controllers\\ProfileController\:\:hydrateInputExtension\(\) expects array, bool given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Http/Controllers/ProfileController.php
+
+		-
 			message: '#^Parameter \$app of method Unusualify\\Modularous\\Http\\Controllers\\ProfileController\:\:__afterConstructManageTable\(\) has invalid type Unusualify\\Modularous\\Http\\Controllers\\Traits\\Application\.$#'
 			identifier: class.notFound
 			count: 1
@@ -13447,6 +14299,12 @@ parameters:
 			path: src/Http/Controllers/Utility/FileLibraryController.php
 
 		-
+			message: '#^Parameter \#1 \$item of method Unusualify\\Modularous\\Http\\Controllers\\Utility\\FileLibraryController\:\:buildFile\(\) expects Unusualify\\Modularous\\Entities\\File, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Http/Controllers/Utility/FileLibraryController.php
+
+		-
 			message: '#^Unreachable statement \- code above always terminates\.$#'
 			identifier: deadCode.unreachable
 			count: 1
@@ -13509,6 +14367,18 @@ parameters:
 		-
 			message: '#^Method Unusualify\\Modularous\\Http\\Controllers\\Utility\\MediaLibraryController\:\:storeFile\(\) should return Unusualify\\Modularous\\Models\\Media but returns Unusualify\\Modularous\\Entities\\Model\.$#'
 			identifier: return.type
+			count: 1
+			path: src/Http/Controllers/Utility/MediaLibraryController.php
+
+		-
+			message: '#^Parameter \#1 \$fields of method Unusualify\\Modularous\\Repositories\\Repository\:\:create\(\) expects array\<string\>, array\<string, mixed\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Http/Controllers/Utility/MediaLibraryController.php
+
+		-
+			message: '#^Parameter \#1 \$ignore of method Unusualify\\Modularous\\Repositories\\Repository\:\:addIgnoreFieldsBeforeSave\(\) expects array, string given\.$#'
+			identifier: argument.type
 			count: 1
 			path: src/Http/Controllers/Utility/MediaLibraryController.php
 
@@ -13783,6 +14653,18 @@ parameters:
 			path: src/Http/Controllers/VerificationController.php
 
 		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Support\\Collection\<\(int\|string\),mixed\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: src/Http/Controllers/VerificationController.php
+
+		-
+			message: '#^Parameter \#3 \$arrayable of method Unusualify\\Modularous\\Http\\Controllers\\VerificationController\:\:hydrateInputExtension\(\) expects array, bool given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Http/Controllers/VerificationController.php
+
+		-
 			message: '#^Parameter \$input of method Unusualify\\Modularous\\Http\\Controllers\\VerificationController\:\:configureInput\(\) has invalid type Unusualify\\Modularous\\Http\\Controllers\\Traits\\Form\\stdClass\.$#'
 			identifier: class.notFound
 			count: 1
@@ -13829,6 +14711,18 @@ parameters:
 			identifier: method.childParameterType
 			count: 1
 			path: src/Http/Middleware/AuthenticateMiddleware.php
+
+		-
+			message: '#^Parameter \#3 \.\.\.\$guards of method Illuminate\\Auth\\Middleware\\Authenticate\:\:handle\(\) expects string, array\<string\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Http/Middleware/AuthenticateMiddleware.php
+
+		-
+			message: '#^Parameter \#1 \$object of method Unusualify\\Modularous\\Repositories\\Repository\:\:getFormFields\(\) expects Unusualify\\Modularous\\Entities\\Model, Unusualify\\Modularous\\Entities\\User\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Http/Middleware/AuthorizationMiddleware.php
 
 		-
 			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
@@ -13937,6 +14831,12 @@ parameters:
 			identifier: deadCode.unreachable
 			count: 2
 			path: src/Http/Requests/Request.php
+
+		-
+			message: '#^Parameter \#1 \$user of function get_user_profile expects Unusualify\\Modularous\\Entities\\Model, Unusualify\\Modularous\\Entities\\User given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Http/ViewComposers/CurrentUser.php
 
 		-
 			message: '#^Function azureEndpoint not found\.$#'
@@ -14251,6 +15151,12 @@ parameters:
 			path: src/Hydrates/Inputs/PriceHydrate.php
 
 		-
+			message: '#^Parameter \#1 \$column of method Unusualify\\Modularous\\Repositories\\Repository\:\:list\(\) expects string, array\<int, string\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Hydrates/Inputs/PriceHydrate.php
+
+		-
 			message: '#^Using nullsafe property access "\?\-\>id" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
 			identifier: nullsafe.neverNull
 			count: 1
@@ -14461,6 +15367,12 @@ parameters:
 			path: src/Modularous.php
 
 		-
+			message: '#^Parameter \#1 \$app of method Unusualify\\Modularous\\Modularous\:\:createModule\(\) expects Illuminate\\Container\\Container, Illuminate\\Contracts\\Foundation\\Application\|Laravel\\Lumen\\Application given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Modularous.php
+
+		-
 			message: '#^Property Unusualify\\Modularous\\Modularous\:\:\$activator \(Unusualify\\Modularous\\ActivatorInterface\) does not accept Nwidart\\Modules\\Activators\\FileActivator\.$#'
 			identifier: assign.propertyType
 			count: 1
@@ -14625,6 +15537,12 @@ parameters:
 		-
 			message: '#^PHPDoc tag @param references unknown parameter\: \$panel$#'
 			identifier: parameter.notFound
+			count: 1
+			path: src/Module.php
+
+		-
+			message: '#^Parameter \#1 \$array \(list\<string\>\) of array_values is already a list, call has no effect\.$#'
+			identifier: arrayValues.list
 			count: 1
 			path: src/Module.php
 
@@ -15199,6 +16117,108 @@ parameters:
 			path: src/Repositories/Repository.php
 
 		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Support\\Collection\<int,stdClass\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: src/Repositories/Repository.php
+
+		-
+			message: '#^Parameter \#1 \$class of function get_class_short_name expects string, \$this\(Unusualify\\Modularous\\Repositories\\Repository\) given\.$#'
+			identifier: argument.type
+			count: 52
+			path: src/Repositories/Repository.php
+
+		-
+			message: '#^Parameter \#1 \$object of method Unusualify\\Modularous\\Repositories\\Repository\:\:afterDelete\(\) expects Unusualify\\Modularous\\Entities\\Model, Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Repositories/Repository.php
+
+		-
+			message: '#^Parameter \#1 \$object of method Unusualify\\Modularous\\Repositories\\Repository\:\:afterSave\(\) expects Unusualify\\Modularous\\Entities\\Model, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Repositories/Repository.php
+
+		-
+			message: '#^Parameter \#1 \$object of method Unusualify\\Modularous\\Repositories\\Repository\:\:afterUpdateBasic\(\) expects Unusualify\\Modularous\\Entities\\Model, Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Repositories/Repository.php
+
+		-
+			message: '#^Parameter \#1 \$object of method Unusualify\\Modularous\\Repositories\\Repository\:\:afterUpdateBasic\(\) expects Unusualify\\Modularous\\Entities\\Model, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Repositories/Repository.php
+
+		-
+			message: '#^Parameter \#1 \$object of method Unusualify\\Modularous\\Repositories\\Repository\:\:beforeSave\(\) expects Unusualify\\Modularous\\Entities\\Model, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Repositories/Repository.php
+
+		-
+			message: '#^Parameter \#1 \$object of method Unusualify\\Modularous\\Repositories\\Repository\:\:cleanupFields\(\) expects Unusualify\\Modularous\\Entities\\Model, null given\.$#'
+			identifier: argument.type
+			count: 3
+			path: src/Repositories/Repository.php
+
+		-
+			message: '#^Parameter \#1 \$object of method Unusualify\\Modularous\\Repositories\\Repository\:\:getFormFields\(\) expects Unusualify\\Modularous\\Entities\\Model, Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Repositories/Repository.php
+
+		-
+			message: '#^Parameter \#1 \$object of method Unusualify\\Modularous\\Repositories\\Repository\:\:getShowFields\(\) expects Unusualify\\Modularous\\Entities\\Model, stdClass given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Repositories/Repository.php
+
+		-
+			message: '#^Parameter \#1 \$object of method Unusualify\\Modularous\\Repositories\\Repository\:\:hydrate\(\) expects Unusualify\\Modularous\\Entities\\Model, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Repositories/Repository.php
+
+		-
+			message: '#^Parameter \#1 \$object of method Unusualify\\Modularous\\Repositories\\Repository\:\:prepareFieldsBeforeSave\(\) expects Unusualify\\Modularous\\Entities\\Model, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Repositories/Repository.php
+
+		-
+			message: '#^Parameter \#1 \$query of method Unusualify\\Modularous\\Repositories\\Repository\:\:filter\(\) expects Illuminate\\Database\\Query\\Builder, Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\> given\.$#'
+			identifier: argument.type
+			count: 6
+			path: src/Repositories/Repository.php
+
+		-
+			message: '#^Parameter \#1 \$query of method Unusualify\\Modularous\\Repositories\\Repository\:\:searchIn\(\) expects Illuminate\\Database\\Query\\Builder, Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\> given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Repositories/Repository.php
+
+		-
+			message: '#^Parameter \#1 \$query of method Unusualify\\Modularous\\Repositories\\Repository\:\:searchInRelationships\(\) expects Illuminate\\Database\\Query\\Builder, Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Repositories/Repository.php
+
+		-
+			message: '#^Parameter \#2 \$offset of function array_splice expects int, false given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Repositories/Repository.php
+
+		-
+			message: '#^Parameter \#2 \$subject of function preg_match expects string, false given\.$#'
+			identifier: argument.type
+			count: 4
+			path: src/Repositories/Repository.php
+
+		-
 			message: '#^Property Unusualify\\Modularous\\Repositories\\Repository\:\:\$cacheEnabled \(bool\) on left side of \?\? is not nullable\.$#'
 			identifier: nullCoalesce.property
 			count: 4
@@ -15613,6 +16633,12 @@ parameters:
 			path: src/Services/FilepondManager.php
 
 		-
+			message: '#^Parameter \#2 \.\.\.\$arrays of function array_merge expects array, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Services/FilepondManager.php
+
+		-
 			message: '#^Undefined variable\: \$notations$#'
 			identifier: variable.undefined
 			count: 1
@@ -15623,6 +16649,12 @@ parameters:
 			identifier: variable.undefined
 			count: 1
 			path: src/Services/FilepondManager.php
+
+		-
+			message: '#^Parameter \#1 \$array of function array_values contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: src/Services/Library/OrphanUploadCleanup.php
 
 		-
 			message: '#^Expression on left side of \?\? is not nullable\.$#'
@@ -15771,6 +16803,42 @@ parameters:
 		-
 			message: '#^PHPDoc tag @param references unknown parameter\: \$routeName$#'
 			identifier: parameter.notFound
+			count: 2
+			path: src/Services/ModularousCacheService.php
+
+		-
+			message: '#^Parameter \#1 \$controller of method Unusualify\\Modularous\\Services\\ModularousCacheService\:\:warmupControllerCounts\(\) expects Unusualify\\Modularous\\Http\\Controllers\\BaseController, Illuminate\\Routing\\Controller\|string given\.$#'
+			identifier: argument.type
+			count: 8
+			path: src/Services/ModularousCacheService.php
+
+		-
+			message: '#^Parameter \#1 \$controller of method Unusualify\\Modularous\\Services\\ModularousCacheService\:\:warmupControllerItem\(\) expects Unusualify\\Modularous\\Http\\Controllers\\BaseController, Illuminate\\Routing\\Controller\|string given\.$#'
+			identifier: argument.type
+			count: 4
+			path: src/Services/ModularousCacheService.php
+
+		-
+			message: '#^Parameter \#1 \$item of method Unusualify\\Modularous\\Http\\Controllers\\BaseController\:\:getFormattedIndexItem\(\) expects Unusualify\\Modularous\\Entities\\Model, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Services/ModularousCacheService.php
+
+		-
+			message: '#^Parameter \#2 \$pattern of method Redis\:\:scan\(\) expects string\|null, array\<string, int\|string\> given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Services/ModularousCacheService.php
+
+		-
+			message: '#^Parameter \#2 \.\.\.\$arrays of function array_merge expects array, string given\.$#'
+			identifier: argument.type
+			count: 2
+			path: src/Services/ModularousCacheService.php
+
+		-
+			message: '#^Parameter \#3 \$count of method Redis\:\:scan\(\) expects int\|null, string given\.$#'
+			identifier: argument.type
 			count: 2
 			path: src/Services/ModularousCacheService.php
 
@@ -16031,6 +17099,12 @@ parameters:
 			identifier: function.alreadyNarrowedType
 			count: 1
 			path: src/Services/RemoteApi/RemoteApiConfiguration.php
+
+		-
+			message: '#^Parameter \#3 \$connectorClass of static method Unusualify\\Modularous\\Services\\RemoteApi\\RemoteApiConfiguration\:\:fromConnectorClass\(\) expects class\-string\<Unusualify\\Modularous\\Services\\RemoteApi\\AbstractRemoteApiConnector\>, class\-string\<Unusualify\\Modularous\\Services\\RemoteApi\\Contracts\\RemoteApiConnectorInterface\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Services/RemoteApi/RemoteApiConnectorResolver.php
 
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
@@ -16611,6 +17685,12 @@ parameters:
 		-
 			message: '#^PHPDoc tag @param references unknown parameter\: \$schema$#'
 			identifier: parameter.notFound
+			count: 1
+			path: src/Support/Decomposers/ValidatorParser.php
+
+		-
+			message: '#^Parameter \#3 \$subject of function str_replace expects array\<string\>\|string, bool given\.$#'
+			identifier: argument.type
 			count: 1
 			path: src/Support/Decomposers/ValidatorParser.php
 

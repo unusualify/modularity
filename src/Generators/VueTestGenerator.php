@@ -157,7 +157,7 @@ class VueTestGenerator extends Generator
     {
         $type = $this->getType();
         $sub = $this->subImportDir;
-        $conventionMethod = 'get' . $type['file_convention'] ?? 'CamelCase';
+        $conventionMethod = 'get' . ($type['file_convention'] ?? 'CamelCase');
 
         return $type['import_dir'] . ($sub ? $sub . '/' : '') . $this->{$conventionMethod}($this->getName());
     }
@@ -221,7 +221,7 @@ class VueTestGenerator extends Generator
     {
         $type = $this->getType();
         $sub = $this->subImportDir;
-        $conventionMethod = 'get' . $type['file_convention'] ?? 'CamelCase';
+        $conventionMethod = 'get' . ($type['file_convention'] ?? 'CamelCase');
 
         $extension = isset($type['extension']) ? $type['extension'] : 'js';
 
