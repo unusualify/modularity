@@ -14,9 +14,9 @@
         "minChangedLines": 5
     },
     "phpstan": {
-        "enabled": false,
+        "enabled": true,
         "level": 0,
-        "baselineMaxErrors": null
+        "baselineMaxErrors": 830
     },
     "ratchet": true,
     "measured": {

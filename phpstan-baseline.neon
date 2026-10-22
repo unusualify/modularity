@@ -1,0 +1,2845 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Class Unusualify\\Modularous\\Activators\\FileActivator not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: config/config.php
+
+		-
+			message: '#^Array has 2 duplicate keys with value ''default'' \(''default'', ''default''\)\.$#'
+			identifier: array.duplicateKey
+			count: 1
+			path: config/defers/form_drafts.php
+
+		-
+			message: '#^Array has 2 duplicate keys with value ''stickyButton'' \(''stickyButton'', ''stickyButton''\)\.$#'
+			identifier: array.duplicateKey
+			count: 1
+			path: config/merges/default_form_attributes.php
+
+		-
+			message: '#^Array has 2 duplicate keys with value ''_timezone'' \(''_timezone'', ''_timezone''\)\.$#'
+			identifier: array.duplicateKey
+			count: 1
+			path: config/merges/input_types.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 1
+			path: database/factories/UserFactory.php
+
+		-
+			message: '#^Called ''except'' on Laravel collection, but could have been retrieved as a query\.$#'
+			identifier: larastan.noUnnecessaryCollectionCall
+			count: 1
+			path: database/seeders/DefaultPermissionsSeeder.php
+
+		-
+			message: '#^Array has 2 duplicate keys with value ''type'' \(''type'', ''type''\)\.$#'
+			identifier: array.duplicateKey
+			count: 1
+			path: modules/Cms/Blueprint/Page/Form/PageFormInputs.php
+
+		-
+			message: '#^Called ''slice'' on Laravel collection, but could have been retrieved as a query\.$#'
+			identifier: larastan.noUnnecessaryCollectionCall
+			count: 1
+			path: modules/Cms/Entities/HomepageTest.php
+
+		-
+			message: '#^Array has 2 duplicate keys with value ''Â'' \(''Â'', ''Â''\)\.$#'
+			identifier: array.duplicateKey
+			count: 1
+			path: modules/Cms/Entities/Page.php
+
+		-
+			message: '#^Array has 2 duplicate keys with value ''Ç'' \(''Ç'', ''Ç''\)\.$#'
+			identifier: array.duplicateKey
+			count: 1
+			path: modules/Cms/Entities/Page.php
+
+		-
+			message: '#^Array has 2 duplicate keys with value ''Î'' \(''Î'', ''Î''\)\.$#'
+			identifier: array.duplicateKey
+			count: 1
+			path: modules/Cms/Entities/Page.php
+
+		-
+			message: '#^Array has 2 duplicate keys with value ''Ó'' \(''Ó'', ''Ó''\)\.$#'
+			identifier: array.duplicateKey
+			count: 1
+			path: modules/Cms/Entities/Page.php
+
+		-
+			message: '#^Array has 2 duplicate keys with value ''Ö'' \(''Ö'', ''Ö''\)\.$#'
+			identifier: array.duplicateKey
+			count: 1
+			path: modules/Cms/Entities/Page.php
+
+		-
+			message: '#^Array has 2 duplicate keys with value ''Ü'' \(''Ü'', ''Ü''\)\.$#'
+			identifier: array.duplicateKey
+			count: 1
+			path: modules/Cms/Entities/Page.php
+
+		-
+			message: '#^Array has 2 duplicate keys with value ''â'' \(''â'', ''â''\)\.$#'
+			identifier: array.duplicateKey
+			count: 1
+			path: modules/Cms/Entities/Page.php
+
+		-
+			message: '#^Array has 2 duplicate keys with value ''ç'' \(''ç'', ''ç''\)\.$#'
+			identifier: array.duplicateKey
+			count: 1
+			path: modules/Cms/Entities/Page.php
+
+		-
+			message: '#^Array has 2 duplicate keys with value ''î'' \(''î'', ''î''\)\.$#'
+			identifier: array.duplicateKey
+			count: 1
+			path: modules/Cms/Entities/Page.php
+
+		-
+			message: '#^Array has 2 duplicate keys with value ''ó'' \(''ó'', ''ó''\)\.$#'
+			identifier: array.duplicateKey
+			count: 1
+			path: modules/Cms/Entities/Page.php
+
+		-
+			message: '#^Array has 2 duplicate keys with value ''ö'' \(''ö'', ''ö''\)\.$#'
+			identifier: array.duplicateKey
+			count: 1
+			path: modules/Cms/Entities/Page.php
+
+		-
+			message: '#^Array has 2 duplicate keys with value ''ü'' \(''ü'', ''ü''\)\.$#'
+			identifier: array.duplicateKey
+			count: 1
+			path: modules/Cms/Entities/Page.php
+
+		-
+			message: '#^Array has 2 duplicate keys with value ''Č'' \(''Č'', ''Č''\)\.$#'
+			identifier: array.duplicateKey
+			count: 1
+			path: modules/Cms/Entities/Page.php
+
+		-
+			message: '#^Array has 2 duplicate keys with value ''č'' \(''č'', ''č''\)\.$#'
+			identifier: array.duplicateKey
+			count: 1
+			path: modules/Cms/Entities/Page.php
+
+		-
+			message: '#^Array has 2 duplicate keys with value ''Š'' \(''Š'', ''Š''\)\.$#'
+			identifier: array.duplicateKey
+			count: 1
+			path: modules/Cms/Entities/Page.php
+
+		-
+			message: '#^Array has 2 duplicate keys with value ''š'' \(''š'', ''š''\)\.$#'
+			identifier: array.duplicateKey
+			count: 1
+			path: modules/Cms/Entities/Page.php
+
+		-
+			message: '#^Array has 2 duplicate keys with value ''Ž'' \(''Ž'', ''Ž''\)\.$#'
+			identifier: array.duplicateKey
+			count: 1
+			path: modules/Cms/Entities/Page.php
+
+		-
+			message: '#^Array has 2 duplicate keys with value ''ž'' \(''ž'', ''ž''\)\.$#'
+			identifier: array.duplicateKey
+			count: 1
+			path: modules/Cms/Entities/Page.php
+
+		-
+			message: '#^Call to static method getCapsuleForModel\(\) on an unknown class Unusualify\\Modularous\\Facades\\TwillCapsules\.$#'
+			identifier: class.notFound
+			count: 1
+			path: modules/Cms/Entities/Page.php
+
+		-
+			message: '#^Called ''slice'' on Laravel collection, but could have been retrieved as a query\.$#'
+			identifier: larastan.noUnnecessaryCollectionCall
+			count: 1
+			path: modules/Cms/Entities/Page.php
+
+		-
+			message: '#^Method Modules\\Cms\\Http\\Controllers\\API\\HomepageTestController\:\:destroy\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/Cms/Http/Controllers/API/HomepageTestController.php
+
+		-
+			message: '#^Method Modules\\Cms\\Http\\Controllers\\API\\HomepageTestController\:\:show\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/Cms/Http/Controllers/API/HomepageTestController.php
+
+		-
+			message: '#^Method Modules\\Cms\\Http\\Controllers\\API\\HomepageTestController\:\:store\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/Cms/Http/Controllers/API/HomepageTestController.php
+
+		-
+			message: '#^Method Modules\\Cms\\Http\\Controllers\\API\\HomepageTestController\:\:update\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/Cms/Http/Controllers/API/HomepageTestController.php
+
+		-
+			message: '#^Method Modules\\Cms\\Http\\Controllers\\API\\LayoutBuilderController\:\:destroy\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/Cms/Http/Controllers/API/LayoutBuilderController.php
+
+		-
+			message: '#^Method Modules\\Cms\\Http\\Controllers\\API\\LayoutBuilderController\:\:show\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/Cms/Http/Controllers/API/LayoutBuilderController.php
+
+		-
+			message: '#^Method Modules\\Cms\\Http\\Controllers\\API\\LayoutBuilderController\:\:store\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/Cms/Http/Controllers/API/LayoutBuilderController.php
+
+		-
+			message: '#^Method Modules\\Cms\\Http\\Controllers\\API\\LayoutBuilderController\:\:update\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/Cms/Http/Controllers/API/LayoutBuilderController.php
+
+		-
+			message: '#^Method Modules\\Cms\\Repositories\\PageRepository\:\:afterSaveRepeatersTrait\(\) should return Unusualify\\Modularous\\Entities\\Model but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/Cms/Repositories/PageRepository.php
+
+		-
+			message: '#^Method Modules\\Cms\\Repositories\\SiteSettingRepository\:\:afterSaveRepeatersTrait\(\) should return Unusualify\\Modularous\\Entities\\Model but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/Cms/Repositories/SiteSettingRepository.php
+
+		-
+			message: '#^Called ''pluck'' on Laravel collection, but could have been retrieved as a query\.$#'
+			identifier: larastan.noUnnecessaryCollectionCall
+			count: 3
+			path: modules/Cms/Services/CmsPromotionService.php
+
+		-
+			message: '#^Class Unusualify\\Modularous\\Entities\\Traits\\HasParentSegment not found\.$#'
+			identifier: class.notFound
+			count: 5
+			path: modules/Cms/Services/CmsSlugInputValidationService.php
+
+		-
+			message: '#^Call to function unset\(\) contains undefined variable \$presetKey\.$#'
+			identifier: unset.variable
+			count: 1
+			path: modules/Cms/Services/Stylesheet/UtilityCssGenerator.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 2
+			path: modules/ErrorPage/Entities/ErrorPage.php
+
+		-
+			message: '#^Method Modules\\ErrorPage\\Http\\Controllers\\API\\ErrorPageController\:\:destroy\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/ErrorPage/Http/Controllers/API/ErrorPageController.php
+
+		-
+			message: '#^Method Modules\\ErrorPage\\Http\\Controllers\\API\\ErrorPageController\:\:show\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/ErrorPage/Http/Controllers/API/ErrorPageController.php
+
+		-
+			message: '#^Method Modules\\ErrorPage\\Http\\Controllers\\API\\ErrorPageController\:\:store\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/ErrorPage/Http/Controllers/API/ErrorPageController.php
+
+		-
+			message: '#^Method Modules\\ErrorPage\\Http\\Controllers\\API\\ErrorPageController\:\:update\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/ErrorPage/Http/Controllers/API/ErrorPageController.php
+
+		-
+			message: '#^Method Modules\\SystemNotification\\Http\\Controllers\\API\\MyNotificationController\:\:destroy\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemNotification/Http/Controllers/API/MyNotificationController.php
+
+		-
+			message: '#^Method Modules\\SystemNotification\\Http\\Controllers\\API\\MyNotificationController\:\:show\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemNotification/Http/Controllers/API/MyNotificationController.php
+
+		-
+			message: '#^Method Modules\\SystemNotification\\Http\\Controllers\\API\\MyNotificationController\:\:store\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemNotification/Http/Controllers/API/MyNotificationController.php
+
+		-
+			message: '#^Method Modules\\SystemNotification\\Http\\Controllers\\API\\MyNotificationController\:\:update\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemNotification/Http/Controllers/API/MyNotificationController.php
+
+		-
+			message: '#^Method Modules\\SystemNotification\\Http\\Controllers\\API\\NotificationController\:\:destroy\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemNotification/Http/Controllers/API/NotificationController.php
+
+		-
+			message: '#^Method Modules\\SystemNotification\\Http\\Controllers\\API\\NotificationController\:\:show\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemNotification/Http/Controllers/API/NotificationController.php
+
+		-
+			message: '#^Method Modules\\SystemNotification\\Http\\Controllers\\API\\NotificationController\:\:store\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemNotification/Http/Controllers/API/NotificationController.php
+
+		-
+			message: '#^Method Modules\\SystemNotification\\Http\\Controllers\\API\\NotificationController\:\:update\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemNotification/Http/Controllers/API/NotificationController.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 2
+			path: modules/SystemPayment/Entities/MyPayment.php
+
+		-
+			message: '#^Access to an undefined static property static\(Modules\\SystemPayment\\Entities\\Payment\)\:\:\$abortCreatorRoleExceptions\.$#'
+			identifier: staticProperty.notFound
+			count: 1
+			path: modules/SystemPayment/Entities/Payment.php
+
+		-
+			message: '#^Access to an undefined static property static\(Modules\\SystemPayment\\Entities\\Payment\)\:\:\$creatableClass\.$#'
+			identifier: staticProperty.notFound
+			count: 1
+			path: modules/SystemPayment/Entities/Payment.php
+
+		-
+			message: '#^Access to an undefined static property static\(Modules\\SystemPayment\\Entities\\Payment\)\:\:\$spreadableClass\.$#'
+			identifier: staticProperty.notFound
+			count: 1
+			path: modules/SystemPayment/Entities/Payment.php
+
+		-
+			message: '#^Access to an undefined static property static\(Modules\\SystemPayment\\Entities\\Payment\)\:\:\$spreadableSavingKey\.$#'
+			identifier: staticProperty.notFound
+			count: 1
+			path: modules/SystemPayment/Entities/Payment.php
+
+		-
+			message: '#^Array has 2 duplicate keys with value ''converted_currency'' \(''converted_currency'', ''converted_currency''\)\.$#'
+			identifier: array.duplicateKey
+			count: 1
+			path: modules/SystemPayment/Entities/Payment.php
+
+		-
+			message: '#^Class App\\Models\\User not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: modules/SystemPayment/Entities/Payment.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 4
+			path: modules/SystemPayment/Entities/Payment.php
+
+		-
+			message: '#^Access to an undefined static property static\(Modules\\SystemPayment\\Entities\\PaymentCountry\)\:\:\$spreadableClass\.$#'
+			identifier: staticProperty.notFound
+			count: 1
+			path: modules/SystemPayment/Entities/PaymentCountry.php
+
+		-
+			message: '#^Access to an undefined static property static\(Modules\\SystemPayment\\Entities\\PaymentCountry\)\:\:\$spreadableSavingKey\.$#'
+			identifier: staticProperty.notFound
+			count: 1
+			path: modules/SystemPayment/Entities/PaymentCountry.php
+
+		-
+			message: '#^Access to an undefined static property static\(Modules\\SystemPayment\\Entities\\PaymentCurrency\)\:\:\$spreadableClass\.$#'
+			identifier: staticProperty.notFound
+			count: 1
+			path: modules/SystemPayment/Entities/PaymentCurrency.php
+
+		-
+			message: '#^Access to an undefined static property static\(Modules\\SystemPayment\\Entities\\PaymentCurrency\)\:\:\$spreadableSavingKey\.$#'
+			identifier: staticProperty.notFound
+			count: 1
+			path: modules/SystemPayment/Entities/PaymentCurrency.php
+
+		-
+			message: '#^Access to an undefined static property static\(Modules\\SystemPayment\\Entities\\PaymentService\)\:\:\$spreadableClass\.$#'
+			identifier: staticProperty.notFound
+			count: 1
+			path: modules/SystemPayment/Entities/PaymentService.php
+
+		-
+			message: '#^Access to an undefined static property static\(Modules\\SystemPayment\\Entities\\PaymentService\)\:\:\$spreadableSavingKey\.$#'
+			identifier: staticProperty.notFound
+			count: 1
+			path: modules/SystemPayment/Entities/PaymentService.php
+
+		-
+			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\API\\CardTypeController\:\:destroy\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPayment/Http/Controllers/API/CardTypeController.php
+
+		-
+			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\API\\CardTypeController\:\:show\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPayment/Http/Controllers/API/CardTypeController.php
+
+		-
+			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\API\\CardTypeController\:\:store\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPayment/Http/Controllers/API/CardTypeController.php
+
+		-
+			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\API\\CardTypeController\:\:update\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPayment/Http/Controllers/API/CardTypeController.php
+
+		-
+			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\API\\MyPaymentController\:\:destroy\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPayment/Http/Controllers/API/MyPaymentController.php
+
+		-
+			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\API\\MyPaymentController\:\:show\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPayment/Http/Controllers/API/MyPaymentController.php
+
+		-
+			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\API\\MyPaymentController\:\:store\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPayment/Http/Controllers/API/MyPaymentController.php
+
+		-
+			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\API\\MyPaymentController\:\:update\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPayment/Http/Controllers/API/MyPaymentController.php
+
+		-
+			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\API\\PaymentController\:\:destroy\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPayment/Http/Controllers/API/PaymentController.php
+
+		-
+			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\API\\PaymentController\:\:show\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPayment/Http/Controllers/API/PaymentController.php
+
+		-
+			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\API\\PaymentController\:\:store\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPayment/Http/Controllers/API/PaymentController.php
+
+		-
+			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\API\\PaymentController\:\:update\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPayment/Http/Controllers/API/PaymentController.php
+
+		-
+			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\API\\PaymentCountryController\:\:destroy\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPayment/Http/Controllers/API/PaymentCountryController.php
+
+		-
+			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\API\\PaymentCountryController\:\:show\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPayment/Http/Controllers/API/PaymentCountryController.php
+
+		-
+			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\API\\PaymentCountryController\:\:store\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPayment/Http/Controllers/API/PaymentCountryController.php
+
+		-
+			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\API\\PaymentCountryController\:\:update\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPayment/Http/Controllers/API/PaymentCountryController.php
+
+		-
+			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\API\\PaymentCurrencyController\:\:destroy\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPayment/Http/Controllers/API/PaymentCurrencyController.php
+
+		-
+			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\API\\PaymentCurrencyController\:\:show\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPayment/Http/Controllers/API/PaymentCurrencyController.php
+
+		-
+			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\API\\PaymentCurrencyController\:\:store\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPayment/Http/Controllers/API/PaymentCurrencyController.php
+
+		-
+			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\API\\PaymentCurrencyController\:\:update\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPayment/Http/Controllers/API/PaymentCurrencyController.php
+
+		-
+			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\API\\PaymentServiceController\:\:destroy\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPayment/Http/Controllers/API/PaymentServiceController.php
+
+		-
+			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\API\\PaymentServiceController\:\:show\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPayment/Http/Controllers/API/PaymentServiceController.php
+
+		-
+			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\API\\PaymentServiceController\:\:store\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPayment/Http/Controllers/API/PaymentServiceController.php
+
+		-
+			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\API\\PaymentServiceController\:\:update\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPayment/Http/Controllers/API/PaymentServiceController.php
+
+		-
+			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\Front\\PaymentController\:\:destroy\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPayment/Http/Controllers/Front/PaymentController.php
+
+		-
+			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\Front\\PaymentController\:\:index\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPayment/Http/Controllers/Front/PaymentController.php
+
+		-
+			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\Front\\PaymentController\:\:show\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPayment/Http/Controllers/Front/PaymentController.php
+
+		-
+			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\Front\\PaymentController\:\:store\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPayment/Http/Controllers/Front/PaymentController.php
+
+		-
+			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\Front\\PaymentController\:\:update\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPayment/Http/Controllers/Front/PaymentController.php
+
+		-
+			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\Front\\PaymentCurrencyController\:\:destroy\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPayment/Http/Controllers/Front/PaymentCurrencyController.php
+
+		-
+			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\Front\\PaymentCurrencyController\:\:index\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPayment/Http/Controllers/Front/PaymentCurrencyController.php
+
+		-
+			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\Front\\PaymentCurrencyController\:\:show\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPayment/Http/Controllers/Front/PaymentCurrencyController.php
+
+		-
+			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\Front\\PaymentCurrencyController\:\:store\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPayment/Http/Controllers/Front/PaymentCurrencyController.php
+
+		-
+			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\Front\\PaymentCurrencyController\:\:update\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPayment/Http/Controllers/Front/PaymentCurrencyController.php
+
+		-
+			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\Front\\PaymentServiceController\:\:destroy\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPayment/Http/Controllers/Front/PaymentServiceController.php
+
+		-
+			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\Front\\PaymentServiceController\:\:index\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPayment/Http/Controllers/Front/PaymentServiceController.php
+
+		-
+			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\Front\\PaymentServiceController\:\:show\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPayment/Http/Controllers/Front/PaymentServiceController.php
+
+		-
+			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\Front\\PaymentServiceController\:\:store\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPayment/Http/Controllers/Front/PaymentServiceController.php
+
+		-
+			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\Front\\PaymentServiceController\:\:update\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPayment/Http/Controllers/Front/PaymentServiceController.php
+
+		-
+			message: '#^Unknown parameter \$decimals in call to static method Unusualify\\Modularous\\Facades\\CurrencyExchange\:\:convertTo\(\)\.$#'
+			identifier: argument.unknown
+			count: 2
+			path: modules/SystemPayment/Http/Controllers/PriceController.php
+
+		-
+			message: '#^Unknown parameter \$round in call to static method Unusualify\\Modularous\\Facades\\CurrencyExchange\:\:convertTo\(\)\.$#'
+			identifier: argument.unknown
+			count: 2
+			path: modules/SystemPayment/Http/Controllers/PriceController.php
+
+		-
+			message: '#^Method Modules\\SystemPayment\\Repositories\\PaymentCountryRepository\:\:afterSaveRepeatersTrait\(\) should return Unusualify\\Modularous\\Entities\\Model but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPayment/Repositories/PaymentCountryRepository.php
+
+		-
+			message: '#^Method Modules\\SystemPayment\\Repositories\\PaymentCurrencyRepository\:\:afterSaveRepeatersTrait\(\) should return Unusualify\\Modularous\\Entities\\Model but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPayment/Repositories/PaymentCurrencyRepository.php
+
+		-
+			message: '#^Method Modules\\SystemPayment\\Repositories\\PaymentRepository\:\:filterCreatorTrait\(\) should return Illuminate\\Database\\Eloquent\\Builder but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPayment/Repositories/PaymentRepository.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 2
+			path: modules/SystemPricing/Entities/Currency.php
+
+		-
+			message: '#^Array has 2 duplicate keys with value ''converted_raw_amount'' \(''converted_raw_amount'', ''converted_raw_amount''\)\.$#'
+			identifier: array.duplicateKey
+			count: 1
+			path: modules/SystemPricing/Entities/Price.php
+
+		-
+			message: '#^Array has 2 duplicate keys with value ''converted_total_amount'' \(''converted_total_amount'', ''converted_total_amount''\)\.$#'
+			identifier: array.duplicateKey
+			count: 1
+			path: modules/SystemPricing/Entities/Price.php
+
+		-
+			message: '#^Unknown parameter \$decimals in call to static method Unusualify\\Modularous\\Facades\\CurrencyExchange\:\:convertTo\(\)\.$#'
+			identifier: argument.unknown
+			count: 1
+			path: modules/SystemPricing/Entities/Price.php
+
+		-
+			message: '#^Unknown parameter \$round in call to static method Unusualify\\Modularous\\Facades\\CurrencyExchange\:\:convertTo\(\)\.$#'
+			identifier: argument.unknown
+			count: 1
+			path: modules/SystemPricing/Entities/Price.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 2
+			path: modules/SystemPricing/Entities/Price.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 2
+			path: modules/SystemPricing/Entities/PriceType.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 2
+			path: modules/SystemPricing/Entities/VatRate.php
+
+		-
+			message: '#^Method Modules\\SystemPricing\\Http\\Controllers\\API\\CurrencyController\:\:destroy\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPricing/Http/Controllers/API/CurrencyController.php
+
+		-
+			message: '#^Method Modules\\SystemPricing\\Http\\Controllers\\API\\CurrencyController\:\:show\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPricing/Http/Controllers/API/CurrencyController.php
+
+		-
+			message: '#^Method Modules\\SystemPricing\\Http\\Controllers\\API\\CurrencyController\:\:store\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPricing/Http/Controllers/API/CurrencyController.php
+
+		-
+			message: '#^Method Modules\\SystemPricing\\Http\\Controllers\\API\\CurrencyController\:\:update\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPricing/Http/Controllers/API/CurrencyController.php
+
+		-
+			message: '#^Method Modules\\SystemPricing\\Http\\Controllers\\API\\PriceController\:\:destroy\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPricing/Http/Controllers/API/PriceController.php
+
+		-
+			message: '#^Method Modules\\SystemPricing\\Http\\Controllers\\API\\PriceController\:\:show\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPricing/Http/Controllers/API/PriceController.php
+
+		-
+			message: '#^Method Modules\\SystemPricing\\Http\\Controllers\\API\\PriceController\:\:store\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPricing/Http/Controllers/API/PriceController.php
+
+		-
+			message: '#^Method Modules\\SystemPricing\\Http\\Controllers\\API\\PriceController\:\:update\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPricing/Http/Controllers/API/PriceController.php
+
+		-
+			message: '#^Method Modules\\SystemPricing\\Http\\Controllers\\API\\PriceTypeController\:\:destroy\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPricing/Http/Controllers/API/PriceTypeController.php
+
+		-
+			message: '#^Method Modules\\SystemPricing\\Http\\Controllers\\API\\PriceTypeController\:\:show\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPricing/Http/Controllers/API/PriceTypeController.php
+
+		-
+			message: '#^Method Modules\\SystemPricing\\Http\\Controllers\\API\\PriceTypeController\:\:store\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPricing/Http/Controllers/API/PriceTypeController.php
+
+		-
+			message: '#^Method Modules\\SystemPricing\\Http\\Controllers\\API\\PriceTypeController\:\:update\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPricing/Http/Controllers/API/PriceTypeController.php
+
+		-
+			message: '#^Method Modules\\SystemPricing\\Http\\Controllers\\API\\VatRateController\:\:destroy\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPricing/Http/Controllers/API/VatRateController.php
+
+		-
+			message: '#^Method Modules\\SystemPricing\\Http\\Controllers\\API\\VatRateController\:\:show\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPricing/Http/Controllers/API/VatRateController.php
+
+		-
+			message: '#^Method Modules\\SystemPricing\\Http\\Controllers\\API\\VatRateController\:\:store\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPricing/Http/Controllers/API/VatRateController.php
+
+		-
+			message: '#^Method Modules\\SystemPricing\\Http\\Controllers\\API\\VatRateController\:\:update\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPricing/Http/Controllers/API/VatRateController.php
+
+		-
+			message: '#^Method Modules\\SystemPricing\\Http\\Controllers\\Front\\CurrencyController\:\:destroy\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPricing/Http/Controllers/Front/CurrencyController.php
+
+		-
+			message: '#^Method Modules\\SystemPricing\\Http\\Controllers\\Front\\CurrencyController\:\:index\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPricing/Http/Controllers/Front/CurrencyController.php
+
+		-
+			message: '#^Method Modules\\SystemPricing\\Http\\Controllers\\Front\\CurrencyController\:\:show\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPricing/Http/Controllers/Front/CurrencyController.php
+
+		-
+			message: '#^Method Modules\\SystemPricing\\Http\\Controllers\\Front\\CurrencyController\:\:store\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPricing/Http/Controllers/Front/CurrencyController.php
+
+		-
+			message: '#^Method Modules\\SystemPricing\\Http\\Controllers\\Front\\CurrencyController\:\:update\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPricing/Http/Controllers/Front/CurrencyController.php
+
+		-
+			message: '#^Method Modules\\SystemPricing\\Http\\Controllers\\Front\\PriceController\:\:destroy\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPricing/Http/Controllers/Front/PriceController.php
+
+		-
+			message: '#^Method Modules\\SystemPricing\\Http\\Controllers\\Front\\PriceController\:\:index\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPricing/Http/Controllers/Front/PriceController.php
+
+		-
+			message: '#^Method Modules\\SystemPricing\\Http\\Controllers\\Front\\PriceController\:\:show\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPricing/Http/Controllers/Front/PriceController.php
+
+		-
+			message: '#^Method Modules\\SystemPricing\\Http\\Controllers\\Front\\PriceController\:\:store\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPricing/Http/Controllers/Front/PriceController.php
+
+		-
+			message: '#^Method Modules\\SystemPricing\\Http\\Controllers\\Front\\PriceController\:\:update\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPricing/Http/Controllers/Front/PriceController.php
+
+		-
+			message: '#^Method Modules\\SystemPricing\\Http\\Controllers\\Front\\PriceTypeController\:\:destroy\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPricing/Http/Controllers/Front/PriceTypeController.php
+
+		-
+			message: '#^Method Modules\\SystemPricing\\Http\\Controllers\\Front\\PriceTypeController\:\:index\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPricing/Http/Controllers/Front/PriceTypeController.php
+
+		-
+			message: '#^Method Modules\\SystemPricing\\Http\\Controllers\\Front\\PriceTypeController\:\:show\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPricing/Http/Controllers/Front/PriceTypeController.php
+
+		-
+			message: '#^Method Modules\\SystemPricing\\Http\\Controllers\\Front\\PriceTypeController\:\:store\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPricing/Http/Controllers/Front/PriceTypeController.php
+
+		-
+			message: '#^Method Modules\\SystemPricing\\Http\\Controllers\\Front\\PriceTypeController\:\:update\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPricing/Http/Controllers/Front/PriceTypeController.php
+
+		-
+			message: '#^Method Modules\\SystemPricing\\Http\\Controllers\\Front\\VatRateController\:\:destroy\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPricing/Http/Controllers/Front/VatRateController.php
+
+		-
+			message: '#^Method Modules\\SystemPricing\\Http\\Controllers\\Front\\VatRateController\:\:index\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPricing/Http/Controllers/Front/VatRateController.php
+
+		-
+			message: '#^Method Modules\\SystemPricing\\Http\\Controllers\\Front\\VatRateController\:\:show\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPricing/Http/Controllers/Front/VatRateController.php
+
+		-
+			message: '#^Method Modules\\SystemPricing\\Http\\Controllers\\Front\\VatRateController\:\:store\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPricing/Http/Controllers/Front/VatRateController.php
+
+		-
+			message: '#^Method Modules\\SystemPricing\\Http\\Controllers\\Front\\VatRateController\:\:update\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemPricing/Http/Controllers/Front/VatRateController.php
+
+		-
+			message: '#^Method Modules\\SystemSetting\\Http\\Controllers\\API\\GeneralController\:\:destroy\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemSetting/Http/Controllers/API/GeneralController.php
+
+		-
+			message: '#^Method Modules\\SystemSetting\\Http\\Controllers\\API\\GeneralController\:\:show\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemSetting/Http/Controllers/API/GeneralController.php
+
+		-
+			message: '#^Method Modules\\SystemSetting\\Http\\Controllers\\API\\GeneralController\:\:store\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemSetting/Http/Controllers/API/GeneralController.php
+
+		-
+			message: '#^Method Modules\\SystemSetting\\Http\\Controllers\\API\\GeneralController\:\:update\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemSetting/Http/Controllers/API/GeneralController.php
+
+		-
+			message: '#^Method Modules\\SystemSetting\\Repositories\\GeneralRepository\:\:afterSaveRepeatersTrait\(\) should return Unusualify\\Modularous\\Entities\\Model but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemSetting/Repositories/GeneralRepository.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 1
+			path: modules/SystemSetting/Support/AnalyticsScripts.php
+
+		-
+			message: '#^Array has 2 duplicate keys with value ''color'' \(''color'', ''color''\)\.$#'
+			identifier: array.duplicateKey
+			count: 1
+			path: modules/SystemUser/Config/config.php
+
+		-
+			message: '#^Array has 2 duplicate keys with value ''icon'' \(''icon'', ''icon''\)\.$#'
+			identifier: array.duplicateKey
+			count: 1
+			path: modules/SystemUser/Config/config.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 2
+			path: modules/SystemUser/Entities/Role.php
+
+		-
+			message: '#^Method Modules\\SystemUser\\Http\\Controllers\\API\\CompanyController\:\:destroy\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemUser/Http/Controllers/API/CompanyController.php
+
+		-
+			message: '#^Method Modules\\SystemUser\\Http\\Controllers\\API\\CompanyController\:\:show\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemUser/Http/Controllers/API/CompanyController.php
+
+		-
+			message: '#^Method Modules\\SystemUser\\Http\\Controllers\\API\\CompanyController\:\:store\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemUser/Http/Controllers/API/CompanyController.php
+
+		-
+			message: '#^Method Modules\\SystemUser\\Http\\Controllers\\API\\CompanyController\:\:update\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemUser/Http/Controllers/API/CompanyController.php
+
+		-
+			message: '#^Method Modules\\SystemUser\\Http\\Controllers\\API\\PermissionController\:\:destroy\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemUser/Http/Controllers/API/PermissionController.php
+
+		-
+			message: '#^Method Modules\\SystemUser\\Http\\Controllers\\API\\PermissionController\:\:show\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemUser/Http/Controllers/API/PermissionController.php
+
+		-
+			message: '#^Method Modules\\SystemUser\\Http\\Controllers\\API\\PermissionController\:\:store\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemUser/Http/Controllers/API/PermissionController.php
+
+		-
+			message: '#^Method Modules\\SystemUser\\Http\\Controllers\\API\\PermissionController\:\:update\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemUser/Http/Controllers/API/PermissionController.php
+
+		-
+			message: '#^Method Modules\\SystemUser\\Http\\Controllers\\API\\RoleController\:\:destroy\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemUser/Http/Controllers/API/RoleController.php
+
+		-
+			message: '#^Method Modules\\SystemUser\\Http\\Controllers\\API\\RoleController\:\:show\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemUser/Http/Controllers/API/RoleController.php
+
+		-
+			message: '#^Method Modules\\SystemUser\\Http\\Controllers\\API\\RoleController\:\:store\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemUser/Http/Controllers/API/RoleController.php
+
+		-
+			message: '#^Method Modules\\SystemUser\\Http\\Controllers\\API\\RoleController\:\:update\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemUser/Http/Controllers/API/RoleController.php
+
+		-
+			message: '#^Method Modules\\SystemUser\\Http\\Controllers\\Front\\CompanyController\:\:destroy\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemUser/Http/Controllers/Front/CompanyController.php
+
+		-
+			message: '#^Method Modules\\SystemUser\\Http\\Controllers\\Front\\CompanyController\:\:index\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemUser/Http/Controllers/Front/CompanyController.php
+
+		-
+			message: '#^Method Modules\\SystemUser\\Http\\Controllers\\Front\\CompanyController\:\:show\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemUser/Http/Controllers/Front/CompanyController.php
+
+		-
+			message: '#^Method Modules\\SystemUser\\Http\\Controllers\\Front\\CompanyController\:\:store\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemUser/Http/Controllers/Front/CompanyController.php
+
+		-
+			message: '#^Method Modules\\SystemUser\\Http\\Controllers\\Front\\CompanyController\:\:update\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemUser/Http/Controllers/Front/CompanyController.php
+
+		-
+			message: '#^Method Modules\\SystemUser\\Http\\Controllers\\Front\\PermissionController\:\:destroy\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemUser/Http/Controllers/Front/PermissionController.php
+
+		-
+			message: '#^Method Modules\\SystemUser\\Http\\Controllers\\Front\\PermissionController\:\:index\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemUser/Http/Controllers/Front/PermissionController.php
+
+		-
+			message: '#^Method Modules\\SystemUser\\Http\\Controllers\\Front\\PermissionController\:\:show\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemUser/Http/Controllers/Front/PermissionController.php
+
+		-
+			message: '#^Method Modules\\SystemUser\\Http\\Controllers\\Front\\PermissionController\:\:store\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemUser/Http/Controllers/Front/PermissionController.php
+
+		-
+			message: '#^Method Modules\\SystemUser\\Http\\Controllers\\Front\\PermissionController\:\:update\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemUser/Http/Controllers/Front/PermissionController.php
+
+		-
+			message: '#^Method Modules\\SystemUser\\Http\\Controllers\\Front\\RoleController\:\:destroy\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemUser/Http/Controllers/Front/RoleController.php
+
+		-
+			message: '#^Method Modules\\SystemUser\\Http\\Controllers\\Front\\RoleController\:\:index\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemUser/Http/Controllers/Front/RoleController.php
+
+		-
+			message: '#^Method Modules\\SystemUser\\Http\\Controllers\\Front\\RoleController\:\:show\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemUser/Http/Controllers/Front/RoleController.php
+
+		-
+			message: '#^Method Modules\\SystemUser\\Http\\Controllers\\Front\\RoleController\:\:store\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemUser/Http/Controllers/Front/RoleController.php
+
+		-
+			message: '#^Method Modules\\SystemUser\\Http\\Controllers\\Front\\RoleController\:\:update\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemUser/Http/Controllers/Front/RoleController.php
+
+		-
+			message: '#^Method Modules\\SystemUser\\Http\\Controllers\\Front\\UserController\:\:destroy\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemUser/Http/Controllers/Front/UserController.php
+
+		-
+			message: '#^Method Modules\\SystemUser\\Http\\Controllers\\Front\\UserController\:\:index\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemUser/Http/Controllers/Front/UserController.php
+
+		-
+			message: '#^Method Modules\\SystemUser\\Http\\Controllers\\Front\\UserController\:\:show\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemUser/Http/Controllers/Front/UserController.php
+
+		-
+			message: '#^Method Modules\\SystemUser\\Http\\Controllers\\Front\\UserController\:\:store\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemUser/Http/Controllers/Front/UserController.php
+
+		-
+			message: '#^Method Modules\\SystemUser\\Http\\Controllers\\Front\\UserController\:\:update\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemUser/Http/Controllers/Front/UserController.php
+
+		-
+			message: '#^Class Modules\\SystemUtility\\Database\\Seeders\\CountrySeeder not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: modules/SystemUtility/Database/Seeders/SystemUtilityDatabaseSeeder.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 2
+			path: modules/SystemUtility/Entities/State.php
+
+		-
+			message: '#^Method Modules\\SystemUtility\\Http\\Controllers\\API\\CountryController\:\:destroy\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemUtility/Http/Controllers/API/CountryController.php
+
+		-
+			message: '#^Method Modules\\SystemUtility\\Http\\Controllers\\API\\CountryController\:\:show\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemUtility/Http/Controllers/API/CountryController.php
+
+		-
+			message: '#^Method Modules\\SystemUtility\\Http\\Controllers\\API\\CountryController\:\:store\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemUtility/Http/Controllers/API/CountryController.php
+
+		-
+			message: '#^Method Modules\\SystemUtility\\Http\\Controllers\\API\\CountryController\:\:update\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemUtility/Http/Controllers/API/CountryController.php
+
+		-
+			message: '#^Method Modules\\SystemUtility\\Http\\Controllers\\API\\StateController\:\:destroy\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemUtility/Http/Controllers/API/StateController.php
+
+		-
+			message: '#^Method Modules\\SystemUtility\\Http\\Controllers\\API\\StateController\:\:show\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemUtility/Http/Controllers/API/StateController.php
+
+		-
+			message: '#^Method Modules\\SystemUtility\\Http\\Controllers\\API\\StateController\:\:store\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemUtility/Http/Controllers/API/StateController.php
+
+		-
+			message: '#^Method Modules\\SystemUtility\\Http\\Controllers\\API\\StateController\:\:update\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: modules/SystemUtility/Http/Controllers/API/StateController.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "build\:modularous" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "mod\:c\:cmd" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "mod\:c\:feature" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "mod\:c\:input\:hydrate" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "mod\:c\:model\:trait" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "mod\:c\:operation" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "mod\:c\:repo\:trait" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "mod\:c\:vue\:input" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "mod\:c\:vue\:test" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "mod\:cache\:ver" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "mod\:composer\:scripts" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "mod\:g\:ver" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "mod\:operations\:process" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "mod\:replace\:regex" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "mod\:upgrade\:v11\-db" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularity\:dev" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:build" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:cache\:purge\-presentation" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:cache\:versions" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:cache\:warm\-presentation" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:composer\:merge" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:composer\:scripts" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:create\:command" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:create\:database" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:create\:feature" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:create\:horizon\:supervisor" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:create\:input\:hydrate" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:create\:model\:trait" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:create\:operation" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:create\:repository\:trait" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:create\:route\:permissions" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:create\:superadmin" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:create\:theme" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:create\:vue\:input" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:create\:vue\:test" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:dev" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:filepond\:flush" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:flush" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:flush\:filepond" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:flush\:library\-uploads" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:generate\:command\:docs" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:get\:version" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:install" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:library\-uploads\:flush" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:make\:command" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:make\:feature" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:make\:horizon\:supervisor" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:make\:input\:hydrate" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:make\:model\:trait" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:make\:operation" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:make\:repository\:trait" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:make\:route\:permissions" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:make\:theme" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:make\:theme\:folder" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:make\:vue\:input" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:make\:vue\:test" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:operations\:make" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:operations\:process" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:pint" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:publish\:operations" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:refresh" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:replace\:regex" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:setup\:development" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:sync\:cache\-permissions" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:sync\:revision\-permissions" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:sync\:states" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:sync\:translations" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:update\:laravel\:configs" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "modularous\:upgrade\:v11\-db" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Command "unusual\:composer\:scripts" does not have argument "module"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Console\\BaseCommand\:\:getDestinationFilePath\(\) should return string but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Console\\BaseCommand\:\:getTemplateContents\(\) should return string but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 2
+			path: src/Console/BuildCommand.php
+
+		-
+			message: '#^Static method Unusualify\\Modularous\\Facades\\ModularousCache\:\:invalidateCountCaches\(\) invoked with 1 parameter, 2 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: src/Console/Cache/CacheClearCommand.php
+
+		-
+			message: '#^Static method Unusualify\\Modularous\\Facades\\ModularousCache\:\:invalidateIndexCaches\(\) invoked with 1 parameter, 2 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: src/Console/Cache/CacheClearCommand.php
+
+		-
+			message: '#^Result of method Illuminate\\Console\\Command\:\:error\(\) \(void\) is used\.$#'
+			identifier: method.void
+			count: 1
+			path: src/Console/Cache/CacheGraphCommand.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 2
+			path: src/Console/Coverage/CoverageTestGeneratorCommand.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Console\\Flush\\FlushSessionsCommand\:\:handle\(\) should return int but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: src/Console/Flush/FlushSessionsCommand.php
+
+		-
+			message: '#^Command "modularous\:create\:laravel\:test" does not have argument "name"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 2
+			path: src/Console/Make/MakeLaravelTestCommand.php
+
+		-
+			message: '#^Command "modularous\:create\:laravel\:test" does not have argument "type"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 2
+			path: src/Console/Make/MakeLaravelTestCommand.php
+
+		-
+			message: '#^Command "modularous\:create\:laravel\:test" does not have option "all"\.$#'
+			identifier: larastan.console.undefinedOption
+			count: 1
+			path: src/Console/Make/MakeLaravelTestCommand.php
+
+		-
+			message: '#^Command "modularous\:make\:laravel\:test" does not have argument "name"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 2
+			path: src/Console/Make/MakeLaravelTestCommand.php
+
+		-
+			message: '#^Command "modularous\:make\:laravel\:test" does not have argument "type"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 2
+			path: src/Console/Make/MakeLaravelTestCommand.php
+
+		-
+			message: '#^Command "modularous\:make\:laravel\:test" does not have option "all"\.$#'
+			identifier: larastan.console.undefinedOption
+			count: 1
+			path: src/Console/Make/MakeLaravelTestCommand.php
+
+		-
+			message: '#^Command "mod\:m\:migration" does not have option "name"\.$#'
+			identifier: larastan.console.undefinedOption
+			count: 1
+			path: src/Console/Make/MakeMigrationCommand.php
+
+		-
+			message: '#^Command "modularous\:make\:migration" does not have option "name"\.$#'
+			identifier: larastan.console.undefinedOption
+			count: 1
+			path: src/Console/Make/MakeMigrationCommand.php
+
+		-
+			message: '#^Calling the helper function ''with\(\)'' with only one argument simply returns the value itself\. If you want to chain methods on a construct, use ''\(new ClassName\(\)\)\-\>foo\(\)'' instead$#'
+			identifier: larastan.uselessConstructs.with
+			count: 1
+			path: src/Console/Make/MakeRouteCommand.php
+
+		-
+			message: '#^Calling the helper function ''with\(\)'' with only one argument simply returns the value itself\. If you want to chain methods on a construct, use ''\(new ClassName\(\)\)\-\>foo\(\)'' instead$#'
+			identifier: larastan.uselessConstructs.with
+			count: 1
+			path: src/Console/Make/MakeStubsCommand.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 5
+			path: src/Console/Setup/CreateSuperAdminCommand.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Console\\Setup\\CreateSuperAdminCommand\:\:setEmail\(\) should return string but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: src/Console/Setup/CreateSuperAdminCommand.php
+
+		-
+			message: '#^Command "modularous\:setup\:development" does not have argument "repo"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/Setup/SetupModularousDevelopmentCommand.php
+
+		-
+			message: '#^Command "modularous\:setup\:development" does not have argument "timeout"\.$#'
+			identifier: larastan.console.undefinedArgument
+			count: 1
+			path: src/Console/Setup/SetupModularousDevelopmentCommand.php
+
+		-
+			message: '#^Property ''attachments'' does not exist in model\.$#'
+			identifier: rules.modelAppends
+			count: 1
+			path: src/Entities/Chat.php
+
+		-
+			message: '#^Access to an undefined static property static\(Unusualify\\Modularous\\Entities\\ChatMessage\)\:\:\$creatableClass\.$#'
+			identifier: staticProperty.notFound
+			count: 2
+			path: src/Entities/ChatMessage.php
+
+		-
+			message: '#^Class App\\Models\\User not found\.$#'
+			identifier: class.notFound
+			count: 2
+			path: src/Entities/ChatMessage.php
+
+		-
+			message: '#^Access to an undefined static property static\(Unusualify\\Modularous\\Entities\\Company\)\:\:\$spreadableClass\.$#'
+			identifier: staticProperty.notFound
+			count: 1
+			path: src/Entities/Company.php
+
+		-
+			message: '#^Access to an undefined static property static\(Unusualify\\Modularous\\Entities\\Company\)\:\:\$spreadableSavingKey\.$#'
+			identifier: staticProperty.notFound
+			count: 1
+			path: src/Entities/Company.php
+
+		-
+			message: '#^Access to an undefined static property static\(Unusualify\\Modularous\\Entities\\File\)\:\:\$abortCreatorRoleExceptions\.$#'
+			identifier: staticProperty.notFound
+			count: 1
+			path: src/Entities/File.php
+
+		-
+			message: '#^Access to an undefined static property static\(Unusualify\\Modularous\\Entities\\File\)\:\:\$creatableClass\.$#'
+			identifier: staticProperty.notFound
+			count: 1
+			path: src/Entities/File.php
+
+		-
+			message: '#^Called ''pluck'' on Laravel collection, but could have been retrieved as a query\.$#'
+			identifier: larastan.noUnnecessaryCollectionCall
+			count: 1
+			path: src/Entities/File.php
+
+		-
+			message: '#^Class App\\Models\\User not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Entities/File.php
+
+		-
+			message: '#^Access to an undefined static property static\(Unusualify\\Modularous\\Entities\\Media\)\:\:\$abortCreatorRoleExceptions\.$#'
+			identifier: staticProperty.notFound
+			count: 1
+			path: src/Entities/Media.php
+
+		-
+			message: '#^Access to an undefined static property static\(Unusualify\\Modularous\\Entities\\Media\)\:\:\$creatableClass\.$#'
+			identifier: staticProperty.notFound
+			count: 1
+			path: src/Entities/Media.php
+
+		-
+			message: '#^Called ''pluck'' on Laravel collection, but could have been retrieved as a query\.$#'
+			identifier: larastan.noUnnecessaryCollectionCall
+			count: 1
+			path: src/Entities/Media.php
+
+		-
+			message: '#^Class App\\Models\\User not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Entities/Media.php
+
+		-
+			message: '#^Access to an undefined static property Unusualify\\Modularous\\Entities\\Model\:\:\$loadLocalizedTags\.$#'
+			identifier: staticProperty.notFound
+			count: 1
+			path: src/Entities/Model.php
+
+		-
+			message: '#^Access to an undefined static property static\(Unusualify\\Modularous\\Entities\\Model\)\:\:\$hasAuthorizableFillable\.$#'
+			identifier: staticProperty.notFound
+			count: 1
+			path: src/Entities/Model.php
+
+		-
+			message: '#^Access to an undefined static property static\(Unusualify\\Modularous\\Entities\\Model\)\:\:\$localeTagsSlugGenerator\.$#'
+			identifier: staticProperty.notFound
+			count: 1
+			path: src/Entities/Model.php
+
+		-
+			message: '#^Unknown parameter \$dictionary in call to function call_user_func\.$#'
+			identifier: argument.unknown
+			count: 1
+			path: src/Entities/Model.php
+
+		-
+			message: '#^Unknown parameter \$language in call to function call_user_func\.$#'
+			identifier: argument.unknown
+			count: 1
+			path: src/Entities/Model.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 6
+			path: src/Entities/Model.php
+
+		-
+			message: '#^Access to an undefined static property static\(Unusualify\\Modularous\\Entities\\User\)\:\:\$noCompanyAppends\.$#'
+			identifier: staticProperty.notFound
+			count: 1
+			path: src/Entities/User.php
+
+		-
+			message: '#^Access to an undefined static property static\(Unusualify\\Modularous\\Entities\\User\)\:\:\$savingCompanyFieldName\.$#'
+			identifier: staticProperty.notFound
+			count: 1
+			path: src/Entities/User.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 1
+			path: src/Entities/User.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 2
+			path: src/Entities/User.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Events\\ModelEvent\:\:broadcastVia\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Events/ModelEvent.php
+
+		-
+			message: '#^Function array_export\(\) should return bool but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: src/Helpers/array.php
+
+		-
+			message: '#^Undefined variable\: \$this$#'
+			identifier: variable.undefined
+			count: 5
+			path: src/Helpers/input.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 1
+			path: src/Helpers/module.php
+
+		-
+			message: '#^Array has 2 duplicate keys with value ''appends'' \(''appends'', ''appends''\)\.$#'
+			identifier: array.duplicateKey
+			count: 1
+			path: src/Helpers/sources.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Http\\Controllers\\API\\LanguageController\:\:destroy\(\) should return Illuminate\\Http\\Response but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: src/Http/Controllers/API/LanguageController.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Http\\Controllers\\API\\LanguageController\:\:show\(\) should return Illuminate\\Http\\Response but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: src/Http/Controllers/API/LanguageController.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Http\\Controllers\\API\\LanguageController\:\:store\(\) should return Illuminate\\Http\\Response but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: src/Http/Controllers/API/LanguageController.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Http\\Controllers\\API\\LanguageController\:\:update\(\) should return Illuminate\\Http\\Response but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: src/Http/Controllers/API/LanguageController.php
+
+		-
+			message: '#^Parameter \$request of method Unusualify\\Modularous\\Http\\Controllers\\API\\LanguageController\:\:update\(\) has invalid type Unusualify\\Modularous\\Http\\Controllers\\API\\RoleRequest\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Http/Controllers/API/LanguageController.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:\$baseKey\.$#'
+			identifier: property.notFound
+			count: 6
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:\$defaultFilters\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:\$formWith\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:\$indexColumns\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:\$isNested\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:\$isSingleton\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:\$module\.$#'
+			identifier: property.notFound
+			count: 12
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:\$moduleName\.$#'
+			identifier: property.notFound
+			count: 12
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:\$nestedParentId\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:\$nestedParentModel\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:\$nestedParentName\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:\$repository\.$#'
+			identifier: property.notFound
+			count: 35
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:\$request\.$#'
+			identifier: property.notFound
+			count: 12
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:\$routeName\.$#'
+			identifier: property.notFound
+			count: 13
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:\$routePrefix\.$#'
+			identifier: property.notFound
+			count: 4
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:\$titleColumnKey\.$#'
+			identifier: property.notFound
+			count: 20
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:\$user\.$#'
+			identifier: property.notFound
+			count: 7
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Array has 2 duplicate keys with value ''endpoints'' \(''endpoints'', ''endpoints''\)\.$#'
+			identifier: array.duplicateKey
+			count: 1
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Result of method Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:getTableAttributes\(\) \(void\) is used\.$#'
+			identifier: method.void
+			count: 1
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Result of method Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:getVuetifyDatatableOptions\(\) \(void\) is used\.$#'
+			identifier: method.void
+			count: 1
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Result of method Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:hydrateTableAttributes\(\) \(void\) is used\.$#'
+			identifier: method.void
+			count: 1
+			path: src/Http/Controllers/Auth/Controller.php
+
+		-
+			message: '#^Instantiated class PragmaRX\\Google2FA\\Google2FA not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Http/Controllers/Auth/LoginController.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 1
+			path: src/Http/Controllers/Auth/PreRegisterController.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\BaseController\:\:\$indexColumns\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Http/Controllers/BaseController.php
+
+		-
+			message: '#^Array has 2 duplicate keys with value ''endpoints'' \(''endpoints'', ''endpoints''\)\.$#'
+			identifier: array.duplicateKey
+			count: 1
+			path: src/Http/Controllers/BaseController.php
+
+		-
+			message: '#^Result of method Unusualify\\Modularous\\Http\\Controllers\\BaseController\:\:getTableAttributes\(\) \(void\) is used\.$#'
+			identifier: method.void
+			count: 1
+			path: src/Http/Controllers/BaseController.php
+
+		-
+			message: '#^Result of method Unusualify\\Modularous\\Http\\Controllers\\BaseController\:\:getVuetifyDatatableOptions\(\) \(void\) is used\.$#'
+			identifier: method.void
+			count: 1
+			path: src/Http/Controllers/BaseController.php
+
+		-
+			message: '#^Result of method Unusualify\\Modularous\\Http\\Controllers\\BaseController\:\:hydrateTableAttributes\(\) \(void\) is used\.$#'
+			identifier: method.void
+			count: 1
+			path: src/Http/Controllers/BaseController.php
+
+		-
+			message: '#^Result of method Unusualify\\Modularous\\Http\\Controllers\\CoreController\:\:getRepositoryClass\(\) \(void\) is used\.$#'
+			identifier: method.void
+			count: 2
+			path: src/Http/Controllers/CoreController.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\DashboardController\:\:\$indexColumns\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Http/Controllers/DashboardController.php
+
+		-
+			message: '#^Array has 2 duplicate keys with value ''endpoints'' \(''endpoints'', ''endpoints''\)\.$#'
+			identifier: array.duplicateKey
+			count: 1
+			path: src/Http/Controllers/DashboardController.php
+
+		-
+			message: '#^Result of method Unusualify\\Modularous\\Http\\Controllers\\DashboardController\:\:getTableAttributes\(\) \(void\) is used\.$#'
+			identifier: method.void
+			count: 1
+			path: src/Http/Controllers/DashboardController.php
+
+		-
+			message: '#^Result of method Unusualify\\Modularous\\Http\\Controllers\\DashboardController\:\:getVuetifyDatatableOptions\(\) \(void\) is used\.$#'
+			identifier: method.void
+			count: 1
+			path: src/Http/Controllers/DashboardController.php
+
+		-
+			message: '#^Result of method Unusualify\\Modularous\\Http\\Controllers\\DashboardController\:\:hydrateTableAttributes\(\) \(void\) is used\.$#'
+			identifier: method.void
+			count: 1
+			path: src/Http/Controllers/DashboardController.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\PanelController\:\:\$formSchema\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Http/Controllers/PanelController.php
+
+		-
+			message: '#^Call to static method getBlockCollection\(\) on an unknown class Unusualify\\Modularous\\Http\\Controllers\\TwillBlocks\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Http/Controllers/PanelController.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 1
+			path: src/Http/Controllers/PanelController.php
+
+		-
+			message: '#^Parameter \$repeater of anonymous function has invalid type Unusualify\\Modularous\\Http\\Controllers\\Block\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Http/Controllers/PanelController.php
+
+		-
+			message: '#^Result of method Unusualify\\Modularous\\Http\\Controllers\\PanelController\:\:getFormRequestClass\(\) \(void\) is used\.$#'
+			identifier: method.void
+			count: 1
+			path: src/Http/Controllers/PanelController.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:\$baseKey\.$#'
+			identifier: property.notFound
+			count: 6
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:\$config\.$#'
+			identifier: property.notFound
+			count: 7
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:\$defaultFilters\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:\$formWith\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:\$indexColumns\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:\$isNested\.$#'
+			identifier: property.notFound
+			count: 4
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:\$isSingleton\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:\$module\.$#'
+			identifier: property.notFound
+			count: 14
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:\$moduleName\.$#'
+			identifier: property.notFound
+			count: 17
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:\$nestedParentId\.$#'
+			identifier: property.notFound
+			count: 3
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:\$nestedParentModel\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:\$nestedParentName\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:\$repository\.$#'
+			identifier: property.notFound
+			count: 35
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:\$request\.$#'
+			identifier: property.notFound
+			count: 13
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:\$routeName\.$#'
+			identifier: property.notFound
+			count: 19
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:\$routePrefix\.$#'
+			identifier: property.notFound
+			count: 7
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:\$titleColumnKey\.$#'
+			identifier: property.notFound
+			count: 20
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:\$user\.$#'
+			identifier: property.notFound
+			count: 7
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Array has 2 duplicate keys with value ''endpoints'' \(''endpoints'', ''endpoints''\)\.$#'
+			identifier: array.duplicateKey
+			count: 1
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Result of method Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:getTableAttributes\(\) \(void\) is used\.$#'
+			identifier: method.void
+			count: 1
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Result of method Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:getVuetifyDatatableOptions\(\) \(void\) is used\.$#'
+			identifier: method.void
+			count: 1
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Result of method Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:hydrateTableAttributes\(\) \(void\) is used\.$#'
+			identifier: method.void
+			count: 1
+			path: src/Http/Controllers/PasswordController.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\ProfileController\:\:\$indexColumns\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Http/Controllers/ProfileController.php
+
+		-
+			message: '#^Array has 2 duplicate keys with value ''endpoints'' \(''endpoints'', ''endpoints''\)\.$#'
+			identifier: array.duplicateKey
+			count: 1
+			path: src/Http/Controllers/ProfileController.php
+
+		-
+			message: '#^Result of method Unusualify\\Modularous\\Http\\Controllers\\ProfileController\:\:getTableAttributes\(\) \(void\) is used\.$#'
+			identifier: method.void
+			count: 1
+			path: src/Http/Controllers/ProfileController.php
+
+		-
+			message: '#^Result of method Unusualify\\Modularous\\Http\\Controllers\\ProfileController\:\:getVuetifyDatatableOptions\(\) \(void\) is used\.$#'
+			identifier: method.void
+			count: 1
+			path: src/Http/Controllers/ProfileController.php
+
+		-
+			message: '#^Result of method Unusualify\\Modularous\\Http\\Controllers\\ProfileController\:\:hydrateTableAttributes\(\) \(void\) is used\.$#'
+			identifier: method.void
+			count: 1
+			path: src/Http/Controllers/ProfileController.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\Utility\\TagController\:\:\$repository\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Http/Controllers/Utility/TagController.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\Utility\\UIPreferencesController\:\:\$isNested\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/Http/Controllers/Utility/UIPreferencesController.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\Utility\\UIPreferencesController\:\:\$module\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/Http/Controllers/Utility/UIPreferencesController.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\Utility\\UIPreferencesController\:\:\$moduleName\.$#'
+			identifier: property.notFound
+			count: 5
+			path: src/Http/Controllers/Utility/UIPreferencesController.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\Utility\\UIPreferencesController\:\:\$nestedParentId\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Http/Controllers/Utility/UIPreferencesController.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\Utility\\UIPreferencesController\:\:\$nestedParentName\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Http/Controllers/Utility/UIPreferencesController.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\Utility\\UIPreferencesController\:\:\$request\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Http/Controllers/Utility/UIPreferencesController.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\Utility\\UIPreferencesController\:\:\$routeName\.$#'
+			identifier: property.notFound
+			count: 6
+			path: src/Http/Controllers/Utility/UIPreferencesController.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\Utility\\UIPreferencesController\:\:\$routePrefix\.$#'
+			identifier: property.notFound
+			count: 3
+			path: src/Http/Controllers/Utility/UIPreferencesController.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\VerificationController\:\:\$config\.$#'
+			identifier: property.notFound
+			count: 3
+			path: src/Http/Controllers/VerificationController.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\VerificationController\:\:\$module\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/Http/Controllers/VerificationController.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\VerificationController\:\:\$moduleName\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/Http/Controllers/VerificationController.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\VerificationController\:\:\$repository\.$#'
+			identifier: property.notFound
+			count: 7
+			path: src/Http/Controllers/VerificationController.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\VerificationController\:\:\$request\.$#'
+			identifier: property.notFound
+			count: 3
+			path: src/Http/Controllers/VerificationController.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\VerificationController\:\:\$routeName\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Http/Controllers/VerificationController.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\VerificationController\:\:\$user\.$#'
+			identifier: property.notFound
+			count: 3
+			path: src/Http/Controllers/VerificationController.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 5
+			path: src/Http/Middleware/HandleInertiaRequests.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 1
+			path: src/Http/Middleware/LanguageMiddleware.php
+
+		-
+			message: '#^Undefined variable\: \$provider$#'
+			identifier: variable.undefined
+			count: 1
+			path: src/Http/Requests/OauthRequest.php
+
+		-
+			message: '#^Access to constant ERROR on an unknown class Unusualify\\Modularity\\Services\\MessageStage\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Http/Requests/Request.php
+
+		-
+			message: '#^Function azureEndpoint not found\.$#'
+			identifier: function.notFound
+			count: 1
+			path: src/Http/ViewComposers/FilesUploaderConfig.php
+
+		-
+			message: '#^Function s3Endpoint not found\.$#'
+			identifier: function.notFound
+			count: 1
+			path: src/Http/ViewComposers/FilesUploaderConfig.php
+
+		-
+			message: '#^Function azureEndpoint not found\.$#'
+			identifier: function.notFound
+			count: 1
+			path: src/Http/ViewComposers/MediasUploaderConfig.php
+
+		-
+			message: '#^Function s3Endpoint not found\.$#'
+			identifier: function.notFound
+			count: 1
+			path: src/Http/ViewComposers/MediasUploaderConfig.php
+
+		-
+			message: '#^Result of method Unusualify\\Modularous\\Hydrates\\Inputs\\InputHydrate\:\:hydrate\(\) \(void\) is used\.$#'
+			identifier: method.void
+			count: 1
+			path: src/Hydrates/Inputs/InputHydrate.php
+
+		-
+			message: '#^Result of method Unusualify\\Modularous\\Hydrates\\Inputs\\SelectHydrate\:\:hydrate\(\) \(void\) is used\.$#'
+			identifier: staticMethod.void
+			count: 1
+			path: src/Hydrates/Inputs/ModuleRouteModelHydrate.php
+
+		-
+			message: '#^Trait Modules\\Cms\\Repositories\\Traits\\CmrTrait referenced with incorrect case\: Modules\\Cms\\Repositories\\Traits\\CMRTrait\.$#'
+			identifier: trait.nameCase
+			count: 1
+			path: src/Hydrates/Inputs/SlugHydrate.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 1
+			path: src/Module.php
+
+		-
+			message: '#^ServiceProviders that implement the "DeferrableProvider" interface should implement the "provides" method that returns an array of strings or class\-strings$#'
+			identifier: larastan.deferrableServiceProvider.missingProvides
+			count: 1
+			path: src/Providers/AuthServiceProvider.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 10
+			path: src/Providers/BaseServiceProvider.php
+
+		-
+			message: '#^ServiceProviders that implement the "DeferrableProvider" interface should implement the "provides" method that returns an array of strings or class\-strings$#'
+			identifier: larastan.deferrableServiceProvider.missingProvides
+			count: 1
+			path: src/Providers/ModuleServiceProvider.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 2
+			path: src/Providers/RemoteApiServiceProvider.php
+
+		-
+			message: '#^Call to private static method host\(\) of class Unusualify\\Modularous\\Support\\HostRouteRegistrar\.$#'
+			identifier: staticMethod.private
+			count: 1
+			path: src/Providers/RouteServiceProvider.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 1
+			path: src/Providers/ServiceProvider.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Repositories\\FileRepository\:\:filterCreatorTrait\(\) should return Illuminate\\Database\\Eloquent\\Builder but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: src/Repositories/FileRepository.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Repositories\\MediaRepository\:\:filterCreatorTrait\(\) should return Illuminate\\Database\\Eloquent\\Builder but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: src/Repositories/MediaRepository.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Repositories\\Repository\:\:setColumns\(\) should return array but return statement is missing\.$#'
+			identifier: return.missing
+			count: 3
+			path: src/Repositories/Repository.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 1
+			path: src/Services/BroadcastManager.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Services\\Connector\:\:unshiftEvent\(\) should return array but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: src/Services/Connector.php
+
+		-
+			message: '#^Result of method Unusualify\\Modularous\\Services\\FileTranslation\:\:saveNamespacedGroupTranslations\(\) \(void\) is used\.$#'
+			identifier: method.void
+			count: 1
+			path: src/Services/FileTranslation.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 3
+			path: src/Services/FileTranslation.php
+
+		-
+			message: '#^Call to static method make\(\) on an unknown class Image\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Services/FilepondManager.php
+
+		-
+			message: '#^Function encodeImagePath not found\.$#'
+			identifier: function.notFound
+			count: 1
+			path: src/Services/FilepondManager.php
+
+		-
+			message: '#^Undefined variable\: \$notations$#'
+			identifier: variable.undefined
+			count: 1
+			path: src/Services/FilepondManager.php
+
+		-
+			message: '#^Undefined variable\: \$table$#'
+			identifier: variable.undefined
+			count: 1
+			path: src/Services/FilepondManager.php
+
+		-
+			message: '#^Caught class Predis\\Connection\\ConnectionException not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Services/ModularousCacheService.php
+
+		-
+			message: '#^Caught class Predis\\Connection\\Resource\\Exception\\StreamInitException not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Services/ModularousCacheService.php
+
+		-
+			message: '#^Unknown parameter \$decimals in call to static method Unusualify\\Modularous\\Facades\\CurrencyExchange\:\:convertTo\(\)\.$#'
+			identifier: argument.unknown
+			count: 1
+			path: src/Services/PaymentCalculationService.php
+
+		-
+			message: '#^Unknown parameter \$round in call to static method Unusualify\\Modularous\\Facades\\CurrencyExchange\:\:convertTo\(\)\.$#'
+			identifier: argument.unknown
+			count: 1
+			path: src/Services/PaymentCalculationService.php
+
+		-
+			message: '#^Instantiated class PragmaRX\\Google2FA\\Google2FA not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Services/Security/StepUpService.php
+
+		-
+			message: '#^Access to an undefined property JoeDixon\\Translation\\Drivers\\Translation\:\:\$scanner\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Services/Translation.php
+
+		-
+			message: '#^Call to an undefined method JoeDixon\\Translation\\Drivers\\Translation\:\:addGroupTranslation\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: src/Services/Translation.php
+
+		-
+			message: '#^Call to an undefined method JoeDixon\\Translation\\Drivers\\Translation\:\:addSingleTranslation\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: src/Services/Translation.php
+
+		-
+			message: '#^Call to an undefined method JoeDixon\\Translation\\Drivers\\Translation\:\:allLanguages\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Services/Translation.php
+
+		-
+			message: '#^Call to an undefined method JoeDixon\\Translation\\Drivers\\Translation\:\:allTranslationsFor\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: src/Services/Translation.php
+
+		-
+			message: '#^Function azureEndpoint not found\.$#'
+			identifier: function.notFound
+			count: 1
+			path: src/Services/Uploader/SignAzureUpload.php
+
+		-
+			message: '#^Instantiated class MicrosoftAzure\\Storage\\Blob\\BlobSharedAccessSignatureHelper not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Services/Uploader/SignAzureUpload.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 3
+			path: src/Services/UtmParameters.php
+
+		-
+			message: '#^Undefined variable\: \$metric$#'
+			identifier: variable.undefined
+			count: 1
+			path: src/Services/View/ModularousNavigation.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Services\\View\\UComponent\:\:__call\(\) should return Unusualify\\Modularous\\Services\\View\\UComponent but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: src/Services/View/UComponent.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Services\\View\\UComponent\:\:__callStatic\(\) should return Unusualify\\Modularous\\Services\\View\\UComponent but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: src/Services/View/UComponent.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 1
+			path: src/Services/View/UComponent.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 1
+			path: src/Services/View/UWrapper.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Support\\Decomposers\\ValidatorParser\:\:render\(\) should return string but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: src/Support/Decomposers/ValidatorParser.php
+
+		-
+			message: '#^Result of method Unusualify\\Modularous\\Support\\Decomposers\\ValidatorParser\:\:parse\(\) \(void\) is used\.$#'
+			identifier: method.void
+			count: 1
+			path: src/Support/Decomposers/ValidatorParser.php
+
+		-
+			message: '#^Calling the helper function ''with\(\)'' with only one argument simply returns the value itself\. If you want to chain methods on a construct, use ''\(new ClassName\(\)\)\-\>foo\(\)'' instead$#'
+			identifier: larastan.uselessConstructs.with
+			count: 3
+			path: src/Support/Finder.php
+
+		-
+			message: '#^Class Spatie\\Permission\\Middlewares\\PermissionMiddleware not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Support/ModularousRoutes.php
+
+		-
+			message: '#^Class Spatie\\Permission\\Middlewares\\RoleMiddleware not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Support/ModularousRoutes.php
+
+		-
+			message: '#^Class Spatie\\Permission\\Middlewares\\RoleOrPermissionMiddleware not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Support/ModularousRoutes.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 1
+			path: src/Support/ModularousVite.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\View\\Component\:\:__call\(\) should return Unusualify\\Modularous\\View\\Component but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: src/View/Component.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\View\\Component\:\:__callStatic\(\) should return Unusualify\\Modularous\\View\\Component but return statement is missing\.$#'
+			identifier: return.missing
+			count: 1
+			path: src/View/Component.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 3
+			path: src/View/Component.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 1
+			path: src/View/ModularousWidget.php
+
+		-
+			message: '#^Access to an undefined property Unusualify\\Modularous\\View\\Table\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/View/Table.php

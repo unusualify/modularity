@@ -43,7 +43,7 @@ flowchart TD
     "php": { "lines": 79.5, "methods": 70 },
     "vue": { "lines": 62.5, "statements": 62.5, "branches": 69, "functions": 33.5 },
     "diff": { "lines": 80, "minChangedLines": 5 },
-    "phpstan": { "enabled": false, "level": 0, "baselineMaxErrors": null },
+    "phpstan": { "enabled": true, "level": 0, "baselineMaxErrors": 830 },
     "ratchet": true,
     "measured": { "date": "2026-10-22", "php": { "...": "..." }, "vue": { "...": "..." } }
 }
@@ -144,6 +144,18 @@ bin/coverage-gate [--clover=<path>] [--vue=<coverage-final.json>] [--vue-summary
 
 Diff coverage needs a fresh report. With a stale `coverage-clover.xml` the line numbers no longer match the working tree; `composer check:full` always regenerates it.
 
+## PHPStan setup
+
+| Path | Role |
+|------|------|
+| `phpstan.neon` | Level, paths (`src`, `modules`, `config`, `database`, `routes`), Larastan config directories, targeted ignores |
+| `phpstan-bootstrap.php` | Loads `src/Helpers/*.php` and registers the package providers in Larastan's Testbench app (helpers and providers are otherwise only loaded at runtime) |
+| `phpstan-baseline.neon` | Known errors at the current level; must only shrink |
+
+- Package config lives in `config/`, `config/merges` and `config/publishes`, so `configDirectories` points at `config/` for Larastan's `env()` rule.
+- `src/Entities/NestedsetCollection.php` is excluded: it extends `Kalnoy\Nestedset\Collection`, but `kalnoy/nestedset` is not a dependency.
+- To check that the baseline is reproducible, back it up, reset it to `ignoreErrors: []`, run `composer stan:baseline` and diff against the backup.
+
 ## Rules for contributors and agents
 
 - Run `composer check` after every change and `composer check:full` before pushing.
@@ -155,6 +167,6 @@ Diff coverage needs a fresh report. With a stale `coverage-clover.xml` the line 
 | Area | Status |
 |------|--------|
 | Coverage thresholds | Enforced locally (`check:full`, `npm run test:coverage`) |
-| PHPStan | Disabled in the runner: analysis stops with internal errors because package helpers (e.g. `modularousConfig()`) are not bootstrapped. Config fix and baseline are next, then a level-by-level climb towards level 8+ |
+| PHPStan | Enabled at level 0 with `phpstan-baseline.neon` (830 errors, capped by `baselineMaxErrors`). Next: level-by-level climb towards level 8+, shrinking the baseline each step |
 | Agent enforcement | Planned: always-applied Cursor rule, Cursor `stop` hook and git `pre-push` hook calling the runner |
 | CI | Planned: reusable workflow calling the same runner and `bin/coverage-gate` instead of inline thresholds |

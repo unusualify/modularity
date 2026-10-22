@@ -1,22 +1,30 @@
 includes:
     - vendor/larastan/larastan/extension.neon
     - vendor/nesbot/carbon/extension.neon
+    - phpstan-baseline.neon
 
 parameters:
-    # Level 10 is the highest level
+    # Raised level by level; keep in sync with quality.json phpstan.level
     level: 0
+    tmpDir: .phpstan.cache
     paths:
         - src
+        - modules
         - config
         - database
-        - lang
-        - resources
         - routes
-        - src
-        - modules
-
-#    ignoreErrors:
-#        - '#PHPDoc tag @var#'
-#
-#    excludePaths:
-#        - ./*/*/FileToBeExcluded.php
+    excludePaths:
+        - '*.blade.php'
+        # Extends Kalnoy\Nestedset\Collection, but kalnoy/nestedset is not a dependency
+        - src/Entities/NestedsetCollection.php
+    bootstrapFiles:
+        - phpstan-bootstrap.php
+    # Package config lives in config/, config/merges and config/publishes (not config_path())
+    configDirectories:
+        - %currentWorkingDirectory%/config
+    ignoreErrors:
+        # BaseCommand guards every shared option with hasOption(); Larastan reports the
+        # guarded call once per subclass that lacks the option.
+        -
+            identifier: larastan.console.undefinedOption
+            path: src/Console/BaseCommand.php
