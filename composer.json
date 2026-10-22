@@ -207,14 +207,8 @@
         "coverage:gate": "bin/coverage-gate --diff",
         "quality:report": "bin/quality-report",
         "quality:ratchet": "bin/coverage-gate --vue-summary=vue/coverage/coverage-summary.json --ratchet-update",
-        "stan": [
-            "@test-clean",
-            "@php vendor/bin/phpstan analyse --memory-limit=2G"
-        ],
-        "stan:baseline": [
-            "@test-clean",
-            "@php vendor/bin/phpstan analyse --memory-limit=2G --generate-baseline"
-        ],
+        "stan": "bin/stan",
+        "stan:baseline": "bin/stan --generate-baseline",
         "lint": [
             "@php vendor/bin/pint --ansi",
             "@php vendor/bin/phpstan analyse --verbose --ansi"

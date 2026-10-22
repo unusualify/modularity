@@ -5095,12 +5095,6 @@ parameters:
 			path: modules/Cms/Jobs/ScanCmsPublishWindowBoundariesJob.php
 
 		-
-			message: '#^Call to an undefined static method Mcamara\\LaravelLocalization\\Facades\\LaravelLocalization\:\:getLocalizedURL\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: modules/Cms/Localization/McamaraCmsLocalizationAdapter.php
-
-		-
 			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 2
@@ -42091,12 +42085,6 @@ parameters:
 			path: src/Http/Controllers/Auth/Controller.php
 
 		-
-			message: '#^Call to an undefined static method Illuminate\\Support\\Facades\\Request\:\:inertia\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: src/Http/Controllers/Auth/Controller.php
-
-		-
 			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 1
@@ -44542,12 +44530,6 @@ parameters:
 			message: '#^Call to an undefined method object\:\:run\(\)\.$#'
 			identifier: method.notFound
 			count: 1
-			path: src/Http/Controllers/BaseController.php
-
-		-
-			message: '#^Call to an undefined static method Illuminate\\Support\\Facades\\Request\:\:inertia\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 2
 			path: src/Http/Controllers/BaseController.php
 
 		-
@@ -47773,12 +47755,6 @@ parameters:
 			path: src/Http/Controllers/DashboardController.php
 
 		-
-			message: '#^Call to an undefined static method Illuminate\\Support\\Facades\\Request\:\:inertia\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: src/Http/Controllers/DashboardController.php
-
-		-
 			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 1
@@ -50839,12 +50815,6 @@ parameters:
 			path: src/Http/Controllers/PasswordController.php
 
 		-
-			message: '#^Call to an undefined static method Illuminate\\Support\\Facades\\Request\:\:inertia\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: src/Http/Controllers/PasswordController.php
-
-		-
 			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 1
@@ -52671,12 +52641,6 @@ parameters:
 		-
 			message: '#^Call to an undefined method Unusualify\\Modularous\\Repositories\\Repository\:\:isTranslationAttribute\(\)\.$#'
 			identifier: method.notFound
-			count: 1
-			path: src/Http/Controllers/ProfileController.php
-
-		-
-			message: '#^Call to an undefined static method Illuminate\\Support\\Facades\\Request\:\:inertia\(\)\.$#'
-			identifier: staticMethod.notFound
 			count: 1
 			path: src/Http/Controllers/ProfileController.php
 
@@ -55447,12 +55411,6 @@ parameters:
 			path: src/Http/Controllers/VerificationController.php
 
 		-
-			message: '#^Call to an undefined static method Illuminate\\Support\\Facades\\Request\:\:inertia\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: src/Http/Controllers/VerificationController.php
-
-		-
 			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 1
@@ -57137,12 +57095,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Hydrates/HeaderHydrator.php
-
-		-
-			message: '#^Call to an undefined static method Illuminate\\Support\\Facades\\Request\:\:inertia\(\)\.$#'
-			identifier: staticMethod.notFound
-			count: 1
-			path: src/Hydrates/InputHydrator.php
 
 		-
 			message: '#^Method Unusualify\\Modularous\\Hydrates\\InputHydrator\:\:__construct\(\) has parameter \$input with no type specified\.$#'

@@ -128,10 +128,7 @@ step_pint() {
 }
 
 step_phpstan() {
-    # Larastan boots Testbench; a leftover package discovery cache changes which
-    # providers (and macros) it sees, so analyse from the same clean state as the baseline.
-    composer test-clean --quiet
-    vendor/bin/phpstan analyse --memory-limit=2G --no-progress --error-format=table || return $?
+    bin/stan --no-progress --error-format=table || return $?
 
     local max
     max="$(quality_value phpstan.baselineMaxErrors)"

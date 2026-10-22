@@ -42,11 +42,7 @@ class CoverageService
      */
     public static function instance(): self
     {
-        if (self::$instance === null) {
-            self::$instance = app('coverage.service');
-        }
-
-        return self::$instance;
+        return self::$instance ??= app(self::class);
     }
 
     /**

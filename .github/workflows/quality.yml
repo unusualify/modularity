@@ -74,7 +74,7 @@ jobs:
 
       - name: Annotate PHPStan errors
         if: failure()
-        run: vendor/bin/phpstan analyse --memory-limit=2G --no-progress --error-format=github || true
+        run: bin/stan --no-progress --error-format=github || true
 
   phpunit:
     name: PHP ${{ matrix.php }} - Laravel ${{ inputs.laravel }}

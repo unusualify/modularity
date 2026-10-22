@@ -48,7 +48,7 @@ flowchart TD
     "php": { "lines": 79.5, "methods": 70 },
     "vue": { "lines": 62.5, "statements": 62.5, "branches": 69, "functions": 33.5 },
     "diff": { "lines": 80, "minChangedLines": 5 },
-    "phpstan": { "enabled": true, "level": 8, "baselineMaxErrors": 16592 },
+    "phpstan": { "enabled": true, "level": 8, "baselineMaxErrors": 16583 },
     "ratchet": true,
     "measured": { "date": "2026-10-22", "php": { "...": "..." }, "vue": { "...": "..." } }
 }
@@ -160,7 +160,11 @@ Diff coverage needs a fresh report. With a stale `coverage-clover.xml` the line 
 
 - Package config lives in `config/`, `config/merges` and `config/publishes`, so `configDirectories` points at `config/` for Larastan's `env()` rule.
 - `src/Entities/NestedsetCollection.php` is excluded: it extends `Kalnoy\Nestedset\Collection`, but `kalnoy/nestedset` is not a dependency.
-- `composer stan`, `composer stan:baseline` and the runner's `phpstan` step run `composer test-clean` first. Larastan boots Testbench, and a leftover package discovery cache (`vendor/orchestra/testbench-core/laravel/bootstrap/cache/packages.php`, created by `composer install`, deleted by every test run) changes which providers and macros it sees. Without the reset the same code gives different errors locally and in CI.
+- **Same results locally and in CI.** Larastan boots Testbench and resolves facades and macros from the real container, so the environment leaks into the results:
+  - Package discovery goes through the `vendor/orchestra/testbench-core/laravel/vendor` → `vendor` symlink, which Larastan creates when missing. If that path is a real directory, no vendor provider is discovered (macros such as `Request::inertia()` go missing); if the symlink is left behind, recursive vendor scans in the test suite (`FinderTest`) loop forever.
+  - Always run PHPStan through `bin/stan` (`composer stan`, `composer stan:baseline`, the runner and CI do). It clears that path and the Testbench discovery cache before the run and removes the symlink again on exit.
+  - Facade roots that need local files to construct (e.g. `coverage.service` needs `coverage-clover.xml`) must not be the only source of type information; declare `@method` tags on the facade.
+  - After changing any of this, clear the result cache (`vendor/bin/phpstan clear-result-cache --memory-limit=2G`) before regenerating the baseline.
 - To check that the baseline is reproducible, back it up, reset it to `ignoreErrors: []`, run `composer stan:baseline` and diff against the backup.
 
 ## Agent enforcement
@@ -206,6 +210,6 @@ Three layers make sure the gate runs even when an agent forgets to call it:
 | Area | Status |
 |------|--------|
 | Coverage thresholds | Enforced locally (`check:full`, `npm run test:coverage`) |
-| PHPStan | Enabled at level 8 with `phpstan-baseline.neon` (16592 errors, capped by `baselineMaxErrors`). Next: shrink the baseline; lower `baselineMaxErrors` whenever fixes reduce it |
+| PHPStan | Enabled at level 8 with `phpstan-baseline.neon` (16583 errors, capped by `baselineMaxErrors`). Next: shrink the baseline; lower `baselineMaxErrors` whenever fixes reduce it |
 | Agent enforcement | Always-applied Cursor rule, Cursor `stop` hook (`check`) and git `pre-push` hook (`full`) |
 | CI | Reusable `quality.yml` (Pint, PHPStan, PHPUnit matrix, coverage gate) with a PR comment from `bin/quality-report` |
