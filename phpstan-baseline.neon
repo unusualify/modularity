@@ -43,6 +43,12 @@ parameters:
 			path: database/factories/UserFactory.php
 
 		-
+			message: '#^Property Unusualify\\Modularous\\Database\\Factories\\UserFactory\:\:\$model \(class\-string\<App\\Models\\User\>\) does not accept default value of type string\.$#'
+			identifier: property.defaultValue
+			count: 1
+			path: database/factories/UserFactory.php
+
+		-
 			message: '#^Property Unusualify\\Modularous\\Database\\Factories\\UserFactory\:\:\$model has unknown class App\\Models\\User as its type\.$#'
 			identifier: class.notFound
 			count: 1
@@ -151,6 +157,18 @@ parameters:
 			path: modules/Cms/Entities/HomepageTest.php
 
 		-
+			message: '#^Method Modules\\Cms\\Entities\\HomepageTest\:\:getFileponds\(\) should return array\<Unusualify\\Modularous\\Entities\\Filepond\> but returns Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\>\.$#'
+			identifier: return.type
+			count: 1
+			path: modules/Cms/Entities/HomepageTest.php
+
+		-
+			message: '#^Method Modules\\Cms\\Entities\\HomepageTest\:\:localeUrlRoute\(\) should return Modules\\Cms\\Entities\\UrlRoute\|null but returns Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: return.type
+			count: 2
+			path: modules/Cms/Entities/HomepageTest.php
+
+		-
 			message: '#^PHPDoc tag @var for variable \$model has invalid type Unusualify\\Modularous\\Entities\\Traits\\HasImages\.$#'
 			identifier: varTag.trait
 			count: 1
@@ -161,6 +179,24 @@ parameters:
 			identifier: varTag.nativeType
 			count: 1
 			path: modules/Cms/Entities/HomepageTest.php
+
+		-
+			message: '#^PHPDoc type array\<int, string\> of property Modules\\Cms\\Entities\\HomepageTest\:\:\$fillable is not covariant with PHPDoc type list\<string\> of overridden property Illuminate\\Database\\Eloquent\\Model\:\:\$fillable\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: modules/Cms/Entities/HomepageTest.php
+
+		-
+			message: '#^Method Modules\\Cms\\Entities\\LayoutBuilder\:\:styleSheet\(\) should return Illuminate\\Database\\Eloquent\\Relations\\BelongsTo\<Modules\\Cms\\Entities\\StyleSheet, Modules\\Cms\\Entities\\LayoutBuilder\> but returns Illuminate\\Database\\Eloquent\\Relations\\BelongsTo\<Modules\\Cms\\Entities\\StyleSheet, \$this\(Modules\\Cms\\Entities\\LayoutBuilder\)\>\.$#'
+			identifier: return.type
+			count: 1
+			path: modules/Cms/Entities/LayoutBuilder.php
+
+		-
+			message: '#^PHPDoc type array\<int, string\> of property Modules\\Cms\\Entities\\LayoutBuilder\:\:\$fillable is not covariant with PHPDoc type list\<string\> of overridden property Illuminate\\Database\\Eloquent\\Model\:\:\$fillable\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: modules/Cms/Entities/LayoutBuilder.php
 
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$active\.$#'
@@ -529,6 +565,18 @@ parameters:
 			path: modules/Cms/Entities/Page.php
 
 		-
+			message: '#^Method Modules\\Cms\\Entities\\Page\:\:getFileponds\(\) should return array\<Unusualify\\Modularous\\Entities\\Filepond\> but returns Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\>\.$#'
+			identifier: return.type
+			count: 2
+			path: modules/Cms/Entities/Page.php
+
+		-
+			message: '#^Method Modules\\Cms\\Entities\\Page\:\:localeUrlRoute\(\) should return Modules\\Cms\\Entities\\UrlRoute\|null but returns Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: return.type
+			count: 2
+			path: modules/Cms/Entities/Page.php
+
+		-
 			message: '#^Method Modules\\Cms\\Entities\\Page\:\:scopeWithActiveTranslations\(\) should return Illuminate\\Database\\Eloquent\\Builder\|null but return statement is missing\.$#'
 			identifier: return.missing
 			count: 1
@@ -551,6 +599,12 @@ parameters:
 			identifier: empty.variable
 			count: 1
 			path: modules/Cms/Entities/Page.php
+
+		-
+			message: '#^Method Modules\\Cms\\Entities\\PageLayout\:\:layoutBuilder\(\) should return Illuminate\\Database\\Eloquent\\Relations\\BelongsTo\<Modules\\Cms\\Entities\\LayoutBuilder, Modules\\Cms\\Entities\\PageLayout\> but returns Illuminate\\Database\\Eloquent\\Relations\\BelongsTo\<Modules\\Cms\\Entities\\LayoutBuilder, \$this\(Modules\\Cms\\Entities\\PageLayout\)\>\.$#'
+			identifier: return.type
+			count: 1
+			path: modules/Cms/Entities/PageLayout.php
 
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$content\.$#'
@@ -739,6 +793,12 @@ parameters:
 			path: modules/Cms/Entities/SiteSetting.php
 
 		-
+			message: '#^Method Modules\\Cms\\Entities\\SiteSetting\:\:getFileponds\(\) should return array\<Unusualify\\Modularous\\Entities\\Filepond\> but returns Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\>\.$#'
+			identifier: return.type
+			count: 1
+			path: modules/Cms/Entities/SiteSetting.php
+
+		-
 			message: '#^PHPDoc tag @var for variable \$model has invalid type Unusualify\\Modularous\\Entities\\Traits\\HasImages\.$#'
 			identifier: varTag.trait
 			count: 2
@@ -751,8 +811,20 @@ parameters:
 			path: modules/Cms/Entities/SiteSetting.php
 
 		-
+			message: '#^PHPDoc type array\<int, string\> of property Modules\\Cms\\Entities\\StyleSheet\:\:\$fillable is not covariant with PHPDoc type list\<string\> of overridden property Illuminate\\Database\\Eloquent\\Model\:\:\$fillable\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: modules/Cms/Entities/StyleSheet.php
+
+		-
 			message: '#^Method Modules\\Cms\\Http\\Controllers\\API\\HomepageTestController\:\:destroy\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
 			identifier: return.missing
+			count: 1
+			path: modules/Cms/Http/Controllers/API/HomepageTestController.php
+
+		-
+			message: '#^Method Modules\\Cms\\Http\\Controllers\\API\\HomepageTestController\:\:index\(\) should return Illuminate\\Contracts\\Support\\Renderable but returns Modules\\Cms\\Transformers\\HomepageTestResource\.$#'
+			identifier: return.type
 			count: 1
 			path: modules/Cms/Http/Controllers/API/HomepageTestController.php
 
@@ -777,6 +849,12 @@ parameters:
 		-
 			message: '#^Method Modules\\Cms\\Http\\Controllers\\API\\LayoutBuilderController\:\:destroy\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
 			identifier: return.missing
+			count: 1
+			path: modules/Cms/Http/Controllers/API/LayoutBuilderController.php
+
+		-
+			message: '#^Method Modules\\Cms\\Http\\Controllers\\API\\LayoutBuilderController\:\:index\(\) should return Illuminate\\Contracts\\Support\\Renderable but returns Modules\\Cms\\Transformers\\LayoutBuilderResource\.$#'
+			identifier: return.type
 			count: 1
 			path: modules/Cms/Http/Controllers/API/LayoutBuilderController.php
 
@@ -865,6 +943,12 @@ parameters:
 			path: modules/Cms/Observers/ParentSegmentUrlRouteObserver.php
 
 		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$mediasParams\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/Cms/Repositories/HomepageTestRepository.php
+
+		-
 			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Filepond\:\:\$filepondable_id\.$#'
 			identifier: property.notFound
 			count: 1
@@ -907,12 +991,6 @@ parameters:
 			path: modules/Cms/Repositories/HomepageTestRepository.php
 
 		-
-			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Model\:\:\$mediasParams\.$#'
-			identifier: property.notFound
-			count: 1
-			path: modules/Cms/Repositories/HomepageTestRepository.php
-
-		-
 			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getRevisionModel\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -928,6 +1006,12 @@ parameters:
 			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:revisions\(\)\.$#'
 			identifier: method.notFound
 			count: 8
+			path: modules/Cms/Repositories/HomepageTestRepository.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:single\(\)\.$#'
+			identifier: method.notFound
+			count: 1
 			path: modules/Cms/Repositories/HomepageTestRepository.php
 
 		-
@@ -955,12 +1039,6 @@ parameters:
 			path: modules/Cms/Repositories/HomepageTestRepository.php
 
 		-
-			message: '#^Call to an undefined method Unusualify\\Modularous\\Entities\\Model\:\:single\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: modules/Cms/Repositories/HomepageTestRepository.php
-
-		-
 			message: '#^Call to an undefined method Unusualify\\Modularous\\Entities\\Model\:\:userCanApproveRevisions\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -971,6 +1049,12 @@ parameters:
 			identifier: method.nonObject
 			count: 1
 			path: modules/Cms/Repositories/HomepageTestRepository.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$mediasParams\.$#'
+			identifier: property.notFound
+			count: 2
+			path: modules/Cms/Repositories/PageRepository.php
 
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$translations\.$#'
@@ -1033,12 +1117,6 @@ parameters:
 			path: modules/Cms/Repositories/PageRepository.php
 
 		-
-			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Model\:\:\$mediasParams\.$#'
-			identifier: property.notFound
-			count: 2
-			path: modules/Cms/Repositories/PageRepository.php
-
-		-
 			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Model\:\:\$modularousSkipAutomaticSlugSync\.$#'
 			identifier: property.notFound
 			count: 2
@@ -1063,9 +1141,21 @@ parameters:
 			path: modules/Cms/Repositories/PageRepository.php
 
 		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:existsInactiveSlug\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: modules/Cms/Repositories/PageRepository.php
+
+		-
 			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getRevisionModel\(\)\.$#'
 			identifier: method.notFound
 			count: 1
+			path: modules/Cms/Repositories/PageRepository.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getTranslatedAttributes\(\)\.$#'
+			identifier: method.notFound
+			count: 3
 			path: modules/Cms/Repositories/PageRepository.php
 
 		-
@@ -1075,9 +1165,27 @@ parameters:
 			path: modules/Cms/Repositories/PageRepository.php
 
 		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:isTranslatable\(\)\.$#'
+			identifier: method.notFound
+			count: 5
+			path: modules/Cms/Repositories/PageRepository.php
+
+		-
 			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:revisions\(\)\.$#'
 			identifier: method.notFound
 			count: 8
+			path: modules/Cms/Repositories/PageRepository.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:single\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: modules/Cms/Repositories/PageRepository.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:translations\(\)\.$#'
+			identifier: method.notFound
+			count: 3
 			path: modules/Cms/Repositories/PageRepository.php
 
 		-
@@ -1099,12 +1207,6 @@ parameters:
 			path: modules/Cms/Repositories/PageRepository.php
 
 		-
-			message: '#^Call to an undefined method Unusualify\\Modularous\\Entities\\Model\:\:existsInactiveSlug\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: modules/Cms/Repositories/PageRepository.php
-
-		-
 			message: '#^Call to an undefined method Unusualify\\Modularous\\Entities\\Model\:\:getRevisionModel\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -1119,7 +1221,7 @@ parameters:
 		-
 			message: '#^Call to an undefined method Unusualify\\Modularous\\Entities\\Model\:\:getTranslatedAttributes\(\)\.$#'
 			identifier: method.notFound
-			count: 4
+			count: 1
 			path: modules/Cms/Repositories/PageRepository.php
 
 		-
@@ -1147,21 +1249,9 @@ parameters:
 			path: modules/Cms/Repositories/PageRepository.php
 
 		-
-			message: '#^Call to an undefined method Unusualify\\Modularous\\Entities\\Model\:\:single\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: modules/Cms/Repositories/PageRepository.php
-
-		-
 			message: '#^Call to an undefined method Unusualify\\Modularous\\Entities\\Model\:\:slugs\(\)\.$#'
 			identifier: method.notFound
 			count: 2
-			path: modules/Cms/Repositories/PageRepository.php
-
-		-
-			message: '#^Call to an undefined method Unusualify\\Modularous\\Entities\\Model\:\:translations\(\)\.$#'
-			identifier: method.notFound
-			count: 3
 			path: modules/Cms/Repositories/PageRepository.php
 
 		-
@@ -1195,6 +1285,12 @@ parameters:
 			path: modules/Cms/Repositories/PageRepository.php
 
 		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$mediasParams\.$#'
+			identifier: property.notFound
+			count: 2
+			path: modules/Cms/Repositories/SiteSettingRepository.php
+
+		-
 			message: '#^Access to an undefined property Oobook\\Priceable\\Models\\Currency\:\:\$iso_4217\.$#'
 			identifier: property.notFound
 			count: 2
@@ -1208,12 +1304,6 @@ parameters:
 
 		-
 			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Model\:\:\$medias\.$#'
-			identifier: property.notFound
-			count: 2
-			path: modules/Cms/Repositories/SiteSettingRepository.php
-
-		-
-			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Model\:\:\$mediasParams\.$#'
 			identifier: property.notFound
 			count: 2
 			path: modules/Cms/Repositories/SiteSettingRepository.php
@@ -1259,6 +1349,12 @@ parameters:
 			identifier: property.notFound
 			count: 1
 			path: modules/Cms/Repositories/SitemapRepository.php
+
+		-
+			message: '#^Argument of an invalid type Illuminate\\Routing\\RouteCollectionInterface supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 1
+			path: modules/Cms/Routing/CmsFrontRouteRegistrar.php
 
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$publish_end_date\.$#'
@@ -1573,6 +1669,12 @@ parameters:
 			path: modules/ErrorPage/Http/Controllers/API/ErrorPageController.php
 
 		-
+			message: '#^Method Modules\\ErrorPage\\Http\\Controllers\\API\\ErrorPageController\:\:index\(\) should return Illuminate\\Contracts\\Support\\Renderable but returns Modules\\ErrorPage\\Transformers\\ErrorPageResource\.$#'
+			identifier: return.type
+			count: 1
+			path: modules/ErrorPage/Http/Controllers/API/ErrorPageController.php
+
+		-
 			message: '#^Method Modules\\ErrorPage\\Http\\Controllers\\API\\ErrorPageController\:\:show\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
 			identifier: return.missing
 			count: 1
@@ -1621,6 +1723,12 @@ parameters:
 			path: modules/ErrorPage/Support/ErrorPageRenderer.php
 
 		-
+			message: '#^Method Modules\\SystemNotification\\Blueprint\\MyNotification\\Index\\MyNotificationIndexActions\:\:__invoke\(\) should return list\<array\<string, mixed\>\> but returns array\{bulk\-mark\-read\: array\{label\: \(array\|string\), forceLabel\: true, icon\: ''mdi\-check'', color\: ''success'', variant\: ''outlined'', density\: ''comfortable'', href\: ''admin\.system\.system…'', target\: ''_self''\}\}\.$#'
+			identifier: return.type
+			count: 1
+			path: modules/SystemNotification/Blueprint/MyNotification/Index/MyNotificationIndexActions.php
+
+		-
 			message: '#^Call to an undefined static method Unusualify\\Modularous\\View\\Component\:\:makeDiv\(\)\.$#'
 			identifier: staticMethod.notFound
 			count: 6
@@ -1645,6 +1753,24 @@ parameters:
 			path: modules/SystemNotification/Entities/Notification.php
 
 		-
+			message: '#^PHPDoc type array of property Modules\\SystemNotification\\Entities\\Notification\:\:\$casts is not covariant with PHPDoc type array\<string, string\> of overridden property Illuminate\\Database\\Eloquent\\Model\:\:\$casts\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: modules/SystemNotification/Entities/Notification.php
+
+		-
+			message: '#^PHPDoc type array of property Modules\\SystemNotification\\Entities\\Notification\:\:\$guarded is not covariant with PHPDoc type array\<string\> of overridden property Illuminate\\Database\\Eloquent\\Model\:\:\$guarded\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: modules/SystemNotification/Entities/Notification.php
+
+		-
+			message: '#^Return type \(Illuminate\\Notifications\\DatabaseNotificationCollection\) of method Modules\\SystemNotification\\Entities\\Notification\:\:newCollection\(\) should be compatible with return type \(Illuminate\\Database\\Eloquent\\Collection\<\(int\|string\), static\(Illuminate\\Database\\Eloquent\\Model\)\>\) of method Illuminate\\Database\\Eloquent\\Model\:\:newCollection\(\)$#'
+			identifier: method.childReturnType
+			count: 1
+			path: modules/SystemNotification/Entities/Notification.php
+
+		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
 			identifier: property.notFound
 			count: 1
@@ -1653,6 +1779,12 @@ parameters:
 		-
 			message: '#^Method Modules\\SystemNotification\\Http\\Controllers\\API\\MyNotificationController\:\:destroy\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
 			identifier: return.missing
+			count: 1
+			path: modules/SystemNotification/Http/Controllers/API/MyNotificationController.php
+
+		-
+			message: '#^Method Modules\\SystemNotification\\Http\\Controllers\\API\\MyNotificationController\:\:index\(\) should return Illuminate\\Contracts\\Support\\Renderable but returns Modules\\SystemNotification\\Transformers\\MyNotificationResource\.$#'
+			identifier: return.type
 			count: 1
 			path: modules/SystemNotification/Http/Controllers/API/MyNotificationController.php
 
@@ -1677,6 +1809,12 @@ parameters:
 		-
 			message: '#^Method Modules\\SystemNotification\\Http\\Controllers\\API\\NotificationController\:\:destroy\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
 			identifier: return.missing
+			count: 1
+			path: modules/SystemNotification/Http/Controllers/API/NotificationController.php
+
+		-
+			message: '#^Method Modules\\SystemNotification\\Http\\Controllers\\API\\NotificationController\:\:index\(\) should return Illuminate\\Contracts\\Support\\Renderable but returns Modules\\SystemNotification\\Transformers\\NotificationResource\.$#'
+			identifier: return.type
 			count: 1
 			path: modules/SystemNotification/Http/Controllers/API/NotificationController.php
 
@@ -1861,6 +1999,18 @@ parameters:
 			path: modules/SystemNotification/Notifications/TaskUpdatedNotification.php
 
 		-
+			message: '#^Method Modules\\SystemPayment\\Blueprint\\CardType\\Form\\CardTypeFormInputs\:\:__invoke\(\) should return list\<array\<string, mixed\>\> but returns array\{array\{name\: ''name'', label\: ''Name'', type\: ''text''\}, array\{type\: ''text'', name\: ''card_type'', label\: \(array\|string\), rules\: ''sometimes\|required''\}, array\{name\: ''paymentServices'', label\: \(array\|string\), type\: ''select'', 0\: ''multiple'', repository\: ''Modules…''\}, array\{label\: \(array\|string\), type\: ''image'', name\: ''logo'', rules\: ''sometimes\|required…'', isIcon\: true\}\}\.$#'
+			identifier: return.type
+			count: 1
+			path: modules/SystemPayment/Blueprint/CardType/Form/CardTypeFormInputs.php
+
+		-
+			message: '#^Method Modules\\SystemPayment\\Blueprint\\PaymentService\\Form\\PaymentServiceFormInputs\:\:__invoke\(\) should return list\<array\<string, mixed\>\> but returns array\{array\{type\: ''text'', name\: ''name'', label\: ''Payment Service Name'', rules\: ''sometimes\|required'', col\: array\{cols\: 12, lg\: 6\}\}, array\{name\: ''key'', label\: ''Payment Service Slug'', type\: ''text'', col\: array\{cols\: 12, lg\: 6\}\}, array\{name\: ''paymentCurrencies'', label\: \(array\|string\), type\: ''select'', 0\: ''multiple'', repository\: ''Modules…'', col\: array\{cols\: 12, lg\: 6\}\}, array\{name\: ''transaction_fee…'', label\: \(array\|string\), type\: ''number\-input'', clearable\: false, default\: 0\.0, precision\: 2, max\: 100\.0, min\: 0\.0, \.\.\.\}, array\{type\: ''radio\-group'', name\: ''type'', label\: \(array\|string\), spreadable\: true, items\: array\{array\{name\: ''Standard'', id\: 1, transfer_details_toggleInputValue\: false\}, array\{name\: ''Transfer'', id\: 2, transfer_details_toggleInputValue\: true\}\}, formEvents\: array\{array\{''toggleInput'', ''transfer_details'', ''items\.\*\.transfer…''\}\}\}, array\{type\: ''group'', col\: array\{cols\: 12, lg\: 12\}, name\: ''transfer_details'', label\: ''Transfer Details'', class\: ''d\-none'', spreadable\: true, schema\: array\{array\{type\: ''text'', name\: ''account_holder'', label\: \(array\|string\), col\: array\{cols\: 12, lg\: 6\}, rules\: '''', _cached\-rawRules\: ''required''\}, array\{type\: ''text'', name\: ''iban'', label\: \(array\|string\), col\: array\{cols\: 12, lg\: 6\}, rules\: '''', _cached\-rules\: ''required''\}, array\{type\: ''text'', name\: ''swift_code'', label\: \(array\|string\), col\: array\{cols\: 12, lg\: 6\}, rules\: '''', _cached\-rawRules\: ''required''\}, array\{type\: ''text'', name\: ''description'', label\: \(array\|string\), col\: array\{cols\: 12, lg\: 6\}, rules\: '''', _cached\-rawRules\: ''required''\}, array\{type\: ''textarea'', name\: ''address'', label\: \(array\|string\), col\: array\{cols\: 12\}, rules\: '''', _cached\-rawRules\: ''required''\}\}\}, array\{name\: ''is_external'', label\: \(array\|string\), type\: ''checkbox'', col\: array\{cols\: 12, lg\: 6\}\}, array\{name\: ''is_internal'', label\: \(array\|string\), type\: ''checkbox'', col\: array\{cols\: 12, lg\: 6\}\}, \.\.\.\}\.$#'
+			identifier: return.type
+			count: 1
+			path: modules/SystemPayment/Blueprint/PaymentService/Form/PaymentServiceFormInputs.php
+
+		-
 			message: '#^Access to an undefined property Modules\\SystemPayment\\Entities\\PaymentCurrency\:\:\$payment_service_id\.$#'
 			identifier: property.notFound
 			count: 1
@@ -1911,6 +2061,12 @@ parameters:
 		-
 			message: '#^PHPDoc tag @var with type Unusualify\\Modularous\\Entities\\Traits\\HasImages is not subtype of native type Illuminate\\Database\\Eloquent\\Model\.$#'
 			identifier: varTag.nativeType
+			count: 1
+			path: modules/SystemPayment/Entities/CardType.php
+
+		-
+			message: '#^PHPDoc type array\<int, string\> of property Modules\\SystemPayment\\Entities\\CardType\:\:\$fillable is not covariant with PHPDoc type list\<string\> of overridden property Illuminate\\Database\\Eloquent\\Model\:\:\$fillable\.$#'
+			identifier: property.phpDocType
 			count: 1
 			path: modules/SystemPayment/Entities/CardType.php
 
@@ -2269,6 +2425,12 @@ parameters:
 			path: modules/SystemPayment/Entities/Payment.php
 
 		-
+			message: '#^Method Modules\\SystemPayment\\Entities\\Payment\:\:getFileponds\(\) should return array\<Unusualify\\Modularous\\Entities\\Filepond\> but returns Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\>\.$#'
+			identifier: return.type
+			count: 1
+			path: modules/SystemPayment/Entities/Payment.php
+
+		-
 			message: '#^Unsafe usage of new static\(\)\.$#'
 			identifier: new.static
 			count: 4
@@ -2547,6 +2709,12 @@ parameters:
 		-
 			message: '#^Call to method medias\(\) on an unknown class Unusualify\\Modularous\\Entities\\Traits\\HasImages\.$#'
 			identifier: class.notFound
+			count: 1
+			path: modules/SystemPayment/Entities/PaymentCountry.php
+
+		-
+			message: '#^Method Modules\\SystemPayment\\Entities\\PaymentCountry\:\:getFileponds\(\) should return array\<Unusualify\\Modularous\\Entities\\Filepond\> but returns Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\>\.$#'
+			identifier: return.type
 			count: 1
 			path: modules/SystemPayment/Entities/PaymentCountry.php
 
@@ -2893,6 +3061,12 @@ parameters:
 			path: modules/SystemPayment/Entities/PaymentCurrency.php
 
 		-
+			message: '#^Method Modules\\SystemPayment\\Entities\\PaymentCurrency\:\:getFileponds\(\) should return array\<Unusualify\\Modularous\\Entities\\Filepond\> but returns Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\>\.$#'
+			identifier: return.type
+			count: 1
+			path: modules/SystemPayment/Entities/PaymentCurrency.php
+
+		-
 			message: '#^PHPDoc tag @var for variable \$model has invalid type Unusualify\\Modularous\\Entities\\Traits\\HasImages\.$#'
 			identifier: varTag.trait
 			count: 1
@@ -3031,8 +3205,20 @@ parameters:
 			path: modules/SystemPayment/Entities/PaymentService.php
 
 		-
+			message: '#^PHPDoc type array\<int, string\> of property Modules\\SystemPayment\\Entities\\PaymentService\:\:\$fillable is not covariant with PHPDoc type list\<string\> of overridden property Illuminate\\Database\\Eloquent\\Model\:\:\$fillable\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: modules/SystemPayment/Entities/PaymentService.php
+
+		-
 			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\API\\CardTypeController\:\:destroy\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
 			identifier: return.missing
+			count: 1
+			path: modules/SystemPayment/Http/Controllers/API/CardTypeController.php
+
+		-
+			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\API\\CardTypeController\:\:index\(\) should return Illuminate\\Contracts\\Support\\Renderable but returns Modules\\SystemPayment\\Transformers\\CardTypeResource\.$#'
+			identifier: return.type
 			count: 1
 			path: modules/SystemPayment/Http/Controllers/API/CardTypeController.php
 
@@ -3061,6 +3247,12 @@ parameters:
 			path: modules/SystemPayment/Http/Controllers/API/MyPaymentController.php
 
 		-
+			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\API\\MyPaymentController\:\:index\(\) should return Illuminate\\Contracts\\Support\\Renderable but returns Modules\\SystemPayment\\Transformers\\MyPaymentResource\.$#'
+			identifier: return.type
+			count: 1
+			path: modules/SystemPayment/Http/Controllers/API/MyPaymentController.php
+
+		-
 			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\API\\MyPaymentController\:\:show\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
 			identifier: return.missing
 			count: 1
@@ -3081,6 +3273,12 @@ parameters:
 		-
 			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\API\\PaymentController\:\:destroy\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
 			identifier: return.missing
+			count: 1
+			path: modules/SystemPayment/Http/Controllers/API/PaymentController.php
+
+		-
+			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\API\\PaymentController\:\:index\(\) should return Illuminate\\Contracts\\Support\\Renderable but returns Modules\\SystemPayment\\Transformers\\PaymentResource\.$#'
+			identifier: return.type
 			count: 1
 			path: modules/SystemPayment/Http/Controllers/API/PaymentController.php
 
@@ -3109,6 +3307,12 @@ parameters:
 			path: modules/SystemPayment/Http/Controllers/API/PaymentCountryController.php
 
 		-
+			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\API\\PaymentCountryController\:\:index\(\) should return Illuminate\\Contracts\\Support\\Renderable but returns Modules\\SystemPayment\\Transformers\\PaymentCountryResource\.$#'
+			identifier: return.type
+			count: 1
+			path: modules/SystemPayment/Http/Controllers/API/PaymentCountryController.php
+
+		-
 			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\API\\PaymentCountryController\:\:show\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
 			identifier: return.missing
 			count: 1
@@ -3129,6 +3333,12 @@ parameters:
 		-
 			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\API\\PaymentCurrencyController\:\:destroy\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
 			identifier: return.missing
+			count: 1
+			path: modules/SystemPayment/Http/Controllers/API/PaymentCurrencyController.php
+
+		-
+			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\API\\PaymentCurrencyController\:\:index\(\) should return Illuminate\\Contracts\\Support\\Renderable but returns Modules\\SystemPayment\\Transformers\\PaymentCurrencyResource\.$#'
+			identifier: return.type
 			count: 1
 			path: modules/SystemPayment/Http/Controllers/API/PaymentCurrencyController.php
 
@@ -3165,6 +3375,12 @@ parameters:
 		-
 			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\API\\PaymentServiceController\:\:destroy\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
 			identifier: return.missing
+			count: 1
+			path: modules/SystemPayment/Http/Controllers/API/PaymentServiceController.php
+
+		-
+			message: '#^Method Modules\\SystemPayment\\Http\\Controllers\\API\\PaymentServiceController\:\:index\(\) should return Illuminate\\Contracts\\Support\\Renderable but returns Modules\\SystemPayment\\Transformers\\PaymentServiceResource\.$#'
+			identifier: return.type
 			count: 1
 			path: modules/SystemPayment/Http/Controllers/API/PaymentServiceController.php
 
@@ -3517,16 +3733,22 @@ parameters:
 			path: modules/SystemPayment/Http/Controllers/PriceController.php
 
 		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$mediasParams\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemPayment/Repositories/CardTypeRepository.php
+
+		-
 			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Model\:\:\$medias\.$#'
 			identifier: property.notFound
 			count: 1
 			path: modules/SystemPayment/Repositories/CardTypeRepository.php
 
 		-
-			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Model\:\:\$mediasParams\.$#'
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$mediasParams\.$#'
 			identifier: property.notFound
 			count: 1
-			path: modules/SystemPayment/Repositories/CardTypeRepository.php
+			path: modules/SystemPayment/Repositories/PaymentCountryRepository.php
 
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$translations\.$#'
@@ -3553,12 +3775,6 @@ parameters:
 			path: modules/SystemPayment/Repositories/PaymentCountryRepository.php
 
 		-
-			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Model\:\:\$mediasParams\.$#'
-			identifier: property.notFound
-			count: 1
-			path: modules/SystemPayment/Repositories/PaymentCountryRepository.php
-
-		-
 			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Model\:\:\$translations\.$#'
 			identifier: property.notFound
 			count: 1
@@ -3571,6 +3787,30 @@ parameters:
 			path: modules/SystemPayment/Repositories/PaymentCountryRepository.php
 
 		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getRouteInputs\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: modules/SystemPayment/Repositories/PaymentCountryRepository.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getTranslatedAttributes\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: modules/SystemPayment/Repositories/PaymentCountryRepository.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:isTranslatable\(\)\.$#'
+			identifier: method.notFound
+			count: 4
+			path: modules/SystemPayment/Repositories/PaymentCountryRepository.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:translations\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: modules/SystemPayment/Repositories/PaymentCountryRepository.php
+
+		-
 			message: '#^Call to an undefined method Unusualify\\Modularous\\Entities\\Model\:\:getSpreadableSavingKey\(\)\.$#'
 			identifier: method.notFound
 			count: 4
@@ -3579,7 +3819,7 @@ parameters:
 		-
 			message: '#^Call to an undefined method Unusualify\\Modularous\\Entities\\Model\:\:getTranslatedAttributes\(\)\.$#'
 			identifier: method.notFound
-			count: 4
+			count: 1
 			path: modules/SystemPayment/Repositories/PaymentCountryRepository.php
 
 		-
@@ -3595,12 +3835,6 @@ parameters:
 			path: modules/SystemPayment/Repositories/PaymentCountryRepository.php
 
 		-
-			message: '#^Call to an undefined method Unusualify\\Modularous\\Entities\\Model\:\:translations\(\)\.$#'
-			identifier: method.notFound
-			count: 3
-			path: modules/SystemPayment/Repositories/PaymentCountryRepository.php
-
-		-
 			message: '#^Cannot access property \$repeaters on class\-string\|object\.$#'
 			identifier: property.nonObject
 			count: 1
@@ -3611,6 +3845,12 @@ parameters:
 			identifier: return.missing
 			count: 1
 			path: modules/SystemPayment/Repositories/PaymentCountryRepository.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$mediasParams\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemPayment/Repositories/PaymentCurrencyRepository.php
 
 		-
 			message: '#^Access to an undefined property Oobook\\Priceable\\Models\\Currency\:\:\$iso_4217\.$#'
@@ -3631,13 +3871,13 @@ parameters:
 			path: modules/SystemPayment/Repositories/PaymentCurrencyRepository.php
 
 		-
-			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Model\:\:\$mediasParams\.$#'
-			identifier: property.notFound
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:defaultAttributes\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: modules/SystemPayment/Repositories/PaymentCurrencyRepository.php
 
 		-
-			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:defaultAttributes\(\)\.$#'
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getRouteInputs\(\)\.$#'
 			identifier: method.notFound
 			count: 1
 			path: modules/SystemPayment/Repositories/PaymentCurrencyRepository.php
@@ -3709,6 +3949,12 @@ parameters:
 			path: modules/SystemPayment/Repositories/PaymentRepository.php
 
 		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getRouteInputs\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: modules/SystemPayment/Repositories/PaymentRepository.php
+
+		-
 			message: '#^Call to an undefined method Unusualify\\Modularous\\Entities\\Model\:\:getSpreadableSavingKey\(\)\.$#'
 			identifier: method.notFound
 			count: 4
@@ -3721,14 +3967,20 @@ parameters:
 			path: modules/SystemPayment/Repositories/PaymentRepository.php
 
 		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$mediasParams\.$#'
+			identifier: property.notFound
+			count: 1
+			path: modules/SystemPayment/Repositories/PaymentServiceRepository.php
+
+		-
 			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Model\:\:\$medias\.$#'
 			identifier: property.notFound
 			count: 1
 			path: modules/SystemPayment/Repositories/PaymentServiceRepository.php
 
 		-
-			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Model\:\:\$mediasParams\.$#'
-			identifier: property.notFound
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getRouteInputs\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: modules/SystemPayment/Repositories/PaymentServiceRepository.php
 
@@ -4027,6 +4279,18 @@ parameters:
 			path: modules/SystemPricing/Entities/Price.php
 
 		-
+			message: '#^Method Modules\\SystemPricing\\Entities\\Price\:\:payment\(\) should return Illuminate\\Database\\Eloquent\\Relations\\HasOne but returns Illuminate\\Database\\Eloquent\\Builder\<Modules\\SystemPayment\\Entities\\Payment\>\.$#'
+			identifier: return.type
+			count: 1
+			path: modules/SystemPricing/Entities/Price.php
+
+		-
+			message: '#^Method Modules\\SystemPricing\\Entities\\Price\:\:payments\(\) should return Illuminate\\Database\\Eloquent\\Relations\\HasMany but returns Illuminate\\Database\\Eloquent\\Builder\<Modules\\SystemPayment\\Entities\\Payment\>\.$#'
+			identifier: return.type
+			count: 1
+			path: modules/SystemPricing/Entities/Price.php
+
+		-
 			message: '#^Unknown parameter \$decimals in call to static method Unusualify\\Modularous\\Facades\\CurrencyExchange\:\:convertTo\(\)\.$#'
 			identifier: argument.unknown
 			count: 1
@@ -4207,6 +4471,12 @@ parameters:
 			path: modules/SystemPricing/Http/Controllers/API/CurrencyController.php
 
 		-
+			message: '#^Method Modules\\SystemPricing\\Http\\Controllers\\API\\CurrencyController\:\:index\(\) should return Illuminate\\Contracts\\Support\\Renderable but returns Modules\\SystemPricing\\Transformers\\CurrencyResource\.$#'
+			identifier: return.type
+			count: 1
+			path: modules/SystemPricing/Http/Controllers/API/CurrencyController.php
+
+		-
 			message: '#^Method Modules\\SystemPricing\\Http\\Controllers\\API\\CurrencyController\:\:show\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
 			identifier: return.missing
 			count: 1
@@ -4227,6 +4497,12 @@ parameters:
 		-
 			message: '#^Method Modules\\SystemPricing\\Http\\Controllers\\API\\PriceController\:\:destroy\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
 			identifier: return.missing
+			count: 1
+			path: modules/SystemPricing/Http/Controllers/API/PriceController.php
+
+		-
+			message: '#^Method Modules\\SystemPricing\\Http\\Controllers\\API\\PriceController\:\:index\(\) should return Illuminate\\Contracts\\Support\\Renderable but returns Modules\\SystemPricing\\Transformers\\PriceResource\.$#'
+			identifier: return.type
 			count: 1
 			path: modules/SystemPricing/Http/Controllers/API/PriceController.php
 
@@ -4255,6 +4531,12 @@ parameters:
 			path: modules/SystemPricing/Http/Controllers/API/PriceTypeController.php
 
 		-
+			message: '#^Method Modules\\SystemPricing\\Http\\Controllers\\API\\PriceTypeController\:\:index\(\) should return Illuminate\\Contracts\\Support\\Renderable but returns Modules\\SystemPricing\\Transformers\\PriceTypeResource\.$#'
+			identifier: return.type
+			count: 1
+			path: modules/SystemPricing/Http/Controllers/API/PriceTypeController.php
+
+		-
 			message: '#^Method Modules\\SystemPricing\\Http\\Controllers\\API\\PriceTypeController\:\:show\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
 			identifier: return.missing
 			count: 1
@@ -4275,6 +4557,12 @@ parameters:
 		-
 			message: '#^Method Modules\\SystemPricing\\Http\\Controllers\\API\\VatRateController\:\:destroy\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
 			identifier: return.missing
+			count: 1
+			path: modules/SystemPricing/Http/Controllers/API/VatRateController.php
+
+		-
+			message: '#^Method Modules\\SystemPricing\\Http\\Controllers\\API\\VatRateController\:\:index\(\) should return Illuminate\\Contracts\\Support\\Renderable but returns Modules\\SystemPricing\\Transformers\\VatRateResource\.$#'
+			identifier: return.type
 			count: 1
 			path: modules/SystemPricing/Http/Controllers/API/VatRateController.php
 
@@ -4603,6 +4891,12 @@ parameters:
 			path: modules/SystemSetting/Entities/General.php
 
 		-
+			message: '#^Method Modules\\SystemSetting\\Entities\\General\:\:getFileponds\(\) should return array\<Unusualify\\Modularous\\Entities\\Filepond\> but returns Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\>\.$#'
+			identifier: return.type
+			count: 1
+			path: modules/SystemSetting/Entities/General.php
+
+		-
 			message: '#^PHPDoc tag @var for variable \$model has invalid type Unusualify\\Modularous\\Entities\\Traits\\HasImages\.$#'
 			identifier: varTag.trait
 			count: 2
@@ -4617,6 +4911,12 @@ parameters:
 		-
 			message: '#^Method Modules\\SystemSetting\\Http\\Controllers\\API\\GeneralController\:\:destroy\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
 			identifier: return.missing
+			count: 1
+			path: modules/SystemSetting/Http/Controllers/API/GeneralController.php
+
+		-
+			message: '#^Method Modules\\SystemSetting\\Http\\Controllers\\API\\GeneralController\:\:index\(\) should return Illuminate\\Contracts\\Support\\Renderable but returns Modules\\SystemSetting\\Transformers\\GeneralResource\.$#'
+			identifier: return.type
 			count: 1
 			path: modules/SystemSetting/Http/Controllers/API/GeneralController.php
 
@@ -4645,6 +4945,12 @@ parameters:
 			path: modules/SystemSetting/Providers/SystemSettingServiceProvider.php
 
 		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$mediasParams\.$#'
+			identifier: property.notFound
+			count: 2
+			path: modules/SystemSetting/Repositories/GeneralRepository.php
+
+		-
 			message: '#^Access to an undefined property Oobook\\Priceable\\Models\\Currency\:\:\$iso_4217\.$#'
 			identifier: property.notFound
 			count: 2
@@ -4658,12 +4964,6 @@ parameters:
 
 		-
 			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Model\:\:\$medias\.$#'
-			identifier: property.notFound
-			count: 2
-			path: modules/SystemSetting/Repositories/GeneralRepository.php
-
-		-
-			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Model\:\:\$mediasParams\.$#'
 			identifier: property.notFound
 			count: 2
 			path: modules/SystemSetting/Repositories/GeneralRepository.php
@@ -4709,6 +5009,24 @@ parameters:
 			identifier: property.notFound
 			count: 1
 			path: modules/SystemSetting/Support/MigrateRobotsTxtFromSiteSetting.php
+
+		-
+			message: '#^Method Modules\\SystemUser\\Blueprint\\Permission\\Form\\PermissionFormInputs\:\:__invoke\(\) should return list\<array\<string, mixed\>\> but returns array\{array\{type\: ''text'', title\: ''Name'', name\: ''name'', label\: ''Permission Name'', placeholder\: '''', default\: '''', col\: array\{cols\: 12, sm\: 8, md\: 6\}, rules\: ''sometimes\|required…''\}, array\{type\: ''text'', title\: ''Guard Name'', name\: ''guard_name'', label\: ''Guard Name'', placeholder\: ''web'', default\: ''modularous'', col\: array\{cols\: 12, sm\: 8, md\: 6\}, 0\: ''readonly'', \.\.\.\}\}\.$#'
+			identifier: return.type
+			count: 1
+			path: modules/SystemUser/Blueprint/Permission/Form/PermissionFormInputs.php
+
+		-
+			message: '#^Method Modules\\SystemUser\\Blueprint\\Role\\Form\\RoleFormInputs\:\:__invoke\(\) should return list\<array\<string, mixed\>\> but returns array\{array\{type\: ''text'', name\: ''title'', label\: ''Title'', col\: array\{cols\: 10, sm\: 10, md\: 6, lg\: 6, xl\: 6\}, rules\: ''sometimes\|required…''\}, array\{type\: ''text'', name\: ''name'', label\: ''Name'', hint\: '''', placeholder\: '''', default\: '''', col\: array\{cols\: 10, sm\: 10, md\: 6, lg\: 6, xl\: 6\}, editable\: false, \.\.\.\}, array\{type\: ''text'', name\: ''guard_name'', label\: ''Guard Name'', placeholder\: ''modularous'', _tooltip\: ''Enter the guard name'', default\: ''modularous'', col\: array\{cols\: 10, sm\: 10, md\: 6, lg\: 6, xl\: 6\}, 0\: ''readonly'', \.\.\.\}, array\{type\: ''checklist'', isTreeview\: true, closeAllGroups\: true, name\: ''permissions'', label\: ''Permissions of the…'', col\: array\{cols\: 12, sm\: 12, md\: 12, lg\: 12, xl\: 12\}, connector\: ''SystemUser…'', allowedRoles\: array\{''superadmin'', ''admin''\}\}\}\.$#'
+			identifier: return.type
+			count: 1
+			path: modules/SystemUser/Blueprint/Role/Form/RoleFormInputs.php
+
+		-
+			message: '#^Method Modules\\SystemUser\\Blueprint\\User\\Form\\UserFormInputs\:\:__invoke\(\) should return list\<array\<string, mixed\>\> but returns array\{array\{type\: ''filepond\-avatar'', name\: ''avatar'', allow\-image\-preview\: true, label\-idle\: ''Drop files here\.\.\.'', disabled\: true, noSubmit\: true, creatable\: ''hidden'', editable\: false\}, array\{type\: ''text'', label\: ''Email'', name\: ''email'', rules\: ''sometimes\|required'', col\: array\{cols\: 12, sm\: 8, md\: 6\}, 0\: ''dense''\}, array\{label\: ''Name'', name\: ''name'', type\: ''text'', rules\: ''sometimes\|required'', editable\: false, col\: array\{cols\: 12, sm\: 8, md\: 6\}, 0\: ''dense''\}, array\{label\: ''Surname'', name\: ''surname'', type\: ''text'', editable\: false, col\: array\{cols\: 12, sm\: 8, md\: 6\}, 0\: ''dense''\}, array\{name\: ''company_id'', label\: ''Company'', type\: ''select'', col\: array\{cols\: 12, sm\: 8, md\: 6\}, repository\: ''Modules\\\\SystemUser…''\}, array\{name\: ''company_name'', label\: ''Company Name'', placeholder\: ''If you want to…'', hint\: ''If you select a…'', editable\: ''hidden'', type\: ''text'', col\: array\{cols\: 12, sm\: 8, md\: 6\}, conditions\: array\{array\{''id'', ''not exists''\}\}\}, array\{type\: ''combobox'', label\: ''Roles'', name\: ''roles'', chips\: true, itemTitle\: ''title'', col\: array\{cols\: 12, sm\: 8, md\: 6\}, allowedRoles\: array\{''superadmin'', ''admin''\}, rules\: ''required'', \.\.\.\}\}\.$#'
+			identifier: return.type
+			count: 1
+			path: modules/SystemUser/Blueprint/User/Form/UserFormInputs.php
 
 		-
 			message: '#^Array has 2 duplicate keys with value ''color'' \(''color'', ''color''\)\.$#'
@@ -4801,6 +5119,12 @@ parameters:
 			path: modules/SystemUser/Http/Controllers/API/CompanyController.php
 
 		-
+			message: '#^Method Modules\\SystemUser\\Http\\Controllers\\API\\CompanyController\:\:index\(\) should return Illuminate\\Contracts\\Support\\Renderable but returns Modules\\SystemUser\\Transformers\\CompanyResource\.$#'
+			identifier: return.type
+			count: 1
+			path: modules/SystemUser/Http/Controllers/API/CompanyController.php
+
+		-
 			message: '#^Method Modules\\SystemUser\\Http\\Controllers\\API\\CompanyController\:\:show\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
 			identifier: return.missing
 			count: 1
@@ -4825,6 +5149,12 @@ parameters:
 			path: modules/SystemUser/Http/Controllers/API/PermissionController.php
 
 		-
+			message: '#^Method Modules\\SystemUser\\Http\\Controllers\\API\\PermissionController\:\:index\(\) should return Illuminate\\Contracts\\Support\\Renderable but returns Modules\\SystemUser\\Transformers\\PermissionResource\.$#'
+			identifier: return.type
+			count: 1
+			path: modules/SystemUser/Http/Controllers/API/PermissionController.php
+
+		-
 			message: '#^Method Modules\\SystemUser\\Http\\Controllers\\API\\PermissionController\:\:show\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
 			identifier: return.missing
 			count: 1
@@ -4845,6 +5175,12 @@ parameters:
 		-
 			message: '#^Method Modules\\SystemUser\\Http\\Controllers\\API\\RoleController\:\:destroy\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
 			identifier: return.missing
+			count: 1
+			path: modules/SystemUser/Http/Controllers/API/RoleController.php
+
+		-
+			message: '#^Method Modules\\SystemUser\\Http\\Controllers\\API\\RoleController\:\:index\(\) should return Illuminate\\Contracts\\Support\\Renderable but returns Modules\\SystemUser\\Transformers\\RoleResource\.$#'
+			identifier: return.type
 			count: 1
 			path: modules/SystemUser/Http/Controllers/API/RoleController.php
 
@@ -5005,6 +5341,12 @@ parameters:
 			path: modules/SystemUser/Repositories/CapabilityRepository.php
 
 		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getRouteInputs\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: modules/SystemUser/Repositories/CompanyRepository.php
+
+		-
 			message: '#^Call to an undefined method Unusualify\\Modularous\\Entities\\Model\:\:getSpreadableSavingKey\(\)\.$#'
 			identifier: method.notFound
 			count: 4
@@ -5083,7 +5425,7 @@ parameters:
 			path: modules/SystemUser/Repositories/UserRepository.php
 
 		-
-			message: '#^Call to an undefined method Unusualify\\Modularous\\Entities\\Model\:\:assignRole\(\)\.$#'
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:assignRole\(\)\.$#'
 			identifier: method.notFound
 			count: 1
 			path: modules/SystemUser/Repositories/UserRepository.php
@@ -5091,6 +5433,18 @@ parameters:
 		-
 			message: '#^Method Modules\\SystemUser\\Repositories\\UserRepository\:\:oauthCreateUser\(\) has invalid return type A17\\Twill\\Models\\User\.$#'
 			identifier: class.notFound
+			count: 1
+			path: modules/SystemUser/Repositories/UserRepository.php
+
+		-
+			message: '#^Method Modules\\SystemUser\\Repositories\\UserRepository\:\:oauthCreateUser\(\) should return A17\\Twill\\Models\\User but returns Illuminate\\Database\\Eloquent\\Model\.$#'
+			identifier: return.type
+			count: 1
+			path: modules/SystemUser/Repositories/UserRepository.php
+
+		-
+			message: '#^Method Modules\\SystemUser\\Repositories\\UserRepository\:\:oauthUser\(\) should return Unusualify\\Modularous\\Entities\\User but returns Illuminate\\Database\\Eloquent\\Model\|null\.$#'
+			identifier: return.type
 			count: 1
 			path: modules/SystemUser/Repositories/UserRepository.php
 
@@ -5133,6 +5487,12 @@ parameters:
 		-
 			message: '#^Method Modules\\SystemUtility\\Entities\\Country\:\:scopeWithActiveTranslations\(\) should return Illuminate\\Database\\Eloquent\\Builder\|null but return statement is missing\.$#'
 			identifier: return.missing
+			count: 1
+			path: modules/SystemUtility/Entities/Country.php
+
+		-
+			message: '#^PHPDoc type array\<int, string\> of property Modules\\SystemUtility\\Entities\\Country\:\:\$fillable is not covariant with PHPDoc type list\<string\> of overridden property Illuminate\\Database\\Eloquent\\Model\:\:\$fillable\.$#'
+			identifier: property.phpDocType
 			count: 1
 			path: modules/SystemUtility/Entities/Country.php
 
@@ -5203,6 +5563,12 @@ parameters:
 			path: modules/SystemUtility/Http/Controllers/API/CountryController.php
 
 		-
+			message: '#^Method Modules\\SystemUtility\\Http\\Controllers\\API\\CountryController\:\:index\(\) should return Illuminate\\Contracts\\Support\\Renderable but returns Modules\\SystemUtility\\Transformers\\CountryResource\.$#'
+			identifier: return.type
+			count: 1
+			path: modules/SystemUtility/Http/Controllers/API/CountryController.php
+
+		-
 			message: '#^Method Modules\\SystemUtility\\Http\\Controllers\\API\\CountryController\:\:show\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
 			identifier: return.missing
 			count: 1
@@ -5223,6 +5589,12 @@ parameters:
 		-
 			message: '#^Method Modules\\SystemUtility\\Http\\Controllers\\API\\StateController\:\:destroy\(\) should return Illuminate\\Contracts\\Support\\Renderable but return statement is missing\.$#'
 			identifier: return.missing
+			count: 1
+			path: modules/SystemUtility/Http/Controllers/API/StateController.php
+
+		-
+			message: '#^Method Modules\\SystemUtility\\Http\\Controllers\\API\\StateController\:\:index\(\) should return Illuminate\\Contracts\\Support\\Renderable but returns Modules\\SystemUtility\\Transformers\\StateResource\.$#'
+			identifier: return.type
 			count: 1
 			path: modules/SystemUtility/Http/Controllers/API/StateController.php
 
@@ -5257,21 +5629,33 @@ parameters:
 			path: modules/SystemUtility/Repositories/CountryRepository.php
 
 		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getTranslatedAttributes\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: modules/SystemUtility/Repositories/CountryRepository.php
+
+		-
 			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:hasPublishDates\(\)\.$#'
 			identifier: method.notFound
 			count: 1
 			path: modules/SystemUtility/Repositories/CountryRepository.php
 
 		-
-			message: '#^Call to an undefined method Unusualify\\Modularous\\Entities\\Model\:\:getTranslatedAttributes\(\)\.$#'
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:isTranslatable\(\)\.$#'
 			identifier: method.notFound
 			count: 4
 			path: modules/SystemUtility/Repositories/CountryRepository.php
 
 		-
-			message: '#^Call to an undefined method Unusualify\\Modularous\\Entities\\Model\:\:translations\(\)\.$#'
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:translations\(\)\.$#'
 			identifier: method.notFound
 			count: 3
+			path: modules/SystemUtility/Repositories/CountryRepository.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Entities\\Model\:\:getTranslatedAttributes\(\)\.$#'
+			identifier: method.notFound
+			count: 1
 			path: modules/SystemUtility/Repositories/CountryRepository.php
 
 		-
@@ -5287,22 +5671,28 @@ parameters:
 			path: modules/SystemUtility/Repositories/StateRepository.php
 
 		-
-			message: '#^Call to an undefined method Unusualify\\Modularous\\Entities\\Model\:\:getTranslatedAttributes\(\)\.$#'
-			identifier: method.notFound
-			count: 4
-			path: modules/SystemUtility/Repositories/StateRepository.php
-
-		-
-			message: '#^Call to an undefined method Unusualify\\Modularous\\Entities\\Model\:\:translations\(\)\.$#'
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getTranslatedAttributes\(\)\.$#'
 			identifier: method.notFound
 			count: 3
 			path: modules/SystemUtility/Repositories/StateRepository.php
 
 		-
-			message: '#^Call to an undefined method Illuminate\\Filesystem\\Filesystem\:\:forget\(\)\.$#'
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:isTranslatable\(\)\.$#'
+			identifier: method.notFound
+			count: 4
+			path: modules/SystemUtility/Repositories/StateRepository.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:translations\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: modules/SystemUtility/Repositories/StateRepository.php
+
+		-
+			message: '#^Call to an undefined method Unusualify\\Modularous\\Entities\\Model\:\:getTranslatedAttributes\(\)\.$#'
 			identifier: method.notFound
 			count: 1
-			path: src/Activators/ModuleActivator.php
+			path: modules/SystemUtility/Repositories/StateRepository.php
 
 		-
 			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\User\:\:\$email\.$#'
@@ -5743,10 +6133,28 @@ parameters:
 			path: src/Console/BaseCommand.php
 
 		-
+			message: '#^Method Unusualify\\Modularous\\Console\\BaseCommand\:\:getModuleName\(\) should return string but returns null\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Console/BaseCommand.php
+
+		-
 			message: '#^Method Unusualify\\Modularous\\Console\\BaseCommand\:\:getTemplateContents\(\) should return string but return statement is missing\.$#'
 			identifier: return.missing
 			count: 1
 			path: src/Console/BaseCommand.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Console\\Blueprint\\MakeBlueprintCommand\:\:getOptions\(\) should return array\<array\{0\: non\-empty\-string, 1\?\: non\-empty\-array\<string\>\|string, 2\?\: int\<0, 31\>, 3\?\: string, 4\?\: mixed, 5\?\: \(Closure\(Symfony\\Component\\Console\\Completion\\CompletionInput, Symfony\\Component\\Console\\Completion\\CompletionSuggestions\)\: list\<string\|Symfony\\Component\\Console\\Completion\\Suggestion\>\)\|list\<string\|Symfony\\Component\\Console\\Completion\\Suggestion\>\}\|Symfony\\Component\\Console\\Input\\InputOption\> but returns array\{array\{''force'', ''f'', 1, ''Overwrite existing…''\}, array\{''from\-config'', null, 1, ''Seed class bodies…''\}, array\{''table\-options'', null, 1, ''Also generate…''\}, array\{''options'', null, 1, ''Also generate…''\}, array\{''all'', null, 1, ''Generate all ADR…''\}, array\{''only'', null, 2, ''Comma\-separated…''\}, array\{''write\-config'', null, 1, ''Persist nested…''\}, array\{''keep\-flats'', null, 1, ''With \-\-write\-config…''\}, \.\.\.\}\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Console/Blueprint/MakeBlueprintCommand.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Console\\Blueprint\\MakeBlueprintFieldCommand\:\:getOptions\(\) should return array\<array\{0\: non\-empty\-string, 1\?\: non\-empty\-array\<string\>\|string, 2\?\: int\<0, 31\>, 3\?\: string, 4\?\: mixed, 5\?\: \(Closure\(Symfony\\Component\\Console\\Completion\\CompletionInput, Symfony\\Component\\Console\\Completion\\CompletionSuggestions\)\: list\<string\|Symfony\\Component\\Console\\Completion\\Suggestion\>\)\|list\<string\|Symfony\\Component\\Console\\Completion\\Suggestion\>\}\|Symfony\\Component\\Console\\Input\\InputOption\> but returns array\{array\{''force'', ''f'', 1, ''Overwrite an…''\}, array\{''from\-config'', null, 1, ''Seed class body…''\}, array\{''dry\-run'', null, 1, ''Show planned…''\}\}\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Console/Blueprint/MakeBlueprintFieldCommand.php
 
 		-
 			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
@@ -5887,6 +6295,18 @@ parameters:
 			path: src/Console/Make/MakeMigrationCommand.php
 
 		-
+			message: '#^Method Unusualify\\Modularous\\Console\\Make\\MakeModelCommand\:\:getInterface\(\) should return string but returns array\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Console/Make/MakeModelCommand.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Console\\Make\\MakeModelCommand\:\:getInterfaceNamespace\(\) should return string but returns array\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Console/Make/MakeModelCommand.php
+
+		-
 			message: '#^Property Unusualify\\Modularous\\Console\\Make\\MakeModuleCommand\:\:\$console has unknown class Unusualify\\Modularous\\Console\\Make\\Console as its type\.$#'
 			identifier: class.notFound
 			count: 1
@@ -5895,6 +6315,18 @@ parameters:
 		-
 			message: '#^Method Unusualify\\Modularous\\Console\\Make\\MakeRepositoryCommand\:\:getModelClass\(\) has invalid return type Unusualify\\Modularous\\Console\\Make\\class\.$#'
 			identifier: class.notFound
+			count: 1
+			path: src/Console/Make/MakeRepositoryCommand.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Console\\Make\\MakeRepositoryCommand\:\:getModelClass\(\) should return Unusualify\\Modularous\\Console\\Make\\class but returns class\-string\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Console/Make/MakeRepositoryCommand.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Console\\Make\\MakeRepositoryCommand\:\:getModelClass\(\) should return Unusualify\\Modularous\\Console\\Make\\class but returns string\.$#'
+			identifier: return.type
 			count: 1
 			path: src/Console/Make/MakeRepositoryCommand.php
 
@@ -5993,6 +6425,12 @@ parameters:
 			identifier: return.phpDocType
 			count: 1
 			path: src/Console/RefreshCommand.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Console\\Setup\\CreateDatabaseCommand\:\:getOptions\(\) should return array\<array\{0\: non\-empty\-string, 1\?\: non\-empty\-array\<string\>\|string, 2\?\: int\<0, 31\>, 3\?\: string, 4\?\: mixed, 5\?\: \(Closure\(Symfony\\Component\\Console\\Completion\\CompletionInput, Symfony\\Component\\Console\\Completion\\CompletionSuggestions\)\: list\<string\|Symfony\\Component\\Console\\Completion\\Suggestion\>\)\|list\<string\|Symfony\\Component\\Console\\Completion\\Suggestion\>\}\|Symfony\\Component\\Console\\Input\\InputOption\> but returns array\{array\{''connection'', null, 4, ''The database…'', null\}\}\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Console/Setup/CreateDatabaseCommand.php
 
 		-
 			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\User\:\:\$password\.$#'
@@ -6145,6 +6583,24 @@ parameters:
 			path: src/Entities/Assignment.php
 
 		-
+			message: '#^Method Unusualify\\Modularous\\Entities\\Assignment\:\:getFileponds\(\) should return array\<Unusualify\\Modularous\\Entities\\Filepond\> but returns Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\>\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Entities/Assignment.php
+
+		-
+			message: '#^PHPDoc type array\<int, string\> of property Unusualify\\Modularous\\Entities\\Assignment\:\:\$fillable is not covariant with PHPDoc type list\<string\> of overridden property Illuminate\\Database\\Eloquent\\Model\:\:\$fillable\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: src/Entities/Assignment.php
+
+		-
+			message: '#^PHPDoc type array\<int, string\> of property Unusualify\\Modularous\\Entities\\Authorization\:\:\$fillable is not covariant with PHPDoc type list\<string\> of overridden property Illuminate\\Database\\Eloquent\\Model\:\:\$fillable\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: src/Entities/Authorization.php
+
+		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
 			identifier: property.notFound
 			count: 2
@@ -6201,6 +6657,18 @@ parameters:
 		-
 			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:mediableFormat\(\)\.$#'
 			identifier: method.notFound
+			count: 1
+			path: src/Entities/Chat.php
+
+		-
+			message: '#^PHPDoc type array of property Unusualify\\Modularous\\Entities\\Chat\:\:\$appends is not covariant with PHPDoc type list\<string\> of overridden property Illuminate\\Database\\Eloquent\\Model\:\:\$appends\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: src/Entities/Chat.php
+
+		-
+			message: '#^PHPDoc type array\<int, string\> of property Unusualify\\Modularous\\Entities\\Chat\:\:\$fillable is not covariant with PHPDoc type list\<string\> of overridden property Illuminate\\Database\\Eloquent\\Model\:\:\$fillable\.$#'
+			identifier: property.phpDocType
 			count: 1
 			path: src/Entities/Chat.php
 
@@ -6286,6 +6754,30 @@ parameters:
 			message: '#^Class App\\Models\\User not found\.$#'
 			identifier: class.notFound
 			count: 2
+			path: src/Entities/ChatMessage.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Entities\\ChatMessage\:\:getFileponds\(\) should return array\<Unusualify\\Modularous\\Entities\\Filepond\> but returns Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\>\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Entities/ChatMessage.php
+
+		-
+			message: '#^PHPDoc type array of property Unusualify\\Modularous\\Entities\\ChatMessage\:\:\$appends is not covariant with PHPDoc type list\<string\> of overridden property Illuminate\\Database\\Eloquent\\Model\:\:\$appends\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: src/Entities/ChatMessage.php
+
+		-
+			message: '#^PHPDoc type array of property Unusualify\\Modularous\\Entities\\ChatMessage\:\:\$casts is not covariant with PHPDoc type array\<string, string\> of overridden property Illuminate\\Database\\Eloquent\\Model\:\:\$casts\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: src/Entities/ChatMessage.php
+
+		-
+			message: '#^PHPDoc type array\<int, string\> of property Unusualify\\Modularous\\Entities\\ChatMessage\:\:\$fillable is not covariant with PHPDoc type list\<string\> of overridden property Illuminate\\Database\\Eloquent\\Model\:\:\$fillable\.$#'
+			identifier: property.phpDocType
+			count: 1
 			path: src/Entities/ChatMessage.php
 
 		-
@@ -6757,6 +7249,12 @@ parameters:
 			path: src/Entities/Model.php
 
 		-
+			message: '#^PHPDoc type array\<int, string\> of property Unusualify\\Modularous\\Entities\\ModuleRouteStatus\:\:\$fillable is not covariant with PHPDoc type list\<string\> of overridden property Illuminate\\Database\\Eloquent\\Model\:\:\$fillable\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: src/Entities/ModuleRouteStatus.php
+
+		-
 			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Process\:\:\$status\.$#'
 			identifier: property.notFound
 			count: 9
@@ -6766,6 +7264,12 @@ parameters:
 			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\:\:status\(\)\.$#'
 			identifier: method.notFound
 			count: 5
+			path: src/Entities/Process.php
+
+		-
+			message: '#^PHPDoc type array\<int, string\> of property Unusualify\\Modularous\\Entities\\Process\:\:\$fillable is not covariant with PHPDoc type list\<string\> of overridden property Illuminate\\Database\\Eloquent\\Model\:\:\$fillable\.$#'
+			identifier: property.phpDocType
+			count: 1
 			path: src/Entities/Process.php
 
 		-
@@ -6783,6 +7287,12 @@ parameters:
 		-
 			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\RemoteApiSource\:\:\$remote_synced_at\.$#'
 			identifier: property.notFound
+			count: 1
+			path: src/Entities/RemoteApiSource.php
+
+		-
+			message: '#^PHPDoc type array\<int, string\> of property Unusualify\\Modularous\\Entities\\RemoteApiSource\:\:\$fillable is not covariant with PHPDoc type list\<string\> of overridden property Illuminate\\Database\\Eloquent\\Model\:\:\$fillable\.$#'
+			identifier: property.phpDocType
 			count: 1
 			path: src/Entities/RemoteApiSource.php
 
@@ -6871,6 +7381,12 @@ parameters:
 			path: src/Entities/Setting.php
 
 		-
+			message: '#^PHPDoc type array\<int, string\> of property Unusualify\\Modularous\\Entities\\Spread\:\:\$fillable is not covariant with PHPDoc type list\<string\> of overridden property Illuminate\\Database\\Eloquent\\Model\:\:\$fillable\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: src/Entities/Spread.php
+
+		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$locale\.$#'
 			identifier: property.notFound
 			count: 2
@@ -6911,6 +7427,24 @@ parameters:
 			identifier: return.missing
 			count: 1
 			path: src/Entities/State.php
+
+		-
+			message: '#^PHPDoc type array\<int, string\> of property Unusualify\\Modularous\\Entities\\State\:\:\$fillable is not covariant with PHPDoc type list\<string\> of overridden property Illuminate\\Database\\Eloquent\\Model\:\:\$fillable\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: src/Entities/State.php
+
+		-
+			message: '#^PHPDoc type array\<int, string\> of property Unusualify\\Modularous\\Entities\\Stateable\:\:\$fillable is not covariant with PHPDoc type list\<string\> of overridden property Illuminate\\Database\\Eloquent\\Model\:\:\$fillable\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: src/Entities/Stateable.php
+
+		-
+			message: '#^PHPDoc type array\<int, string\> of property Unusualify\\Modularous\\Entities\\Tag\:\:\$fillable is not covariant with PHPDoc type list\<string\> of overridden property Cartalyst\\Tags\\IlluminateTag\:\:\$fillable\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: src/Entities/Tag.php
 
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$companyType\.$#'
@@ -7093,6 +7627,24 @@ parameters:
 			path: src/Entities/User.php
 
 		-
+			message: '#^Method Unusualify\\Modularous\\Entities\\User\:\:getFileponds\(\) should return array\<Unusualify\\Modularous\\Entities\\Filepond\> but returns Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\>\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Entities/User.php
+
+		-
+			message: '#^PHPDoc type array\<int, string\> of property Unusualify\\Modularous\\Entities\\User\:\:\$fillable is not covariant with PHPDoc type list\<string\> of overridden property Illuminate\\Database\\Eloquent\\Model\:\:\$fillable\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: src/Entities/User.php
+
+		-
+			message: '#^PHPDoc type array\<int, string\> of property Unusualify\\Modularous\\Entities\\User\:\:\$hidden is not covariant with PHPDoc type list\<string\> of overridden property Illuminate\\Database\\Eloquent\\Model\:\:\$hidden\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: src/Entities/User.php
+
+		-
 			message: '#^Unsafe usage of new static\(\)\.$#'
 			identifier: new.static
 			count: 2
@@ -7129,6 +7681,12 @@ parameters:
 			path: src/Events/ModelEvent.php
 
 		-
+			message: '#^Property Unusualify\\Modularous\\Events\\ModelEvent\:\:\$stateableChanged \(string\|null\) does not accept default value of type false\.$#'
+			identifier: property.defaultValue
+			count: 1
+			path: src/Events/ModelEvent.php
+
+		-
 			message: '#^PHPDoc tag @param for parameter \$module with type Nwidart\\Modules\\FileRepository is incompatible with native type Unusualify\\Modularous\\Module\|null\.$#'
 			identifier: parameter.phpDocType
 			count: 1
@@ -7147,6 +7705,30 @@ parameters:
 			path: src/Generators/Generator.php
 
 		-
+			message: '#^Property Unusualify\\Modularous\\Generators\\Generator\:\:\$app \(Illuminate\\Config\\Repository\) does not accept Illuminate\\Container\\Container\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Generators/Generator.php
+
+		-
+			message: '#^Property Unusualify\\Modularous\\Generators\\Generator\:\:\$module \(Unusualify\\Modularous\\Module\) does not accept Nwidart\\Modules\\Module\|null\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Generators/Generator.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Generators\\LaravelTestGenerator\:\:getTypes\(\) should return array but returns string\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Generators/LaravelTestGenerator.php
+
+		-
+			message: '#^Offset string does not exist on string\.$#'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: src/Generators/LaravelTestGenerator.php
+
+		-
 			message: '#^PHPDoc tag @param for parameter \$module with type Nwidart\\Modules\\FileRepository is incompatible with native type Unusualify\\Modularous\\Module\|null\.$#'
 			identifier: parameter.phpDocType
 			count: 1
@@ -7155,6 +7737,12 @@ parameters:
 		-
 			message: '#^PHPDoc tag @param references unknown parameter\: \$fix$#'
 			identifier: parameter.notFound
+			count: 1
+			path: src/Generators/LaravelTestGenerator.php
+
+		-
+			message: '#^Property Unusualify\\Modularous\\Generators\\LaravelTestGenerator\:\:\$types \(string\) does not accept default value of type array\<string, array\<string, string\>\>\.$#'
+			identifier: property.defaultValue
 			count: 1
 			path: src/Generators/LaravelTestGenerator.php
 
@@ -7179,6 +7767,12 @@ parameters:
 		-
 			message: '#^Call to an undefined method Unusualify\\Modularous\\Module\:\:getModulePath\(\)\.$#'
 			identifier: method.notFound
+			count: 1
+			path: src/Generators/RouteGenerator.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Generators\\RouteGenerator\:\:hasSoftDelete\(\) should return array but returns bool\.$#'
+			identifier: return.type
 			count: 1
 			path: src/Generators/RouteGenerator.php
 
@@ -7219,10 +7813,76 @@ parameters:
 			path: src/Generators/RouteGenerator.php
 
 		-
+			message: '#^Property Unusualify\\Modularous\\Generators\\RouteGenerator\:\:\$api \(string\) does not accept default value of type true\.$#'
+			identifier: property.defaultValue
+			count: 1
+			path: src/Generators/RouteGenerator.php
+
+		-
+			message: '#^Property Unusualify\\Modularous\\Generators\\RouteGenerator\:\:\$app \(Illuminate\\Config\\Repository\) does not accept Illuminate\\Container\\Container\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Generators/RouteGenerator.php
+
+		-
+			message: '#^Property Unusualify\\Modularous\\Generators\\RouteGenerator\:\:\$customModel \(bool\) does not accept class\-string\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Generators/RouteGenerator.php
+
+		-
+			message: '#^Property Unusualify\\Modularous\\Generators\\RouteGenerator\:\:\$module \(Unusualify\\Modularous\\Module\) does not accept Nwidart\\Modules\\Module\|null\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Generators/RouteGenerator.php
+
+		-
+			message: '#^Property Unusualify\\Modularous\\Generators\\RouteGenerator\:\:\$rules \(string\) does not accept bool\|int\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Generators/RouteGenerator.php
+
+		-
 			message: '#^PHPDoc tag @param for parameter \$module with type Nwidart\\Modules\\FileRepository is incompatible with native type Unusualify\\Modularous\\Module\|null\.$#'
 			identifier: parameter.phpDocType
 			count: 1
 			path: src/Generators/StubsGenerator.php
+
+		-
+			message: '#^Cannot access offset ''file_convention'' on bool\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: src/Generators/VueTestGenerator.php
+
+		-
+			message: '#^Cannot access offset ''import_dir'' on bool\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: src/Generators/VueTestGenerator.php
+
+		-
+			message: '#^Cannot access offset ''stub'' on bool\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 1
+			path: src/Generators/VueTestGenerator.php
+
+		-
+			message: '#^Cannot access offset ''target_dir'' on bool\|int\.$#'
+			identifier: offsetAccess.nonOffsetAccessible
+			count: 2
+			path: src/Generators/VueTestGenerator.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Generators\\VueTestGenerator\:\:getTypes\(\) should return array but returns string\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Generators/VueTestGenerator.php
+
+		-
+			message: '#^Offset string does not exist on string\.$#'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: src/Generators/VueTestGenerator.php
 
 		-
 			message: '#^PHPDoc tag @param for parameter \$module with type Nwidart\\Modules\\FileRepository is incompatible with native type Unusualify\\Modularous\\Module\|null\.$#'
@@ -7237,8 +7897,26 @@ parameters:
 			path: src/Generators/VueTestGenerator.php
 
 		-
+			message: '#^Property Unusualify\\Modularous\\Generators\\VueTestGenerator\:\:\$types \(string\) does not accept default value of type array\<string, array\<string, string\>\>\.$#'
+			identifier: property.defaultValue
+			count: 1
+			path: src/Generators/VueTestGenerator.php
+
+		-
 			message: '#^Function array_export\(\) should return bool but return statement is missing\.$#'
 			identifier: return.missing
+			count: 1
+			path: src/Helpers/array.php
+
+		-
+			message: '#^Function array_export\(\) should return bool but returns string\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Helpers/array.php
+
+		-
+			message: '#^Function array_export\(\) should return bool but returns string\|null\.$#'
+			identifier: return.type
 			count: 1
 			path: src/Helpers/array.php
 
@@ -7453,6 +8131,18 @@ parameters:
 			path: src/Http/Controllers/API/LanguageController.php
 
 		-
+			message: '#^Method Unusualify\\Modularous\\Http\\Controllers\\API\\LanguageController\:\:index\(\) should return Illuminate\\Contracts\\Support\\Renderable but returns Illuminate\\Http\\JsonResponse\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Http/Controllers/API/LanguageController.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Http\\Controllers\\API\\LanguageController\:\:index\(\) should return Illuminate\\Contracts\\Support\\Renderable but returns Illuminate\\Http\\Response\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Http/Controllers/API/LanguageController.php
+
+		-
 			message: '#^Method Unusualify\\Modularous\\Http\\Controllers\\API\\LanguageController\:\:show\(\) should return Illuminate\\Http\\Response but return statement is missing\.$#'
 			identifier: return.missing
 			count: 1
@@ -7569,6 +8259,42 @@ parameters:
 		-
 			message: '#^Cannot call method previousPageUrl\(\) on class\-string\|object\.$#'
 			identifier: method.nonObject
+			count: 1
+			path: src/Http/Controllers/ApiController.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Http\\Controllers\\ApiController\:\:getBlockingMaximumAttempts\(\) should return int but returns array\|string\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Http/Controllers/ApiController.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Http\\Controllers\\ApiController\:\:getBlockingTimeThreshold\(\) should return int but returns array\|string\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Http/Controllers/ApiController.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Http\\Controllers\\ApiController\:\:getRateLimit\(\) should return int but returns array\|string\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Http/Controllers/ApiController.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Http\\Controllers\\ApiController\:\:getRateLimitBlockingTime\(\) should return int but returns array\|string\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Http/Controllers/ApiController.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Http\\Controllers\\ApiController\:\:getRateLimitPerHour\(\) should return int but returns array\|string\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Http/Controllers/ApiController.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Http\\Controllers\\ApiController\:\:isRateLimitingEnabled\(\) should return bool but returns array\|string\.$#'
+			identifier: return.type
 			count: 1
 			path: src/Http/Controllers/ApiController.php
 
@@ -8005,21 +8731,15 @@ parameters:
 			path: src/Http/Controllers/Auth/Controller.php
 
 		-
-			message: '#^Result of method Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:getTableAttributes\(\) \(void\) is used\.$#'
-			identifier: method.void
+			message: '#^Parameter &\$data by\-ref type of method Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:hydrateInputExtension\(\) expects array, array\<string, mixed\>\|null given\.$#'
+			identifier: parameterByRef.type
 			count: 1
 			path: src/Http/Controllers/Auth/Controller.php
 
 		-
-			message: '#^Result of method Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:getVuetifyDatatableOptions\(\) \(void\) is used\.$#'
-			identifier: method.void
-			count: 1
-			path: src/Http/Controllers/Auth/Controller.php
-
-		-
-			message: '#^Result of method Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:hydrateTableAttributes\(\) \(void\) is used\.$#'
-			identifier: method.void
-			count: 1
+			message: '#^Parameter &\$input by\-ref type of method Unusualify\\Modularous\\Http\\Controllers\\Auth\\Controller\:\:hydrateInputConnector\(\) expects array, array\|object\|null given\.$#'
+			identifier: parameterByRef.type
+			count: 2
 			path: src/Http/Controllers/Auth/Controller.php
 
 		-
@@ -8071,6 +8791,12 @@ parameters:
 			path: src/Http/Controllers/Auth/LoginController.php
 
 		-
+			message: '#^Method Unusualify\\Modularous\\Http\\Controllers\\Auth\\LoginController\:\:showLogin2FaForm\(\) should return Illuminate\\View\\View but returns Illuminate\\Contracts\\View\\View\.$#'
+			identifier: return.type
+			count: 2
+			path: src/Http/Controllers/Auth/LoginController.php
+
+		-
 			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
 			identifier: larastan.noEnvCallsOutsideOfConfig
 			count: 1
@@ -8107,6 +8833,12 @@ parameters:
 			path: src/Http/Controllers/Auth/RegisterController.php
 
 		-
+			message: '#^Method Unusualify\\Modularous\\Http\\Controllers\\Auth\\RegisterController\:\:register\(\) should return App\\Models\\User but returns Illuminate\\Http\\JsonResponse\|Illuminate\\Http\\RedirectResponse\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Http/Controllers/Auth/RegisterController.php
+
+		-
 			message: '#^PHPDoc tag @param references unknown parameter\: \$data$#'
 			identifier: parameter.notFound
 			count: 1
@@ -8121,6 +8853,12 @@ parameters:
 		-
 			message: '#^Call to an undefined method Illuminate\\Contracts\\Auth\\PasswordBroker\:\:getRepository\(\)\.$#'
 			identifier: method.notFound
+			count: 1
+			path: src/Http/Controllers/Auth/ResetPasswordController.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Http\\Controllers\\Auth\\ResetPasswordController\:\:showWelcomeForm\(\) should return Illuminate\\Http\\RedirectResponse\|Illuminate\\View\\View but returns Illuminate\\Contracts\\View\\View\.$#'
+			identifier: return.type
 			count: 1
 			path: src/Http/Controllers/Auth/ResetPasswordController.php
 
@@ -8181,6 +8919,12 @@ parameters:
 		-
 			message: '#^Access to an undefined property Unusualify\\Modularous\\Http\\Controllers\\BaseController\:\:\$indexColumns\.$#'
 			identifier: property.notFound
+			count: 1
+			path: src/Http/Controllers/BaseController.php
+
+		-
+			message: '#^Argument of an invalid type Illuminate\\Routing\\RouteCollectionInterface supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
 			count: 1
 			path: src/Http/Controllers/BaseController.php
 
@@ -8425,6 +9169,36 @@ parameters:
 			path: src/Http/Controllers/BaseController.php
 
 		-
+			message: '#^Method Unusualify\\Modularous\\Http\\Controllers\\BaseController\:\:renderBladeForm\(\) should return Illuminate\\View\\View but returns Illuminate\\Contracts\\View\\View\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Http/Controllers/BaseController.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Http\\Controllers\\BaseController\:\:renderBladeIndex\(\) should return Illuminate\\View\\View but returns Illuminate\\Contracts\\View\\View\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Http/Controllers/BaseController.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Http\\Controllers\\BaseController\:\:show\(\) should return Illuminate\\Http\\RedirectResponse but returns Illuminate\\Contracts\\View\\View\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Http/Controllers/BaseController.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Http\\Controllers\\BaseController\:\:show\(\) should return Illuminate\\Http\\RedirectResponse but returns Illuminate\\Http\\JsonResponse\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Http/Controllers/BaseController.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Http\\Controllers\\BaseController\:\:update\(\) should return Illuminate\\Http\\JsonResponse but returns Illuminate\\Http\\RedirectResponse\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Http/Controllers/BaseController.php
+
+		-
 			message: '#^Method Unusualify\\Modularous\\Repositories\\Repository\:\:getPermissionName\(\) invoked with 2 parameters, 1 required\.$#'
 			identifier: arguments.count
 			count: 2
@@ -8521,21 +9295,15 @@ parameters:
 			path: src/Http/Controllers/BaseController.php
 
 		-
-			message: '#^Result of method Unusualify\\Modularous\\Http\\Controllers\\BaseController\:\:getTableAttributes\(\) \(void\) is used\.$#'
-			identifier: method.void
+			message: '#^Parameter &\$data by\-ref type of method Unusualify\\Modularous\\Http\\Controllers\\BaseController\:\:hydrateInputExtension\(\) expects array, array\<string, mixed\>\|null given\.$#'
+			identifier: parameterByRef.type
 			count: 1
 			path: src/Http/Controllers/BaseController.php
 
 		-
-			message: '#^Result of method Unusualify\\Modularous\\Http\\Controllers\\BaseController\:\:getVuetifyDatatableOptions\(\) \(void\) is used\.$#'
-			identifier: method.void
-			count: 1
-			path: src/Http/Controllers/BaseController.php
-
-		-
-			message: '#^Result of method Unusualify\\Modularous\\Http\\Controllers\\BaseController\:\:hydrateTableAttributes\(\) \(void\) is used\.$#'
-			identifier: method.void
-			count: 1
+			message: '#^Parameter &\$input by\-ref type of method Unusualify\\Modularous\\Http\\Controllers\\BaseController\:\:hydrateInputConnector\(\) expects array, array\|object\|null given\.$#'
+			identifier: parameterByRef.type
+			count: 2
 			path: src/Http/Controllers/BaseController.php
 
 		-
@@ -8587,15 +9355,33 @@ parameters:
 			path: src/Http/Controllers/CoreController.php
 
 		-
-			message: '#^PHPDoc tag @return contains unresolvable type\.$#'
-			identifier: return.unresolvableType
+			message: '#^Method Unusualify\\Modularous\\Http\\Controllers\\CoreController\:\:getTransformerClass\(\) should return Unusualify\\Modularous\\Http\\Controllers\\Transformers but returns class\-string\.$#'
+			identifier: return.type
 			count: 1
 			path: src/Http/Controllers/CoreController.php
 
 		-
-			message: '#^Result of method Unusualify\\Modularous\\Http\\Controllers\\CoreController\:\:getRepositoryClass\(\) \(void\) is used\.$#'
-			identifier: method.void
-			count: 2
+			message: '#^Method Unusualify\\Modularous\\Http\\Controllers\\CoreController\:\:getTransformerClass\(\) should return Unusualify\\Modularous\\Http\\Controllers\\Transformers but returns null\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Http/Controllers/CoreController.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Http\\Controllers\\CoreController\:\:tags\(\) should return Illuminate\\Support\\Facades\\Response but returns Illuminate\\Http\\JsonResponse\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Http/Controllers/CoreController.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Http\\Controllers\\CoreController\:\:tagsUpdate\(\) should return Illuminate\\Support\\Facades\\Response but returns Illuminate\\Http\\JsonResponse\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Http/Controllers/CoreController.php
+
+		-
+			message: '#^PHPDoc tag @return contains unresolvable type\.$#'
+			identifier: return.unresolvableType
+			count: 1
 			path: src/Http/Controllers/CoreController.php
 
 		-
@@ -8839,21 +9625,15 @@ parameters:
 			path: src/Http/Controllers/DashboardController.php
 
 		-
-			message: '#^Result of method Unusualify\\Modularous\\Http\\Controllers\\DashboardController\:\:getTableAttributes\(\) \(void\) is used\.$#'
-			identifier: method.void
+			message: '#^Parameter &\$data by\-ref type of method Unusualify\\Modularous\\Http\\Controllers\\DashboardController\:\:hydrateInputExtension\(\) expects array, array\<string, mixed\>\|null given\.$#'
+			identifier: parameterByRef.type
 			count: 1
 			path: src/Http/Controllers/DashboardController.php
 
 		-
-			message: '#^Result of method Unusualify\\Modularous\\Http\\Controllers\\DashboardController\:\:getVuetifyDatatableOptions\(\) \(void\) is used\.$#'
-			identifier: method.void
-			count: 1
-			path: src/Http/Controllers/DashboardController.php
-
-		-
-			message: '#^Result of method Unusualify\\Modularous\\Http\\Controllers\\DashboardController\:\:hydrateTableAttributes\(\) \(void\) is used\.$#'
-			identifier: method.void
-			count: 1
+			message: '#^Parameter &\$input by\-ref type of method Unusualify\\Modularous\\Http\\Controllers\\DashboardController\:\:hydrateInputConnector\(\) expects array, array\|object\|null given\.$#'
+			identifier: parameterByRef.type
+			count: 2
 			path: src/Http/Controllers/DashboardController.php
 
 		-
@@ -8923,9 +9703,33 @@ parameters:
 			path: src/Http/Controllers/PanelController.php
 
 		-
+			message: '#^Method Unusualify\\Modularous\\Http\\Controllers\\PanelController\:\:getFormattedIndexItems\(\) should return array but returns Illuminate\\Pagination\\AbstractPaginator\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Http/Controllers/PanelController.php
+
+		-
 			message: '#^Method Unusualify\\Modularous\\Http\\Controllers\\PanelController\:\:getRepeaterList__\(\) has invalid return type Unusualify\\Modularous\\Http\\Controllers\\Block\.$#'
 			identifier: class.notFound
 			count: 1
+			path: src/Http/Controllers/PanelController.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Http\\Controllers\\PanelController\:\:nestedParentScopes\(\) should return string but returns array\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Http/Controllers/PanelController.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Http\\Controllers\\PanelController\:\:nestedParentScopes\(\) should return string but returns array\<string, class\-string\<Unusualify\\Modularous\\Entities\\Model\>\|int\>\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Http/Controllers/PanelController.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Http\\Controllers\\PanelController\:\:nestedParentScopes\(\) should return string but returns array\<string, int\>\.$#'
+			identifier: return.type
+			count: 2
 			path: src/Http/Controllers/PanelController.php
 
 		-
@@ -8953,8 +9757,14 @@ parameters:
 			path: src/Http/Controllers/PanelController.php
 
 		-
-			message: '#^Result of method Unusualify\\Modularous\\Http\\Controllers\\PanelController\:\:getFormRequestClass\(\) \(void\) is used\.$#'
-			identifier: method.void
+			message: '#^Property Unusualify\\Modularous\\Http\\Controllers\\PanelController\:\:\$isParent \(string\) does not accept bool\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Http/Controllers/PanelController.php
+
+		-
+			message: '#^Property Unusualify\\Modularous\\Http\\Controllers\\PanelController\:\:\$user \(Unusualify\\Modularous\\Entities\\Model\) does not accept Unusualify\\Modularous\\Entities\\User\|null\.$#'
+			identifier: assign.propertyType
 			count: 1
 			path: src/Http/Controllers/PanelController.php
 
@@ -9385,21 +10195,15 @@ parameters:
 			path: src/Http/Controllers/PasswordController.php
 
 		-
-			message: '#^Result of method Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:getTableAttributes\(\) \(void\) is used\.$#'
-			identifier: method.void
+			message: '#^Parameter &\$data by\-ref type of method Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:hydrateInputExtension\(\) expects array, array\<string, mixed\>\|null given\.$#'
+			identifier: parameterByRef.type
 			count: 1
 			path: src/Http/Controllers/PasswordController.php
 
 		-
-			message: '#^Result of method Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:getVuetifyDatatableOptions\(\) \(void\) is used\.$#'
-			identifier: method.void
-			count: 1
-			path: src/Http/Controllers/PasswordController.php
-
-		-
-			message: '#^Result of method Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:hydrateTableAttributes\(\) \(void\) is used\.$#'
-			identifier: method.void
-			count: 1
+			message: '#^Parameter &\$input by\-ref type of method Unusualify\\Modularous\\Http\\Controllers\\PasswordController\:\:hydrateInputConnector\(\) expects array, array\|object\|null given\.$#'
+			identifier: parameterByRef.type
+			count: 2
 			path: src/Http/Controllers/PasswordController.php
 
 		-
@@ -9601,6 +10405,12 @@ parameters:
 			path: src/Http/Controllers/ProfileController.php
 
 		-
+			message: '#^Method Unusualify\\Modularous\\Http\\Controllers\\ProfileController\:\:edit\(\) should return Illuminate\\Http\\JsonResponse\|Illuminate\\Http\\RedirectResponse\|Illuminate\\View\\View but returns Illuminate\\Contracts\\View\\View\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Http/Controllers/ProfileController.php
+
+		-
 			message: '#^Method Unusualify\\Modularous\\Http\\Controllers\\ProfileController\:\:getCustomRowAppendData\(\) invoked with 1 parameter, 0 required\.$#'
 			identifier: arguments.count
 			count: 1
@@ -9691,21 +10501,15 @@ parameters:
 			path: src/Http/Controllers/ProfileController.php
 
 		-
-			message: '#^Result of method Unusualify\\Modularous\\Http\\Controllers\\ProfileController\:\:getTableAttributes\(\) \(void\) is used\.$#'
-			identifier: method.void
+			message: '#^Parameter &\$data by\-ref type of method Unusualify\\Modularous\\Http\\Controllers\\ProfileController\:\:hydrateInputExtension\(\) expects array, array\<string, mixed\>\|null given\.$#'
+			identifier: parameterByRef.type
 			count: 1
 			path: src/Http/Controllers/ProfileController.php
 
 		-
-			message: '#^Result of method Unusualify\\Modularous\\Http\\Controllers\\ProfileController\:\:getVuetifyDatatableOptions\(\) \(void\) is used\.$#'
-			identifier: method.void
-			count: 1
-			path: src/Http/Controllers/ProfileController.php
-
-		-
-			message: '#^Result of method Unusualify\\Modularous\\Http\\Controllers\\ProfileController\:\:hydrateTableAttributes\(\) \(void\) is used\.$#'
-			identifier: method.void
-			count: 1
+			message: '#^Parameter &\$input by\-ref type of method Unusualify\\Modularous\\Http\\Controllers\\ProfileController\:\:hydrateInputConnector\(\) expects array, array\|object\|null given\.$#'
+			identifier: parameterByRef.type
+			count: 2
 			path: src/Http/Controllers/ProfileController.php
 
 		-
@@ -9799,6 +10603,18 @@ parameters:
 			path: src/Http/Controllers/Utility/FileLibraryController.php
 
 		-
+			message: '#^Method Unusualify\\Modularous\\Http\\Controllers\\Utility\\FileLibraryController\:\:storeFile\(\) should return Unusualify\\Modularous\\Entities\\File but returns Unusualify\\Modularous\\Entities\\Model\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Http/Controllers/Utility/FileLibraryController.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Http\\Controllers\\Utility\\FileLibraryController\:\:storeReference\(\) should return Unusualify\\Modularous\\Entities\\File but returns Unusualify\\Modularous\\Entities\\Model\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Http/Controllers/Utility/FileLibraryController.php
+
+		-
 			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Model\:\:\$id\.$#'
 			identifier: property.notFound
 			count: 2
@@ -9849,6 +10665,12 @@ parameters:
 		-
 			message: '#^Method Unusualify\\Modularous\\Http\\Controllers\\Utility\\MediaLibraryController\:\:storeFile\(\) has invalid return type Unusualify\\Modularous\\Models\\Media\.$#'
 			identifier: class.notFound
+			count: 1
+			path: src/Http/Controllers/Utility/MediaLibraryController.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Http\\Controllers\\Utility\\MediaLibraryController\:\:storeFile\(\) should return Unusualify\\Modularous\\Models\\Media but returns Unusualify\\Modularous\\Entities\\Model\.$#'
+			identifier: return.type
 			count: 1
 			path: src/Http/Controllers/Utility/MediaLibraryController.php
 
@@ -10087,6 +10909,24 @@ parameters:
 			path: src/Http/Controllers/VerificationController.php
 
 		-
+			message: '#^Parameter &\$data by\-ref type of method Unusualify\\Modularous\\Http\\Controllers\\VerificationController\:\:hydrateInputExtension\(\) expects array, array\<string, mixed\>\|null given\.$#'
+			identifier: parameterByRef.type
+			count: 1
+			path: src/Http/Controllers/VerificationController.php
+
+		-
+			message: '#^Parameter &\$input by\-ref type of method Unusualify\\Modularous\\Http\\Controllers\\VerificationController\:\:hydrateInputConnector\(\) expects array, array\|object\|null given\.$#'
+			identifier: parameterByRef.type
+			count: 2
+			path: src/Http/Controllers/VerificationController.php
+
+		-
+			message: '#^Parameter \#3 \$guards \(array\<string\>\) of method Unusualify\\Modularous\\Http\\Middleware\\AuthenticateMiddleware\:\:handle\(\) should be compatible with parameter \$guards \(string\) of method Illuminate\\Auth\\Middleware\\Authenticate\:\:handle\(\)$#'
+			identifier: method.childParameterType
+			count: 1
+			path: src/Http/Middleware/AuthenticateMiddleware.php
+
+		-
 			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
 			identifier: larastan.noEnvCallsOutsideOfConfig
 			count: 5
@@ -10103,6 +10943,18 @@ parameters:
 			identifier: larastan.noEnvCallsOutsideOfConfig
 			count: 1
 			path: src/Http/Middleware/LanguageMiddleware.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Http\\Requests\\MediaRequest\:\:authorize\(\) should return array but returns true\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Http/Requests/MediaRequest.php
+
+		-
+			message: '#^Return type \(array\) of method Unusualify\\Modularous\\Http\\Requests\\MediaRequest\:\:authorize\(\) should be compatible with return type \(bool\) of method Unusualify\\Modularous\\Http\\Requests\\BaseFormRequest\:\:authorize\(\)$#'
+			identifier: method.childReturnType
+			count: 1
+			path: src/Http/Requests/MediaRequest.php
 
 		-
 			message: '#^Undefined variable\: \$provider$#'
@@ -10165,10 +11017,148 @@ parameters:
 			path: src/Http/ViewComposers/MediasUploaderConfig.php
 
 		-
+			message: '#^Parameter &\$data by\-ref type of method Unusualify\\Modularous\\Hydrates\\FormEventCompiler\:\:apply\(\) expects array\<string, mixed\>\|null, array given\.$#'
+			identifier: parameterByRef.type
+			count: 1
+			path: src/Hydrates/FormEventCompiler.php
+
+		-
+			message: '#^Parameter &\$extraInputs by\-ref type of method Unusualify\\Modularous\\Hydrates\\FormEventCompiler\:\:compilePermalink\(\) expects array\<string, mixed\>, array given\.$#'
+			identifier: parameterByRef.type
+			count: 1
+			path: src/Hydrates/FormEventCompiler.php
+
+		-
+			message: '#^Parameter &\$input by\-ref type of method Unusualify\\Modularous\\Hydrates\\FormEventCompiler\:\:apply\(\) expects array\<string, mixed\>, array given\.$#'
+			identifier: parameterByRef.type
+			count: 1
+			path: src/Hydrates/FormEventCompiler.php
+
+		-
+			message: '#^Parameter &\$input by\-ref type of method Unusualify\\Modularous\\Hydrates\\FormEventCompiler\:\:compilePattern\(\) expects array\<string, mixed\>, array given\.$#'
+			identifier: parameterByRef.type
+			count: 1
+			path: src/Hydrates/FormEventCompiler.php
+
+		-
 			message: '#^Call to an undefined static method Illuminate\\Support\\Facades\\Request\:\:inertia\(\)\.$#'
 			identifier: staticMethod.notFound
 			count: 1
 			path: src/Hydrates/InputHydrator.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Hydrates\\Inputs\\AssignmentHydrate\:\:hydrate\(\) with return type void returns array but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: src/Hydrates/Inputs/AssignmentHydrate.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Hydrates\\Inputs\\AuthorizeHydrate\:\:hydrate\(\) with return type void returns array but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: src/Hydrates/Inputs/AuthorizeHydrate.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Hydrates\\Inputs\\AutocompleteHydrate\:\:hydrate\(\) with return type void returns array but should not return anything\.$#'
+			identifier: return.void
+			count: 2
+			path: src/Hydrates/Inputs/AutocompleteHydrate.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Hydrates\\Inputs\\BrowserHydrate\:\:hydrate\(\) with return type void returns array but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: src/Hydrates/Inputs/BrowserHydrate.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Hydrates\\Inputs\\ChatHydrate\:\:hydrate\(\) with return type void returns array but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: src/Hydrates/Inputs/ChatHydrate.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Hydrates\\Inputs\\CheckboxHydrate\:\:hydrate\(\) with return type void returns array but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: src/Hydrates/Inputs/CheckboxHydrate.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Hydrates\\Inputs\\ChecklistGroupHydrate\:\:hydrate\(\) with return type void returns array but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: src/Hydrates/Inputs/ChecklistGroupHydrate.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Hydrates\\Inputs\\ChecklistHydrate\:\:hydrate\(\) with return type void returns array but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: src/Hydrates/Inputs/ChecklistHydrate.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Hydrates\\Inputs\\ComboboxHydrate\:\:hydrate\(\) with return type void returns array but should not return anything\.$#'
+			identifier: return.void
+			count: 2
+			path: src/Hydrates/Inputs/ComboboxHydrate.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Hydrates\\Inputs\\ComparisonTableHydrate\:\:hydrate\(\) with return type void returns array but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: src/Hydrates/Inputs/ComparisonTableHydrate.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Hydrates\\Inputs\\CreatorHydrate\:\:hydrate\(\) with return type void returns array\<mixed, mixed\> but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: src/Hydrates/Inputs/CreatorHydrate.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Hydrates\\Inputs\\DateHydrate\:\:hydrate\(\) with return type void returns array but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: src/Hydrates/Inputs/DateHydrate.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Hydrates\\Inputs\\FileHydrate\:\:hydrate\(\) with return type void returns array but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: src/Hydrates/Inputs/FileHydrate.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Hydrates\\Inputs\\FilepondAvatarHydrate\:\:hydrate\(\) with return type void returns array but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: src/Hydrates/Inputs/FilepondAvatarHydrate.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Hydrates\\Inputs\\FilepondHydrate\:\:hydrate\(\) with return type void returns array but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: src/Hydrates/Inputs/FilepondHydrate.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Hydrates\\Inputs\\FormTabsHydrate\:\:hydrate\(\) with return type void returns array but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: src/Hydrates/Inputs/FormTabsHydrate.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Hydrates\\Inputs\\ImageHydrate\:\:hydrate\(\) with return type void returns array but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: src/Hydrates/Inputs/ImageHydrate.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Hydrates\\Inputs\\InputHydrate\:\:__toString\(\) should return string but returns array\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Hydrates/Inputs/InputHydrate.php
+
+		-
+			message: '#^Property Unusualify\\Modularous\\Hydrates\\Inputs\\InputHydrate\:\:\$input \(array\) does not accept null\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Hydrates/Inputs/InputHydrate.php
 
 		-
 			message: '#^Result of method Unusualify\\Modularous\\Hydrates\\Inputs\\InputHydrate\:\:hydrate\(\) \(void\) is used\.$#'
@@ -10177,10 +11167,28 @@ parameters:
 			path: src/Hydrates/Inputs/InputHydrate.php
 
 		-
+			message: '#^Method Unusualify\\Modularous\\Hydrates\\Inputs\\JsonHydrate\:\:hydrate\(\) with return type void returns array but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: src/Hydrates/Inputs/JsonHydrate.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Hydrates\\Inputs\\ModuleRouteModelHydrate\:\:hydrate\(\) with return type void returns null but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: src/Hydrates/Inputs/ModuleRouteModelHydrate.php
+
+		-
 			message: '#^Result of method Unusualify\\Modularous\\Hydrates\\Inputs\\SelectHydrate\:\:hydrate\(\) \(void\) is used\.$#'
 			identifier: staticMethod.void
 			count: 1
 			path: src/Hydrates/Inputs/ModuleRouteModelHydrate.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Hydrates\\Inputs\\OtpInputHydrate\:\:hydrate\(\) with return type void returns array but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: src/Hydrates/Inputs/OtpInputHydrate.php
 
 		-
 			message: '#^Access to an undefined property Illuminate\\Contracts\\Auth\\Authenticatable\:\:\$company\.$#'
@@ -10207,10 +11215,70 @@ parameters:
 			path: src/Hydrates/Inputs/PaymentServiceHydrate.php
 
 		-
+			message: '#^Method Unusualify\\Modularous\\Hydrates\\Inputs\\PaymentServiceHydrate\:\:hydrate\(\) with return type void returns array but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: src/Hydrates/Inputs/PaymentServiceHydrate.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Hydrates\\Inputs\\PriceHydrate\:\:hydrate\(\) with return type void returns array but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: src/Hydrates/Inputs/PriceHydrate.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Hydrates\\Inputs\\ProcessHydrate\:\:hydrate\(\) with return type void returns array but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: src/Hydrates/Inputs/ProcessHydrate.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Hydrates\\Inputs\\RadioGroupHydrate\:\:hydrate\(\) with return type void returns array but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: src/Hydrates/Inputs/RadioGroupHydrate.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Hydrates\\Inputs\\RelationshipsHydrate\:\:hydrate\(\) with return type void returns array but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: src/Hydrates/Inputs/RelationshipsHydrate.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Hydrates\\Inputs\\RemoteApiHydrate\:\:hydrate\(\) with return type void returns array\<string, mixed\> but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: src/Hydrates/Inputs/RemoteApiHydrate.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Hydrates\\Inputs\\RepeaterHydrate\:\:hydrate\(\) with return type void returns array but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: src/Hydrates/Inputs/RepeaterHydrate.php
+
+		-
 			message: '#^Cannot call method usesRevisionWorkflow\(\) on Illuminate\\Database\\Eloquent\\Model\|string\.$#'
 			identifier: method.nonObject
 			count: 2
 			path: src/Hydrates/Inputs/RevisionHydrate.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Hydrates\\Inputs\\RevisionHydrate\:\:hydrate\(\) with return type void returns array but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: src/Hydrates/Inputs/RevisionHydrate.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Hydrates\\Inputs\\SelectHydrate\:\:hydrate\(\) with return type void returns array but should not return anything\.$#'
+			identifier: return.void
+			count: 2
+			path: src/Hydrates/Inputs/SelectHydrate.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Hydrates\\Inputs\\SelectScrollHydrate\:\:hydrate\(\) with return type void returns array but should not return anything\.$#'
+			identifier: return.void
+			count: 2
+			path: src/Hydrates/Inputs/SelectScrollHydrate.php
 
 		-
 			message: '#^Trait Modules\\Cms\\Repositories\\Traits\\CmrTrait referenced with incorrect case\: Modules\\Cms\\Repositories\\Traits\\CMRTrait\.$#'
@@ -10219,10 +11287,40 @@ parameters:
 			path: src/Hydrates/Inputs/SlugHydrate.php
 
 		-
+			message: '#^Method Unusualify\\Modularous\\Hydrates\\Inputs\\SpreadHydrate\:\:hydrate\(\) with return type void returns array but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: src/Hydrates/Inputs/SpreadHydrate.php
+
+		-
 			message: '#^Variable \$spreadableInputs in empty\(\) always exists and is not falsy\.$#'
 			identifier: empty.variable
 			count: 1
 			path: src/Hydrates/Inputs/SpreadHydrate.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Hydrates\\Inputs\\StateableHydrate\:\:hydrate\(\) with return type void returns array but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: src/Hydrates/Inputs/StateableHydrate.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Hydrates\\Inputs\\SwitchHydrate\:\:hydrate\(\) with return type void returns array but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: src/Hydrates/Inputs/SwitchHydrate.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Hydrates\\Inputs\\TagHydrate\:\:hydrate\(\) with return type void returns array but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: src/Hydrates/Inputs/TagHydrate.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Hydrates\\Inputs\\TaggerHydrate\:\:hydrate\(\) with return type void returns array but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: src/Hydrates/Inputs/TaggerHydrate.php
 
 		-
 			message: '#^Cannot call static method query\(\) on class\-string\<Illuminate\\Database\\Eloquent\\Model\>\|false\.$#'
@@ -10241,6 +11339,18 @@ parameters:
 			identifier: staticMethod.nonObject
 			count: 2
 			path: src/Jobs/Cache/WarmModuleRouteCachesJob.php
+
+		-
+			message: '#^Access to offset ''cache'' on an unknown class Laravel\\Lumen\\Application\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Modularous.php
+
+		-
+			message: '#^Access to offset ''config'' on an unknown class Laravel\\Lumen\\Application\.$#'
+			identifier: class.notFound
+			count: 4
+			path: src/Modularous.php
 
 		-
 			message: '#^Call to method flushCache\(\) on an unknown class Unusualify\\Modularous\\ActivatorInterface\.$#'
@@ -10279,6 +11389,12 @@ parameters:
 			path: src/Modularous.php
 
 		-
+			message: '#^Property Unusualify\\Modularous\\Modularous\:\:\$activator \(Unusualify\\Modularous\\ActivatorInterface\) does not accept Nwidart\\Modules\\Activators\\FileActivator\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Modularous.php
+
+		-
 			message: '#^Property Unusualify\\Modularous\\Modularous\:\:\$activator has unknown class Unusualify\\Modularous\\ActivatorInterface as its type\.$#'
 			identifier: class.notFound
 			count: 1
@@ -10289,6 +11405,18 @@ parameters:
 			identifier: staticClassAccess.privateProperty
 			count: 2
 			path: src/Modularous.php
+
+		-
+			message: '#^Access to offset ''config'' on an unknown class Laravel\\Lumen\\Application\.$#'
+			identifier: class.notFound
+			count: 10
+			path: src/Module.php
+
+		-
+			message: '#^Access to offset ''events'' on an unknown class Laravel\\Lumen\\Application\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Module.php
 
 		-
 			message: '#^Call to method disable\(\) on an unknown class Unusualify\\Modularous\\ModuleActivatorInterface\.$#'
@@ -10357,6 +11485,12 @@ parameters:
 			path: src/Module.php
 
 		-
+			message: '#^Method Unusualify\\Modularous\\Module\:\:getRepository\(\) should return string\|Unusualify\\Modularous\\Repositories\\Repository but returns false\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Module.php
+
+		-
 			message: '#^PHPDoc tag @param for parameter \$permission with type mixed is not subtype of native type string\.$#'
 			identifier: parameter.phpDocType
 			count: 3
@@ -10383,6 +11517,12 @@ parameters:
 		-
 			message: '#^PHPDoc tag @param references unknown parameter\: \$panel$#'
 			identifier: parameter.notFound
+			count: 1
+			path: src/Module.php
+
+		-
+			message: '#^Property Unusualify\\Modularous\\Module\:\:\$moduleActivator \(Unusualify\\Modularous\\ModuleActivatorInterface\) does not accept Unusualify\\Modularous\\Activators\\ModuleActivator\.$#'
+			identifier: assign.propertyType
 			count: 1
 			path: src/Module.php
 
@@ -10483,6 +11623,12 @@ parameters:
 			path: src/Repositories/FileRepository.php
 
 		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:allTags\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Repositories/FileRepository.php
+
+		-
 			message: '#^Method Unusualify\\Modularous\\Repositories\\FileRepository\:\:filterCreatorTrait\(\) should return Illuminate\\Database\\Eloquent\\Builder but return statement is missing\.$#'
 			identifier: return.missing
 			count: 1
@@ -10507,7 +11653,13 @@ parameters:
 			path: src/Repositories/MediaRepository.php
 
 		-
-			message: '#^Call to an undefined method Unusualify\\Modularous\\Entities\\Model\:\:altTextFrom\(\)\.$#'
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:allTags\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Repositories/MediaRepository.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:altTextFrom\(\)\.$#'
 			identifier: method.notFound
 			count: 1
 			path: src/Repositories/MediaRepository.php
@@ -10519,6 +11671,12 @@ parameters:
 			path: src/Repositories/MediaRepository.php
 
 		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Repositories/Repository.php
+
+		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$mustTouchable\.$#'
 			identifier: property.notFound
 			count: 1
@@ -10527,7 +11685,7 @@ parameters:
 		-
 			message: '#^Access to an undefined property Unusualify\\Modularous\\Entities\\Model\:\:\$id\.$#'
 			identifier: property.notFound
-			count: 3
+			count: 2
 			path: src/Repositories/Repository.php
 
 		-
@@ -10538,6 +11696,12 @@ parameters:
 
 		-
 			message: '#^Call to an undefined method Illuminate\\Database\\ConnectionInterface\:\:getConfig\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Repositories/Repository.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Query\\Builder\:\:withTrashed\(\)\.$#'
 			identifier: method.notFound
 			count: 1
 			path: src/Repositories/Repository.php
@@ -10558,6 +11722,42 @@ parameters:
 			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getSnapshotSourceForeignKey\(\)\.$#'
 			identifier: method.notFound
 			count: 1
+			path: src/Repositories/Repository.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:hasScope\(\)\.$#'
+			identifier: method.notFound
+			count: 6
+			path: src/Repositories/Repository.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:isTranslatable\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: src/Repositories/Repository.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:onlyTrashed\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: src/Repositories/Repository.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:setNewOrder\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Repositories/Repository.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:single\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Repositories/Repository.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:withTrashed\(\)\.$#'
+			identifier: method.notFound
+			count: 2
 			path: src/Repositories/Repository.php
 
 		-
@@ -10594,18 +11794,6 @@ parameters:
 			message: '#^Call to an undefined method Illuminate\\Database\\Query\\Builder\:\:whereHas\(\)\.$#'
 			identifier: method.notFound
 			count: 7
-			path: src/Repositories/Repository.php
-
-		-
-			message: '#^Call to an undefined method Unusualify\\Modularous\\Entities\\Model\:\:setNewOrder\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: src/Repositories/Repository.php
-
-		-
-			message: '#^Call to an undefined method Unusualify\\Modularous\\Entities\\Model\:\:single\(\)\.$#'
-			identifier: method.notFound
-			count: 1
 			path: src/Repositories/Repository.php
 
 		-
@@ -10647,6 +11835,18 @@ parameters:
 		-
 			message: '#^Cannot call method newInstance\(\) on string\|false\.$#'
 			identifier: method.nonObject
+			count: 1
+			path: src/Repositories/Repository.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Repositories\\Repository\:\:findNewConnectorRepository\(\) should return Unusualify\\Modularous\\Services\\Connector but returns Unusualify\\Modularous\\Services\\Repository\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Repositories/Repository.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Repositories\\Repository\:\:firstOrCreate\(\) should return Unusualify\\Modularous\\Entities\\Model but returns Illuminate\\Database\\Eloquent\\Model\.$#'
+			identifier: return.type
 			count: 1
 			path: src/Repositories/Repository.php
 
@@ -10741,14 +11941,38 @@ parameters:
 			path: src/Services/Connector.php
 
 		-
+			message: '#^Method Unusualify\\Modularous\\Services\\Connector\:\:getModel\(\) should return Unusualify\\Modularous\\Services\\Model but returns Illuminate\\Database\\Eloquent\\Model\|string\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Services/Connector.php
+
+		-
 			message: '#^Method Unusualify\\Modularous\\Services\\Connector\:\:getRepository\(\) has invalid return type Unusualify\\Modularous\\Services\\Repository\.$#'
 			identifier: class.notFound
 			count: 1
 			path: src/Services/Connector.php
 
 		-
+			message: '#^Method Unusualify\\Modularous\\Services\\Connector\:\:getRepository\(\) should return Unusualify\\Modularous\\Services\\Repository but returns string\|Unusualify\\Modularous\\Repositories\\Repository\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Services/Connector.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Services\\Connector\:\:parseConnector\(\) should return array but returns string\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Services/Connector.php
+
+		-
 			message: '#^Method Unusualify\\Modularous\\Services\\Connector\:\:unshiftEvent\(\) should return array but return statement is missing\.$#'
 			identifier: return.missing
+			count: 1
+			path: src/Services/Connector.php
+
+		-
+			message: '#^Property Unusualify\\Modularous\\Services\\Connector\:\:\$target \(Unusualify\\Modularous\\Services\\Class\) does not accept Unusualify\\Modularous\\Module\.$#'
+			identifier: assign.propertyType
 			count: 1
 			path: src/Services/Connector.php
 
@@ -10775,6 +11999,12 @@ parameters:
 			identifier: arguments.count
 			count: 2
 			path: src/Services/CurrencyExchangeService.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Services\\FileTranslation\:\:saveGroupTranslations\(\) with return type void returns null but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: src/Services/FileTranslation.php
 
 		-
 			message: '#^Result of method Unusualify\\Modularous\\Services\\FileTranslation\:\:saveNamespacedGroupTranslations\(\) \(void\) is used\.$#'
@@ -10825,6 +12055,12 @@ parameters:
 			path: src/Services/FilepondManager.php
 
 		-
+			message: '#^Method Unusualify\\Modularous\\Services\\FilepondManager\:\:getStorageFile\(\) should return string but returns null\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Services/FilepondManager.php
+
+		-
 			message: '#^PHPDoc tag @param references unknown parameter\: \$filepond$#'
 			identifier: parameter.notFound
 			count: 1
@@ -10853,6 +12089,12 @@ parameters:
 			identifier: variable.undefined
 			count: 1
 			path: src/Services/FilepondManager.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Services\\MediaLibrary\\Glide\:\:getOriginalMediaUrl\(\) should return string but returns null\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Services/MediaLibrary/Glide.php
 
 		-
 			message: '#^Call to method url\(\) on an unknown class Unusualify\\Modularous\\Services\\MediaLibrary\\FilesystemAdapter\.$#'
@@ -10887,6 +12129,12 @@ parameters:
 		-
 			message: '#^Anonymous function has an unused use \$count\.$#'
 			identifier: closure.unusedUse
+			count: 2
+			path: src/Services/ModularousCacheService.php
+
+		-
+			message: '#^Argument of an invalid type string supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
 			count: 2
 			path: src/Services/ModularousCacheService.php
 
@@ -10959,6 +12207,12 @@ parameters:
 		-
 			message: '#^Method Unusualify\\Modularous\\Http\\Controllers\\BaseController\:\:handleFilterCount\(\) invoked with 2 parameters, 1 required\.$#'
 			identifier: arguments.count
+			count: 2
+			path: src/Services/ModularousCacheService.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Services\\ModularousCacheService\:\:warmupControllerCounts\(\) should return bool but empty return statement found\.$#'
+			identifier: return.empty
 			count: 2
 			path: src/Services/ModularousCacheService.php
 
@@ -11197,6 +12451,12 @@ parameters:
 			path: src/Services/Security/StepUpService.php
 
 		-
+			message: '#^Method Unusualify\\Modularous\\Services\\Security\\StepUpService\:\:verify\(\) should return Illuminate\\Http\\JsonResponse\|Illuminate\\Http\\RedirectResponse but returns Illuminate\\Http\\Response\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Services/Security/StepUpService.php
+
+		-
 			message: '#^Call to an undefined static method TModel of Illuminate\\Database\\Eloquent\\Model\:\:single\(\)\.$#'
 			identifier: staticMethod.notFound
 			count: 2
@@ -11269,6 +12529,12 @@ parameters:
 			path: src/Services/Uploader/SignAzureUpload.php
 
 		-
+			message: '#^Property Unusualify\\Modularous\\Services\\Uploader\\SignAzureUpload\:\:\$blobSharedAccessSignatureHelper \(Illuminate\\Config\\Repository\) does not accept MicrosoftAzure\\Storage\\Blob\\BlobSharedAccessSignatureHelper\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Services/Uploader/SignAzureUpload.php
+
+		-
 			message: '#^Variable \$credentialCondition might not be defined\.$#'
 			identifier: variable.undefined
 			count: 1
@@ -11313,6 +12579,18 @@ parameters:
 		-
 			message: '#^Method Unusualify\\Modularous\\Services\\View\\UComponent\:\:__callStatic\(\) should return Unusualify\\Modularous\\Services\\View\\UComponent but return statement is missing\.$#'
 			identifier: return.missing
+			count: 1
+			path: src/Services/View/UComponent.php
+
+		-
+			message: '#^PHPDoc type array of property Unusualify\\Modularous\\Services\\View\\UComponent\:\:\$attributes is not covariant with PHPDoc type Illuminate\\View\\ComponentAttributeBag of overridden property Illuminate\\View\\Component\:\:\$attributes\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: src/Services/View/UComponent.php
+
+		-
+			message: '#^Return type \(array\) of method Unusualify\\Modularous\\Services\\View\\UComponent\:\:render\(\) should be compatible with return type \(Closure\|Illuminate\\Contracts\\Support\\Htmlable\|Illuminate\\Contracts\\View\\View\|string\) of method Illuminate\\View\\Component\:\:render\(\)$#'
+			identifier: method.childReturnType
 			count: 1
 			path: src/Services/View/UComponent.php
 
@@ -11365,6 +12643,30 @@ parameters:
 			path: src/Services/View/UWrapper.php
 
 		-
+			message: '#^Method Unusualify\\Modularous\\Support\\Decomposers\\ModelRelationParser\:\:generateRelationshipArgument\(\) should return array but returns string\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Support/Decomposers/ModelRelationParser.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Support\\Decomposers\\ModelRelationParser\:\:getRelatedMethodName\(\) should return string but returns array\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Support/Decomposers/ModelRelationParser.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Support\\Decomposers\\ModelRelationParser\:\:getRelationshipArguments\(\) should return array but returns false\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Support/Decomposers/ModelRelationParser.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Support\\Decomposers\\ModelRelationParser\:\:render\(\) should return string but returns list\<string\>\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Support/Decomposers/ModelRelationParser.php
+
+		-
 			message: '#^PHPDoc tag @param references unknown parameter\: \$index$#'
 			identifier: parameter.notFound
 			count: 1
@@ -11399,6 +12701,24 @@ parameters:
 			identifier: phpDoc.parseError
 			count: 1
 			path: src/Support/Decomposers/ModelRelationParser.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Support\\Decomposers\\SchemaParser\:\:generateRelationshipArgument\(\) should return array but returns string\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Support/Decomposers/SchemaParser.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Support\\Decomposers\\SchemaParser\:\:getRelatedMethodName\(\) should return string but returns array\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Support/Decomposers/SchemaParser.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\Support\\Decomposers\\SchemaParser\:\:getRelationshipArguments\(\) should return array but returns false\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Support/Decomposers/SchemaParser.php
 
 		-
 			message: '#^PHPDoc tag @param for parameter \$column with type mixed is not subtype of native type string\.$#'
@@ -11451,12 +12771,6 @@ parameters:
 		-
 			message: '#^PHPDoc tag @param references unknown parameter\: \$schema$#'
 			identifier: parameter.notFound
-			count: 1
-			path: src/Support/Decomposers/ValidatorParser.php
-
-		-
-			message: '#^Result of method Unusualify\\Modularous\\Support\\Decomposers\\ValidatorParser\:\:parse\(\) \(void\) is used\.$#'
-			identifier: method.void
 			count: 1
 			path: src/Support/Decomposers/ValidatorParser.php
 
@@ -11545,6 +12859,18 @@ parameters:
 			path: src/View/Component.php
 
 		-
+			message: '#^PHPDoc type array of property Unusualify\\Modularous\\View\\Component\:\:\$attributes is not covariant with PHPDoc type Illuminate\\View\\ComponentAttributeBag of overridden property Illuminate\\View\\Component\:\:\$attributes\.$#'
+			identifier: property.phpDocType
+			count: 1
+			path: src/View/Component.php
+
+		-
+			message: '#^Return type \(array\) of method Unusualify\\Modularous\\View\\Component\:\:render\(\) should be compatible with return type \(Closure\|Illuminate\\Contracts\\Support\\Htmlable\|Illuminate\\Contracts\\View\\View\|string\) of method Illuminate\\View\\Component\:\:render\(\)$#'
+			identifier: method.childReturnType
+			count: 1
+			path: src/View/Component.php
+
+		-
 			message: '#^Unsafe usage of new static\(\)\.$#'
 			identifier: new.static
 			count: 3
@@ -11555,6 +12881,12 @@ parameters:
 			identifier: empty.variable
 			count: 1
 			path: src/View/Component.php
+
+		-
+			message: '#^Method Unusualify\\Modularous\\View\\ModularousWidget\:\:fromWidgetTemplate\(\) should return static\(Unusualify\\Modularous\\View\\ModularousWidget\) but returns Unusualify\\Modularous\\View\\Component\.$#'
+			identifier: return.type
+			count: 1
+			path: src/View/ModularousWidget.php
 
 		-
 			message: '#^PHPDoc tag @param references unknown parameter\: \$name$#'

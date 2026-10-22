@@ -183,7 +183,6 @@ abstract class CoreController extends LaravelController implements ModuleableInt
      * getRepositoryClass
      *
      * @param mixed $model
-     * @return void
      */
     public function getRepositoryClass($model)
     {

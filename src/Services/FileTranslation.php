@@ -279,7 +279,6 @@ class FileTranslation extends File
      * @param string $language
      * @param string $group
      * @param array $translations
-     * @return void
      */
     public function saveGroupTranslations($language, $group, $translations)
     {

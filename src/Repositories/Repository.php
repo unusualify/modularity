@@ -37,7 +37,7 @@ abstract class Repository implements CacheableInterface, ModuleableInterface, Re
         Logic\ResourceCacheActionsTrait;
 
     /**
-     * @var Model
+     * @var \Illuminate\Database\Eloquent\Model
      */
     protected $model;
 
@@ -285,7 +285,6 @@ abstract class Repository implements CacheableInterface, ModuleableInterface, Re
 
     /**
      * @param array $ids
-     * @return void
      */
     public function setNewOrder($ids)
     {

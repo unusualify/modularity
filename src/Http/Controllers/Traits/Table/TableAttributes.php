@@ -33,8 +33,6 @@ trait TableAttributes
 
     /**
      * getTableOptions
-     *
-     * @return void
      */
     public function getTableAttributes()
     {
@@ -68,8 +66,6 @@ trait TableAttributes
 
     /**
      * Hydrate the table attributes
-     *
-     * @return void
      */
     protected function hydrateTableAttributes()
     {
@@ -110,7 +106,6 @@ trait TableAttributes
      * Set the table attributes
      *
      * @param array $tableOptions
-     * @return void
      */
     protected function setTableAttributes($tableOptions = null)
     {

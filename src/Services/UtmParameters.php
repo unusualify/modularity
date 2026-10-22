@@ -170,7 +170,6 @@ class UtmParameters
      * Merge UTM parameters
      *
      * @param array $data
-     * @return void
      */
     public function mergeParameters($data = [])
     {

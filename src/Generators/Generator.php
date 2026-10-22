@@ -319,8 +319,6 @@ abstract class Generator extends NwidartGenerator
 
     /**
      * Get Path to be written
-     *
-     * @return void
      */
     public function getTargetPath()
     {

@@ -78,7 +78,7 @@ class CacheListCommand extends Command
         }
 
         $cacheDir = $store->getDirectory();
-        $this->limit = $this->option('limit');
+        $this->limit = (int) $this->option('limit');
 
         $this->scanDirectory($cacheDir);
 

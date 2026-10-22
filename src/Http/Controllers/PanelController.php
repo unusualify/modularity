@@ -493,8 +493,6 @@ abstract class PanelController extends CoreController implements CacheableInterf
 
     /**
      * getFormRequestClass
-     *
-     * @return void
      */
     public function getFormRequestClass($schema = null)
     {
